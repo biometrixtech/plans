@@ -1,7 +1,7 @@
 from serialisable import Serialisable
 from fathomapi.utils.exceptions import InvalidSchemaException
 from logic.soreness_processing import SorenessCalculator
-from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData
+from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, InsightCategory
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.data_series import DataSeries
 from models.historic_soreness import HistoricSeverity, HistoricSoreness
@@ -575,7 +575,7 @@ class AthleteStats(Serialisable):
         athlete_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         athlete_stats.triggers = [Trigger.json_deserialise(trigger) for trigger in input_dict.get('triggers', [])]
         athlete_stats.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
-        athlete_stats.insight_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in
+        athlete_stats.insight_categories = [InsightCategory.json_deserialise(trend_category) for trend_category in
                                           input_dict.get('insight_categories', [])]
         athlete_stats.api_version = input_dict.get('api_version', '4_3')
         athlete_stats.timezone = input_dict.get('timezone', '-04:00')

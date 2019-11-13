@@ -1,5 +1,5 @@
 from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, TrendCategory, TrendData, \
-    FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
+    FirstTimeExperienceElement, CategoryFirstTimeExperienceModal, InsightCategory
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
 from models.chart_data import Prevention3sChartData, RecoveryChartData, CareChartData
@@ -42,10 +42,17 @@ class TrendProcessor(object):
 
         care_index = next((i for i, x in enumerate(self.athlete_trend_categories) if InsightType.care == x.insight_type), -1)
 
+        care_insight_index = next(
+            (i for i, x in enumerate(self.athlete_insight_categories) if InsightType.care == x.insight_type), -1)
+
         if care_index == -1:
             care_category = self.create_care_category()
-            care_insight_category = deepcopy(care_category)
             self.athlete_trend_categories.append(care_category)
+        else:
+            self.remove_old_trends(care_index, VisualizationType.care_today)
+
+        if care_insight_index == -1:
+            care_insight_category = self.create_insight_care_category()
             self.athlete_insight_categories.append(care_insight_category)
         else:
             self.remove_old_trends(care_index, VisualizationType.care_today)
@@ -53,10 +60,17 @@ class TrendProcessor(object):
         prevention_index = next(
             (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.prevention == x.insight_type), -1)
 
+        prevention_insight_index = next(
+            (i for i, x in enumerate(self.athlete_insight_categories) if InsightType.prevention == x.insight_type), -1)
+
         if prevention_index == -1:
             prevention_category = self.create_prevention_category()
-            prevention_insight_category = deepcopy(prevention_category)
             self.athlete_trend_categories.append(prevention_category)
+        else:
+            self.remove_old_trends(prevention_index, VisualizationType.prevention)
+
+        if prevention_insight_index == -1:
+            prevention_insight_category = self.create_insight_prevention_category()
             self.athlete_insight_categories.append(prevention_insight_category)
         else:
             self.remove_old_trends(prevention_index, VisualizationType.prevention)
@@ -64,10 +78,18 @@ class TrendProcessor(object):
         recovery_index = next(
             (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.personalized_recovery == x.insight_type), -1)
 
+        recovery_insight_index = next(
+            (i for i, x in enumerate(self.athlete_insight_categories) if
+             InsightType.personalized_recovery == x.insight_type), -1)
+
         if recovery_index == -1:
             personalized_recovery_category = self.create_personalized_recovery_category()
-            recovery_insight_category = deepcopy(personalized_recovery_category)
             self.athlete_trend_categories.append(personalized_recovery_category)
+        else:
+            self.remove_old_trends(recovery_index, VisualizationType.personalized_recovery)
+
+        if recovery_insight_index == -1:
+            recovery_insight_category = self.create_insight_recovery_category()
             self.athlete_insight_categories.append(recovery_insight_category)
         else:
             self.remove_old_trends(recovery_index, VisualizationType.personalized_recovery)
@@ -160,7 +182,12 @@ class TrendProcessor(object):
         category_index = next((i for i, x in enumerate(self.athlete_insight_categories) if
                                x.insight_type == insight_type), -1)
         if category_index == -1:
-            trend_category = self.create_personalized_recovery_category()
+            if insight_type == InsightType.care:
+                trend_category = self.create_insight_care_category()
+            elif insight_type == InsightType.personalized_recovery:
+                trend_category = self.create_insight_recovery_category()
+            else:
+                trend_category = self.create_insight_prevention_category()
             self.athlete_insight_categories.append(trend_category)
             category_index = len(self.athlete_insight_categories) - 1
         return category_index
@@ -172,8 +199,6 @@ class TrendProcessor(object):
 
         muscle_trend = self.create_personalized_recovery_trend()
         trend_category.trends.append(muscle_trend)
-
-        trend_category.trend_data = Insight()
 
         modal = CategoryFirstTimeExperienceModal()
         modal.title = "Personalized Recovery - FTE"
@@ -192,6 +217,37 @@ class TrendProcessor(object):
 
         return trend_category
 
+    def create_insight_recovery_category(self):
+
+        insight_category = InsightCategory(InsightType.personalized_recovery)
+        insight_category.title = "Searching for Recovery Insights"
+        insight_category.icon = "recovery.png"
+        insight_category.image = "recovery-FTE-empty.png"
+        insight_category.context_sensors_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
+        insight_category.context_sensors_not_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
+        insight_category.cta = "Log Training"
+
+        insight_category.first_time_experience = True
+
+        insight_category.trend_data = Insight()
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Personalized Recovery - FTE"
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
+        element_1 = FirstTimeExperienceElement()
+        element_1.title = "Tissue Under\n& Over Activity"
+        element_1.image = "view1icon.png"
+
+        modal.categories.append(element_1)
+
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
+
+        insight_category.first_time_experience_modal = modal
+
+        return insight_category
+
     def create_prevention_category(self):
         trend_category = TrendCategory(InsightType.prevention)
         trend_category.title = "Prevention"
@@ -199,8 +255,6 @@ class TrendProcessor(object):
 
         limitation_trend = self.create_prevention_trend()
         trend_category.trends.append(limitation_trend)
-
-        trend_category.trend_data = Insight()
 
         modal = CategoryFirstTimeExperienceModal()
         modal.title = "Prevention - FTE"
@@ -220,6 +274,38 @@ class TrendProcessor(object):
 
         return trend_category
 
+    def create_insight_prevention_category(self):
+
+        insight_category = InsightCategory(InsightType.prevention)
+        insight_category.title = "Searching for Prevention Insights"
+        insight_category.icon = "prevention.png"
+        insight_category.image = "prevention-FTE-empty.png"
+        insight_category.context_sensors_enabled = "Wear your PRO sensors and log your symptoms regularly to identify and correct underlying imbalances, dysfunctions, and other injury risk factors. It typically takes 1 to 3 weeks to derive prevention needs."
+        insight_category.context_sensors_not_enabled = "Upgrade to Fathom PRO- our advanced, wearable biomechanics tracking system- to begin identifying and correcting imbalances and dysfunctions which lead to chronic injury."
+        insight_category.cta = ""
+
+        insight_category.first_time_experience = True
+
+        insight_category.trend_data = Insight()
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Prevention - FTE"
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
+
+        element_2 = FirstTimeExperienceElement()
+        element_2.title = "Functional\nLimitations"
+        element_2.image = "view3icon.png"
+
+        modal.categories.append(element_2)
+
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
+
+        insight_category.first_time_experience_modal = modal
+
+        return insight_category
+
     def create_care_category(self):
         trend_category = TrendCategory(InsightType.care)
         trend_category.title = "Care"
@@ -227,8 +313,6 @@ class TrendProcessor(object):
 
         daily_trend = self.create_care_trend()
         trend_category.trends.append(daily_trend)
-
-        trend_category.trend_data = Insight()
 
         modal = CategoryFirstTimeExperienceModal()
         modal.title = "Care - FTE"
@@ -247,6 +331,37 @@ class TrendProcessor(object):
         trend_category.first_time_experience_modal = modal
 
         return trend_category
+
+    def create_insight_care_category(self):
+
+        insight_category = InsightCategory(InsightType.care)
+        insight_category.title = "Searching for Care Insights"
+        insight_category.icon = "care.png"
+        insight_category.image = "care-FTE-empty.png"
+        insight_category.context_sensors_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
+        insight_category.context_sensors_not_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
+        insight_category.cta = "Log Symptoms"
+        insight_category.first_time_experience = True
+
+        insight_category.trend_data = Insight()
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Care - FTE"
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
+
+        element_2 = FirstTimeExperienceElement()
+        element_2.title = "Functional\nLimitations"
+        element_2.image = "view3icon.png"
+
+        modal.categories.append(element_2)
+
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
+
+        insight_category.first_time_experience_modal = modal
+
+        return insight_category
 
     def create_care_trend(self):
         daily_trend = Trend(TriggerType.sore_today)
@@ -654,6 +769,12 @@ class TrendProcessor(object):
             inflamed_data = self.get_inflamed_insight_data(inflamed_high, inflamed_low, inflamed_mod)
             tight_data = self.get_tight_insight_data(muscle_spasm, knots)
 
+            body_parts = []
+            body_parts.extend(inflamed_data.body_parts)
+            body_parts.extend(tight_data.body_parts)
+            body_parts = list(set(body_parts))
+            insight_category.trend_data.body_parts = body_parts
+
             insight_category.trend_data.data = []
             insight_category.trend_data.data.append(inflamed_data)
             insight_category.trend_data.data.append(tight_data)
@@ -713,6 +834,15 @@ class TrendProcessor(object):
         low_plot_legend = PlotLegend(LegendColor.error_xx_light, 'Low', 0)
         mod_plot_legend = PlotLegend(LegendColor.error_x_light, 'Mod', 1)
         high_plot_legend = PlotLegend(LegendColor.error_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(inflamed_high)
+        body_parts.extend(inflamed_low)
+        body_parts.extend(inflamed_mod)
+
+        body_parts = list(set(body_parts))
+        inflamed_data.body_parts = body_parts
+
         inflamed_viz_data = InsightVisualizationData()
         inflamed_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
         inflamed_data.visualization_data.append(inflamed_viz_data)
@@ -770,6 +900,14 @@ class TrendProcessor(object):
         low_plot_legend = PlotLegend(LegendColor.warning_xx_light, 'Low', 0)
         mod_plot_legend = PlotLegend(LegendColor.warning_x_light, 'Mod', 1)
         high_plot_legend = PlotLegend(LegendColor.warning_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(tight_spasm)
+        body_parts.extend(tight_adhesions)
+
+        body_parts = list(set(body_parts))
+        tight_data.body_parts = body_parts
+
         tight_viz_data = InsightVisualizationData()
         tight_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
         tight_data.visualization_data.append(tight_viz_data)
@@ -933,11 +1071,17 @@ class TrendProcessor(object):
             movement_dysfunction = [k for k in movement_dysfunction if k in compensating_list]
 
             compensating_data = self.get_compensating_insight_data(movement_dysfunction, compensating)
-            tight_data = self.get_training_stress_insight_data(high_stress, low_stress, mod_stress)
+            training_data = self.get_training_stress_insight_data(high_stress, low_stress, mod_stress)
+
+            body_parts = []
+            body_parts.extend(compensating_data.body_parts)
+            body_parts.extend(training_data.body_parts)
+            body_parts = list(set(body_parts))
+            insight_category.trend_data.body_parts = body_parts
 
             insight_category.trend_data.data = []
             insight_category.trend_data.data.append(compensating_data)
-            insight_category.trend_data.data.append(tight_data)
+            insight_category.trend_data.data.append(training_data)
 
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.recovery
@@ -992,6 +1136,14 @@ class TrendProcessor(object):
         low_plot_legend = PlotLegend(LegendColor.splash_x_light, 'Low', 0)
         mod_plot_legend = PlotLegend(LegendColor.splash_m_light, 'Mod', 1)
         high_plot_legend = PlotLegend(LegendColor.splash_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(movement_dysfunction)
+        body_parts.extend(compensating)
+
+        body_parts = list(set(body_parts))
+        compensating_data.body_parts = body_parts
+
         compensating_viz_data = InsightVisualizationData()
         compensating_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
         compensating_data.visualization_data.append(compensating_viz_data)
@@ -1039,6 +1191,15 @@ class TrendProcessor(object):
         low_plot_legend = PlotLegend(LegendColor.success_xx_light, 'Low', 0)
         mod_plot_legend = PlotLegend(LegendColor.success_x_light, 'Mod', 1)
         high_plot_legend = PlotLegend(LegendColor.success_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(stress_high)
+        body_parts.extend(stress_low)
+        body_parts.extend(stress_mod)
+
+        body_parts = list(set(body_parts))
+        stress_data.body_parts = body_parts
+
         stress_viz_data = InsightVisualizationData()
         stress_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
         stress_data.visualization_data.append(stress_viz_data)
@@ -1224,6 +1385,12 @@ class TrendProcessor(object):
             limited_mobility_data = self.get_limited_mobility_insight_data(short, joint_artho, tendin, overactive, limited_mobility_2, limited_mobility_3)
             underactive_weak_data = self.get_underactive_insight_data(underactive_weak, underactive_inhibited, underactive_weak_2, underactive_weak_3)
 
+            body_parts = []
+            body_parts.extend(limited_mobility_data.body_parts)
+            body_parts.extend(underactive_weak_data.body_parts)
+            body_parts = list(set(body_parts))
+            insight_category.trend_data.body_parts = body_parts
+
             insight_category.trend_data.data = []
             insight_category.trend_data.data.append(limited_mobility_data)
             insight_category.trend_data.data.append(underactive_weak_data)
@@ -1313,6 +1480,18 @@ class TrendProcessor(object):
         low_plot_legend = PlotLegend(LegendColor.warning_xx_light, 'Low', 0)
         mod_plot_legend = PlotLegend(LegendColor.warning_x_light, 'Mod', 1)
         high_plot_legend = PlotLegend(LegendColor.warning_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(short)
+        body_parts.extend(joint_artho)
+        body_parts.extend(tendin)
+        body_parts.extend(overactive)
+        body_parts.extend(limited_mobility_2)
+        body_parts.extend(limited_mobility_3)
+
+        body_parts = list(set(body_parts))
+        limited_mobility_data.body_parts = body_parts
+
         limited_mobility_viz_data = InsightVisualizationData()
         limited_mobility_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
         limited_mobility_data.visualization_data.append(limited_mobility_viz_data)
@@ -1403,6 +1582,16 @@ class TrendProcessor(object):
         low_plot_legend = PlotLegend(LegendColor.splash_x_light, 'Low', 0)
         mod_plot_legend = PlotLegend(LegendColor.splash_m_light, 'Mod', 1)
         high_plot_legend = PlotLegend(LegendColor.splash_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(underactive_weak)
+        body_parts.extend(underactive_inhibited)
+        body_parts.extend(underactive_weak_2)
+        body_parts.extend(underactive_weak_3)
+
+        body_parts = list(set(body_parts))
+        underactive_data.body_parts = body_parts
+
         underactive_viz_data = InsightVisualizationData()
         underactive_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
         underactive_data.visualization_data.append(underactive_viz_data)

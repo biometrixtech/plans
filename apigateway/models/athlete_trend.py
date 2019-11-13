@@ -436,7 +436,7 @@ class TrendCategory(Serialisable):
         # self.alerts = []
         self.title = ""
         self.trends = []
-        self.trend_data = None  # new insights structure - will contain an Insight object which has a collection of InisightData for each data series in legend
+        #self.trend_data = None  # new insights structure - will contain an Insight object which has a collection of InisightData for each data series in legend
         self.plan_alerts = []
         self.visible = False
         self.first_time_experience = False
@@ -454,7 +454,7 @@ class TrendCategory(Serialisable):
             'title': self.title,
             # 'alerts': [alert.json_serialise() for alert in self.alerts],
             'trends': [trend.json_serialise() for trend in self.trends],
-            'trend_data': self.trend_data.json_serialise() if self.trend_data is not None else None,
+            #'trend_data': self.trend_data.json_serialise() if self.trend_data is not None else None,
             'plan_alerts': plan_alerts,
             'visible': self.visible,
             'first_time_experience': self.first_time_experience,
@@ -470,7 +470,7 @@ class TrendCategory(Serialisable):
         # trend_category.alerts = [Trend.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
         trend_category.title = input_dict.get('title', "")
         trend_category.trends = [Trend.json_deserialise(trend) for trend in input_dict.get('trends', [])]
-        trend_category.trend_data = Insight.json_deserialise(input_dict['trend_data']) if input_dict.get('trend_data') is not None else None
+        #trend_category.trend_data = Insight.json_deserialise(input_dict['trend_data']) if input_dict.get('trend_data') is not None else None
         trend_category.plan_alerts = [PlanAlert.json_deserialise(alert) for alert in input_dict.get('plan_alerts', [])]
         trend_category.visible = input_dict.get('visible', False)
         trend_category.first_time_experience = input_dict.get('first_time_experience', False)
@@ -519,6 +519,52 @@ class TrendCategory(Serialisable):
 
     # def remove_not_present_in_trends_page(self):
     #     self.alerts = [alert for alert in self.alerts if alert.present_in_trends]
+
+
+class InsightCategory(Serialisable):
+    def __init__(self, insight_type):
+        self.insight_type = insight_type
+        self.title = ""
+        self.trend_data = None
+        self.visible = False
+        self.first_time_experience = False
+        self.first_time_experience_modal = None
+        self.icon = ""
+        self.image = ""
+        self.context_sensors_enabled = ""
+        self.context_sensors_not_enabled = ""
+        self.cta = ""
+
+    def json_serialise(self):
+        ret = {
+            'insight_type': self.insight_type.value,
+            'title': self.title,
+            'trend_data': self.trend_data.json_serialise() if self.trend_data is not None else None,
+            'visible': self.visible,
+            'first_time_experience': self.first_time_experience,
+            'first_time_experience_modal': self.first_time_experience_modal.json_serialise() if self.first_time_experience_modal is not None else None,
+            'icon': self.icon,
+            'image': self.image,
+            'context_sensors_enabled': self.context_sensors_enabled,
+            'context_sensors_not_enabled': self.context_sensors_not_enabled,
+            'cta': self.cta
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        insight_category = cls(InsightType(input_dict['insight_type']))
+        insight_category.title = input_dict.get('title', "")
+        insight_category.trend_data = Insight.json_deserialise(input_dict['trend_data']) if input_dict.get('trend_data') is not None else None
+        insight_category.visible = input_dict.get('visible', False)
+        insight_category.first_time_experience = input_dict.get('first_time_experience', False)
+        insight_category.first_time_experience_modal = CategoryFirstTimeExperienceModal.json_deserialise(input_dict['first_time_experience_modal']) if input_dict.get('first_time_experience_modal') is not None else None
+        insight_category.icon = input_dict.get('icon','')
+        insight_category.image = input_dict.get('image', '')
+        insight_category.context_sensors_enabled = input_dict.get('context_sensors_enabled', '')
+        insight_category.context_sensors_not_enabled = input_dict.get('context_sensors_not_enabled', '')
+        insight_category.cta = input_dict.get('cta', '')
+        return insight_category
 
 
 class DataStatus(object):
@@ -725,7 +771,7 @@ class AthleteTrends(object):
         trends.body_response = TrendData.json_deserialise(input_dict['body_response']) if input_dict.get('body_response', None) is not None else None
         trends.workload = TrendData.json_deserialise(input_dict['workload']) if input_dict.get('workload', None) is not None else None
         trends.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
-        trends.insight_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in
+        trends.insight_categories = [InsightCategory.json_deserialise(trend_category) for trend_category in
                                    input_dict.get('insight_categories', [])]
         trends.biomechanics_apt = BiomechanicsAPTChart.json_deserialise(
             input_dict['biomechanics_apt']) if input_dict.get('biomechanics_apt', None) is not None else None
