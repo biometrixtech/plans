@@ -710,7 +710,7 @@ class BodyPartFactory(object):
 
     def get_deep_rotators_hip(self, sample=True):
 
-        hip_flexor = BodyPart(BodyPartLocation.hip_flexor, 2)
+        hip_flexor = BodyPart(BodyPartLocation.deep_rotators_hip, 2)
 
         if sample:
             inhibit = self.get_exercise_dictionary([54])

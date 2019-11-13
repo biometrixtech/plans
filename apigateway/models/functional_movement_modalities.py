@@ -333,7 +333,7 @@ class ModalityBase(object):
         for b in range(0, len(benchmarks) - 1):
             total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
             proposed_efficient = total_efficient + self.dosage_durations[benchmarks[b + 1]].efficient_duration
-            if proposed_efficient < 720:
+            if proposed_efficient < 720 and b < (len(benchmarks) - 2):
                 continue
             elif abs(total_efficient - 720) < abs(proposed_efficient - 720):
                 self.efficient_winner = benchmarks[b]
