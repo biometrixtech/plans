@@ -786,8 +786,10 @@ class TrendProcessor(object):
 
             if not inflamed_data.active and not tight_data.active:
                 insight_category.active = False
+                insight_category.trend_data.active = False
             else:
                 insight_category.active = True
+                insight_category.trend_data.active = True
 
             body_parts = []
             body_parts.extend(inflamed_data.body_parts)
@@ -893,7 +895,7 @@ class TrendProcessor(object):
             mod_trigger_tile.body_parts = inflamed_mod
             title_text = "Moderate Inflammation"
             mod_trigger_tile.title = title_text
-            mod_trigger_tile.text = "These tissues have signs of inflammation and shortening which can restrict mobility and alter muscle activation. This leads to movement compensations in training which elevate injury risk and recovery need."
+            mod_trigger_tile.text = "These tissues have signs of inflammation which can restrict mobility and alter muscle activation. This leads to movement compensations in training which elevate injury risk and recovery need."
             bold_1 = BoldText()
             bold_1.text = title_text
             bold_1.color = LegendColor.error_light
@@ -1097,8 +1099,10 @@ class TrendProcessor(object):
 
             if not compensating_data.active and not training_data.active:
                 insight_category.active = False
+                insight_category.trend_data.active = False
             else:
                 insight_category.active = True
+                insight_category.trend_data.active = True
 
             body_parts = []
             body_parts.extend(compensating_data.body_parts)
@@ -1416,8 +1420,10 @@ class TrendProcessor(object):
 
             if not limited_mobility_data.active and not underactive_weak_data.active:
                 insight_category.active = False
+                insight_category.trend_data.active = False
             else:
                 insight_category.active = True
+                insight_category.trend_data.active = True
 
             body_parts = []
             body_parts.extend(limited_mobility_data.body_parts)
@@ -1600,7 +1606,7 @@ class TrendProcessor(object):
             low_trigger_tile.body_parts = limited_mobility_3
             title_text = "Monitoring for Overactivity"
             low_trigger_tile.title = title_text
-            low_trigger_tile.text = "We see early signs that some of these mucles may be over-activating, thereby altering your movement and leading to a possible movement dysfunction which may increase your injury risk. We'll keep monitoring this and will refine our estimates as we learn more."
+            low_trigger_tile.text = "We see early signs that some of these muscles may be over-activating, thereby altering your movement and leading to a possible movement dysfunction which may increase your injury risk. We'll keep monitoring this and will refine our estimates as we learn more."
             bold_1 = BoldText()
             bold_1.text = title_text
             bold_1.color = LegendColor.warning_light
@@ -1657,7 +1663,7 @@ class TrendProcessor(object):
             mod_trigger_tile.body_parts = underactive_inhibited
             title_text = "Underactive Muscle(s)"
             mod_trigger_tile.title = title_text
-            mod_trigger_tile.text = "Your movement data indicates these muscles are likely under-activating and contributing to a dysfuntion which reduces movement efficiency and elevates injury risk. Your prevention activities will encourage proper muscle activation."
+            mod_trigger_tile.text = "Your movement data indicates these muscles are likely under-activating and contributing to a dysfunction which reduces movement efficiency and elevates injury risk. Your prevention activities will encourage proper muscle activation."
             bold_1 = BoldText()
             bold_1.text = title_text
             bold_1.color = LegendColor.splash_light
@@ -1668,7 +1674,7 @@ class TrendProcessor(object):
             low_trigger_tile.body_parts = underactive_weak_2
             title_text = "Possible Underactivity"
             low_trigger_tile.title = title_text
-            low_trigger_tile.text = "We're starting to see a pattern of movement dysfunction emerge which points to under-activation in these muscles. We'll provide a few prevention excersices to engourage proper activation and will continue to refine our estimates."
+            low_trigger_tile.text = "We're starting to see a pattern of movement dysfunction emerge which points to under-activation in these muscles. We'll provide a few prevention excerciss to encourage proper activation and will continue to refine our estimates."
             bold_1 = BoldText()
             bold_1.text = title_text
             bold_1.color = LegendColor.splash_light
@@ -1679,7 +1685,7 @@ class TrendProcessor(object):
             low_trigger_tile.body_parts = underactive_weak_3
             title_text = "Monitoring for Underactivity"
             low_trigger_tile.title = title_text
-            low_trigger_tile.text = "We see early signs that some of these mucles may be under-activating relative to their counterparts, thereby contributing to a possible movement dysfunction. We'll keep monitoring this and will refine our estimates as we learn more. "
+            low_trigger_tile.text = "We see early signs that some of these muscles may be under-activating relative to their counterparts, thereby contributing to a possible movement dysfunction. We'll keep monitoring this and will refine our estimates as we learn more. "
             bold_1 = BoldText()
             bold_1.text = title_text
             bold_1.color = LegendColor.splash_light
