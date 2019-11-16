@@ -834,6 +834,15 @@ class BodyPartInjuryRisk(object):
 
         return max_severity
 
+    def get_knots_severity(self, base_date):
+
+        max_severity = 0
+
+        if self.test_date(self.last_knots_date, base_date):
+            max_severity = max(max_severity, self.last_knots_level)
+
+        return max_severity
+
     def get_muscle_spasm_severity(self, base_date):
 
         max_severity = 0
