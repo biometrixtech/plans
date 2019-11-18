@@ -59,14 +59,19 @@ def handle_daily_plan_get(user_id=None):
                         if session.asymmetry is not None and session.last_updated is not None and session.last_updated > parse_datetime(plan.last_updated):
                             need_plan_update = True
                             break
-                # check if plan update is required because of swtich from pre 4_6 to 4_6 and beyond
-                viz_types = set()
-                if plan.trends is not None and plan.trends.trend_categories is not None:
-                    for tc in plan.trends.trend_categories:
-                        viz_types.update([trend.visualization_type.value for trend in tc.trends])
-                if not ({12, 13, 14} & viz_types):  # new viz types are not present, update hist and create plan
+                # check if plan update is required because of switch from pre 4_6 to 4_6 and beyond
+                if plan.trends is not None and plan.trends.insight_categories is not None and\
+                        len(plan.trends.insight_categories) == 0:  #  insight_categories is only present in 4_6 and beyond and will be empty if last plan was generated on 4_5 and earlier
                     hist_update = True
                     need_plan_update = True
+
+                # viz_types = set()
+                # if plan.trends is not None and plan.trends.trend_categories is not None:
+                #     for tc in plan.trends.trend_categories:
+                #         viz_types.update([trend.visualization_type.value for trend in tc.trends])
+                # if not ({12, 13, 14} & viz_types):  # new viz types are not present, update hist and create plan
+                #     hist_update = True
+                #     need_plan_update = True
 
         if plan.event_date == format_date(event_date) and need_plan_update:  # if update required for any reason, create new plan
             plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations, hist_update=hist_update)
