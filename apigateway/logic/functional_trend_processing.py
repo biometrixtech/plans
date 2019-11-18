@@ -1517,7 +1517,7 @@ class TrendProcessor(object):
     def get_limited_mobility_insight_data(self, short, joint_artho, tendin, overactive, limited_mobility_2, limited_mobility_3):
 
         limited_mobility_data = InsightData()
-        limited_mobility_data.title = 'Training Stress'
+        limited_mobility_data.title = 'Limited Mobility'
         limited_mobility_data.active = True
         limited_mobility_data.color = LegendColor.warning_light
         low_plot_legend = PlotLegend(LegendColor.warning_xx_light, 'Low', 0)
