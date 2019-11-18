@@ -706,6 +706,9 @@ class TrendProcessor(object):
             if (body_part_injury_risk.last_muscle_spasm_date is not None and
                     body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
                 is_muscle_spasm = True
+            if (body_part_injury_risk.last_muscle_spasm_trigger_date is not None and
+                    body_part_injury_risk.last_muscle_spasm_trigger_date == self.event_date_time.date()):
+                is_muscle_spasm = True
 
             if (body_part_injury_risk.last_knots_date is not None and
                     body_part_injury_risk.last_knots_date == self.event_date_time.date()):

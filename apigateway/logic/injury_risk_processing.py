@@ -1713,6 +1713,8 @@ class InjuryRiskProcessor(object):
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_trigger_date = base_date
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_level = target_symptom.sharp
 
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
@@ -1720,6 +1722,8 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
                     body_part_injury_risk.sharp_count_last_0_20_days += 1
+                    body_part_injury_risk.last_muscle_spasm_trigger_date = base_date
+                    body_part_injury_risk.last_muscle_spasm_level = target_symptom.sharp
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.tight is not None and target_symptom.tight > 0:
@@ -1730,13 +1734,16 @@ class InjuryRiskProcessor(object):
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
                         injury_risk_dict[target_body_part_side].last_tight_date = base_date
                         injury_risk_dict[target_body_part_side].tight_count_last_0_20_days += 1  # 0_10 not tracked
-
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_trigger_date = base_date
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_level = target_symptom.tight
                     injury_risk_dict[target_body_part_side].last_tight_level = target_symptom.tight
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_tight_date = base_date
                     body_part_injury_risk.last_tight_level = target_symptom.tight
                     body_part_injury_risk.tight_count_last_0_20_days += 1
+                    body_part_injury_risk.last_muscle_spasm_trigger_date = base_date
+                    body_part_injury_risk.last_muscle_spasm_level = target_symptom.tight
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             #if target_symptom.ache is not None and target_symptom.ache > 3:
@@ -1748,6 +1755,8 @@ class InjuryRiskProcessor(object):
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_trigger_date = base_date
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_level = target_symptom.ache
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
@@ -1755,6 +1764,8 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
                     body_part_injury_risk.ache_count_last_0_20_days += 1
+                    body_part_injury_risk.last_muscle_spasm_trigger_date = base_date
+                    body_part_injury_risk.last_muscle_spasm_level = target_symptom.ache
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             # if target_symptom.ache is not None and target_symptom.ache <= 3:
@@ -1803,9 +1814,11 @@ class InjuryRiskProcessor(object):
                             body_part_side = BodyPartSide(BodyPartLocation(r), sd)
                             if body_part_side in injury_risk_dict:
                                 injury_risk_dict[body_part_side].last_muscle_spasm_date = base_date
+                                injury_risk_dict[body_part_side].last_muscle_spasm_level = related_level
                             else:
                                 body_part_injury_risk = BodyPartInjuryRisk()
                                 body_part_injury_risk.last_muscle_spasm_date = base_date
+                                body_part_injury_risk.last_muscle_spasm_level = related_level
                                 injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict

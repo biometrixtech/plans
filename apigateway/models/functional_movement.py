@@ -232,6 +232,8 @@ class BodyPartInjuryRisk(object):
 
         # muscle spasm
         self.last_muscle_spasm_date = None
+        self.last_muscle_spasm_trigger_date = None
+        self.last_muscle_spasm_level = 0
 
         # adhesions
         self.last_adhesions_date = None
@@ -390,6 +392,8 @@ class BodyPartInjuryRisk(object):
 
                 # muscle spasm
                 "last_muscle_spasm_date": format_date(self.last_muscle_spasm_date),
+                "last_muscle_spasm_trigger_date": format_date(self.last_muscle_spasm_trigger_date),
+                "last_muscle_spasm_level": self.last_muscle_spasm_level,
 
                 # adhesions
                 "last_adhesions_date": format_date(self.last_adhesions_date),
@@ -554,6 +558,8 @@ class BodyPartInjuryRisk(object):
 
         # muscle spasm
         injury_risk.last_muscle_spasm_date = input_dict.get('last_muscle_spasm_date')
+        injury_risk.last_muscle_spasm_trigger_date = input_dict.get('last_muscle_spasm_trigger_date')
+        injury_risk.last_muscle_spasm_level = input_dict.get('last_muscle_spasm_level', 0)
 
         # adhesions
         injury_risk.last_adhesions_date = input_dict.get('last_adhesions_date')
@@ -671,6 +677,9 @@ class BodyPartInjuryRisk(object):
 
         # muscle spasm
         self.last_muscle_spasm_date = self.merge_with_none(self.last_muscle_spasm_date, body_part_injury_risk.last_muscle_spasm_date)
+        self.last_muscle_spasm_trigger_date = self.merge_with_none(self.last_muscle_spasm_trigger_date,
+                                                           body_part_injury_risk.last_muscle_spasm_trigger_date)
+        self.last_muscle_spasm_level = max(self.last_muscle_spasm_level, body_part_injury_risk.last_muscle_spasm_level)
 
         # adhesions
         self.last_adhesions_date = self.merge_with_none(self.last_adhesions_date, body_part_injury_risk.last_adhesions_date)
@@ -853,6 +862,10 @@ class BodyPartInjuryRisk(object):
             max_severity = max(max_severity, self.last_sharp_level)
         if self.test_date(self.last_ache_date, base_date):
             max_severity = max(max_severity, self.last_ache_level)
+        if self.test_date(self.last_muscle_spasm_date, base_date):
+            max_severity = max(max_severity, self.last_muscle_spasm_level)
+        if self.test_date(self.last_muscle_spasm_trigger_date, base_date):
+            max_severity = max(max_severity, self.last_muscle_spasm_level)
 
         return max_severity
 
