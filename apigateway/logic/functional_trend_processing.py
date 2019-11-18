@@ -756,7 +756,7 @@ class TrendProcessor(object):
                                                          LegendColor.warning_xx_light)
                 muscle_spasm.append(body_part_side_viz)
 
-        if len(inflamed) > 0 or len(muscle_spasm) > 0 and len(knots) > 0:
+        if len(inflamed) > 0 or len(muscle_spasm) > 0 or len(knots) > 0:
 
             trend = self.get_care_trend(category_index)
 
