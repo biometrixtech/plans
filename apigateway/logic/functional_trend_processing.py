@@ -847,8 +847,29 @@ class TrendProcessor(object):
             self.set_care_trend(category_index, trend)
 
         else:
-            trend = self.create_care_trend()
-            self.set_care_trend(category_index, trend)
+            # trend = self.create_care_trend()
+            # self.set_care_trend(category_index, trend)
+            care_index = self.get_insight_category_index(InsightType.care)
+
+            insight_category = self.athlete_insight_categories[care_index]
+            insight_category.active = False
+
+            inflamed_data = self.get_inflamed_insight_data([], [], [])
+            tight_data = self.get_tight_insight_data([], [])
+
+            if not inflamed_data.active and not tight_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(inflamed_data)
+            insight_category.trend_data.data.append(tight_data)
 
     def get_inflamed_insight_data(self, inflamed_high, inflamed_low, inflamed_mod):
 
@@ -1158,8 +1179,29 @@ class TrendProcessor(object):
             self.set_personalized_recovery_trend(category_index, trend)
 
         else:
-            trend = self.create_personalized_recovery_trend()
-            self.set_personalized_recovery_trend(category_index, trend)
+            # trend = self.create_personalized_recovery_trend()
+            # self.set_personalized_recovery_trend(category_index, trend)
+            recovery_index = self.get_insight_category_index(InsightType.personalized_recovery)
+
+            insight_category = self.athlete_insight_categories[recovery_index]
+            insight_category.active = False
+
+            compensating_data = self.get_compensating_insight_data([], [])
+            training_data = self.get_training_stress_insight_data([], [], [])
+
+            if not compensating_data.active and not training_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(compensating_data)
+            insight_category.trend_data.data.append(training_data)
 
     def get_compensating_insight_data(self, movement_dysfunction, compensating):
 
@@ -1511,8 +1553,29 @@ class TrendProcessor(object):
             self.set_prevention_trend(category_index, trend)
 
         else:
-            trend = self.create_prevention_trend()
-            self.set_prevention_trend(category_index, trend)
+            # trend = self.create_prevention_trend()
+            # self.set_prevention_trend(category_index, trend)
+            prevention_index = self.get_insight_category_index(InsightType.prevention)
+
+            insight_category = self.athlete_insight_categories[prevention_index]
+            insight_category.active = False
+
+            limited_mobility_data = self.get_limited_mobility_insight_data([], [], [], [], [], [])
+            underactive_weak_data = self.get_underactive_insight_data([], [], [], [])
+
+            if not limited_mobility_data.active and not underactive_weak_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(limited_mobility_data)
+            insight_category.trend_data.data.append(underactive_weak_data)
 
     def get_limited_mobility_insight_data(self, short, joint_artho, tendin, overactive, limited_mobility_2, limited_mobility_3):
 
