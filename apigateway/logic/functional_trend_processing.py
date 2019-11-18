@@ -771,7 +771,7 @@ class TrendProcessor(object):
             inflamed_list = []
             inflamed_list.extend(inflamed_high)
             inflamed_list.extend(inflamed_mod)
-            inflamed_high.extend(inflamed_low)
+            inflamed_list.extend(inflamed_low)
 
             tight_list = []
             tight_list.extend(muscle_spasm)
