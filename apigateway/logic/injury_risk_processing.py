@@ -1696,9 +1696,11 @@ class InjuryRiskProcessor(object):
         else:
 
             mark_related_muscles = False
+            related_level = 0
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
                 mark_related_muscles = True
+                related_level = max(related_level, target_symptom.sharp)
 
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
@@ -1717,6 +1719,7 @@ class InjuryRiskProcessor(object):
 
             if target_symptom.tight is not None and target_symptom.tight > 0:
                 mark_related_muscles = True
+                related_level = max(related_level, target_symptom.tight)
 
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
@@ -1734,6 +1737,7 @@ class InjuryRiskProcessor(object):
             #if target_symptom.ache is not None and target_symptom.ache > 3:
             if target_symptom.ache is not None and target_symptom.ache > 0:
                 mark_related_muscles = True
+                related_level = max(related_level, target_symptom.ache)
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date

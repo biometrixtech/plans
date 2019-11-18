@@ -1613,7 +1613,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
     #                                 goal, body_part_injury_risk.total_compensation_percent_tier, 0,
     #                                 exercise_library)
 
-    def care_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
+    def check_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 
         goals = []
 
@@ -1624,16 +1624,16 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 body_part_injury_risk.last_inflammation_date == self.event_date_time.date()):
             goals.append(AthleteGoal("Inflammation", 1, AthleteGoalType.pain))
 
-            if (body_part_injury_risk.last_muscle_spasm_date is not None and
-                    body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
-                muscle_spasm = True
+        if (body_part_injury_risk.last_muscle_spasm_date is not None and
+                body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
+            muscle_spasm = True
 
-            if (body_part_injury_risk.last_knots_date is not None and
-                    body_part_injury_risk.last_knots_date == self.event_date_time.date()):
-                knots = True
+        if (body_part_injury_risk.last_knots_date is not None and
+                body_part_injury_risk.last_knots_date == self.event_date_time.date()):
+            knots = True
 
-            if muscle_spasm or knots:
-                goals.append(AthleteGoal("Tightness", 1, AthleteGoalType.sore))
+        if muscle_spasm or knots:
+            goals.append(AthleteGoal("Tightness", 1, AthleteGoalType.sore))
 
         for goal in goals:
 
@@ -2143,7 +2143,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
     #                 self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, body_part_injury_risk.total_compensation_percent_tier, 0,
     #                                     exercise_library)
 
-    def care_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
+    def check_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 
         goals = []
 
@@ -2154,16 +2154,16 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 body_part_injury_risk.last_inflammation_date == self.event_date_time.date()):
             goals.append(AthleteGoal("Inflammation", 1, AthleteGoalType.pain))
 
-            if (body_part_injury_risk.last_muscle_spasm_date is not None and
-                    body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
-                muscle_spasm = True
+        if (body_part_injury_risk.last_muscle_spasm_date is not None and
+                body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
+            muscle_spasm = True
 
-            if (body_part_injury_risk.last_knots_date is not None and
-                    body_part_injury_risk.last_knots_date == self.event_date_time.date()):
-                knots = True
+        if (body_part_injury_risk.last_knots_date is not None and
+                body_part_injury_risk.last_knots_date == self.event_date_time.date()):
+            knots = True
 
-            if muscle_spasm or knots:
-                goals.append(AthleteGoal("Tightness", 1, AthleteGoalType.sore))
+        if muscle_spasm or knots:
+            goals.append(AthleteGoal("Tightness", 1, AthleteGoalType.sore))
 
         for goal in goals:
 
