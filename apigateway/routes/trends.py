@@ -60,11 +60,11 @@ def handle_fte_category(user_id):
     plan = DatastoreCollection().daily_plan_datastore.get(user_id, start_date=plan_event_day, end_date=plan_event_day)[0]
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(user_id)
     fte_insight_type = InsightType(request.json['insight_type'])
-    fte_trend_categories = [category for category in plan.trends.trend_categories if category.insight_type == fte_insight_type]
-    if len(fte_trend_categories) > 0:
-        fte_trend_category = fte_trend_categories[0]
-        fte_trend_category.first_time_experience = False
-        athlete_stats.trend_categories = plan.trends.trend_categories
+    fte_insight_categories = [category for category in plan.trends.insight_categories if category.insight_type == fte_insight_type]
+    if len(fte_insight_categories) > 0:
+        fte_insight_category = fte_insight_categories[0]
+        fte_insight_category.first_time_experience = False
+        athlete_stats.insight_categories = plan.trends.insight_categories
         DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
         DatastoreCollection().daily_plan_datastore.put(plan)
     else:
