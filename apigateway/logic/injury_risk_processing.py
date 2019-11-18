@@ -364,8 +364,13 @@ class InjuryRiskProcessor(object):
                 else:
                     body_part_injury_risk.eccentric_volume_percent_tier = 0
 
-        # add prevention ranking
+        # add prevention and delayed excessive strain ranking
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            if body_part_injury_risk.last_non_functional_overreaching_date == self.two_days_ago:
+                if body_part_injury_risk.total_volume_percent_tier == 0:
+                    body_part_injury_risk.total_volume_percent_tier = 3
+                else:
+                    body_part_injury_risk.total_volume_percent_tier = min(body_part_injury_risk.total_volume_percent_tier, 3)
             if (body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
                     body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
                     body_part_injury_risk.underactive_short_count_last_0_20_days >= 3):
