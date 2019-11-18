@@ -1166,10 +1166,10 @@ class TrendProcessor(object):
         compensating_data = InsightData()
         compensating_data.title = 'Compensation Stress'
         compensating_data.active = True
-        compensating_data.color = LegendColor.splash_light
-        low_plot_legend = PlotLegend(LegendColor.splash_x_light, 'Low', 0)
-        mod_plot_legend = PlotLegend(LegendColor.splash_m_light, 'Mod', 1)
-        high_plot_legend = PlotLegend(LegendColor.splash_light, 'High', 2)
+        compensating_data.color = LegendColor.yellow_light
+        low_plot_legend = PlotLegend(LegendColor.yellow_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.yellow_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.yellow_light, 'High', 2)
 
         body_parts = []
         body_parts.extend(movement_dysfunction)

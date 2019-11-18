@@ -626,8 +626,10 @@ class TriggerTile(Serialisable):
 
     def json_serialise(self):
         ret = {'text': self.text,
+               'title': self.title,
                'description': self.description,
                'bold_text': [b.json_serialise() for b in self.bold_text],
+               'bold_title': [b.json_serialise() for b in self.bold_title],
                'statistic_text': self.statistic_text,
                'bold_statistic_text': [b.json_serialise() for b in self.bold_statistic_text],
                'trigger_type': self.trigger_type.value if self.trigger_type is not None else None,
@@ -639,6 +641,8 @@ class TriggerTile(Serialisable):
     def json_deserialise(cls, input_dict):
         trigger_tile = cls()
         trigger_tile.text = input_dict.get('text', "")
+        trigger_tile.title = input_dict.get('title', "")
+        trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_title', [])]
         trigger_tile.description = input_dict.get('description', '')
         trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         trigger_tile.statistic_text = input_dict.get('statistic_text', "")
