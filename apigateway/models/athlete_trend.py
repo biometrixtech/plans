@@ -625,7 +625,8 @@ class TriggerTile(Serialisable):
         self.sport_name = None
 
     def json_serialise(self):
-        ret = {'text': self.text,
+        ret = {'body_parts': [b.json_serialise() for b in self.body_parts],
+               'text': self.text,
                'title': self.title,
                'description': self.description,
                'bold_text': [b.json_serialise() for b in self.bold_text],
@@ -640,6 +641,7 @@ class TriggerTile(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         trigger_tile = cls()
+        trigger_tile.body_parts = [BodyPartSideViz.json_deserialise(b) for b in input_dict.get('body_parts', [])]
         trigger_tile.text = input_dict.get('text', "")
         trigger_tile.title = input_dict.get('title', "")
         trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_title', [])]
