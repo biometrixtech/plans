@@ -117,6 +117,8 @@ class InjuryRiskProcessor(object):
 
     def process(self, update_historical_data=False, aggregate_results=False, aggregate_for_viz=False):
 
+        body_part_factory = BodyPartFactory()
+
         self.initialize()
         # deconstruct symptoms to muscle level
         detailed_symptoms = []
@@ -126,6 +128,13 @@ class InjuryRiskProcessor(object):
                 for m in muscles:
                     symptom = deepcopy(s)
                     symptom.body_part = BodyPart(m, None)
+                    bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
+                    if bilateral:
+                        symptom.side = 1
+                        symptom_2 = deepcopy(s)
+                        symptom_2.body_part = BodyPart(m, None)
+                        symptom_2.side = 2
+                        detailed_symptoms.append(symptom_2)
                     detailed_symptoms.append(symptom)
             else:  # joints, ligaments and muscle groups that do not have constituent muscles defined
                 detailed_symptoms.append(s)
