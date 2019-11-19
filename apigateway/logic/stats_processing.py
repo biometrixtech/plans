@@ -165,10 +165,12 @@ class StatsProcessing(object):
 
         body_part_factory = BodyPartFactory()
 
-        body_part_side_set = set()
+        body_part_side_dict = {}
 
         detailed_symptoms = []
         for s in soreness_list_25:
+            if s.reported_date_time not in body_part_side_dict:
+                body_part_side_dict[s.reported_date_time] = []
             muscles = BodyPartLocation.get_muscles_for_group(s.body_part.location)
             if isinstance(muscles, list) and len(muscles) > 0:  # muscle groups that have constituent muscles defined
                 for m in muscles:
@@ -186,11 +188,11 @@ class StatsProcessing(object):
                             symptom_2.body_part = BodyPart(m, None)
                             symptom_2.side = 2
                             body_part_side_2 = BodyPartSide(m, 2)
-                            if body_part_side_2 not in body_part_side_set:
-                                body_part_side_set.add(body_part_side_2)
+                            if body_part_side_2 not in body_part_side_dict[s.reported_date_time]:
+                                body_part_side_dict[s.reported_date_time].append(body_part_side_2)
                                 detailed_symptoms.append(symptom_2)
-                        if body_part_side not in body_part_side_set:
-                            body_part_side_set.add(body_part_side)
+                        if body_part_side not in body_part_side_dict[s.reported_date_time]:
+                            body_part_side_dict[s.reported_date_time].append(body_part_side)
                             detailed_symptoms.append(symptom)
                     else:
                         symptom = deepcopy(s)
@@ -204,11 +206,11 @@ class StatsProcessing(object):
                             body_part_side = BodyPartSide(viz_muscle_group, 1)
                             symptom_2.side = 2
                             body_part_side_2 = BodyPartSide(viz_muscle_group, 2)
-                            if body_part_side_2 not in body_part_side_set:
-                                body_part_side_set.add(body_part_side_2)
+                            if body_part_side_2 not in body_part_side_dict[s.reported_date_time]:
+                                body_part_side_dict[s.reported_date_time].append(body_part_side_2)
                                 detailed_symptoms.append(symptom_2)
-                        if body_part_side not in body_part_side_set:
-                            body_part_side_set.add(body_part_side)
+                        if body_part_side not in body_part_side_dict[s.reported_date_time]:
+                            body_part_side_dict[s.reported_date_time].append(body_part_side)
                             detailed_symptoms.append(symptom)
             else:  # joints, ligaments and muscle groups that do not have constituent muscles defined
                 detailed_symptoms.append(s)
@@ -216,7 +218,7 @@ class StatsProcessing(object):
         #current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
         current_athlete_stats.body_response_chart.process_soreness(detailed_symptoms)
 
-        #temp_symptoms = [d for d in detailed_symptoms if d.reported_date_time.date() == self.event_date.date()]
+        temp_symptoms = [d for d in detailed_symptoms if d.reported_date_time.date() == self.event_date.date()]
 
         body_part_chart_collection = BodyPartChartCollection(self.event_date)
         #body_part_chart_collection.process_soreness_list(soreness_list_25)
