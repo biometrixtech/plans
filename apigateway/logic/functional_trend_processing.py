@@ -1242,7 +1242,7 @@ class TrendProcessor(object):
             high_trigger_tile.text = "Biomechanical imbalances in your workout today are likely to have elevated stress on these muscles. These would benefit from  proactive recovery to aid tissue regeneration."
             bold_1 = BoldText()
             bold_1.text = title_text
-            bold_1.color = LegendColor.splash_light
+            bold_1.color = LegendColor.yellow_light
             high_trigger_tile.bold_title.append(bold_1)
             compensating_data.trigger_tiles.append(high_trigger_tile)
         if len(compensating) > 0:
@@ -1253,7 +1253,7 @@ class TrendProcessor(object):
             mod_trigger_tile.text = "Given your reported tightness, inflammation, and today's training conditions, the following tissues are likely to have experienced elevated stress. Go to your plan for proactive recovery recommendations."
             bold_1 = BoldText()
             bold_1.text = title_text
-            bold_1.color = LegendColor.splash_light
+            bold_1.color = LegendColor.yellow_light
             mod_trigger_tile.bold_title.append(bold_1)
             compensating_data.trigger_tiles.append(mod_trigger_tile)
 

@@ -20,18 +20,18 @@ class FunctionalAnatomyProcessor(object):
     def get_related_muscles_for_joint(self, joint_value):
 
         if joint_value == BodyPartLocation.foot.value:
-            return [40, 41, 42, 43, 44]
+            return [40, 41, 42, 43, 44, 61]
         elif joint_value == BodyPartLocation.ankle.value:
-            return [41, 43, 44]
+            return [41, 43, 44, 61]
         elif joint_value == BodyPartLocation.knee.value:
-            return [46, 47, 48, 55, 56, 57, 58, 62]
+            return [45, 46, 47, 48, 55, 56, 57, 58]
         elif joint_value == BodyPartLocation.hip.value:
-            return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]
-        elif joint_value == BodyPartLocation.shoulder:
+            return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 71, 72, 60, 67, 63, 64, 65, 66]
+        elif joint_value == BodyPartLocation.shoulder.value:
             return [83, 81, 22, 23]
-        elif joint_value == BodyPartLocation.wrist:
+        elif joint_value == BodyPartLocation.wrist.value:
             return [24]
-        elif joint_value == BodyPartLocation.elbow:
+        elif joint_value == BodyPartLocation.elbow.value:
             return [22, 23, 24]
         # elif joint_value == BodyPartLocation.lower_back.value:
         #     return [45, 47, 48, 49, 50, 51, 52, 53, 54, 58, 59, 60, 61, 62, 63, 64, 65, 66]

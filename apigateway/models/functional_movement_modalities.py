@@ -188,35 +188,35 @@ class ModalityBase(object):
             if 7 <= severity:
                 return 1, DosageProgression.mod_max_super_max
             elif 4 <= severity < 7:
-                return 2, DosageProgression.mod_max_super_max
+                return 1, DosageProgression.mod_max_super_max
             else:
-                return 3, DosageProgression.min_mod_max
+                return 2, DosageProgression.min_mod_max
 
         elif goal.goal_type == AthleteGoalType.high_load:
             if tier == 1:
-                return 2, DosageProgression.min_mod_max
+                return 1, DosageProgression.min_mod_max
             elif tier == 2:
-                return 3, DosageProgression.min_mod_max
+                return 2, DosageProgression.min_mod_max
             elif tier == 3:
-                return 4, DosageProgression.min_mod_max
+                return 3, DosageProgression.min_mod_max
             else:
                 return 0, None
 
         elif goal.goal_type == AthleteGoalType.asymmetric_session or goal.goal_type == AthleteGoalType.on_request:
             if tier == 1:
-                return 2, DosageProgression.min_mod_max
+                return 1, DosageProgression.min_mod_max
             elif tier == 2:
-                return 3, DosageProgression.min_mod_max
+                return 2, DosageProgression.min_mod_max
             elif tier == 3:
-                return 4, DosageProgression.min_mod_max
+                return 3, DosageProgression.min_mod_max
             else:
                 return 0, None
 
         elif goal.goal_type == AthleteGoalType.corrective:
             if tier == 1:
-                return 3, DosageProgression.min_mod_max
+                return 2, DosageProgression.min_mod_max
             elif tier == 2:
-                return 4, DosageProgression.min_mod_max
+                return 3, DosageProgression.min_mod_max
             else:
                 return 0, None
         else:
@@ -226,12 +226,18 @@ class ModalityBase(object):
 
         for dosage in dosages:
             if dosage.goal.goal_type not in self.goals:
-                self.goals[dosage.goal.goal_type] = ModalityGoal()
+                if ((dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned > 0) or
+                        (dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned > 0) or
+                        (dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0)):
+                    self.goals[dosage.goal.goal_type] = ModalityGoal()
 
     def update_goals(self, dosage):
 
         if dosage.goal.goal_type not in self.goals:
-            self.goals[dosage.goal.goal_type] = ModalityGoal()
+            if ((dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned > 0) or
+                    (dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned > 0) or
+                    (dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0)):
+                self.goals[dosage.goal.goal_type] = ModalityGoal()
 
         # self.goals[dosage.goal.goal_type].efficient_active = False
         # self.goals[dosage.goal.goal_type].complete_active = False
