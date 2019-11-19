@@ -644,7 +644,7 @@ class TriggerTile(Serialisable):
         trigger_tile.body_parts = [BodyPartSideViz.json_deserialise(b) for b in input_dict.get('body_parts', [])]
         trigger_tile.text = input_dict.get('text', "")
         trigger_tile.title = input_dict.get('title', "")
-        trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_title', [])]
+        trigger_tile.bold_title = [BoldText.json_deserialise(b) for b in input_dict.get('bold_title', [])]
         trigger_tile.description = input_dict.get('description', '')
         trigger_tile.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', [])]
         trigger_tile.statistic_text = input_dict.get('statistic_text', "")
