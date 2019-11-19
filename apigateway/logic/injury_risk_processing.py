@@ -129,7 +129,7 @@ class InjuryRiskProcessor(object):
                     symptom = deepcopy(s)
                     symptom.body_part = BodyPart(m, None)
                     bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
-                    if bilateral:
+                    if bilateral and s.side == 0:
                         symptom.side = 1
                         symptom_2 = deepcopy(s)
                         symptom_2.body_part = BodyPart(m, None)
