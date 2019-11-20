@@ -27,6 +27,7 @@ app = Blueprint('symptoms', __name__)
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.symptoms.post')
 def handle_session_create(user_id=None):
+    1 > None
     event_date = parse_datetime(request.json['event_date'])
     timezone = get_timezone(event_date)
     hist_update = False
