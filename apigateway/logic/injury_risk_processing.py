@@ -54,18 +54,23 @@ class InjuryRiskProcessor(object):
         self.synergist_compensating_concentric_intensity_dict = {}
         self.synergist_total_intensity_dict = {}
 
-    def initialize(self):
+    def set_relative_load_level(self, base_date):
 
         self.relative_load_level = 3
-        two_days_ago = (self.event_date_time - timedelta(days=1)).date()
+
+        # if base_date == datetime(2019, 11, 19).date():
+        #     g =0
+        #
+        # if base_date == datetime(2019, 11, 20).date():
+        #     g = 0
 
         # check workload for relative load level
         if len(self.high_relative_load_sessions) > 0:
 
             max_percent = 49.9
 
-            relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date()
-                                           >= two_days_ago]
+            relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date() == base_date]
+
             if len(relevant_high_load_sessions) > 0:
 
                 for r in relevant_high_load_sessions:
@@ -87,16 +92,15 @@ class InjuryRiskProcessor(object):
         # High
         # RPE >= 5 and self.ultra_high_intensity_session
         # RPE >= 7 and not self.ultra_high_intensity_session():
-        relevant_training_sessions = [s for s in self.training_sessions if s.event_date.date()
-                                           >= two_days_ago]
+        relevant_training_sessions = [s for s in self.training_sessions if s.event_date.date() == base_date]
 
         for r in relevant_training_sessions:
             high_intensity_session = r.ultra_high_intensity_session()
             if r.session_RPE is not None:
                 if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
-                    self.relative_load_level = 1
+                    self.relative_load_level = min(self.relative_load_level, 1)
                 elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
-                    self.relative_load_level = 2
+                    self.relative_load_level = min(self.relative_load_level, 2)
 
     def get_consolidated_dict(self):
 
@@ -119,7 +123,6 @@ class InjuryRiskProcessor(object):
 
         body_part_factory = BodyPartFactory()
 
-        self.initialize()
         # deconstruct symptoms to muscle level
         detailed_symptoms = []
         for s in self.symptoms:
@@ -220,7 +223,7 @@ class InjuryRiskProcessor(object):
             injury_risk_dict[b].long_count_last_0_20_days = 0
             injury_risk_dict[b].short_count_last_0_20_days = 0
 
-    def update_injury_risk_dict_rankings(self, injury_risk_dict):
+    def update_injury_risk_dict_rankings(self, injury_risk_dict, base_date):
         
         total_compensation_muscles = [c.total_compensation_percent for c in injury_risk_dict.values() if c.total_compensation_percent > 0]
         eccentric_compensation_muscles = [c.eccentric_compensation_percent for c in injury_risk_dict.values() if c.eccentric_compensation_percent > 0]
@@ -233,6 +236,8 @@ class InjuryRiskProcessor(object):
         max_eccentric_compensation = None
         max_total_volume = None
         max_eccentric_volume = None
+
+        two_days_ago = base_date - timedelta(days=1)
 
         if len(total_compensation_muscles) > 0:
             min_total_compensation = min(total_compensation_muscles)
@@ -308,15 +313,15 @@ class InjuryRiskProcessor(object):
 
                         if total_volume_today >= total_volume_tier_1:
                             body_part_injury_risk.total_volume_percent_tier = 1
-                            body_part_injury_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injury_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injury_risk.last_non_functional_overreaching_date = self.event_date_time.date()
+                            body_part_injury_risk.last_excessive_strain_date = base_date
+                            body_part_injury_risk.last_inhibited_date = base_date
+                            body_part_injury_risk.last_non_functional_overreaching_date = base_date
 
                         elif total_volume_today >= total_volume_tier_2:
                             body_part_injury_risk.total_volume_percent_tier = 2
-                            body_part_injury_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injury_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injury_risk.last_functional_overreaching_date = self.event_date_time.date()
+                            body_part_injury_risk.last_excessive_strain_date = base_date
+                            body_part_injury_risk.last_inhibited_date = base_date
+                            body_part_injury_risk.last_functional_overreaching_date = base_date
 
                         elif total_volume_today >= total_volume_tier_3:
                             body_part_injury_risk.total_volume_percent_tier = 3
@@ -327,9 +332,9 @@ class InjuryRiskProcessor(object):
                     elif self.relative_load_level == 2:
                         if total_volume_today >= total_volume_tier_1:
                             body_part_injury_risk.total_volume_percent_tier = 2
-                            body_part_injury_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injury_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injury_risk.last_functional_overreaching_date = self.event_date_time.date()
+                            body_part_injury_risk.last_excessive_strain_date = base_date
+                            body_part_injury_risk.last_inhibited_date = base_date
+                            body_part_injury_risk.last_functional_overreaching_date = base_date
 
                         elif total_volume_today >= total_volume_tier_2:
                             body_part_injury_risk.total_volume_percent_tier = 3
@@ -354,7 +359,7 @@ class InjuryRiskProcessor(object):
                             body_part_injury_risk.total_volume_percent_tier = 0
 
                 else:
-                    if body_part_injury_risk.last_non_functional_overreaching_date == self.two_days_ago:
+                    if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
                         body_part_injury_risk.total_volume_percent_tier = 3
                     else:
                         body_part_injury_risk.total_volume_percent_tier = 0
@@ -375,7 +380,7 @@ class InjuryRiskProcessor(object):
 
         # add prevention and delayed excessive strain ranking
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
-            if body_part_injury_risk.last_non_functional_overreaching_date == self.two_days_ago:
+            if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
                 if body_part_injury_risk.total_volume_percent_tier == 0:
                     body_part_injury_risk.total_volume_percent_tier = 3
                 else:
@@ -401,13 +406,13 @@ class InjuryRiskProcessor(object):
 
             # include joint and ligament issues
             if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
-                    body_part_injury_risk.last_altered_joint_arthokinematics_date == self.event_date_time.date()):
+                    body_part_injury_risk.last_altered_joint_arthokinematics_date == base_date):
                 body_part_injury_risk.limited_mobility_tier = 1
 
             if ((body_part_injury_risk.last_tendinopathy_date is not None and
-                 body_part_injury_risk.last_tendinopathy_date == self.event_date_time.date()) or
+                 body_part_injury_risk.last_tendinopathy_date == base_date) or
                     (body_part_injury_risk.last_tendinosis_date is not None and
-                     body_part_injury_risk.last_tendinosis_date == self.event_date_time.date())):
+                     body_part_injury_risk.last_tendinosis_date == base_date)):
                 body_part_injury_risk.limited_mobility_tier = 1
 
             # add prevention ranking
@@ -590,6 +595,8 @@ class InjuryRiskProcessor(object):
             daily_sessions = [n for n in self.training_sessions if n.event_date.date() == d]
             daily_sessions = sorted(daily_sessions, key=lambda x:x.event_date)
 
+            self.set_relative_load_level(d)
+
             session_mapping_dict = {}
 
             for session in daily_sessions:
@@ -603,7 +610,7 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict = self.mark_anc_muscle_imbalance(injury_risk_dict,
                                                                       current_session.event_date)
 
-                injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+                injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, d)
 
                 session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
@@ -666,7 +673,11 @@ class InjuryRiskProcessor(object):
                 #     injury_risk_dict[body_part_side].last_functional_overreaching_date = d
                 # elif 1.1 < injury_risk_dict[body_part_side].total_volume_ramp_today:
                 #     injury_risk_dict[body_part_side].last_non_functional_overreaching_date = d
-        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+        #if len(combined_dates) > 0:
+        #    ordered_dates = sorted(combined_dates, key=lambda x:x, reverse=True)
+        # now provide a current day ranking
+        self.set_relative_load_level(self.event_date_time.date())
+        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, self.event_date_time.date())
 
         return injury_risk_dict
 
@@ -1204,6 +1215,8 @@ class InjuryRiskProcessor(object):
         daily_sessions = [n for n in self.training_sessions if n.event_date.date() == base_date]
         daily_sessions = sorted(daily_sessions, key=lambda x:x.event_date)
 
+        self.set_relative_load_level(base_date)
+
         #reset
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 
@@ -1249,13 +1262,13 @@ class InjuryRiskProcessor(object):
             injury_risk_dict = self.mark_anc_muscle_imbalance(injury_risk_dict,
                                                               current_session.event_date)
 
-            injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+            injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, base_date)
 
             session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
         injury_risk_dict = self.merge_daily_sessions(base_date, session_mapping_dict, injury_risk_dict)
 
-        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, base_date)
 
             # for b in session_functional_movement.body_parts:
             #
