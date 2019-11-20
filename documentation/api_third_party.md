@@ -125,10 +125,10 @@ The client __must__ submit a request body containing a JSON object with the foll
 {
     "date_time": Datetime,
     "soreness": [sore_part, sore_part],
-    "clear_candidates": [sore_part, sore_part]
     "sessions": [session, session],
     "sessions_planned": boolean,
-    "health_sync_date": Datetime
+    "health_sync_date": Datetime,
+    "user_age": number
 }
 ```
 * `date_time` __should__ reflect the local time that survey was taken
@@ -991,11 +991,264 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
     "youtube_id": null
 }
 ```
+
+
+## Appendix
+
+### Enums
+
+#### Reportable body part
+
+```
+    chest = 2
+    abdominals = 3
+    groin = 5
+    quads = 6
+    knee = 7
+    shin = 8
+    ankle = 9
+    foot = 10
+    it_band = 11
+    lower_back = 12
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    achilles = 17
+    upper_back_neck = 18
+    elbow = 19
+    wrist = 20
+    lats = 21
+    biceps = 22
+    triceps = 23
+    forearm = 24
+    it_band_lateral_knee = 27
+    hip_flexor = 28
+    deltoid = 29
+```
+
+#### All body parts
+```
+    shoulder = 1
+    chest = 2
+    abdominals = 3
+    hip = 4
+    groin = 5
+    quads = 6
+    knee = 7
+    shin = 8
+    ankle = 9
+    foot = 10
+    it_band = 11
+    lower_back = 12
+    general = 13
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    achilles = 17
+    upper_back_neck = 18
+    elbow = 19
+    wrist = 20
+    lats = 21
+    biceps = 22
+    triceps = 23
+    forearm = 24
+    core_stabilizers = 25
+    erector_spinae = 26
+    it_band_lateral_knee = 27
+    hip_flexor = 28
+    deltoid = 29
+    deep_rotators_hip = 30
+    obliques = 31
+
+    # shin
+    anterior_tibialis = 40
+    peroneals_longus = 41
+
+    # calves
+    posterior_tibialis = 42
+    soleus = 43
+    gastrocnemius_medial = 44
+
+    # hamstrings
+    bicep_femoris_long_head = 45
+    bicep_femoris_short_head = 46
+    semimembranosus = 47
+    semitendinosus = 48
+
+    # groin
+    adductor_longus = 49
+    adductor_magnus_anterior_fibers = 50
+    adductor_magnus_posterior_fibers = 51
+    adductor_brevis = 52
+    gracilis = 53
+    pectineus = 54
+
+    # quads
+    vastus_lateralis = 55
+    vastus_medialis = 56
+    vastus_intermedius = 57
+    rectus_femoris = 58
+
+    tensor_fascia_latae = 59 # hips
+    piriformis = 60 # deep rotator of hip
+
+    gastrocnemius_lateral = 61  # calves - was 75 but that was a duplicate
+    sartorius = 62  # quads
+
+    # glutes
+    gluteus_medius_anterior_fibers = 63
+    gluteus_medius_posterior_fibers = 64
+    gluteus_minimus = 65
+    gluteus_maximus = 66
+
+    # deep rotators of the hip (30)
+    quadratus_femoris = 67
+
+    # knee
+    popliteus = 68
+
+    external_obliques = 69  # abdominal
+
+    # lower_back
+    quadratus_lumorum = 70
+
+    # hip_flexor
+    psoas = 71
+    iliacus = 72
+
+    # core_stabilizers
+    transverse_abdominis = 73
+    internal_obliques = 74
+
+    # abdominals
+    rectus_abdominis = 75
+
+    # upper back, traps, neck
+    upper_trapezius = 76
+    levator_scapulae = 77
+    middle_trapezius = 78
+    lower_trapezius = 79
+    rhomboids = 80
+
+    # chest
+    pectoralis_minor = 81
+    pectoralis_major = 82
+
+    # deltoid (29)
+    anterior_deltoid = 83
+    medial_deltoid = 84
+    posterior_deltoid = 85
+
+    upper_body = 91
+    lower_body = 92
+    full_body = 93
+
+    # merge
+    semimembranosus_semitendinosus = 100
+    anterior_adductors = 101
+    rectus_femoris_vastus_intermedius = 102
+    glute_med = 103
+    upper_traps_levator_scapulae = 105
+    middle_traps_rhomboids = 106
+    pec_major_minor = 107
+    hip_flexor_merge = 108
+```
+
+#### side
+
+```
+    none_unilateral = 0
+    left = 1
+    right = 2
+```
+
+
+#### sport name
+```
+    basketball = 0
+    baseball = 1
+    softball = 2
+    cycling = 3
+    field_hockey = 4
+    football = 5
+    general_fitness = 6
+    golf = 7
+    gymnastics = 8
+    skate_sports = 9
+    lacrosse = 10
+    rowing = 11
+    rugby = 12
+    diving = 13
+    soccer = 14
+    pool_sports = 15
+    tennis = 16
+    distance_running = 17
+    sprints = 18
+    jumps = 19
+    throws = 20
+    volleyball = 21
+    wrestling = 22
+    weightlifting = 23
+    track_field = 24
+    archery = 25
+    australian_football = 26
+    badminton = 27
+    bowling = 28
+    boxing = 29
+    cricket = 30
+    curling = 31
+    dance = 32
+    equestrian_sports = 33
+    fencing = 34
+    fishing = 35
+    handball = 36
+    hockey = 37
+    martial_arts = 38
+    paddle_sports = 39
+    racquetball = 40
+    sailing = 41
+    snow_sports = 42
+    squash = 43
+    surfing_sports = 44
+    swimming = 45
+    table_tennis = 46
+    water_polo = 47
+    cross_country_skiing = 48
+    downhill_skiing = 49
+    kick_boxing = 50
+    snowboarding = 51
+    endurance = 52
+    power = 53
+    speed_agility = 54
+    strength = 55
+    cross_training = 56
+    elliptical = 57
+    functional_strength_training = 58
+    hiking = 59
+    hunting = 60
+    mind_and_body = 61
+    play = 62
+    preparation_and_recovery = 63
+    stair_climbing = 64
+    traditional_strength_training = 65
+    walking = 66
+    water_fitness = 67
+    yoga = 68
+    barre = 69
+    core_training = 70
+    flexibility = 71
+    high_intensity_interval_training = 72
+    jump_rope = 73
+    pilates = 74
+    stairs = 75
+    step_training = 76
+    wheelchair_walk_pace = 77
+    wheelchair_run_pace = 78
+    taichi = 79
+    mixed_cardio = 80
+    hand_cycling = 81
+    climbing = 82
+    other = 83
+```
 ###### Last Modified: September 9, 2019
-
-
-
-
-
-
 
