@@ -141,10 +141,10 @@ The client __must__ submit a request body containing a JSON object with the foll
 <!-- * `severity` __should__ be an integer 0, 1, 3 or 5 indicating the severity of the pain/soreness -->
 <!-- * `movement` __should__ be an integer 0, 1, 3 or 5 indicating how much movement is restricted  -->
 * `side` __should__ be an integer, either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
-* `tight` __should__ be an integer 1-10 indicating the level of tightness felt. If not reported, it should be null
-* `knots` __should__ be an integer 1-10 indicating the level of knots felt. If not reported, it should be null. It should only be available for muscles.
-* `ache` __should__ be an integer 1-10 indicating the level of ache felt. If not reported, it should be null
-* `sharp` __should__ be an integer 1-10 indicating the level of sharpness felt. If not reported, it should be null
+* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be null
+* `knots` __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be null. It should only be available for muscles.
+* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be null
+* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be null
 <!-- * `pain` __should__ be a boolean to indicate whether it's pain or soreness. -->
 <!-- * `status` __should__ be a string representing the historical soreness status if one was received. Optional for soreness but required for clear candidates. -->
 
@@ -182,14 +182,14 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body Having the following syntax:
  
 ```
 {
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same structure as defined in output of [Get Daily Plan](#get-daily-plan) route.
 
 
 #### Soreness/Typical Session history
@@ -317,7 +317,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `duration` __should__ be in minutes and reflect the duration which the user confirmend (health data) or entered (manually logged session).
 * `calories` __if present__, __should__ be calorie information obtained from health workout _(only needed for health workout)_
 * `distance` __if present__, __should__ be distance information obtained from health workout _(only needed for health workout)_
-* `source` __if present__, __should__ be [Session source enum](#session-source)
+* `source` __if present__, __should__ reflect [Session source](#session-source) enumeration
 * `deleted` __if present__, __should__ be true if the user deletes the workout detected from health app
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value` _(only needed for health workout)_
@@ -558,7 +558,16 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date": "2019-10-29T17:45:24Z",
-    "soreness":[{"body_part": 18, "side": 0, "tight": 4, "knots": null, "sharp": null, "ache": null}],
+    "soreness":[
+        {
+            "body_part": 18,
+            "side": 0,
+            "tight": 4,
+            "knots": null,
+            "sharp": null,
+            "ache": null
+        }
+    ]
 }
 ```
 ##### Responses

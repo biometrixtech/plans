@@ -128,32 +128,34 @@ The client __must__ submit a request body containing a JSON object with the foll
     "sessions": [session, session],
     "sessions_planned": boolean,
     "health_sync_date": Datetime,
-    "user_age": number
+    "user_age": number,
+    "sleep_data": [sleep_event]
 }
 ```
 * `date_time` __should__ reflect the local time that survey was taken
-* `soreness` __should__ reflect a list of body parts(`sore_part`) with pain or soreness. Length __could__ be 0.
-* `clear_candidates` is __optional__ and __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear".
+* `soreness` __should__ reflect a list of body parts(`sore_part`) with symptoms. Length __could__ be 0.
 * `sessions` is __optional__ and __should__ be a list of session objects, where each session matches the body of Create Session.
 * `sessions_planned` is __optional__ and __should__ represent whether the user plans to train again that day.
 * `health_sync_date` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source
+* `user_age` (Fathom Mobile App Only) is __optional__ and only needed if one of the sessions is obtained from a third party source and contains heart rate data
 * `sore_part` __should__ have the following schema:
 ```
 {
-    "body_part": integer,
-    "severity": integer,
-    "movement": integer,
-    "side": integer,
-    "pain": boolean,
-    "status": string
+    "body_part": number,
+    "side": number,
+    "tight": number,
+    "knots": number,
+    "ache": number,
+    "sharp": number
 }
+
 ```
-* `body_part` __should__ reflect BodyPart enum
-* `severity` __should__ be 0, 1, 3 or 5 indicating the severity of the pain/soreness
-* `movement` __should__ be 0, 1, 3 or 5 indicating how much movement is restricted 
-* `side` __should__ be either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
-* `pain` __should__ indicate whether it's pain or soreness.
-* `status` __should__ represent the historical soreness status if one was received. Optional for soreness but required for clear candidates.
+* `body_part` __should__ be an integer reflecting BodyPart enum as defined in Appendix
+* `side` __should__ be an integer reflecting side enum as defined in Appendix
+* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be null
+* `knots` __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be null. It should only be available for muscles.
+* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be null
+* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be null
 
 ```
 POST /plans/{version}/daily_readiness/{User UUID} HTTPS/1.1
@@ -163,9 +165,14 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "date_time": "2018-12-10T17:45:24Z",
-    "soreness":[{"body_part": 18, "severity": 3, "movement": 3, "side": 0}],
-    "clear_candidates": [{"body_part": 5, "severity": 0, "side": 1, "pain":true, 
-                        "status": "persistant_2_pain"}]
+    "soreness":[{
+                                    "body_part": 14,
+                                    "side": 2
+                                    "tight": 3,
+                                    "knots": 5,
+                                    "ache": 3,
+                                    "sharp": 4,
+                                }],
     "sessions": [{"event_date": "2018-12-10T12:30:00Z",
                   "sport_name": 3,
                   "duration": 90,
@@ -177,10 +184,11 @@ Authorization: eyJraWQ...ajBc4VQ
                                         }
                   }
                 ],
+    "user_age": 25,
     "sessions_planned": false
 }
 ```
-##### Response
+##### Responses
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following syntax:
  
@@ -227,25 +235,19 @@ Authentication is required for this endpoint
 `readiness` will have the following schema
 ```
 {
-    "body_parts": [
-                {"body_part": integer, "side": integer, "status": string},
-                {"body_part": integer, "side": integer, "status": string}
-                ],
-    "hist_sore_status": [{"body_part": integer, "side": integer, 
-                        "status": string, pain: boolean}],
-    "clear_candidates": [{"body_part": integer, "side": integer, 
-                        "status": string, pain: boolean}],
-    "dormant_tipping_candidates": [{"body_part": integer, "side": integer, 
-                                   "status": string, pain: boolean}],
+    "body_parts": [],
+    "hist_sore_status": [],
+    "clear_candidates": [],
+    "dormant_tipping_candidates": [],
     "current_position": integer,
     "current_sport_name": integer
 }
 ```
-* `body_parts` will be a list of enumerated body parts + side (potentially empty)
-* `clear_candidates` will be a list of sore body parts with historical status that are candidates for clearance
-* `hist_sore_status` will be a list of sore body parts with historical status that are not candidates for clearing
-* `dormant_tipping_candidates` will be a list of sore body parts that should not prompt a response for the user but if they indicate a status for that, they will tip into specific status as defined in the response
-* `current_position` and `current_sport_name` will be an enumeration, if they exist
+* `body_parts` will be a list of enumerated body parts + side (potentially empty) `DEPRECATED, WILL BE EMPTY`
+* `clear_candidates` will be a list of sore body parts with historical status that are candidates for clearance `DEPRECATED, WILL BE EMPTY`
+* `hist_sore_status` will be a list of sore body parts with historical status that are not candidates for clearing `DEPRECATED, WILL BE EMPTY`
+* `dormant_tipping_candidates` will be a list of sore body parts that should not prompt a response for the user but if they indicate a status for that, they will tip into specific status as defined in the response `DEPRECATED, WILL BE EMPTY`
+* `current_position` and `current_sport_name` will be an enumeration, if they exist `DEPRECATED`
 
 `typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
 * `session` object will be of the following schema
@@ -280,13 +282,15 @@ The client __must__ submit a request body containing a JSON object with the foll
     "event_date": Datetime,
     "sessions": [session, session],
     "health_sync_date": Datetime,
-    "sessions_planned": Boolean
+    "sessions_planned": Boolean,
+    "user_age": number
 }
 ```
 * `event_date` __should__ reflect the date and time when the survey is submitted.
 * `health_sync_date` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source
+* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day
+* `user_age` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source and contains heart rate data
 * `session` __should__ be of the following schema
-* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 ```
 {
     "event_date": Datetime,
@@ -309,14 +313,14 @@ The client __must__ submit a request body containing a JSON object with the foll
     "hr_data": [hr, hr, hr],
 }
 ```
-* `event_date` __should__ reflect the start time of the session (third party data) or default date (manually logged session)
-* `end_date` is __optional__ parameter that reflects the end time of the session for third party data
+* `event_date` __should__ reflect the start time of the session (third party/FathomPRO data) or default date (manually logged session)
+* `end_date` is __optional__ parameter that reflects the end time of the session for third party/FathomPRO data
 * `session_type` __should__ reflect SessionType enumeration. NOTE: We'll only use 6 moving forward
-* `sport_name` __should__ reflect SportName enumeration.
+* `sport_name` __should__ reflect SportName enumeration as defined in Appendix.
 * `duration` __should__ be in minutes and reflect the duration which the user confirmed (third party data) or entered (manually logged session).
 * `calories` __if present__, __should__ be calorie information obtained from third party workout _(only needed for third party workout)_
 * `distance` __if present__, __should__ be distance information obtained from third party workout _(only needed for third party workout)_
-* `source` __if present__, __should__ be 0 for manually logged session and 1 for third party data
+* `source` __if present__, __should__ be SessionSource enumeration as defined in Appendix
 * `deleted` __if present__, __should__ be true if the user deletes the workout detected from the third party source 
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the third party workout. Each hr will have `startDate`, `endDate` and `value` _(only needed for third party workout)_
@@ -461,7 +465,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date": "2018-08-10T16:30:00Z",
-    "session_type": 0
+    "session_type": 6
 }
 ```
 ##### Response
@@ -997,7 +1001,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
 
 ### Enums
 
-#### Reportable body part
+#### BodyPart
 
 ```
     chest = 2
@@ -1163,7 +1167,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
 ```
 
 
-#### sport name
+#### SportName
 ```
     basketball = 0
     baseball = 1
@@ -1249,6 +1253,14 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
     hand_cycling = 81
     climbing = 82
     other = 83
+```
+
+#### SessionSource
+``` 
+    user = 0
+    health = 1
+    user_health = 2
+    three_sensor = 3
 ```
 ###### Last Modified: September 9, 2019
 
