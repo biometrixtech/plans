@@ -1663,11 +1663,11 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
             if inflammation:
                 last_severity = max(last_severity, body_part_injury_risk.get_inflammation_severity(self.event_date_time.date()))
 
-            self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 0, last_severity,
+            self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 1, last_severity,
                                 exercise_library)
 
             if max_severity < 7.0:
-                self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, 0,
+                self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, 1,
                                     last_severity, exercise_library)
 
             body_part_factory = BodyPartFactory()
@@ -2217,11 +2217,11 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             if inflammation:
                 last_severity = max(last_severity, body_part_injury_risk.get_inflammation_severity(self.event_date_time.date()))
 
-            self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 0, last_severity,
+            self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 1, last_severity,
                                 exercise_library)
 
             if max_severity < 7.0:
-                self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, 0,
+                self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, 1,
                                     last_severity, exercise_library)
 
             body_part_factory = BodyPartFactory()
