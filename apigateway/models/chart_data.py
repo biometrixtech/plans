@@ -1085,7 +1085,7 @@ class BodyResponseChart(Serialisable):
             return 0
         elif severity <= 3:
             return 1
-        elif 1 < severity <= 6:
+        elif 3 < severity <= 6:
             return 2
         else:
             return 3
