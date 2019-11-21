@@ -5,8 +5,8 @@ users = [
     #"full_fte", #6a91a0cb-2c90-4b93-94d2-a943c6284af7
     #"sore_fte",
     #"near_clear",
-    #"two_sore",
-    "two_pain", #c82d4f18-efba-421e-b28f-bab349ebd3c1
+    "two_sore",
+    #"two_pain", #c82d4f18-efba-421e-b28f-bab349ebd3c1
     #"full_fte_2",
     # "sore_fte_2",
     #"near_clear_2",
