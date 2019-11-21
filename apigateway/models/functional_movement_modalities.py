@@ -1842,7 +1842,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             tier_one = False
 
-            if is_overactive_short or is_short:
+            if is_overactive_short:
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 tier_one = True
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 1, 0, exercise_library)
@@ -1878,6 +1878,15 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal, 1, 0, exercise_library)
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal, 1, 0, exercise_library)
+
+            elif is_short:
+                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+                tier_one = True
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 2, 0, exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, 1,
+                                        0, exercise_library)
 
             if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
@@ -2374,7 +2383,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             tier_one = False
 
-            if is_overactive_short or is_short:
+            if is_overactive_short:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 tier_one = True
@@ -2410,6 +2419,16 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, self.isolated_activate_exercises, goal,
                                         1, 0, exercise_library)
+
+            elif is_short:
+
+                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+                tier_one = True
+                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 2, 0, exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, 2,
+                                        0, exercise_library)
 
             if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
 
