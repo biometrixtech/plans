@@ -1551,6 +1551,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                     body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
 
                 compensating = True
+                body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
                   body_part_injury_risk.total_compensation_percent_tier <= 3):
@@ -1562,14 +1563,19 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             #for goal in goals:
 
-            goal = AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load)
+            goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
             if high_load or compensating:
 
+                high_load_tier = 0
+                comp_tier = 0
+
                 if high_load:
-                    tier = body_part_injury_risk.total_volume_percent_tier
-                else: #compensating
-                    tier = body_part_injury_risk.total_compensation_percent_tier
+                    high_load_tier = body_part_injury_risk.total_volume_percent_tier
+                if compensating:
+                    comp_tier = body_part_injury_risk.total_compensation_percent_tier
+
+                tier = max(high_load_tier, comp_tier)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
                                     tier, 0, exercise_library)
@@ -1889,7 +1895,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal, 2, 0, exercise_library)
 
                 if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, 1,
+                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal, 2,
                                         0, exercise_library)
 
             if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
@@ -2114,6 +2120,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                     body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
 
                 compensating = True
+                body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
                   body_part_injury_risk.total_compensation_percent_tier <= 3):
@@ -2124,14 +2131,19 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
             #     goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
 
             #for goal in goals:
-            goal = AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load)
+            goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
             if high_load or compensating:
 
+                high_load_tier = 0
+                comp_tier = 0
+
                 if high_load:
-                    tier = body_part_injury_risk.total_volume_percent_tier
-                else: #compensating
-                    tier = body_part_injury_risk.total_compensation_percent_tier
+                    high_load_tier = body_part_injury_risk.total_volume_percent_tier
+                if compensating:
+                    comp_tier = body_part_injury_risk.total_compensation_percent_tier
+
+                tier = max(high_load_tier, comp_tier)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
                                     tier, 0, exercise_library)
