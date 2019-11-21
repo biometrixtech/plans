@@ -1,6 +1,6 @@
 from serialisable import Serialisable
 from datetime import datetime, timedelta
-from utils import format_date, format_datetime, parse_datetime, parse_date
+from utils import format_date, format_datetime, parse_datetime, parse_date, none_max
 from fathomapi.utils.exceptions import InvalidSchemaException
 from models.styles import BoldText
 from models.soreness import Soreness
@@ -1079,11 +1079,13 @@ class BodyResponseChart(Serialisable):
 
             self.data[chart_data.date] = chart_data
 
-    def scale_severity(self, severity):
-
-        if severity <= 1:
+    def scale_severity(self, soreness):
+        severity = none_max([soreness.tight, soreness.knots, soreness.ache, soreness.sharp])
+        if severity is None:
+            return 0
+        elif severity <= 3:
             return 1
-        elif 1 < severity <= 3:
+        elif 1 < severity <= 6:
             return 2
         else:
             return 3
@@ -1181,15 +1183,15 @@ class BodyResponseChart(Serialisable):
                 self.set_status_text()
 
             if soreness.pain:
-                self.data[soreness.reported_date_time.date()].pain_value = max(self.scale_severity(soreness.severity),
+                self.data[soreness.reported_date_time.date()].pain_value = max(self.scale_severity(soreness),
                                                                                self.data[soreness.reported_date_time.date()].pain_value)
             else:
-                self.data[soreness.reported_date_time.date()].soreness_value = max(self.scale_severity(soreness.severity),
+                self.data[soreness.reported_date_time.date()].soreness_value = max(self.scale_severity(soreness),
                                                                                    self.data[soreness.reported_date_time.date()].soreness_value)
             body_part_summary = BodyPartSummary()
             body_part_summary.body_part = soreness.body_part.location.value
             body_part_summary.side = soreness.side
-            body_part_summary.value = self.scale_severity(soreness.severity)
+            body_part_summary.value = self.scale_severity(soreness)
             body_part_summary.pain = soreness.pain
 
             if body_part_summary in self.data[soreness.reported_date_time.date()].body_parts:
