@@ -44,6 +44,7 @@ class FunctionalMovement(object):
         self.prime_movers = []
         self.antagonists = []
         self.synergists = []
+        self.parts_receiving_compensation = []
 
 
 class Elasticity(Serialisable):
@@ -1409,6 +1410,12 @@ class SessionFunctionalMovement(object):
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.synergists.append(functional_movement_body_part_side)
 
+            for a in functional_movement.parts_receiving_compensation:
+                body_part_side_list = self.get_body_part_side_list(a)
+                for b in body_part_side_list:
+                    functional_movement_body_part_side = BodyPartFunctionalMovement(b)
+                    m.parts_receiving_compensation.append(functional_movement_body_part_side)
+
             m.attribute_training_volume(self.session.training_volume(load_stats), self.injury_risk_dict, event_date)
             # TODO - ensure we're using the correct (and all) intensity measures
             if self.session.session_RPE is not None:
@@ -1467,6 +1474,7 @@ class FunctionalMovementActivityMapping(object):
         self.prime_movers = []
         self.antagonists = []
         self.synergists = []
+        self.parts_receiving_compensation = []
 
     def attribute_training_volume(self, training_volume, injury_risk_dict, event_date):
 
@@ -1488,10 +1496,10 @@ class FunctionalMovementActivityMapping(object):
             compensated_concentric_volume = training_volume * self.concentric_level * factor
             compensated_eccentric_volume = training_volume * self.eccentric_level * factor
 
-            for s in self.synergists:
+            for s in self.parts_receiving_compensation:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-                    synergist_compensated_concentric_volume = compensated_concentric_volume / float(len(self.synergists))
-                    synergist_compensated_eccentric_volume = compensated_eccentric_volume / float(len(self.synergists))
+                    synergist_compensated_concentric_volume = compensated_concentric_volume / float(len(self.parts_receiving_compensation))
+                    synergist_compensated_eccentric_volume = compensated_eccentric_volume / float(len(self.parts_receiving_compensation))
                     s.body_part_function = BodyPartFunction.synergist
                     s.compensated_concentric_volume += synergist_compensated_concentric_volume
                     s.compensated_eccentric_volume += synergist_compensated_eccentric_volume
@@ -1532,10 +1540,10 @@ class FunctionalMovementActivityMapping(object):
             compensated_concentric_intensity = intensity * self.concentric_level * factor
             compensated_eccentric_intensity = intensity * self.eccentric_level * factor
 
-            for s in self.synergists:
+            for s in self.parts_receiving_compensation:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-                    synergist_compensated_concentric_intensity = compensated_concentric_intensity / float(len(self.synergists))
-                    synergist_compensated_eccentric_intensity = compensated_eccentric_intensity / float(len(self.synergists))
+                    synergist_compensated_concentric_intensity = compensated_concentric_intensity / float(len(self.parts_receiving_compensation))
+                    synergist_compensated_eccentric_intensity = compensated_eccentric_intensity / float(len(self.parts_receiving_compensation))
                     s.body_part_function = BodyPartFunction.synergist
                     s.compensated_concentric_intensity = synergist_compensated_concentric_intensity  # note this isn't a max or additive; one time only
                     s.compensated_eccentric_intensity = synergist_compensated_eccentric_intensity
@@ -1735,6 +1743,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [40]
         functional_movement.antagonists = [41, 43, 44, 61]
         functional_movement.synergists = []
+        functional_movement.parts_receiving_compensation = []
         return functional_movement
 
     def get_ankle_plantar_flexion(self):
@@ -1743,6 +1752,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [43, 44, 61]
         functional_movement.antagonists = [40]
         functional_movement.synergists = [41, 42]
+        functional_movement.parts_receiving_compensation = [41, 42]
         return functional_movement
 
     def get_inversion_of_the_foot(self):
@@ -1751,6 +1761,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [40, 42]
         functional_movement.antagonists = [41, 43, 61]
         functional_movement.synergists = [44]
+        functional_movement.parts_receiving_compensation = [44]
         return functional_movement
 
     def get_eversion_of_the_foot(self):
@@ -1759,6 +1770,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [41]
         functional_movement.antagonists = [40, 42, 44]
         functional_movement.synergists = [43, 61]
+        functional_movement.parts_receiving_compensation = [43, 61]
         return functional_movement
 
     def get_knee_flexion(self):
@@ -1767,6 +1779,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [45, 46, 47, 48]
         functional_movement.antagonists = [55, 56, 57, 58]
         functional_movement.synergists = [44, 61, 53]
+        functional_movement.parts_receiving_compensation = [44, 61, 53]
         return functional_movement
 
     def get_knee_extension(self):
@@ -1774,6 +1787,8 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_extension)
         functional_movement.prime_movers = [55, 56, 57, 58]
         functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53]
+        functional_movement.synergists = []
+        functional_movement.parts_receiving_compensation = []
         return functional_movement
 
     def get_hip_extension(self):
@@ -1782,6 +1797,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [66]
         functional_movement.antagonists = [50, 54, 58, 59, 71]
         functional_movement.synergists = [45, 47, 48, 51]
+        functional_movement.parts_receiving_compensation = [45, 47, 48, 51]
         return functional_movement
 
     def get_hip_flexion(self):
@@ -1790,6 +1806,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [54, 71]
         functional_movement.antagonists = [45, 47, 48, 51, 66]
         functional_movement.synergists = [49, 50, 52, 53, 58, 59, 65]
+        functional_movement.parts_receiving_compensation = [49, 50, 52, 53, 58, 59, 65]
         return functional_movement
 
     def get_hip_adduction(self):
@@ -1798,6 +1815,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [49, 50, 51, 52, 53]
         functional_movement.antagonists = [55, 59, 63, 64, 65]
         functional_movement.synergists = [47, 48, 54, 67, 66]
+        functional_movement.parts_receiving_compensation = [47, 48, 54, 67, 66]
         return functional_movement
 
     def get_hip_abduction(self):
@@ -1806,6 +1824,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [63, 64]
         functional_movement.antagonists = [49, 50, 51, 52, 53, 54, 67]
         functional_movement.synergists = [55, 59, 65, 66]
+        functional_movement.parts_receiving_compensation = [55, 59, 65, 66]
         return functional_movement
 
     def get_hip_internal_rotation(self):
@@ -1814,6 +1833,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [54, 65]
         functional_movement.antagonists = [45, 51, 67, 64, 66]
         functional_movement.synergists = [46, 47, 48, 49, 50, 52, 53, 59, 63]
+        functional_movement.parts_receiving_compensation = [46, 47, 48, 49, 50, 52, 53, 59, 63]
         return functional_movement
 
     def get_hip_external_rotation(self):
@@ -1822,6 +1842,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [60]
         functional_movement.antagonists = [47, 48, 49, 50, 52, 53, 54, 59, 63, 65]
         functional_movement.synergists = [45, 51, 67, 64, 66]
+        functional_movement.parts_receiving_compensation = [45, 51, 67, 64, 66]
         return functional_movement
 
     def get_pelvic_anterior_tilt(self):
@@ -1830,6 +1851,7 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [58, 71, 72, 26, 70, 21]
         functional_movement.antagonists = [74, 75]
         functional_movement.synergists = [54, 59]
+        functional_movement.parts_receiving_compensation = [54, 59]
         return functional_movement
 
     def get_pelvic_posterior_tilt(self):
@@ -1838,9 +1860,12 @@ class FunctionalMovementFactory(object):
         functional_movement.prime_movers = [74, 75]
         functional_movement.antagonists = [58, 71, 72, 26, 70, 21]
         functional_movement.synergists = [45, 69]
+        functional_movement.parts_receiving_compensation = [45, 69]
         return functional_movement
 
     def get_trunk_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.trunk_flexion)
         functional_movement.prime_movers = []
+        functional_movement.synergists = []
+        functional_movement.parts_receiving_compensation = []

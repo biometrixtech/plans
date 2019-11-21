@@ -1763,6 +1763,16 @@ class TrendProcessor(object):
 
         is_short = False
 
+        if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
+                body_part_injury_risk.last_altered_joint_arthokinematics_date == self.event_date_time.date()):
+            return False
+
+        if ((body_part_injury_risk.last_tendinopathy_date is not None and
+             body_part_injury_risk.last_tendinopathy_date == self.event_date_time.date()) or
+                (body_part_injury_risk.last_tendinosis_date is not None and
+                 body_part_injury_risk.last_tendinosis_date == self.event_date_time.date())):
+            return False
+
         if body_part_injury_risk.knots_count_last_0_20_days >= 3:
             is_short = True
         if body_part_injury_risk.tight_count_last_0_20_days >= 3:
