@@ -1575,7 +1575,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 if compensating:
                     comp_tier = body_part_injury_risk.total_compensation_percent_tier
 
-                tier = max(high_load_tier, comp_tier)
+                tier = min(high_load_tier, comp_tier)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
                                     tier, 0, exercise_library)
@@ -2143,7 +2143,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 if compensating:
                     comp_tier = body_part_injury_risk.total_compensation_percent_tier
 
-                tier = max(high_load_tier, comp_tier)
+                tier = min(high_load_tier, comp_tier)
 
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
                                     tier, 0, exercise_library)
