@@ -1566,13 +1566,17 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
             if high_load or compensating:
 
+                if high_load:
+                    tier = body_part_injury_risk.total_volume_percent_tier
+                else: #compensating
+                    tier = body_part_injury_risk.total_compensation_percent_tier
+
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
-                                    body_part_injury_risk.total_volume_percent_tier, 0, exercise_library)
+                                    tier, 0, exercise_library)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
-                                        body_part_injury_risk.total_volume_percent_tier,
-                                        0, exercise_library)
+                                        tier, 0, exercise_library)
 
             if high_load:
 
@@ -2124,13 +2128,17 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
             if high_load or compensating:
 
+                if high_load:
+                    tier = body_part_injury_risk.total_volume_percent_tier
+                else: #compensating
+                    tier = body_part_injury_risk.total_compensation_percent_tier
+
                 self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
-                                    body_part_injury_risk.total_volume_percent_tier, 0, exercise_library)
+                                    tier, 0, exercise_library)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
-                                        body_part_injury_risk.total_volume_percent_tier,
-                                        0, exercise_library)
+                                        tier, 0, exercise_library)
 
             if high_load:
 
