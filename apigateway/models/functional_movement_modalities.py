@@ -1569,20 +1569,28 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
                 high_load_tier = 0
                 comp_tier = 0
+                tier = 0
 
                 if high_load:
                     high_load_tier = body_part_injury_risk.total_volume_percent_tier
                 if compensating:
                     comp_tier = body_part_injury_risk.total_compensation_percent_tier
 
-                tier = min(high_load_tier, comp_tier)
+                if high_load_tier > 0 and comp_tier > 0:
+                    tier = min(high_load_tier, comp_tier)
+                elif high_load_tier > 0:
+                    tier = high_load_tier
+                elif comp_tier > 0:
+                    tier = comp_tier
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
-                                    tier, 0, exercise_library)
+                if tier > 0:
 
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
                                         tier, 0, exercise_library)
+
+                    if max_severity < 7.0:
+                        self.copy_exercises(body_part.active_stretch_exercises, self.active_stretch_exercises, goal,
+                                            tier, 0, exercise_library)
 
             if high_load:
 
@@ -2137,20 +2145,27 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
                 high_load_tier = 0
                 comp_tier = 0
+                tier = 0
 
                 if high_load:
                     high_load_tier = body_part_injury_risk.total_volume_percent_tier
                 if compensating:
                     comp_tier = body_part_injury_risk.total_compensation_percent_tier
 
-                tier = min(high_load_tier, comp_tier)
+                if high_load_tier > 0 and comp_tier > 0:
+                    tier = min(high_load_tier, comp_tier)
+                elif high_load_tier > 0:
+                    tier = high_load_tier
+                elif comp_tier > 0:
+                    tier = comp_tier
 
-                self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
+                if tier > 0:
+                    self.copy_exercises(body_part.inhibit_exercises, self.inhibit_exercises, goal,
                                     tier, 0, exercise_library)
 
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
-                                        tier, 0, exercise_library)
+                    if max_severity < 7.0:
+                        self.copy_exercises(body_part.static_stretch_exercises, self.static_stretch_exercises, goal,
+                                            tier, 0, exercise_library)
 
             if high_load:
 
