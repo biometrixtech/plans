@@ -190,6 +190,10 @@ The following data elements are required when following the  __Post-Workout__ pa
 * `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `soreness` __should__ follow the same definition as in  _Daily Readiness_
 
+<br/>
+<br/>
+<br/>
+<br/>
 
 ### Symptom-Reporting
 #### Required Data Elements

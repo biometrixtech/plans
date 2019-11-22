@@ -261,13 +261,15 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `hr_data` __if present__, __should__ be the heart rate data associated with the third party workout. Each hr will have `startDate`, `endDate` and `value` _(only needed for third party workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
 
+
+
+
 ```
 POST /plans/{version}/session/{User UUID} HTTP/1.1
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJ0eX...xA8
 Cache-Control: no-cache
-
 {
     "event_date": "2019-01-12T16:54:57Z",
     "sessions":[
@@ -284,27 +286,10 @@ Cache-Control: no-cache
                     "deleted": false,
                     "ignored": false,
                     "hr_data":  [
-                                {"value": 153, 
-                                    "startDate": "2019-01-12T10:43:08.490-0500", 
-                                    "endDate": "2019-01-12T10:43:08.490-0500"},
-                                {"value": 156, 
-                                    "startDate": "2019-01-12T10:43:03.490-0500", 
-                                    "endDate": "2019-01-12T10:43:03.490-0500"},
-                                {"value": 161, 
-                                    "startDate": "2019-01-12T10:42:58.490-0500", 
-                                    "endDate": "2019-01-12T10:42:58.490-0500"},
-                                {"value": 163, 
-                                    "startDate": "2019-01-12T10:42:56.490-0500", 
-                                    "endDate": "2019-01-12T10:42:56.490-0500"},
-                                {"value": 167, 
-                                    "startDate": "2019-01-12T10:42:50.490-0500", 
-                                    "endDate": "2019-01-12T10:42:50.490-0500"},
-                                {"value": 163, 
-                                    "startDate": "2019-01-12T10:42:47.490-0500", 
-                                    "endDate": "2019-01-12T10:42:47.490-0500"},
-                                {"value": 127, 
-                                    "startDate": "2019-01-12T10:41:23.490-0500", 
-                                    "endDate": "2019-01-12T10:41:23.490-0500"}
+                                {"value": 153,
+                                 "startDate": "2019-01-12T10:43:08.490-0500",
+                                 "endDate": "2019-01-12T10:43:08.490-0500"
+                                 },
                             ],
                     "post_session_survey": {
                                             "event_date": "2019-02-08T16:54:57Z",
@@ -987,7 +972,6 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "start_date_time": null
     }
 ```
-
 * `AssignedExercise` has the following example schema
 ```
 {
@@ -1039,8 +1023,17 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "youtube_id": null
 }
 ```
-
-
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
 ## Appendix
 
 ### Enumerations
@@ -1128,16 +1121,18 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     rectus_femoris = 58
     tensor_fascia_latae = 59 # hips
     piriformis = 60 # deep rotator of hip
-    gastrocnemius_lateral = 61  # calves - was 75 but that was a duplicate
-    sartorius = 62  # quads
+    gastrocnemius_lateral = 61
+    sartorius = 62 
     gluteus_medius_anterior_fibers = 63
     gluteus_medius_posterior_fibers = 64
     gluteus_minimus = 65
     gluteus_maximus = 66
     quadratus_femoris = 67
     popliteus = 68
-    external_obliques = 69  # abdominal
+    external_obliques = 69
     quadratus_lumorum = 70
+```
+```
     psoas = 71
     iliacus = 72
     transverse_abdominis = 73
@@ -1188,6 +1183,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     gymnastics = 8
     skate_sports = 9
     lacrosse = 10
+```
+```
     rowing = 11
     rugby = 12
     diving = 13
@@ -1236,6 +1233,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     cross_training = 56
     elliptical = 57
     functional_strength_training = 58
+```
+```
     hiking = 59
     hunting = 60
     mind_and_body = 61
