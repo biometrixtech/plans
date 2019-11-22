@@ -34,6 +34,7 @@ class SurveyProcessing(object):
         self.plans = []
         self.stats_processor = None
         self.datastore_collection = datastore_collection
+        self.symptoms = []
 
     def create_session_from_survey(self, session, historic_health_data=False):
         session_obj = self.convert_session(session, historic_health_data)
@@ -211,7 +212,8 @@ class SurveyProcessing(object):
             self.stats_processor.load_historical_data()
         soreness_list_25 = self.stats_processor.merge_soreness_from_surveys(
             self.stats_processor.get_readiness_soreness_list(self.stats_processor.last_25_days_readiness_surveys),
-            self.stats_processor.get_ps_survey_soreness_list(self.stats_processor.last_25_days_ps_surveys)
+            self.stats_processor.get_ps_survey_soreness_list(self.stats_processor.last_25_days_ps_surveys),
+            self.stats_processor.last_25_days_symptoms
             )
         for q3_response in clear_candidates:
             body_part_location = BodyPartLocation(q3_response['body_part'])
@@ -317,6 +319,11 @@ class SurveyProcessing(object):
         self.athlete_stats.high_relative_load_session = high_relative_load_session_present
         self.athlete_stats.high_relative_load_session_sport_name = sport_name
 
+    def create_soreness_from_survey(self, soreness):
+        soreness['reported_date_time'] = self.event_date_time
+        soreness = Soreness().json_deserialise(soreness)
+        self.symptoms.append(soreness)
+
 
 def create_session(session_type, data):
     session = SessionFactory().create(SessionType(session_type))
@@ -368,7 +375,8 @@ def match_sessions(user_sessions, health_session):
     return health_session
 
 
-def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None, force_data=False, mobilize_only=False, visualizations=True):
+def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None,
+                force_data=False, mobilize_only=False, visualizations=True, hist_update=False):
     if datastore_collection is None:
         datastore_collection = DatastoreCollection()
     if update_stats:
@@ -378,7 +386,7 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
                                               # event_date=format_date(event_date),
                                               event_date=event_date,
                                               datastore_collection=datastore_collection)
-        athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats)
+        athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats, force_historical_process=hist_update)
         # update metrics
         metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats=athlete_stats,
                                                                      event_date=format_date(event_date))

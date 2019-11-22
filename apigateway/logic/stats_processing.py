@@ -9,12 +9,15 @@ from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
 from models.soreness import Soreness
 from models.soreness_base import HistoricSorenessStatus
-from models.body_parts import BodyPart
+from models.body_parts import BodyPart, BodyPartFactory, BodyPartLocation, BodyPartSide
 from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence, SorenessCause
 from models.post_session_survey import PostSessionSurvey
 from models.data_series import DataSeries
 from models.asymmetry import HistoricAsymmetry, AsymmetryType
 from utils import parse_date, format_date
+from logic.injury_risk_processing import InjuryRiskProcessor
+from models.athlete_injury_risk import AthleteInjuryRisk
+from copy import deepcopy
 
 
 class StatsProcessing(object):
@@ -25,6 +28,7 @@ class StatsProcessing(object):
         self.athlete_stats_datastore = datastore_collection.athlete_stats_datastore
         self.daily_plan_datastore = datastore_collection.daily_plan_datastore
         self.cleared_soreness_datastore = datastore_collection.cleared_soreness_datastore
+        self.injury_risk_datastore = datastore_collection.injury_risk_datastore
         self.start_date = None
         self.end_date = None
         self.start_date_time = None
@@ -62,6 +66,11 @@ class StatsProcessing(object):
         self.all_plans = []
         self.all_daily_readiness_surveys = []
         self.historic_data_loaded = False
+        self.acute_symptoms = []
+        self.chronic_symptoms = []
+        self.last_7_days_symptoms = []
+        self.days_8_14_symptoms = []
+        self.last_25_days_symptoms = []
 
     def set_start_end_times(self):
         # start_date = datetime.strptime(self.event_date, "%Y-%m-%d")
@@ -84,7 +93,7 @@ class StatsProcessing(object):
         return True
 
     @xray_recorder.capture('logic.StatsProcessing.process_athlete_stats')
-    def process_athlete_stats(self, current_athlete_stats=None):
+    def process_athlete_stats(self, current_athlete_stats=None, force_historical_process=False):
         if self.start_date is None:
             self.set_start_end_times()
         self.load_historical_data()
@@ -99,7 +108,8 @@ class StatsProcessing(object):
         current_athlete_stats = self.calc_survey_stats(current_athlete_stats)
         soreness_list_25 = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.last_25_days_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys)
+            self.get_ps_survey_soreness_list(self.last_25_days_ps_surveys),
+            self.last_25_days_symptoms
         )
 
         current_athlete_stats.historic_soreness = self.get_historic_soreness_list(soreness_list_25,
@@ -152,10 +162,67 @@ class StatsProcessing(object):
         current_athlete_stats.biomechanics_hip_drop_chart = training_volume_processing.biomechanics_hip_drop_chart
 
         current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
-        current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
+
+        body_part_factory = BodyPartFactory()
+
+        body_part_side_dict = {}
+
+        detailed_symptoms = []
+        for s in soreness_list_25:
+            if s.reported_date_time not in body_part_side_dict:
+                body_part_side_dict[s.reported_date_time] = []
+            muscles = BodyPartLocation.get_muscles_for_group(s.body_part.location)
+            if isinstance(muscles, list) and len(muscles) > 0:  # muscle groups that have constituent muscles defined
+                for m in muscles:
+                    viz_muscle_group = m.get_viz_muscle_group(m)
+                    if isinstance(viz_muscle_group, bool):
+
+                        symptom = deepcopy(s)
+                        symptom.body_part = BodyPart(m, None)
+                        body_part_side = BodyPartSide(m, s.side)
+                        bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
+                        if bilateral and s.side == 0:
+                            symptom.side = 1
+                            body_part_side = BodyPartSide(m, 1)
+                            symptom_2 = deepcopy(s)
+                            symptom_2.body_part = BodyPart(m, None)
+                            symptom_2.side = 2
+                            body_part_side_2 = BodyPartSide(m, 2)
+                            if body_part_side_2 not in body_part_side_dict[s.reported_date_time]:
+                                body_part_side_dict[s.reported_date_time].append(body_part_side_2)
+                                detailed_symptoms.append(symptom_2)
+                        if body_part_side not in body_part_side_dict[s.reported_date_time]:
+                            body_part_side_dict[s.reported_date_time].append(body_part_side)
+                            detailed_symptoms.append(symptom)
+                    else:
+                        symptom = deepcopy(s)
+                        symptom.body_part = BodyPart(viz_muscle_group, None)
+                        body_part_side = BodyPartSide(viz_muscle_group, s.side)
+                        bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
+                        if bilateral and s.side == 0:
+                            symptom.side = 1
+                            symptom_2 = deepcopy(s)
+                            symptom_2.body_part = BodyPart(viz_muscle_group, None)
+                            body_part_side = BodyPartSide(viz_muscle_group, 1)
+                            symptom_2.side = 2
+                            body_part_side_2 = BodyPartSide(viz_muscle_group, 2)
+                            if body_part_side_2 not in body_part_side_dict[s.reported_date_time]:
+                                body_part_side_dict[s.reported_date_time].append(body_part_side_2)
+                                detailed_symptoms.append(symptom_2)
+                        if body_part_side not in body_part_side_dict[s.reported_date_time]:
+                            body_part_side_dict[s.reported_date_time].append(body_part_side)
+                            detailed_symptoms.append(symptom)
+            else:  # joints, ligaments and muscle groups that do not have constituent muscles defined
+                detailed_symptoms.append(s)
+
+        #current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
+        current_athlete_stats.body_response_chart.process_soreness(detailed_symptoms)
+
+        temp_symptoms = [d for d in detailed_symptoms if d.reported_date_time.date() == self.event_date.date()]
 
         body_part_chart_collection = BodyPartChartCollection(self.event_date)
-        body_part_chart_collection.process_soreness_list(soreness_list_25)
+        #body_part_chart_collection.process_soreness_list(soreness_list_25)
+        body_part_chart_collection.process_soreness_list(detailed_symptoms)
         current_athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
         current_athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
 
@@ -185,6 +252,18 @@ class StatsProcessing(object):
             # persist all of soreness/pain and session_RPE
             current_athlete_stats.session_RPE = current_athlete_stats.session_RPE
             current_athlete_stats.session_RPE_event_date = current_athlete_stats.session_RPE_event_date
+            if force_historical_process:
+                # New
+                historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+                injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
+                                                            historical_injury_risk_dict, current_athlete_stats, self.athlete_id)
+                injury_risk_processor.process(update_historical_data=True)
+
+                athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
+                athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
+
+                self.injury_risk_datastore.put(athlete_injury_risk)
+
         else:  # nightly process (first update for the day)
             # clear these if it's a new day
             current_athlete_stats.session_RPE = None
@@ -225,6 +304,17 @@ class StatsProcessing(object):
             if not found:
                 current_athlete_stats.muscular_strain.append(most_recent_muscular_strain)
 
+            # New
+            historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+            injury_risk_processor = InjuryRiskProcessor(self.event_date, soreness_list_25, sessions,
+                                                        historical_injury_risk_dict, current_athlete_stats, self.athlete_id)
+            injury_risk_processor.process(update_historical_data=True)
+
+            athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
+            athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
+
+            self.injury_risk_datastore.put(athlete_injury_risk)
+
             # training_volume_processing.fill_load_monitoring_measures(self.all_daily_readiness_surveys, self.all_plans, parse_date(self.event_date))
             # current_athlete_stats.muscular_strain_increasing = training_volume_processing.muscular_strain_increasing()
             # current_athlete_stats.high_relative_load_benchmarks = training_volume_processing.calc_high_relative_load_benchmarks()
@@ -239,10 +329,12 @@ class StatsProcessing(object):
 
         acute_surveys = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.acute_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.acute_post_session_surveys))
+            self.get_ps_survey_soreness_list(self.acute_post_session_surveys),
+            self.acute_symptoms)
         chronic_surveys = self.merge_soreness_from_surveys(
             self.get_readiness_soreness_list(self.chronic_readiness_surveys),
-            self.get_ps_survey_soreness_list(self.chronic_post_session_surveys))
+            self.get_ps_survey_soreness_list(self.chronic_post_session_surveys),
+            self.chronic_symptoms)
         all_surveys = []
         all_surveys.extend(acute_surveys)
         all_surveys.extend(chronic_surveys)
@@ -360,15 +452,18 @@ class StatsProcessing(object):
             self.all_plans = self.daily_plan_datastore.get(self.athlete_id, self.start_date, self.end_date, stats_processing=True)
             self.all_daily_readiness_surveys = [plan.daily_readiness_survey for plan in self.all_plans if plan.daily_readiness_survey is not None]
         post_session_surveys = []
+        symptoms = []
         for plan in self.all_plans:
             post_surveys = \
                 [PostSessionSurvey.post_session_survey_from_training_session(session.post_session_survey, self.athlete_id, session.id, session.session_type().value, plan.event_date)
                  for session in plan.training_sessions if session is not None]
             post_session_surveys.extend([s for s in post_surveys if s is not None])
+            symptoms.extend(plan.symptoms)
         self.update_start_times(self.all_daily_readiness_surveys, post_session_surveys, self.all_plans)
         self.set_acute_chronic_periods()
         self.load_historical_readiness_surveys(self.all_daily_readiness_surveys)
         self.load_historical_post_session_surveys(post_session_surveys)
+        self.load_historical_symptoms(symptoms)
         self.load_historical_plans()
         self.historic_data_loaded = True
 
@@ -1019,36 +1114,41 @@ class StatsProcessing(object):
 
         return streak_soreness, streak_start_soreness
 
-    def merge_soreness_from_surveys(self, readiness_survey_soreness_list, ps_survey_soreness_list):
+    def merge_soreness_from_surveys(self, readiness_survey_soreness_list, ps_survey_soreness_list, symptoms):
 
         soreness_list = []
         merged_soreness_list = []
 
         soreness_list.extend(readiness_survey_soreness_list)
         soreness_list.extend(ps_survey_soreness_list)
-
-        grouped_soreness = {}
-
-        ns = namedtuple("ns", ["location", "is_pain", "side", "reported_date_time"])
-
-        for s in soreness_list:
-            ns_new = ns(s.body_part.location, s.pain, s.side, s.reported_date_time)
-            if ns_new in grouped_soreness:
-                grouped_soreness[ns_new] = max(grouped_soreness[ns_new], SorenessCalculator.get_severity(s.severity, s.movement))
-            else:
-                grouped_soreness[ns_new] = SorenessCalculator.get_severity(s.severity, s.movement)
-
-        for r in grouped_soreness:
-
-            s = Soreness()
-            s.body_part = BodyPart(r.location, None)
-            s.side = r.side
-            s.reported_date_time = r.reported_date_time
-            s.severity = grouped_soreness[r]
-            s.pain = r.is_pain
-            merged_soreness_list.append(s)
-
-        return merged_soreness_list
+        soreness_list.extend(symptoms)
+        for soreness in soreness_list:
+            soreness.severity = SorenessCalculator.get_severity(soreness.severity, soreness.movement)
+        #TODO merge within date
+        return soreness_list
+        # grouped_soreness = {}
+        #
+        # ns = namedtuple("ns", ["location", "is_pain", "side", "reported_date_time"])
+        #
+        # for s in soreness_list:
+        #     ns_new = ns(s.body_part.location, s.pain, s.side, s.reported_date_time)
+        #     if ns_new in grouped_soreness:
+        #         grouped_soreness[ns_new] = max(grouped_soreness[ns_new], SorenessCalculator.get_severity(s.severity, s.movement))
+        #     else:
+        #         grouped_soreness[ns_new] = SorenessCalculator.get_severity(s.severity, s.movement)
+        #
+        # for r in grouped_soreness:
+        #
+        #     s = Soreness()
+        #     s.body_part = BodyPart(r.location, None)
+        #     s.side = r.side
+        #     s.reported_date_time = r.reported_date_time
+        #     s.severity = grouped_soreness[r]
+        #     s.pain = r.is_pain
+        #
+        #     merged_soreness_list.append(s)
+        #
+        # return merged_soreness_list
 
     def get_hs_dictionary(self, soreness_list):
 
@@ -1364,6 +1464,27 @@ class StatsProcessing(object):
 
         self.days_8_14_ps_surveys = [p for p in post_session_surveys if self.last_week is not None
                                      and self.previous_week is not None and self.last_week > p.event_date_time >= self.previous_week]
+
+
+    def load_historical_symptoms(self, symptoms):
+
+        self.acute_symptoms = sorted([s for s in symptoms if self.acute_start_date_time is not None and
+                                      s.reported_date_time >= self.acute_start_date_time],
+                                     key=lambda x: x.reported_date_time)
+        self.chronic_symptoms = sorted([s for s in symptoms if self.acute_start_date_time is not None and
+                                        self.chronic_start_date_time is not None and
+                                        self.acute_start_date_time > s.reported_date_time >= self.chronic_start_date_time],
+                                       key=lambda x: x.reported_date_time)
+
+        self.last_7_days_symptoms = [s for s in symptoms if self.last_week is not None and
+                                     s.reported_date_time >= self.last_week]
+
+        self.last_25_days_symptoms = [s for s in symptoms if self.last_25_days is not None and
+                                      s.reported_date_time >= self.last_25_days]
+
+        self.days_8_14_symptoms = [s for s in symptoms if self.last_week is not None
+                                   and self.previous_week is not None and
+                                   self.last_week > s.reported_date_time >= self.previous_week]
 
     def update_start_times(self, daily_readiness_surveys, post_session_surveys, daily_plans):
 

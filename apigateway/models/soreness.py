@@ -59,6 +59,8 @@ class Soreness(BaseSoreness, Serialisable):
         self.ache = None
         self.sharp = None
 
+        self.severity_combined = False
+
 
     @classmethod
     def json_deserialise(cls, input_dict):
@@ -100,17 +102,17 @@ class Soreness(BaseSoreness, Serialisable):
                     value = parse_datetime(value)
                 except InvalidSchemaException:
                     value = parse_date(value)
-        elif name in ['tight', 'knots'] and value is not None:
+        elif name in ['tight', 'knots'] and value is not None and not self.severity_combined:
             self.movement = self.get_movement_from_tight_knot(value)
 
-        elif name == 'sharp' and value is not None:
+        elif name == 'sharp' and value is not None and not self.severity_combined:
             severity_sharp = self.get_pain_from_sharp_ache(value)
             self.pain = True
             if self.severity is None:
                 self.severity = severity_sharp
             else:
                 self.severity = max([self.severity, severity_sharp])
-        elif name == 'ache' and value is not None:
+        elif name == 'ache' and value is not None and not self.severity_combined:
             if BodyPartFactory().is_muscle(self.body_part):
                 severity_ache = self.get_soreness_from_ache(value)
             else:  # is joint
@@ -337,7 +339,8 @@ class Soreness(BaseSoreness, Serialisable):
                    'tight': self.tight,
                    'knots': self.knots,
                    'ache': self.ache,
-                   'sharp': self.sharp
+                   'sharp': self.sharp,
+                   'reported_date_time': format_datetime(self.reported_date_time) if self.reported_date_time is not None else None
                   }
         return ret
 

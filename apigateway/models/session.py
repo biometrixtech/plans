@@ -8,6 +8,8 @@ from models.sport import SportName, SportType, BaseballPosition, BasketballPosit
 from models.post_session_survey import PostSurvey
 from models.load_stats import LoadStats
 from models.asymmetry import Asymmetry
+from models.functional_movement import MovementPatterns
+from models.soreness_base import BodyPartSide
 
 
 class SessionType(Enum):
@@ -114,6 +116,13 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
         # three sensor
         self.asymmetry = None
+        self.movement_patterns = None
+        # self.overactive_body_parts = []
+        # self.underactive_inhibited_body_parts = []
+        # self.underactive_weak_body_parts = []
+        # self.compensating_body_parts = []
+        # self.short_body_parts = []
+        # self.long_body_parts = []
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
@@ -317,7 +326,14 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'calories': self.calories,
             'distance': self.distance,
             'source': self.source.value if self.source is not None else SessionSource.user.value,
-            'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None
+            'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None,
+            'movement_patterns': self.movement_patterns.json_serialise() if self.movement_patterns is not None else None,
+            # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
+            # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
+            # 'underactive_weak_body_parts': [u.json_serialise() for u in self.underactive_weak_body_parts],
+            # 'compensating_body_parts': [c.json_serialise() for c in self.compensating_body_parts],
+            # 'short_body_parts': [c.json_serialise() for c in self.short_body_parts],
+            # 'long_body_parts': [c.json_serialise() for c in self.long_body_parts],
         }
         return ret
 
@@ -367,7 +383,15 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             session.post_session_survey = None
         session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
-
+        session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
+            'movement_patterns') is not None else None
+        # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
+        # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]
+        # session.underactive_weak_body_parts = [BodyPartSide.json_deserialise(u) for u in
+        #                                             input_dict.get('underactive_weak_body_parts',[])]
+        # session.compensating_body_parts = [BodyPartSide.json_deserialise(c) for c in input_dict.get('compensating_body_parts',[])]
+        # session.short_body_parts = [BodyPartSide.json_deserialise(c) for c in input_dict.get('short_body_parts',[])]
+        # session.long_body_parts = [BodyPartSide.json_deserialise(c) for c in input_dict.get('long_body_parts',[])]
         return session
 
     def internal_load(self):

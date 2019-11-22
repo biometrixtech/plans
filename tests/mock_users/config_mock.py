@@ -38,6 +38,7 @@ def get_mongo_database(suffix='Test'):
         os.environ["MONGO_COLLECTION_SLEEPHISTORY"] = config['collection_sleephistory'] + suffix
         os.environ["MONGO_COLLECTION_CLEAREDSORENESS"] = config['collection_clearedsoreness'] + suffix
         os.environ["MONGO_COLLECTION_ASYMMETRY"] = config['collection_asymmetry'] + suffix
+        os.environ["MONGO_COLLECTION_INJURYRISK"] = config['collection_injuryrisk'] + suffix
 
         host = Config.get('MONGO_HOST')
         replicaset = Config.get('MONGO_REPLICASET')
