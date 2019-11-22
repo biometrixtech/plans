@@ -1654,7 +1654,7 @@ The following reportable body parts are considered ligaments
 ```
 
 #### Muscles
-The following reportable body parts are considered ligaments
+The following reportable body parts are considered muscles
 ```
     chest = 2
     abdominals = 3
