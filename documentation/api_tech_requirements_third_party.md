@@ -138,17 +138,18 @@ Required data elements are based on the following simple types :
 The following data elements are required when following the  __Daily Readiness__ pathway to __Daily Plan__ generation.
 
 * `date_time` __should__ be a Datetime and reflect the local time that survey was taken
-* `soreness` __should__ reflect a list of body parts(`sore_part`) with pain or soreness. Length __could__ be 0.
+* `soreness` __should__ reflect a list of body parts(`sore_part`) with symptoms. Length __could__ be 0.
 
 `sore_part` __should__ include the following:
 
-* `body_part` __should__ be an integer reflecting BodyPart enum of the body part with pain/soreness
-* `severity` __should__ be an integer 0, 1, 3 or 5 indicating the severity of the pain/soreness
-* `movement` __should__ be an integer 0, 1, 3 or 5 indicating how much movement is restricted 
+* `body_part` __should__ be an integer reflecting BodyPart enum of the body part with symptom
 * `side` __should__ be an integer, either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
-* `pain` __should__ be a boolean to indicate whether it's pain or soreness.
+* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
+* `knots` __should__ be reported for muscles only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be `null`
+* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
+* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be `null`
 
-Note: Fathom can customize the processing of `severity` and `movement` data upon request to accommodate third-party systems that only report `severity` related measures.
+Note: Fathom can customize the processing of symptoms data upon request to accommodate third-party systems that only report a subset of measures.
 
 #### Optional Data Elements
 
@@ -190,11 +191,17 @@ The following data elements are required when following the  __Post-Workout__ pa
 * `soreness` __should__ follow the same definition as in  _Daily Readiness_
 
 
+### Symptom-Reporting
+#### Required Data Elements
+The following data elements are required when following the  __Symptom-Reporing__ pathway to __Daily Plan__ generation.
+
+* `event_date` __should__ be a Datetime and reflect the local time that survey was taken
+* `soreness` __should__ follow the same definition as in _Daily Readiness_
 
 
 ## Appendix
 
-### Enums
+### Enumerations
 
 #### Reportable body part
 

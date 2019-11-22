@@ -1,4 +1,4 @@
-# FathomAI - Plans API (v 4.4.0)
+# FathomAI - Plans API (v 4.6.0)
 
 ## Common provisions
 
@@ -150,12 +150,12 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 
 ```
-* `body_part` __should__ be an integer reflecting BodyPart enum as defined in Appendix
-* `side` __should__ be an integer reflecting side enum as defined in Appendix
-* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be null
-* `knots` __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be null. It should only be available for muscles.
-* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be null
-* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be null
+* `body_part` __should__ be an integer reflecting BodyPart enumeration as defined in Appendix
+* `side` __should__ be an integer reflecting side enumeration as defined in Appendix
+* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
+* `knots` __should__ be reported for muscles(see Appendix) only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be `null`
+* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
+* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be `null`
 
 ```
 POST /plans/{version}/daily_readiness/{User UUID} HTTPS/1.1
@@ -168,10 +168,10 @@ Authorization: eyJraWQ...ajBc4VQ
     "soreness":[{
                                     "body_part": 14,
                                     "side": 2
-                                    "tight": 3,
-                                    "knots": 5,
+                                    "tight": null,
+                                    "knots": null,
                                     "ache": 3,
-                                    "sharp": 4,
+                                    "sharp": 6,
                                 }],
     "sessions": [{"event_date": "2018-12-10T12:30:00Z",
                   "sport_name": 3,
@@ -197,72 +197,8 @@ Authorization: eyJraWQ...ajBc4VQ
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of Get Daily Plan route.
+* `daily_plan` will have the same schema as defined in Get Daily Plan.
 
-
-#### Soreness/Typical Session history
-
-This endpoint can be called to get the body parts where soreness was reported in the last three days and typical sessions.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/daily_readiness/{User UUID}/previous`. The request method __must__ be `POST`.
-
-##### Request
-For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
-```
-{
-    "event_date": Datetime
-}
-```
-```
-POST /plans/{version}/daily_readiness/{User UUID}/previous HTTPS/1.1
-Host: apis.{env}.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-```
-Authentication is required for this endpoint
-
-##### Response
- 
- The Service __will__ respond with HTTP Status `200 OK`, with a body having the following syntax:
- 
-```
-"readiness": readiness,
-"typical_sessions": [sesson, session]
-```
-`readiness` will have the following schema
-```
-{
-    "body_parts": [],
-    "hist_sore_status": [],
-    "clear_candidates": [],
-    "dormant_tipping_candidates": [],
-    "current_position": integer,
-    "current_sport_name": integer
-}
-```
-* `body_parts` will be a list of enumerated body parts + side (potentially empty) `DEPRECATED, WILL BE EMPTY`
-* `clear_candidates` will be a list of sore body parts with historical status that are candidates for clearance `DEPRECATED, WILL BE EMPTY`
-* `hist_sore_status` will be a list of sore body parts with historical status that are not candidates for clearing `DEPRECATED, WILL BE EMPTY`
-* `dormant_tipping_candidates` will be a list of sore body parts that should not prompt a response for the user but if they indicate a status for that, they will tip into specific status as defined in the response `DEPRECATED, WILL BE EMPTY`
-* `current_position` and `current_sport_name` will be an enumeration, if they exist `DEPRECATED`
-
-`typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
-* `session` object will be of the following schema
-
-``` 
-{
-    "count": integer,
-    "duration": integer,
-    "event_date": datetime,
-    "session_type": integer,
-    "sport_name": integer,
-    "strength_and_conditioning_type": integer
-}
-
-```
 
 ### Session
 
@@ -288,7 +224,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 * `event_date` __should__ reflect the date and time when the survey is submitted.
 * `health_sync_date` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source
-* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day
+* `sessions_planned` __should__ represent whether the user plans to train again that day
 * `user_age` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source and contains heart rate data
 * `session` __should__ be of the following schema
 ```
@@ -313,7 +249,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "hr_data": [hr, hr, hr],
 }
 ```
-* `event_date` __should__ reflect the start time of the session (third party/FathomPRO data) or default date (manually logged session)
+* `event_date` __should__ reflect the start time of the session (third party/FathomPRO data) or when the session is logged (manually logged session)
 * `end_date` is __optional__ parameter that reflects the end time of the session for third party/FathomPRO data
 * `session_type` __should__ reflect SessionType enumeration. NOTE: We'll only use 6 moving forward
 * `sport_name` __should__ reflect SportName enumeration as defined in Appendix.
@@ -393,7 +329,7 @@ Cache-Control: no-cache
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of Get Daily Plan route.
+* `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 
 #### Mark no sessions planned
@@ -435,7 +371,7 @@ Cache-Control: no-cache
     "daily_plans": [daily_plan]
 }
 ```
-where `daily_plan` will have the standard schema as defined in Get Daily Plan
+* `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 #### Delete
 
@@ -541,6 +477,114 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+#### Typical Sessions history
+
+This endpoint can be called to get typical sessions that the user logs
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/session/{User UUID}/typical`. The request method __must__ be `POST`.
+
+##### Request
+For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
+```
+POST /plans/{version}/session/{User UUID}/typical HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2019-02-08T16:30:00Z"
+}
+
+```
+Authentication is required for this endpoint
+
+##### Response
+ 
+ The Service __will__ respond with HTTP Status `200 OK`, with a body having the following syntax:
+ 
+```
+{
+    "typical_sessions": [sesson, session]
+}
+```
+`typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
+* `session` object will be of the following schema
+
+``` 
+{
+    "count": integer,
+    "duration": integer,
+    "event_date": datetime,
+    "session_type": integer,
+    "sport_name": integer,
+    "strength_and_conditioning_type": integer
+}
+
+```
+
+### Symptoms
+
+#### Submit
+
+This endpoint can be called to submit symptoms to receive a new plan without submitting a session.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/symptoms/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime,
+    "soreness": [sore_part, sore_part]
+}
+```
+* `event_date` __should__  be a Datetime and reflect the local time that survey was taken
+* `soreness` __should__ reflect a list of body parts(`sore_part`) as defined in Readiness Create
+
+
+```
+POST /plans/version/symptoms/{User UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2019-10-29T17:45:24Z",
+    "soreness":[
+        {
+            "body_part": 18,
+            "side": 0,
+            "tight": 4,
+            "knots": null,
+            "sharp": null,
+            "ache": null
+        }
+    ]
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in Get Daily Plan.
+
+
+
 ### Active Recovery
 
 #### Mark Started (Exercise Modalities)
@@ -561,7 +605,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `event_date` __should__ be the time when user checks the first exercise for the session.
-* `recovery_type` __should__ be one of `pre_active_rest`, `post_active_rest` or `cool_down`
+* `recovery_type` __should__ be one of `pre_active_rest` or `post_active_rest`<!--  or `cool_down` -->
 
 ```
 POST /plans/{version}/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
@@ -602,7 +646,7 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 ```
 * `event_date` __should__ be the time when user completes the session.
-* `recovery_type` __should__ be one of `pre_active_rest`, `post_active_rest` or `cool_down`
+* `recovery_type` __should__ be one of `pre_active_rest` or `post_active_rest`<!--  or `cool_down` -->
 * `completed_exercises` __should__ be a list representing the exercises that the user checked off
 
 ```
@@ -625,7 +669,7 @@ If the write was successful, the Service __will__ respond with HTTP Status `202 
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of Get Daily Plan route.
+* `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 
 
@@ -690,33 +734,34 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `event_date` __should__ be the time when user completes the session.
 * `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
 * `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
-* `body_part` __should__ be of the following schema. Note that there will be additional attributes based on whether it's `heat` or `ice`. They should just be passed along as is.
+* `body_part` __should__ be of the following schema.
 ```
 {
-    "active": true,
-    "body_part_location": 7,
-    "completed": false,
-    "goals": [
-        {
-            "goal_type": 0,
-            "priority": 1,
-            "text": "Care for Pain",
-            "trigger": "Pain Reported Today"
-        }
-    ]
-    "side": 1
+    "body_part_location": number,
+    "side": number
 }
 ```
+* `body_part_location` __should__ be an integer reflecting Body Part enumeration as defined in Appendix
+* `side` __should__ be an integer reflecting [side](#side) enumeration
 
 ```
-PATCH /plans/{version}/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
+PATCH /plans/version/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
     "recovery_type": "ice",
-    "completed_body_parts": ["3", "5", "20", "142"]
+    "completed_body_parts": [
+                                {
+                                    "body_part_lcoation": 3,
+                                    "side": 0,
+                                },
+                                {
+                                    "body_part_lcoation": 7,
+                                    "side": 1,
+                                }
+                        ]
 }
 ```
 ##### Response
@@ -728,7 +773,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of Get Daily Plan route.
+* `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 
 ### Daily Plans
@@ -999,7 +1044,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
 
 ## Appendix
 
-### Enums
+### Enumerations
 
 #### BodyPart
 
@@ -1261,6 +1306,46 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
     health = 1
     user_health = 2
     three_sensor = 3
+```
+
+### Body Part Types
+
+#### Joints
+The following reportable body parts are considered joints
+```
+    elbow = 19
+    wrist = 20
+    knee = 7
+    ankle = 9
+    foot = 10
+```
+#### Ligaments
+The following reportable body parts are considered ligaments
+```
+    it_band = 11
+    it_band_lateral_knee = 27
+    achilles = 17
+```
+
+#### Muscles
+The following reportable body parts are considered ligaments
+```
+    chest = 2
+    abdominals = 3
+    groin = 5
+    quads = 6
+    shin = 8
+    lower_back = 12
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    upper_back_neck = 18
+    lats = 21
+    biceps = 22
+    triceps = 23
+    forearm = 24
+    hip_flexor = 28
+    deltoid = 29
 ```
 ###### Last Modified: September 9, 2019
 

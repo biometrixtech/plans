@@ -20,6 +20,7 @@
       - [Mark no sessions planned](#mark-no-sessions-planned)
       - [Delete](#delete)
       - [Update](#update)
+      - [Typical Sessions history](#typical-sessions-history)
     - [Symptoms](#symptoms)
       - [Submit](#submit)
     - [Active Recovery](#active-recovery)
@@ -40,12 +41,16 @@
       - [Log App/Device information](#log-appdevice-information)
       - [Copy test user's data](#copy-test-users-data)
   - [Appendix](#appendix)
-    - [Enums](#enums)
+    - [Enumerations](#enumerations)
       - [Reportable body part](#reportable-body-part)
       - [All body parts](#all-body-parts)
       - [side](#side)
       - [sport name](#sport-name)
       - [Session Source](#session-source)
+    - [Body Part Types](#body-part-types)
+      - [Joints](#joints)
+      - [Ligaments](#ligaments)
+      - [Muscles](#muscles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -137,14 +142,14 @@ The client __must__ submit a request body containing a JSON object with the foll
 }
 
 ```
-* `body_part` __should__ be an integer reflecting BodyPart enum as defined in [Body parts enum](#reportable-body-part)
+* `body_part` __should__ be an integer reflecting [BodyPart](#reportable-body-part) enumeration
 <!-- * `severity` __should__ be an integer 0, 1, 3 or 5 indicating the severity of the pain/soreness -->
 <!-- * `movement` __should__ be an integer 0, 1, 3 or 5 indicating how much movement is restricted  -->
 * `side` __should__ be an integer, either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
-* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be null
-* `knots` __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be null. It should only be available for muscles.
-* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be null
-* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be null
+* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
+* `knots` __should__ be reported for [muscles](#muscles) only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be `null`
+* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
+* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be `null`
 <!-- * `pain` __should__ be a boolean to indicate whether it's pain or soreness. -->
 <!-- * `status` __should__ be a string representing the historical soreness status if one was received. Optional for soreness but required for clear candidates. -->
 
@@ -159,10 +164,10 @@ Authorization: eyJraWQ...ajBc4VQ
     "soreness":[{
                                     "body_part": 14,
                                     "side": 2
-                                    "tight": 3,
-                                    "knots": 5,
+                                    "tight": null,
+                                    "knots": null,
                                     "ache": 3,
-                                    "sharp": 4,
+                                    "sharp": 6,
                                 }],
     "sessions": [{"event_date": "2018-12-10T12:30:00Z",
                   "sport_name": 3,
@@ -189,7 +194,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get Daily Plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 #### Soreness/Typical Session history
@@ -285,9 +290,9 @@ The client __must__ submit a request body containing a JSON object with the foll
 ```
 * `event_date` __should__ reflect the date and time when the survey is submitted.
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
-* `session` __should__ be of the following schema
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 * `user_age` is __optional__ and only needed if one of the sessions is obtained from health app and contains heart rate data
+* `session` __should__ be of the following schema
 ```
 {
     "event_date": Datetime,
@@ -378,7 +383,7 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 #### Mark no sessions planned
@@ -421,7 +426,7 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
     "daily_plan": daily_plan
 }
 ```
-where `daily_plan` will have the standard schema as defined in [Get daily plan](#get-daily-plan)
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 #### Delete
 
@@ -527,6 +532,59 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+
+#### Typical Sessions history
+
+This endpoint can be called to get typical sessions that the user logs
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/session/{User UUID}/typical`. The request method __must__ be `POST`.
+
+##### Request
+For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
+```
+POST /plans/{version}/session/{User UUID}/typical HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2019-02-08T16:30:00Z"
+}
+
+```
+Authentication is required for this endpoint
+
+##### Response
+ 
+ The Service __will__ respond with HTTP Status `200 OK`, with a body having the following syntax:
+ 
+```
+{
+    "typical_sessions": [sesson, session]
+}
+```
+`typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
+* `session` object will be of the following schema
+
+``` 
+{
+    "count": integer,
+    "duration": integer,
+    "event_date": datetime,
+    "session_type": integer,
+    "sport_name": integer,
+    "strength_and_conditioning_type": integer
+}
+
+```
+
 ### Symptoms
 
 #### Submit
@@ -579,7 +637,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 ### Active Recovery
@@ -666,7 +724,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 
@@ -731,23 +789,15 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `event_date` __should__ be the time when user completes the session.
 * `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
 * `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
-* `body_part` __should__ be of the following schema. Note that there will be additional attributes based on whether it's `heat` or `ice`. They should just be passed along as is.
+* `body_part` __should__ be of the following schema
 ```
 {
-    "active": true,
-    "body_part_location": 7,
-    "completed": false,
-    "goals": [
-        {
-            "goal_type": 0,
-            "priority": 1,
-            "text": "Care for Pain",
-            "trigger": "Pain Reported Today"
-        }
-    ]
-    "side": 1
+    "body_part_location": number,
+    "side": number
 }
 ```
+* `body_part_location` __should__ be an integer reflecting [BodyPart](#reportable-body-part) enumeration
+* `side` __should__ be an integer reflecting [side](#side) enumeration
 
 ```
 PATCH /plans/version/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
@@ -757,7 +807,16 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
     "recovery_type": "ice",
-    "completed_body_parts": ["3", "5", "20", "142"]
+    "completed_body_parts": [
+                                {
+                                    "body_part_lcoation": 3,
+                                    "side": 0,
+                                },
+                                {
+                                    "body_part_lcoation": 7,
+                                    "side": 1,
+                                }
+                        ]
 }
 ```
 ##### Responses
@@ -769,7 +828,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 ### Daily Plans
@@ -814,9 +873,9 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
     "typical_sessions": [session, session]
 }
 ```
-* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
+* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined in [here](#sorenesstypical-session-history)
 * `typical_sessions` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
-* `daily_plans` __could__ be emply list
+* `daily_plans` __could__ be empty list
 * each `daily_plan*` will be of following schema:
 ```
 {
@@ -1343,7 +1402,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ## Appendix
 
-### Enums
+### Enumerations
 
 #### Reportable body part
 
@@ -1373,6 +1432,7 @@ Authorization: eyJraWQ...ajBc4VQ
     hip_flexor = 28
     deltoid = 29
 ```
+
 
 #### All body parts
 ```
@@ -1606,4 +1666,46 @@ Authorization: eyJraWQ...ajBc4VQ
     health = 1
     user_health = 2
     three_sensor = 3
+```
+
+
+
+### Body Part Types
+
+#### Joints
+The following reportable body parts are considered joints
+```
+    elbow = 19
+    wrist = 20
+    knee = 7
+    ankle = 9
+    foot = 10
+```
+#### Ligaments
+The following reportable body parts are considered ligaments
+```
+    it_band = 11
+    it_band_lateral_knee = 27
+    achilles = 17
+```
+
+#### Muscles
+The following reportable body parts are considered ligaments
+```
+    chest = 2
+    abdominals = 3
+    groin = 5
+    quads = 6
+    shin = 8
+    lower_back = 12
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    upper_back_neck = 18
+    lats = 21
+    biceps = 22
+    triceps = 23
+    forearm = 24
+    hip_flexor = 28
+    deltoid = 29
 ```
