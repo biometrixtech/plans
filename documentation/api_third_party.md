@@ -128,8 +128,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "sessions": [session, session],
     "sessions_planned": boolean,
     "health_sync_date": Datetime,
-    "user_age": number,
-    "sleep_data": [sleep_event]
+    "user_age": number
 }
 ```
 * `date_time` __should__ reflect the local time that survey was taken
@@ -1108,91 +1107,55 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
     deltoid = 29
     deep_rotators_hip = 30
     obliques = 31
-
-    # shin
     anterior_tibialis = 40
     peroneals_longus = 41
-
-    # calves
     posterior_tibialis = 42
     soleus = 43
     gastrocnemius_medial = 44
-
-    # hamstrings
     bicep_femoris_long_head = 45
     bicep_femoris_short_head = 46
     semimembranosus = 47
     semitendinosus = 48
-
-    # groin
     adductor_longus = 49
     adductor_magnus_anterior_fibers = 50
     adductor_magnus_posterior_fibers = 51
     adductor_brevis = 52
     gracilis = 53
     pectineus = 54
-
-    # quads
     vastus_lateralis = 55
     vastus_medialis = 56
     vastus_intermedius = 57
     rectus_femoris = 58
-
     tensor_fascia_latae = 59 # hips
     piriformis = 60 # deep rotator of hip
-
     gastrocnemius_lateral = 61  # calves - was 75 but that was a duplicate
     sartorius = 62  # quads
-
-    # glutes
     gluteus_medius_anterior_fibers = 63
     gluteus_medius_posterior_fibers = 64
     gluteus_minimus = 65
     gluteus_maximus = 66
-
-    # deep rotators of the hip (30)
     quadratus_femoris = 67
-
-    # knee
     popliteus = 68
-
     external_obliques = 69  # abdominal
-
-    # lower_back
     quadratus_lumorum = 70
-
-    # hip_flexor
     psoas = 71
     iliacus = 72
-
-    # core_stabilizers
     transverse_abdominis = 73
     internal_obliques = 74
-
-    # abdominals
     rectus_abdominis = 75
-
-    # upper back, traps, neck
     upper_trapezius = 76
     levator_scapulae = 77
     middle_trapezius = 78
     lower_trapezius = 79
     rhomboids = 80
-
-    # chest
     pectoralis_minor = 81
     pectoralis_major = 82
-
-    # deltoid (29)
     anterior_deltoid = 83
     medial_deltoid = 84
     posterior_deltoid = 85
-
     upper_body = 91
     lower_body = 92
     full_body = 93
-
-    # merge
     semimembranosus_semitendinosus = 100
     anterior_adductors = 101
     rectus_femoris_vastus_intermedius = 102
