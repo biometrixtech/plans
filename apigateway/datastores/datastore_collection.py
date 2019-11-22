@@ -4,7 +4,7 @@ from datastores import post_session_survey_datastore, session_datastore
 from datastores import sleep_history_datastore
 from datastores import cleared_soreness_datastore
 from datastores import asymmetry_datastore
-from datastores import injury_risk_datastore
+from datastores import injury_risk_datastore, hist_injury_risk_datastore
 
 
 class DatastoreCollection(object):
@@ -22,3 +22,4 @@ class DatastoreCollection(object):
         self.cleared_soreness_datastore = cleared_soreness_datastore.ClearedSorenessDatastore()
         self.asymmetry_datastore = asymmetry_datastore.AsymmetryDatastore()
         self.injury_risk_datastore = injury_risk_datastore.InjuryRiskDatastore()
+        self.hist_injury_risk_datastore = hist_injury_risk_datastore.HistInjuryRiskDatastore()
