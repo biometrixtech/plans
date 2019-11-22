@@ -13,7 +13,7 @@ from math import floor
 
 
 class InjuryRiskProcessor(object):
-    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, athlete_stats, user_id, hist_injury_risk_dict):
+    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, athlete_stats, user_id, hist_injury_risk_dict=None):
         self.user_id = user_id
         self.event_date_time = event_date_time
         self.symptoms = symptoms_list
