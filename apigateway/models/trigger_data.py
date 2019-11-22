@@ -204,6 +204,63 @@ visualization_data = {
                     }
                 ]
             },
+            12: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 5,
+                        'text': "Limited Mobility",
+                        'type': 0,
+                        'series': "limited_mobility"
+                    },
+                    {
+                        'color': 4,
+                        'text': "Underactive",
+                        'type': 0,
+                        'series': "underactive"
+                    },
+                ]
+            },
+            13: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 5,
+                        'text': "Compensation Stress",
+                        'type': 0,
+                        'series': "compensation_stress"
+                    },
+                    {
+                        'color': 13,
+                        'text': "Training Stress",
+                        'type': 0,
+                        'series': "training_stress"
+                    },
+                ]
+            },
+            14: {
+                'title': "",
+                'y_axis_1': "",
+                'y_axis_2': "",
+                'legend': [
+                    {
+                        'color': 6,
+                        'text': "Inflamed",
+                        'type': 0,
+                        'series': "inflamed"
+                    },
+                    {
+                        'color': 5,
+                        'text': "Tight",
+                        'type': 0,
+                        'series': "tight"
+                    },
+                ]
+            },
         }
 
 cta_data = {

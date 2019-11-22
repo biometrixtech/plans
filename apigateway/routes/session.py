@@ -19,6 +19,7 @@ from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 from logic.session_processing import merge_sessions
+from models.functional_movement import MovementPatterns
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -40,12 +41,15 @@ def handle_session_create(user_id=None):
     timezone = get_timezone(event_date)
     plan_update_required = False
     train_later = False
+    hist_update = False
     if 'sessions_planned' in request.json and request.json['sessions_planned']:
         train_later = True
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
     athlete_stats.api_version = Config.get('API_VERSION')
     athlete_stats.timezone = timezone
 
@@ -130,7 +134,8 @@ def handle_session_create(user_id=None):
                            athlete_stats=survey_processor.athlete_stats,
                            stats_processor=survey_processor.stats_processor,
                            datastore_collection=datastore_collection,
-                           visualizations=visualizations)
+                           visualizations=visualizations,
+                           hist_update=hist_update)
     else:
         plan = cleanup_plan(plan, visualizations)
 
@@ -320,6 +325,7 @@ def handle_session_three_sensor_data(user_id):
 
     session_id = request.json['session_id']
     asymmetry = request.json.get('asymmetry', {})
+    movement_patterns = request.json.get('movement_patterns', {})
     duration = request.json.get('seconds_duration', 0)
     duration_minutes = round(duration / 60, 2)
     session_obj = create_session(6, {'description': 'three_sensor_data',
@@ -334,6 +340,7 @@ def handle_session_three_sensor_data(user_id):
     # update other fields
     session_obj.id = session_id
     session_obj.asymmetry = Asymmetry.json_deserialise(asymmetry)
+    session_obj.movement_patterns = MovementPatterns.json_deserialise(movement_patterns)
 
     # does session already exist
     found = False
@@ -349,6 +356,7 @@ def handle_session_three_sensor_data(user_id):
             plan.training_sessions[s].duration_sensor = duration
             plan.training_sessions[s].duration_minutes = duration_minutes
             plan.training_sessions[s].asymmetry = session_obj.asymmetry
+            plan.training_sessions[s].movement_patterns = session_obj.movement_patterns
             found = True
             break
 
@@ -381,7 +389,7 @@ def handle_get_typical_sessions(user_id=None):
 def handle_no_sessions_planned(user_id=None):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
-
+    hist_update = False
     plan_event_date = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
@@ -395,12 +403,15 @@ def handle_no_sessions_planned(user_id=None):
     plan.train_later = False
     daily_plan_datastore.put(plan)
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
     plan = create_plan(user_id,
                        event_date,
                        athlete_stats=athlete_stats,
                        update_stats=True,
                        datastore_collection=datastore_collection,
-                       visualizations=visualizations)
+                       visualizations=visualizations,
+                       hist_update=hist_update)
 
     return {'daily_plans': [plan]}, 200
 

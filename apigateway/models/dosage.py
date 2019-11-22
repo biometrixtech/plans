@@ -1,11 +1,19 @@
 from models.goal import AthleteGoal
 from models.trigger import Trigger
+from enum import Enum
+
+
+class DosageProgression(Enum):
+    min_mod_max = 0
+    mod_max_super_max = 1
 
 
 class ExerciseDosage(object):
     def __init__(self):
         self.goal = None
         self.priority = 0
+        self.last_severity = 0
+        self.tier = 0
         self.soreness_source = None
         self.sports = []
         self.efficient_reps_assigned = 0
@@ -21,10 +29,108 @@ class ExerciseDosage(object):
         self.default_comprehensive_reps_assigned = 0
         self.default_comprehensive_sets_assigned = 0
         self.ranking = 0
+        self.dosage_progression = None  # just used for calcs, no need to ser/de-ser
+
+    def set_reps_and_sets(self, exercise):
+
+        if self.priority == '1':
+            if self.dosage_progression == DosageProgression.min_mod_max:
+                self.efficient_reps_assigned = exercise.min_reps
+                self.efficient_sets_assigned = 1
+                self.default_efficient_reps_assigned = exercise.min_reps
+                self.default_efficient_sets_assigned = 1
+
+                self.complete_reps_assigned = exercise.max_reps
+                self.complete_sets_assigned = 1
+                self.default_complete_reps_assigned = exercise.max_reps
+                self.default_complete_sets_assigned = 1
+
+                self.comprehensive_reps_assigned = exercise.max_reps
+                self.comprehensive_sets_assigned = 2
+                self.default_comprehensive_reps_assigned = exercise.max_reps
+                self.default_comprehensive_sets_assigned = 2
+            elif self.dosage_progression == DosageProgression.mod_max_super_max:
+                self.efficient_reps_assigned = exercise.max_reps
+                self.efficient_sets_assigned = 1
+                self.default_efficient_reps_assigned = exercise.max_reps
+                self.default_efficient_sets_assigned = 1
+
+                self.complete_reps_assigned = exercise.max_reps
+                self.complete_sets_assigned = 2
+                self.default_complete_reps_assigned = exercise.max_reps
+                self.default_complete_sets_assigned = 2
+
+                self.comprehensive_reps_assigned = exercise.max_reps
+                self.comprehensive_sets_assigned = 3
+                self.default_comprehensive_reps_assigned = exercise.max_reps
+                self.default_comprehensive_sets_assigned = 3
+        elif self.priority == '2':
+            if self.dosage_progression == DosageProgression.min_mod_max:
+                self.efficient_reps_assigned = 0
+                self.efficient_sets_assigned = 0
+                self.default_efficient_reps_assigned = 0
+                self.default_efficient_sets_assigned = 0
+
+                self.complete_reps_assigned = exercise.min_reps
+                self.complete_sets_assigned = 1
+                self.default_complete_reps_assigned = exercise.min_reps
+                self.default_complete_sets_assigned = 1
+
+                self.comprehensive_reps_assigned = exercise.max_reps
+                self.comprehensive_sets_assigned = 1
+                self.default_comprehensive_reps_assigned = exercise.max_reps
+                self.default_comprehensive_sets_assigned = 1
+            elif self.dosage_progression == DosageProgression.mod_max_super_max:
+                self.efficient_reps_assigned = 0
+                self.efficient_sets_assigned = 0
+                self.default_efficient_reps_assigned = 0
+                self.default_efficient_sets_assigned = 0
+
+                self.complete_reps_assigned = exercise.max_reps
+                self.complete_sets_assigned = 1
+                self.default_complete_reps_assigned = exercise.max_reps
+                self.default_complete_sets_assigned = 1
+
+                self.comprehensive_reps_assigned = exercise.max_reps
+                self.comprehensive_sets_assigned = 2
+                self.default_comprehensive_reps_assigned = exercise.max_reps
+                self.default_comprehensive_sets_assigned = 2
+        elif self.priority == '3':
+            if self.dosage_progression == DosageProgression.min_mod_max:
+                self.efficient_reps_assigned = 0
+                self.efficient_sets_assigned = 0
+                self.default_efficient_reps_assigned = 0
+                self.default_efficient_sets_assigned = 0
+
+                self.complete_reps_assigned = 0
+                self.complete_sets_assigned = 0
+                self.default_complete_reps_assigned = 0
+                self.default_complete_sets_assigned = 0
+
+                self.comprehensive_reps_assigned = exercise.min_reps
+                self.comprehensive_sets_assigned = 1
+                self.default_comprehensive_reps_assigned = exercise.min_reps
+                self.default_comprehensive_sets_assigned = 1
+            elif self.dosage_progression == DosageProgression.mod_max_super_max:
+                self.efficient_reps_assigned = 0
+                self.efficient_sets_assigned = 0
+                self.default_efficient_reps_assigned = 0
+                self.default_efficient_sets_assigned = 0
+
+                self.complete_reps_assigned = 0
+                self.complete_sets_assigned = 0
+                self.default_complete_reps_assigned = 0
+                self.default_complete_sets_assigned = 0
+
+                self.comprehensive_reps_assigned = exercise.max_reps
+                self.comprehensive_sets_assigned = 1
+                self.default_comprehensive_reps_assigned = exercise.max_reps
+                self.default_comprehensive_sets_assigned = 1
 
     def severity(self):
         if self.soreness_source is not None:
-            return self.soreness_source.severity
+            #return self.soreness_source.severity
+            return self.last_severity
         else:
             return 0.5
 
@@ -36,7 +142,7 @@ class ExerciseDosage(object):
     def json_serialise(self):
         ret = {'goal': self.goal.json_serialise() if self.goal is not None else None,
                'priority': self.priority,
-               # 'soreness_source': self.soreness_source.json_serialise() if self.soreness_source is not None else None,
+               'tier': self.tier,
                'efficient_reps_assigned': self.efficient_reps_assigned,
                'efficient_sets_assigned': self.efficient_sets_assigned,
                'complete_reps_assigned': self.complete_reps_assigned,
@@ -56,11 +162,10 @@ class ExerciseDosage(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         goal = input_dict.get('goal', None)
-        soreness_source = input_dict.get('soreness_source', None)
         dosage = cls()
         dosage.goal = AthleteGoal.json_deserialise(goal) if goal is not None else None
         dosage.priority = input_dict.get('priority', 0)
-        # dosage.soreness_source = Trigger.json_deserialise(soreness_source) if soreness_source is not None else None
+        dosage.tier = input_dict.get('tier', 0)
         dosage.efficient_reps_assigned = input_dict.get('efficient_reps_assigned', 0)
         dosage.efficient_sets_assigned = input_dict.get('efficient_sets_assigned', 0)
         dosage.complete_reps_assigned = input_dict.get('complete_reps_assigned', 0)

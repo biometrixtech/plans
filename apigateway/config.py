@@ -44,6 +44,8 @@ def get_mongo_database():
         os.environ["MONGO_COLLECTION_DAILYPLANTEST"] = config['collection_dailyplantest']
         os.environ["MONGO_COLLECTION_ATHLETESTATSTEST"] = config['collection_athletestatstest']
         os.environ["MONGO_COLLECTION_COMPLETEDEXERCISESTEST"] = config['collection_completedexercisestest']
+        os.environ["MONGO_COLLECTION_INJURYRISK"] = config['collection_injuryrisk']
+        os.environ["MONGO_COLLECTION_HISTINJURYRISK"] = config['collection_histinjuryrisk']
     
         host = Config.get('MONGO_HOST')
         replicaset = Config.get('MONGO_REPLICASET')

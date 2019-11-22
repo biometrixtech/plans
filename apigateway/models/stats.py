@@ -1,7 +1,7 @@
 from serialisable import Serialisable
 from fathomapi.utils.exceptions import InvalidSchemaException
 from logic.soreness_processing import SorenessCalculator
-from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData
+from models.athlete_trend import AthleteTrends, PlanAlert, Trend, TrendCategory, TrendData, InsightCategory
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.data_series import DataSeries
 from models.historic_soreness import HistoricSeverity, HistoricSoreness
@@ -146,6 +146,7 @@ class AthleteStats(Serialisable):
         self.triggers = []
 
         self.trend_categories = []
+        self.insight_categories = []
 
         self.api_version = '4_3'
         self.timezone = '-04:00'
@@ -510,6 +511,7 @@ class AthleteStats(Serialisable):
             'sport_max_load': {str(sport_name): sport_max_load.json_serialise() for (sport_name, sport_max_load) in self.sport_max_load.items()},
             'triggers': [s.json_serialise() for s in self.triggers],
             'trend_categories': [s.json_serialise() for s in self.trend_categories],
+            'insight_categories': [s.json_serialise() for s in self.insight_categories],
             # 'workout_chart': self.workout_chart.json_serialise() if self.workout_chart is not None else None,
             # 'body_response_chart': self.body_response_chart.json_serialise() if self.body_response_chart is not None else None
             # 'training_volume_chart_data': [chart_data.json_serialise() for chart_data in self.training_volume_chart_data]
@@ -573,6 +575,8 @@ class AthleteStats(Serialisable):
         athlete_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         athlete_stats.triggers = [Trigger.json_deserialise(trigger) for trigger in input_dict.get('triggers', [])]
         athlete_stats.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
+        athlete_stats.insight_categories = [InsightCategory.json_deserialise(trend_category) for trend_category in
+                                          input_dict.get('insight_categories', [])]
         athlete_stats.api_version = input_dict.get('api_version', '4_3')
         athlete_stats.timezone = input_dict.get('timezone', '-04:00')
         athlete_stats.historic_asymmetry = {int(asymmetry_type): HistoricAsymmetry.json_deserialise(historic_asymmetry)
