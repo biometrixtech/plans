@@ -187,7 +187,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body Having the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following schema:
  
 ```
 {
@@ -563,7 +563,7 @@ Authentication is required for this endpoint
 
 ##### Response
  
- The Service __will__ respond with HTTP Status `200 OK`, with a body having the following syntax:
+ The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
  
 ```
 {
