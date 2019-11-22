@@ -9,7 +9,7 @@ from logic.soreness_processing import SorenessCalculator
 from models.stats import AthleteStats
 from models.soreness import Soreness
 from models.soreness_base import HistoricSorenessStatus
-from models.body_parts import BodyPart
+from models.body_parts import BodyPart, BodyPartFactory, BodyPartLocation, BodyPartSide
 from models.historic_soreness import HistoricSoreness, HistoricSeverity, CoOccurrence, SorenessCause
 from models.post_session_survey import PostSessionSurvey
 from models.data_series import DataSeries
@@ -17,6 +17,7 @@ from models.asymmetry import HistoricAsymmetry, AsymmetryType
 from utils import parse_date, format_date
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.athlete_injury_risk import AthleteInjuryRisk
+from copy import deepcopy
 
 
 class StatsProcessing(object):
@@ -161,10 +162,67 @@ class StatsProcessing(object):
         current_athlete_stats.biomechanics_hip_drop_chart = training_volume_processing.biomechanics_hip_drop_chart
 
         current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
-        current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
+
+        body_part_factory = BodyPartFactory()
+
+        body_part_side_dict = {}
+
+        detailed_symptoms = []
+        for s in soreness_list_25:
+            if s.reported_date_time not in body_part_side_dict:
+                body_part_side_dict[s.reported_date_time] = []
+            muscles = BodyPartLocation.get_muscles_for_group(s.body_part.location)
+            if isinstance(muscles, list) and len(muscles) > 0:  # muscle groups that have constituent muscles defined
+                for m in muscles:
+                    viz_muscle_group = m.get_viz_muscle_group(m)
+                    if isinstance(viz_muscle_group, bool):
+
+                        symptom = deepcopy(s)
+                        symptom.body_part = BodyPart(m, None)
+                        body_part_side = BodyPartSide(m, s.side)
+                        bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
+                        if bilateral and s.side == 0:
+                            symptom.side = 1
+                            body_part_side = BodyPartSide(m, 1)
+                            symptom_2 = deepcopy(s)
+                            symptom_2.body_part = BodyPart(m, None)
+                            symptom_2.side = 2
+                            body_part_side_2 = BodyPartSide(m, 2)
+                            if body_part_side_2 not in body_part_side_dict[s.reported_date_time]:
+                                body_part_side_dict[s.reported_date_time].append(body_part_side_2)
+                                detailed_symptoms.append(symptom_2)
+                        if body_part_side not in body_part_side_dict[s.reported_date_time]:
+                            body_part_side_dict[s.reported_date_time].append(body_part_side)
+                            detailed_symptoms.append(symptom)
+                    else:
+                        symptom = deepcopy(s)
+                        symptom.body_part = BodyPart(viz_muscle_group, None)
+                        body_part_side = BodyPartSide(viz_muscle_group, s.side)
+                        bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
+                        if bilateral and s.side == 0:
+                            symptom.side = 1
+                            symptom_2 = deepcopy(s)
+                            symptom_2.body_part = BodyPart(viz_muscle_group, None)
+                            body_part_side = BodyPartSide(viz_muscle_group, 1)
+                            symptom_2.side = 2
+                            body_part_side_2 = BodyPartSide(viz_muscle_group, 2)
+                            if body_part_side_2 not in body_part_side_dict[s.reported_date_time]:
+                                body_part_side_dict[s.reported_date_time].append(body_part_side_2)
+                                detailed_symptoms.append(symptom_2)
+                        if body_part_side not in body_part_side_dict[s.reported_date_time]:
+                            body_part_side_dict[s.reported_date_time].append(body_part_side)
+                            detailed_symptoms.append(symptom)
+            else:  # joints, ligaments and muscle groups that do not have constituent muscles defined
+                detailed_symptoms.append(s)
+
+        #current_athlete_stats.body_response_chart.process_soreness(soreness_list_25)
+        current_athlete_stats.body_response_chart.process_soreness(detailed_symptoms)
+
+        temp_symptoms = [d for d in detailed_symptoms if d.reported_date_time.date() == self.event_date.date()]
 
         body_part_chart_collection = BodyPartChartCollection(self.event_date)
-        body_part_chart_collection.process_soreness_list(soreness_list_25)
+        #body_part_chart_collection.process_soreness_list(soreness_list_25)
+        body_part_chart_collection.process_soreness_list(detailed_symptoms)
         current_athlete_stats.soreness_chart_data = body_part_chart_collection.get_soreness_dictionary()
         current_athlete_stats.pain_chart_data = body_part_chart_collection.get_pain_dictionary()
 

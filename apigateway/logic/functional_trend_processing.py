@@ -1,40 +1,28 @@
 from models.athlete_trend import TrendDashboardCategory, PlanAlert, Trend, TrendCategory, TrendData, \
-    FirstTimeExperienceElement, CategoryFirstTimeExperienceModal
+    FirstTimeExperienceElement, CategoryFirstTimeExperienceModal, InsightCategory
 from models.styles import BoldText, LegendColor, VisualizationType
 from models.trigger import TriggerType, Trigger
 from models.chart_data import Prevention3sChartData, RecoveryChartData, CareChartData
 from models.insights import InsightType
 from models.body_parts import BodyPartFactory
 from models.soreness_base import BodyPartSide, BodyPartLocation, BodyPartSideViz
-from models.athlete_trend import TriggerTile
+from models.athlete_trend import TriggerTile, Insight, InsightData, InsightVisualizationData, PlotLegend
 from models.sport import SportName
 from logic.goal_focus_text_generator import RecoveryTextGenerator
+from copy import deepcopy
 from math import ceil
 from datetime import datetime, timedelta
+from serialisable import Serialisable
 
 
 class TrendProcessor(object):
-    def __init__(self, injury_hist_dict, event_date_time, athlete_trend_categories=None, dashboard_categories=None):
+    def __init__(self, injury_hist_dict, event_date_time, athlete_trend_categories=None, dashboard_categories=None, athlete_insight_categories=None):
+        self.athlete_insight_categories = [] if athlete_insight_categories is None else athlete_insight_categories
         self.athlete_trend_categories = [] if athlete_trend_categories is None else athlete_trend_categories
         self.injury_hist_dict = injury_hist_dict
         self.dashboard_categories = [] if dashboard_categories is None else dashboard_categories
         self.event_date_time = event_date_time
         self.initialize_trend_categories()
-
-    # def get_antagonists_syngergists(self, triggers, use_agonists=False):
-    #
-    #     antagonists = []
-    #     synergists = []
-    #
-    #     body_part_factory = BodyPartFactory()
-    #
-    #     for t in triggers:
-    #         if body_part_factory.is_joint(t.body_part) and use_agonists:
-    #             antagonists.extend(t.agonists)
-    #         antagonists.extend(t.antagonists)
-    #         synergists.extend(t.synergists)
-    #
-    #     return antagonists, synergists
 
     def initialize_trend_categories(self):
 
@@ -54,23 +42,67 @@ class TrendProcessor(object):
 
         care_index = next((i for i, x in enumerate(self.athlete_trend_categories) if InsightType.care == x.insight_type), -1)
 
+        care_insight_index = next(
+            (i for i, x in enumerate(self.athlete_insight_categories) if InsightType.care == x.insight_type), -1)
+
         if care_index == -1:
             care_category = self.create_care_category()
             self.athlete_trend_categories.append(care_category)
+        else:
+            self.remove_old_trends(care_index, VisualizationType.care_today)
+
+        if care_insight_index == -1:
+            care_insight_category = self.create_insight_care_category()
+            self.athlete_insight_categories.append(care_insight_category)
+        else:
+            self.remove_old_trends(care_index, VisualizationType.care_today)
 
         prevention_index = next(
             (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.prevention == x.insight_type), -1)
 
+        prevention_insight_index = next(
+            (i for i, x in enumerate(self.athlete_insight_categories) if InsightType.prevention == x.insight_type), -1)
+
         if prevention_index == -1:
             prevention_category = self.create_prevention_category()
             self.athlete_trend_categories.append(prevention_category)
+        else:
+            self.remove_old_trends(prevention_index, VisualizationType.prevention)
+
+        if prevention_insight_index == -1:
+            prevention_insight_category = self.create_insight_prevention_category()
+            self.athlete_insight_categories.append(prevention_insight_category)
+        else:
+            self.remove_old_trends(prevention_index, VisualizationType.prevention)
 
         recovery_index = next(
             (i for i, x in enumerate(self.athlete_trend_categories) if InsightType.personalized_recovery == x.insight_type), -1)
 
+        recovery_insight_index = next(
+            (i for i, x in enumerate(self.athlete_insight_categories) if
+             InsightType.personalized_recovery == x.insight_type), -1)
+
         if recovery_index == -1:
             personalized_recovery_category = self.create_personalized_recovery_category()
             self.athlete_trend_categories.append(personalized_recovery_category)
+        else:
+            self.remove_old_trends(recovery_index, VisualizationType.personalized_recovery)
+
+        if recovery_insight_index == -1:
+            recovery_insight_category = self.create_insight_recovery_category()
+            self.athlete_insight_categories.append(recovery_insight_category)
+        else:
+            self.remove_old_trends(recovery_index, VisualizationType.personalized_recovery)
+
+    def remove_old_trends(self, cat_index, viz_type):
+        del_list = []
+        trends = self.athlete_trend_categories[cat_index].trends
+        for t in range(len(trends)):
+            if trends[t].visualization_type == viz_type:
+                del_list.append(t)
+        del_list.sort(reverse=True)
+        for d in del_list:
+            del trends[d]
 
     def get_care_trend(self, category_index):
 
@@ -145,6 +177,21 @@ class TrendProcessor(object):
             category_index = len(self.athlete_trend_categories) - 1
         return category_index
 
+    def get_insight_category_index(self, insight_type):
+
+        category_index = next((i for i, x in enumerate(self.athlete_insight_categories) if
+                               x.insight_type == insight_type), -1)
+        if category_index == -1:
+            if insight_type == InsightType.care:
+                trend_category = self.create_insight_care_category()
+            elif insight_type == InsightType.personalized_recovery:
+                trend_category = self.create_insight_recovery_category()
+            else:
+                trend_category = self.create_insight_prevention_category()
+            self.athlete_insight_categories.append(trend_category)
+            category_index = len(self.athlete_insight_categories) - 1
+        return category_index
+
     def create_personalized_recovery_category(self):
         trend_category = TrendCategory(InsightType.personalized_recovery)
         trend_category.title = "Personalized Recovery"
@@ -169,6 +216,42 @@ class TrendProcessor(object):
         trend_category.first_time_experience_modal = modal
 
         return trend_category
+
+    def create_insight_recovery_category(self):
+
+        insight_category = InsightCategory(InsightType.personalized_recovery)
+        insight_category.header = "Recovery Insights"
+        insight_category.context_text = "Given your training & symptom data, these areas have likely experienced elevates stress in training & require proactive recovery.\n\nTap on each category for more information."
+        bold_category_text = BoldText()
+        bold_category_text.text = "Tap on each category for more information."
+        insight_category.context_bold_text.append(bold_category_text)
+        insight_category.empty_state_header = "Searching for Recovery Insights"
+        insight_category.icon = "recovery.png"
+        insight_category.empty_state_image = "recovery-FTE-empty.png"
+        insight_category.empty_context_sensors_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
+        insight_category.empty_context_sensors_not_enabled = "Log your training & symptoms regularly and use the PRO sensors to help us learn how your body responds to training to optimize your tissue regeneration."
+        insight_category.empty_state_cta = "Log Training"
+
+        insight_category.first_time_experience = True
+
+        insight_category.trend_data = Insight()
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Personalized Recovery - FTE"
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
+        element_1 = FirstTimeExperienceElement()
+        element_1.title = "Tissue Under\n& Over Activity"
+        element_1.image = "view1icon.png"
+
+        modal.categories.append(element_1)
+
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
+
+        insight_category.first_time_experience_modal = modal
+
+        return insight_category
 
     def create_prevention_category(self):
         trend_category = TrendCategory(InsightType.prevention)
@@ -196,6 +279,43 @@ class TrendProcessor(object):
 
         return trend_category
 
+    def create_insight_prevention_category(self):
+
+        insight_category = InsightCategory(InsightType.prevention)
+        insight_category.header = "Prevention Insights"
+        insight_category.context_text = "Patterns in your data indicate imbalances affecting tissue mobility & muscle activation which may elevate your injury risks.\n\nTap on each category for more information."
+        bold_category_text = BoldText()
+        bold_category_text.text = "Tap on each category for more information."
+        insight_category.context_bold_text.append(bold_category_text)
+        insight_category.empty_state_header = "Searching for Prevention Insights"
+        insight_category.icon = "prevention.png"
+        insight_category.empty_state_image = "prevention-FTE-empty.png"
+        insight_category.empty_context_sensors_enabled = "Wear your PRO sensors and log your symptoms regularly to identify and correct underlying imbalances, dysfunctions, and other injury risk factors. It typically takes 1 to 3 weeks to derive prevention needs."
+        insight_category.empty_context_sensors_not_enabled = "Upgrade to Fathom PRO- our advanced, wearable biomechanics tracking system- to begin identifying and correcting imbalances and dysfunctions which lead to chronic injury."
+        insight_category.empty_state_cta = ""
+
+        insight_category.first_time_experience = True
+
+        insight_category.trend_data = Insight()
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Prevention - FTE"
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
+
+        element_2 = FirstTimeExperienceElement()
+        element_2.title = "Functional\nLimitations"
+        element_2.image = "view3icon.png"
+
+        modal.categories.append(element_2)
+
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
+
+        insight_category.first_time_experience_modal = modal
+
+        return insight_category
+
     def create_care_category(self):
         trend_category = TrendCategory(InsightType.care)
         trend_category.title = "Care"
@@ -221,6 +341,42 @@ class TrendProcessor(object):
         trend_category.first_time_experience_modal = modal
 
         return trend_category
+
+    def create_insight_care_category(self):
+
+        insight_category = InsightCategory(InsightType.care)
+        insight_category.header = "Care Insights"
+        insight_category.context_text = "Pain & soreness change how your distribute force and can lead to elevated stress in other tissues during training.\n\nTap on each category for more information."
+        bold_category_text = BoldText()
+        bold_category_text.text = "Tap on each category for more information."
+        insight_category.context_bold_text.append(bold_category_text)
+        insight_category.empty_state_header = "Searching for Care Insights"
+        insight_category.icon = "care.png"
+        insight_category.empty_state_image = "care-FTE-empty.png"
+        insight_category.empty_context_sensors_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
+        insight_category.empty_context_sensors_not_enabled = "Update your tightness, soreness, and pain symptoms to inform optimal activity recommendations to care for your body and prepare for movement."
+        insight_category.empty_state_cta = "Log Symptoms"
+        insight_category.first_time_experience = True
+
+        insight_category.trend_data = Insight()
+
+        modal = CategoryFirstTimeExperienceModal()
+        modal.title = "Care - FTE"
+        modal.body = ("We monitor your data for signs of imbalances in  muscle activation, range of motion and more.\n\n" +
+                        "These imbalances can create inefficiency in speed & power production, over-strain tissues making them short and tight, and even increase soft tissue injury risk.\n\n" +
+                        "We try to find and help address two types of body-part specific imbalances:")
+
+        element_2 = FirstTimeExperienceElement()
+        element_2.title = "Functional\nLimitations"
+        element_2.image = "view3icon.png"
+
+        modal.categories.append(element_2)
+
+        modal.subtext = 'Tap “Continue” to see your unique findings.'
+
+        insight_category.first_time_experience_modal = modal
+
+        return insight_category
 
     def create_care_trend(self):
         daily_trend = Trend(TriggerType.sore_today)
@@ -354,6 +510,9 @@ class TrendProcessor(object):
             if body_part.treatment_priority is None:
                 body_part.treatment_priority = 99
             converted_body_parts.append(body_part)
+
+            if body_part.location is None:
+                h=0
 
         if side == 0:
             converted_body_parts = set(converted_body_parts)
@@ -531,6 +690,9 @@ class TrendProcessor(object):
         inflamed = []
         muscle_spasm = []
         knots = []
+        inflamed_low = []
+        inflamed_mod = []
+        inflamed_high = []
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
             is_inflammation = False
@@ -544,6 +706,9 @@ class TrendProcessor(object):
             if (body_part_injury_risk.last_muscle_spasm_date is not None and
                     body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
                 is_muscle_spasm = True
+            if (body_part_injury_risk.last_muscle_spasm_trigger_date is not None and
+                    body_part_injury_risk.last_muscle_spasm_trigger_date == self.event_date_time.date()):
+                is_muscle_spasm = True
 
             if (body_part_injury_risk.last_knots_date is not None and
                     body_part_injury_risk.last_knots_date == self.event_date_time.date()):
@@ -555,12 +720,15 @@ class TrendProcessor(object):
                 if inflammation_severity >= 7:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.error_light)
+                    inflamed_high.append(body_part_side_viz)
                 elif 4 <= inflammation_severity < 7:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.error_x_light)
+                    inflamed_mod.append(body_part_side_viz)
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.error_xx_light)
+                    inflamed_low.append(body_part_side_viz)
                 inflamed.append(body_part_side_viz)
 
             #if not is_inflammation and not is_muscle_spasm and is_knots:
@@ -591,16 +759,55 @@ class TrendProcessor(object):
                                                          LegendColor.warning_xx_light)
                 muscle_spasm.append(body_part_side_viz)
 
-        if len(inflamed) > 0 or len(muscle_spasm) > 0 and len(knots) > 0:
+        if len(inflamed) > 0 or len(muscle_spasm) > 0 or len(knots) > 0:
 
             trend = self.get_care_trend(category_index)
+
+            care_index = self.get_insight_category_index(InsightType.care)
+
+            insight_category = self.athlete_insight_categories[care_index]
+            insight_category.active = True
+
+            inflamed_list = []
+            inflamed_list.extend(inflamed_high)
+            inflamed_list.extend(inflamed_mod)
+            inflamed_list.extend(inflamed_low)
+
+            tight_list = []
+            tight_list.extend(muscle_spasm)
+            tight_list.extend(knots)
+
+            inflamed_list, tight_list = self.remove_duplicates_two_lists(inflamed_list, tight_list)
+            inflamed_high = [i for i in inflamed_high if i in inflamed_list]
+            inflamed_mod = [i for i in inflamed_mod if i in inflamed_list]
+            inflamed_low = [i for i in inflamed_low if i in inflamed_list]
+            muscle_spasm = [m for m in muscle_spasm if m in tight_list]
+            knots = [k for k in knots if k in tight_list]
+
+            inflamed_data = self.get_inflamed_insight_data(inflamed_high, inflamed_low, inflamed_mod)
+            tight_data = self.get_tight_insight_data(muscle_spasm, knots)
+
+            if not inflamed_data.active and not tight_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            body_parts.extend(inflamed_data.body_parts)
+            body_parts.extend(tight_data.body_parts)
+            body_parts = list(set(body_parts))
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(inflamed_data)
+            insight_category.trend_data.data.append(tight_data)
 
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.care
             trend_data.add_visualization_data()
             care_data = CareChartData()
-
-            body_part_factory = BodyPartFactory()
 
             care_data.inflamed.extend(inflamed)
             care_data.tight.extend(muscle_spasm)
@@ -610,12 +817,16 @@ class TrendProcessor(object):
             trend_data.data = [care_data]
 
             trend.trigger_tiles = []
-            if len(inflamed) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed, "Inflamed", LegendColor.error_light))
+            if len(inflamed_high) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed_high, "Inflamed - High", LegendColor.error_light))
+            if len(inflamed_mod) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed_mod, "Inflamed - Mod", LegendColor.error_light))
+            if len(inflamed_low) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(inflamed_low, "Inflamed - Low", LegendColor.error_light))
             if len(muscle_spasm) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(muscle_spasm, "Tight", LegendColor.warning_light))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(muscle_spasm, "Tight - Muscle Spasms", LegendColor.warning_light))
             if len(knots) > 0:
-                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(knots, "Tight", LegendColor.warning_light))
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(knots, "Tight - Adhesions", LegendColor.warning_light))
 
 
             # trend.trigger_tiles.extend(self.get_trigger_tiles(inflamed))
@@ -636,8 +847,171 @@ class TrendProcessor(object):
             self.set_care_trend(category_index, trend)
 
         else:
-            trend = self.create_care_trend()
-            self.set_care_trend(category_index, trend)
+            # trend = self.create_care_trend()
+            # self.set_care_trend(category_index, trend)
+            care_index = self.get_insight_category_index(InsightType.care)
+
+            insight_category = self.athlete_insight_categories[care_index]
+            insight_category.active = False
+
+            inflamed_data = self.get_inflamed_insight_data([], [], [])
+            tight_data = self.get_tight_insight_data([], [])
+
+            if not inflamed_data.active and not tight_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(inflamed_data)
+            insight_category.trend_data.data.append(tight_data)
+
+    def get_inflamed_insight_data(self, inflamed_high, inflamed_low, inflamed_mod):
+
+        inflamed_data = InsightData()
+        inflamed_data.title = 'Inflamed'
+        inflamed_data.active = True
+        inflamed_data.color = LegendColor.error_light
+        low_plot_legend = PlotLegend(LegendColor.error_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.error_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.error_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(inflamed_high)
+        body_parts.extend(inflamed_low)
+        body_parts.extend(inflamed_mod)
+
+        body_parts = list(set(body_parts))
+        inflamed_data.body_parts = body_parts
+
+        inflamed_viz_data = InsightVisualizationData()
+        inflamed_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        inflamed_data.visualization_data.append(inflamed_viz_data)
+        if len(inflamed_high) == 0 and len(inflamed_mod) == 0 and len(inflamed_low) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "No Signs of Inflammation"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "You haven't reported any symptoms which indicate tissue inflammation."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_title.append(bold_1)
+            inflamed_data.trigger_tiles.append(empty_trigger_tile)
+            inflamed_data.active = False
+        if len(inflamed_high) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = inflamed_high
+            title_text = "Severe Inflammation"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "Severe pain & soreness are signs of inflammation and tissue damage. To help reduce inflammation, give these areas some rest, do your 'Care' activities, and avoid any movements that cause pain."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.error_light
+            high_trigger_tile.bold_title.append(bold_1)
+            inflamed_data.trigger_tiles.append(high_trigger_tile)
+        if len(inflamed_mod) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = inflamed_mod
+            title_text = "Moderate Inflammation"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "These tissues have signs of inflammation which can restrict mobility and alter muscle activation. This leads to movement compensations in training which elevate injury risk and recovery need."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.error_light
+            mod_trigger_tile.bold_title.append(bold_1)
+            inflamed_data.trigger_tiles.append(mod_trigger_tile)
+        if len(inflamed_low) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = inflamed_low
+            title_text = "Mild Inflammation"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "These tissues likely have mild inflammation. For optimal movement efficiency, reduce this inflammation with the foam rolling and stretching activities created for you in your 'Care' plan."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.error_light
+            low_trigger_tile.bold_title.append(bold_1)
+            inflamed_data.trigger_tiles.append(low_trigger_tile)
+        return inflamed_data
+
+    def get_tight_insight_data(self, tight_spasm, tight_adhesions):
+
+        tight_data = InsightData()
+        tight_data.title = 'Tight'
+        tight_data.active = True
+        tight_data.color = LegendColor.warning_light
+        low_plot_legend = PlotLegend(LegendColor.warning_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.warning_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.warning_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(tight_spasm)
+        body_parts.extend(tight_adhesions)
+
+        body_parts = list(set(body_parts))
+        tight_data.body_parts = body_parts
+
+        tight_viz_data = InsightVisualizationData()
+        tight_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        tight_data.visualization_data.append(tight_viz_data)
+        if len(tight_spasm) == 0 and len(tight_adhesions) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "No Signs of Tightness"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "You haven't reported any symptoms which indicate tissue tightness."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_title.append(bold_1)
+            tight_data.trigger_tiles.append(empty_trigger_tile)
+            tight_data.active = False
+        if len(tight_spasm) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = tight_spasm
+            title_text = "Muscle Spasm"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "Tightness in a tissue can change the way you move, causing compensations during training. Your 'Care' activities help 'release' this tightness."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            high_trigger_tile.bold_title.append(bold_1)
+            tight_data.trigger_tiles.append(high_trigger_tile)
+        if len(tight_adhesions) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = tight_adhesions
+            title_text = "Tightness Causing Damage"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "Chronic tightness and inflammation leads to muscles forming knots which decrease the tissue's ability to produce and absorb force. Training in this condition further damages the muscle and diverts stress to other tissues- elevating the risk of injury."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            mod_trigger_tile.bold_title.append(bold_1)
+            tight_data.trigger_tiles.append(mod_trigger_tile)
+
+        return tight_data
+
+    def remove_duplicates_two_lists(self, list_high, list_low):
+
+        unc_delete = []
+
+        id = 0
+        for u in list_low:
+            index = next((i for i, x in enumerate(list_high) if u == x), -1)
+
+            if index > -1:
+                unc_delete.append(id)
+            id += 1
+
+        unc_delete.sort(reverse=True)  # need to remove in reverse order so we don't mess up indexes along the way
+
+        for d in unc_delete:
+            del (list_low[d])
+
+        return list_high, list_low
 
     def set_recovery(self, category_index):
 
@@ -654,11 +1028,11 @@ class TrendProcessor(object):
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
 
-            is_training_stress = False
+            is_training_stress_today = False
             is_compensating = False
             is_elevated_stress = False
-            is_functional_overreaching = False
-            is_non_functional_overreaching = False
+            # is_functional_overreaching_today = False
+            # is_non_functional_overreaching = False
 
             if (body_part_injury_risk.last_compensation_date is not None and
                     body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
@@ -666,13 +1040,13 @@ class TrendProcessor(object):
                 is_compensating = True
 
             if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
-                is_training_stress = True
+                is_training_stress_today = True
 
-            if body_part_injury_risk.last_functional_overreaching_date is not None and body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date():
-                is_functional_overreaching = True
-
-            if body_part_injury_risk.last_non_functional_overreaching_date is not None and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
-                is_non_functional_overreaching = True
+            # if body_part_injury_risk.last_functional_overreaching_date is not None and body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date():
+            #     is_functional_overreaching_today = True
+            #
+            # if body_part_injury_risk.last_non_functional_overreaching_date is not None and body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago:
+            #     is_non_functional_overreaching = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
                     body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
@@ -688,37 +1062,31 @@ class TrendProcessor(object):
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.yellow_xx_light)
-                compensating.append(body_part_side_viz)
+                movement_dysfunction.append(body_part_side_viz)
 
             if is_compensating and not is_elevated_stress:
                 if body_part_injury_risk.total_compensation_percent_tier == 1:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                         LegendColor.yellow_light)
-                    movement_dysfunction.append(body_part_side_viz)
+                elif body_part_injury_risk.total_compensation_percent_tier == 2:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                        LegendColor.yellow_x_light)
+                else:
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                         LegendColor.yellow_xx_light)
+                compensating.append(body_part_side_viz)
 
-            if not is_compensating and not is_elevated_stress and is_training_stress:
+            if not is_compensating and not is_elevated_stress and is_training_stress_today:
                 if body_part_injury_risk.total_volume_percent_tier == 1:
-                    if is_non_functional_overreaching:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                             LegendColor.success_light)
-                        high_stress.append(body_part_side_viz)
-                    elif is_functional_overreaching:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.success_x_light)
-                        mod_stress.append(body_part_side_viz)
-                    else:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.success_xx_light)
-                        low_stress.append(body_part_side_viz)
+                    high_stress.append(body_part_side_viz)
+
                 elif body_part_injury_risk.total_volume_percent_tier == 2:
-                    if is_functional_overreaching:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                    body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                              LegendColor.success_x_light)
-                        mod_stress.append(body_part_side_viz)
-                    else:
-                        body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                             LegendColor.success_xx_light)
-                        low_stress.append(body_part_side_viz)
+                    mod_stress.append(body_part_side_viz)
+
                 else:
                     body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                          LegendColor.success_xx_light)
@@ -728,6 +1096,47 @@ class TrendProcessor(object):
         if len(training_stress) > 0 or len(compensating) > 0 or len(movement_dysfunction) > 0:
 
             trend = self.get_personalized_recovery_trend(category_index)
+
+            recovery_index = self.get_insight_category_index(InsightType.personalized_recovery)
+
+            insight_category = self.athlete_insight_categories[recovery_index]
+            insight_category.active = True
+
+            compensating_list = []
+            compensating_list.extend(compensating)
+            compensating_list.extend(movement_dysfunction)
+
+            stress_list = []
+            stress_list.extend(high_stress)
+            stress_list.extend(mod_stress)
+            stress_list.extend(low_stress)
+
+            compensating_list, stress_list = self.remove_duplicates_two_lists(compensating_list, stress_list)
+            high_stress = [i for i in high_stress if i in stress_list]
+            mod_stress = [i for i in mod_stress if i in stress_list]
+            low_stress = [i for i in low_stress if i in stress_list]
+            compensating = [m for m in compensating if m in compensating_list]
+            movement_dysfunction = [k for k in movement_dysfunction if k in compensating_list]
+
+            compensating_data = self.get_compensating_insight_data(movement_dysfunction, compensating)
+            training_data = self.get_training_stress_insight_data(high_stress, low_stress, mod_stress)
+
+            if not compensating_data.active and not training_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            body_parts.extend(compensating_data.body_parts)
+            body_parts.extend(training_data.body_parts)
+            body_parts = list(set(body_parts))
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(compensating_data)
+            insight_category.trend_data.data.append(training_data)
 
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.recovery
@@ -770,8 +1179,152 @@ class TrendProcessor(object):
             self.set_personalized_recovery_trend(category_index, trend)
 
         else:
-            trend = self.create_personalized_recovery_trend()
-            self.set_personalized_recovery_trend(category_index, trend)
+            # trend = self.create_personalized_recovery_trend()
+            # self.set_personalized_recovery_trend(category_index, trend)
+            recovery_index = self.get_insight_category_index(InsightType.personalized_recovery)
+
+            insight_category = self.athlete_insight_categories[recovery_index]
+            insight_category.active = False
+
+            compensating_data = self.get_compensating_insight_data([], [])
+            training_data = self.get_training_stress_insight_data([], [], [])
+
+            if not compensating_data.active and not training_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(compensating_data)
+            insight_category.trend_data.data.append(training_data)
+
+    def get_compensating_insight_data(self, movement_dysfunction, compensating):
+
+        compensating_data = InsightData()
+        compensating_data.title = 'Compensation Stress'
+        compensating_data.active = True
+        compensating_data.color = LegendColor.yellow_light
+        low_plot_legend = PlotLegend(LegendColor.yellow_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.yellow_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.yellow_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(movement_dysfunction)
+        body_parts.extend(compensating)
+
+        body_parts = list(set(body_parts))
+        compensating_data.body_parts = body_parts
+
+        compensating_viz_data = InsightVisualizationData()
+        compensating_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        compensating_data.visualization_data.append(compensating_viz_data)
+        if len(compensating) == 0 and len(movement_dysfunction) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "No Compensation Stresses Identified"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "We look for fatigue and compensations in your data in order to predict stress distribution and prioritize recovery. You have are no signs of compensations today."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_title.append(bold_1)
+            compensating_data.trigger_tiles.append(empty_trigger_tile)
+            compensating_data.active = False
+        if len(movement_dysfunction) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = movement_dysfunction
+            title_text = "Stressed by Movement Imbalance"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "Biomechanical imbalances in your workout today are likely to have elevated stress on these muscles. These would benefit from  proactive recovery to aid tissue regeneration."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.yellow_light
+            high_trigger_tile.bold_title.append(bold_1)
+            compensating_data.trigger_tiles.append(high_trigger_tile)
+        if len(compensating) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = compensating
+            title_text = "Symptom-Related Compensations"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "Given your reported tightness, inflammation, and today's training conditions, the following tissues are likely to have experienced elevated stress. Go to your plan for proactive recovery recommendations."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.yellow_light
+            mod_trigger_tile.bold_title.append(bold_1)
+            compensating_data.trigger_tiles.append(mod_trigger_tile)
+
+        return compensating_data
+    
+    def get_training_stress_insight_data(self, stress_high, stress_low, stress_mod):
+
+        stress_data = InsightData()
+        stress_data.title = 'Training Stress'
+        stress_data.active = True
+        stress_data.color = LegendColor.success_light
+        low_plot_legend = PlotLegend(LegendColor.success_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.success_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.success_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(stress_high)
+        body_parts.extend(stress_low)
+        body_parts.extend(stress_mod)
+
+        body_parts = list(set(body_parts))
+        stress_data.body_parts = body_parts
+
+        stress_viz_data = InsightVisualizationData()
+        stress_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        stress_data.visualization_data.append(stress_viz_data)
+        if len(stress_high) == 0 and len(stress_mod) == 0 and len(stress_low) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "Normal Training Stress today"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "We try to learn about your training to estimate your need for recovery in response to different types of workouts. Today is either a normal training day or we may need more data!"
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_title.append(bold_1)
+            stress_data.trigger_tiles.append(empty_trigger_tile)
+            stress_data.active = False
+        if len(stress_high) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = stress_high
+            title_text = "Over-stressed by Training"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "The conditions of today's workout may have heavily over-stressed these muscles- likely requiring 2 or more days of proactive recovery based on your prior data."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.success_light
+            high_trigger_tile.bold_title.append(bold_1)
+            stress_data.trigger_tiles.append(high_trigger_tile)
+        if len(stress_mod) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = stress_mod
+            title_text = "Moderate Training Stress"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "Given your training history, the conditions of today's training have moderately stressed these muscles and will likely require 1-2 days of proactive recovery."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.success_light
+            mod_trigger_tile.bold_title.append(bold_1)
+            stress_data.trigger_tiles.append(mod_trigger_tile)
+        if len(stress_low) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = stress_low
+            title_text = "Mild Training Stress"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "These areas experienced typical stress today given your training history and are likely to recover within the next day even without proactive measures."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.success_light
+            low_trigger_tile.bold_title.append(bold_1)
+            stress_data.trigger_tiles.append(low_trigger_tile)
+        return stress_data
 
     def set_prevention(self, category_index):
 
@@ -781,6 +1334,10 @@ class TrendProcessor(object):
         tendin = []
         underactive_weak = []
         underactive_inhibited = []
+        limited_mobility_2 = []
+        limited_mobility_3 = []
+        underactive_weak_2 = []
+        underactive_weak_3 = []
 
         for body_part_side, body_part_injury_risk in self.injury_hist_dict.items():
 
@@ -816,40 +1373,112 @@ class TrendProcessor(object):
 
             if is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_x_light)
+                                                     LegendColor.warning_light)
                 overactive.append(body_part_side_viz)
 
             if is_weak and not is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.splash_m_light)
+                                                     LegendColor.splash_light)
                 underactive_weak.append(body_part_side_viz)
 
             if not is_weak and is_inhibited and not is_overactive_short and not is_joint_arthro and not is_tendin:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.splash_m_light)
+                                                     LegendColor.splash_light)
                 underactive_inhibited.append(body_part_side_viz)
 
             if is_short and not is_overactive_short and not is_weak and not is_inhibited and not is_joint_arthro and not is_tendin:
+                # making this priority 2 (mod)
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
                                                      LegendColor.warning_x_light)
                 short.append(body_part_side_viz)
 
             if is_joint_arthro and not is_tendin and not is_overactive_short and not is_weak and not is_inhibited and not is_short:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_x_light)
+                                                     LegendColor.warning_light)
                 joint_artho.append(body_part_side_viz)
 
             if is_tendin and not is_joint_arthro and not is_overactive_short and not is_weak and not is_inhibited and not is_short:
                 body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
-                                                     LegendColor.warning_x_light)
+                                                     LegendColor.warning_light)
                 tendin.append(body_part_side_viz)
+
+            if body_part_injury_risk.limited_mobility_tier == 2:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_x_light)
+                limited_mobility_2.append(body_part_side_viz)
+            elif body_part_injury_risk.limited_mobility_tier == 3:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.warning_xx_light)
+                limited_mobility_3.append(body_part_side_viz)
+
+            if body_part_injury_risk.underactive_weak_tier == 2:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.splash_m_light)
+                underactive_weak_2.append(body_part_side_viz)
+            elif body_part_injury_risk.underactive_weak_tier == 3:
+                body_part_side_viz = BodyPartSideViz(body_part_side.body_part_location, body_part_side.side,
+                                                     LegendColor.splash_x_light)
+                underactive_weak_3.append(body_part_side_viz)
 
         # since we're reverse sorting, 2 is a higher priority than 1
 
         if (len(short) > 0 or len(joint_artho) > 0 or len(overactive) > 0 or len(tendin) > 0 or
-                len(underactive_weak) > 0 or len(underactive_inhibited) > 0):
+                len(underactive_weak) > 0 or len(underactive_inhibited) > 0 or
+                len(limited_mobility_2) > 0 or len(limited_mobility_3) > 0 or
+                len(underactive_weak_2) > 0 or len(underactive_weak_3) > 0):
 
             trend = self.get_prevention_trend(category_index)
+
+            prevention_index = self.get_insight_category_index(InsightType.prevention)
+
+            insight_category = self.athlete_insight_categories[prevention_index]
+            insight_category.active = True
+
+            limited_mobility_list = []
+            limited_mobility_list.extend(overactive)
+            limited_mobility_list.extend(short)
+            limited_mobility_list.extend(joint_artho)
+            limited_mobility_list.extend(tendin)
+            limited_mobility_list.extend(limited_mobility_2)
+            limited_mobility_list.extend(limited_mobility_3)
+
+            underactive_list = []
+            underactive_list.extend(underactive_weak)
+            underactive_list.extend(underactive_inhibited)
+            underactive_list.extend(underactive_weak_2)
+            underactive_list.extend(underactive_weak_3)
+
+            compensating_list, underactive_list = self.remove_duplicates_two_lists(limited_mobility_list, underactive_list)
+            underactive_weak = [i for i in underactive_weak if i in underactive_list]
+            underactive_inhibited = [i for i in underactive_inhibited if i in underactive_list]
+            underactive_weak_2 = [i for i in underactive_weak_2 if i in underactive_list]
+            underactive_weak_3 = [i for i in underactive_weak_3 if i in underactive_list]
+            overactive = [m for m in overactive if m in limited_mobility_list]
+            short = [k for k in short if k in limited_mobility_list]
+            joint_artho = [k for k in joint_artho if k in limited_mobility_list]
+            tendin = [k for k in tendin if k in limited_mobility_list]
+            limited_mobility_2 = [k for k in limited_mobility_2 if k in limited_mobility_list]
+            limited_mobility_3 = [k for k in limited_mobility_3 if k in limited_mobility_list]
+
+            limited_mobility_data = self.get_limited_mobility_insight_data(short, joint_artho, tendin, overactive, limited_mobility_2, limited_mobility_3)
+            underactive_weak_data = self.get_underactive_insight_data(underactive_weak, underactive_inhibited, underactive_weak_2, underactive_weak_3)
+
+            if not limited_mobility_data.active and not underactive_weak_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            body_parts.extend(limited_mobility_data.body_parts)
+            body_parts.extend(underactive_weak_data.body_parts)
+            body_parts = list(set(body_parts))
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(limited_mobility_data)
+            insight_category.trend_data.data.append(underactive_weak_data)
 
             trend_data = TrendData()
             trend_data.visualization_type = VisualizationType.prevention3s
@@ -860,9 +1489,13 @@ class TrendProcessor(object):
             prevention_data.limited_mobility.extend(short)
             prevention_data.limited_mobility.extend(joint_artho)
             prevention_data.limited_mobility.extend(tendin)
+            prevention_data.limited_mobility.extend(limited_mobility_2)
+            prevention_data.limited_mobility.extend(limited_mobility_3)
 
             prevention_data.underactive.extend(underactive_weak)
             prevention_data.underactive.extend(underactive_inhibited)
+            prevention_data.underactive.extend(underactive_weak_2)
+            prevention_data.underactive.extend(underactive_weak_3)
 
             prevention_data.remove_duplicates()
             trend_data.data = [prevention_data]
@@ -876,11 +1509,21 @@ class TrendProcessor(object):
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(joint_artho, "Altered Arthrokinematics", LegendColor.warning_light))
             if len(tendin) > 0:
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(tendin, "Tendinopathy or Tendinosis", LegendColor.warning_light))
+            if len(limited_mobility_2) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(limited_mobility_2, "Signs of Pattern", LegendColor.warning_light))
+            if len(limited_mobility_3) > 0:
+                trend.trigger_tiles.extend(
+                    self.get_body_part_list_trigger_tiles(limited_mobility_3, "Tracking for Pattern", LegendColor.warning_light))
 
             if len(underactive_weak) > 0:
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_weak, "Weak", LegendColor.splash_light))
             if len(underactive_inhibited) > 0:
                 trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_inhibited, "Inhibited", LegendColor.splash_light))
+            if len(underactive_weak_2) > 0:
+                trend.trigger_tiles.extend(self.get_body_part_list_trigger_tiles(underactive_weak_2, "Signs of Pattern", LegendColor.splash_light))
+            if len(underactive_weak_3) > 0:
+                trend.trigger_tiles.extend(
+                    self.get_body_part_list_trigger_tiles(underactive_weak_3, "Tracking for Pattern", LegendColor.splash_light))
 
             # underactive_list = []
             # underactive_list.extend(underactive_weak)
@@ -910,12 +1553,225 @@ class TrendProcessor(object):
             self.set_prevention_trend(category_index, trend)
 
         else:
-            trend = self.create_prevention_trend()
-            self.set_prevention_trend(category_index, trend)
+            # trend = self.create_prevention_trend()
+            # self.set_prevention_trend(category_index, trend)
+            prevention_index = self.get_insight_category_index(InsightType.prevention)
+
+            insight_category = self.athlete_insight_categories[prevention_index]
+            insight_category.active = False
+
+            limited_mobility_data = self.get_limited_mobility_insight_data([], [], [], [], [], [])
+            underactive_weak_data = self.get_underactive_insight_data([], [], [], [])
+
+            if not limited_mobility_data.active and not underactive_weak_data.active:
+                insight_category.active = False
+                insight_category.trend_data.active = False
+            else:
+                insight_category.active = True
+                insight_category.trend_data.active = True
+
+            body_parts = []
+            insight_category.trend_data.body_parts = body_parts
+
+            insight_category.trend_data.data = []
+            insight_category.trend_data.data.append(limited_mobility_data)
+            insight_category.trend_data.data.append(underactive_weak_data)
+
+    def get_limited_mobility_insight_data(self, short, joint_artho, tendin, overactive, limited_mobility_2, limited_mobility_3):
+
+        limited_mobility_data = InsightData()
+        limited_mobility_data.title = 'Limited Mobility'
+        limited_mobility_data.active = True
+        limited_mobility_data.color = LegendColor.warning_light
+        low_plot_legend = PlotLegend(LegendColor.warning_xx_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.warning_x_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.warning_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(short)
+        body_parts.extend(joint_artho)
+        body_parts.extend(tendin)
+        body_parts.extend(overactive)
+        body_parts.extend(limited_mobility_2)
+        body_parts.extend(limited_mobility_3)
+
+        body_parts = list(set(body_parts))
+        limited_mobility_data.body_parts = body_parts
+
+        limited_mobility_viz_data = InsightVisualizationData()
+        limited_mobility_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        limited_mobility_data.visualization_data.append(limited_mobility_viz_data)
+        if len(overactive) == 0 and len(short) == 0 and len(joint_artho) == 0 and len(tendin) == 0 and len(limited_mobility_2) == 0 and len(limited_mobility_3) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "No signs of limited mobility"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "We haven't yet found any signs of mobility limitations in your movement or symptom data."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_title.append(bold_1)
+            limited_mobility_data.trigger_tiles.append(empty_trigger_tile)
+            limited_mobility_data.active = False
+        if len(short) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = short
+            title_text = "Shortened Muscle(s)"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "Your data suggests these tissues are shortened due to cross-linkages called adhesions and require proactive lengthening to regain proper length balance and reduce injury risk. Incorporate Fathom biomechanics sensors into your training to help correct the underlying imbalances and track improvement."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            high_trigger_tile.bold_title.append(bold_1)
+            limited_mobility_data.trigger_tiles.append(high_trigger_tile)
+        if len(joint_artho) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = joint_artho
+            title_text = "Signs of Altered Joint Movement"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "Range of motion limitations around the joint is a sign of altered joint arthrokinematics which often elevate injury risk. Incorporate Fathom biomechanics sensors into your training to identify potential underlying causes and reduce the injury risk factors through corrective exercise."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            mod_trigger_tile.bold_title.append(bold_1)
+            limited_mobility_data.trigger_tiles.append(mod_trigger_tile)
+        if len(tendin) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = tendin
+            title_text = "Signs of Tendinopathy"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "Your symptoms indicate signs of tendinopathy or tendinosis. Incorporate Fathom biomechanics sensors into your training to identify potential underlying causes and reduce the injury risk factors through corrective exercise."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            low_trigger_tile.bold_title.append(bold_1)
+            limited_mobility_data.trigger_tiles.append(low_trigger_tile)
+        if len(overactive) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = overactive
+            title_text = "Overactive & Shortened Muscle(s)"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "Your biomechanics data suggests these tissues may be overactive and shortened relative to their counterparts, altering proper movement and contributing to a length-tension imbalances that change your posture and may lead to injury."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            low_trigger_tile.bold_title.append(bold_1)
+            limited_mobility_data.trigger_tiles.append(low_trigger_tile)
+        if len(limited_mobility_2) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = limited_mobility_2
+            title_text = "Possible Overactivity"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "Some early signs of a possible movement dysfunction suggest that these muscles may be under-activating. We'll keep monitoring your data and will refine our estimates as we learn more."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            low_trigger_tile.bold_title.append(bold_1)
+            limited_mobility_data.trigger_tiles.append(low_trigger_tile)
+        if len(limited_mobility_3) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = limited_mobility_3
+            title_text = "Monitoring for Overactivity"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "We see early signs that some of these muscles may be over-activating, thereby altering your movement and leading to a possible movement dysfunction which may increase your injury risk. We'll keep monitoring this and will refine our estimates as we learn more."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.warning_light
+            low_trigger_tile.bold_title.append(bold_1)
+            limited_mobility_data.trigger_tiles.append(low_trigger_tile)
+        return limited_mobility_data
+
+    def get_underactive_insight_data(self, underactive_weak, underactive_inhibited, underactive_weak_2, underactive_weak_3):
+
+        underactive_data = InsightData()
+        underactive_data.title = 'Underactive'
+        underactive_data.active = True
+        underactive_data.color = LegendColor.splash_light
+        low_plot_legend = PlotLegend(LegendColor.splash_x_light, 'Low', 0)
+        mod_plot_legend = PlotLegend(LegendColor.splash_m_light, 'Mod', 1)
+        high_plot_legend = PlotLegend(LegendColor.splash_light, 'High', 2)
+
+        body_parts = []
+        body_parts.extend(underactive_weak)
+        body_parts.extend(underactive_inhibited)
+        body_parts.extend(underactive_weak_2)
+        body_parts.extend(underactive_weak_3)
+
+        body_parts = list(set(body_parts))
+        underactive_data.body_parts = body_parts
+
+        underactive_viz_data = InsightVisualizationData()
+        underactive_viz_data.plot_legends = [high_plot_legend, mod_plot_legend, low_plot_legend]
+        underactive_data.visualization_data.append(underactive_viz_data)
+        if len(underactive_weak) == 0 and len(underactive_inhibited) == 0 and len(underactive_weak_2) == 0 and len(underactive_weak_3) == 0:
+            empty_trigger_tile = TriggerTile()
+            title_text = "No signs of underactivity"
+            empty_trigger_tile.title = title_text
+            empty_trigger_tile.text = "We haven't yet found any signs of muscle under-activity in your movement or symptom data."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.slate_light
+            empty_trigger_tile.bold_title.append(bold_1)
+            underactive_data.trigger_tiles.append(empty_trigger_tile)
+            underactive_data.active = False
+        if len(underactive_weak) > 0:
+            high_trigger_tile = TriggerTile()
+            high_trigger_tile.body_parts = underactive_weak
+            title_text = "Weak Muscle(s)"
+            high_trigger_tile.title = title_text
+            high_trigger_tile.text = "Your movement patterns indicate these muscles are likely weaker than needed to maintain strength balance, contributing to a dysfunction that can over-stress supporting tissues."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.splash_light
+            high_trigger_tile.bold_title.append(bold_1)
+            underactive_data.trigger_tiles.append(high_trigger_tile)
+        if len(underactive_inhibited) > 0:
+            mod_trigger_tile = TriggerTile()
+            mod_trigger_tile.body_parts = underactive_inhibited
+            title_text = "Underactive Muscle(s)"
+            mod_trigger_tile.title = title_text
+            mod_trigger_tile.text = "Your movement data indicates these muscles are likely under-activating and contributing to a dysfunction which reduces movement efficiency and elevates injury risk. Your prevention activities will encourage proper muscle activation."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.splash_light
+            mod_trigger_tile.bold_title.append(bold_1)
+            underactive_data.trigger_tiles.append(mod_trigger_tile)
+        if len(underactive_weak_2) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = underactive_weak_2
+            title_text = "Possible Underactivity"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "We're starting to see a pattern of movement dysfunction emerge which points to under-activation in these muscles. We'll provide a few prevention excerciss to encourage proper activation and will continue to refine our estimates."
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.splash_light
+            low_trigger_tile.bold_title.append(bold_1)
+            underactive_data.trigger_tiles.append(low_trigger_tile)
+        if len(underactive_weak_3) > 0:
+            low_trigger_tile = TriggerTile()
+            low_trigger_tile.body_parts = underactive_weak_3
+            title_text = "Monitoring for Underactivity"
+            low_trigger_tile.title = title_text
+            low_trigger_tile.text = "We see early signs that some of these muscles may be under-activating relative to their counterparts, thereby contributing to a possible movement dysfunction. We'll keep monitoring this and will refine our estimates as we learn more. "
+            bold_1 = BoldText()
+            bold_1.text = title_text
+            bold_1.color = LegendColor.splash_light
+            low_trigger_tile.bold_title.append(bold_1)
+            underactive_data.trigger_tiles.append(low_trigger_tile)
+        return underactive_data
 
     def is_body_part_short(self, body_part_injury_risk):
 
         is_short = False
+
+        if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
+                body_part_injury_risk.last_altered_joint_arthokinematics_date == self.event_date_time.date()):
+            return False
+
+        if ((body_part_injury_risk.last_tendinopathy_date is not None and
+             body_part_injury_risk.last_tendinopathy_date == self.event_date_time.date()) or
+                (body_part_injury_risk.last_tendinosis_date is not None and
+                 body_part_injury_risk.last_tendinosis_date == self.event_date_time.date())):
+            return False
 
         if body_part_injury_risk.knots_count_last_0_20_days >= 3:
             is_short = True
@@ -936,7 +1792,25 @@ class TrendProcessor(object):
         statistic_text = ""
         bold_statistic_text = []
         # mobilize_suffix = "to improve tissue range of motion"
-        sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        # aggregate to muscle group level
+        muscle_groups = []
+        for b in body_part_sides:
+            muscle_group = b.body_part_location.get_viz_muscle_group(b.body_part_location)
+            if isinstance(muscle_group, bool):
+                muscle_group = b.body_part_location.get_muscle_group(b.body_part_location)
+                if isinstance(muscle_group, bool):
+                    muscle_groups.append(b.body_part_location)
+                else:
+                    muscle_groups.append(muscle_group)
+            else:
+                muscle_group_2 = b.body_part_location.get_muscle_group_for_viz_group(muscle_group)
+                if isinstance(muscle_group_2, bool):
+                    muscle_groups.append(muscle_group)
+                else:
+                    muscle_groups.append(muscle_group_2)
+
+        #sideless_body_parts = [b.body_part_location for b in body_part_sides]
+        sideless_body_parts = [b for b in muscle_groups]
         sideless_body_parts = list(set(sideless_body_parts))
 
         body_part_text_string = ''
@@ -965,7 +1839,7 @@ class TrendProcessor(object):
         tile_1.description = body_part_text_string
         bold_1 = BoldText()
         bold_1.text = body_part_text_string
-        bold_1.color = LegendColor.warning_x_light
+        bold_1.color = color
         tile_1.bold_text.append(bold_1)
         # tile_1.statistic_text = statistic_text
         # tile_1.bold_statistic_text = bold_statistic_text

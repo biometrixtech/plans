@@ -143,18 +143,18 @@ class TrainingPlanManager(object):
         injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions,
                                                     historical_injury_risk_dict, self.athlete_stats,
                                                     self.athlete_stats.athlete_id)
-        aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_results=True)
+        aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_for_viz=True)
 
-        consolidated_injury_risk_dict = {}
+        consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
 
-        body_part_factory = BodyPartFactory()
-
-        for body_part_side, body_part_injury_risk in aggregated_injury_risk_dict.items():
-            body_part = body_part_factory.get_body_part(body_part_side)
-            if body_part not in consolidated_injury_risk_dict:
-                consolidated_injury_risk_dict[body_part] = copy.deepcopy(body_part_injury_risk)
-            else:
-                consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
+        # body_part_factory = BodyPartFactory()
+        #
+        # for body_part_side, body_part_injury_risk in aggregated_injury_risk_dict.items():
+        #     body_part = body_part_factory.get_body_part(body_part_side)
+        #     if body_part not in consolidated_injury_risk_dict:
+        #         consolidated_injury_risk_dict[body_part] = copy.deepcopy(body_part_injury_risk)
+        #     else:
+        #         consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
 
         # save this for later
         #
@@ -190,9 +190,12 @@ class TrainingPlanManager(object):
         #                             reverse=False)
 
         if visualizations:
-                trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date), athlete_trend_categories=self.athlete_stats.trend_categories)
+                trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date),
+                                                 athlete_trend_categories=self.athlete_stats.trend_categories,
+                                                 athlete_insight_categories=self.athlete_stats.insight_categories)
                 trend_processor.process_triggers()
                 self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
+                self.athlete_stats.insight_categories = trend_processor.athlete_insight_categories
 
             # calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
             #                                                      self.completed_exercise_datastore,
@@ -278,6 +281,7 @@ class TrainingPlanManager(object):
         if visualizations:
             self.daily_plan.trends = AthleteTrends()
             self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
+            self.daily_plan.trends.insight_categories = trend_processor.athlete_insight_categories
             self.daily_plan.trends.dashboard.trend_categories = trend_processor.dashboard_categories
             self.daily_plan.trends.add_trend_data(self.athlete_stats)
 

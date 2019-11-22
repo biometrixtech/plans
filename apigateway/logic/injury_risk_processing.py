@@ -1,3 +1,4 @@
+from fathomapi.utils.xray import xray_recorder
 from datetime import datetime, timedelta
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -12,16 +13,18 @@ from math import floor
 
 
 class InjuryRiskProcessor(object):
-    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, athlete_stats, user_id):
+    def __init__(self, event_date_time, symptoms_list, training_session_list, injury_risk_dict, athlete_stats, user_id, hist_injury_risk_dict=None):
         self.user_id = user_id
         self.event_date_time = event_date_time
         self.symptoms = symptoms_list
         self.training_sessions = training_session_list
         self.load_stats = athlete_stats.load_stats
         self.injury_risk_dict = injury_risk_dict
+        self.hist_injury_risk_dict = hist_injury_risk_dict
         self.relative_load_level = 3
         self.high_relative_load_sessions = athlete_stats.high_relative_load_sessions
         self.aggregated_injury_risk_dict = {}
+        self.viz_aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
         self.three_days_ago = self.event_date_time.date() - timedelta(days=2)
         self.ten_days_ago = self.event_date_time.date() - timedelta(days=9)
@@ -52,18 +55,23 @@ class InjuryRiskProcessor(object):
         self.synergist_compensating_concentric_intensity_dict = {}
         self.synergist_total_intensity_dict = {}
 
-    def initialize(self):
+    def set_relative_load_level(self, base_date):
 
         self.relative_load_level = 3
-        two_days_ago = (self.event_date_time - timedelta(days=1)).date()
+
+        # if base_date == datetime(2019, 11, 19).date():
+        #     g =0
+        #
+        # if base_date == datetime(2019, 11, 20).date():
+        #     g = 0
 
         # check workload for relative load level
         if len(self.high_relative_load_sessions) > 0:
 
             max_percent = 49.9
 
-            relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date()
-                                           >= two_days_ago]
+            relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date() == base_date]
+
             if len(relevant_high_load_sessions) > 0:
 
                 for r in relevant_high_load_sessions:
@@ -85,20 +93,37 @@ class InjuryRiskProcessor(object):
         # High
         # RPE >= 5 and self.ultra_high_intensity_session
         # RPE >= 7 and not self.ultra_high_intensity_session():
-        relevant_training_sessions = [s for s in self.training_sessions if s.event_date.date()
-                                           >= two_days_ago]
+        relevant_training_sessions = [s for s in self.training_sessions if s.event_date.date() == base_date]
 
         for r in relevant_training_sessions:
             high_intensity_session = r.ultra_high_intensity_session()
             if r.session_RPE is not None:
                 if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
-                    self.relative_load_level = 1
+                    self.relative_load_level = min(self.relative_load_level, 1)
                 elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
-                    self.relative_load_level = 2
+                    self.relative_load_level = min(self.relative_load_level, 2)
 
-    def process(self, update_historical_data=False, aggregate_results=False):
+    def get_consolidated_dict(self):
 
-        self.initialize()
+        self.aggregate_ird()
+
+        consolidated_injury_risk_dict = {}
+
+        body_part_factory = BodyPartFactory()
+
+        for body_part_side, body_part_injury_risk in self.aggregated_injury_risk_dict.items():
+            body_part = body_part_factory.get_body_part(body_part_side)
+            if body_part not in consolidated_injury_risk_dict:
+                consolidated_injury_risk_dict[body_part] = deepcopy(body_part_injury_risk)
+            else:
+                consolidated_injury_risk_dict[body_part].merge(deepcopy(body_part_injury_risk))
+
+        return consolidated_injury_risk_dict
+
+    def process(self, update_historical_data=False, aggregate_results=False, aggregate_for_viz=False):
+
+        body_part_factory = BodyPartFactory()
+
         # deconstruct symptoms to muscle level
         detailed_symptoms = []
         for s in self.symptoms:
@@ -107,6 +132,13 @@ class InjuryRiskProcessor(object):
                 for m in muscles:
                     symptom = deepcopy(s)
                     symptom.body_part = BodyPart(m, None)
+                    bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
+                    if bilateral and s.side == 0:
+                        symptom.side = 1
+                        symptom_2 = deepcopy(s)
+                        symptom_2.body_part = BodyPart(m, None)
+                        symptom_2.side = 2
+                        detailed_symptoms.append(symptom_2)
                     detailed_symptoms.append(symptom)
             else:  # joints, ligaments and muscle groups that do not have constituent muscles defined
                 detailed_symptoms.append(s)
@@ -125,29 +157,55 @@ class InjuryRiskProcessor(object):
         #reconstruct to group level
         if aggregate_results:
 
+            return self.aggregate_ird()
+
+        elif aggregate_for_viz:
+
             aggregated_injury_hist_dict = {}
 
             for body_part_side, body_part_injury_risk in self.injury_risk_dict.items():
                 if body_part_side not in aggregated_injury_hist_dict:
-                    muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
+                    muscle_group = BodyPartLocation.get_viz_muscle_group(body_part_side.body_part_location)
                     if isinstance(muscle_group, BodyPartLocation):
                         new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
                         if new_body_part_side not in aggregated_injury_hist_dict:
                             aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
                         else:
-                            aggregated_injury_hist_dict[new_body_part_side].merge(self.injury_risk_dict[body_part_side])
+                            existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                            aggregated_injury_hist_dict[new_body_part_side].merge(existing_body_part_injury_risk)
                     else:
                         aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
                 else:
-                    aggregated_injury_hist_dict[body_part_side].merge(self.injury_risk_dict[body_part_side])
+                    existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                    aggregated_injury_hist_dict[body_part_side].merge(existing_body_part_injury_risk)
 
-            self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
+            self.viz_aggregated_injury_risk_dict = aggregated_injury_hist_dict
 
-            #self.aggregated_injury_risk_dict = self.update_injury_risk_dict_rankings(self.aggregated_injury_risk_dict)
+            return self.viz_aggregated_injury_risk_dict
 
-            return self.aggregated_injury_risk_dict
         else:
             return self.injury_risk_dict
+
+    def aggregate_ird(self):
+        aggregated_injury_hist_dict = {}
+        for body_part_side, body_part_injury_risk in self.injury_risk_dict.items():
+            if body_part_side not in aggregated_injury_hist_dict:
+                muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
+                if isinstance(muscle_group, BodyPartLocation):
+                    new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
+                    if new_body_part_side not in aggregated_injury_hist_dict:
+                        aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
+                    else:
+                        existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                        aggregated_injury_hist_dict[new_body_part_side].merge(existing_body_part_injury_risk)
+                else:
+                    aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
+            else:
+                existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                aggregated_injury_hist_dict[body_part_side].merge(existing_body_part_injury_risk)
+        self.aggregated_injury_risk_dict = aggregated_injury_hist_dict
+
+        return self.aggregated_injury_risk_dict
 
     def reset_reported_symptoms(self, injury_risk_dict):
 
@@ -166,7 +224,7 @@ class InjuryRiskProcessor(object):
             injury_risk_dict[b].long_count_last_0_20_days = 0
             injury_risk_dict[b].short_count_last_0_20_days = 0
 
-    def update_injury_risk_dict_rankings(self, injury_risk_dict):
+    def update_injury_risk_dict_rankings(self, injury_risk_dict, base_date):
         
         total_compensation_muscles = [c.total_compensation_percent for c in injury_risk_dict.values() if c.total_compensation_percent > 0]
         eccentric_compensation_muscles = [c.eccentric_compensation_percent for c in injury_risk_dict.values() if c.eccentric_compensation_percent > 0]
@@ -179,6 +237,8 @@ class InjuryRiskProcessor(object):
         max_eccentric_compensation = None
         max_total_volume = None
         max_eccentric_volume = None
+
+        two_days_ago = base_date - timedelta(days=1)
 
         if len(total_compensation_muscles) > 0:
             min_total_compensation = min(total_compensation_muscles)
@@ -212,72 +272,220 @@ class InjuryRiskProcessor(object):
             eccentric_volume_tier_2 = max_eccentric_volume - (2 * eccentric_volume_tier)
             eccentric_volume_tier_3 = max_eccentric_volume - (3 * eccentric_volume_tier)
 
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            body_part_injury_risk.total_compensation_percent_tier = 0
+            body_part_injury_risk.eccentric_compensation_percent_tier = 0
+            body_part_injury_risk.total_volume_percent_tier = 0
+            body_part_injury_risk.eccentric_volume_percent_tier = 0
+            body_part_injury_risk.limited_mobility_tier = 0
+            body_part_injury_risk.underactive_weak_tier = 0
+
         if max_total_compensation is not None or max_eccentric_compensation is not None or max_total_volume is not None or max_eccentric_volume is not None:
 
-            for body_part_side, body_part_injurk_risk in injury_risk_dict.items():
-                if max_total_compensation is not None:
-                    if body_part_injurk_risk.total_compensation_percent >= total_compensation_tier_1:
-                        body_part_injurk_risk.total_compensation_percent_tier = 1
-                    elif body_part_injurk_risk.total_compensation_percent >= total_compensation_tier_2:
-                        body_part_injurk_risk.total_compensation_percent_tier = 2
-                    elif body_part_injurk_risk.total_compensation_percent >= total_compensation_tier_3:
-                        body_part_injurk_risk.total_compensation_percent_tier = 3
-                    elif body_part_injurk_risk.total_compensation_percent >= min_total_compensation:
-                        body_part_injurk_risk.total_compensation_percent_tier = 4
-                else:
-                    body_part_injurk_risk.total_compensation_percent_tier = 0
+            for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+                if self.relative_load_level == 1:
+                    if max_total_compensation is not None:
+                        if body_part_injury_risk.total_compensation_percent >= total_compensation_tier_1:
+                            body_part_injury_risk.total_compensation_percent_tier = 1
+                        elif body_part_injury_risk.total_compensation_percent >= total_compensation_tier_2:
+                            body_part_injury_risk.total_compensation_percent_tier = 2
+                        elif body_part_injury_risk.total_compensation_percent >= min_total_compensation:
+                            body_part_injury_risk.total_compensation_percent_tier = 3
+                        # elif body_part_injury_risk.total_compensation_percent >= min_total_compensation:
+                        #     body_part_injury_risk.total_compensation_percent_tier = 4
+                    else:
+                        body_part_injury_risk.total_compensation_percent_tier = 0
 
-                if max_eccentric_compensation is not None:
-                    if body_part_injurk_risk.eccentric_compensation_percent >= eccentric_compensation_tier_1:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 1
-                    elif body_part_injurk_risk.eccentric_compensation_percent >= eccentric_compensation_tier_2:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 2
-                    elif body_part_injurk_risk.eccentric_compensation_percent >= eccentric_compensation_tier_3:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 3
-                    elif body_part_injurk_risk.eccentric_compensation_percent >= min_eccentric_compensation:
-                        body_part_injurk_risk.eccentric_compensation_percent_tier = 4
-                else:
-                    body_part_injurk_risk.eccentric_compensation_percent_tier = 0
+                    if max_eccentric_compensation is not None:
+                        if body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_1:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 1
+                        elif body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_2:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 2
+                        elif body_part_injury_risk.eccentric_compensation_percent >= min_eccentric_compensation:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 3
+                        # elif body_part_injury_risk.eccentric_compensation_percent >= min_eccentric_compensation:
+                        #     body_part_injury_risk.eccentric_compensation_percent_tier = 4
+                    else:
+                        body_part_injury_risk.eccentric_compensation_percent_tier = 0
+
+                elif self.relative_load_level == 2:
+                    if max_total_compensation is not None:
+                        if body_part_injury_risk.total_compensation_percent >= total_compensation_tier_1:
+                            body_part_injury_risk.total_compensation_percent_tier = 1
+                        elif body_part_injury_risk.total_compensation_percent >= total_compensation_tier_2:
+                            body_part_injury_risk.total_compensation_percent_tier = 2
+                        elif body_part_injury_risk.total_compensation_percent >= total_compensation_tier_3:
+                            body_part_injury_risk.total_compensation_percent_tier = 3
+                        elif body_part_injury_risk.total_compensation_percent >= min_total_compensation:
+                            body_part_injury_risk.total_compensation_percent_tier = 4
+                    else:
+                        body_part_injury_risk.total_compensation_percent_tier = 0
+
+                    if max_eccentric_compensation is not None:
+                        if body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_1:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 1
+                        elif body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_2:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 2
+                        elif body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_3:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 3
+                        elif body_part_injury_risk.eccentric_compensation_percent >= min_eccentric_compensation:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 4
+                    else:
+                        body_part_injury_risk.eccentric_compensation_percent_tier = 0
+
+                else:  # relative load 3
+                    if max_total_compensation is not None:
+                        if body_part_injury_risk.total_compensation_percent >= total_compensation_tier_1:
+                            body_part_injury_risk.total_compensation_percent_tier = 2
+                        elif body_part_injury_risk.total_compensation_percent >= total_compensation_tier_2:
+                            body_part_injury_risk.total_compensation_percent_tier = 3
+                        elif body_part_injury_risk.total_compensation_percent >= total_compensation_tier_3:
+                            body_part_injury_risk.total_compensation_percent_tier = 4
+                        else:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 0
+                        # elif body_part_injury_risk.total_compensation_percent >= min_total_compensation:
+                        #     body_part_injury_risk.total_compensation_percent_tier = 4
+                    else:
+                        body_part_injury_risk.total_compensation_percent_tier = 0
+
+                    if max_eccentric_compensation is not None:
+                        if body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_1:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 2
+                        elif body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_2:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 3
+                        elif body_part_injury_risk.eccentric_compensation_percent >= eccentric_compensation_tier_3:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 4
+                        else:
+                            body_part_injury_risk.eccentric_compensation_percent_tier = 0
+                        # elif body_part_injury_risk.eccentric_compensation_percent >= min_eccentric_compensation:
+                        #     body_part_injury_risk.eccentric_compensation_percent_tier = 4
+                    else:
+                        body_part_injury_risk.eccentric_compensation_percent_tier = 0
 
                 if max_total_volume is not None:
-                    total_volume_today = body_part_injurk_risk.total_volume_today()
+                    total_volume_today = body_part_injury_risk.total_volume_today()
 
-                    if total_volume_today >= total_volume_tier_1:
-                        body_part_injurk_risk.total_volume_percent_tier = 1
-                        if self.relative_load_level == 1:
-                            body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_non_functional_overreaching_date = self.event_date_time.date()
-                        elif self.relative_load_level == 2:
-                            body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_functional_overreaching_date = self.event_date_time.date()
-                    elif total_volume_today >= total_volume_tier_2:
-                        body_part_injurk_risk.total_volume_percent_tier = 2
-                        if self.relative_load_level == 1:
-                            body_part_injurk_risk.last_excessive_strain_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_inhibited_date = self.event_date_time.date()
-                            body_part_injurk_risk.last_functional_overreaching_date = self.event_date_time.date()
-                    elif total_volume_today >= total_volume_tier_3:
-                        body_part_injurk_risk.total_volume_percent_tier = 3
-                    elif total_volume_today >= min_total_volume:
-                        body_part_injurk_risk.total_volume_percent_tier = 4
+                    if self.relative_load_level == 1:
+
+                        if total_volume_today >= total_volume_tier_1:
+                            body_part_injury_risk.total_volume_percent_tier = 1
+                            body_part_injury_risk.last_excessive_strain_date = base_date
+                            body_part_injury_risk.last_inhibited_date = base_date
+                            body_part_injury_risk.last_non_functional_overreaching_date = base_date
+
+                        elif total_volume_today >= total_volume_tier_2:
+                            body_part_injury_risk.total_volume_percent_tier = 2
+                            body_part_injury_risk.last_excessive_strain_date = base_date
+                            body_part_injury_risk.last_inhibited_date = base_date
+                            body_part_injury_risk.last_functional_overreaching_date = base_date
+
+                        elif total_volume_today >= total_volume_tier_3:
+                            body_part_injury_risk.total_volume_percent_tier = 3
+
+                        elif total_volume_today >= min_total_volume:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                    elif self.relative_load_level == 2:
+                        if total_volume_today >= total_volume_tier_1:
+                            body_part_injury_risk.total_volume_percent_tier = 2
+                            body_part_injury_risk.last_excessive_strain_date = base_date
+                            body_part_injury_risk.last_inhibited_date = base_date
+                            body_part_injury_risk.last_functional_overreaching_date = base_date
+
+                        elif total_volume_today >= total_volume_tier_2:
+                            body_part_injury_risk.total_volume_percent_tier = 3
+
+                        elif total_volume_today >= total_volume_tier_3:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                        elif total_volume_today >= min_total_volume:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                    else:
+                        if total_volume_today >= total_volume_tier_1:
+                            body_part_injury_risk.total_volume_percent_tier = 3
+
+                        elif total_volume_today >= total_volume_tier_2:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                        elif total_volume_today >= total_volume_tier_3:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
+                        elif total_volume_today >= min_total_volume:
+                            body_part_injury_risk.total_volume_percent_tier = 0
+
                 else:
-                    body_part_injurk_risk.total_volume_percent_tier = 0
+                    if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
+                        body_part_injury_risk.total_volume_percent_tier = 3
+                    else:
+                        body_part_injury_risk.total_volume_percent_tier = 0
 
                 if max_eccentric_volume is not None:
-                    eccentric_volume_today = body_part_injurk_risk.eccentric_volume_today()
+                    eccentric_volume_today = body_part_injury_risk.eccentric_volume_today()
 
                     if eccentric_volume_today >= eccentric_volume_tier_1:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 1
+                        body_part_injury_risk.eccentric_volume_percent_tier = 1
                     elif eccentric_volume_today >= eccentric_volume_tier_2:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 2
+                        body_part_injury_risk.eccentric_volume_percent_tier = 2
                     elif eccentric_volume_today >= eccentric_volume_tier_3:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 3
+                        body_part_injury_risk.eccentric_volume_percent_tier = 3
                     elif eccentric_volume_today >= min_eccentric_volume:
-                        body_part_injurk_risk.eccentric_volume_percent_tier = 4
+                        body_part_injury_risk.eccentric_volume_percent_tier = 4
                 else:
-                    body_part_injurk_risk.eccentric_volume_percent_tier = 0
+                    body_part_injury_risk.eccentric_volume_percent_tier = 0
+
+        # add prevention and delayed excessive strain ranking
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
+                if body_part_injury_risk.total_volume_percent_tier == 0:
+                    body_part_injury_risk.total_volume_percent_tier = 3
+                else:
+                    body_part_injury_risk.total_volume_percent_tier = min(body_part_injury_risk.total_volume_percent_tier, 3)
+            if (body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.underactive_short_count_last_0_20_days >= 3):
+                # create tier 1
+                body_part_injury_risk.limited_mobility_tier = 1
+            elif (body_part_injury_risk.overactive_long_count_last_0_20_days < 3 and
+                    body_part_injury_risk.overactive_short_count_last_0_20_days < 3 and
+                    body_part_injury_risk.underactive_short_count_last_0_20_days < 3):
+                if (body_part_injury_risk.overactive_long_count_last_0_20_days > 0 or
+                        body_part_injury_risk.overactive_short_count_last_0_20_days > 0 or
+                        body_part_injury_risk.underactive_short_count_last_0_20_days > 0):
+                    # create tier two
+                    body_part_injury_risk.limited_mobility_tier = 2
+                elif (body_part_injury_risk.overactive_long_vote_count > 0 or
+                        body_part_injury_risk.overactive_short_vote_count > 0 or
+                        body_part_injury_risk.underactive_short_vote_count > 0):
+                    # create tier 3
+                    body_part_injury_risk.limited_mobility_tier = 3
+
+            # include joint and ligament issues
+            if (body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and
+                    body_part_injury_risk.last_altered_joint_arthokinematics_date == base_date):
+                body_part_injury_risk.limited_mobility_tier = 1
+
+            if ((body_part_injury_risk.last_tendinopathy_date is not None and
+                 body_part_injury_risk.last_tendinopathy_date == base_date) or
+                    (body_part_injury_risk.last_tendinosis_date is not None and
+                     body_part_injury_risk.last_tendinosis_date == base_date)):
+                body_part_injury_risk.limited_mobility_tier = 1
+
+            # add prevention ranking
+            if (body_part_injury_risk.underactive_long_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.weak_count_last_0_20_days >= 3):
+                # create tier 1
+                body_part_injury_risk.underactive_weak_tier = 1
+            elif (body_part_injury_risk.underactive_long_count_last_0_20_days < 3 and
+                    body_part_injury_risk.weak_count_last_0_20_days < 3):
+                if (body_part_injury_risk.underactive_long_count_last_0_20_days > 0 or
+                        body_part_injury_risk.weak_count_last_0_20_days > 0):
+                    # create tier two
+                    body_part_injury_risk.underactive_weak_tier = 2
+                elif (body_part_injury_risk.underactive_long_vote_count > 0 or
+                        body_part_injury_risk.weak_vote_count > 0):
+                    # create tier 3
+                    body_part_injury_risk.underactive_weak_tier = 3
 
         return injury_risk_dict
     
@@ -410,6 +618,7 @@ class InjuryRiskProcessor(object):
 
         return injury_risk_dict
 
+    @xray_recorder.capture('logic.InjuryRiskProcessor.update_historical_data')
     def update_historical_data(self, load_stats):
 
         combined_dates = []
@@ -442,6 +651,8 @@ class InjuryRiskProcessor(object):
             daily_sessions = [n for n in self.training_sessions if n.event_date.date() == d]
             daily_sessions = sorted(daily_sessions, key=lambda x:x.event_date)
 
+            self.set_relative_load_level(d)
+
             session_mapping_dict = {}
 
             for session in daily_sessions:
@@ -455,7 +666,7 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict = self.mark_anc_muscle_imbalance(injury_risk_dict,
                                                                       current_session.event_date)
 
-                injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+                injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, d)
 
                 session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
@@ -472,7 +683,6 @@ class InjuryRiskProcessor(object):
                 concentric_volume_dict = self.concentric_volume_dict[body_part_side]
                 total_volume_dict = self.total_volume_dict[body_part_side]
 
-                # TODO: calc ramp, etc for intensity
                 # self.populate_intensity_dictionaries(body_part_injury_risk, body_part_side, d)
                 # eccentric_intensity_dict = self.eccentric_intensity_dict[body_part_side]
                 # concentric_intensity_dict = self.concentric_intensity_dict[body_part_side]
@@ -506,20 +716,9 @@ class InjuryRiskProcessor(object):
                 injury_risk_dict[body_part_side].eccentric_volume_ramp_today = injury_risk_dict[body_part_side].eccentric_volume_ramp()
                 injury_risk_dict[body_part_side].total_volume_ramp_today = injury_risk_dict[body_part_side].total_volume_ramp()
 
-                # if injury_risk_dict[body_part_side].eccentric_volume_ramp_today > 1.0 or injury_risk_dict[body_part_side].total_volume_ramp_today > 1.0:
-                #     injury_risk_dict[body_part_side].last_excessive_strain_date = d
-                #     injury_risk_dict[body_part_side].last_inhibited_date = d
-                #
-                # if 1.0 < injury_risk_dict[body_part_side].eccentric_volume_ramp_today <= 1.05:
-                #     injury_risk_dict[body_part_side].last_functional_overreaching_date = d
-                # elif 1.05 < injury_risk_dict[body_part_side].eccentric_volume_ramp_today:
-                #     injury_risk_dict[body_part_side].last_non_functional_overreaching_date = d
-                #
-                # elif 1.0 < injury_risk_dict[body_part_side].total_volume_ramp_today <= 1.1:
-                #     injury_risk_dict[body_part_side].last_functional_overreaching_date = d
-                # elif 1.1 < injury_risk_dict[body_part_side].total_volume_ramp_today:
-                #     injury_risk_dict[body_part_side].last_non_functional_overreaching_date = d
-        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+        # now provide a current day ranking
+        self.set_relative_load_level(self.event_date_time.date())
+        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, self.event_date_time.date())
 
         return injury_risk_dict
 
@@ -702,7 +901,7 @@ class InjuryRiskProcessor(object):
             elif apt_ankle_present and (
                     hip_drop_apt_present or hip_drop_pva_present) and (knee_valgus_apt_present or knee_valgus_pva_present):
                 short_list = [59, 49, 50, 52, 53, 54, 46, 55]
-                long_list = [66, 63, 64, 47, 48, 53, 68, 44]
+                long_list = [66, 63, 64, 47, 48, 44]
                 full_list = []
                 full_list.extend(short_list)
                 full_list.extend(long_list)
@@ -733,7 +932,7 @@ class InjuryRiskProcessor(object):
 
             elif not apt_ankle_present and ((hip_drop_pva_present and knee_valgus_pva_present) or knee_valgus_hip_drop_present):
                 short_list = [65, 59, 49, 50, 52, 53, 54, 55, 46]
-                long_list = [66, 63, 64, 68, 53, 47, 48, 56]
+                long_list = [66, 63, 64, 53, 47, 48, 56]
                 full_list = []
                 full_list.extend(short_list)
                 full_list.extend(long_list)
@@ -751,7 +950,7 @@ class InjuryRiskProcessor(object):
 
             elif not apt_ankle_present and not hip_drop_pva_present and knee_valgus_pva_present:
                 short_list = [59, 55, 46, 61, 43, 41]
-                long_list = [68, 53, 47, 48, 56, 44, 40, 42]
+                long_list = [53, 47, 48, 56, 44, 40, 42]
                 full_list = []
                 full_list.extend(short_list)
                 full_list.extend(long_list)
@@ -1057,37 +1256,25 @@ class InjuryRiskProcessor(object):
         daily_sessions = [n for n in self.training_sessions if n.event_date.date() == base_date]
         daily_sessions = sorted(daily_sessions, key=lambda x:x.event_date)
 
+        self.set_relative_load_level(base_date)
+
         #reset
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 
-            #injury_risk_dict[body_part_side].eccentric_volume_today = 0
-            #injury_risk_dict[body_part_side].concentric_volume_today = 0
-            #injury_risk_dict[body_part_side].last_compensation_date = None
-            #injury_risk_dict[body_part_side].compensating_source = None
-
             injury_risk_dict[body_part_side].prime_mover_concentric_volume_today = 0
             injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today = 0
-            #injury_risk_dict[body_part_side].prime_mover_total_volume_today = 0
             injury_risk_dict[body_part_side].synergist_concentric_volume_today = 0
             injury_risk_dict[body_part_side].synergist_eccentric_volume_today = 0
-            #injury_risk_dict[body_part_side].synergist_total_volume_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_concentric_volume_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_eccentric_volume_today = 0
-            #injury_risk_dict[body_part_side].synergist_compensating_total_volume_today = 0
-
-            #injury_risk_dict[body_part_side].concentric_intensity_today = 0
-            #injury_risk_dict[body_part_side].eccentric_intensity_today = 0
 
             injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today = 0
-            #injury_risk_dict[body_part_side].prime_mover_total_intensity_today = 0
 
             injury_risk_dict[body_part_side].synergist_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = 0
-            #injury_risk_dict[body_part_side].synergist_total_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = 0
-            #injury_risk_dict[body_part_side].synergist_compensating_total_intensity_today = 0
 
         session_mapping_dict = {}
         injury_cycle_summary_dict = {}
@@ -1102,41 +1289,13 @@ class InjuryRiskProcessor(object):
             injury_risk_dict = self.mark_anc_muscle_imbalance(injury_risk_dict,
                                                               current_session.event_date)
 
-            injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
+            injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, base_date)
 
             session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
 
         injury_risk_dict = self.merge_daily_sessions(base_date, session_mapping_dict, injury_risk_dict)
 
-        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict)
-
-            # for b in session_functional_movement.body_parts:
-            #
-            #     if b.body_part_side not in injury_risk_dict:
-            #         injury_risk_dict[b.body_part_side] = BodyPartInjuryRisk()
-            #
-            #     injury_risk_dict[b.body_part_side].eccentric_volume_today += b.eccentric_volume
-            #     injury_risk_dict[b.body_part_side].concentric_volume_today += b.concentric_volume
-            #     if b.is_compensating:
-            #         injury_risk_dict[b.body_part_side].last_compensation_date = base_date
-            #         injury_risk_dict[b.body_part_side].compensating_source = b.compensation_source
-            #
-            #     eccentric_volume_ramp = injury_risk_dict[b.body_part_side].eccentric_volume_ramp()
-            #     total_volume_ramp = injury_risk_dict[b.body_part_side].total_volume_ramp()
-            #
-            #     if eccentric_volume_ramp > 1.0 or total_volume_ramp > 1.0:
-            #         injury_risk_dict[b.body_part_side].last_excessive_strain_date = base_date
-            #         injury_risk_dict[b.body_part_side].last_inhibited_date = base_date
-            #
-            #     if 1.0 < eccentric_volume_ramp <= 1.05:
-            #         injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
-            #     elif 1.05 < eccentric_volume_ramp:
-            #         injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
-            #
-            #     elif 1.0 < total_volume_ramp <= 1.1:
-            #         injury_risk_dict[b.body_part_side].last_functional_overreaching_date = base_date
-            #     elif 1.1 < total_volume_ramp:
-            #         injury_risk_dict[b.body_part_side].last_non_functional_overreaching_date = base_date
+        injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, base_date)
 
     def merge_daily_sessions(self, base_date, session_functional_movement_dict_list, injury_risk_dict):
 
@@ -1151,8 +1310,10 @@ class InjuryRiskProcessor(object):
 
                 prime_movers = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.prime_movers]
                 synergists = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.synergists]
+                compensation_parts = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.parts_receiving_compensation]
                 body_part_side_list.extend(prime_movers)
                 body_part_side_list.extend(synergists)
+                body_part_side_list.extend(compensation_parts)
 
         body_part_side_set = list(set(body_part_side_list))
 
@@ -1178,14 +1339,10 @@ class InjuryRiskProcessor(object):
             # intensity
             injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today = 0
-            #injury_risk_dict[body_part_side].prime_mover_total_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = 0
             injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = 0
-            #injury_risk_dict[body_part_side].synergist_total_intensity_today = 0
-            #injury_risk_dict[body_part_side].eccentric_intensity_today = 0
-            #injury_risk_dict[body_part_side].concentric_intensity_today = 0
             injury_risk_dict[body_part_side].compensating_causes_intensity_today = []
             injury_risk_dict[body_part_side].compensating_source_intensity = None
 
@@ -1198,8 +1355,6 @@ class InjuryRiskProcessor(object):
                     body_part_side = BodyPartSide(prime_mover.body_part_side.body_part_location, prime_mover.body_part_side.side)
                     injury_risk_dict[body_part_side].prime_mover_concentric_volume_today += prime_mover.concentric_volume
                     injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today += prime_mover.eccentric_volume
-                    # injury_risk_dict[
-                    #     body_part_side].prime_mover_total_volume_today = prime_mover.total_volume()
 
                     injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = max(
                         prime_mover.concentric_intensity,
@@ -1211,15 +1366,13 @@ class InjuryRiskProcessor(object):
                         prime_mover.total_intensity(),
                         injury_risk_dict[body_part_side].prime_mover_total_intensity_today)
 
-                for synergist in functional_movement.synergists:
+                for synergist in functional_movement.synergists:  # list of BodyPartFunctionalMovement objects
                     body_part_side = BodyPartSide(synergist.body_part_side.body_part_location,
                                                   synergist.body_part_side.side)
                     injury_risk_dict[body_part_side].synergist_concentric_volume_today += synergist.concentric_volume
                     injury_risk_dict[body_part_side].synergist_eccentric_volume_today += synergist.eccentric_volume
-                    injury_risk_dict[body_part_side].synergist_compensating_concentric_volume_today += synergist.compensated_concentric_volume
-                    injury_risk_dict[body_part_side].synergist_compensating_eccentric_volume_today += synergist.compensated_eccentric_volume
                     # injury_risk_dict[
-                    #     body_part_side].synergist_total_volume_today = synergist.total_volume()
+                    #     body_part_side].prime_mover_total_volume_today = prime_mover.total_volume()
 
                     injury_risk_dict[body_part_side].synergist_concentric_intensity_today = max(
                         synergist.concentric_intensity,
@@ -1227,36 +1380,48 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = max(
                         synergist.eccentric_intensity,
                         injury_risk_dict[body_part_side].synergist_eccentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = max(
-                        synergist.compensated_concentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = max(
-                        synergist.compensated_eccentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today)
                     injury_risk_dict[body_part_side].synergist_total_intensity_today = max(
                         synergist.total_intensity(),
                         injury_risk_dict[body_part_side].synergist_total_intensity_today)
 
-                    injury_risk_dict[body_part_side].compensating_causes_volume_today.extend(
-                        synergist.compensating_causes_volume)
-                    injury_risk_dict[body_part_side].compensating_causes_intensity_today.extend(
-                        synergist.compensating_causes_intensity)
+                for compensation_part in functional_movement.parts_receiving_compensation:
+                    body_part_side = BodyPartSide(compensation_part.body_part_side.body_part_location,
+                                                  compensation_part.body_part_side.side)
+                    injury_risk_dict[body_part_side].synergist_concentric_volume_today += compensation_part.concentric_volume
+                    injury_risk_dict[body_part_side].synergist_eccentric_volume_today += compensation_part.eccentric_volume
+                    injury_risk_dict[body_part_side].synergist_compensating_concentric_volume_today += compensation_part.compensated_concentric_volume
+                    injury_risk_dict[body_part_side].synergist_compensating_eccentric_volume_today += compensation_part.compensated_eccentric_volume
+                    # injury_risk_dict[
+                    #     body_part_side].synergist_total_volume_today = synergist.total_volume()
 
-                    if len(synergist.compensating_causes_volume) > 0 or len(synergist.compensating_causes_intensity) > 0:
+                    injury_risk_dict[body_part_side].synergist_concentric_intensity_today = max(
+                        compensation_part.concentric_intensity,
+                        injury_risk_dict[body_part_side].synergist_concentric_intensity_today)
+                    injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = max(
+                        compensation_part.eccentric_intensity,
+                        injury_risk_dict[body_part_side].synergist_eccentric_intensity_today)
+                    injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = max(
+                        compensation_part.compensated_concentric_intensity,
+                        injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today)
+                    injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = max(
+                        compensation_part.compensated_eccentric_intensity,
+                        injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today)
+                    injury_risk_dict[body_part_side].synergist_total_intensity_today = max(
+                        compensation_part.total_intensity(),
+                        injury_risk_dict[body_part_side].synergist_total_intensity_today)
+
+                    injury_risk_dict[body_part_side].compensating_causes_volume_today.extend(
+                        compensation_part.compensating_causes_volume)
+                    injury_risk_dict[body_part_side].compensating_causes_intensity_today.extend(
+                        compensation_part.compensating_causes_intensity)
+
+                    if len(compensation_part.compensating_causes_volume) > 0 or len(compensation_part.compensating_causes_intensity) > 0:
                         injury_risk_dict[body_part_side].last_compensation_date = base_date
                         #TODO - take merge compensation sources here
-                    injury_risk_dict[body_part_side].compensating_source_volume = synergist.compensation_source_volume
-                    injury_risk_dict[body_part_side].compensating_source_intensity = synergist.compensation_source_intensity
+                    injury_risk_dict[body_part_side].compensating_source_volume = compensation_part.compensation_source_volume
+                    injury_risk_dict[body_part_side].compensating_source_intensity = compensation_part.compensation_source_intensity
 
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
-            # injury_risk_dict[body_part_side].concentric_volume_today += (injury_risk_dict[body_part_side].prime_mover_concentric_volume_today +
-            #                                                              injury_risk_dict[body_part_side].synergist_concentric_volume_today +
-            #                                                              injury_risk_dict[
-            #                                                                  body_part_side].synergist_compensating_concentric_volume_today)
-            # injury_risk_dict[body_part_side].eccentric_volume_today += (injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today +
-            #                                                              injury_risk_dict[body_part_side].synergist_eccentric_volume_today +
-            #                                                              injury_risk_dict[
-            #                                                                  body_part_side].synergist_compensating_eccentric_volume_today)
 
             injury_risk_dict[body_part_side].eccentric_volume_ramp_today = injury_risk_dict[
                 body_part_side].eccentric_volume_ramp()
@@ -1267,21 +1432,6 @@ class InjuryRiskProcessor(object):
                 body_part_side].percent_total_compensation()
             injury_risk_dict[body_part_side].eccentric_compensation_percent = injury_risk_dict[
                 body_part_side].percent_eccentric_compensation()
-
-            # if injury_risk_dict[body_part_side].eccentric_volume_ramp_today > 1.0 or injury_risk_dict[body_part_side].total_volume_ramp_today > 1.0:
-            #     injury_risk_dict[body_part_side].last_excessive_strain_date = base_date
-            #     injury_risk_dict[body_part_side].last_inhibited_date = base_date
-            #
-            # if 1.0 < injury_risk_dict[body_part_side].eccentric_volume_ramp_today <= 1.05:
-            #     injury_risk_dict[body_part_side].last_functional_overreaching_date = base_date
-            # elif 1.05 < injury_risk_dict[body_part_side].eccentric_volume_ramp_today:
-            #     injury_risk_dict[body_part_side].last_non_functional_overreaching_date = base_date
-            #
-            # elif 1.0 < injury_risk_dict[body_part_side].total_volume_ramp_today <= 1.1:
-            #     injury_risk_dict[body_part_side].last_functional_overreaching_date = base_date
-            # elif 1.1 < injury_risk_dict[body_part_side].total_volume_ramp_today:
-            #     injury_risk_dict[body_part_side].last_non_functional_overreaching_date = base_date
-
 
         return injury_risk_dict
 
@@ -1417,7 +1567,6 @@ class InjuryRiskProcessor(object):
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
                 # moderate severity or 2 reports in last 10 days
-                # TODO: is moderate to high ache severity > 3?
                 if target_symptom.ache > 3 or (ache_count >= 2 and ache_count == ache_count_0_20):
                     injury_risk_dict[target_body_part_side].last_inflammation_date = base_date
 
@@ -1564,9 +1713,11 @@ class InjuryRiskProcessor(object):
         else:
 
             mark_related_muscles = False
+            related_level = 0
 
             if target_symptom.sharp is not None and target_symptom.sharp > 0:
                 mark_related_muscles = True
+                related_level = max(related_level, target_symptom.sharp)
 
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_sharp_date is None or injury_risk_dict[target_body_part_side].last_sharp_date < base_date:
@@ -1574,6 +1725,8 @@ class InjuryRiskProcessor(object):
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].sharp_count_last_0_20_days += 1
                     injury_risk_dict[target_body_part_side].last_sharp_level = target_symptom.sharp
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_trigger_date = base_date
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_level = target_symptom.sharp
 
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
@@ -1581,32 +1734,41 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_sharp_level = target_symptom.sharp
                     body_part_injury_risk.sharp_count_last_0_10_days += 1
                     body_part_injury_risk.sharp_count_last_0_20_days += 1
+                    body_part_injury_risk.last_muscle_spasm_trigger_date = base_date
+                    body_part_injury_risk.last_muscle_spasm_level = target_symptom.sharp
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             if target_symptom.tight is not None and target_symptom.tight > 0:
                 mark_related_muscles = True
+                related_level = max(related_level, target_symptom.tight)
 
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_tight_date is None or injury_risk_dict[target_body_part_side].last_tight_date < base_date:
                         injury_risk_dict[target_body_part_side].last_tight_date = base_date
                         injury_risk_dict[target_body_part_side].tight_count_last_0_20_days += 1  # 0_10 not tracked
-
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_trigger_date = base_date
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_level = target_symptom.tight
                     injury_risk_dict[target_body_part_side].last_tight_level = target_symptom.tight
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
                     body_part_injury_risk.last_tight_date = base_date
                     body_part_injury_risk.last_tight_level = target_symptom.tight
                     body_part_injury_risk.tight_count_last_0_20_days += 1
+                    body_part_injury_risk.last_muscle_spasm_trigger_date = base_date
+                    body_part_injury_risk.last_muscle_spasm_level = target_symptom.tight
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             #if target_symptom.ache is not None and target_symptom.ache > 3:
             if target_symptom.ache is not None and target_symptom.ache > 0:
                 mark_related_muscles = True
+                related_level = max(related_level, target_symptom.ache)
                 if target_body_part_side in injury_risk_dict:
                     if injury_risk_dict[target_body_part_side].last_ache_date is None or injury_risk_dict[target_body_part_side].last_ache_date < base_date:
                         injury_risk_dict[target_body_part_side].last_ache_date = base_date
                         injury_risk_dict[target_body_part_side].ache_count_last_0_10_days += 1
                         injury_risk_dict[target_body_part_side].ache_count_last_0_20_days += 1
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_trigger_date = base_date
+                    injury_risk_dict[target_body_part_side].last_muscle_spasm_level = target_symptom.ache
                     injury_risk_dict[target_body_part_side].last_ache_level = target_symptom.ache
                 else:
                     body_part_injury_risk = BodyPartInjuryRisk()
@@ -1614,6 +1776,8 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_ache_level = target_symptom.ache
                     body_part_injury_risk.ache_count_last_0_10_days += 1
                     body_part_injury_risk.ache_count_last_0_20_days += 1
+                    body_part_injury_risk.last_muscle_spasm_trigger_date = base_date
+                    body_part_injury_risk.last_muscle_spasm_level = target_symptom.ache
                     injury_risk_dict[target_body_part_side] = body_part_injury_risk
 
             # if target_symptom.ache is not None and target_symptom.ache <= 3:
@@ -1662,9 +1826,11 @@ class InjuryRiskProcessor(object):
                             body_part_side = BodyPartSide(BodyPartLocation(r), sd)
                             if body_part_side in injury_risk_dict:
                                 injury_risk_dict[body_part_side].last_muscle_spasm_date = base_date
+                                injury_risk_dict[body_part_side].last_muscle_spasm_level = related_level
                             else:
                                 body_part_injury_risk = BodyPartInjuryRisk()
                                 body_part_injury_risk.last_muscle_spasm_date = base_date
+                                body_part_injury_risk.last_muscle_spasm_level = related_level
                                 injury_risk_dict[body_part_side] = body_part_injury_risk
 
         return injury_risk_dict

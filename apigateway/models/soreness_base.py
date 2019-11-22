@@ -90,6 +90,7 @@ class BodyPartLocation(Enum):
     deltoid = 29
 
     deep_rotators_hip = 30
+    obliques = 31
 
     # shin
     anterior_tibialis = 40
@@ -172,11 +173,23 @@ class BodyPartLocation(Enum):
     medial_deltoid = 84
     posterior_deltoid = 85
 
-
     upper_body = 91
     lower_body = 92
     full_body = 93
-    
+
+    # merge
+    semimembranosus_semitendinosus = 100
+    anterior_adductors = 101
+    rectus_femoris_vastus_intermedius = 102
+
+    glute_med = 103
+
+    upper_traps_levator_scapulae = 105
+    middle_traps_rhomboids = 106
+
+    pec_major_minor = 107
+
+    hip_flexor_merge = 108
 
     @classmethod
     def get_muscle_group(cls, muscle):
@@ -198,6 +211,70 @@ class BodyPartLocation(Enum):
         return False
 
     @classmethod
+    def get_viz_muscle_group(cls, muscle):
+        muscle_groups = cls.muscle_groups_viz()
+
+        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+            return muscle
+        else:
+            for key, value in muscle_groups.items():
+                if muscle in value:  # is a muscle, return the group
+                    return key
+        return False  # joint or ligament
+
+    @classmethod
+    def get_muscle_group_for_viz_group(cls, muscle):
+        muscle_groups = cls.viz_groups_to_muscle_groups()
+
+        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+            return muscle
+        else:
+            for key, value in muscle_groups.items():
+                if muscle in value:  # is a muscle, return the group
+                    return key
+        return False  # joint or ligament
+
+    @classmethod
+    def get_viz_muscles_for_group(cls, muscle_group):
+        muscle_groups = cls.muscle_groups_viz()
+        if muscle_group in muscle_groups.keys():
+            return muscle_groups[muscle_group]
+        return False
+
+    @classmethod
+    def viz_groups_to_muscle_groups(cls):
+        grouped_muscles = {
+            cls.hamstrings: [cls.semimembranosus_semitendinosus],
+            cls.groin: [cls.anterior_adductors],
+            cls.quads: [cls.rectus_femoris_vastus_intermedius],
+            cls.hip_flexor: [cls.hip_flexor_merge],
+            cls.deep_rotators_hip: [cls.quadratus_femoris],
+            cls.glutes: [cls.glute_med],
+            cls.obliques: [cls.internal_obliques, cls.external_obliques],
+            cls.upper_back_neck: [cls.upper_traps_levator_scapulae, cls.middle_traps_rhomboids],
+            cls.chest: [cls.pec_major_minor]
+
+        }
+        return grouped_muscles
+
+    @classmethod
+    def muscle_groups_viz(cls):
+        grouped_muscles = {
+            cls.semimembranosus_semitendinosus: [cls.semimembranosus, cls.semitendinosus],
+            cls.anterior_adductors: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_brevis, cls.adductor_magnus_posterior_fibers],
+            cls.rectus_femoris_vastus_intermedius: [cls.rectus_femoris, cls.vastus_intermedius],
+            cls.hip_flexor_merge: [cls.psoas, cls.iliacus],
+            cls.quadratus_femoris: [cls.piriformis, cls.quadratus_femoris], # this is intentional
+            cls.glute_med: [cls.gluteus_medius_anterior_fibers, cls.gluteus_medius_posterior_fibers, cls.gluteus_minimus],
+            cls.obliques: [cls.internal_obliques, cls.external_obliques],
+            cls.upper_traps_levator_scapulae: [cls.upper_trapezius, cls.levator_scapulae],
+            cls.middle_traps_rhomboids: [cls.middle_trapezius, cls.rhomboids],
+            cls.pec_major_minor: [cls.pectoralis_minor, cls.pectoralis_major]
+
+        }
+        return grouped_muscles
+
+    @classmethod
     def muscle_groups(cls):
         grouped_muscles = {
             cls.shin: [cls.anterior_tibialis, cls.peroneals_longus],
@@ -207,7 +284,8 @@ class BodyPartLocation(Enum):
             cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris],
             cls.hip_flexor: [cls.tensor_fascia_latae, cls.psoas, cls.iliacus],
             cls.deep_rotators_hip: [cls.piriformis, cls.quadratus_femoris],
-            cls.core_stabilizers: [cls.transverse_abdominis, cls.internal_obliques],
+            cls.core_stabilizers: [cls.transverse_abdominis],
+            cls.obliques: [cls.internal_obliques, cls.external_obliques],
             cls.glutes: [cls.gluteus_medius_anterior_fibers, cls.gluteus_medius_posterior_fibers, cls.gluteus_minimus, cls.gluteus_maximus],
             cls.forearm: [],
             cls.biceps: [],
@@ -217,7 +295,7 @@ class BodyPartLocation(Enum):
             cls.upper_back_neck: [cls.upper_trapezius, cls.levator_scapulae, cls.middle_trapezius, cls.lower_trapezius, cls.rhomboids],
             # cls.erector_spinae: [],
             cls.lats: [],
-            cls.abdominals: [cls.rectus_abdominis, cls.external_obliques],
+            cls.abdominals: [cls.rectus_abdominis],
             cls.lower_back: [cls.erector_spinae, cls.quadratus_lumorum]
         }
         return grouped_muscles
@@ -257,7 +335,9 @@ class BodyPartLocationText(object):
                           'forearm': 'forearm',
                           'erector_spinae': 'erector spinae',
                           'core_stabilizers': 'core stabilizers',
-                          'it_band_lateral_knee': 'outer knee'}
+                          'it_band_lateral_knee': 'outer knee',
+                          'obliques': 'obliques',
+                          'deep_rotators_hip': 'deep rotators of the hip'}
 
         return body_part_text[self.body_part_location.name]
 
@@ -296,10 +376,13 @@ class BodyPartSideViz(object):
         self.color = color
 
     def __hash__(self):
-        return hash((self.body_part_location.value, self.side, self.color))
+        #return hash((self.body_part_location.value, self.side, self.color))
+        return hash((self.body_part_location.value, self.side))
 
     def __eq__(self, other):
-        return self.body_part_location == other.body_part_location and self.side == other.side and self.color == other.color
+        #return self.body_part_location == other.body_part_location and self.side == other.side and self.color == other.color
+
+        return self.body_part_location == other.body_part_location and self.side == other.side
 
     def __ne__(self, other):
         # Not strictly necessary, but to avoid having both x==y and x!=y

@@ -54,11 +54,14 @@ def handle_daily_readiness_create(user_id):
 
     sessions_planned = True
     train_later = True
+    hist_update = False
     plan_event_date = format_date(event_date)
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
         athlete_stats.event_date = event_date
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
     athlete_stats.api_version = Config.get('API_VERSION')
     athlete_stats.timezone = timezone
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
@@ -145,7 +148,8 @@ def handle_daily_readiness_create(user_id):
                        athlete_stats=survey_processor.athlete_stats,
                        stats_processor=survey_processor.stats_processor,
                        datastore_collection=datastore_collection,
-                       visualizations=visualizations)
+                       visualizations=visualizations,
+                       hist_update=hist_update)
     if is_fathom_environment():
         if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
             Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
