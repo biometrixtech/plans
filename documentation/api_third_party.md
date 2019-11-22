@@ -120,7 +120,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/daily_rea
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "date_time": Datetime,
@@ -189,7 +189,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following schema:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
@@ -211,7 +211,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/session/{
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -321,7 +321,7 @@ Cache-Control: no-cache
 ```
 ##### Response
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
@@ -341,7 +341,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/session/{
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime
@@ -363,7 +363,7 @@ Cache-Control: no-cache
 ```
 ##### Response
  
- If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -382,7 +382,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/session/{
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -405,7 +405,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Response
  
- If the delete was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the delete was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -423,7 +423,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/session/{
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -468,7 +468,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Response
  
- If the update was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the update was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -485,7 +485,7 @@ This endpoint can be called to get typical sessions that the user logs
 The client __must__ submit a request to the endpoint `/plans/{version}/session/{User UUID}/typical`. The request method __must__ be `POST`.
 
 ##### Request
-For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
+For `POST` method, the client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime
@@ -506,7 +506,7 @@ Authentication is required for this endpoint
 
 ##### Response
  
- The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -540,7 +540,7 @@ The client __must__ submit a request to the endpoint `/plans/version/symptoms/{U
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -573,7 +573,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
@@ -596,7 +596,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/active_re
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -618,7 +618,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Response
  
-If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -636,7 +636,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/active_re
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -661,7 +661,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Response
  
-If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
+If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
  
 ```
 {
@@ -682,7 +682,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/active_re
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -704,7 +704,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Response
  
-If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -722,7 +722,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/active_re
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -765,7 +765,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Response
  
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
  
 ```
 {
@@ -783,7 +783,7 @@ Authorization: eyJraWQ...ajBc4VQ
 The client __must__ submit a request to the endpoint `/plans/{version}/daily_plan/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime
@@ -808,7 +808,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
-The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
