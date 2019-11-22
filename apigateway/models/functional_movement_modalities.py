@@ -1565,7 +1565,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-                  body_part_injury_risk.total_compensation_percent_tier <= 5):
+                  0 < body_part_injury_risk.total_compensation_percent_tier < 6):
 
                 compensating = True
 
@@ -2142,7 +2142,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-                  body_part_injury_risk.total_compensation_percent_tier <= 5):
+                  0 < body_part_injury_risk.total_compensation_percent_tier < 6):
 
                 compensating = True
 
