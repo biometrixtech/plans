@@ -119,8 +119,7 @@ The client __must__ submit a request body containing a JSON object with the foll
     "sessions": [session, session],
     "sessions_planned": boolean,
     "health_sync_date": Datetime,
-    "user_age": number,
-    "sleep_data": [sleep_event]
+    "user_age": number
 }
 ```
 * `date_time` __should__  be a Datetime and reflect the local time that survey was taken
@@ -181,8 +180,7 @@ Authorization: eyJraWQ...ajBc4VQ
                   }
                 ],
     "user_age": 25,
-    "sessions_planned": false,
-    "sleep_data": [{"value": "INBED", "startDate": "2019-01-09T00:09:50.212-0500", "endDate": "2019-01-09T07:35:21.256-0500"}]
+    "sessions_planned": false
 }
 ```
 ##### Responses
