@@ -20,6 +20,7 @@
       - [Mark no sessions planned](#mark-no-sessions-planned)
       - [Delete](#delete)
       - [Update](#update)
+      - [Typical Sessions history](#typical-sessions-history)
     - [Symptoms](#symptoms)
       - [Submit](#submit)
     - [Active Recovery](#active-recovery)
@@ -39,6 +40,17 @@
       - [Clear user's data](#clear-users-data)
       - [Log App/Device information](#log-appdevice-information)
       - [Copy test user's data](#copy-test-users-data)
+  - [Appendix](#appendix)
+    - [Enumerations](#enumerations)
+      - [Reportable body part](#reportable-body-part)
+      - [All body parts](#all-body-parts)
+      - [side](#side)
+      - [sport name](#sport-name)
+      - [Session Source](#session-source)
+    - [Body Part Types](#body-part-types)
+      - [Joints](#joints)
+      - [Ligaments](#ligaments)
+      - [Muscles](#muscles)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -98,40 +110,47 @@ The client __must__ submit a request to the endpoint `/plans/version/daily_readi
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "date_time": Datetime,
     "soreness": [sore_part, sore_part],
-    "clear_candidates": [sore_part, sore_part]
+    "clear_candidates": [sore_part, sore_part],
     "sessions": [session, session],
     "sessions_planned": boolean,
-    "health_sync_date": Datetime
+    "health_sync_date": Datetime,
+    "user_age": number
 }
 ```
 * `date_time` __should__  be a Datetime and reflect the local time that survey was taken
-* `soreness` __should__ reflect a list of body parts(`sore_part`) with pain or soreness. Length __could__ be 0.
-* `clear_candidates` is __optional__ and __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear".
+* `soreness` __should__ reflect a list of body parts(`sore_part`) with symptoms. Length __could__ be 0.
+* `clear_candidates` is __optional__ and __should__ include body parts that were candidates to be cleared of historical status. Note this should include the body part even if marked "all_clear"
 * `sessions` is __optional__ and __should__ be a list of session objects, where each session matches the body of [Create](#create-2) Session.
-* `sessions_planned` is __optional__ and __should__ be a boolean representing whether the user plans to train again that day.
+* `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
+* `user_age` is __optional__ and only needed if one of the sessions is obtained from health app and contains heart rate data
 * `sore_part` __should__ have the following schema:
 ```
 {
     "body_part": number,
-    "severity": number,
-    "movement": number,
     "side": number,
-    "pain": boolean,
-    "status": string
+    "tight": number,
+    "knots": number,
+    "ache": number,
+    "sharp": number
 }
+
 ```
-* `body_part` __should__ be an integer reflecting BodyPart enum
-* `severity` __should__ be an integer 0, 1, 3 or 5 indicating the severity of the pain/soreness
-* `movement` __should__ be an integer 0, 1, 3 or 5 indicating how much movement is restricted 
+* `body_part` __should__ be an integer reflecting [BodyPart](#reportable-body-part) enumeration
+<!-- * `severity` __should__ be an integer 0, 1, 3 or 5 indicating the severity of the pain/soreness -->
+<!-- * `movement` __should__ be an integer 0, 1, 3 or 5 indicating how much movement is restricted  -->
 * `side` __should__ be an integer, either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
-* `pain` __should__ be a boolean to indicate whether it's pain or soreness.
-* `status` __should__ be a string representing the historical soreness status if one was received. Optional for soreness but required for clear candidates.
+* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
+* `knots` __should__ be reported for [muscles](#muscles) only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be `null`
+* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
+* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be `null`
+<!-- * `pain` __should__ be a boolean to indicate whether it's pain or soreness. -->
+<!-- * `status` __should__ be a string representing the historical soreness status if one was received. Optional for soreness but required for clear candidates. -->
 
 ```
 POST /plans/version/daily_readiness/{User UUID} HTTPS/1.1
@@ -141,8 +160,14 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "date_time": "2018-12-10T17:45:24Z",
-    "soreness":[{"body_part": 18, "severity": 3, "movement": 3, "side": 0}],
-    "clear_candidates": [{"body_part": 5, "severity": 0, "side": 1, "pain":true, "status": "persistant_2_pain"}]
+    "soreness":[{
+                                    "body_part": 14,
+                                    "side": 2
+                                    "tight": null,
+                                    "knots": null,
+                                    "ache": 3,
+                                    "sharp": 6,
+                                }],
     "sessions": [{"event_date": "2018-12-10T12:30:00Z",
                   "sport_name": 3,
                   "duration": 90,
@@ -154,20 +179,20 @@ Authorization: eyJraWQ...ajBc4VQ
                                         }
                   }
                 ],
-    "sessions_planned": false,
-    "sleep_data": [{"value": "INBED", "startDate": "2019-01-09T00:09:50.212-0500", "endDate": "2019-01-09T07:35:21.256-0500"}]
+    "user_age": 25,
+    "sessions_planned": false
 }
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 #### Soreness/Typical Session history
@@ -179,7 +204,7 @@ This endpoint can be called to get the body parts where soreness was reported in
 The client __must__ submit a request to the endpoint `/plans/version/daily_readiness/{User UUID}/previous`. The request method __must__ be `POST`.
 
 ##### Request
-For `POST` method, the client __must__ submit a request body containing a JSON object with the following schema:
+For `POST` method, the client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime
@@ -196,11 +221,13 @@ Authentication is required for this endpoint
 
 ##### Responses
  
- The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
-"readiness": readiness,
-"typical_sessions": [sesson, session]
+{
+    "readiness": readiness,
+    "typical_sessions": [sesson, session]
+}
 ```
 * `readiness` will have the following schema
 ```
@@ -217,12 +244,12 @@ Authentication is required for this endpoint
     "functional_strength_eligible": boolean,
 }
 ```
-* `body_part` will be a list of enumerated body parts + side (potentially empty)
-* `clear_candidates` will be a list of sore body parts with historical status that are candidates for clearance
-* `hist_sore_status` will be a list of sore body parts with historical status that are not candidates for clearing
-* `dormant_tipping_candidates` will be a list of sore body parts that should not prompt a response for the user but if they indicate a status for that, they will tip into specific status as defined in the response
-* `current_position` and `current_sport_name` will be enumeration
-* `current_position` exists but `current_sport_name` does not, then it's implied that the user wants functional strength for sport-less activity
+* `body_part` will be a list of enumerated body parts + side (potentially empty). `DEPRECATED: WILLL ALWAYS BE EMPTY`
+* `clear_candidates` will be a list of sore body parts with historical status that are candidates for clearance `DEPRECATED: WILLL ALWAYS BE EMPTY`
+* `hist_sore_status` will be a list of sore body parts with historical status that are not candidates for clearing `DEPRECATED: WILLL ALWAYS BE EMPTY`
+* `dormant_tipping_candidates` will be a list of sore body parts that should not prompt a response for the user but if they indicate a status for that, they will tip into specific status as defined in the response `DEPRECATED: WILLL ALWAYS BE EMPTY`
+* `current_position` and `current_sport_name` will be enumeration `DEPRECATED`
+* `current_position` exists but `current_sport_name` does not, then it's implied that the user wants functional strength for sport-less activity `DEPRECATED`
 
 * `typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
 * `session` object will be of the following schema
@@ -251,19 +278,21 @@ The client __must__ submit a request to the endpoint `/plans/version/session/{Us
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
     "sessions": [session, session],
     "health_sync_date": Datetime,
     "sessions_planned": Boolean
+    "user_age": number
 }
 ```
 * `event_date` __should__ reflect the date and time when the survey is submitted.
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
-* `session` __should__ be of the following schema
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
+* `user_age` is __optional__ and only needed if one of the sessions is obtained from health app and contains heart rate data
+* `session` __should__ be of the following schema
 ```
 {
     "event_date": Datetime,
@@ -283,17 +312,17 @@ The client __must__ submit a request body containing a JSON object with the foll
                             "soreness": [sore_part, sore_part],
                             "clear_candidates": [sore_part]}
                         },
-    "hr_data": [hr, hr, hr],
+    "hr_data": [hr, hr, hr]
 }
 ```
-* `event_date` __should__ reflect the start time of the session (health data) or default date (manually logged session)
-* `end_date` is __optional__ parameter that reflects the end time of the session for health data
+* `event_date` __should__ reflect the start time of the session (health/three sensor data) or default date (manually logged session)
+* `end_date` is __optional__ parameter that reflects the end time of the session for health/three sensor data
 * `session_type` __should__ be an integer reflecting SessionType enumeration. NOTE: We'll only use 6 moving forward
-* `sport_name` __should__ be an integer reflecting SportName enumeration.
+* `sport_name` __should__ be an integer reflecting  [sport name](#sport-name) enumeration.
 * `duration` __should__ be in minutes and reflect the duration which the user confirmend (health data) or entered (manually logged session).
 * `calories` __if present__, __should__ be calorie information obtained from health workout _(only needed for health workout)_
 * `distance` __if present__, __should__ be distance information obtained from health workout _(only needed for health workout)_
-* `source` __if present__, __should__ be 0 for manually logged session and 1 for health data
+* `source` __if present__, __should__ reflect [Session source](#session-source) enumeration
 * `deleted` __if present__, __should__ be true if the user deletes the workout detected from health app
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the health workout. each hr will have `startDate`, `endDate` and `value` _(only needed for health workout)_
@@ -340,20 +369,21 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
                     }
                     
                 ],
+    "user_age": 25,
     "sessions_planned": true,
     "health_sync_date": "2019-02-08T16:54:57Z"
 }
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 #### Mark no sessions planned
@@ -366,7 +396,7 @@ The client __must__ submit a request to the endpoint `/plans/version/session/{{U
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime
@@ -389,14 +419,14 @@ Postman-Token: 4b6c3946-89fd-4cde-ae29-3a4984d5f373
 ```
 ##### Responses
  
- If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
     "daily_plan": daily_plan
 }
 ```
-where `daily_plan` will have the standard schema as defined in [Get daily plan](#get-daily-plan)
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 #### Delete
 
@@ -408,7 +438,7 @@ The client __must__ submit a request to the endpoint `/plans/version/session/{se
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -431,7 +461,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the delete was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the delete was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -449,7 +479,7 @@ The client __must__ submit a request to the endpoint `/plans/version/session/{Us
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -494,12 +524,65 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the update was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the update was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
     "message": "success"
 }
+```
+
+
+#### Typical Sessions history
+
+This endpoint can be called to get typical sessions that the user logs
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/session/{User UUID}/typical`. The request method __must__ be `POST`.
+
+##### Request
+For `POST` method, the client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
+```
+POST /plans/{version}/session/{User UUID}/typical HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2019-02-08T16:30:00Z"
+}
+
+```
+Authentication is required for this endpoint
+
+##### Response
+ 
+ The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+ 
+```
+{
+    "typical_sessions": [sesson, session]
+}
+```
+`typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
+* `session` object will be of the following schema
+
+``` 
+{
+    "count": integer,
+    "duration": integer,
+    "event_date": datetime,
+    "session_type": integer,
+    "sport_name": integer,
+    "strength_and_conditioning_type": integer
+}
+
 ```
 
 ### Symptoms
@@ -514,7 +597,7 @@ The client __must__ submit a request to the endpoint `/plans/version/symptoms/{U
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -533,19 +616,28 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date": "2019-10-29T17:45:24Z",
-    "soreness":[{"body_part": 18, "side": 0, "tight": 4, "knots": null, "sharp": null, "ache": null}],
+    "soreness":[
+        {
+            "body_part": 18,
+            "side": 0,
+            "tight": 4,
+            "knots": null,
+            "sharp": null,
+            "ache": null
+        }
+    ]
 }
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 ### Active Recovery
@@ -560,7 +652,7 @@ The client __must__ submit a request to the endpoint `/plans/version/active_reco
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -582,7 +674,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -600,7 +692,7 @@ The client __must__ submit a request to the endpoint `/plans/version/active_reco
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -625,14 +717,14 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
  
 ```
 {
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 
@@ -646,7 +738,7 @@ The client __must__ submit a request to the endpoint `/plans/version/active_reco
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -668,7 +760,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -686,7 +778,7 @@ The client __must__ submit a request to the endpoint `/plans/version/active_reco
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -697,23 +789,15 @@ The client __must__ submit a request body containing a JSON object with the foll
 * `event_date` __should__ be the time when user completes the session.
 * `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
 * `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
-* `body_part` __should__ be of the following schema. Note that there will be additional attributes based on whether it's `heat` or `ice`. They should just be passed along as is.
+* `body_part` __should__ be of the following schema
 ```
 {
-    "active": true,
-    "body_part_location": 7,
-    "completed": false,
-    "goals": [
-        {
-            "goal_type": 0,
-            "priority": 1,
-            "text": "Care for Pain",
-            "trigger": "Pain Reported Today"
-        }
-    ]
-    "side": 1
+    "body_part_location": number,
+    "side": number
 }
 ```
+* `body_part_location` __should__ be an integer reflecting [BodyPart](#reportable-body-part) enumeration
+* `side` __should__ be an integer reflecting [side](#side) enumeration
 
 ```
 PATCH /plans/version/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
@@ -723,19 +807,28 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
     "recovery_type": "ice",
-    "completed_body_parts": ["3", "5", "20", "142"]
+    "completed_body_parts": [
+                                {
+                                    "body_part_lcoation": 3,
+                                    "side": 0,
+                                },
+                                {
+                                    "body_part_lcoation": 7,
+                                    "side": 1,
+                                }
+                        ]
 }
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following syntax.
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
  
 ```
 {
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same structure as defined in output of [Get daily plan](#get-daily-plan) route.
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
 
 
 ### Daily Plans
@@ -746,7 +839,7 @@ Authorization: eyJraWQ...ajBc4VQ
 The client __must__ submit a request to the endpoint `/plans/version/daily_plan/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime
@@ -771,7 +864,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
-The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -780,9 +873,9 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body with the fol
     "typical_sessions": [session, session]
 }
 ```
-* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
+* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined in [here](#sorenesstypical-session-history)
 * `typical_sessions` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
-* `daily_plans` __could__ be emply list
+* `daily_plans` __could__ be empty list
 * each `daily_plan*` will be of following schema:
 ```
 {
@@ -1018,7 +1111,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
-The Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {"teams": [team, team]}
@@ -1112,7 +1205,7 @@ This endpoint can used to submit user survey.
 The client __must__ submit a request to the endpoint `/plans/version/athlete/{athlete_id}/survey`. The request method __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "wearable_devices": [string, string],
@@ -1132,7 +1225,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 ##### Responses
- If successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -1150,7 +1243,7 @@ This endpoint can used to submit health app workouts from missed days
 The client __must__ submit a request to the endpoint `/plans/version/health_data/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -1181,7 +1274,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 ##### Responses
- If successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -1198,7 +1291,7 @@ This endpoint can used to clear the user's data for the given day. Note that his
 The client __must__ submit a request to the endpoint `/plans/version/misc/{User UUID}/clear_user_data`. The request method __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime
@@ -1217,7 +1310,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 ##### Responses
- If clearing data was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If clearing data was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -1232,7 +1325,7 @@ This endpoingt can be used to log relevant device/app information and usage
 The client __must__ submit a request to the endpoint `/plans/version/misc/{User UUID}/app_logs`. The request method __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -1262,7 +1355,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 ##### Responses
- If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body with the following syntax:
+ If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
 {
@@ -1277,7 +1370,7 @@ This endpoint can used to copy test user's data to create personas to test diffe
 The client __must__ submit a request to the endpoint `/plans/version/misc/{User UUID}/copy_test_data`. The request method __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object with the following schema:
+The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
     "event_date": Datetime,
@@ -1299,7 +1392,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 ##### Responses
- If copying data was successful, the Service __will__ respond with HTTP Status `202 Accepted`, with a body with the following syntax:
+ If copying data was successful, the Service __will__ respond with HTTP Status `202 Accepted`, with a body having the following schema:
  
 ```
 {
@@ -1307,6 +1400,276 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+## Appendix
+
+### Enumerations
+
+#### Reportable body part
+
+```
+    chest = 2
+    abdominals = 3
+    groin = 5
+    quads = 6
+    knee = 7
+    shin = 8
+    ankle = 9
+    foot = 10
+    it_band = 11
+    lower_back = 12
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    achilles = 17
+    upper_back_neck = 18
+    elbow = 19
+    wrist = 20
+    lats = 21
+    biceps = 22
+    triceps = 23
+    forearm = 24
+    it_band_lateral_knee = 27
+    hip_flexor = 28
+    deltoid = 29
+```
+
+
+#### All body parts
+```
+    shoulder = 1
+    chest = 2
+    abdominals = 3
+    hip = 4
+    groin = 5
+    quads = 6
+    knee = 7
+    shin = 8
+    ankle = 9
+    foot = 10
+    it_band = 11
+    lower_back = 12
+    general = 13
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    achilles = 17
+    upper_back_neck = 18
+    elbow = 19
+    wrist = 20
+    lats = 21
+    biceps = 22
+    triceps = 23
+    forearm = 24
+    core_stabilizers = 25
+    erector_spinae = 26
+    it_band_lateral_knee = 27
+    hip_flexor = 28
+    deltoid = 29
+    deep_rotators_hip = 30
+    obliques = 31
+    anterior_tibialis = 40
+    peroneals_longus = 41
+    posterior_tibialis = 42
+    soleus = 43
+    gastrocnemius_medial = 44
+    bicep_femoris_long_head = 45
+    bicep_femoris_short_head = 46
+    semimembranosus = 47
+    semitendinosus = 48
+    adductor_longus = 49
+    adductor_magnus_anterior_fibers = 50
+    adductor_magnus_posterior_fibers = 51
+    adductor_brevis = 52
+    gracilis = 53
+    pectineus = 54
+    vastus_lateralis = 55
+    vastus_medialis = 56
+    vastus_intermedius = 57
+    rectus_femoris = 58
+    tensor_fascia_latae = 59 # hips
+    piriformis = 60 # deep rotator of hip
+    gastrocnemius_lateral = 61  # calves - was 75 but that was a duplicate
+    sartorius = 62  # quads
+    gluteus_medius_anterior_fibers = 63
+    gluteus_medius_posterior_fibers = 64
+    gluteus_minimus = 65
+    gluteus_maximus = 66
+    quadratus_femoris = 67
+    popliteus = 68
+    external_obliques = 69  # abdominal
+    quadratus_lumorum = 70
+    psoas = 71
+    iliacus = 72
+    transverse_abdominis = 73
+    internal_obliques = 74
+    rectus_abdominis = 75
+    upper_trapezius = 76
+    levator_scapulae = 77
+    middle_trapezius = 78
+    lower_trapezius = 79
+    rhomboids = 80
+    pectoralis_minor = 81
+    pectoralis_major = 82
+    anterior_deltoid = 83
+    medial_deltoid = 84
+    posterior_deltoid = 85
+    upper_body = 91
+    lower_body = 92
+    full_body = 93
+    semimembranosus_semitendinosus = 100
+    anterior_adductors = 101
+    rectus_femoris_vastus_intermedius = 102
+    glute_med = 103
+    upper_traps_levator_scapulae = 105
+    middle_traps_rhomboids = 106
+    pec_major_minor = 107
+    hip_flexor_merge = 108
+```
+
+#### side
+
+```
+    none_unilateral = 0
+    left = 1
+    right = 2
+```
+
+
+#### sport name
+```
+    basketball = 0
+    baseball = 1
+    softball = 2
+    cycling = 3
+    field_hockey = 4
+    football = 5
+    general_fitness = 6
+    golf = 7
+    gymnastics = 8
+    skate_sports = 9
+    lacrosse = 10
+    rowing = 11
+    rugby = 12
+    diving = 13
+    soccer = 14
+    pool_sports = 15
+    tennis = 16
+    distance_running = 17
+    sprints = 18
+    jumps = 19
+    throws = 20
+    volleyball = 21
+    wrestling = 22
+    weightlifting = 23
+    track_field = 24
+    archery = 25
+    australian_football = 26
+    badminton = 27
+    bowling = 28
+    boxing = 29
+    cricket = 30
+    curling = 31
+    dance = 32
+    equestrian_sports = 33
+    fencing = 34
+    fishing = 35
+    handball = 36
+    hockey = 37
+    martial_arts = 38
+    paddle_sports = 39
+    racquetball = 40
+    sailing = 41
+    snow_sports = 42
+    squash = 43
+    surfing_sports = 44
+    swimming = 45
+    table_tennis = 46
+    water_polo = 47
+    cross_country_skiing = 48
+    downhill_skiing = 49
+    kick_boxing = 50
+    snowboarding = 51
+    endurance = 52
+    power = 53
+    speed_agility = 54
+    strength = 55
+    cross_training = 56
+    elliptical = 57
+    functional_strength_training = 58
+    hiking = 59
+    hunting = 60
+    mind_and_body = 61
+    play = 62
+    preparation_and_recovery = 63
+    stair_climbing = 64
+    traditional_strength_training = 65
+    walking = 66
+    water_fitness = 67
+    yoga = 68
+    barre = 69
+    core_training = 70
+    flexibility = 71
+    high_intensity_interval_training = 72
+    jump_rope = 73
+    pilates = 74
+    stairs = 75
+    step_training = 76
+    wheelchair_walk_pace = 77
+    wheelchair_run_pace = 78
+    taichi = 79
+    mixed_cardio = 80
+    hand_cycling = 81
+    climbing = 82
+    other = 83
+```
+
+
+#### Session Source
+``` 
+    user = 0
+    health = 1
+    user_health = 2
+    three_sensor = 3
+```
 
 
 
+### Body Part Types
+
+#### Joints
+The following reportable body parts are considered joints
+```
+    elbow = 19
+    wrist = 20
+    knee = 7
+    ankle = 9
+    foot = 10
+```
+#### Ligaments
+The following reportable body parts are considered ligaments
+```
+    it_band = 11
+    it_band_lateral_knee = 27
+    achilles = 17
+```
+
+#### Muscles
+The following reportable body parts are considered muscles
+```
+    chest = 2
+    abdominals = 3
+    groin = 5
+    quads = 6
+    shin = 8
+    lower_back = 12
+    glutes = 14
+    hamstrings = 15
+    calves = 16
+    upper_back_neck = 18
+    lats = 21
+    biceps = 22
+    triceps = 23
+    forearm = 24
+    hip_flexor = 28
+    deltoid = 29
+```
