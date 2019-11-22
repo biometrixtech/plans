@@ -1554,7 +1554,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
 
         if body_part is not None:
 
-            if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
                 #goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
                 high_load = True
 
@@ -1565,7 +1565,7 @@ class ActiveRestBeforeTraining(ActiveRest, Serialisable):
                 body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-                  body_part_injury_risk.total_compensation_percent_tier <= 3):
+                  body_part_injury_risk.total_compensation_percent_tier <= 5):
 
                 compensating = True
 
@@ -2131,7 +2131,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
 
         if body_part is not None:
 
-            if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
                 #goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
                 high_load = True
 
@@ -2142,7 +2142,7 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
                 body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-                  body_part_injury_risk.total_compensation_percent_tier <= 3):
+                  body_part_injury_risk.total_compensation_percent_tier <= 5):
 
                 compensating = True
 
