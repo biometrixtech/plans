@@ -208,6 +208,10 @@ class ModalityBase(object):
                 return 2, DosageProgression.min_mod_max
             elif tier == 3:
                 return 3, DosageProgression.min_mod_max
+            elif tier == 4:
+                return 4, DosageProgression.min_mod_max
+            elif tier == 5:
+                return 5, DosageProgression.min_mod_max
             else:
                 return 0, None
 
@@ -218,6 +222,10 @@ class ModalityBase(object):
                 return 2, DosageProgression.min_mod_max
             elif tier == 3:
                 return 3, DosageProgression.min_mod_max
+            elif tier == 4:
+                return 4, DosageProgression.min_mod_max
+            elif tier == 5:
+                return 5, DosageProgression.min_mod_max
             else:
                 return 0, None
 
@@ -294,7 +302,10 @@ class ModalityBase(object):
         #         self.default_plan = "Complete"
         #     else:
         #         self.default_plan = "Comprehensive"
-        self.default_plan = "Complete"
+        if 1 not in self.rankings and 2 not in self.rankings:
+            self.default_plan = "Efficient"
+        else:
+            self.default_plan = "Complete"
 
     def copy_exercises(self, source_collection, target_collection, goal, tier, severity, exercise_library,
                        sports=[]):
