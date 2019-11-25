@@ -8,10 +8,11 @@ This technical summary provides prospective third party partners ('providers') o
 
 ### Daily Plan
 
-The plans service generates a  __Daily Plan__ for an athlete based on one or both of the following data elements:
+The plans service generates a  __Daily Plan__ for an athlete based on one or all of the following data elements:
 
-* __Daily Readiness__ - information about the athlete's training plan and pain/soreness for a given day
-* __Post-Workout__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and pain/soreness following the workout
+* __Daily Readiness__ - information about the athlete's training plan and symptoms for a given day
+* __Post-Workout__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and symptoms following the workout
+* __Symptom-Reporting__ - information about the athlete's symptoms indpendent of workout and/or training plan
 
 A __Daily Plan__ can be created with as little as one of the above data elements. As this information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to identify underlying imbalances unique to the athlete which influence the creation of their __Daily Plan__.
 
@@ -19,7 +20,7 @@ A __Daily Plan__ provides a personalized, research-driven prep, recovery, and co
 
 The __Daily Plan__ includes modalities such as  __foam rolling__, __static stretching__, __active stretching__, __dynamic stretching__, __targeted muscle activation__, and __integrated movement__ exercises personalized for the athlete for that day.  These exercises are provided in a sequence consistent with sports science research to expedite tissue recovery, reduce pain, and prevent injury.
  
-Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__.
+<!-- Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__. -->
 
 Recommended dosages are also provided for each exercise and modality.  These dosages are associated with three different active times which correspond with minimal, optimal, and comprehensive sequences of activities.  These sequences are designed to achieve each of the athlete's unique combination of goals.  Additionally, dosages are also provided by goal, allowing the athlete to further customize their recovery.
 
