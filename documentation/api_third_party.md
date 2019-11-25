@@ -106,6 +106,7 @@ The following simple types __may__ be used in requests and responses:
 * `Uuid`: a `string` matching the regular expression `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, that is, the string representation of an [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID.
 * `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full  [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
+<div style="page-break-after: always;"></div>
 ## Endpoints
 
 ### Daily Readiness
@@ -150,7 +151,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 ```
 * `body_part` __should__ be an integer reflecting BodyPart enumeration as defined in Appendix
-* `side` __should__ be an integer reflecting side enumeration as defined in Appendix
+* `side` __should__ be an integer reflecting Side enumeration as defined in Appendix
 * `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
 * `knots` __should__ be reported for muscles(see Appendix) only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be `null`
 * `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
@@ -187,7 +188,8 @@ Authorization: eyJraWQ...ajBc4VQ
     "sessions_planned": false
 }
 ```
-##### Responses
+<div style="page-break-after: always;"></div>
+##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
@@ -199,6 +201,7 @@ Authorization: eyJraWQ...ajBc4VQ
 * `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 
+<div style="page-break-after: always;"></div>
 ### Session
 
 #### Create
@@ -225,6 +228,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `health_sync_date` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source
 * `sessions_planned` __should__ represent whether the user plans to train again that day
 * `user_age` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source and contains heart rate data
+<div style="page-break-after: always;"></div>
 * `session` __should__ be of the following schema
 ```
 {
@@ -260,9 +264,6 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the third party workout. Each hr will have `startDate`, `endDate` and `value` _(only needed for third party workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
-
-
-
 
 ```
 POST /plans/{version}/session/{User UUID} HTTP/1.1
@@ -304,6 +305,8 @@ Cache-Control: no-cache
     "health_sync_date": "2019-02-08T16:54:57Z"
 }
 ```
+
+<div style="page-break-after: always;"></div>
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
@@ -316,6 +319,7 @@ Cache-Control: no-cache
 * `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 
+<div style="page-break-after: always;"></div>
 #### Mark no sessions planned
 
 This endpoint can be called to notify that no sessions are planned for the day.
@@ -357,6 +361,7 @@ Cache-Control: no-cache
 ```
 * `daily_plan` will have the same schema as defined in Get Daily Plan.
 
+<div style="page-break-after: always;"></div>
 #### Delete
 
 This endpoint can be called to delete existing externally regimented session from today or yesterday's plan.
@@ -398,6 +403,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+<div style="page-break-after: always;"></div>
 #### Update
 
 This endpoint can be called to update and combine a manually logged session with a third party workout session
@@ -461,6 +467,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
+<div style="page-break-after: always;"></div>
 #### Typical Sessions history
 
 This endpoint can be called to get typical sessions that the user logs
@@ -498,7 +505,8 @@ Authentication is required for this endpoint
     "typical_sessions": [sesson, session]
 }
 ```
-`typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
+* `typical sessions` will be a list of sessions that the user has logged in the last 14 days
+<div style="page-break-after: always;"></div>
 * `session` object will be of the following schema
 
 ``` 
@@ -513,6 +521,7 @@ Authentication is required for this endpoint
 
 ```
 
+<div style="page-break-after: always;"></div>
 ### Symptoms
 
 #### Submit
@@ -556,7 +565,8 @@ Authorization: eyJraWQ...ajBc4VQ
     ]
 }
 ```
-##### Responses
+<div style="page-break-after: always;"></div>
+##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
@@ -568,7 +578,7 @@ Authorization: eyJraWQ...ajBc4VQ
 * `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 
-
+<div style="page-break-after: always;"></div>
 ### Active Recovery
 
 #### Mark Started (Exercise Modalities)
@@ -611,6 +621,7 @@ If the write was successful, the Service __will__ respond with HTTP Status `200 
 }
 ```
 
+<div style="page-break-after: always;"></div>
 #### Mark Completed (Exercise Modalities)
 
 This endpoint can be called to mark the completion of exercise-based modalities.
@@ -657,7 +668,7 @@ If the write was successful, the Service __will__ respond with HTTP Status `202 
 
 
 
-#### Mark Started (Body Part Modalities)
+<!-- #### Mark Started (Body Part Modalities)
 
 This endpoint can be called to mark the start of body part based modalities.
 
@@ -757,10 +768,11 @@ Authorization: eyJraWQ...ajBc4VQ
     "daily_plans": [daily_plan]
 }
 ```
-* `daily_plan` will have the same schema as defined in Get Daily Plan.
+* `daily_plan` will have the same schema as defined in Get Daily Plan. -->
 
 
-### Daily Plans
+<div style="page-break-after: always;"></div>
+### Daily Plan
 
 #### Get Daily Plan
 
@@ -791,7 +803,8 @@ Authorization: eyJraWQ...ajBc4VQ
     "start_date": "2018-07-31"
 }
 ```
-##### Responses
+<div style="page-break-after: always;"></div>
+##### Response
  
 The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
@@ -806,7 +819,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 * `typical_sessions` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined in Session
 * `daily_plans` __could__ be an empty list
 * each `daily_plan*` will be of following schema:
-```
+<!-- ```
 {
     "date": Date,
     "day_of_week": integer,
@@ -836,11 +849,45 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "sessions_planned": Boolean,
     "train_later": Bolean
 }
+``` -->
 ```
+{
+    "date": Date,
+    "day_of_week": integer,
+    "pre_active_rest": [PreActiveRest],
+    "completed_pre_active_rest": [PreActiveRest],
+    "heat": null,
+    "completed_heat": [],
+    "warm_up": [],
+    "completed_warm_up": [],
+    "training_sessions": [Session],
+    "cool_down": [],
+    "completed_cool_down": [],
+    "post_active_rest": [PostActiveRest],
+    "completed_post_active_rest": [PostActiveRest],
+    "ice": null,
+    "completed_ice": [],
+    "cold_water_immersion": null,
+    "completed_cold_water_immersion": [],
+    "cross_training_sessions": [],
+    "daily_readiness_survey_completed": Boolean,
+    "landing_screen": integer,
+    "last_sensor_sync": Datetime,
+    "last_updated": Datetime,
+    "nav_bar_indicator": null,
+    "post_active_rest_completed": Boolean,
+    "pre_active_rest_completed": Boolean,
+    "sessions_planned": Boolean,
+    "train_later": Bolean
+}
+```
+<div style="page-break-after: always;"></div>
 * Any of the `completed_*` attributes could be empty list
 * Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
-* Any of the body part modalities (`heat`, `ice`, `cold_water_immersion`) could be null
-* `Heat` has following example schema
+* `warm_up` and `cool_down` will always be empty list
+* All of the body part modalities (`heat`, `ice`, `cold_water_immersion`) will be null
+<!-- * Any of the body part modalities (`heat`, `ice`, `cold_water_immersion`) could be null -->
+<!-- * `Heat` has following example schema
 ```
 {
     "active": true,
@@ -897,8 +944,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "minutes": 10,
     "start_date_time": null
 }
-```
-* `ColdWaterImmersion` has following example schema
+``` -->
+<!-- * `ColdWaterImmersion` has following example schema
 ```
 {
     "minutes": 10,
@@ -918,7 +965,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "active": true
 }
 
-```
+``` -->
 * `PreActiveRest` has the following example schema
 ```
 {
@@ -956,7 +1003,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "static_stretch_exercises": [AssignedExercise, AssignedExercise]
 }
 ```
-* `CoolDown` has the following example schema
+<!-- * `CoolDown` has the following example schema
 ```
 {
     "active": true,
@@ -971,73 +1018,62 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "sport_name": 17,
     "start_date_time": null
     }
-```
+``` -->
+<div style="page-break-after: always;"></div>
 * `AssignedExercise` has the following example schema
+
 ```
 {
-    "bilateral": true,
-    "description": "Step forward and straighten your leg, lifting your toes off 
-        the ground as you lean down, moving your arms in a scooping motion. 
-        Straighten back up and repeat on the other leg as you take another 
-        step forward. ",
-    "display_name": "Walking Hamstring Scoops",
-    "dosages": [
+    "name" : "Foam Roller - Hamstrings",
+    "display_name" : "Foam Roll - Hamstrings",
+    "library_id" : "3",
+    "description" : "Place foam roller just before the glute & roll the length of 
+                     your hamstring. If you find a tender spot, hold for 30 seconds.
+                     Don’t have a foam roller?
+                     You can use a tennis ball or water bottle.",
+    "youtube_id" : null,
+    "bilateral" : true,
+    "seconds_per_rep" : null,
+    "seconds_per_set" : 30,
+    "unit_of_measure" : "seconds",
+    "position_order" : 0,
+    "duration_efficient" : 60,
+    "duration_complete" : 60,
+    "duration_comprehensive" : 60,
+    "goal_text" : "",
+    "equipment_required" : [ 
+        "Foam Roller"
+    ],
+    "dosages" : [ 
         {
-            "complete_reps_assigned": 12,
-            "complete_sets_assigned": 1,
-            "comprehensive_reps_assigned": 12,
-            "comprehensive_sets_assigned": 1,
-            "efficient_reps_assigned": 12,
-            "efficient_sets_assigned": 1,
-            "goal": {
-                "goal_type": 2,
-                "priority": 1,
-                "text": "Recover from Sport",
-                "trigger": "High Relative Volume or Intensity of Logged Session"
+            "goal" : {
+                "text" : "Soreness",
+                "priority" : 1,
+                "goal_type" : 1
             },
-            "priority": "1",
-            "ranking": 0,
-            "soreness_source": {
-                "body_part": 13,
-                "first_reported_date_time": null,
-                "movement": null,
-                "pain": false,
-                "severity": 0.4,
-                "side": null
-            }
+            "priority" : "1",
+            "efficient_reps_assigned" : 30,
+            "efficient_sets_assigned" : 1,
+            "complete_reps_assigned" : 30,
+            "complete_sets_assigned" : 1,
+            "comprehensive_reps_assigned" : 30,
+            "comprehensive_sets_assigned" : 1,
+            "default_efficient_reps_assigned" : 30,
+            "default_efficient_sets_assigned" : 1,
+            "default_complete_reps_assigned" : 30,
+            "default_complete_sets_assigned" : 1,
+            "default_comprehensive_reps_assigned" : 30,
+            "default_comprehensive_sets_assigned" : 1,
+            "ranking" : 0
         }
-    ],
-    "duration_complete": null,
-    "duration_comprehensive": null,
-    "duration_efficient": null,
-    "equipment_required": [
-        "None"
-    ],
-    "goal_text": "",
-    "library_id": "139",
-    "name": "Walking Hamstring Scoops",
-    "position_order": 0,
-    "seconds_per_rep": null,
-    "seconds_per_set": 30,
-    "unit_of_measure": "yards",
-    "youtube_id": null
+    ]
 }
 ```
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+
+<div style="page-break-after: always;"></div>
 ## Appendix
 
 ### Enumerations
-
 #### BodyPart
 
 ```
@@ -1066,8 +1102,26 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     hip_flexor = 28
     deltoid = 29
 ```
+#### Side
 
+```
+    none_unilateral = 0
+    left = 1
+    right = 2
+```
+
+#### SessionSource
+``` 
+    user = 0
+    health = 1
+    user_health = 2
+    three_sensor = 3
+```
+
+
+<div style="page-break-after: always;"></div>
 #### All body parts
+
 ```
     shoulder = 1
     chest = 2
@@ -1115,6 +1169,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     adductor_brevis = 52
     gracilis = 53
     pectineus = 54
+```
+```
     vastus_lateralis = 55
     vastus_medialis = 56
     vastus_intermedius = 57
@@ -1131,8 +1187,6 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     popliteus = 68
     external_obliques = 69
     quadratus_lumorum = 70
-```
-```
     psoas = 71
     iliacus = 72
     transverse_abdominis = 73
@@ -1161,14 +1215,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     hip_flexor_merge = 108
 ```
 
-#### side
-
-```
-    none_unilateral = 0
-    left = 1
-    right = 2
-```
-
+<div style="page-break-after: always;"></div>
 
 #### SportName
 ```
@@ -1183,8 +1230,6 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     gymnastics = 8
     skate_sports = 9
     lacrosse = 10
-```
-```
     rowing = 11
     rugby = 12
     diving = 13
@@ -1219,6 +1264,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     snow_sports = 42
     squash = 43
     surfing_sports = 44
+```
+```
     swimming = 45
     table_tennis = 46
     water_polo = 47
@@ -1233,8 +1280,6 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     cross_training = 56
     elliptical = 57
     functional_strength_training = 58
-```
-```
     hiking = 59
     hunting = 60
     mind_and_body = 61
@@ -1262,14 +1307,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     other = 83
 ```
 
-#### SessionSource
-``` 
-    user = 0
-    health = 1
-    user_health = 2
-    three_sensor = 3
-```
-
+<div style="page-break-after: always;"></div>
 ### Body Part Types
 
 #### Joints
