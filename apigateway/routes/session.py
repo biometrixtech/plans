@@ -214,14 +214,48 @@ def handle_session_update(session_id, user_id=None):
                                  user_id=user_id,
                                  event_date=plan_event_date
                                  )
-    # write hr data if it exists
-    if len(survey_processor.heart_rate_data) > 0:
-        heart_rate_datastore.put(survey_processor.heart_rate_data)
-    if is_fathom_environment():
-        if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
-            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                                    endpoint=f"user/{user_id}",
-                                                                                    body={"health_sync_date": request.json['health_sync_date']})
+        # write hr data if it exists
+        if len(survey_processor.heart_rate_data) > 0:
+            heart_rate_datastore.put(survey_processor.heart_rate_data)
+        if is_fathom_environment():
+            if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
+                Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                        endpoint=f"user/{user_id}",
+                                                                                        body={"health_sync_date": request.json['health_sync_date']})
+
+        return {'message': 'success'}, 200
+
+    elif session_obj.source == SessionSource.three_sensor:
+        athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+        timezone = get_timezone(event_date)
+        if athlete_stats is None:
+            athlete_stats = AthleteStats(user_id)
+            athlete_stats.event_date = event_date
+            
+        updated_date = get_local_time(datetime.datetime.now(), timezone)
+        # update existing session with new data
+        session_obj.post_session_survey = new_session.post_session_survey
+        session_obj.last_updated = updated_date
+        # write session
+        session_datastore.update(session_obj,
+                                 user_id=user_id,
+                                 event_date=plan_event_date
+                                 )
+        # update plan
+        visualizations = is_fathom_environment()
+        hist_update = False
+        if athlete_stats.api_version in [None, '4_4', '4_5']:
+            hist_update = True
+        athlete_stats.api_version = Config.get('API_VERSION')
+        athlete_stats.timezone = timezone
+        plan = create_plan(user_id,
+                           event_date,
+                           athlete_stats=athlete_stats,
+                           datastore_collection=datastore_collection,
+                           visualizations=visualizations,
+                           hist_update=hist_update)
+
+        return {'daily_plans': [plan]}, 200
 
     return {'message': 'success'}, 200
 
