@@ -130,7 +130,7 @@ class MovementPatterns(Serialisable):
             input_dict['knee_valgus_apt']) if input_dict.get('knee_valgus_apt') is not None else None
         movement_patterns.hip_rotation_ankle_pitch = LeftRightElasticity.json_deserialise(
             input_dict['hip_rotation_ankle_pitch']) if input_dict.get('hip_rotation_ankle_pitch') is not None else None
-        movement_patterns.knee_valgus_apt = LeftRightElasticity.json_deserialise(
+        movement_patterns.hip_rotation_apt = LeftRightElasticity.json_deserialise(
             input_dict['hip_rotation_apt']) if input_dict.get('hip_rotation_apt') is not None else None
         return movement_patterns
 
