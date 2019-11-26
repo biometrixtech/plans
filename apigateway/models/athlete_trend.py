@@ -776,7 +776,8 @@ class AthleteTrends(object):
             'biomechanics_ankle_pitch': self.biomechanics_ankle_pitch.json_serialise() if self.biomechanics_ankle_pitch is not None else None,
             'biomechanics_hip_drop': self.biomechanics_hip_drop.json_serialise() if self.biomechanics_hip_drop is not None else None,
             'insight_categories': [insight_category.json_serialise() for insight_category in self.insight_categories],
-            'biomechanics_summary': fake_biomechanics_summary()
+            'recovery_quality': fake_recovery_quality(),
+            'biomechanics_summary': fake_sessions_summary()
         }
         return ret
 
@@ -896,22 +897,54 @@ class AthleteTrends(object):
         self.biomechanics_hip_drop = athlete_stats.biomechanics_hip_drop_chart
 
 
-def fake_biomechanics_summary():
+def fake_recovery_quality():
     return {
-            "score": 78,
-            "score_color": 5,
-            "change": -3,
-            "change_color": 6,
-            "text": "Insight Text here: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna",
-            "bold_text": [],
+            "score": {
+                    "value": 73,
+                    "text": "recovery quality",
+                    "color": 5,
+                    "active": True
+                    },
+
+            "change": {
+                    "value": -3,
+                    "text": "pts",
+                    "color": 6,
+                    "active": True
+                    },
+            "summary_text": {
+                 "text": "Insight Text here: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna",
+                 "bold_text": [],
+                 "text_items" : [{
+                    "text": "abc",
+                    "bold_text": []
+                 }],
+                 "active": True
+                 },
+            "active": True
+            }
+
+
+def fake_sessions_summary():
+    return {
+            "three_sensor_enabled": True,
+            "active": True,
             "sessions": [
                 {
                 "id": "test_id",
-                "event_date": "2019-11-28T08:23:00Z",
+                "event_date": "2019-11-25T08:23:00Z",
                 "duration": 79,
                 "sport_name": 17,
-                "score": 73,
-                "score_color": 5,
+                "summary_text": {
+                            "text": "Your distance run had a movement quality of 73 out of 100.",
+                            "bold_text": [
+                                        {
+                                        "text": "73 out of 100.",
+                                        "color": 5
+                                        }
+                            ],
+                            "active": True
+                },
                 "summary_pills": [
                         {
                         "text": "High Asymmetry",
@@ -919,234 +952,369 @@ def fake_biomechanics_summary():
                         "severity": 2
                         },
                         {
-                        "text": "Fatigue",
-                        "color": 5,
+                        "text": "Moderate Magnitude",
+                        "color": 16,
                         "severity": 1
                         },
                         {
-                        "text": "Moderate Magnitude",
-                        "color": 16,
+                        "text": "Fatigue",
+                        "color": 5,
                         "severity": 0
                         }
                     ],
                 "apt": {
-                        "score": 72,
-                        "score_color": 5,
-                        "body_side" : 1,
+                        "active": True,
+                        "score": {
+                                "value": 72,
+                                "text": "movement quality",
+                                "color": 5,
+                                "active": True},
+                        "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
                             "left_y" : 8.54,
                             "left_y_legend" : 8.54,
+                            "left_y_legend_color": 3,
                             "right_start_angle" : 0,
                             "right_y" : 7.12,
                             "right_y_legend" : 7.12,
+                            "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : "That's 5% worse than your ususal",
-                        "summary_text_color": 6,
-                        "summary_bold_text" : [
-                                        {
-                                        "text": "That's 5% worse than your ususal",
-                                        "color": 6
-                                        }
-                                        ],
+                        "summary_text" : 
+                                {"text": "That's 5% worse than your ususal",
+                                 "color": 6,
+                                 "bold_text" : [
+                                                {
+                                                "text": "That's 5% worse than your ususal",
+                                                "color": 6
+                                                }
+                                                ],
+                                 "display": True
+                                },
                         "data_cards":[{
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
                                     "color": 6,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension." 
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "abc",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 1,
                                     "value": 1,
                                     "title_text": "Magnitude: Low",
                                     "color": 13,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
+                                    "summary_text": {
+                                         "text": "",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 2,
                                     "value": 0,
                                     "title_text": "Fatigue Present",
                                     "color": 5,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
-                                    }
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : []
+                                         }
+                                }
                                 ]
                     },
                 "hip_drop": {
-                        "score": 72,
-                        "score_color": 5,
-                        "body_side" : 1,
+                        "active": True,
+                        "score": {
+                                "value": 72,
+                                "text": "movement quality",
+                                "color": 5,
+                                "active": True},
+                        "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
                             "left_y" : 8.54,
                             "left_y_legend" : 8.54,
+                            "left_y_legend_color": 3,
                             "right_start_angle" : 0,
                             "right_y" : 7.12,
                             "right_y_legend" : 7.12,
+                            "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : "That's 5% worse than your ususal",
-                        "summary_text_color": 6,
-                        "summary_bold_text" : [
-                                        {
-                                        "text": "That's 5% worse than your ususal",
-                                        "color": 6
-                                        }
-                                        ],
+                        "summary_text" : 
+                                {"text": "That's 5% worse than your ususal",
+                                 "color": 6,
+                                 "bold_text" : [
+                                                {
+                                                "text": "That's 5% worse than your ususal",
+                                                "color": 6
+                                                }
+                                                ],
+                                 "display": True
+                                },
                         "data_cards":[{
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
                                     "color": 6,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension." 
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "abc",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 1,
                                     "value": 1,
                                     "title_text": "Magnitude: Low",
                                     "color": 13,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
+                                    "summary_text": {
+                                         "text": "",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 2,
                                     "value": 0,
                                     "title_text": "Fatigue Present",
                                     "color": 5,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
-                                    }
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : []
+                                         }
+                                }
                                 ]
                     },
                 "ankle_pitch": {
-                        "score": 72,
-                        "score_color": 5,
-                        "body_side" : 1,
+                        "active": True,
+                        "score": {
+                                "value": 72,
+                                "text": "movement quality",
+                                "color": 5,
+                                "active": True},
+                        "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
                             "left_y" : 8.54,
                             "left_y_legend" : 8.54,
+                            "left_y_legend_color": 3,
                             "right_start_angle" : 0,
                             "right_y" : 7.12,
                             "right_y_legend" : 7.12,
+                            "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : "That's 5% worse than your ususal",
-                        "summary_text_color": 6,
-                        "summary_bold_text" : [
-                                        {
-                                        "text": "That's 5% worse than your ususal",
-                                        "color": 6
-                                        }
-                                        ],
+                        "summary_text" : 
+                                {"text": "That's 5% worse than your ususal",
+                                 "color": 6,
+                                 "bold_text" : [
+                                                {
+                                                "text": "That's 5% worse than your ususal",
+                                                "color": 6
+                                                }
+                                                ],
+                                 "display": True
+                                },
                         "data_cards":[{
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
                                     "color": 6,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension." 
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "abc",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 1,
                                     "value": 1,
                                     "title_text": "Magnitude: Low",
                                     "color": 13,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
+                                    "summary_text": {
+                                         "text": "",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 2,
                                     "value": 0,
                                     "title_text": "Fatigue Present",
                                     "color": 5,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
-                                    }
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : []
+                                         }
+                                }
                                 ]
                     },
                 "knee_valgus": {
-                        "score": 72,
-                        "score_color": 5,
-                        "body_side" : 1,
+                        "active": True,
+                        "score": {
+                                "value": 72,
+                                "text": "movement quality",
+                                "color": 5,
+                                "active": True},
+                        "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
                             "left_y" : 8.54,
                             "left_y_legend" : 8.54,
+                            "left_y_legend_color": 3,
                             "right_start_angle" : 0,
                             "right_y" : 7.12,
                             "right_y_legend" : 7.12,
+                            "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : "That's 5% worse than your ususal",
-                        "summary_text_color": 6,
-                        "summary_bold_text" : [
-                                        {
-                                        "text": "That's 5% worse than your ususal",
-                                        "color": 6
-                                        }
-                                        ],
+                        "summary_text" : 
+                                {"text": "That's 5% worse than your ususal",
+                                 "color": 6,
+                                 "bold_text" : [
+                                                {
+                                                "text": "That's 5% worse than your ususal",
+                                                "color": 6
+                                                }
+                                                ],
+                                 "display": True
+                                },
                         "data_cards":[{
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
                                     "color": 6,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension." 
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "abc",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 1,
                                     "value": 1,
                                     "title_text": "Magnitude: Low",
                                     "color": 13,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
+                                    "summary_text": {
+                                         "text": "",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 2,
                                     "value": 0,
                                     "title_text": "Fatigue Present",
                                     "color": 5,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
-                                    }
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : []
+                                         }
+                                }
                                 ]
                     },
                 "hip_rotation": {
-                        "score": 72,
-                        "score_color": 5,
-                        "body_side" : 1,
+                        "active": True,
+                        "score": {
+                                "value": 72,
+                                "text": "movement quality",
+                                "color": 5,
+                                "active": True},
+                        "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
                             "left_y" : 8.54,
                             "left_y_legend" : 8.54,
+                            "left_y_legend_color": 3,
                             "right_start_angle" : 0,
                             "right_y" : 7.12,
                             "right_y_legend" : 7.12,
+                            "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : "That's 5% worse than your ususal",
-                        "summary_text_color": 6,
-                        "summary_bold_text" : [
-                                        {
-                                        "text": "That's 5% worse than your ususal",
-                                        "color": 6
-                                        }
-                                        ],
+                        "summary_text" : 
+                                {"text": "That's 5% worse than your ususal",
+                                 "color": 6,
+                                 "bold_text" : [
+                                                {
+                                                "text": "That's 5% worse than your ususal",
+                                                "color": 6
+                                                }
+                                                ],
+                                 "display": True
+                                },
                         "data_cards":[{
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
                                     "color": 6,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension." 
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "abc",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 1,
                                     "value": 1,
                                     "title_text": "Magnitude: Low",
                                     "color": 13,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
+                                    "summary_text": {
+                                         "text": "",
+                                         "bold_text": [],
+                                         "text_items" : [{
+                                            "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                            "bold_text": []
+                                         }]
+                                         }
                                 },
                                 {
                                     "type": 2,
                                     "value": 0,
                                     "title_text": "Fatigue Present",
                                     "color": 5,
-                                    "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension."
-                                    }
+                                    "summary_text": {
+                                         "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
+                                         "bold_text": [],
+                                         "text_items" : []
+                                         }
+                                }
                                 ]
                     }
                 }
