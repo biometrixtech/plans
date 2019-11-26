@@ -191,8 +191,7 @@ def handle_session_update(session_id, user_id=None):
                                         event_date,
                                         datastore_collection=datastore_collection)
     session = request.json['sessions'][0]
-    survey_processor.create_session_from_survey(session)
-    new_session = survey_processor.sessions[0]
+
 
     # get existing session
     if not _check_plan_exists(user_id, plan_event_date):
@@ -204,6 +203,8 @@ def handle_session_update(session_id, user_id=None):
                                         )[0]
     # update existing session with new data
     if session_obj.source == SessionSource.user:
+        survey_processor.create_session_from_survey(session)
+        new_session = survey_processor.sessions[0]
         session_obj.event_date = new_session.event_date
         session_obj.end_date = new_session.end_date
         session_obj.duration_health = new_session.duration_health
@@ -231,7 +232,9 @@ def handle_session_update(session_id, user_id=None):
         if athlete_stats is None:
             athlete_stats = AthleteStats(user_id)
             athlete_stats.event_date = event_date
-            
+        survey_processor.athlete_stats = athlete_stats
+        survey_processor.create_session_from_survey(session)
+        new_session = survey_processor.sessions[0]
         updated_date = get_local_time(datetime.datetime.now(), timezone)
         # update existing session with new data
         session_obj.post_session_survey = new_session.post_session_survey
