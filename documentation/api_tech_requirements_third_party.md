@@ -1,4 +1,4 @@
-# FathomAI - Plans API (v 4.4.0)
+# FathomAI - Plans API (v 4.6.0)
 ## Technical Summary
 
 
@@ -8,10 +8,11 @@ This technical summary provides prospective third party partners ('providers') o
 
 ### Daily Plan
 
-The plans service generates a  __Daily Plan__ for an athlete based on one or both of the following data elements:
+The plans service generates a  __Daily Plan__ for an athlete based on one or all of the following data elements:
 
-* __Daily Readiness__ - information about the athlete's training plan and pain/soreness for a given day
-* __Post-Workout__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and pain/soreness following the workout
+* __Daily Readiness__ - information about the athlete's training plan and symptoms for a given day
+* __Post-Workout__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and symptoms following the workout
+* __Symptom-Reporting__ - information about the athlete's symptoms indpendent of workout and/or training plan
 
 A __Daily Plan__ can be created with as little as one of the above data elements. As this information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to identify underlying imbalances unique to the athlete which influence the creation of their __Daily Plan__.
 
@@ -19,7 +20,7 @@ A __Daily Plan__ provides a personalized, research-driven prep, recovery, and co
 
 The __Daily Plan__ includes modalities such as  __foam rolling__, __static stretching__, __active stretching__, __dynamic stretching__, __targeted muscle activation__, and __integrated movement__ exercises personalized for the athlete for that day.  These exercises are provided in a sequence consistent with sports science research to expedite tissue recovery, reduce pain, and prevent injury.
  
-Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__.
+<!-- Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__. -->
 
 Recommended dosages are also provided for each exercise and modality.  These dosages are associated with three different active times which correspond with minimal, optimal, and comprehensive sequences of activities.  These sequences are designed to achieve each of the athlete's unique combination of goals.  Additionally, dosages are also provided by goal, allowing the athlete to further customize their recovery.
 
@@ -138,17 +139,18 @@ Required data elements are based on the following simple types :
 The following data elements are required when following the  __Daily Readiness__ pathway to __Daily Plan__ generation.
 
 * `date_time` __should__ be a Datetime and reflect the local time that survey was taken
-* `soreness` __should__ reflect a list of body parts(`sore_part`) with pain or soreness. Length __could__ be 0.
+* `soreness` __should__ reflect a list of body parts(`sore_part`) with symptoms. Length __could__ be 0.
 
 `sore_part` __should__ include the following:
 
-* `body_part` __should__ be an integer reflecting BodyPart enum of the body part with pain/soreness
-* `severity` __should__ be an integer 0, 1, 3 or 5 indicating the severity of the pain/soreness
-* `movement` __should__ be an integer 0, 1, 3 or 5 indicating how much movement is restricted 
+* `body_part` __should__ be an integer reflecting BodyPart enum of the body part with symptom
 * `side` __should__ be an integer, either 0 (both sides/non-bilateral), 1 (left) or 2 (right)
-* `pain` __should__ be a boolean to indicate whether it's pain or soreness.
+* `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
+* `knots` __should__ be reported for muscles only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be `null`
+* `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
+* `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be `null`
 
-Note: Fathom can customize the processing of `severity` and `movement` data upon request to accommodate third-party systems that only report `severity` related measures.
+Note: Fathom can customize the processing of symptoms data upon request to accommodate third-party systems that only report a subset of measures.
 
 #### Optional Data Elements
 
@@ -189,7 +191,14 @@ The following data elements are required when following the  __Post-Workout__ pa
 * `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `soreness` __should__ follow the same definition as in  _Daily Readiness_
 
+<br/>
+<br/>
+<br/>
+<br/>
 
+### Symptom-Reporting
+#### Required Data Elements
+The following data elements are required when following the  __Symptom-Reporing__ pathway to __Daily Plan__ generation.
 
-
-
+* `event_date` __should__ be a Datetime and reflect the local time that survey was taken
+* `soreness` __should__ follow the same definition as in _Daily Readiness_
