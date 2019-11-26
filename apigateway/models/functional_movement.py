@@ -96,6 +96,8 @@ class MovementPatterns(Serialisable):
         self.knee_valgus_hip_drop = None
         self.knee_valgus_pva = None
         self.knee_valgus_apt = None
+        self.hip_rotation_ankle_pitch = None
+        self.hip_rotation_apt = None
 
     def json_serialise(self):
         ret = {
@@ -105,6 +107,8 @@ class MovementPatterns(Serialisable):
             'knee_valgus_hip_drop': self.knee_valgus_hip_drop.json_serialise() if self.knee_valgus_hip_drop is not None else None,
             'knee_valgus_pva': self.knee_valgus_pva.json_serialise() if self.knee_valgus_pva is not None else None,
             'knee_valgus_apt': self.knee_valgus_apt.json_serialise() if self.knee_valgus_apt is not None else None,
+            'hip_rotation_ankle_pitch': self.hip_rotation_ankle_pitch.json_serialise() if self.hip_rotation_ankle_pitch is not None else None,
+            'hip_rotation_apt': self.hip_rotation_apt.json_serialise() if self.hip_rotation_apt is not None else None,
         }
 
         return ret
@@ -124,6 +128,10 @@ class MovementPatterns(Serialisable):
             input_dict['knee_valgus_pva']) if input_dict.get('knee_valgus_pva') is not None else None
         movement_patterns.knee_valgus_apt = LeftRightElasticity.json_deserialise(
             input_dict['knee_valgus_apt']) if input_dict.get('knee_valgus_apt') is not None else None
+        movement_patterns.hip_rotation_ankle_pitch = LeftRightElasticity.json_deserialise(
+            input_dict['hip_rotation_ankle_pitch']) if input_dict.get('hip_rotation_ankle_pitch') is not None else None
+        movement_patterns.knee_valgus_apt = LeftRightElasticity.json_deserialise(
+            input_dict['hip_rotation_apt']) if input_dict.get('hip_rotation_apt') is not None else None
         return movement_patterns
 
 
