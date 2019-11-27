@@ -907,7 +907,7 @@ def fake_recovery_quality():
                     },
 
             "change": {
-                    "value": -3,
+                    "value": -3.1,
                     "text": "pts",
                     "color": 6,
                     "active": True
@@ -932,43 +932,58 @@ def fake_sessions_summary():
             "sessions": [
                 {
                 "id": "test_id",
+                "score": {
+                    "value": 85,
+                    "text": "total movement efficiency score",
+                    "color": 5,
+                    "active": True
+                    },
                 "event_date": "2019-11-25T08:23:00Z",
                 "duration": 79,
                 "sport_name": 17,
-                "summary_text": {
-                            "text": "Your distance run had a movement quality of 73 out of 100.",
-                            "bold_text": [
-                                        {
-                                        "text": "73 out of 100.",
-                                        "color": 5
-                                        }
-                            ],
-                            "active": True
-                },
                 "summary_pills": [
                         {
-                        "text": "High Asymmetry",
-                        "color": 6,
-                        "severity": 2
+                         "text": "High Asymmetry",
+                         "color": 6,
+                         "severity": 2
                         },
                         {
-                        "text": "Moderate Magnitude",
-                        "color": 16,
-                        "severity": 1
+                         "text": "Moderate Magnitude",
+                         "color": 16,
+                         "severity": 1
                         },
                         {
-                        "text": "Fatigue",
-                        "color": 5,
-                        "severity": 0
+                         "text": "Fatigue",
+                         "color": 5,
+                         "severity": 0
                         }
                     ],
                 "apt": {
                         "active": True,
+                        "dashboard_title": "Pelvic Tilt Efficiency",
+                        "child_title": "Pelvic Tilt",
                         "score": {
                                 "value": 72,
-                                "text": "movement quality",
+                                "text": "",
                                 "color": 5,
                                 "active": True},
+                        "summary_text": {"text": "movement efficiency",
+                                         "color": None,
+                                         "bold_text" : [],
+                                         "active": True
+                                        },
+                        "change": {
+                                    "value": -3.1,
+                                    "text": "pts",
+                                    "color": 6,
+                                    "active": True
+                                    },
+                        "change_text" : 
+                                {"text": "less than usual",
+                                 "color": 6,
+                                 "bold_text" : [],
+                                 "active": True
+                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -981,18 +996,8 @@ def fake_sessions_summary():
                             "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : 
-                                {"text": "That's 5% worse than your ususal",
-                                 "color": 6,
-                                 "bold_text" : [
-                                                {
-                                                "text": "That's 5% worse than your ususal",
-                                                "color": 6
-                                                }
-                                                ],
-                                 "display": True
-                                },
-                        "data_cards":[{
+                        "data_cards":[
+                                {
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
@@ -1023,7 +1028,7 @@ def fake_sessions_summary():
                                 {
                                     "type": 2,
                                     "value": 0,
-                                    "title_text": "Fatigue Present",
+                                    "title_text": "Fatigue: Present",
                                     "color": 5,
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
@@ -1031,15 +1036,34 @@ def fake_sessions_summary():
                                          "text_items" : []
                                          }
                                 }
-                                ]
+                            ]
                     },
                 "hip_drop": {
                         "active": True,
+                        "dashboard_title": "Hip Drop Efficiency",
+                        "child_title": "Hip Drop",
                         "score": {
                                 "value": 72,
-                                "text": "movement quality",
+                                "text": "",
                                 "color": 5,
                                 "active": True},
+                        "summary_text": {"text": "movement efficiency",
+                                         "color": None,
+                                         "bold_text" : [],
+                                         "active": True
+                                        },
+                        "change": {
+                                    "value": -3.1,
+                                    "text": "pts",
+                                    "color": 6,
+                                    "active": True
+                                    },
+                        "change_text" : 
+                                {"text": "less than usual",
+                                 "color": 6,
+                                 "bold_text" : [],
+                                 "active": True
+                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1052,18 +1076,8 @@ def fake_sessions_summary():
                             "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : 
-                                {"text": "That's 5% worse than your ususal",
-                                 "color": 6,
-                                 "bold_text" : [
-                                                {
-                                                "text": "That's 5% worse than your ususal",
-                                                "color": 6
-                                                }
-                                                ],
-                                 "display": True
-                                },
-                        "data_cards":[{
+                        "data_cards":[
+                                {
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
@@ -1094,7 +1108,7 @@ def fake_sessions_summary():
                                 {
                                     "type": 2,
                                     "value": 0,
-                                    "title_text": "Fatigue Present",
+                                    "title_text": "Fatigue: Present",
                                     "color": 5,
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
@@ -1102,15 +1116,34 @@ def fake_sessions_summary():
                                          "text_items" : []
                                          }
                                 }
-                                ]
+                            ]
                     },
                 "ankle_pitch": {
                         "active": True,
+                        "dashboard_title": "Leg Extension Efficiency",
+                        "child_title": "Leg Extension",
                         "score": {
                                 "value": 72,
-                                "text": "movement quality",
+                                "text": "",
                                 "color": 5,
                                 "active": True},
+                        "summary_text": {"text": "movement efficiency",
+                                         "color": None,
+                                         "bold_text" : [],
+                                         "active": True
+                                        },
+                        "change": {
+                                    "value": -3.1,
+                                    "text": "pts",
+                                    "color": 6,
+                                    "active": True
+                                    },
+                        "change_text" : 
+                                {"text": "less than usual",
+                                 "color": 6,
+                                 "bold_text" : [],
+                                 "active": True
+                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1123,18 +1156,8 @@ def fake_sessions_summary():
                             "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : 
-                                {"text": "That's 5% worse than your ususal",
-                                 "color": 6,
-                                 "bold_text" : [
-                                                {
-                                                "text": "That's 5% worse than your ususal",
-                                                "color": 6
-                                                }
-                                                ],
-                                 "display": True
-                                },
-                        "data_cards":[{
+                        "data_cards":[
+                                {
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
@@ -1165,7 +1188,7 @@ def fake_sessions_summary():
                                 {
                                     "type": 2,
                                     "value": 0,
-                                    "title_text": "Fatigue Present",
+                                    "title_text": "Fatigue: Present",
                                     "color": 5,
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
@@ -1173,15 +1196,34 @@ def fake_sessions_summary():
                                          "text_items" : []
                                          }
                                 }
-                                ]
+                            ]
                     },
                 "knee_valgus": {
                         "active": True,
+                        "dashboard_title": "Knee Valgus Efficiency",
+                        "child_title": "Knee Valgus",
                         "score": {
                                 "value": 72,
-                                "text": "movement quality",
+                                "text": "",
                                 "color": 5,
                                 "active": True},
+                        "summary_text": {"text": "movement efficiency",
+                                         "color": None,
+                                         "bold_text" : [],
+                                         "active": True
+                                        },
+                        "change": {
+                                    "value": -3.1,
+                                    "text": "pts",
+                                    "color": 6,
+                                    "active": True
+                                    },
+                        "change_text" : 
+                                {"text": "less than usual",
+                                 "color": 6,
+                                 "bold_text" : [],
+                                 "active": True
+                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1194,18 +1236,8 @@ def fake_sessions_summary():
                             "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : 
-                                {"text": "That's 5% worse than your ususal",
-                                 "color": 6,
-                                 "bold_text" : [
-                                                {
-                                                "text": "That's 5% worse than your ususal",
-                                                "color": 6
-                                                }
-                                                ],
-                                 "display": True
-                                },
-                        "data_cards":[{
+                        "data_cards":[
+                                {
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
@@ -1236,7 +1268,7 @@ def fake_sessions_summary():
                                 {
                                     "type": 2,
                                     "value": 0,
-                                    "title_text": "Fatigue Present",
+                                    "title_text": "Fatigue: Present",
                                     "color": 5,
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
@@ -1244,15 +1276,34 @@ def fake_sessions_summary():
                                          "text_items" : []
                                          }
                                 }
-                                ]
+                            ]
                     },
                 "hip_rotation": {
                         "active": True,
+                        "dashboard_title": "Hip Rotation Efficiency",
+                        "child_title": "Hip Rotation",
                         "score": {
                                 "value": 72,
-                                "text": "movement quality",
+                                "text": "",
                                 "color": 5,
                                 "active": True},
+                        "summary_text": {"text": "movement efficiency",
+                                         "color": None,
+                                         "bold_text" : [],
+                                         "active": True
+                                        },
+                        "change": {
+                                    "value": -3.1,
+                                    "text": "pts",
+                                    "color": 6,
+                                    "active": True
+                                    },
+                        "change_text" : 
+                                {"text": "less than usual",
+                                 "color": 6,
+                                 "bold_text" : [],
+                                 "active": True
+                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1265,18 +1316,8 @@ def fake_sessions_summary():
                             "right_y_legend_color": 6,
                             "multiplier" : 1.0
                         },
-                        "summary_text" : 
-                                {"text": "That's 5% worse than your ususal",
-                                 "color": 6,
-                                 "bold_text" : [
-                                                {
-                                                "text": "That's 5% worse than your ususal",
-                                                "color": 6
-                                                }
-                                                ],
-                                 "display": True
-                                },
-                        "data_cards":[{
+                        "data_cards":[
+                                {
                                     "type": 0,
                                     "value": 91,
                                     "title_text": "Asymmetry: High",
@@ -1307,7 +1348,7 @@ def fake_sessions_summary():
                                 {
                                     "type": 2,
                                     "value": 0,
-                                    "title_text": "Fatigue Present",
+                                    "title_text": "Fatigue: Present",
                                     "color": 5,
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
@@ -1315,7 +1356,7 @@ def fake_sessions_summary():
                                          "text_items" : []
                                          }
                                 }
-                                ]
+                            ]
                     }
                 }
             ]
