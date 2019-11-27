@@ -97,7 +97,7 @@ def handle_session_create(user_id=None):
         for s in range(0, len(plan.training_sessions)):
             if plan.training_sessions[s].id == new_session.id:
                 if new_session.source == SessionSource.three_sensor:
-                    new_session = get_local_time(datetime.datetime.now(), timezone)
+                    new_session.last_updated = get_local_time(datetime.datetime.now(), timezone)
                 # replace existing session with new session
                 plan.training_sessions[s] = new_session
                 found = True
