@@ -962,6 +962,12 @@ def fake_sessions_summary():
                         "active": True,
                         "dashboard_title": "Pelvic Tilt Efficiency",
                         "child_title": "Pelvic Tilt",
+                        "description": {
+                                 "text": "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles. ",
+                                 "bold_text": [],
+                                 "text_items" : [],
+                                 "active": True
+                                 },
                         "score": {
                                 "value": 72,
                                 "text": "",
@@ -1005,10 +1011,13 @@ def fake_sessions_summary():
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                          "bold_text": [],
-                                         "text_items" : [{
+                                         "text_items" : [
+                                            {
                                             "text": "abc",
                                             "bold_text": []
-                                         }]
+                                            }
+                                            ],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1022,7 +1031,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1033,7 +1043,8 @@ def fake_sessions_summary():
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                          "bold_text": [],
-                                         "text_items" : []
+                                         "text_items" : [],
+                                         "active": True
                                          }
                                 }
                             ]
@@ -1042,6 +1053,12 @@ def fake_sessions_summary():
                         "active": True,
                         "dashboard_title": "Hip Drop Efficiency",
                         "child_title": "Hip Drop",
+                        "description": {
+                                 "text": "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles. ",
+                                 "bold_text": [],
+                                 "text_items" : [],
+                                 "active": True
+                                 },
                         "score": {
                                 "value": 72,
                                 "text": "",
@@ -1088,7 +1105,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "abc",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1102,7 +1120,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1113,7 +1132,8 @@ def fake_sessions_summary():
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                          "bold_text": [],
-                                         "text_items" : []
+                                         "text_items" : [],
+                                         "active": True
                                          }
                                 }
                             ]
@@ -1122,6 +1142,12 @@ def fake_sessions_summary():
                         "active": True,
                         "dashboard_title": "Leg Extension Efficiency",
                         "child_title": "Leg Extension",
+                        "description": {
+                                 "text": "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles. ",
+                                 "bold_text": [],
+                                 "text_items" : [],
+                                 "active": True
+                                 },
                         "score": {
                                 "value": 72,
                                 "text": "",
@@ -1168,7 +1194,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "abc",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1182,7 +1209,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1193,7 +1221,8 @@ def fake_sessions_summary():
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                          "bold_text": [],
-                                         "text_items" : []
+                                         "text_items" : [],
+                                         "active": True
                                          }
                                 }
                             ]
@@ -1202,6 +1231,12 @@ def fake_sessions_summary():
                         "active": True,
                         "dashboard_title": "Knee Valgus Efficiency",
                         "child_title": "Knee Valgus",
+                        "description": {
+                                 "text": "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles. ",
+                                 "bold_text": [],
+                                 "text_items" : [],
+                                 "active": True
+                                 },
                         "score": {
                                 "value": 72,
                                 "text": "",
@@ -1248,7 +1283,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "abc",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1262,7 +1298,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1273,7 +1310,8 @@ def fake_sessions_summary():
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                          "bold_text": [],
-                                         "text_items" : []
+                                         "text_items" : [],
+                                         "active": True
                                          }
                                 }
                             ]
@@ -1282,6 +1320,12 @@ def fake_sessions_summary():
                         "active": True,
                         "dashboard_title": "Hip Rotation Efficiency",
                         "child_title": "Hip Rotation",
+                        "description": {
+                                 "text": "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles. ",
+                                 "bold_text": [],
+                                 "text_items" : [],
+                                 "active": True
+                                 },
                         "score": {
                                 "value": 72,
                                 "text": "",
@@ -1328,7 +1372,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "abc",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1342,7 +1387,8 @@ def fake_sessions_summary():
                                          "text_items" : [{
                                             "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                             "bold_text": []
-                                         }]
+                                         }],
+                                         "active": True
                                          }
                                 },
                                 {
@@ -1353,7 +1399,8 @@ def fake_sessions_summary():
                                     "summary_text": {
                                          "text": "Your Pelvic Tilt Asymmetry seems to worsen in correlation with your Leg Extension.",
                                          "bold_text": [],
-                                         "text_items" : []
+                                         "text_items" : [],
+                                         "active": True
                                          }
                                 }
                             ]
