@@ -68,24 +68,23 @@ def handle_session_create(user_id=None):
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
 
     for session in request.json['sessions']:
-        existing = False
+        create_new = True
         if session is None:
             continue
         # if id is already present, it's potentially a patch. Check if session already exists and overwrite if it does
         if session.get('session_id') is not None:
             for s in range(0, len(plan.training_sessions)):
                 if plan.training_sessions[s].id == session['session_id']:
-                    existing = True
-        if existing:
-            if session.get('source', 0) == 3:
-                session['last_updated'] = get_local_time(datetime.datetime.now(), timezone)
-            new_session = Session.json_deserialise(session)
-            plan.training_sessions[s] = new_session
-            plan_update_required = True
-            if new_session.post_session_survey is not None:
-                survey_processor.soreness.extend(new_session.post_session_survey.soreness)
-            break
-        else:
+                    create_new = False
+                    if session.get('source', 0) == 3:
+                        session['last_updated'] = get_local_time(datetime.datetime.now(), timezone)
+                    new_session = Session.json_deserialise(session)
+                    plan.training_sessions[s] = new_session
+                    plan_update_required = True
+                    if new_session.post_session_survey is not None:
+                        survey_processor.soreness.extend(new_session.post_session_survey.soreness)
+                    break
+        if create_new:
             survey_processor.create_session_from_survey(session)
 
     visualizations = is_fathom_environment()
