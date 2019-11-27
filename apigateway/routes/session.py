@@ -72,9 +72,9 @@ def handle_session_create(user_id=None):
         if session is None:
             continue
         # if id is already present, it's potentially a patch. Check if session already exists and overwrite if it does
-        if session.get('id') is not None:
+        if session.get('session_id') is not None:
             for s in range(0, len(plan.training_sessions)):
-                if plan.training_sessions[s].id == session['id']:
+                if plan.training_sessions[s].id == session['session_id']:
                     existing = True
         if existing:
             if session.get('source', 0) == 3:
