@@ -18,7 +18,7 @@ from utils import parse_datetime, format_date, format_datetime, get_timezone, ge
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
-from logic.session_processing import merge_sessions
+# from logic.session_processing import merge_sessions
 from models.functional_movement import MovementPatterns
 
 datastore_collection = DatastoreCollection()
@@ -88,9 +88,24 @@ def handle_session_create(user_id=None):
         #if not survey_processor.athlete_stats.high_relative_load_session and len(plan.training_sessions) > 0:
         #    survey_processor.check_high_relative_load_sessions(plan.training_sessions)
 
+    # plan.training_sessions.extend(survey_processor.sessions)
+
     # add sessions to plan and write to mongo
     plan.train_later = train_later
-    plan.training_sessions.extend(survey_processor.sessions)
+    for new_session in survey_processor.sessions:
+        found = False
+        for s in range(0, len(plan.training_sessions)):
+            if plan.training_sessions[s].id == new_session.id:
+                if new_session.source == SessionSource.three_sensor:
+                    new_session = get_local_time(datetime.datetime.now(), timezone)
+                # replace existing session with new session
+                plan.training_sessions[s] = new_session
+                found = True
+                break
+        if not found:
+            # if it doesn't exist add as a new session
+            plan.training_sessions.append(new_session) 
+
 
     # apple_ids_to_merge = None
     # session_ids_to_merge = None
