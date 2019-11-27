@@ -157,152 +157,50 @@ class SessionAsymmetry(Serialisable):
 
         self.seconds_duration = 0
 
-    def json_serialise(self, api=False):
+    def json_serialise(self, api=False, get_all=False):
         if api:
-            minutes = round(self.seconds_duration / 60)
+            ret = {
+                'session_id': self.session_id,
+                'seconds_duration': self.seconds_duration,
+                'asymmetry': {}
+            }
+            apt = None
+            ankle_pitch = None
+            hip_drop = None
+            knee_valgus = None
+            hip_rotation = None
             if self.anterior_pelvic_tilt is not None:
-                asymmetric_minutes = round((self.anterior_pelvic_tilt.percent_events_asymmetric / float(100)) * minutes)
-                if self.anterior_pelvic_tilt.percent_events_asymmetric > 0:
-                    asymmetric_minutes = max(1, asymmetric_minutes)
-                ret = {
-                    'session_id': self.session_id,
-                    'seconds_duration': self.seconds_duration,
-                    'asymmetry': {
-                        'apt': {
-                            'detail_legend': [
-                                    {
-                                        'color': [8, 9],
-                                        'text': 'Symmetric',
-                                    },
-                                    {
-                                        'color': [10, 4],
-                                        'text': 'Asymmetric',
-                                    },
-                                ],
-                            'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            'detail_text': self.anterior_pelvic_tilt.get_detail_text(asymmetric_minutes, minutes) if self.anterior_pelvic_tilt is not None else '',
-                            #'detail_text': "Your Pelvic Tilt was symmetric for " + str(symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
-                            'detail_bold_text': [b.json_serialise() for b in self.anterior_pelvic_tilt.get_detail_bold_text(asymmetric_minutes) if self.anterior_pelvic_tilt is not None],
-                            'detail_bold_side': self.anterior_pelvic_tilt.get_detail_bold_side() if self.anterior_pelvic_tilt is not None else ''
-                        }
-                    }
-                }
-            elif self.ankle_pitch is not None:
-                asymmetric_minutes = round((self.ankle_pitch.percent_events_asymmetric / float(100)) * minutes)
-                if self.ankle_pitch.percent_events_asymmetric > 0:
-                    asymmetric_minutes = max(1, asymmetric_minutes)
-                ret = {
-                    'session_id': self.session_id,
-                    'seconds_duration': self.seconds_duration,
-                    'asymmetry': {
-                        'ankle_pitch': {
-                            'detail_legend': [
-                                {
-                                    'color': [8, 9],
-                                    'text': 'Symmetric',
-                                },
-                                {
-                                    'color': [10, 4],
-                                    'text': 'Asymmetric',
-                                },
-                            ],
-                            'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            'detail_text': self.ankle_pitch.get_detail_text(asymmetric_minutes, minutes) if self.ankle_pitch is not None else '',
-                            #'detail_text': "Your Leg Extension was symmetric for " + str(
-                            #    symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
-                            'detail_bold_text': [b.json_serialise() for b in
-                                                 self.ankle_pitch.get_detail_bold_text(asymmetric_minutes) if
-                                                 self.ankle_pitch is not None],
-                            'detail_bold_side': self.ankle_pitch.get_detail_bold_side() if self.ankle_pitch is not None else ''
-                        }
-                    }
-                }
-            elif self.hip_drop is not None:
-                asymmetric_minutes = round((self.hip_drop.percent_events_asymmetric / float(100)) * minutes)
-                if self.hip_drop.percent_events_asymmetric > 0:
-                    asymmetric_minutes = max(1, asymmetric_minutes)
-                ret = {
-                    'session_id': self.session_id,
-                    'seconds_duration': self.seconds_duration,
-                    'asymmetry': {
-                        'hip_drop': {
-                            'detail_legend': [
-                                {
-                                    'color': [8, 9],
-                                    'text': 'Symmetric',
-                                },
-                                {
-                                    'color': [10, 4],
-                                    'text': 'Asymmetric',
-                                },
-                            ],
-                            'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            'detail_text': self.hip_drop.get_detail_text(asymmetric_minutes, minutes) if self.hip_drop is not None else '',
-                            #'detail_text': "Your Leg Extension was symmetric for " + str(
-                            #    symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
-                            'detail_bold_text': [b.json_serialise() for b in
-                                                 self.hip_drop.get_detail_bold_text(asymmetric_minutes) if
-                                                 self.hip_drop is not None],
-                            'detail_bold_side': self.hip_drop.get_detail_bold_side() if self.hip_drop is not None else ''
-                        }
-                    }
-                }
-            elif self.knee_valgus is not None:
-                asymmetric_minutes = round((self.knee_valgus.percent_events_asymmetric / float(100)) * minutes)
-                if self.knee_valgus.percent_events_asymmetric > 0:
-                    asymmetric_minutes = max(1, asymmetric_minutes)
-                ret = {
-                    'session_id': self.session_id,
-                    'seconds_duration': self.seconds_duration,
-                    'asymmetry': {
-                        'hip_drop': {
-                            'detail_legend': [
-                                {
-                                    'color': [8, 9],
-                                    'text': 'Symmetric',
-                                },
-                                {
-                                    'color': [10, 4],
-                                    'text': 'Asymmetric',
-                                },
-                            ],
-                            'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            'detail_text': self.knee_valgus.get_detail_text(asymmetric_minutes, minutes) if self.knee_valgus is not None else '',
-                            'detail_bold_text': [b.json_serialise() for b in
-                                                 self.knee_valgus.get_detail_bold_text(asymmetric_minutes) if
-                                                 self.knee_valgus is not None],
-                            'detail_bold_side': self.knee_valgus.get_detail_bold_side() if self.knee_valgus is not None else ''
-                        }
-                    }
-                }
-            elif self.hip_rotation is not None:
-                asymmetric_minutes = round((self.hip_rotation.percent_events_asymmetric / float(100)) * minutes)
-                if self.hip_rotation.percent_events_asymmetric > 0:
-                    asymmetric_minutes = max(1, asymmetric_minutes)
-                ret = {
-                    'session_id': self.session_id,
-                    'seconds_duration': self.seconds_duration,
-                    'asymmetry': {
-                        'hip_drop': {
-                            'detail_legend': [
-                                {
-                                    'color': [8, 9],
-                                    'text': 'Symmetric',
-                                },
-                                {
-                                    'color': [10, 4],
-                                    'text': 'Asymmetric',
-                                },
-                            ],
-                            'detail_data': [t.json_serialise(api) for t in self.time_blocks],
-                            'detail_text': self.hip_rotation.get_detail_text(asymmetric_minutes, minutes) if self.hip_rotation is not None else '',
-                            'detail_bold_text': [b.json_serialise() for b in
-                                                 self.hip_rotation.get_detail_bold_text(asymmetric_minutes) if
-                                                 self.hip_rotation is not None],
-                            'detail_bold_side': self.hip_rotation.get_detail_bold_side() if self.hip_rotation is not None else ''
-                        }
-                    }
-                }
+                apt = self.get_apt(api)
+            if self.ankle_pitch is not None:
+                ankle_pitch = self.get_ankle_pitch(api)
+            if self.hip_drop is not None:
+                hip_drop = self.get_hip_drop(api)
+            if self.knee_valgus is not None:
+                knee_valgus = self.get_knee_valgus(api)
+            if self.hip_rotation is not None:
+                hip_rotation = self.get_hip_rotation(api)
+            if get_all:
+                asymmetry = {}
+                asymmetry['apt'] = apt
+                asymmetry['ankle_pitch'] = ankle_pitch
+                asymmetry['hip_drop'] = hip_drop
+                asymmetry['knee_valgus'] = knee_valgus
+                asymmetry['hip_rotation'] = hip_rotation
+                ret['asymmetry'] = asymmetry
+            else:
+                if apt is not None:
+                    ret['asymmetry']['apt'] = apt
+                elif ankle_pitch is not None:
+                    ret['asymmetry']['ankle_pitch'] = ankle_pitch
+                elif hip_drop is not None:
+                    ret['asymmetry']['hip_drop'] = hip_drop
+                elif knee_valgus is not None:
+                    ret['asymmetry']['knee_valgus'] = knee_valgus
+                elif hip_rotation is not None:
+                    ret['asymmetry']['hip_rotation'] = hip_rotation
+
+
+
         else:
             ret = {
                 'session_id': self.session_id,
@@ -343,6 +241,131 @@ class SessionAsymmetry(Serialisable):
         session.seconds_duration = input_dict.get('seconds_duration', 0)
 
         return session
+
+    def get_apt(self, api):
+        minutes = round(self.seconds_duration / 60)
+        asymmetric_minutes = round((self.anterior_pelvic_tilt.percent_events_asymmetric / float(100)) * minutes)
+        if self.anterior_pelvic_tilt.percent_events_asymmetric > 0:
+            asymmetric_minutes = max(1, asymmetric_minutes)
+        return  {
+                    'detail_legend': [
+                        {
+                            'color': [8, 9],
+                            'text': 'Symmetric',
+                        },
+                        {
+                            'color': [10, 4],
+                            'text': 'Asymmetric',
+                        },
+                    ],
+                    'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                    'detail_text': self.anterior_pelvic_tilt.get_detail_text(asymmetric_minutes, minutes) if self.anterior_pelvic_tilt is not None else '',
+                    # 'detail_text': "Your Pelvic Tilt was symmetric for " + str(symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
+                    'detail_bold_text': [b.json_serialise() for b in self.anterior_pelvic_tilt.get_detail_bold_text(asymmetric_minutes) if self.anterior_pelvic_tilt is not None],
+                    'detail_bold_side': self.anterior_pelvic_tilt.get_detail_bold_side() if self.anterior_pelvic_tilt is not None else ''
+                }
+
+
+    def get_ankle_pitch(self, api):
+            minutes = round(self.seconds_duration / 60)
+            asymmetric_minutes = round((self.ankle_pitch.percent_events_asymmetric / float(100)) * minutes)
+            if self.ankle_pitch.percent_events_asymmetric > 0:
+                asymmetric_minutes = max(1, asymmetric_minutes)
+            return {
+                    'detail_legend': [
+                        {
+                            'color': [8, 9],
+                            'text': 'Symmetric',
+                        },
+                        {
+                            'color': [10, 4],
+                            'text': 'Asymmetric',
+                        },
+                    ],
+                    'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                    'detail_text': self.ankle_pitch.get_detail_text(asymmetric_minutes, minutes) if self.ankle_pitch is not None else '',
+                    # 'detail_text': "Your Leg Extension was symmetric for " + str(
+                    #    symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
+                    'detail_bold_text': [b.json_serialise() for b in
+                                         self.ankle_pitch.get_detail_bold_text(asymmetric_minutes) if
+                                         self.ankle_pitch is not None],
+                    'detail_bold_side': self.ankle_pitch.get_detail_bold_side() if self.ankle_pitch is not None else ''
+                }
+
+
+    def get_hip_drop(self, api):
+        minutes = round(self.seconds_duration / 60)
+        asymmetric_minutes = round((self.hip_drop.percent_events_asymmetric / float(100)) * minutes)
+        if self.hip_drop.percent_events_asymmetric > 0:
+            asymmetric_minutes = max(1, asymmetric_minutes)
+        return {
+                    'detail_legend': [
+                        {
+                            'color': [8, 9],
+                            'text': 'Symmetric',
+                        },
+                        {
+                            'color': [10, 4],
+                            'text': 'Asymmetric',
+                        },
+                    ],
+                    'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                    'detail_text': self.hip_drop.get_detail_text(asymmetric_minutes, minutes) if self.hip_drop is not None else '',
+                    # 'detail_text': "Your Leg Extension was symmetric for " + str(
+                    #    symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
+                    'detail_bold_text': [b.json_serialise() for b in
+                                         self.hip_drop.get_detail_bold_text(asymmetric_minutes) if
+                                         self.hip_drop is not None],
+                    'detail_bold_side': self.hip_drop.get_detail_bold_side() if self.hip_drop is not None else ''
+                }
+
+    def get_knee_valgus(self, api):
+        minutes = round(self.seconds_duration / 60)
+        asymmetric_minutes = round((self.knee_valgus.percent_events_asymmetric / float(100)) * minutes)
+        if self.knee_valgus.percent_events_asymmetric > 0:
+            asymmetric_minutes = max(1, asymmetric_minutes)
+        return {
+                'detail_legend': [
+                    {
+                        'color': [8, 9],
+                        'text': 'Symmetric',
+                    },
+                    {
+                        'color': [10, 4],
+                        'text': 'Asymmetric',
+                    },
+                ],
+                'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                'detail_text': self.knee_valgus.get_detail_text(asymmetric_minutes, minutes) if self.knee_valgus is not None else '',
+                'detail_bold_text': [b.json_serialise() for b in
+                                     self.knee_valgus.get_detail_bold_text(asymmetric_minutes) if
+                                     self.knee_valgus is not None],
+                'detail_bold_side': self.knee_valgus.get_detail_bold_side() if self.knee_valgus is not None else ''
+            }
+
+    def get_hip_rotation(self, api):
+        minutes = round(self.seconds_duration / 60)
+        asymmetric_minutes = round((self.hip_rotation.percent_events_asymmetric / float(100)) * minutes)
+        if self.hip_rotation.percent_events_asymmetric > 0:
+            asymmetric_minutes = max(1, asymmetric_minutes)
+        return {
+                'detail_legend': [
+                    {
+                        'color': [8, 9],
+                        'text': 'Symmetric',
+                    },
+                    {
+                        'color': [10, 4],
+                        'text': 'Asymmetric',
+                    },
+                ],
+                'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                'detail_text': self.hip_rotation.get_detail_text(asymmetric_minutes, minutes) if self.hip_rotation is not None else '',
+                'detail_bold_text': [b.json_serialise() for b in
+                                     self.hip_rotation.get_detail_bold_text(asymmetric_minutes) if
+                                     self.hip_rotation is not None],
+                'detail_bold_side': self.hip_rotation.get_detail_bold_side() if self.hip_rotation is not None else ''
+                }
 
 
 class VisualizedLeftRightAsymmetry(object):
