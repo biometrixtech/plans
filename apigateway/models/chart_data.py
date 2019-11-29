@@ -9,9 +9,11 @@ from models.soreness_base import BodyPartSide, BodyPartSideViz
 from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
 from models.asymmetry import VisualizedLeftRightAsymmetry
+from models.scoring import MovementVariableScore, MovementVariableSummary
 from models.styles import LegendColor
 from logic.soreness_processing import SorenessCalculator
 from logic.asymmetry_logic import AsymmetryProcessor
+from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
 
 
 class BaseChart(object):
@@ -242,6 +244,111 @@ class BiomechanicsHipDropChart(Serialisable):
         chart = cls()
         chart.sessions = [BiomechanicsHipDropChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
         return chart
+
+
+class BiomechanicsSummaryChart(Serialisable):
+    def __init__(self):
+        self.three_sensor_enabled = False
+        self.active = False
+        self.sessions = []
+
+    def add_sessions(self, session_list):
+
+        filtered_list = [s for s in session_list if s.source == SessionSource.three_sensor]
+
+        filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=True)
+
+        for f in filtered_list:
+            chart_data = BiomechanicsSummaryChartData()
+            chart_data.add_session_data(f)
+
+            self.sessions.append(chart_data)
+        self.sessions = self.sessions[:7]
+        self.sessions = sorted(self.sessions, key=lambda x:x.event_date_time, reverse=False)
+
+    def json_serialise(self):
+        ret = {
+            'three_sensor_enabled': self.three_sensor_enabled,
+            'active': self.active,
+            'sessions': [s.json_serialise() for s in self.sessions]
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        chart = cls()
+        chart.three_sensor_enabled = input_dict.get('three_sensor_enabled', False)
+        chart.active = input_dict.get('active', False)
+        chart.sessions = [BiomechanicsSummaryChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
+        return chart
+
+
+class BiomechanicsSummaryChartData(Serialisable):
+    def __init__(self):
+        self.id = ''
+        self.score = None  # MovementVariableScore
+        self.event_date_time = None
+        self.duration = 0
+        self.sport_name = None
+        self.summary_pills = []  # MovementSummaryPill
+        self.apt = None  # MovementVariableSummary
+        self.hip_drop = None  # MovementVariableSummary
+        self.ankle_pitch = None  # MovementVariableSummary
+        self.knee_valgus = None  # MovementVariableSummary
+        self.hip_rotation = None  # MovementVariableSummary
+
+    def json_serialise(self):
+        ret = {
+            'id': self.id,
+            'score': self.score.json_serialise() if self.score is not None else None,
+            'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
+            'duration': self.duration,
+            'sport_name': self.sport_name.value if self.sport_name is not None else None,
+            'apt': self.apt.json_serialise() if self.apt is not None else None,
+            'hip_drop': self.hip_drop.json_serialise() if self.hip_drop is not None else None,
+            'ankle_pitch': self.ankle_pitch.json_serialise() if self.ankle_pitch is not None else None,
+            'knee_valgus': self.knee_valgus.json_serialise() if self.knee_valgus is not None else None,
+            'hip_rotation': self.hip_rotation.json_serialise() if self.hip_rotation is not None else None,
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.id = input_dict.get('id', '')
+        data.score = MovementVariableScore.json_deserialise(input_dict['score']) if input_dict.get('score') is not None else None
+        data.event_date_time = parse_datetime(input_dict['event_date_time']) if input_dict.get(
+            'event_date_time') is not None else None
+        data.duration = input_dict.get('duration', 0)
+        data.sport_name = SportName(input_dict['sport_name']) if input_dict.get('sport_name') is not None else None
+        data.apt = MovementVariableSummary.json_deserialise(input_dict['apt']) if input_dict.get('apt') is not None else None
+        data.hip_drop = MovementVariableSummary.json_deserialise(input_dict['hip_drop']) if input_dict.get(
+            'hip_drop') is not None else None
+        data.ankle_pitch = MovementVariableSummary.json_deserialise(input_dict['ankle_pitch']) if input_dict.get(
+            'ankle_pitch') is not None else None
+        data.knee_valgus = MovementVariableSummary.json_deserialise(input_dict['knee_valgus']) if input_dict.get(
+            'knee_valgus') is not None else None
+        data.hip_rotation = MovementVariableSummary.json_deserialise(input_dict['hip_rotation']) if input_dict.get(
+            'hip_rotation') is not None else None
+        return data
+
+    def add_session_data(self, session):
+
+        summary_scoring_processor = ScoringSummaryProcessor()
+
+        session_summary = summary_scoring_processor.get_session_summary(session)
+
+        self.id = session.id
+        self.score = session_summary.score
+        self.event_date_time = session.event_date
+        self.duration = session.duration_sensor
+        self.sport_name = session.sport_name
+        self.summary_pills = [] # TODO fill this
+        self.apt = session_summary.apt
+        self.ankle_pitch = session_summary.ankle_pitch
+        self.hip_drop = session_summary.hip_drop
+        self.knee_valgus = session_summary.knee_valgus
+        self.hip_rotation = session_summary.hip_rotation
 
 
 class BiomechanicsAPTChartData(Serialisable):
