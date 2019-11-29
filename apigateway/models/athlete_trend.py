@@ -984,12 +984,6 @@ def fake_sessions_summary():
                                     "color": 6,
                                     "active": True
                                     },
-                        "change_text" : 
-                                {"text": "less than usual",
-                                 "color": 6,
-                                 "bold_text" : [],
-                                 "active": True
-                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1075,12 +1069,6 @@ def fake_sessions_summary():
                                     "color": 6,
                                     "active": True
                                     },
-                        "change_text" : 
-                                {"text": "less than usual",
-                                 "color": 6,
-                                 "bold_text" : [],
-                                 "active": True
-                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1164,12 +1152,6 @@ def fake_sessions_summary():
                                     "color": 6,
                                     "active": True
                                     },
-                        "change_text" : 
-                                {"text": "less than usual",
-                                 "color": 6,
-                                 "bold_text" : [],
-                                 "active": True
-                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1253,12 +1235,6 @@ def fake_sessions_summary():
                                     "color": 6,
                                     "active": True
                                     },
-                        "change_text" : 
-                                {"text": "less than usual",
-                                 "color": 6,
-                                 "bold_text" : [],
-                                 "active": True
-                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,
@@ -1342,12 +1318,6 @@ def fake_sessions_summary():
                                     "color": 6,
                                     "active": True
                                     },
-                        "change_text" : 
-                                {"text": "less than usual",
-                                 "color": 6,
-                                 "bold_text" : [],
-                                 "active": True
-                                },
                         "body_side" : 2,
                         "summary_data" : {
                             "left_start_angle" : 0,

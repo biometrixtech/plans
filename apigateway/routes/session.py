@@ -9,7 +9,7 @@ from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
-from models.session import SessionType, SessionSource
+from models.session import SessionType, SessionSource, Session
 from models.asymmetry import Asymmetry
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
@@ -18,7 +18,7 @@ from utils import parse_datetime, format_date, format_datetime, get_timezone, ge
 from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
-from logic.session_processing import merge_sessions
+# from logic.session_processing import merge_sessions
 from models.functional_movement import MovementPatterns
 
 datastore_collection = DatastoreCollection()
@@ -58,10 +58,34 @@ def handle_session_create(user_id=None):
                                         athlete_stats=athlete_stats,
                                         datastore_collection=datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
+
+    # check if plan exists, if not create a new one
+    if not _check_plan_exists(user_id, plan_event_date):
+        plan = DailyPlan(event_date=plan_event_date)
+        plan.user_id = user_id
+        # plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
+    else:
+        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
+
     for session in request.json['sessions']:
+        create_new = True
         if session is None:
             continue
-        survey_processor.create_session_from_survey(session)
+        # if id is already present, it's potentially a patch. Check if session already exists and overwrite if it does
+        if session.get('session_id') is not None:
+            for s in range(0, len(plan.training_sessions)):
+                if plan.training_sessions[s].id == session['session_id']:
+                    create_new = False
+                    if session.get('source', 0) == 3:
+                        session['last_updated'] = get_local_time(datetime.datetime.now(), timezone)
+                    new_session = Session.json_deserialise(session)
+                    plan.training_sessions[s] = new_session
+                    plan_update_required = True
+                    if new_session.post_session_survey is not None:
+                        survey_processor.soreness.extend(new_session.post_session_survey.soreness)
+                    break
+        if create_new:
+            survey_processor.create_session_from_survey(session)
 
     visualizations = is_fathom_environment()
 
@@ -72,25 +96,32 @@ def handle_session_create(user_id=None):
     for session in survey_processor.sessions:
         if not session.deleted and not session.ignored:
             plan_update_required = True
+            if not plan.sessions_planned:
+                plan.sessions_planned = True
             break
     #survey_processor.check_high_relative_load_sessions(survey_processor.sessions)
 
-    # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
-
-    if not _check_plan_exists(user_id, plan_event_date):
-        plan = DailyPlan(event_date=plan_event_date)
-        plan.user_id = user_id
-        plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
-    else:
-        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-        if plan_update_required and not plan.sessions_planned:
-            plan.sessions_planned = True
         #if not survey_processor.athlete_stats.high_relative_load_session and len(plan.training_sessions) > 0:
         #    survey_processor.check_high_relative_load_sessions(plan.training_sessions)
 
-    # add sessions to plan and write to mongo
-    plan.train_later = train_later
     plan.training_sessions.extend(survey_processor.sessions)
+    plan.train_later = train_later
+
+    # # add sessions to plan and write to mongo
+    # for new_session in survey_processor.sessions:
+    #     found = False
+    #     for s in range(0, len(plan.training_sessions)):
+    #         if plan.training_sessions[s].id == new_session.id:
+    #             if new_session.source == SessionSource.three_sensor:
+    #                 new_session.last_updated = get_local_time(datetime.datetime.now(), timezone)
+    #             # replace existing session with new session
+    #             plan.training_sessions[s] = new_session
+    #             found = True
+    #             break
+    #     if not found:
+    #         # if it doesn't exist add as a new session
+    #         plan.training_sessions.append(new_session) 
+
 
     # apple_ids_to_merge = None
     # session_ids_to_merge = None
