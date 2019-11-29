@@ -82,7 +82,8 @@ class DailyPlan(Serialisable):
                'train_later': self.train_later,
                'insights': [insight.json_serialise() for insight in self.insights],
                'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
-               'symptoms': [soreness.json_serialise() for soreness in self.symptoms]
+               'symptoms': [soreness.json_serialise() for soreness in self.symptoms],
+               'modalities': fake_modality()
                }
 
         return ret
@@ -179,3 +180,146 @@ class DailyPlan(Serialisable):
 
     def sort_insights(self):
         self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
+
+
+def fake_modality():
+    return [
+            {
+                "type": 0,
+                "title": "Cool Down",
+                "when": "Immediately After Workout",
+                "start_date_time" : None,
+                "completed_date_time" : None,
+                "event_date_time" : "2019-05-08T00:00:00Z",
+                "completed" : False,
+                "active" : True,
+                "default_plan": "Complete",
+                "force_data": False,
+                "goal_title": "Complete Routine to reduce effects of:", 
+                "goal_defs": [{
+                                "id": "1",
+                                "type": "1", 
+                                "name": "Recover from Rowing"
+                            },
+                            {
+                                "id": "2",
+                                "type": "1", 
+                                "name": "Recover from Running"
+                            }],
+                "goals": {
+                            "1" : {
+                                "efficient_active" : True,
+                                "complete_active" : True,
+                                "comprehensive_active" : True
+                            },
+                            "2" : {
+                                "efficient_active" : False,
+                                "complete_active" : False,
+                                "comprehensive_active" : False
+                            }
+                        },
+                "exercise_phases":[
+                    {
+                        "type": 0,
+                        "name": "Dynamic Stretch Exercises",
+                        "title": "Dynamic Stretch",
+                        "exercises" : [ 
+                            {
+                                "name" : "Foam Roller - Hamstrings",
+                                "display_name" : "Foam Roll - Hamstrings",
+                                "library_id" : "3",
+                                "description" : "Place foam roller just before the glute & roll the length of your hamstring. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle. ",
+                                "youtube_id" : None,
+                                "bilateral" : True,
+                                "seconds_per_rep" : None,
+                                "seconds_per_set" : 30,
+                                "unit_of_measure" : "seconds",
+                                "position_order" : 0,
+                                "duration_efficient" : 0,
+                                "duration_complete" : 60,
+                                "duration_comprehensive" : 120,
+                                "goal_text" : "",
+                                "equipment_required" : [ 
+                                    "Foam Roller"
+                                ],
+                                "dosages" : [ 
+                                    {
+                                        "goal" : {
+                                            "text" : "Recover from Rowing",
+                                            "priority" : 1,
+                                            "goal_type" : 2
+                                        },
+                                        "priority" : "2",
+                                        "tier" : 2,
+                                        "efficient_reps_assigned" : 0,
+                                        "efficient_sets_assigned" : 0,
+                                        "complete_reps_assigned" : 30,
+                                        "complete_sets_assigned" : 1,
+                                        "comprehensive_reps_assigned" : 30,
+                                        "comprehensive_sets_assigned" : 1,
+                                        "default_efficient_reps_assigned" : 0,
+                                        "default_efficient_sets_assigned" : 0,
+                                        "default_complete_reps_assigned" : 30,
+                                        "default_complete_sets_assigned" : 1,
+                                        "default_comprehensive_reps_assigned" : 30,
+                                        "default_comprehensive_sets_assigned" : 1,
+                                        "ranking" : 2
+                                    }
+                                ]
+                            }
+                        ]
+                     },
+
+                     {
+                        "type": 1,
+                        "name": "Dynamic Integrate Exercises",
+                        "title": "Dynamic Integrate",
+                        "exercises" : [ 
+                            {
+                                "name" : "Foam Roller - Hamstrings",
+                                "display_name" : "Foam Roll - Hamstrings",
+                                "library_id" : "3",
+                                "description" : "Place foam roller just before the glute & roll the length of your hamstring. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle. ",
+                                "youtube_id" : None,
+                                "bilateral" : True,
+                                "seconds_per_rep" : None,
+                                "seconds_per_set" : 30,
+                                "unit_of_measure" : "seconds",
+                                "position_order" : 0,
+                                "duration_efficient" : 0,
+                                "duration_complete" : 60,
+                                "duration_comprehensive" : 120,
+                                "goal_text" : "",
+                                "equipment_required" : [ 
+                                    "Foam Roller"
+                                ],
+                                "dosages" : [ 
+                                    {
+                                        "goal" : {
+                                            "text" : "Recover from Cycling",
+                                            "priority" : 1,
+                                            "goal_type" : 2
+                                        },
+                                        "priority" : "2",
+                                        "tier" : 2,
+                                        "efficient_reps_assigned" : 0,
+                                        "efficient_sets_assigned" : 0,
+                                        "complete_reps_assigned" : 30,
+                                        "complete_sets_assigned" : 1,
+                                        "comprehensive_reps_assigned" : 30,
+                                        "comprehensive_sets_assigned" : 1,
+                                        "default_efficient_reps_assigned" : 0,
+                                        "default_efficient_sets_assigned" : 0,
+                                        "default_complete_reps_assigned" : 30,
+                                        "default_complete_sets_assigned" : 1,
+                                        "default_comprehensive_reps_assigned" : 30,
+                                        "default_comprehensive_sets_assigned" : 1,
+                                        "ranking" : 2
+                                    }
+                                ]
+                            }
+                        ]
+                     }
+                ]
+            }
+            ]
