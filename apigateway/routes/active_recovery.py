@@ -295,14 +295,12 @@ def handle_request_modality(user_id=None):
 
     athlete_stats = athlete_stats_datastore.get(user_id)
 
-    # hist_update = False
-    # if athlete_stats.api_version in [None, '4_4', '4_5']:
-    #     hist_update = True
-    # if hist_update:
-    #     stats_processor = StatsProcessing(user_id,
-    #                                       event_date=event_date,
-    #                                       datastore_collection=datastore_collection)
-    #     athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats, force_historical_process=True)
+    hist_update = False
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
+    if hist_update:
+        athlete_stats = process_stats(user_id, event_date, athlete_stats, hist_update)
+        athlete_stats_datastore.put(athlete_stats)
 
     plan = add_modality_on_demand(user_id, event_date, modality_type=modality_type, athlete_stats=athlete_stats,
                                   visualizations=visualizations)
