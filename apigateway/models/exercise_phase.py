@@ -1,5 +1,5 @@
 from enum import Enum
-from exercise import AssignedExercise
+from models.exercise import AssignedExercise
 
 
 class ExercisePhaseType(Enum):
@@ -20,6 +20,7 @@ class ExercisePhaseType(Enum):
             5: 'STATIC INTEGRATE'
             }
         return display_names[self.value]
+
 
 class ExercisePhase(object):
     def __init__(self, phase_type):
