@@ -1,5 +1,6 @@
 from serialisable import Serialisable
 from models.styles import LegendColor, BoldText
+from models.asymmetry import VisualizedLeftRightAsymmetry
 
 
 class MovementVariableScore(Serialisable):
