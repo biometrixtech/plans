@@ -1,4 +1,4 @@
-from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining
+from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, WarmUp, CoolDown, FunctionalStrength
 
 
 class ExerciseAssignmentCalculator(object):
@@ -42,4 +42,17 @@ class ExerciseAssignmentCalculator(object):
                 return [active_rest]
         return []
 
+    def get_warm_up(self):
+        warm_up = WarmUp()
+        warm_up.fill_exercises(self.exercise_library, {})
+        return warm_up
 
+    def get_cool_down(self):
+        cool_down = CoolDown()
+        cool_down.fill_exercises(self.exercise_library, {})
+        return cool_down
+
+    def get_functional_strength(self):
+        functional_strength = FunctionalStrength()
+        functional_strength.fill_exercises(self.exercise_library, {})
+        return functional_strength

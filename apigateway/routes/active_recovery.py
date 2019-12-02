@@ -7,7 +7,7 @@ from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
 from routes.environments import is_fathom_environment
-from logic.survey_processing import create_plan, cleanup_plan
+from logic.survey_processing import create_plan, cleanup_plan, add_modality_on_demand
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
@@ -148,7 +148,7 @@ def handle_exercise_modalities_start(user_id=None):
 @app.route('/<uuid:user_id>/get_mobilize', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
-@xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
+@xray_recorder.capture('routes.active_recovery.get_mobilize')
 def handle_request_mobilize(user_id=None):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
@@ -281,24 +281,53 @@ def handle_body_part_modalities_start(user_id=None):
     return {'message': 'success'}, 200
 
 
-'''deprecated
-@app.route('/active_time', methods=['PATCH'])
+@app.route('/<uuid:user_id>/get_modality', methods=['POST'])
 @require.authenticated.any
-@require.body({'event_date': str, 'active_time': int})
-@xray_recorder.capture('routes.active_time')
-def handle_workout_active_time(principal_id=None):
-    user_id = principal_id
+@require.body({'event_date': str, 'type': int})
+@xray_recorder.capture('routes.active_recovery.get_modality')
+def handle_request_modality(user_id=None):
     event_date = parse_datetime(request.json['event_date'])
-    target_minutes = request.json['active_time']
-
+    modality_type = request.json['type']
     plan_event_day = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
-    plan = create_plan(user_id, event_date, target_minutes=target_minutes, update_stats=False, datastore_collection=datastore_collection)
+    # plan = daily_plan_datastore.get(user_id=user_id,
+    #                                 start_date=plan_event_day,
+    #                                 end_date=plan_event_day)[0]
+
+    visualizations = is_fathom_environment()
+
+    # if plan.train_later:
+    #     if len(plan.pre_active_rest) == 0:
+    #         force_data = True
+    #     elif plan.pre_active_rest[0].force_data:
+    #         force_data = True
+    #     else:
+    #         force_data = False
+    # else:
+    #     if len(plan.post_active_rest) == 0:
+    #         force_data = True
+    #     elif plan.post_active_rest[0].force_data:
+    #         force_data = True
+    #     else:
+    #         force_data = False
+
+    athlete_stats = athlete_stats_datastore.get(user_id)
+
+    # hist_update = False
+    # if athlete_stats.api_version in [None, '4_4', '4_5']:
+    #     hist_update = True
+    # if hist_update:
+    #     stats_processor = StatsProcessing(user_id,
+    #                                       event_date=event_date,
+    #                                       datastore_collection=datastore_collection)
+    #     athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats, force_historical_process=True)
+
+    plan = add_modality_on_demand(user_id, event_date, modality_type=modality_type, athlete_stats=athlete_stats,
+                                  visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 200
-'''
 
 
 def save_completed_exercises(exercise_list, user_id, event_date):

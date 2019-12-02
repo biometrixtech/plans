@@ -14,6 +14,7 @@ from models.daily_plan import DailyPlan
 from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
 from models.functional_movement_stats import FunctionalMovementSummary
+from models.functional_movement_modalities import ModalityType
 from utils import format_date, parse_datetime, parse_date
 from models.body_parts import BodyPartFactory
 import copy
@@ -71,6 +72,15 @@ class TrainingPlanManager(object):
                 else:
                     modalities.active = False
             return modalities
+
+    def move_completed_modalities(self):
+        # copy over completed ones
+        for modality in self.daily_plan.modalities:
+            if modality.completed:
+                modality.active = False
+                self.daily_plan.completed_modalities.append(modality)
+        # only retain not-completed
+        self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
     def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True):
@@ -233,11 +243,13 @@ class TrainingPlanManager(object):
                 #     self.daily_plan.heat.active = False
                 for pre_active_rest in self.daily_plan.pre_active_rest:
                     pre_active_rest.active = False
+                self.move_completed_modalities()
                 # for warm_up in self.daily_plan.warm_up:
                 #     warm_up.active = False
-
                 # create new post-training modalities
                 # self.daily_plan.cool_down = calc.get_cool_down()
+                cool_down = calc.get_cool_down()
+                self.daily_plan.modalities.append(cool_down)
                 self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
                 # self.daily_plan.ice = calc.get_ice()
                 # self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion()
@@ -263,6 +275,10 @@ class TrainingPlanManager(object):
                 for pre_active_rest in self.daily_plan.pre_active_rest:
                     if pre_active_rest.completed:
                         self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
+                self.move_completed_modalities()
+
+                warm_up = calc.get_warm_up()
+                self.daily_plan.modalities.append(warm_up)
                 # for warm_up in self.daily_plan.warm_up:
                 #     if warm_up.completed:
                 #         self.daily_plan.completed_warm_up.append(warm_up)
@@ -293,3 +309,33 @@ class TrainingPlanManager(object):
         self.injury_risk_datastore.put(athlete_injury_risk)
 
         return self.daily_plan
+
+    def add_modality(self, event_date, modality_type, athlete_stats=None):
+        self.athlete_stats = athlete_stats
+        self.load_data(format_date(event_date))
+        historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+        injury_risk_processor = InjuryRiskProcessor(event_date, [], [],
+                                                    historical_injury_risk_dict, self.athlete_stats,
+                                                    self.athlete_id)
+        consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
+        injury_risk_processor.set_relative_load_level(event_date.date())
+        calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
+                                            event_date, injury_risk_processor.relative_load_level)
+
+        self.move_completed_modalities()
+
+        modality_type = ModalityType(modality_type)
+        if modality_type == ModalityType.warm_up:
+            new_modality = calc.get_warm_up()
+        elif modality_type == ModalityType.cool_down:
+            new_modality = calc.get_cool_down()
+        elif modality_type == ModalityType.functional_strength:
+            new_modality = calc.get_functional_strength()
+        else:
+            new_modality = None
+        if new_modality is not None:
+            self.daily_plan.modalities.append(new_modality)
+            self.daily_plan_datastore.put(self.daily_plan)
+
+        return self.daily_plan
+
