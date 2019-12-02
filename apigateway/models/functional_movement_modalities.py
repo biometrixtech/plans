@@ -2,7 +2,7 @@ from serialisable import Serialisable
 from models.soreness import Soreness, Alert
 from models.soreness_base import HistoricSorenessStatus, BodyPartLocation, BodyPartSide
 from models.exercise import AssignedExercise
-from models.goal import AthleteGoalType, AthleteGoal
+from models.goal import AthleteGoalType, AthleteGoal, AthleteGoalDef
 from models.trigger import TriggerType
 from models.dosage import ExerciseDosage, DosageProgression
 from models.body_parts import BodyPartFactory, BodyPart
@@ -2719,7 +2719,7 @@ class Modality(object):
              "force_data": self.force_data,
              "goal_title": self.goal_title,  ## make dynamic based on selected routine
              "display_image": self.display_image,
-             "goal_defs": [],
+             "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
              "goals": {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()},
              "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases]
              }
@@ -2744,7 +2744,7 @@ class Modality(object):
         modality.force_data = input_dict.get('force_data', False)
         modality.goal_title = input_dict.get('goal_title', '')
         modality.display_image = input_dict.get('display_image', '')
-        modality.goal_defs = []
+        modality.goal_defs = [AthleteGoalDef.json_deserialise(agd) for agd in input_dict.get('goal_defs', [])]
         modality.goals = {}
         modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
         return modality
@@ -2758,6 +2758,7 @@ class Modality(object):
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
         pass
+
 
 class WarmUp(Modality):
     def __init__(self):
@@ -2773,6 +2774,7 @@ class WarmUp(Modality):
         exercise_list = [ex for ex in exercise_library if ex.id == str(1)]
         ex_phase.exercises['1'].exercise = exercise_list[0]
         self.exercise_phases.append(ex_phase)
+
 
 class CoolDown(Modality):
     def __init__(self):

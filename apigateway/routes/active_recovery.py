@@ -68,7 +68,6 @@ def handle_exercise_modalities_complete(user_id=None):
         else:
             save_exercises = False
 
-
     daily_plan_datastore.put(plan)
 
     if save_exercises:

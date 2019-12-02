@@ -211,13 +211,13 @@ def fake_modality():
                 "display_image": "dynamic_flexibility",
                 "goal_defs": [{
                                 "id": "1",
-                                "type": "1", 
-                                "name": "Recover from Rowing"
+                                "goal_type": 1, 
+                                "goal_name": "Recover from Rowing"
                             },
                             {
                                 "id": "2",
-                                "type": "1", 
-                                "name": "Recover from Running"
+                                "goal_type": 1, 
+                                "goal_name": "Recover from Running"
                             }],
                 "goals": {
                             "1" : {
