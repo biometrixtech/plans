@@ -59,35 +59,20 @@ def handle_exercise_modalities_complete(user_id=None):
         plan.post_active_rest_completed = True  # plan
         plan.post_active_rest[recovery_index].completed = True  # recovery
         plan.post_active_rest[recovery_index].completed_date_time = recovery_event_date
-
-    elif recovery_type == 'warm_up':
-        if recovery_index + 1 > len(plan.warm_up):
-            raise NoSuchEntityException('No warm_up found with that index')
-        plan.warm_up[recovery_index].completed_date_time = recovery_event_date
-        plan.warm_up[recovery_index].completed = True
-        if plan.warm_up[recovery_index].completed:
+    elif recovery_type in ['warm_up', 'cool_down', 'functional_strength']:
+        modalities = [m for m in self.modalities if m.type.name == recovery_type and not m.completed]
+        if len(modalities) > 0:
+            modality = modalities[0]
+            modality.completed = True
+            modality.completed_date_time = recovery_event_date
+        else:
             save_exercises = False
 
-    elif recovery_type == 'cool_down':
-        if recovery_index + 1 > len(plan.cool_down):
-            raise NoSuchEntityException('No cool down found with that index')
-        plan.cool_down[recovery_index].completed_date_time = recovery_event_date
-        plan.cool_down[recovery_index].completed = True
-        if plan.cool_down[recovery_index].completed:
-            save_exercises = False
 
     daily_plan_datastore.put(plan)
 
     if save_exercises:
         save_completed_exercises(completed_exercises, user_id, recovery_event_date)
-
-    # survey_complete = plan.daily_readiness_survey_completed()
-    # landing_screen, nav_bar_indicator = plan.define_landing_screen()
-    # plan = plan.json_serialise()
-    # plan['daily_readiness_survey_completed'] = survey_complete
-    # plan['landing_screen'] = landing_screen
-    # plan['nav_bar_indicator'] = nav_bar_indicator
-    # del plan['daily_readiness_survey'], plan['user_id']
 
     plan = cleanup_plan(plan, visualizations=visualizations)
 
@@ -130,15 +115,11 @@ def handle_exercise_modalities_start(user_id=None):
                                             endpoint=f'/athlete/{user_id}/recovery_started',
                                             body=body)
 
-    elif recovery_type == 'warm_up':
-        if recovery_index + 1 > len(plan.warm_up):
-            raise NoSuchEntityException('No warm up found with that index')
-        plan.warm_up[recovery_index].start_date_time = recovery_start_date
-
-    elif recovery_type == 'cool_down':
-        if recovery_index + 1 > len(plan.cool_down):
-            raise NoSuchEntityException('No cool down found with that index')
-        plan.cool_down[recovery_index].start_date_time = recovery_start_date
+    elif recovery_type in ['warm_up', 'cool_down', 'functional_strength']:
+        modalities = [m for m in self.modalities if m.type.name == recovery_type and not m.completed]
+        if len(modalities) > 0:
+            modality = modalities[0]
+            modality.start_date_time = recovery_start_date
 
     daily_plan_datastore.put(plan)
 
