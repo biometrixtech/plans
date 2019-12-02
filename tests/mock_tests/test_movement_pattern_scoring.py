@@ -1,4 +1,4 @@
-from logic.scoring_processor import ScoringProcessor
+from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
 from models.scoring import MovementVariableScores
 import movement_pattern_history as mph
 from models.functional_movement import MovementPatterns
@@ -28,7 +28,7 @@ def get_run_a_sessions():
 
     history, session_details = mph.run_a_regressions()
     days = len(history)
-    base_date_time = datetime.now()
+    base_date_time = datetime.now() - timedelta(days=len(history)-1)
 
     for i in range(days):
         if history[i] is not None:
@@ -50,7 +50,7 @@ def get_run_a_sessions():
             hip_rotation = HipRotation(7,9)
             hip_rotation.percent_events_asymmetric = 91
             asymmetry.hip_rotation = hip_rotation
-            session = get_session(base_date_time - timedelta(days=i), 5)
+            session = get_session(base_date_time + timedelta(days=i), 5)
             session.asymmetry = asymmetry
             session.movement_patterns = movement_patterns
             session_list.append(session)
@@ -93,5 +93,13 @@ def test_biomechanics_summary_chart():
     chart.add_sessions(sessions)
 
     json_data = chart.json_serialise()
+
+    scoring_summary_proc = ScoringSummaryProcessor()
+
+    base_date = datetime.now().date()
+
+    recovery_quality = scoring_summary_proc.get_recovery_quality(chart.sessions, base_date)
+
+    recovery_quality_json = recovery_quality.json_serialise()
 
     k=0
