@@ -3,11 +3,12 @@ from utils import parse_date
 # import models.session as session
 from models.session import Session
 from models.daily_readiness import DailyReadiness
-from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
+from models.modalities import IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
 from models.insights import AthleteInsight
 from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
 from models.soreness import Soreness
+from models.functional_movement_modalities import Modality, ActiveRestBeforeTraining, ActiveRestAfterTraining, ModalityTypeDisplay
 
 
 class DailyPlan(Serialisable):
@@ -41,6 +42,9 @@ class DailyPlan(Serialisable):
         self.insights = []
         self.trends = None
         self.symptoms = []
+        self.modalities = []
+        self.completed_modalities = []
+        self.modalities_available_on_demand = []
 
     def get_id(self):
         return self.user_id
@@ -83,7 +87,11 @@ class DailyPlan(Serialisable):
                'insights': [insight.json_serialise() for insight in self.insights],
                'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
                'symptoms': [soreness.json_serialise() for soreness in self.symptoms],
-               'modalities': fake_modality()
+               'modalities': [m.json_serialise() for m in self.modalities],
+               # 'completed_modalities': [m.json_serialise() for m in self.completed_modalities],
+               'modalities_available_on_demand': [{'type': 2, 'name': 'Warm Up'}],
+               # 'modalities_available_on_demand': self.modalities_available_on_demand
+               'completed_modalities': fake_modality()
                }
 
         return ret
@@ -110,6 +118,9 @@ class DailyPlan(Serialisable):
             daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
             daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
             daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
+            daily_plan.modalities = [Modality.json_deserialise(m) for m in input_dict.get('modalities', '')]
+            daily_plan.completed_modalities = [Modality.json_deserialise(m) for m in input_dict.get('completed_modalities', '')]
+            daily_plan.modalities_available_on_demand = [ModalityTypeDisplay.json_deserialise(md) for md in input_dict.get('modalities_available_on_demand', [])]
         # daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(input_dict.get('daily_readiness_survey', None), daily_plan.user_id) # note that this deserialisation is still done in the datastore
         daily_plan.last_updated = input_dict.get('last_updated', None)
         daily_plan.pre_active_rest_completed = input_dict.get('pre_active_rest_completed', False)
@@ -185,9 +196,10 @@ class DailyPlan(Serialisable):
 def fake_modality():
     return [
             {
-                "type": 0,
+                "type": 3,
                 "title": "Cool Down",
                 "when": "Immediately After Workout",
+                "when_card": "Immediately After Workout",
                 "start_date_time" : None,
                 "completed_date_time" : None,
                 "event_date_time" : "2019-05-08T00:00:00Z",
@@ -195,7 +207,8 @@ def fake_modality():
                 "active" : True,
                 "default_plan": "Complete",
                 "force_data": False,
-                "goal_title": "Complete Routine to reduce effects of:", 
+                "goal_title": " routine to:",  ## make dynamic based on selected routine
+                "display_image": "dynamic_flexibility",
                 "goal_defs": [{
                                 "id": "1",
                                 "type": "1", 

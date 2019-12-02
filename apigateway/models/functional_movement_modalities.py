@@ -8,9 +8,44 @@ from models.dosage import ExerciseDosage, DosageProgression
 from models.body_parts import BodyPartFactory, BodyPart
 from models.sport import SportName
 from models.movement_errors import MovementErrorType, MovementError, MovementErrorFactory
+from models.exercise_phase import ExercisePhase
 from utils import parse_datetime, format_datetime
 import abc
 import datetime
+from enum import Enum
+
+
+class ModalityType(Enum):
+    pre_active_rest = 0
+    post_active_rest = 1
+    warm_up = 2
+    cool_down = 3
+    functional_strength = 4
+
+    def get_display_name(self):
+        display_names = {
+            0: 'Mobilize',
+            1: 'Mobilize',
+            2: 'Warm Up',
+            3: 'Cool Down',
+            4: 'Functional Strength'
+            }
+        return display_names[self.value]
+
+class ModalityTypeDisplay(object):
+    def __init__(self, modality_type):
+        self.type = modality_type
+        self.name = ModalityType.get_display_name(self.type)
+
+    def json_serialise(self):
+        return {
+            "type": self.type.value,
+            "name": self.name
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        return cls(ModalityType(input_dict['type']))
 
 
 class ModalityGoal(Serialisable):
@@ -2510,8 +2545,6 @@ class ActiveRestAfterTraining(ActiveRest, Serialisable):
         #                    self.static_integrate_exercises])
 
 
-
-
 class IceSession(Serialisable):
     def __init__(self, minutes=0):
         self.minutes = minutes
@@ -2650,3 +2683,120 @@ class ColdWaterImmersion(Serialisable):
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
         super().__setattr__(name, value)
+
+
+class Modality(object):
+    def __init__(self, modality_type):
+        self.type = modality_type
+        self.title = ""
+        self.when = ""
+        self.when_card = ""
+        self.start_date_time = None
+        self.completed_date_time = None
+        self.event_date_time = None
+        self.completed = False
+        self.active = True
+        self.default_plan = "Complete"
+        self.force_data = False
+        self.goal_title = ""
+        self.display_image = ""
+        self.goal_defs = []
+        self.goals = {}
+        self.exercise_phases = []
+
+    def json_serialise(self):
+         return {
+             "type": self.type.value,
+             "title": self.title,
+             "when": self.when,
+             "when_card": self.when_card,
+             "start_date_time": format_datetime(self.start_date_time) if self.start_date_time is not None else None,
+             "completed_date_time": format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
+             "event_date_time": format_datetime(self.event_date_time) if self.event_date_time is not None else None,
+             "completed" : self.completed,
+             "active" : self.active,
+             "default_plan": self.default_plan,
+             "force_data": self.force_data,
+             "goal_title": self.goal_title,  ## make dynamic based on selected routine
+             "display_image": self.display_image,
+             "goal_defs": [],
+             "goals": {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()},
+             "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases]
+             }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        modality_type = ModalityType(input_dict["type"])
+        if modality_type == ModalityType.warm_up:
+            modality = WarmUp()
+        elif modality_type == ModalityType.cool_down:
+            modality = CoolDown()
+        elif modality_type == ModalityType.functional_strength:
+            modality = FunctionalStrength()
+        else:
+            raise ValueError("Unknown modality type")
+        modality.start_date_time = input_dict.get('start_date_time', None)
+        modality.completed_date_time = input_dict.get('completed_date_time', None)
+        modality.event_date_time = input_dict.get('event_date_time', None)
+        modality.completed = input_dict.get('completed', False)
+        modality.active = input_dict.get('active', True)
+        modality.default_plan = input_dict.get('default_plan', 'Complete')
+        modality.force_data = input_dict.get('force_data', False)
+        modality.goal_title = input_dict.get('goal_title', '')
+        modality.display_image = input_dict.get('display_image', '')
+        modality.goal_defs = []
+        modality.goals = {}
+        modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
+        return modality
+
+    def __setattr__(self, name, value):
+        if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_datetime(value)
+        super().__setattr__(name, value)
+
+    @abc.abstractmethod
+    def fill_exercises(self, exercise_library, injury_risk_dict):
+        pass
+
+class WarmUp(Modality):
+    def __init__(self):
+        super().__init__(ModalityType.warm_up)
+        self.title = "WARM UP"
+        self.when = "before training"
+        self.when_card = "before training"
+
+    @abc.abstractmethod
+    def fill_exercises(self, exercise_library, injury_risk_dict):
+        ex_phase = ExercisePhase(0)
+        ex_phase.exercises['1'] = AssignedExercise(library_id=str(1))
+        exercise_list = [ex for ex in exercise_library if ex.id == str(1)]
+        ex_phase.exercises['1'].exercise = exercise_list[0]
+        self.exercise_phases.append(ex_phase)
+
+class CoolDown(Modality):
+    def __init__(self):
+        super().__init__(ModalityType.cool_down)
+        self.title = "COOL DOWN"
+        self.when = "after training"
+        self.when_card = "after training"
+
+    @abc.abstractmethod
+    def fill_exercises(self, exercise_library, injury_risk_dict):
+        ex_phase = ExercisePhase(0)
+        ex_phase.exercises['1'] = AssignedExercise(library_id=str(1))
+        exercise_list = [ex for ex in exercise_library if ex.id == str(1)]
+        ex_phase.exercises['1'].exercise = exercise_list[0]
+        self.exercise_phases.append(ex_phase)
+
+
+class FunctionalStrength(Modality):
+    def __init__(self):
+        super().__init__(ModalityType.functional_strength)
+        self.title = "FUNCTIONAL STRENGTH"
+        self.when = "anytime"
+        self.when_card = "anytime"
+
+    @abc.abstractmethod
+    def fill_exercises(self, exercise_library, injury_risk_dict):
+        pass

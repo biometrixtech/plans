@@ -427,6 +427,14 @@ def cleanup_plan(plan, visualizations=True):
     return plan
 
 
+def add_modality_on_demand(user_id, event_date, modality_type, athlete_stats=None, visualizations=True):
+    plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
+    plan = plan_manager.add_modality(event_date, modality_type, athlete_stats=athlete_stats)
+    plan = cleanup_plan(plan, visualizations)
+
+    return plan
+
+
 def add_hk_data_to_sessions(training_sessions, new_sessions):
     for session in new_sessions:
         session_found = False
