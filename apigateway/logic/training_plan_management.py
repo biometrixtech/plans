@@ -1,22 +1,19 @@
-import datetime
+# import datetime
 
 from fathomapi.utils.xray import xray_recorder
-# import logic.exercise_mapping as exercise_mapping
-#from logic.trend_processing import TrendProcessor
 from logic.functional_trend_processing import TrendProcessor
 from logic.soreness_processing import SorenessCalculator
-from logic.alerts_processing import AlertsProcessing
-from logic.trigger_processing import TriggerFactory
+# from logic.trigger_processing import TriggerFactory
 
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from models.daily_plan import DailyPlan
 from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
-from models.functional_movement_stats import FunctionalMovementSummary
+# from models.functional_movement_stats import FunctionalMovementSummary
 from models.functional_movement_modalities import ModalityType
 from utils import format_date, parse_datetime, parse_date
-from models.body_parts import BodyPartFactory
+# from models.body_parts import BodyPartFactory
 import copy
 
 
@@ -98,10 +95,10 @@ class TrainingPlanManager(object):
         historic_soreness = []
 
         self.soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
-                                                                               self.post_session_surveys,
-                                                                               self.trigger_date_time,
-                                                                               historic_soreness,
-                                                                               self.symptoms)
+                                                                                    self.post_session_surveys,
+                                                                                    self.trigger_date_time,
+                                                                                    historic_soreness,
+                                                                                    self.symptoms)
 
         # trigger_factory = TriggerFactory(parse_date(event_date), self.athlete_stats, self.soreness_list, self.training_sessions)
         # trigger_factory.load_triggers()
@@ -207,14 +204,8 @@ class TrainingPlanManager(object):
                 self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
                 self.athlete_stats.insight_categories = trend_processor.athlete_insight_categories
 
-            # calc = exercise_mapping.ExerciseAssignmentCalculator(trigger_factory, self.exercise_library_datastore,
-            #                                                      self.completed_exercise_datastore,
-            #                                                      self.training_sessions, self.soreness_list,
-            #                                                      parse_date(event_date), historic_soreness)
-
         calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
                                             date, injury_risk_processor.relative_load_level)
-
 
         # new modalities
         if not self.daily_plan.train_later:
@@ -227,9 +218,7 @@ class TrainingPlanManager(object):
                 self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
             else:
                 # if any completed post-training modalities exist, preserve them
-                # for cool_down in self.daily_plan.cool_down:
-                #     if cool_down.completed:
-                #         self.daily_plan.completed_cool_down.append(cool_down)
+
                 for post_active_rest in self.daily_plan.post_active_rest:
                     if post_active_rest.completed:
                         self.daily_plan.completed_post_active_rest.append(post_active_rest)
@@ -241,15 +230,13 @@ class TrainingPlanManager(object):
                 # make pre-training modalities inactive
                 # if self.daily_plan.heat is not None:
                 #     self.daily_plan.heat.active = False
+
                 for pre_active_rest in self.daily_plan.pre_active_rest:
                     pre_active_rest.active = False
                 self.move_completed_modalities()
-                # for warm_up in self.daily_plan.warm_up:
-                #     warm_up.active = False
-                # create new post-training modalities
-                # self.daily_plan.cool_down = calc.get_cool_down()
                 cool_down = calc.get_cool_down()
                 self.daily_plan.modalities.append(cool_down)
+
                 self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
                 # self.daily_plan.ice = calc.get_ice()
                 # self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion()
@@ -265,35 +252,26 @@ class TrainingPlanManager(object):
                 self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
             else:
                 # if any post-training modalities are present and complete, preserve the completed ones
-                # self.daily_plan.cool_down = self.preserve_completed_modality(self.daily_plan.cool_down)
                 self.daily_plan.post_active_rest = self.preserve_completed_modality(self.daily_plan.post_active_rest)
                 # self.daily_plan.ice = self.preserve_completed_modality(self.daily_plan.ice)
                 # self.daily_plan.cold_water_immersion = self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
+
                 # if any completed pre-training modalities exist, preserve them
                 # if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
                 #     self.daily_plan.completed_heat.append(self.daily_plan.heat)
                 for pre_active_rest in self.daily_plan.pre_active_rest:
                     if pre_active_rest.completed:
                         self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
-                self.move_completed_modalities()
+                # self.move_completed_modalities()
 
-                warm_up = calc.get_warm_up()
-                self.daily_plan.modalities.append(warm_up)
-                # for warm_up in self.daily_plan.warm_up:
-                #     if warm_up.completed:
-                #         self.daily_plan.completed_warm_up.append(warm_up)
+                # warm_up = calc.get_warm_up()
+                # self.daily_plan.modalities.append(warm_up)
+
                 # create new pre-training modalities
                 # self.daily_plan.heat = calc.get_heat()
                 self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
-                # self.daily_plan.warm_up = calc.get_warm_up(athlete_stats, soreness_list, parse_date(event_date))
 
         self.daily_plan.last_updated = last_updated
-        # alerts = self.daily_plan.get_alerts()
-        # alerts.extend(calc.generate_alerts())
-        # alerts_processing = AlertsProcessing(daily_plan=self.daily_plan,
-        #                                      athlete_stats=self.athlete_stats,
-        #                                      trigger_date_time=self.trigger_date_time,)
-        # alerts_processing.aggregate_alerts(alerts=alerts)
         if visualizations:
             self.daily_plan.trends = AthleteTrends()
             self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories

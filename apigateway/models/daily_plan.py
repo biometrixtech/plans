@@ -87,11 +87,11 @@ class DailyPlan(Serialisable):
                'insights': [insight.json_serialise() for insight in self.insights],
                'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
                'symptoms': [soreness.json_serialise() for soreness in self.symptoms],
-               'modalities': [m.json_serialise() for m in self.modalities],
-               # 'completed_modalities': [m.json_serialise() for m in self.completed_modalities],
-               'modalities_available_on_demand': [{'type': 2, 'name': 'Warm Up'}],
-               # 'modalities_available_on_demand': self.modalities_available_on_demand
-               'completed_modalities': fake_modality()
+               # 'modalities': [m.json_serialise() for m in self.modalities],
+               'modalities': fake_modality(),
+               'completed_modalities': [m.json_serialise() for m in self.completed_modalities],
+               # 'modalities_available_on_demand': self.modalities_available_on_demand,
+               'modalities_available_on_demand': [{'type': 2, 'name': 'Warm Up'}]
                }
 
         return ret
@@ -148,6 +148,9 @@ class DailyPlan(Serialisable):
             return 1.0, None
         else:
             return 0.0, None
+
+    def define_available_modalities(self):
+        pass
 
     def get_past_sessions(self, trigger_date_time):
 
