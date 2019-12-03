@@ -83,7 +83,7 @@ class DosageDuration(object):
 class Modality(object):
     def __init__(self, event_date_time, modality_type, relative_load_level=3):
         self.type = modality_type
-        self.title = ""
+        self.title = self.type.get_display_name().upper()
         self.when = ""
         self.when_card = ""
         self.start_date_time = None
@@ -1344,7 +1344,6 @@ class ActiveRestBeforeTraining(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.active_stretch),
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
                                 ExercisePhase(ExercisePhaseType.static_integrate)]
-        self.title = "MOBILIZE"
         self.when = "before training"
         self.when_card = "before training"
 
@@ -1872,7 +1871,6 @@ class ActiveRestAfterTraining(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
                                 ExercisePhase(ExercisePhaseType.static_integrate)]
-        self.title = "MOBILIZE"
         self.when = "after training"
         self.when_card = "after training"
 
@@ -2368,7 +2366,6 @@ class ActiveRestAfterTraining(ActiveRest):
 class WarmUp(Modality):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ModalityType.warm_up)
-        self.title = "WARM UP"
         self.when = "before training"
         self.when_card = "before training"
 
@@ -2384,7 +2381,6 @@ class WarmUp(Modality):
 class CoolDown(Modality):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ModalityType.cool_down)
-        self.title = "COOL DOWN"
         self.when = "after training"
         self.when_card = "after training"
 
@@ -2400,7 +2396,6 @@ class CoolDown(Modality):
 class FunctionalStrength(Modality):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ModalityType.functional_strength)
-        self.title = "FUNCTIONAL STRENGTH"
         self.when = "anytime"
         self.when_card = "anytime"
 
