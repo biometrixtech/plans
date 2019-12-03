@@ -420,6 +420,7 @@ def process_stats(user_id, event_date, athlete_stats, hist_update):
 def cleanup_plan(plan, visualizations=True):
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
+    plan.define_available_modalities()
 
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
