@@ -90,7 +90,7 @@ class TrainingPlanManager(object):
         #     historic_soreness = []
         # else:
         #     historic_soreness = copy.deepcopy([hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()])
-            # historic_soreness_present = len(historic_soreness) > 0
+        #     historic_soreness_present = len(historic_soreness) > 0
         historic_soreness = []
 
         self.soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
@@ -308,7 +308,7 @@ class TrainingPlanManager(object):
 
         return self.daily_plan
 
-    def add_modality(self, event_date, modality_type, athlete_stats=None):
+    def add_modality(self, event_date, modality_type, athlete_stats=None, force_data=False):
         self.athlete_stats = athlete_stats
         self.load_data(format_date(event_date))
         historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
@@ -323,7 +323,11 @@ class TrainingPlanManager(object):
         self.move_completed_modalities()
 
         modality_type = ModalityType(modality_type)
-        if modality_type == ModalityType.warm_up:
+        if modality_type == ModalityType.pre_active_rest:
+            new_modality = calc.get_pre_active_rest(force_data)
+        elif modality_type == ModalityType.post_active_rest:
+            new_modality = calc.get_post_active_rest(force_data)
+        elif modality_type == ModalityType.warm_up:
             new_modality = calc.get_warm_up()
         elif modality_type == ModalityType.cool_down:
             new_modality = calc.get_cool_down()
@@ -336,4 +340,3 @@ class TrainingPlanManager(object):
             self.daily_plan_datastore.put(self.daily_plan)
 
         return self.daily_plan
-
