@@ -8,7 +8,8 @@ from models.insights import AthleteInsight
 from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
 from models.soreness import Soreness
-from models.functional_movement_modalities import Modality, ActiveRestBeforeTraining, ActiveRestAfterTraining, ModalityTypeDisplay
+from models.modality import Modality, ModalityTypeDisplay
+from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining
 
 
 class DailyPlan(Serialisable):
@@ -87,8 +88,8 @@ class DailyPlan(Serialisable):
                'insights': [insight.json_serialise() for insight in self.insights],
                'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
                'symptoms': [soreness.json_serialise() for soreness in self.symptoms],
-               # 'modalities': [m.json_serialise() for m in self.modalities],
-               'modalities': fake_modality(),
+               'modalities': [m.json_serialise() for m in self.modalities],
+               # 'modalities': fake_modality(),
                'completed_modalities': [m.json_serialise() for m in self.completed_modalities],
                # 'modalities_available_on_demand': self.modalities_available_on_demand,
                'modalities_available_on_demand': [{'type': 2, 'name': 'Warm Up'}]
@@ -118,8 +119,8 @@ class DailyPlan(Serialisable):
             daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
             daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
             daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
-            daily_plan.modalities = [Modality.json_deserialise(m) for m in input_dict.get('modalities', '')]
-            daily_plan.completed_modalities = [Modality.json_deserialise(m) for m in input_dict.get('completed_modalities', '')]
+            daily_plan.modalities = [Modality.json_deserialise(m) for m in input_dict.get('modalities', [])]
+            daily_plan.completed_modalities = [Modality.json_deserialise(m) for m in input_dict.get('completed_modalities', [])]
             daily_plan.modalities_available_on_demand = [ModalityTypeDisplay.json_deserialise(md) for md in input_dict.get('modalities_available_on_demand', [])]
         # daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(input_dict.get('daily_readiness_survey', None), daily_plan.user_id) # note that this deserialisation is still done in the datastore
         daily_plan.last_updated = input_dict.get('last_updated', None)

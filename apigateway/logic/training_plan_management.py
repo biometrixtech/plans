@@ -74,7 +74,6 @@ class TrainingPlanManager(object):
         # copy over completed ones
         for modality in self.daily_plan.modalities:
             if modality.completed:
-                modality.active = False
                 self.daily_plan.completed_modalities.append(modality)
         # only retain not-completed
         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
@@ -208,20 +207,24 @@ class TrainingPlanManager(object):
                                             date, injury_risk_processor.relative_load_level)
 
         # new modalities
+        self.move_completed_modalities()
         if not self.daily_plan.train_later:
             if mobilize_only:
                 # if any completed post_active rest exists, preserve it
-                for post_active_rest in self.daily_plan.post_active_rest:
-                    if post_active_rest.completed:
-                        self.daily_plan.completed_post_active_rest.append(post_active_rest)
+                # for post_active_rest in self.daily_plan.post_active_rest:
+                #     if post_active_rest.completed:
+                #         self.daily_plan.completed_post_active_rest.append(post_active_rest)
                 # create a new post active rest
-                self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
+                # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
+
+                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+                post_active_rests = calc.get_post_active_rest(force_data)
+                self.daily_plan.modalities.extend(post_active_rests)
             else:
                 # if any completed post-training modalities exist, preserve them
-
-                for post_active_rest in self.daily_plan.post_active_rest:
-                    if post_active_rest.completed:
-                        self.daily_plan.completed_post_active_rest.append(post_active_rest)
+                # for post_active_rest in self.daily_plan.post_active_rest:
+                #     if post_active_rest.completed:
+                #         self.daily_plan.completed_post_active_rest.append(post_active_rest)
                 # if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
                 #     self.daily_plan.completed_ice.append(self.daily_plan.ice)
                 # if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
@@ -230,14 +233,21 @@ class TrainingPlanManager(object):
                 # make pre-training modalities inactive
                 # if self.daily_plan.heat is not None:
                 #     self.daily_plan.heat.active = False
-
-                for pre_active_rest in self.daily_plan.pre_active_rest:
+                pre_active_rests = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.pre_active_rest.value]
+                for pre_active_rest in pre_active_rests:
                     pre_active_rest.active = False
-                self.move_completed_modalities()
-                cool_down = calc.get_cool_down()
-                self.daily_plan.modalities.append(cool_down)
 
-                self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
+                # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.cool_down.value]
+                # cool_down = calc.get_cool_down()
+                # self.daily_plan.modalities.append(cool_down)
+
+                # remove existing post active rest
+                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+                # create new post active rest
+                post_active_rests = calc.get_post_active_rest(force_data)
+                self.daily_plan.modalities.extend(post_active_rests)
+
+                # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
                 # self.daily_plan.ice = calc.get_ice()
                 # self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion()
                 # if self.daily_plan.cold_water_immersion is not None:
@@ -245,31 +255,41 @@ class TrainingPlanManager(object):
         else:
             if mobilize_only:
                 # if any completed pre active rest is present, preserve it
-                for pre_active_rest in self.daily_plan.pre_active_rest:
-                    if pre_active_rest.completed:
-                        self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
+                # for pre_active_rest in self.daily_plan.pre_active_rest:
+                #     if pre_active_rest.completed:
+                #         self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
                 # create new pre active rest
-                self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
+                # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
+                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
+                pre_active_rests = calc.get_pre_active_rest(force_data)
+                self.daily_plan.modalities.extend(pre_active_rests)
+
             else:
                 # if any post-training modalities are present and complete, preserve the completed ones
-                self.daily_plan.post_active_rest = self.preserve_completed_modality(self.daily_plan.post_active_rest)
+                # self.daily_plan.post_active_rest = self.preserve_completed_modality(self.daily_plan.post_active_rest)
                 # self.daily_plan.ice = self.preserve_completed_modality(self.daily_plan.ice)
                 # self.daily_plan.cold_water_immersion = self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
 
                 # if any completed pre-training modalities exist, preserve them
                 # if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
                 #     self.daily_plan.completed_heat.append(self.daily_plan.heat)
-                for pre_active_rest in self.daily_plan.pre_active_rest:
-                    if pre_active_rest.completed:
-                        self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
-                # self.move_completed_modalities()
+                # for pre_active_rest in self.daily_plan.pre_active_rest:
+                #     if pre_active_rest.completed:
+                #         self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
 
+                # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.warm_up.value]
                 # warm_up = calc.get_warm_up()
                 # self.daily_plan.modalities.append(warm_up)
 
                 # create new pre-training modalities
                 # self.daily_plan.heat = calc.get_heat()
-                self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
+                # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
+
+                # remove existing pre_active rest
+                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
+                # get new pre active rest
+                pre_active_rests = calc.get_pre_active_rest(force_data)
+                self.daily_plan.modalities.extend(pre_active_rests)
 
         self.daily_plan.last_updated = last_updated
         if visualizations:

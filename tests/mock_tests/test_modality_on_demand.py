@@ -9,6 +9,7 @@ import datetime
 from survey_processing import add_modality_on_demand
 from models.stats import AthleteStats
 from models.functional_movement_modalities import ModalityType
+from models.modality import Modality
 
 def test_get_warm_up():
     user_id = 'templated_modality_test'
