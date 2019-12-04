@@ -1,5 +1,6 @@
 from serialisable import Serialisable
 from models.styles import LegendColor, BoldText
+from utils import format_date
 
 
 class MovementVariableScore(Serialisable):
@@ -46,6 +47,38 @@ class MovementVariableScores(object):
         self.movement_dysfunction_score = MovementVariableScore()
         self.fatigue_score = MovementVariableScore()
         self.overall_score = MovementVariableScore()
+
+
+class RecoveryQuality(Serialisable):
+    def __init__(self):
+        self.date = None
+        self.score = MovementVariableScore()
+        self.change = MovementVariableScore()
+        self.summary_text = DataCardSummaryText()
+        self.active = False
+
+    def json_serialise(self):
+        ret = {
+            'date': format_date(self.date) if self.date is not None else None,
+            'score': self.score.json_serialise() if self.score is not None else None,
+            'change': self.change.json_serialise() if self.change is not None else None,
+            'summary_text': self.summary_text.json_serialise() if self.summary_text is not None else None,
+            'active': self.active
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.active = input_dict.get('active', False)
+        data.date = input_dict.get('date')
+        data.score = MovementVariableScore.json_deserialise(input_dict['score']) if input_dict.get('score') is not None else None,
+        data.change = MovementVariableScore.json_deserialise(input_dict['change']) if input_dict.get(
+            'change') is not None else None,
+        data.summary_text = DataCardSummaryText.json_deserialise(input_dict['summary_text']) if input_dict.get(
+            'summary_text') is not None else None
+
+        return data
 
 
 class SessionScoringSummary(object):
@@ -176,6 +209,7 @@ class MovementVariableSummaryText(Serialisable):
         data.active = input_dict.get('active', False)
 
         return data
+
 
 class DataCard(Serialisable):
     def __init__(self):

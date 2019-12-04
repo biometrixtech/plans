@@ -261,9 +261,8 @@ class BiomechanicsSummaryChart(Serialisable):
         for f in filtered_list:
             chart_data = BiomechanicsSummaryChartData()
             chart_data.add_session_data(f)
-
             self.sessions.append(chart_data)
-        self.sessions = self.sessions[:7]
+
         self.sessions = sorted(self.sessions, key=lambda x:x.event_date_time, reverse=False)
 
     def json_serialise(self):
