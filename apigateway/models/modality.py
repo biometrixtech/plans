@@ -122,8 +122,8 @@ class Modality(object):
              "force_data": self.force_data,
              "goal_title": self.goal_title,  ## make dynamic based on selected routine
              "display_image": self.display_image,
-             "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
-             "goals": {str(goal_type.value): goal.json_serialise() for (goal_type, goal) in self.goals.items()},
+             # "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
+             "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
              "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases]
              }
 
@@ -153,8 +153,9 @@ class Modality(object):
         modality.force_data = input_dict.get('force_data', False)
         modality.goal_title = input_dict.get('goal_title', '')
         modality.display_image = input_dict.get('display_image', '')
-        modality.goal_defs = [AthleteGoalDef.json_deserialise(agd) for agd in input_dict.get('goal_defs', [])]
-        modality.goals = {}
+        # modality.goal_defs = [AthleteGoalDef.json_deserialise(agd) for agd in input_dict.get('goal_defs', [])]
+        modality.goals = {goal_type: ModalityGoal.json_deserialise(goal) for
+                                 (goal_type, goal) in input_dict.get('goals', {}).items()}
         modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
         return modality
 
@@ -259,30 +260,30 @@ class Modality(object):
     def add_goals(self, dosages):
 
         for dosage in dosages:
-            if dosage.goal.goal_type not in self.goals:
+            if dosage.goal.text not in self.goals:
                 if ((dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned > 0) or
                         (dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned > 0) or
                         (dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0)):
-                    self.goals[dosage.goal.goal_type] = ModalityGoal()
+                    self.goals[dosage.goal.text] = ModalityGoal()
 
     def update_goals(self, dosage):
 
-        if dosage.goal.goal_type not in self.goals:
+        if dosage.goal.text not in self.goals:
             if ((dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned > 0) or
                     (dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned > 0) or
                     (dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0)):
-                self.goals[dosage.goal.goal_type] = ModalityGoal()
+                self.goals[dosage.goal.text] = ModalityGoal()
 
-        # self.goals[dosage.goal.goal_type].efficient_active = False
-        # self.goals[dosage.goal.goal_type].complete_active = False
-        # self.goals[dosage.goal.goal_type].comprehensive_active = False
+        # self.goals[dosage.goal.text].efficient_active = False
+        # self.goals[dosage.goal.text].complete_active = False
+        # self.goals[dosage.goal.text].comprehensive_active = False
 
         if dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned > 0:
-            self.goals[dosage.goal.goal_type].efficient_active = True
+            self.goals[dosage.goal.text].efficient_active = True
         if dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned > 0:
-            self.goals[dosage.goal.goal_type].complete_active = True
+            self.goals[dosage.goal.text].complete_active = True
         if dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0:
-            self.goals[dosage.goal.goal_type].comprehensive_active = True
+            self.goals[dosage.goal.text].comprehensive_active = True
 
     def set_plan_dosage(self):
 

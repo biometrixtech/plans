@@ -213,23 +213,13 @@ def fake_modality():
                 "force_data": False,
                 "goal_title": " routine to:",  ## make dynamic based on selected routine
                 "display_image": "dynamic_flexibility",
-                "goal_defs": [{
-                                "id": "1",
-                                "goal_type": 1, 
-                                "goal_name": "Recover from Rowing"
-                            },
-                            {
-                                "id": "2",
-                                "goal_type": 1, 
-                                "goal_name": "Recover from Running"
-                            }],
                 "goals": {
-                            "1" : {
+                            "Recover from Rowing" : {
                                 "efficient_active" : True,
                                 "complete_active" : True,
                                 "comprehensive_active" : True
                             },
-                            "2" : {
+                            "Recover from Running" : {
                                 "efficient_active" : False,
                                 "complete_active" : False,
                                 "comprehensive_active" : False
