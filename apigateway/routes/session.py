@@ -374,6 +374,7 @@ def handle_session_three_sensor_data(user_id):
     if athlete_stats is not None:
         timezone = athlete_stats.timezone
     else:
+        athlete_stats = AthleteStats(user_id)
         timezone = '-04:00'
     event_date = parse_datetime(request.json['event_date'])
     event_date = get_local_time(event_date, timezone)
@@ -432,6 +433,11 @@ def handle_session_three_sensor_data(user_id):
         # add to plans and store plan
         plan.training_sessions.append(session_obj)
 
+    # if this is the first time user has submitted three sensor session, update flag in stats
+    if not athlete_stats.three_sensor_enabled:
+        athlete_stats.three_sensor_enabled = True
+        athlete_stats.event_date = event_date
+        athlete_stats_datastore.put(athlete_stats)
     daily_plan_datastore.put(plan)
 
     return {'message': 'success'}
