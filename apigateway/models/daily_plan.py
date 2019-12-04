@@ -8,7 +8,7 @@ from models.insights import AthleteInsight
 from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
 from models.soreness import Soreness
-from models.modality import Modality, ModalityTypeDisplay
+from models.modality import Modality, ModalityTypeDisplay, ModalityType
 from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining
 
 
@@ -91,8 +91,8 @@ class DailyPlan(Serialisable):
                'modalities': [m.json_serialise() for m in self.modalities],
                # 'modalities': fake_modality(),
                'completed_modalities': [m.json_serialise() for m in self.completed_modalities],
-               # 'modalities_available_on_demand': self.modalities_available_on_demand,
-               'modalities_available_on_demand': [{'type': 2, 'name': 'Warm Up'}]
+               'modalities_available_on_demand': [m.json_serialise() for m in self.modalities_available_on_demand]
+               # 'modalities_available_on_demand': [{'type': 2, 'name': 'Warm Up'}]
                }
 
         return ret
@@ -151,7 +151,22 @@ class DailyPlan(Serialisable):
             return 0.0, None
 
     def define_available_modalities(self):
-        pass
+        self.modalities_available_on_demand = []
+        if not self.train_later:
+            post_active_rest_available = True
+            for m in self.modalities:
+                if m.type.value == 1 and not m.completed:
+                    post_active_rest_available = False
+            if post_active_rest_available:
+                self.modalities_available_on_demand = [ModalityTypeDisplay(ModalityType(1))]
+        else:
+            pre_active_rest_available = True
+            for m in self.modalities:
+                if m.type.value == 1 and not m.completed:
+                    pre_active_rest_available = False
+            if pre_active_rest_available:
+                self.modalities_available_on_demand = [ModalityTypeDisplay(ModalityType(0))]
+
 
     def get_past_sessions(self, trigger_date_time):
 

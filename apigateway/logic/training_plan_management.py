@@ -296,6 +296,7 @@ class TrainingPlanManager(object):
                 # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
 
         self.daily_plan.last_updated = last_updated
+        self.daily_plan.define_available_modalities()
         if visualizations:
             self.daily_plan.trends = AthleteTrends()
             self.daily_plan.trends.trend_categories = trend_processor.athlete_trend_categories
@@ -342,6 +343,7 @@ class TrainingPlanManager(object):
         if new_modality is not None:
             self.daily_plan.modalities.extend(new_modality)
             self.daily_plan.last_updated = event_date
+
             self.daily_plan_datastore.put(self.daily_plan)
 
         return self.daily_plan
