@@ -203,8 +203,9 @@ class TrainingPlanManager(object):
                 self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
                 self.athlete_stats.insight_categories = trend_processor.athlete_insight_categories
 
+        modality_date_time = self.trigger_date_time or date
         calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
-                                            date, injury_risk_processor.relative_load_level)
+                                            modality_date_time, injury_risk_processor.relative_load_level)
 
         # new modalities
         self.move_completed_modalities()
@@ -239,7 +240,7 @@ class TrainingPlanManager(object):
 
                 # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.cool_down.value]
                 # cool_down = calc.get_cool_down()
-                # self.daily_plan.modalities.append(cool_down)
+                # self.daily_plan.modalities.extend(cool_down)
 
                 # remove existing post active rest
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
@@ -289,7 +290,7 @@ class TrainingPlanManager(object):
                 # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.warm_up.value]
                 # get new warm_up
                 # warm_up = calc.get_warm_up()
-                # self.daily_plan.modalities.append(warm_up)
+                # self.daily_plan.modalities.extend(warm_up)
 
                 # self.daily_plan.heat = calc.get_heat()
                 # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
@@ -339,7 +340,8 @@ class TrainingPlanManager(object):
         else:
             new_modality = None
         if new_modality is not None:
-            self.daily_plan.modalities.append(new_modality)
+            self.daily_plan.modalities.extend(new_modality)
+            self.daily_plan.last_updated = event_date
             self.daily_plan_datastore.put(self.daily_plan)
 
         return self.daily_plan

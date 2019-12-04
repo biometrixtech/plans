@@ -43,16 +43,16 @@ class ExerciseAssignmentCalculator(object):
         return []
 
     def get_warm_up(self):
-        warm_up = WarmUp()
+        warm_up = WarmUp(self.event_date_time)
         warm_up.fill_exercises(self.exercise_library, {})
-        return warm_up
+        return [warm_up]
 
     def get_cool_down(self):
-        cool_down = CoolDown()
+        cool_down = CoolDown(self.event_date_time)
         cool_down.fill_exercises(self.exercise_library, {})
-        return cool_down
+        return [cool_down]
 
     def get_functional_strength(self):
-        functional_strength = FunctionalStrength()
+        functional_strength = FunctionalStrength(self.event_date_time)
         functional_strength.fill_exercises(self.exercise_library, {})
-        return functional_strength
+        return [functional_strength]

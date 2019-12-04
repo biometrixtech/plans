@@ -1874,7 +1874,7 @@ class ActiveRestAfterTraining(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.static_integrate)]
         self.when = "after training"
         self.when_card = "after training"
-        self.display_image = ""
+        self.display_image = "foam_roll"
 
     # def get_total_exercises(self):
     #     return len(self.inhibit_exercises) + \

@@ -110,10 +110,16 @@ def create_no_soreness_plan():
 def test_active_rest_after_training_knee():
 
     daily_plan = create_plan([14], [], [], [], train_later=False)
-    assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
-    assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
+    post_active_rest = [m for m in daily_plan.modalities if m.type.value == 1][0]
+    assert len(post_active_rest.exercise_phases[0].exercises) > 0
+    assert len(post_active_rest.exercise_phases[1].exercises) > 0
+    assert len(post_active_rest.exercise_phases[2].exercises) == 0
+    assert len(post_active_rest.exercise_phases[3].exercises) == 0
+
+    # assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
+    # assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
     assert daily_plan.cool_down is not None
     assert daily_plan.heat is None
     assert daily_plan.ice is None
@@ -133,10 +139,16 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_knee():
     historic_soreness_list = [historic_soreness]
 
     daily_plan = create_plan([14], [], [], [], historic_soreness_list, train_later=False)
-    assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
-    assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
+    post_active_rest = [m for m in daily_plan.modalities if m.type.value == 1][0]
+    assert len(post_active_rest.exercise_phases[0].exercises) > 0
+    assert len(post_active_rest.exercise_phases[1].exercises) > 0
+    assert len(post_active_rest.exercise_phases[2].exercises) == 0
+    assert len(post_active_rest.exercise_phases[3].exercises) == 0
+
+    # assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
+    # assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
     #assert daily_plan.cool_down is not None
     #assert daily_plan.heat is None
     #assert daily_plan.ice is None
@@ -155,10 +167,16 @@ def test_active_rest_after_training_outer_thigh_hist_soreness_glutes():
     historic_soreness_list = [historic_soreness]
 
     daily_plan = create_plan([14], [], [], [], historic_soreness_list, train_later=False)
-    assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
-    assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
+    post_active_rest = [m for m in daily_plan.modalities if m.type.value == 1][0]
+    assert len(post_active_rest.exercise_phases[0].exercises) > 0
+    assert len(post_active_rest.exercise_phases[1].exercises) > 0
+    assert len(post_active_rest.exercise_phases[2].exercises) == 0
+    assert len(post_active_rest.exercise_phases[3].exercises) == 0
+
+    # assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
+    # assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
     # assert daily_plan.cool_down == []
     # assert daily_plan.heat is None
     # assert daily_plan.ice is None
@@ -186,10 +204,16 @@ def test_active_rest_after_training_various_hist_soreness_glutes():
     historic_soreness_list = [historic_soreness, historic_soreness_2, historic_soreness_3]
 
     daily_plan = create_plan([6, 14, 16], [], [], [], historic_soreness_list, train_later=False)
-    assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
-    assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
-    assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
+    post_active_rest = [m for m in daily_plan.modalities if m.type.value == 1][0]
+    assert len(post_active_rest.exercise_phases[0].exercises) > 0
+    assert len(post_active_rest.exercise_phases[1].exercises) > 0
+    assert len(post_active_rest.exercise_phases[2].exercises) == 0
+    assert len(post_active_rest.exercise_phases[3].exercises) == 0
+
+    # assert len(daily_plan.post_active_rest[0].inhibit_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].static_stretch_exercises) > 0
+    # assert len(daily_plan.post_active_rest[0].isolated_activate_exercises) == 0
+    # assert len(daily_plan.post_active_rest[0].static_integrate_exercises) == 0
     # assert daily_plan.cool_down == []
     # assert daily_plan.heat is None
     # assert daily_plan.ice is None
@@ -211,10 +235,17 @@ def test_active_rest_before_training_quad_hist_soreness_knee():
 
     daily_plan = create_plan(body_part_list=[7, 6], severity_list=[2, 1], side_list=[1, 1], pain_list=[True, False], historic_soreness_list=historic_soreness_list)
     #daily_plan_json = daily_plan.json_serialise()
-    assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
-    assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) > 0
-    assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) == 0
-    assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) == 0
+
+    pre_active_rest = [m for m in daily_plan.modalities if m.type.value == 0][0]
+    assert len(pre_active_rest.exercise_phases[0].exercises) > 0
+    assert len(pre_active_rest.exercise_phases[1].exercises) > 0
+    assert len(pre_active_rest.exercise_phases[3].exercises) == 0
+    assert len(pre_active_rest.exercise_phases[4].exercises) == 0
+
+    # assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
+    # assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) > 0
+    # assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) == 0
+    # assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) == 0
     # assert len(daily_plan.cool_down) == 0
     # assert daily_plan.heat is  None
     # assert daily_plan.ice is None
@@ -237,10 +268,16 @@ def test_active_rest_before_training_spectrum_soreness():
     daily_plan = create_plan(body_part_list=[7, 6, 5, 4, 3], severity_list=[5, 4, 3, 2, 1], side_list=[1, 1, 1, 1, 1],
                              pain_list=[False, False, True, False, False], historic_soreness_list=historic_soreness_list)
     #daily_plan_json = daily_plan.json_serialise()
-    assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
-    assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) == 0
-    assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) == 0
-    assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) == 0
+    pre_active_rest = [m for m in daily_plan.modalities if m.type.value == 0][0]
+    assert len(pre_active_rest.exercise_phases[0].exercises) > 0
+    assert len(pre_active_rest.exercise_phases[1].exercises) == 0
+    assert len(pre_active_rest.exercise_phases[3].exercises) == 0
+    assert len(pre_active_rest.exercise_phases[4].exercises) == 0
+
+    # assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
+    # assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) == 0
+    # assert len(daily_plan.pre_active_rest[0].isolated_activate_exercises) == 0
+    # assert len(daily_plan.pre_active_rest[0].static_integrate_exercises) == 0
     assert len(daily_plan.cool_down) == 0
     assert daily_plan.heat is None
     assert daily_plan.ice is None
