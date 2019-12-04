@@ -273,23 +273,26 @@ class TrainingPlanManager(object):
                 # if any completed pre-training modalities exist, preserve them
                 # if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
                 #     self.daily_plan.completed_heat.append(self.daily_plan.heat)
-                # for pre_active_rest in self.daily_plan.pre_active_rest:
-                #     if pre_active_rest.completed:
-                #         self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
 
-                # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.warm_up.value]
-                # warm_up = calc.get_warm_up()
-                # self.daily_plan.modalities.append(warm_up)
+                # remove existing post-training modalities rest
+                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+
 
                 # create new pre-training modalities
-                # self.daily_plan.heat = calc.get_heat()
-                # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
-
                 # remove existing pre_active rest
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
                 # get new pre active rest
                 pre_active_rests = calc.get_pre_active_rest(force_data)
                 self.daily_plan.modalities.extend(pre_active_rests)
+
+                # remove existing warm_up
+                # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.warm_up.value]
+                # get new warm_up
+                # warm_up = calc.get_warm_up()
+                # self.daily_plan.modalities.append(warm_up)
+
+                # self.daily_plan.heat = calc.get_heat()
+                # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
 
         self.daily_plan.last_updated = last_updated
         if visualizations:
