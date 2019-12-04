@@ -111,6 +111,22 @@ def handle_daily_plan_get(user_id=None):
             'typical_sessions': typical_sessions}, 200
 
 
+@app.route('/<uuid:user_id>/update', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date': str})
+@xray_recorder.capture('routes.daily_plan.update_get')
+def handle_daily_plan_update_get(user_id=None):
+    event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
+    event_date = parse_datetime(event_date)
+    visualizations = is_fathom_environment()
+
+    plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations)
+
+    return {'daily_plans': [plan],
+            'readiness': [],
+            'typical_sessions': []}, 200
+
+
 def validate_input():
     try:
         format_date(request.json['start_date'])
