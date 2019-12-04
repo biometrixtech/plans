@@ -64,7 +64,7 @@ class Persona(object):
                                      'pain': body_part['pain'],
                                      'severity': body_part['severity'][i]})
 
-            if len(soreness) > 0 or (len(self.rpes) > 0 and self.rpes[i] is not None) or (self.elasticity_adf_dictionary is not None and self.elasticity_adf_dictionary[i] is not None):
+            if len(soreness) > 0 or (len(self.rpes) > 0 and self.rpes[i] is not None) or (len(self.elasticity_adf_dictionary) > 0 and self.elasticity_adf_dictionary[i] is not None):
 
                 if len(soreness) > 0:
                     readiness_data = {'date_time': format_datetime(date_time),
@@ -76,7 +76,7 @@ class Persona(object):
                     self.daily_readiness = None
                     self.create_plan(event_date, i, visualizations)
 
-                if self.elasticity_adf_dictionary[i] is not None:
+                if len(self.elasticity_adf_dictionary) > 0 and self.elasticity_adf_dictionary[i] is not None:
                     todays_regression_history = self.elasticity_adf_dictionary[i]
                     body = OrderedDict()
                     body["event_date"] = format_datetime(date_time)

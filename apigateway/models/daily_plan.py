@@ -162,7 +162,7 @@ class DailyPlan(Serialisable):
         else:
             pre_active_rest_available = True
             for m in self.modalities:
-                if m.type.value == 1 and not m.completed:
+                if m.type.value == 0 and not m.completed:
                     pre_active_rest_available = False
             if pre_active_rest_available:
                 self.modalities_available_on_demand = [ModalityTypeDisplay(ModalityType(0))]
