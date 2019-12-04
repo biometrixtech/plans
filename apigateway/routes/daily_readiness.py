@@ -151,15 +151,16 @@ def handle_daily_readiness_create(user_id):
                        visualizations=visualizations,
                        hist_update=hist_update)
     if is_fathom_environment():
+        body = {"timezone": timezone,
+                "plans_api_version": Config.get('API_VERSION')}
         if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
-            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                                    endpoint=f"user/{user_id}",
-                                                                                    body={"health_sync_date": request.json['health_sync_date']})
-
+            body['health_sync_date'] = request.json['health_sync_date']
+            # Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+            #                                                                         endpoint=f"user/{user_id}",
+            #                                                                         body={"health_sync_date": request.json['health_sync_date']})
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
-                                                                                body={"timezone": timezone,
-                                                                                      "plans_api_version": Config.get('API_VERSION')})
+                                                                                body=body)
 
     return {'daily_plans': [plan]}, 201
 

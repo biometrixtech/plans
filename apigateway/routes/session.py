@@ -107,22 +107,6 @@ def handle_session_create(user_id=None):
     plan.training_sessions.extend(survey_processor.sessions)
     plan.train_later = train_later
 
-    # # add sessions to plan and write to mongo
-    # for new_session in survey_processor.sessions:
-    #     found = False
-    #     for s in range(0, len(plan.training_sessions)):
-    #         if plan.training_sessions[s].id == new_session.id:
-    #             if new_session.source == SessionSource.three_sensor:
-    #                 new_session.last_updated = get_local_time(datetime.datetime.now(), timezone)
-    #             # replace existing session with new session
-    #             plan.training_sessions[s] = new_session
-    #             found = True
-    #             break
-    #     if not found:
-    #         # if it doesn't exist add as a new session
-    #         plan.training_sessions.append(new_session) 
-
-
     # apple_ids_to_merge = None
     # session_ids_to_merge = None
     # destination_session_id = None
@@ -172,14 +156,16 @@ def handle_session_create(user_id=None):
 
     # update users database if health data received
     if is_fathom_environment():
+        body = {"timezone": timezone,
+                "plans_api_version": Config.get('API_VERSION')}
         if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
-            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                                    endpoint=f"user/{user_id}",
-                                                                                    body={"health_sync_date": request.json['health_sync_date']})
+            body['health_sync_date'] = request.json['health_sync_date']
+            # Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+            #                                                                         endpoint=f"user/{user_id}",
+            #                                                                         body={"health_sync_date": request.json['health_sync_date']})
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
-                                                                                body={"timezone": timezone,
-                                                                                      "plans_api_version": Config.get('API_VERSION')})
+                                                                                body=body)
     return {'daily_plans': [plan]}, 201
 
 
