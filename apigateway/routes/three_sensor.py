@@ -59,4 +59,14 @@ def get_session_detail(session_id):
     if session is not None:
         return session.json_serialise(api=True, get_all=True)
     else:
-        return None
+        return {
+                'session_id': session_id,
+                'seconds_duration': None,
+                'asymmetry': {
+                    'apt': None,
+                    'ankle_pitch': None,
+                    'hip_drop': None,
+                    'knee_valgus': None,
+                    'hip_rotation': None
+                }
+        }
