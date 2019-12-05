@@ -1408,7 +1408,7 @@ class ActiveRestBeforeTraining(ActiveRest):
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
             if agonist is not None:
-                self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit_exercises, goal, 1, 0,
+                self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0,
                                     exercise_library)
                 if max_severity < 7:
                     self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
@@ -1432,7 +1432,7 @@ class ActiveRestBeforeTraining(ActiveRest):
         for y in body_part.synergists:
             synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
             if synergist is not None:
-                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit_exercises, goal, 2, 0,
+                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
                                     exercise_library)
                 if max_severity < 7:
                     self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2, 0, exercise_library)
