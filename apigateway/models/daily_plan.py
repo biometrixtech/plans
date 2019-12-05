@@ -89,10 +89,8 @@ class DailyPlan(Serialisable):
                'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
                'symptoms': [soreness.json_serialise() for soreness in self.symptoms],
                'modalities': [m.json_serialise() for m in self.modalities],
-               # 'modalities': fake_modality(),
                'completed_modalities': [m.json_serialise() for m in self.completed_modalities],
                'modalities_available_on_demand': [m.json_serialise() for m in self.modalities_available_on_demand]
-               # 'modalities_available_on_demand': [{'type': 2, 'name': 'Warm Up'}]
                }
 
         return ret
