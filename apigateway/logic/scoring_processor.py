@@ -162,15 +162,15 @@ class ScoringSummaryProcessor(object):
 
         return hip_rotation_movement_variable_summary
 
-    def get_data_cards(self, apt_movement_scores):
+    def get_data_cards(self, movement_scores):
 
         asymmetry_card = DataCard(DataCardType.categorical)
         movement_dysfunction_card = DataCard(DataCardType.magnitude)
         fatigue_card = DataCard(DataCardType.boolean)
 
-        asymmetry_card.value = apt_movement_scores.asymmetry_score.value
-        movement_dysfunction_card.value = apt_movement_scores.movement_dysfunction_score.value
-        fatigue_card.value = apt_movement_scores.fatigue_score.value
+        asymmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
+        movement_dysfunction_card.assign_score_value(movement_scores.movement_dysfunction_score.value)
+        fatigue_card.assign_score_value(movement_scores.fatigue_score.value)
 
         cards = [asymmetry_card, movement_dysfunction_card, fatigue_card]
 

@@ -230,8 +230,8 @@ class MovementVariableSummaryText(Serialisable):
 
 
 class DataCard(Serialisable):
-    def __init__(self, type):
-        self.type = type
+    def __init__(self, card_type):
+        self.type = card_type
         self.value = 0
         self.title_text = ""
         self.color = None
@@ -259,7 +259,39 @@ class DataCard(Serialisable):
     def __setattr__(self, name, value):
         if name == 'type' and value is not None and not isinstance(value, DataCardType):
             value = DataCardType(value)
+        elif name == 'color' and value is not None and not isinstance(value, LegendColor):
+            value = LegendColor(value)
         super().__setattr__(name, value)
+
+    def assign_score_value(self, score):
+        if self.type == DataCardType.categorical:
+            if score is not None:
+                if score < 25:
+                    self.value = 0
+                    self.color = 0
+                elif score < 50:
+                    self.value = 1
+                    self.color = 2
+                elif score < 75:
+                    self.value = 2
+                    self.color = 2
+                else:
+                    self.value = 3
+                    self.color = 3
+
+        elif self.type == DataCardType.boolean:
+            if score is not None and score > 50:
+                self.value = True
+                self.color = 16
+            else:
+                self.value = False
+                self.color = 13
+        else: 
+            self.value = score
+            if score > 50:
+                self.color = 5
+            else:
+                self.color = 12
 
 
 class DataCardSummaryText(Serialisable):
