@@ -9,7 +9,7 @@ from models.soreness_base import BodyPartSide, BodyPartSideViz
 from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
 from models.asymmetry import VisualizedLeftRightAsymmetry
-from models.scoring import MovementVariableScore, MovementVariableSummary
+from models.scoring import MovementVariableScore, MovementVariableSummary, DataPoint
 from models.styles import LegendColor
 from logic.soreness_processing import SorenessCalculator
 from logic.asymmetry_logic import AsymmetryProcessor
@@ -295,6 +295,7 @@ class BiomechanicsSummaryChartData(Serialisable):
         self.ankle_pitch = None  # MovementVariableSummary
         self.knee_valgus = None  # MovementVariableSummary
         self.hip_rotation = None  # MovementVariableSummary
+        self.data_points = []
 
     def json_serialise(self):
         ret = {
@@ -308,6 +309,7 @@ class BiomechanicsSummaryChartData(Serialisable):
             'ankle_pitch': self.ankle_pitch.json_serialise() if self.ankle_pitch is not None else None,
             'knee_valgus': self.knee_valgus.json_serialise() if self.knee_valgus is not None else None,
             'hip_rotation': self.hip_rotation.json_serialise() if self.hip_rotation is not None else None,
+            'data_points': [d.json_serialise() for d in self.data_points]
         }
         return ret
 
@@ -329,6 +331,7 @@ class BiomechanicsSummaryChartData(Serialisable):
             'knee_valgus') is not None else None
         data.hip_rotation = MovementVariableSummary.json_deserialise(input_dict['hip_rotation']) if input_dict.get(
             'hip_rotation') is not None else None
+        data.data_points = [DataPoint.json_deserialise(d) for d in input_dict.get('data_points', [])]
         return data
 
     def add_session_data(self, session):
@@ -348,6 +351,7 @@ class BiomechanicsSummaryChartData(Serialisable):
         self.hip_drop = session_summary.hip_drop
         self.knee_valgus = session_summary.knee_valgus
         self.hip_rotation = session_summary.hip_rotation
+        self.data_points = session_summary.data_points
 
 
 class BiomechanicsAPTChartData(Serialisable):

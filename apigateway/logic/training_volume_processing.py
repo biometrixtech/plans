@@ -9,7 +9,7 @@ from utils import format_date, parse_date
 from itertools import groupby
 from operator import itemgetter, attrgetter
 from statistics import stdev, mean
-from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart, BiomechanicsAPTChart, BiomechanicsAnklePitchChart, BiomechanicsHipDropChart
+from models.chart_data import TrainingVolumeChartData, TrainingVolumeChart, WorkoutChart, BiomechanicsAPTChart, BiomechanicsAnklePitchChart, BiomechanicsHipDropChart, BiomechanicsSummaryChart
 from models.stats import SportMaxLoad
 
 
@@ -181,6 +181,9 @@ class TrainingVolumeProcessing(object):
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_biomechanics_charts')
     def load_biomechanics_charts(self, sessions):
+        biomechanics_summary_chart = BiomechanicsSummaryChart()
+        biomechanics_summary_chart.add_sessions(sessions)
+        self.biomechanics_summary_chart = biomechanics_summary_chart
 
         biomechanics_apt_chart = BiomechanicsAPTChart()
         biomechanics_apt_chart.add_sessions(sessions)

@@ -143,3 +143,10 @@ class VisualizationTitle(object):
         viz_title.body_part_text = input_dict['body_part_text']
         viz_title.color = LegendColor(input_dict['color'])
         return viz_title
+
+class DataType(Enum):
+    apt = 0
+    ankle_pitch = 1
+    hip_drop = 2
+    knee_valgus = 3
+    hip_rotation = 4

@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from models.styles import LegendColor, BoldText
+from models.styles import LegendColor, BoldText, DataType
 from utils import format_date
 
 
@@ -93,6 +93,24 @@ class SessionScoringSummary(object):
         self.hip_drop = None
         self.knee_valgus = None
         self.hip_rotation = None
+        self.data_points = []  # DataPoint
+
+    def get_data_points(self):
+        page = 0
+        if self.apt is not None:
+            self.data_points.append(DataPoint(data_type=DataType(0), index='apt', page=page))
+            page += 1
+        if self.hip_drop is not None:
+            self.data_points.append(DataPoint(data_type=DataType(2), index='hip_drop', page=page))
+            page += 1
+        if self.ankle_pitch is not None:
+            self.data_points.append(DataPoint(data_type=DataType(1), index='ankle_pitch', page=page))
+            page += 1
+        if self.knee_valgus is not None:
+            self.data_points.append(DataPoint(data_type=DataType(3), index='knee_valgus', page=page))
+            page += 1
+        if self.hip_rotation is not None:
+            self.data_points.append(DataPoint(data_type=DataType(4), index='hip_rotation', page=page))
 
 
 class MovementVariableSummary(Serialisable):
@@ -286,3 +304,27 @@ class DataCardSummaryTextItem(Serialisable):
         data.bold_text = [BoldText.json_deserialise(b) for b in input_dict.get('bold_text', '')]
 
         return data
+
+
+class DataPoint(Serialisable):
+    def __init__(self, data_type, index='', page=0):
+        self.data_type = data_type
+        self.index = index
+        self.page = page
+
+    def json_serialise(self):
+        ret = {
+            'data_type': self.data_type.value,
+            'index': self.index,
+            'page': self.page
+        }
+        return ret
+
+    def __setattr__(self, name, value):
+        if name == 'data_type' and value is not None and not isinstance(value, DataType):
+            value = DataType(value)
+        super().__setattr__(name, value)
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        return cls(data_type=input_dict.get('data_type'), index=input_dict.get('index', ''), page=input_dict.get('page', 0))

@@ -46,6 +46,7 @@ class ScoringSummaryProcessor(object):
         session_scoring_summary.hip_drop = self.get_hip_drop_moving_variable_summary(hip_drop_scores, session)
         session_scoring_summary.knee_valgus = self.get_knee_valgus_moving_variable_summary(knee_valgus_scores, session)
         session_scoring_summary.hip_rotation = self.get_hip_rotation_moving_variable_summary(hip_rotation_scores, session)
+        session_scoring_summary.get_data_points()
 
         return session_scoring_summary
 
@@ -55,9 +56,10 @@ class ScoringSummaryProcessor(object):
         apt_movement_variable_summary.score = apt_movement_scores.overall_score
         apt_movement_variable_summary.data_cards = self.get_data_cards(apt_movement_scores)
 
-        apt_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session, session.asymmetry.anterior_pelvic_tilt)
+        if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
+            apt_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session, session.asymmetry.anterior_pelvic_tilt)
 
-        apt_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.anterior_pelvic_tilt)
+            apt_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.anterior_pelvic_tilt)
 
         return apt_movement_variable_summary
 
@@ -89,9 +91,10 @@ class ScoringSummaryProcessor(object):
         ankle_pitch_movement_variable_summary.score = ankle_pitch_movement_scores.overall_score
         ankle_pitch_movement_variable_summary.data_cards = self.get_data_cards(ankle_pitch_movement_scores)
 
-        ankle_pitch_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session, session.asymmetry.ankle_pitch)
+        if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
+            ankle_pitch_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session, session.asymmetry.ankle_pitch)
 
-        ankle_pitch_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.ankle_pitch)
+            ankle_pitch_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.ankle_pitch)
 
         return ankle_pitch_movement_variable_summary
 
@@ -113,10 +116,11 @@ class ScoringSummaryProcessor(object):
         hip_drop_movement_variable_summary.score = hip_drop_movement_scores.overall_score
         hip_drop_movement_variable_summary.data_cards = self.get_data_cards(hip_drop_movement_scores)
 
-        hip_drop_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
-                                                                                                  session.asymmetry.hip_drop)
+        if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
+            hip_drop_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
+                                                                                                      session.asymmetry.hip_drop)
 
-        hip_drop_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.hip_drop)
+            hip_drop_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.hip_drop)
 
         return hip_drop_movement_variable_summary
 
@@ -126,10 +130,11 @@ class ScoringSummaryProcessor(object):
         knee_valgus_movement_variable_summary.score = knee_valgus_movement_scores.overall_score
         knee_valgus_movement_variable_summary.data_cards = self.get_data_cards(knee_valgus_movement_scores)
 
-        knee_valgus_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
-                                                                                                     session.asymmetry.knee_valgus)
+        if session.asymmetry is not None and session.asymmetry.knee_valgus is not None:
+            knee_valgus_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
+                                                                                                         session.asymmetry.knee_valgus)
 
-        knee_valgus_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.knee_valgus)
+            knee_valgus_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.knee_valgus)
 
         return knee_valgus_movement_variable_summary
 
@@ -139,10 +144,11 @@ class ScoringSummaryProcessor(object):
         hip_rotation_movement_variable_summary.score = hip_rotation_movement_scores.overall_score
         hip_rotation_movement_variable_summary.data_cards = self.get_data_cards(hip_rotation_movement_scores)
 
-        hip_rotation_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
-                                                                                                      session.asymmetry.hip_rotation)
+        if session.asymmetry is not None and session.asymmetry.hip_rotation is not None:
+            hip_rotation_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
+                                                                                                          session.asymmetry.hip_rotation)
 
-        hip_rotation_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.hip_rotation)
+            hip_rotation_movement_variable_summary.body_side = self.get_body_side(session, session.asymmetry.hip_rotation)
 
         return hip_rotation_movement_variable_summary
 
@@ -166,15 +172,23 @@ class ScoringProcessor(object):
         pass
 
     def get_apt_scores(self, asymmetry, movement_patterns):
+        combined_equations = []
+        left_equation_list = []
+        right_equation_list = []
 
-        left_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.left
-        right_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.right
-        combined_equations = [left_apt_ankle_pitch, right_apt_ankle_pitch]
+        if movement_patterns is not None:
+            if movement_patterns.apt_ankle_pitch is not None:
+                left_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.left
+                right_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.right
+                combined_equations = [left_apt_ankle_pitch, right_apt_ankle_pitch]
+                left_equation_list = [left_apt_ankle_pitch]
+                right_equation_list = [right_apt_ankle_pitch]
 
         scores = MovementVariableScores()
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score([left_apt_ankle_pitch], [right_apt_ankle_pitch])
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.anterior_pelvic_tilt.left, asymmetry.anterior_pelvic_tilt.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score([left_apt_ankle_pitch], [right_apt_ankle_pitch])
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
+        if asymmetry is not None and asymmetry.anterior_pelvic_tilt is not None:
+            scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.anterior_pelvic_tilt.left, asymmetry.anterior_pelvic_tilt.right)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
 
@@ -185,17 +199,28 @@ class ScoringProcessor(object):
         return scores
 
     def get_hip_drop_scores(self, asymmetry, movement_patterns):
-
-        left_hip_drop_apt = movement_patterns.hip_drop_apt.left
-        left_hip_drop_pva = movement_patterns.hip_drop_pva.left
-        right_hip_drop_apt = movement_patterns.hip_drop_apt.right
-        right_hip_drop_pva = movement_patterns.hip_drop_pva.right
-        combined_equations = [left_hip_drop_apt, right_hip_drop_apt, left_hip_drop_pva, right_hip_drop_pva]
+        combined_equations = []
+        left_equation_list = []
+        right_equation_list = []
+        if movement_patterns is not None:
+            if movement_patterns.hip_drop_apt is not None:
+                left_hip_drop_apt = movement_patterns.hip_drop_apt.left
+                right_hip_drop_apt = movement_patterns.hip_drop_apt.right
+                combined_equations.extend([left_hip_drop_apt, right_hip_drop_apt])
+                left_equation_list.append(left_hip_drop_apt)
+                right_equation_list.append(right_hip_drop_apt)
+            if movement_patterns.hip_drop_apt is not None:
+                left_hip_drop_pva = movement_patterns.hip_drop_pva.left
+                right_hip_drop_pva = movement_patterns.hip_drop_pva.right
+                combined_equations.extend([left_hip_drop_pva, right_hip_drop_pva])
+                left_equation_list.append(left_hip_drop_pva)
+                right_equation_list.append(right_hip_drop_pva)
 
         scores = MovementVariableScores()
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score([left_hip_drop_apt, left_hip_drop_pva], [right_hip_drop_apt, right_hip_drop_pva])
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_drop.left, asymmetry.hip_drop.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score([left_hip_drop_apt, left_hip_drop_pva], [right_hip_drop_apt, right_hip_drop_pva])
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
+        if asymmetry is not None and asymmetry.hip_drop is not None:
+            scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_drop.left, asymmetry.hip_drop.right)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
 
@@ -206,15 +231,26 @@ class ScoringProcessor(object):
         return scores
 
     def get_ankle_pitch_scores(self, movement_patterns):
+        combined_equations = []
+        left_equation_list = []
+        right_equation_list = []
+        if movement_patterns is not None:
+            if movement_patterns.apt_ankle_pitch is not None:
+                left_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.left
+                right_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.right
+                combined_equations.extend([left_apt_ankle_pitch, right_apt_ankle_pitch])
+                left_equation_list.append(left_apt_ankle_pitch)
+                right_equation_list.append(right_apt_ankle_pitch)
 
-        left_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.left
-        left_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.left
-        right_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.right
-        right_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.right
-        combined_equations = [left_apt_ankle_pitch, right_apt_ankle_pitch, left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch]
+            if movement_patterns.hip_rotation_ankle_pitch is not None:
+                left_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.left
+                right_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.right
+                combined_equations.extend([left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch])
+                left_equation_list.append(left_hip_rotation_ankle_pitch)
+                right_equation_list.append(right_hip_rotation_ankle_pitch)
 
         scores = MovementVariableScores()
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score([left_apt_ankle_pitch, left_hip_rotation_ankle_pitch], [right_apt_ankle_pitch, right_hip_rotation_ankle_pitch])
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
         scores.asymmetry_medians_score = 0
         scores.asymmetry_fatigue_score = 0
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
@@ -227,19 +263,38 @@ class ScoringProcessor(object):
         return scores
 
     def get_knee_valgus_scores(self, asymmetry, movement_patterns):
+        combined_equations = []
+        left_equation_list = []
+        right_equation_list = []
+        if movement_patterns is not None:
+            if movement_patterns.knee_valgus_hip_drop is not None:
+                left_knee_valgus_hip_drop = movement_patterns.knee_valgus_hip_drop.left
+                right_knee_valgus_hip_drop = movement_patterns.knee_valgus_hip_drop.right
+                combined_equations.extend([left_knee_valgus_hip_drop, right_knee_valgus_hip_drop])
+                left_equation_list.append(left_knee_valgus_hip_drop)
+                right_equation_list.append(right_knee_valgus_hip_drop)
 
-        left_knee_valgus_hip_drop = movement_patterns.knee_valgus_hip_drop.left
-        left_knee_valgus_pva = movement_patterns.knee_valgus_pva.left
-        left_knee_valgus_apt = movement_patterns.knee_valgus_apt.left
-        right_knee_valgus_hip_drop = movement_patterns.knee_valgus_hip_drop.right
-        right_knee_valgus_pva = movement_patterns.knee_valgus_pva.right
-        right_knee_valgus_apt = movement_patterns.knee_valgus_apt.right
-        combined_equations = [left_knee_valgus_hip_drop, right_knee_valgus_hip_drop, left_knee_valgus_pva, right_knee_valgus_pva, left_knee_valgus_apt, right_knee_valgus_apt]
+            if movement_patterns.knee_valgus_pva is not None:
+                left_knee_valgus_pva = movement_patterns.knee_valgus_pva.left
+                right_knee_valgus_pva = movement_patterns.knee_valgus_pva.right
+                combined_equations.extend([left_knee_valgus_pva, right_knee_valgus_pva])
+                left_equation_list.append(left_knee_valgus_pva)
+                right_equation_list.append(right_knee_valgus_pva)
+
+            if movement_patterns.knee_valgus_apt is not None:
+                left_knee_valgus_apt = movement_patterns.knee_valgus_apt.left
+                right_knee_valgus_apt = movement_patterns.knee_valgus_apt.right
+                combined_equations.extend([left_knee_valgus_apt, right_knee_valgus_apt])
+                left_equation_list.append(left_knee_valgus_apt)
+                right_equation_list.append(right_knee_valgus_apt)
+
+        # combined_equations = [left_knee_valgus_hip_drop, right_knee_valgus_hip_drop, left_knee_valgus_pva, right_knee_valgus_pva, left_knee_valgus_apt, right_knee_valgus_apt]
 
         scores = MovementVariableScores()
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score([left_knee_valgus_hip_drop, left_knee_valgus_pva, left_knee_valgus_apt], [right_knee_valgus_hip_drop, right_knee_valgus_pva, right_knee_valgus_apt])
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.knee_valgus.left, asymmetry.knee_valgus.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score([left_knee_valgus_hip_drop, left_knee_valgus_pva, left_knee_valgus_apt], [right_knee_valgus_hip_drop, right_knee_valgus_pva, right_knee_valgus_apt])
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
+        if asymmetry is not None and asymmetry.knee_valgus is not None:
+            scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.knee_valgus.left, asymmetry.knee_valgus.right)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
 
@@ -251,16 +306,29 @@ class ScoringProcessor(object):
 
     def get_hip_rotation_scores(self, asymmetry, movement_patterns):
 
-        left_hip_rotation_apt = movement_patterns.hip_rotation_apt.left
-        left_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.left
-        right_hip_rotation_apt = movement_patterns.hip_rotation_apt.right
-        right_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.right
-        combined_equations = [left_hip_rotation_apt, right_hip_rotation_apt, left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch]
+        combined_equations = []
+        left_equation_list = []
+        right_equation_list = []
+        if movement_patterns is not None:
+            if movement_patterns.hip_rotation_apt is not None:
+                left_hip_rotation_apt = movement_patterns.hip_rotation_apt.left
+                right_hip_rotation_apt = movement_patterns.hip_rotation_apt.right
+                combined_equations.extend([left_hip_rotation_apt, right_hip_rotation_apt])
+                left_equation_list.append(left_hip_rotation_apt)
+                right_equation_list.append(right_hip_rotation_apt)
+
+            if movement_patterns.hip_rotation_ankle_pitch is not None:
+                left_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.left
+                right_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.right
+                combined_equations.extend([left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch])
+                left_equation_list.append(left_hip_rotation_ankle_pitch)
+                right_equation_list.append(right_hip_rotation_ankle_pitch)
 
         scores = MovementVariableScores()
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score([left_hip_rotation_apt, right_hip_rotation_apt], [left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch])
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_rotation.left, asymmetry.hip_rotation.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score([left_hip_rotation_apt, right_hip_rotation_apt], [left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch])
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
+        if asymmetry is not None and asymmetry.hip_rotation is not None:
+            scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_rotation.left, asymmetry.hip_rotation.right)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(right_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
 

@@ -1,6 +1,6 @@
 from enum import Enum
 from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, RecoveryChartData, Prevention3sChartData, BiomechanicsAPTChart, CareChartData, BiomechanicsAnklePitchChart, BiomechanicsHipDropChart
-from models.chart_data import PreventionChartData, CareTodayChartData, PersonalizedRecoveryChartData
+from models.chart_data import PreventionChartData, CareTodayChartData, PersonalizedRecoveryChartData, BiomechanicsSummaryChart
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide, BodyPartSideViz
 from models.sport import SportName
@@ -762,6 +762,7 @@ class AthleteTrends(object):
         self.workload = TrendData()
         self.trend_categories = []
         self.insight_categories = []
+        self.biomechanics_summary = None
 
     def json_serialise(self, plan=False):
         ret = {
@@ -777,7 +778,8 @@ class AthleteTrends(object):
             'biomechanics_hip_drop': self.biomechanics_hip_drop.json_serialise() if self.biomechanics_hip_drop is not None else None,
             'insight_categories': [insight_category.json_serialise() for insight_category in self.insight_categories],
             'recovery_quality': fake_recovery_quality(),
-            'biomechanics_summary': fake_sessions_summary()
+            # 'biomechanics_summary': fake_sessions_summary()
+            'biomechanics_summary': self.biomechanics_summary.json_serialise() if self.biomechanics_summary is not None else None
         }
         return ret
 
@@ -808,6 +810,7 @@ class AthleteTrends(object):
         trends.biomechanics_hip_drop = BiomechanicsHipDropChart.json_deserialise(
             input_dict['biomechanics_hip_drop']) if input_dict.get(
             'biomechanics_hip_drop', None) is not None else None
+        trends.biomechanics_summary = BiomechanicsSummaryChart.json_deserialise(input_dict.get('biomechanics_summary')) if input_dict.get('biomechanics_summary', None) is not None else None
 
         return trends
 
@@ -895,6 +898,7 @@ class AthleteTrends(object):
         self.biomechanics_apt = athlete_stats.biomechanics_apt_chart
         self.biomechanics_ankle_pitch = athlete_stats.biomechanics_ankle_pitch_chart
         self.biomechanics_hip_drop = athlete_stats.biomechanics_hip_drop_chart
+        self.biomechanics_summary = athlete_stats.biomechanics_summary_chart
 
 
 def fake_recovery_quality():

@@ -164,6 +164,7 @@ class StatsProcessing(object):
         current_athlete_stats.biomechanics_apt_chart = training_volume_processing.biomechanics_apt_chart
         current_athlete_stats.biomechanics_ankle_pitch_chart = training_volume_processing.biomechanics_ankle_pitch_chart
         current_athlete_stats.biomechanics_hip_drop_chart = training_volume_processing.biomechanics_hip_drop_chart
+        current_athlete_stats.biomechanics_summary_chart = training_volume_processing.biomechanics_summary_chart
 
         current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
 
