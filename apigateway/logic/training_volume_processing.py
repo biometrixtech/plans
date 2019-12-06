@@ -180,9 +180,9 @@ class TrainingVolumeProcessing(object):
             return False
 
     @xray_recorder.capture('logic.TrainingVolumeProcessing.load_biomechanics_charts')
-    def load_biomechanics_charts(self, sessions, three_sensor_enabled):
+    def load_biomechanics_charts(self, sessions, has_three_sensor_data):
         biomechanics_summary_chart = BiomechanicsSummaryChart()
-        biomechanics_summary_chart.three_sensor_enabled = three_sensor_enabled
+        biomechanics_summary_chart.has_three_sensor_data = has_three_sensor_data
         biomechanics_summary_chart.add_sessions(sessions)
         self.biomechanics_summary_chart = biomechanics_summary_chart
 

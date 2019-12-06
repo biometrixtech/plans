@@ -151,7 +151,7 @@ class AthleteStats(Serialisable):
         self.api_version = '4_3'
         self.timezone = '-04:00'
         self.historic_asymmetry = {}
-        self.three_sensor_enabled = False
+        self.has_three_sensor_data = False
 
     def update_historic_soreness(self, soreness, event_date):
 
@@ -519,7 +519,7 @@ class AthleteStats(Serialisable):
             'api_version': self.api_version,
             'timezone': self.timezone,
             'historic_asymmetry': {str(asymmetry_type): historic_asymmetry.json_serialise() for (asymmetry_type, historic_asymmetry) in self.historic_asymmetry.items()},
-            'three_sensor_enabled': self.three_sensor_enabled
+            'has_three_sensor_data': self.has_three_sensor_data
         }
         return ret
 
@@ -583,7 +583,7 @@ class AthleteStats(Serialisable):
         athlete_stats.timezone = input_dict.get('timezone', '-04:00')
         athlete_stats.historic_asymmetry = {int(asymmetry_type): HistoricAsymmetry.json_deserialise(historic_asymmetry)
                                             for (asymmetry_type, historic_asymmetry) in input_dict.get('historic_asymmetry', {}).items()}
-        athlete_stats.three_sensor_enabled = input_dict.get('three_sensor_enabled', False)
+        athlete_stats.has_three_sensor_data = input_dict.get('has_three_sensor_data', False)
         return athlete_stats
 
     @classmethod

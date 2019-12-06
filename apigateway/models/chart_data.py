@@ -248,7 +248,7 @@ class BiomechanicsHipDropChart(Serialisable):
 
 class BiomechanicsSummaryChart(Serialisable):
     def __init__(self):
-        self.three_sensor_enabled = False
+        self.has_three_sensor_data = False
         self.active = False
         self.sessions = []
 
@@ -269,7 +269,7 @@ class BiomechanicsSummaryChart(Serialisable):
 
     def json_serialise(self):
         ret = {
-            'three_sensor_enabled': self.three_sensor_enabled,
+            'has_three_sensor_data': self.has_three_sensor_data,
             'active': self.active,
             'sessions': [s.json_serialise() for s in self.sessions]
         }
@@ -278,7 +278,7 @@ class BiomechanicsSummaryChart(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         chart = cls()
-        chart.three_sensor_enabled = input_dict.get('three_sensor_enabled', False)
+        chart.has_three_sensor_data = input_dict.get('has_three_sensor_data', False)
         chart.active = input_dict.get('active', False)
         chart.sessions = [BiomechanicsSummaryChartData.json_deserialise(s) for s in input_dict.get('sessions', [])]
         return chart

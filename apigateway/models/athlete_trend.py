@@ -931,7 +931,7 @@ def fake_recovery_quality():
 
 def fake_sessions_summary():
     return {
-            "three_sensor_enabled": True,
+            "has_three_sensor_data": True,
             "active": True,
             "sessions": [
                 {

@@ -420,8 +420,8 @@ def handle_session_three_sensor_data(user_id):
         plan.training_sessions.append(session_obj)
 
     # if this is the first time user has submitted three sensor session, update flag in stats
-    if not athlete_stats.three_sensor_enabled:
-        athlete_stats.three_sensor_enabled = True
+    if not athlete_stats.has_three_sensor_data:
+        athlete_stats.has_three_sensor_data = True
         athlete_stats.event_date = event_date
         athlete_stats_datastore.put(athlete_stats)
     daily_plan_datastore.put(plan)
