@@ -351,7 +351,7 @@ class ScoringProcessor(object):
     def get_score(self, value):
 
         movement_score = MovementVariableScore()
-        movement_score.value = value
+        movement_score.value = int(value) if value is not None else None
         movement_score.text = ""
         movement_score.color = None
         movement_score.active = True

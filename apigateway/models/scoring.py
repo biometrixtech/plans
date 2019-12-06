@@ -1,7 +1,7 @@
 from serialisable import Serialisable
 from models.styles import LegendColor, BoldText, MovementVariableType
 from utils import format_date
-
+from enum import Enum
 
 class MovementVariableScore(Serialisable):
     def __init__(self):
