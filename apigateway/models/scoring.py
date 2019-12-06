@@ -3,6 +3,7 @@ from models.styles import LegendColor, BoldText, MovementVariableType
 from utils import format_date
 from enum import Enum
 
+
 class MovementVariableScore(Serialisable):
     def __init__(self):
         self.value = 0
@@ -242,7 +243,7 @@ class DataCard(Serialisable):
             'type': self.type.value if self.type is not None else None,
             'value': self.value,
             'title_text': self.title_text,
-            'color': self.color.json_serialise() if self.color is not None else None,
+            'color': self.color.value if self.color is not None else None,
             'summary_text': self.summary_text.json_serialise() if self.summary_text is not None else None
         }
         return ret
