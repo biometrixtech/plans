@@ -130,11 +130,11 @@ class StatsProcessing(object):
 
         sessions = training_volume_processing.get_training_sessions(self.all_plans)
         # to update status for historical users before they submit a new one
-        three_sensor_sessions = [s for s in sessions if s.source.value == 3]
+        three_sensor_sessions = [s for s in sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
         if len(three_sensor_sessions) > 0:
             current_athlete_stats.three_sensor_enabled = True
 
-        training_volume_processing.load_biomechanics_charts(sessions)
+        training_volume_processing.load_biomechanics_charts(three_sensor_sessions, current_athlete_stats.three_sensor_enabled)
 
         current_athlete_stats.historic_asymmetry = self.get_historic_asymmetry(sessions)
 

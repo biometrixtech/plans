@@ -254,7 +254,7 @@ class BiomechanicsSummaryChart(Serialisable):
 
     def add_sessions(self, session_list):
 
-        filtered_list = [s for s in session_list if s.source == SessionSource.three_sensor]
+        filtered_list = [s for s in session_list if s.source == SessionSource.three_sensor and (s.asymmetry is not None or s.movement_patterns is not None)]
 
         filtered_list = sorted(filtered_list, key=lambda x:x.event_date, reverse=True)
 
@@ -264,6 +264,8 @@ class BiomechanicsSummaryChart(Serialisable):
             self.sessions.append(chart_data)
 
         self.sessions = sorted(self.sessions, key=lambda x:x.event_date_time, reverse=False)
+        if len(self.sessions) > 0:
+            self.active = True
 
     def json_serialise(self):
         ret = {

@@ -115,7 +115,7 @@ class SessionScoringSummary(object):
 
 class MovementVariableSummary(Serialisable):
     def __init__(self):
-        self.active = False
+        self.active = True  # TODO: change default to False when correct logic is in place
         self.dashboard_title = ""
         self.child_title = ""
         self.description = DataCardSummaryText()
