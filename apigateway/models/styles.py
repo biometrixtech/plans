@@ -144,7 +144,7 @@ class VisualizationTitle(object):
         viz_title.color = LegendColor(input_dict['color'])
         return viz_title
 
-class DataType(Enum):
+class MovementVariableType(Enum):
     apt = 0
     ankle_pitch = 1
     hip_drop = 2

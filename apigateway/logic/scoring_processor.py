@@ -1,4 +1,4 @@
-from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, DataCard, SessionScoringSummary, MovementVariableSummaryData, RecoveryQuality
+from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, DataCard, SessionScoringSummary, MovementVariableSummaryData, RecoveryQuality, DataCardType
 import statistics
 
 
@@ -164,9 +164,9 @@ class ScoringSummaryProcessor(object):
 
     def get_data_cards(self, apt_movement_scores):
 
-        asymmetry_card = DataCard()
-        movement_dysfunction_card = DataCard()
-        fatigue_card = DataCard()
+        asymmetry_card = DataCard(DataCardType.categorical)
+        movement_dysfunction_card = DataCard(DataCardType.magnitude)
+        fatigue_card = DataCard(DataCardType.boolean)
 
         asymmetry_card.value = apt_movement_scores.asymmetry_score.value
         movement_dysfunction_card.value = apt_movement_scores.movement_dysfunction_score.value

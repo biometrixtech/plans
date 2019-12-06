@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from models.styles import LegendColor, BoldText, DataType
+from models.styles import LegendColor, BoldText, MovementVariableType
 from utils import format_date
 
 
@@ -98,19 +98,19 @@ class SessionScoringSummary(object):
     def get_data_points(self):
         page = 0
         if self.apt is not None:
-            self.data_points.append(DataPoint(data_type=DataType(0), index='apt', page=page))
+            self.data_points.append(DataPoint(data_type=MovementVariableType(0), index='apt', page=page))
             page += 1
         if self.hip_drop is not None:
-            self.data_points.append(DataPoint(data_type=DataType(2), index='hip_drop', page=page))
+            self.data_points.append(DataPoint(data_type=MovementVariableType(2), index='hip_drop', page=page))
             page += 1
         if self.ankle_pitch is not None:
-            self.data_points.append(DataPoint(data_type=DataType(1), index='ankle_pitch', page=page))
+            self.data_points.append(DataPoint(data_type=MovementVariableType(1), index='ankle_pitch', page=page))
             page += 1
         if self.knee_valgus is not None:
-            self.data_points.append(DataPoint(data_type=DataType(3), index='knee_valgus', page=page))
+            self.data_points.append(DataPoint(data_type=MovementVariableType(3), index='knee_valgus', page=page))
             page += 1
         if self.hip_rotation is not None:
-            self.data_points.append(DataPoint(data_type=DataType(4), index='hip_rotation', page=page))
+            self.data_points.append(DataPoint(data_type=MovementVariableType(4), index='hip_rotation', page=page))
 
 
 class MovementVariableSummary(Serialisable):
@@ -230,8 +230,8 @@ class MovementVariableSummaryText(Serialisable):
 
 
 class DataCard(Serialisable):
-    def __init__(self):
-        self.type = None
+    def __init__(self, type):
+        self.type = type
         self.value = 0
         self.title_text = ""
         self.color = None
@@ -249,13 +249,17 @@ class DataCard(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        data = cls()
-        data.type = input_dict.get('type', None)
+        data = cls(input_dict.get('type', None))
         data.value = input_dict.get('value', 0)
         data.title_text = input_dict.get('title_text', "")
         data.color = LegendColor(input_dict['color']) if input_dict.get('color') is not None else None
         data.summary_text = DataCardSummaryText.json_deserialise(input_dict['summary_text']) if input_dict.get('summary_text') is not None else None
         return data
+
+    def __setattr__(self, name, value):
+        if name == 'type' and value is not None and not isinstance(value, DataCardType):
+            value = DataCardType(value)
+        super().__setattr__(name, value)
 
 
 class DataCardSummaryText(Serialisable):
@@ -321,10 +325,16 @@ class DataPoint(Serialisable):
         return ret
 
     def __setattr__(self, name, value):
-        if name == 'data_type' and value is not None and not isinstance(value, DataType):
-            value = DataType(value)
+        if name == 'data_type' and value is not None and not isinstance(value, MovementVariableType):
+            value = MovementVariableType(value)
         super().__setattr__(name, value)
 
     @classmethod
     def json_deserialise(cls, input_dict):
         return cls(data_type=input_dict.get('data_type'), index=input_dict.get('index', ''), page=input_dict.get('page', 0))
+
+
+class DataCardType(Enum):
+    categorical = 0
+    magnitude = 1
+    boolean = 2

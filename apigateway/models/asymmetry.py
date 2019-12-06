@@ -256,13 +256,13 @@ class SessionAsymmetry(Serialisable):
         return  {
                     'detail_legend': [
                         {
-                            'color': [11, 11],
+                            'color': [11, 12],
                             'text': 'Asymmetric Steps',
                             'active': True,
                             'flag': 1
                         },
                         {
-                            'color': [25, 25],
+                            'color': [23, 25],
                             'text': 'Symmetric Steps',
                             'active': False,
                             'flag': 0
