@@ -347,7 +347,7 @@ class BiomechanicsSummaryChartData(Serialisable):
         self.event_date_time = session.event_date
         self.duration = session.duration_sensor
         self.sport_name = session.sport_name
-        self.summary_pills = [] # TODO fill this
+        self.summary_pills = session_summary.summary_pills
         self.apt = session_summary.apt
         self.ankle_pitch = session_summary.ankle_pitch
         self.hip_drop = session_summary.hip_drop

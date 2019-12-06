@@ -29,10 +29,15 @@ class ScoringSummaryProcessor(object):
         scoring_processor = ScoringProcessor()
 
         apt_scores = scoring_processor.get_apt_scores(session.asymmetry, session.movement_patterns)
+        apt_scores.overall_score.color = 11
         ankle_pitch_scores = scoring_processor.get_ankle_pitch_scores(session.movement_patterns)
+        ankle_pitch_scores.overall_score.color = 11
         hip_drop_scores = scoring_processor.get_hip_drop_scores(session.asymmetry, session.movement_patterns)
+        hip_drop_scores.overall_score.color = 11
         knee_valgus_scores = scoring_processor.get_knee_valgus_scores(session.asymmetry, session.movement_patterns)
+        knee_valgus_scores.overall_score.color = 11
         hip_rotation_scores = scoring_processor.get_hip_rotation_scores(session.asymmetry, session.movement_patterns)
+        hip_rotation_scores.overall_score.color = 11
 
         session_scoring_summary = SessionScoringSummary()
         session_scoring_summary.event_date_time = session.event_date
@@ -48,6 +53,8 @@ class ScoringSummaryProcessor(object):
         session_scoring_summary.knee_valgus = self.get_knee_valgus_moving_variable_summary(knee_valgus_scores, session)
         session_scoring_summary.hip_rotation = self.get_hip_rotation_moving_variable_summary(hip_rotation_scores, session)
         session_scoring_summary.get_data_points()
+        all_scores = [apt_scores, ankle_pitch_scores, hip_drop_scores, knee_valgus_scores, hip_rotation_scores]
+        session_scoring_summary.get_summary_pills(all_scores)
 
         return session_scoring_summary
 

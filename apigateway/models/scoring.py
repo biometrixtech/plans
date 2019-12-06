@@ -1,6 +1,6 @@
 from serialisable import Serialisable
 from models.styles import LegendColor, BoldText, MovementVariableType
-from utils import format_date
+from utils import format_date, none_max
 from enum import Enum
 
 
@@ -30,6 +30,11 @@ class MovementVariableScore(Serialisable):
         data.active - input_dict.get('active', False)
 
         return data
+
+    def __setattr__(self, name, value):
+        if name == 'color' and value is not None and not isinstance(value, LegendColor):
+            value = LegendColor(value)
+        super().__setattr__(name, value)
 
 
 class MovementSummaryPill(object):
@@ -95,6 +100,7 @@ class SessionScoringSummary(object):
         self.knee_valgus = None
         self.hip_rotation = None
         self.data_points = []  # DataPoint
+        self.summary_pills = []
 
     def get_data_points(self):
         page = 0
@@ -112,6 +118,53 @@ class SessionScoringSummary(object):
             page += 1
         if self.hip_rotation is not None:
             self.data_points.append(DataPoint(data_type=MovementVariableType(4), index='hip_rotation', page=page))
+
+    def get_summary_pills(self, all_scores):
+        max_asymmetry = 0
+        max_dysfunction = 0
+        max_fatigue = 0
+        for score in all_scores:
+            max_asymmetry = none_max([max_asymmetry, score.asymmetry_score.value])
+            max_dysfunction = none_max([max_dysfunction, score.movement_dysfunction_score.value])
+            max_fatigue = none_max([max_fatigue, score.fatigue_score.value])
+        if max_asymmetry >= 50:
+            asymmetry_pill = MovementSummaryPill()
+            if max_asymmetry >= 90:
+                asymmetry_pill.text = "High Asymmetry"
+                asymmetry_pill.color = 16
+                asymmetry_pill.severity = 3
+            elif max_asymmetry >= 75:
+                asymmetry_pill.text = "Mod Asymmetry"
+                asymmetry_pill.color = 14
+                asymmetry_pill.severity = 2
+            elif max_asymmetry >= 50:
+                asymmetry_pill.text = "Low Asymmetry"
+                asymmetry_pill.color = 25
+                asymmetry_pill.severity = 1
+            self.summary_pills.append(asymmetry_pill)
+
+        if max_fatigue > 85:
+            fatigue_pill = MovementSummaryPill()
+            fatigue_pill.text = "Fatigue"
+            fatigue_pill.color = 16
+            fatigue_pill.severity = 3
+            self.summary_pills.append(fatigue_pill)
+
+        if max_dysfunction >= 50:
+            dysfunction_pill = MovementSummaryPill()
+            if max_dysfunction >= 90:
+                dysfunction_pill.text = "High Magnitude"
+                dysfunction_pill.color = 16
+                dysfunction_pill.severity = 3
+            elif max_dysfunction >= 75:
+                dysfunction_pill.text = "Mod Magnitude"
+                dysfunction_pill.color = 14
+                dysfunction_pill.severity = 2
+            elif max_dysfunction >= 50:
+                dysfunction_pill.text = "Low Magnitude"
+                dysfunction_pill.color = 25
+                dysfunction_pill.severity = 1
+            self.summary_pills.append(dysfunction_pill)
 
 
 class MovementVariableSummary(Serialisable):
@@ -165,11 +218,11 @@ class MovementVariableSummaryData(Serialisable):
         self.left_start_angle = 0
         self.left_y = 0.0
         self.left_y_legend = 0.0
-        self.left_y_legend_color = None
+        self.left_y_legend_color = LegendColor(26)
         self.right_start_angle = 0
         self.right_y = 0.0
         self.right_y_legend = 0.0
-        self.right_y_legend_color = None
+        self.right_y_legend_color = LegendColor(6)
         self.multiplier = 1.0
 
     def json_serialise(self):
