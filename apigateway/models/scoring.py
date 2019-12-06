@@ -267,32 +267,40 @@ class DataCard(Serialisable):
     def assign_score_value(self, score):
         if self.type == DataCardType.categorical:
             if score is not None:
-                if score < 25:
+                if score < 50:
                     self.value = 0
                     self.color = 0
-                elif score < 50:
+                    self.title_text = "Asymmetry: Not Present"
+                elif score < 75:
                     self.value = 1
                     self.color = 2
-                elif score < 75:
+                    self.title_text = "Asymmetry: Low"
+                elif score < 90:
                     self.value = 2
                     self.color = 2
+                    self.title_text = "Asymmetry: Mod"
                 else:
                     self.value = 3
                     self.color = 3
+                    self.title_text = "Asymmetry: High"
 
         elif self.type == DataCardType.boolean:
-            if score is not None and score > 50:
+            if score is not None and score > 85:
                 self.value = True
                 self.color = 16
+                self.title_text = "Fatigue: Present"
             else:
                 self.value = False
                 self.color = 13
+                self.title_text = "Fatigue: Not Present"
         else: 
             self.value = score
-            if score > 50:
+            if score > 75:
                 self.color = 5
+                self.title_text = "Magnitude: High"
             else:
                 self.color = 12
+                self.title_text = "Magnitude: Low"
 
 
 class DataCardSummaryText(Serialisable):

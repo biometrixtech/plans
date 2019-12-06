@@ -41,6 +41,7 @@ class ScoringSummaryProcessor(object):
                     knee_valgus_scores.overall_score.value * .20) + (hip_rotation_scores.overall_score.value * .20)
 
         session_scoring_summary.score = scoring_processor.get_score(total_score)
+        session_scoring_summary.score.text = 'total movement efficiency score'
         session_scoring_summary.apt = self.get_apt_moving_variable_summary(apt_scores, session)
         session_scoring_summary.ankle_pitch = self.get_ankle_pitch_moving_variable_summary(ankle_pitch_scores, session)
         session_scoring_summary.hip_drop = self.get_hip_drop_moving_variable_summary(hip_drop_scores, session)
@@ -57,6 +58,7 @@ class ScoringSummaryProcessor(object):
         apt_movement_variable_summary.data_cards = self.get_data_cards(apt_movement_scores)
         apt_movement_variable_summary.dashboard_title = "Pelvic Tilt Efficiency"
         apt_movement_variable_summary.child_title = "Pelvic Tilt"
+        apt_movement_variable_summary.summary_text.text = "movement efficiency"
 
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
             apt_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session, session.asymmetry.anterior_pelvic_tilt)
@@ -94,6 +96,7 @@ class ScoringSummaryProcessor(object):
         ankle_pitch_movement_variable_summary.data_cards = self.get_data_cards(ankle_pitch_movement_scores)
         ankle_pitch_movement_variable_summary.dashboard_title = "Leg Extension Efficiency"
         ankle_pitch_movement_variable_summary.child_title = "Leg Extension"
+        ankle_pitch_movement_variable_summary.summary_text.text = "movement efficiency"
 
         if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
             ankle_pitch_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session, session.asymmetry.ankle_pitch)
@@ -121,6 +124,7 @@ class ScoringSummaryProcessor(object):
         hip_drop_movement_variable_summary.data_cards = self.get_data_cards(hip_drop_movement_scores)
         hip_drop_movement_variable_summary.dashboard_title = "Hip Drop Efficiency"
         hip_drop_movement_variable_summary.child_title = "Hip Drop"
+        hip_drop_movement_variable_summary.summary_text.text = "movement efficiency"
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
             hip_drop_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
@@ -137,6 +141,7 @@ class ScoringSummaryProcessor(object):
         knee_valgus_movement_variable_summary.data_cards = self.get_data_cards(knee_valgus_movement_scores)
         knee_valgus_movement_variable_summary.dashboard_title = "Knee Valgus Efficiency"
         knee_valgus_movement_variable_summary.child_title = "Knee Valgus"
+        knee_valgus_movement_variable_summary.summary_text.text = "movement efficiency"
 
         if session.asymmetry is not None and session.asymmetry.knee_valgus is not None:
             knee_valgus_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,
@@ -153,6 +158,7 @@ class ScoringSummaryProcessor(object):
         hip_rotation_movement_variable_summary.data_cards = self.get_data_cards(hip_rotation_movement_scores)
         hip_rotation_movement_variable_summary.dashboard_title = "Hip Rotation Efficiency"
         hip_rotation_movement_variable_summary.child_title = "Hip Rotation"
+        hip_rotation_movement_variable_summary.summary_text.text = "movement efficiency"
 
         if session.asymmetry is not None and session.asymmetry.hip_rotation is not None:
             hip_rotation_movement_variable_summary.summary_data = self.get_movement_variable_summary_data(session,

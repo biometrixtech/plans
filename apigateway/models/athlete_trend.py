@@ -997,7 +997,7 @@ def fake_sessions_summary():
                         "dashboard_title": "Pelvic Tilt Efficiency",
                         "child_title": "Pelvic Tilt",
                         "description": {
-                                 "text": "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles. ",
+                                 "text": "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles.",
                                  "bold_text": [],
                                  "text_items" : [],
                                  "active": True
