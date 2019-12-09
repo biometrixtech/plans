@@ -85,8 +85,8 @@ class ScoringSummaryProcessor(object):
         if session.asymmetry is not None and movement_variable_object is not None:
 
             if movement_variable_object.percent_events_asymmetric > 0:
-                viz.left_y = movement_variable_object.left
-                viz.right_y = movement_variable_object.right
+                viz.left_y = round(movement_variable_object.left, 0)
+                viz.right_y = round(movement_variable_object.right, 0)
 
             else:
                 average_symmetry = round(
@@ -96,6 +96,8 @@ class ScoringSummaryProcessor(object):
 
                 viz.left_y = average_symmetry
                 viz.right_y = average_symmetry
+        viz.left_y_legend = viz.left_y
+        viz.right_y_legend = viz.right_y
         return viz
 
     def get_ankle_pitch_moving_variable_summary(self, ankle_pitch_movement_scores, session):
