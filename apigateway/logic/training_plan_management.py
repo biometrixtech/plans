@@ -340,6 +340,8 @@ class TrainingPlanManager(object):
             new_modality = calc.get_functional_strength()
         else:
             new_modality = None
+        
+        self.daily_plan.define_available_modalities()
         if new_modality is not None:
             self.daily_plan.modalities.extend(new_modality)
             self.daily_plan.last_updated = event_date
