@@ -272,31 +272,29 @@ def handle_request_modality(user_id=None):
     if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
-    # plan = daily_plan_datastore.get(user_id=user_id,
-    #                                 start_date=plan_event_day,
-    #                                 end_date=plan_event_day)[0]
+    plan = daily_plan_datastore.get(user_id=user_id,
+                                    start_date=plan_event_day,
+                                    end_date=plan_event_day)[0]
 
     visualizations = is_fathom_environment()
 
-    # force_data = False
-    # if plan.train_later:
-    #     if modality_type == 0:
-    #         pre_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
-    #         if len(pre_active_rests) == 0:
-    #             force_data = True
-    #         elif pre_active_rests[0].force_data:
-    #             force_data = True
-    #         else:
-    #             force_data = False
-    # else:
-    #     if modality_type == 1:
-    #         post_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
-    #         if len(post_active_rests) == 0:
-    #             force_data = True
-    #         elif post_active_rests[0].force_data:
-    #             force_data = True
-    #         else:
-    #             force_data = False
+    force_data = False
+    if modality_type == 0:
+        pre_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(pre_active_rests) == 0:
+            force_data = True
+        elif pre_active_rests[0].force_data:
+            force_data = True
+        else:
+            force_data = False
+    elif modality_type == 1:
+        post_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(post_active_rests) == 0:
+            force_data = True
+        elif post_active_rests[0].force_data:
+            force_data = True
+        else:
+            force_data = False
 
     athlete_stats = athlete_stats_datastore.get(user_id)
 
