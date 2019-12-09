@@ -43,8 +43,7 @@ class SurveyProcessing(object):
             return session_obj
 
     def convert_session(self, session, historic_health_data=False):
-        # existing_session_id = session.get('id', None)
-        existing_session_id = session.get('session_id', None)
+        existing_session_id = session.get('session_id') or session.get('id')
         apple_health_kit_id = session.get('apple_health_kit_id', None)
         apple_health_kit_source_name = session.get('apple_health_kit_source_name', None)
         event_date = parse_datetime(session['event_date'])

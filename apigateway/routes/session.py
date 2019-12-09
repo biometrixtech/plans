@@ -72,9 +72,10 @@ def handle_session_create(user_id=None):
         if session is None:
             continue
         # if id is already present, it's potentially a patch. Check if session already exists and overwrite if it does
-        if session.get('session_id') is not None:
+        if session.get('session_id') or session.get('id') is not None:
+            session_id = session.get('session_id') or session.get('id')
             for s in range(0, len(plan.training_sessions)):
-                if plan.training_sessions[s].id == session['session_id']:
+                if plan.training_sessions[s].id == session_id:
                     create_new = False
                     if session.get('source', 0) == 3:
                         session['last_updated'] = get_local_time(datetime.datetime.now(), timezone)
