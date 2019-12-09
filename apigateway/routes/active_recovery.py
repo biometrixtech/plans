@@ -143,19 +143,22 @@ def handle_request_mobilize(user_id=None):
     visualizations = is_fathom_environment()
 
     if plan.train_later:
-        if len(plan.pre_active_rest) == 0:
+        pre_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(pre_active_rests) == 0:
             force_data = True
-        elif plan.pre_active_rest[0].force_data:
+        elif pre_active_rests[0].force_data:
             force_data = True
         else:
             force_data = False
     else:
-        if len(plan.post_active_rest) == 0:
+        post_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(post_active_rests) == 0:
             force_data = True
-        elif plan.post_active_rest[0].force_data:
+        elif post_active_rests[0].force_data:
             force_data = True
         else:
             force_data = False
+
     hist_update = False
     athlete_stats = athlete_stats_datastore.get(user_id)
     if athlete_stats.api_version in [None, '4_4', '4_5']:
