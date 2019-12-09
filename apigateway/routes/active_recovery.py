@@ -306,7 +306,7 @@ def handle_request_modality(user_id=None):
         athlete_stats_datastore.put(athlete_stats)
 
     plan = add_modality_on_demand(user_id, event_date, modality_type=modality_type, athlete_stats=athlete_stats,
-                                  visualizations=visualizations)
+                                  visualizations=visualizations, force_data=force_data)
 
     return {'daily_plans': [plan]}, 200
 
