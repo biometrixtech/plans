@@ -49,13 +49,9 @@ def handle_daily_plan_get(user_id=None):
                 need_soreness_sessions = True
             if survey_complete:
                 # handle case of RS completed on old app and logging in to new app --> re-generate plan
-                # 4_3 to 4_4 changes
-                # if plan.trends is not None and plan.trends.trend_categories is not None:
-                #     insight_types = [tc.insight_type.value for tc in plan.trends.trend_categories]
-                # else:
-                #     insight_types = []
-                # if plan.trends is None or plan.trends.body_response is None or 6 not in insight_types:
-                #     need_plan_update = True
+                # 4_3 and back
+                if plan.trends is None or plan.trends.body_response is None:
+                    need_plan_update = True
                 if not need_plan_update:
                     # check if plan update is required because three sensor session updated with data after last plan update
                     for session in plan.training_sessions:
@@ -67,14 +63,6 @@ def handle_daily_plan_get(user_id=None):
                         len(plan.trends.insight_categories) == 0:  #  insight_categories is only present in 4_6 and beyond and will be empty if last plan was generated on 4_5 and earlier
                     hist_update = True
                     need_plan_update = True
-
-                # viz_types = set()
-                # if plan.trends is not None and plan.trends.trend_categories is not None:
-                #     for tc in plan.trends.trend_categories:
-                #         viz_types.update([trend.visualization_type.value for trend in tc.trends])
-                # if not ({12, 13, 14} & viz_types):  # new viz types are not present, update hist and create plan
-                #     hist_update = True
-                #     need_plan_update = True
 
         if plan.event_date == format_date(event_date) and need_plan_update:  # if update required for any reason, create new plan
             plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations, hist_update=hist_update)
