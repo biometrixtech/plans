@@ -50,12 +50,12 @@ def handle_daily_plan_get(user_id=None):
             if survey_complete:
                 # handle case of RS completed on old app and logging in to new app --> re-generate plan
                 # 4_3 to 4_4 changes
-                if plan.trends is not None and plan.trends.trend_categories is not None:
-                    insight_types = [tc.insight_type.value for tc in plan.trends.trend_categories]
-                else:
-                    insight_types = []
-                if plan.trends is None or plan.trends.body_response is None or 6 not in insight_types:
-                    need_plan_update = True
+                # if plan.trends is not None and plan.trends.trend_categories is not None:
+                #     insight_types = [tc.insight_type.value for tc in plan.trends.trend_categories]
+                # else:
+                #     insight_types = []
+                # if plan.trends is None or plan.trends.body_response is None or 6 not in insight_types:
+                #     need_plan_update = True
                 if not need_plan_update:
                     # check if plan update is required because three sensor session updated with data after last plan update
                     for session in plan.training_sessions:

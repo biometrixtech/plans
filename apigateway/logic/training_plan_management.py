@@ -12,7 +12,7 @@ from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
 # from models.functional_movement_stats import FunctionalMovementSummary
 from models.functional_movement_modalities import ModalityType
-from utils import format_date, parse_datetime, parse_date
+from utils import format_date, parse_datetime, parse_date, format_datetime
 # from models.body_parts import BodyPartFactory
 import copy
 
@@ -340,11 +340,11 @@ class TrainingPlanManager(object):
             new_modality = calc.get_functional_strength()
         else:
             new_modality = None
-        
+
         self.daily_plan.define_available_modalities()
         if new_modality is not None:
             self.daily_plan.modalities.extend(new_modality)
-            self.daily_plan.last_updated = event_date
+            self.daily_plan.last_updated = format_datetime(event_date)
 
             self.daily_plan_datastore.put(self.daily_plan)
 
