@@ -242,7 +242,7 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_hip_drop_apt, right_hip_drop_apt])
                 left_equation_list.append(left_hip_drop_apt)
                 right_equation_list.append(right_hip_drop_apt)
-            if movement_patterns.hip_drop_apt is not None:
+            if movement_patterns.hip_drop_pva is not None:
                 left_hip_drop_pva = movement_patterns.hip_drop_pva.left
                 right_hip_drop_pva = movement_patterns.hip_drop_pva.right
                 combined_equations.extend([left_hip_drop_pva, right_hip_drop_pva])
