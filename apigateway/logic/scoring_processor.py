@@ -1,4 +1,4 @@
-from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, DataCard, SessionScoringSummary, MovementVariableSummaryData, RecoveryQuality, DataCardType
+from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, DataCard, SessionScoringSummary, MovementVariableSummaryData, RecoveryQuality, DataCardType, DataCardSummaryTextItem
 from models.styles import LegendColor
 import statistics
 
@@ -231,8 +231,22 @@ class ScoringSummaryProcessor(object):
         fatigue_card = DataCard(DataCardType.boolean)
 
         asymmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
+        asymmetry_card.summary_text.text = "You're super asymmetric:"
+        text_item = DataCardSummaryTextItem()
+        text_item.text = "first reason why"
+        asymmetry_card.summary_text.text_items = [text_item]
+        asymmetry_card.summary_text.active = True
+
         movement_dysfunction_card.assign_score_value(movement_scores.movement_dysfunction_score.value)
+        movement_dysfunction_card.summary_text.text = "You're super dysfunctional"
+        movement_dysfunction_card.summary_text.active = True
+
         fatigue_card.assign_score_value(movement_scores.fatigue_score.value)
+        fatigue_card.summary_text.text = "You're super Fatigued"
+        text_item = DataCardSummaryTextItem()
+        text_item.text = "Only reason why"
+        fatigue_card.summary_text.text_items = [text_item]
+        fatigue_card.summary_text.active = True
 
         cards = [asymmetry_card, movement_dysfunction_card, fatigue_card]
 
