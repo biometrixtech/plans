@@ -9,7 +9,7 @@ from models.soreness_base import BodyPartSide, BodyPartSideViz
 from models.sport import SportName
 from models.session import SportTrainingSession, SessionSource
 from models.asymmetry import VisualizedLeftRightAsymmetry
-from models.scoring import MovementVariableScore, MovementVariableSummary, DataPoint
+from models.scoring import MovementVariableScore, MovementVariableSummary, DataPoint, MovementSummaryPill
 from models.styles import LegendColor
 from logic.soreness_processing import SorenessCalculator
 from logic.asymmetry_logic import AsymmetryProcessor
@@ -311,7 +311,8 @@ class BiomechanicsSummaryChartData(Serialisable):
             'ankle_pitch': self.ankle_pitch.json_serialise() if self.ankle_pitch is not None else None,
             'knee_valgus': self.knee_valgus.json_serialise() if self.knee_valgus is not None else None,
             'hip_rotation': self.hip_rotation.json_serialise() if self.hip_rotation is not None else None,
-            'data_points': [d.json_serialise() for d in self.data_points]
+            'data_points': [d.json_serialise() for d in self.data_points],
+            'summary_pills': [s.json_serialise() for s in self.summary_pills]
         }
         return ret
 
@@ -334,6 +335,7 @@ class BiomechanicsSummaryChartData(Serialisable):
         data.hip_rotation = MovementVariableSummary.json_deserialise(input_dict['hip_rotation']) if input_dict.get(
             'hip_rotation') is not None else None
         data.data_points = [DataPoint.json_deserialise(d) for d in input_dict.get('data_points', [])]
+        data.summary_pills = [MovementSummaryPill.json_deserialise(s) for s in input_dict.get('summary_pills', [])]
         return data
 
     def add_session_data(self, session):

@@ -27,7 +27,7 @@ class MovementVariableScore(Serialisable):
         data.value = input_dict.get('value', 0)
         data.text = input_dict.get('text', '')
         data.color = LegendColor(input_dict['color']) if input_dict.get('color') is not None else None
-        data.active - input_dict.get('active', False)
+        data.active = input_dict.get('active', False)
 
         return data
 
@@ -42,6 +42,28 @@ class MovementSummaryPill(object):
         self.text = ""
         self.color = None
         self.severity = 0
+
+    def json_serialise(self):
+        ret = {
+            'text': self.text,
+            'color': self.color.value if self.color is not None else None,
+            'severity': self.severity
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        data = cls()
+        data.text = input_dict.get('text', '')
+        data.color = input_dict.get('color')
+
+        return data
+
+    def __setattr__(self, name, value):
+        if name == 'color' and value is not None and not isinstance(value, LegendColor):
+            value = LegendColor(value)
+        super().__setattr__(name, value)
 
 
 class MovementVariableScores(object):
