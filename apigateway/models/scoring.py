@@ -75,6 +75,7 @@ class MovementVariableScores(object):
         self.movement_dysfunction_score = MovementVariableScore()
         self.fatigue_score = MovementVariableScore()
         self.overall_score = MovementVariableScore()
+        self.change = MovementVariableScore()
 
 
 class RecoveryQuality(Serialisable):

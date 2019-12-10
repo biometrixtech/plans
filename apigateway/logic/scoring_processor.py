@@ -76,6 +76,7 @@ class ScoringSummaryProcessor(object):
 
         session_scoring_summary.event_date_time = session.event_date
         session_scoring_summary.score = scoring_processor.get_score(total_score)
+        # TODO: Update thresholds
         if session_scoring_summary.score.value <= 60:
             session_scoring_summary.score.color = LegendColor.error_light
         elif 60 < session_scoring_summary.score.value <= 80:
@@ -94,12 +95,13 @@ class ScoringSummaryProcessor(object):
 
         apt_movement_variable_summary = MovementVariableSummary()
         apt_movement_variable_summary.score = apt_movement_scores.overall_score
+        apt_movement_variable_summary.change = apt_movement_scores.change
         apt_movement_variable_summary.data_cards = self.get_data_cards(apt_movement_scores)
         apt_movement_variable_summary.dashboard_title = "Pelvic Tilt Efficiency"
         apt_movement_variable_summary.child_title = "Pelvic Tilt"
         apt_movement_variable_summary.summary_text.text = "movement efficiency"
         apt_movement_variable_summary.summary_text.active = True
-        apt_movement_variable_summary.description.text = "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles."
+        apt_movement_variable_summary.description.text = "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles."  # TODO: Update this
         apt_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
@@ -137,12 +139,13 @@ class ScoringSummaryProcessor(object):
 
         ankle_pitch_movement_variable_summary = MovementVariableSummary()
         ankle_pitch_movement_variable_summary.score = ankle_pitch_movement_scores.overall_score
+        ankle_pitch_movement_variable_summary.change = ankle_pitch_movement_scores.change
         ankle_pitch_movement_variable_summary.data_cards = self.get_data_cards(ankle_pitch_movement_scores)
         ankle_pitch_movement_variable_summary.dashboard_title = "Leg Extension Efficiency"
         ankle_pitch_movement_variable_summary.child_title = "Leg Extension"
         ankle_pitch_movement_variable_summary.summary_text.text = "movement efficiency"
         ankle_pitch_movement_variable_summary.summary_text.active = True
-        ankle_pitch_movement_variable_summary.description.text = "Leg extention motion asymmetry can be caused by something, I don't really know what"
+        ankle_pitch_movement_variable_summary.description.text = "Leg extention motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
         ankle_pitch_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
@@ -168,12 +171,13 @@ class ScoringSummaryProcessor(object):
 
         hip_drop_movement_variable_summary = MovementVariableSummary()
         hip_drop_movement_variable_summary.score = hip_drop_movement_scores.overall_score
+        hip_drop_movement_variable_summary.change = hip_drop_movement_scores.change
         hip_drop_movement_variable_summary.data_cards = self.get_data_cards(hip_drop_movement_scores)
         hip_drop_movement_variable_summary.dashboard_title = "Hip Drop Efficiency"
         hip_drop_movement_variable_summary.child_title = "Hip Drop"
         hip_drop_movement_variable_summary.summary_text.text = "movement efficiency"
         hip_drop_movement_variable_summary.summary_text.active = True
-        hip_drop_movement_variable_summary.description.text = "Hip Drop motion asymmetry can be caused by something, I don't really know what"
+        hip_drop_movement_variable_summary.description.text = "Hip Drop motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
         hip_drop_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
@@ -188,12 +192,13 @@ class ScoringSummaryProcessor(object):
 
         knee_valgus_movement_variable_summary = MovementVariableSummary()
         knee_valgus_movement_variable_summary.score = knee_valgus_movement_scores.overall_score
+        knee_valgus_movement_variable_summary.change = knee_valgus_movement_scores.change
         knee_valgus_movement_variable_summary.data_cards = self.get_data_cards(knee_valgus_movement_scores)
         knee_valgus_movement_variable_summary.dashboard_title = "Knee Valgus Efficiency"
         knee_valgus_movement_variable_summary.child_title = "Knee Valgus"
         knee_valgus_movement_variable_summary.summary_text.text = "movement efficiency"
         knee_valgus_movement_variable_summary.summary_text.active = True
-        knee_valgus_movement_variable_summary.description.text = "Knee Valgus motion asymmetry can be caused by something, I don't really know what"
+        knee_valgus_movement_variable_summary.description.text = "Knee Valgus motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
         knee_valgus_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.knee_valgus is not None:
@@ -208,12 +213,13 @@ class ScoringSummaryProcessor(object):
 
         hip_rotation_movement_variable_summary = MovementVariableSummary()
         hip_rotation_movement_variable_summary.score = hip_rotation_movement_scores.overall_score
+        hip_rotation_movement_variable_summary.change = hip_rotation_movement_scores.change
         hip_rotation_movement_variable_summary.data_cards = self.get_data_cards(hip_rotation_movement_scores)
         hip_rotation_movement_variable_summary.dashboard_title = "Hip Rotation Efficiency"
         hip_rotation_movement_variable_summary.child_title = "Hip Rotation"
         hip_rotation_movement_variable_summary.summary_text.text = "movement efficiency"
         hip_rotation_movement_variable_summary.summary_text.active = True
-        hip_rotation_movement_variable_summary.description.text = "Hip Rotation motion asymmetry can be caused by something, I don't really know what"
+        hip_rotation_movement_variable_summary.description.text = "Hip Rotation motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
         hip_rotation_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.hip_rotation is not None:
@@ -230,6 +236,7 @@ class ScoringSummaryProcessor(object):
         movement_dysfunction_card = DataCard(DataCardType.magnitude)
         fatigue_card = DataCard(DataCardType.boolean)
 
+        # TODO: Assign proper text
         asymmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
         asymmetry_card.summary_text.text = "You're super asymmetric:"
         text_item = DataCardSummaryTextItem()
@@ -281,6 +288,12 @@ class ScoringProcessor(object):
 
         scores.overall_score = self.get_score((scores.asymmetry_score.value * .5) + (scores.movement_dysfunction_score.value * .3) + (scores.fatigue_score.value * .2))
 
+        # TODO: update with real logic
+        scores.change.value = -1.2
+        scores.change.text = "pts"
+        scores.change.color = 6
+        scores.change.active = True
+
         return scores
 
     def get_hip_drop_scores(self, asymmetry, movement_patterns):
@@ -311,6 +324,12 @@ class ScoringProcessor(object):
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + (scores.asymmetry_medians_score * .3) + (scores.asymmetry_fatigue_score * .2))
 
         scores.overall_score = self.get_score((scores.asymmetry_score.value * .5) + (scores.movement_dysfunction_score.value * .3) + (scores.fatigue_score.value * .2))
+
+        # TODO: update with real logic
+        scores.change.value = 2.0
+        scores.change.text = "pts"
+        scores.change.color = 13
+        scores.change.active = True
 
         return scores
 
@@ -343,6 +362,12 @@ class ScoringProcessor(object):
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + 50)
 
         scores.overall_score = self.get_score((scores.asymmetry_score.value * .5) + (scores.movement_dysfunction_score.value * .3) + 20)
+
+        # TODO: update with real logic
+        scores.change.value = 0.0
+        scores.change.text = "pts"
+        scores.change.color = 13
+        scores.change.active = True
 
         return scores
 
