@@ -98,6 +98,7 @@ class ScoringSummaryProcessor(object):
         apt_movement_variable_summary.dashboard_title = "Pelvic Tilt Efficiency"
         apt_movement_variable_summary.child_title = "Pelvic Tilt"
         apt_movement_variable_summary.summary_text.text = "movement efficiency"
+        apt_movement_variable_summary.summary_text.active = True
         apt_movement_variable_summary.description.text = "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles."
         apt_movement_variable_summary.description.active = True
 
@@ -140,6 +141,7 @@ class ScoringSummaryProcessor(object):
         ankle_pitch_movement_variable_summary.dashboard_title = "Leg Extension Efficiency"
         ankle_pitch_movement_variable_summary.child_title = "Leg Extension"
         ankle_pitch_movement_variable_summary.summary_text.text = "movement efficiency"
+        ankle_pitch_movement_variable_summary.summary_text.active = True
         ankle_pitch_movement_variable_summary.description.text = "Leg extention motion asymmetry can be caused by something, I don't really know what"
         ankle_pitch_movement_variable_summary.description.active = True
 
@@ -170,6 +172,7 @@ class ScoringSummaryProcessor(object):
         hip_drop_movement_variable_summary.dashboard_title = "Hip Drop Efficiency"
         hip_drop_movement_variable_summary.child_title = "Hip Drop"
         hip_drop_movement_variable_summary.summary_text.text = "movement efficiency"
+        hip_drop_movement_variable_summary.summary_text.active = True
         hip_drop_movement_variable_summary.description.text = "Hip Drop motion asymmetry can be caused by something, I don't really know what"
         hip_drop_movement_variable_summary.description.active = True
 
@@ -189,6 +192,7 @@ class ScoringSummaryProcessor(object):
         knee_valgus_movement_variable_summary.dashboard_title = "Knee Valgus Efficiency"
         knee_valgus_movement_variable_summary.child_title = "Knee Valgus"
         knee_valgus_movement_variable_summary.summary_text.text = "movement efficiency"
+        knee_valgus_movement_variable_summary.summary_text.active = True
         knee_valgus_movement_variable_summary.description.text = "Knee Valgus motion asymmetry can be caused by something, I don't really know what"
         knee_valgus_movement_variable_summary.description.active = True
 
@@ -208,6 +212,7 @@ class ScoringSummaryProcessor(object):
         hip_rotation_movement_variable_summary.dashboard_title = "Hip Rotation Efficiency"
         hip_rotation_movement_variable_summary.child_title = "Hip Rotation"
         hip_rotation_movement_variable_summary.summary_text.text = "movement efficiency"
+        hip_rotation_movement_variable_summary.summary_text.active = True
         hip_rotation_movement_variable_summary.description.text = "Hip Rotation motion asymmetry can be caused by something, I don't really know what"
         hip_rotation_movement_variable_summary.description.active = True
 
