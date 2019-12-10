@@ -347,7 +347,8 @@ class BiomechanicsSummaryChartData(Serialisable):
         self.id = session.id
         self.score = session_summary.score
         self.event_date_time = session.event_date
-        self.duration = session.duration_sensor
+        if session.duration_sensor is not None:
+            self.duration = int(session.duration_sensor / 60)
         self.sport_name = session.sport_name
         self.summary_pills = session_summary.summary_pills
         self.apt = session_summary.apt
