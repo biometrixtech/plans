@@ -244,7 +244,7 @@ class MovementVariableSummaryData(Serialisable):
         self.right_start_angle = 0
         self.right_y = 0.0
         self.right_y_legend = 0.0
-        self.right_y_legend_color = LegendColor(6)
+        self.right_y_legend_color = LegendColor(4)
         self.multiplier = 1.0
 
     def json_serialise(self):

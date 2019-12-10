@@ -1,4 +1,5 @@
 from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, DataCard, SessionScoringSummary, MovementVariableSummaryData, RecoveryQuality, DataCardType
+from models.styles import LegendColor
 import statistics
 
 
@@ -75,6 +76,14 @@ class ScoringSummaryProcessor(object):
 
         session_scoring_summary.event_date_time = session.event_date
         session_scoring_summary.score = scoring_processor.get_score(total_score)
+        if session_scoring_summary.score.value <= 60:
+            session_scoring_summary.score.color = LegendColor.error_light
+        elif 60 < session_scoring_summary.score.value <= 80:
+            session_scoring_summary.score.color = LegendColor.yellow_light
+        else:
+            session_scoring_summary.score.color = LegendColor.success_light
+
+
         session_scoring_summary.score.text = 'total movement efficiency score'
         session_scoring_summary.get_data_points()
         session_scoring_summary.get_summary_pills(all_scores)
