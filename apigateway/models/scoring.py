@@ -353,11 +353,11 @@ class DataCard(Serialisable):
             self.max_value = 4
             if score is not None:
                 if score > 90:
-                    self.value = 0
+                    self.value = 4
                     self.title_text = "Asymmetry: Not Present"
                     self.color = 13
                 elif score > 75:
-                    self.value = 1
+                    self.value = 3
                     self.title_text = "Asymmetry: Mild"
                     self.color = 23
                 elif score > 60:
@@ -365,32 +365,35 @@ class DataCard(Serialisable):
                     self.title_text = "Asymmetry: Moderate"
                     self.color = 5
                 elif score > 50:
-                    self.value = 3
+                    self.value = 1
                     self.title_text = "Asymmetry: High"
                     self.color = 6
                 else:
-                    self.value = 4
+                    self.value = 1
                     self.title_text = "Asymmetry: Severe"
                     self.color = 27
-        elif self.type == DataCardType.boolean:
-            if score is not None and score < 60:
-                self.value = True
-                self.color = 5
-                self.title_text = "Fatigue: Present"
-                self.icon = 2
             else:
-                self.value = False
+                self.value = 4
+                self.title_text = "Asymmetry: Not Present"
                 self.color = 13
-                self.title_text = "Fatigue: Not Present"
-                self.icon = 3
-        else: 
-            self.value = score
-            if score < 70:
-                self.color = 5
-                self.title_text = "Magnitude: High"
+        elif self.type == DataCardType.magnitude:
+            if score is not None:
+                self.value = score
+                if score > 90:
+                    self.color = 13
+                    self.title_text = "Magnitude: Low"
+                elif score > 80:
+                    self.color = 5
+                    self.title_text = "Magnitude: Mod"
+                else:
+                    self.color = 6
+                    self.title_text = "Magnitude: High"
             else:
-                self.color = 13
-                self.title_text = "Magnitude: Low"
+                self.value = 100
+                if score > 90:
+                    self.color = 13
+                    self.title_text = "Magnitude: Low"
+
 
 
 class DataCardSummaryText(Serialisable):

@@ -232,30 +232,35 @@ class ScoringSummaryProcessor(object):
 
     def get_data_cards(self, movement_scores):
 
-        asymmetry_card = DataCard(DataCardType.categorical)
+        # These two cards are always present
+        symmetry_card = DataCard(DataCardType.categorical)
         movement_dysfunction_card = DataCard(DataCardType.magnitude)
-        fatigue_card = DataCard(DataCardType.boolean)
 
         # TODO: Assign proper text
-        asymmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
-        asymmetry_card.summary_text.text = "You're super asymmetric:"
+        symmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
+        symmetry_card.summary_text.text = "You're super asymmetric:"
         text_item = DataCardSummaryTextItem()
         text_item.text = "first reason why"
-        asymmetry_card.summary_text.text_items = [text_item]
-        asymmetry_card.summary_text.active = True
+        symmetry_card.summary_text.text_items = [text_item]
+        symmetry_card.summary_text.active = True
 
         movement_dysfunction_card.assign_score_value(movement_scores.movement_dysfunction_score.value)
         movement_dysfunction_card.summary_text.text = "You're super dysfunctional"
         movement_dysfunction_card.summary_text.active = True
 
-        fatigue_card.assign_score_value(movement_scores.fatigue_score.value)
-        fatigue_card.summary_text.text = "You're super Fatigued"
-        text_item = DataCardSummaryTextItem()
-        text_item.text = "Only reason why"
-        fatigue_card.summary_text.text_items = [text_item]
-        fatigue_card.summary_text.active = True
-
-        cards = [asymmetry_card, movement_dysfunction_card, fatigue_card]
+        cards = [symmetry_card, movement_dysfunction_card]
+        if movement_scores.fatigue_score.value is not None and  movement_scores.fatigue_score.value < 100:
+            fatigue_card = DataCard(DataCardType.boolean)
+            fatigue_card.value = True
+            fatigue_card.color = 5
+            fatigue_card.title_text = "Fatigue: Present"
+            fatigue_card.icon = 2
+            fatigue_card.summary_text.text = "You're super Fatigued"
+            text_item = DataCardSummaryTextItem()
+            text_item.text = "Only reason why"
+            fatigue_card.summary_text.text_items = [text_item]
+            fatigue_card.summary_text.active = True
+            cards.append(fatigue_card)
 
         return cards
 
@@ -357,7 +362,7 @@ class ScoringProcessor(object):
         scores.asymmetry_medians_score = 0
         scores.asymmetry_fatigue_score = 0
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
-        scores.fatigue_score = self.get_score(0)
+        scores.fatigue_score = self.get_score(100) # TODO: This is such that it does not appear in fatigue card
 
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + 50)
 
