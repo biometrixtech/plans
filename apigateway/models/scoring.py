@@ -313,6 +313,7 @@ class DataCard(Serialisable):
         self.color = None
         self.summary_text = DataCardSummaryText()
         self.icon = None
+        self.max_value = None
 
     def json_serialise(self):
         ret = {
@@ -321,7 +322,8 @@ class DataCard(Serialisable):
             'title_text': self.title_text,
             'color': self.color.value if self.color is not None else None,
             'summary_text': self.summary_text.json_serialise() if self.summary_text is not None else None,
-            'icon': self.icon.value if self.icon is not None else None
+            'icon': self.icon.value if self.icon is not None else None,
+            'max_value': self.max_value
         }
         return ret
 
@@ -333,6 +335,7 @@ class DataCard(Serialisable):
         data.color = LegendColor(input_dict['color']) if input_dict.get('color') is not None else None
         data.summary_text = DataCardSummaryText.json_deserialise(input_dict['summary_text']) if input_dict.get('summary_text') is not None else None
         data.icon = input_dict.get('icon')
+        data.max_value = input_dict.get('max_value')
         return data
 
     def __setattr__(self, name, value):
@@ -346,27 +349,32 @@ class DataCard(Serialisable):
 
     def assign_score_value(self, score):
         if self.type == DataCardType.categorical:
+            self.max_value = 4
             if score is not None:
                 if score > 90:
                     self.value = 0
-                    self.color = 0
                     self.title_text = "Asymmetry: Not Present"
+                    self.color = 13
                 elif score > 75:
                     self.value = 1
-                    self.color = 2
-                    self.title_text = "Asymmetry: Low"
+                    self.title_text = "Asymmetry: Mild"
+                    self.color = 23
                 elif score > 60:
                     self.value = 2
-                    self.color = 2
-                    self.title_text = "Asymmetry: Mod"
-                else:
+                    self.title_text = "Asymmetry: Moderate"
+                    self.color = 5
+                elif score > 50:
                     self.value = 3
-                    self.color = 3
                     self.title_text = "Asymmetry: High"
+                    self.color = 6
+                else:
+                    self.value = 4
+                    self.title_text = "Asymmetry: Severe"
+                    self.color = 27
         elif self.type == DataCardType.boolean:
             if score is not None and score < 60:
                 self.value = True
-                self.color = 16
+                self.color = 5
                 self.title_text = "Fatigue: Present"
                 self.icon = 2
             else:
@@ -380,7 +388,7 @@ class DataCard(Serialisable):
                 self.color = 5
                 self.title_text = "Magnitude: High"
             else:
-                self.color = 12
+                self.color = 13
                 self.title_text = "Magnitude: Low"
 
 
