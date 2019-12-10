@@ -132,8 +132,8 @@ class ScoringSummaryProcessor(object):
                 viz.left_y = average_symmetry
                 viz.right_y = average_symmetry
         if viz.left_y == viz.right_y:
-            viz.left_y_legend_color = 13
-            viz.right_y_legend_color = 13
+            viz.left_y_legend_color = LegendColor(7)
+            viz.right_y_legend_color = LegendColor(7)
         viz.left_y_legend = viz.left_y
         viz.right_y_legend = viz.right_y
         return viz
