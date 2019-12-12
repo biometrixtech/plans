@@ -1,7 +1,7 @@
 from enum import Enum
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
-from models.styles import BoldText
+from models.styles import BoldText, LegendColor
 
 
 class TimeBlockDetail(object):
@@ -522,6 +522,7 @@ class HipRotation(object):
             #percentage = self.percent_events_asymmetric
             bold_text = BoldText()
             bold_text.text = str(minutes) + " min"
+            bold_text.color = LegendColor(12)
             return [bold_text]
 
         else:
@@ -589,6 +590,7 @@ class KneeValgus(object):
             #percentage = self.percent_events_asymmetric
             bold_text = BoldText()
             bold_text.text = str(minutes) + " min"
+            bold_text.color = LegendColor(12)
             return [bold_text]
 
         else:
@@ -656,6 +658,7 @@ class HipDrop(object):
             #percentage = self.percent_events_asymmetric
             bold_text = BoldText()
             bold_text.text = str(minutes) + " min"
+            bold_text.color = LegendColor(12)
             return [bold_text]
 
         else:
@@ -723,6 +726,7 @@ class AnklePitch(object):
             #percentage = self.percent_events_asymmetric
             bold_text = BoldText()
             bold_text.text = str(minutes) + " min"
+            bold_text.color = LegendColor(12)
             return [bold_text]
 
         else:
@@ -790,6 +794,7 @@ class AnteriorPelvicTilt(object):
             #percentage = self.percent_events_asymmetric
             bold_text = BoldText()
             bold_text.text = str(minutes) + " min"
+            bold_text.color = LegendColor(12)
             return [bold_text]
         else:
             return []
