@@ -1,4 +1,5 @@
-from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, DataCard, SessionScoringSummary, MovementVariableSummaryData, RecoveryQuality, DataCardType, DataCardSummaryTextItem
+from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, SessionScoringSummary
+from models.scoring import MovementVariableSummaryData, RecoveryQuality, DataCard, DataCardVisualType, DataCardSummaryTextItem, DataCardData
 from models.styles import LegendColor
 import statistics
 
@@ -34,10 +35,12 @@ class ScoringSummaryProcessor(object):
         total_score = 0
         total_score_denom = 0
         all_scores = []
+        # all_data_cards = []
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
             apt_scores = scoring_processor.get_apt_scores(session.asymmetry, session.movement_patterns)
             apt_scores.overall_score.color = 11
             session_scoring_summary.apt = self.get_apt_moving_variable_summary(apt_scores, session)
+            session_scoring_summary.all_data_cards.extend(session_scoring_summary.apt.data_cards)
             total_score += apt_scores.overall_score.value * .35
             total_score_denom += .35
             all_scores.append(apt_scores)
@@ -45,12 +48,14 @@ class ScoringSummaryProcessor(object):
             ankle_pitch_scores = scoring_processor.get_ankle_pitch_scores(session.movement_patterns)
             ankle_pitch_scores.overall_score.color = 11
             session_scoring_summary.ankle_pitch = self.get_ankle_pitch_moving_variable_summary(ankle_pitch_scores, session)
+            session_scoring_summary.all_data_cards.extend(session_scoring_summary.ankle_pitch.data_cards)
             all_scores.append(ankle_pitch_scores)
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
             hip_drop_scores = scoring_processor.get_hip_drop_scores(session.asymmetry, session.movement_patterns)
             hip_drop_scores.overall_score.color = 11
             session_scoring_summary.hip_drop = self.get_hip_drop_moving_variable_summary(hip_drop_scores, session)
+            session_scoring_summary.all_data_cards.extend(session_scoring_summary.hip_drop.data_cards)
             total_score += hip_drop_scores.overall_score.value * .25
             total_score_denom += .25
             all_scores.append(hip_drop_scores)
@@ -59,6 +64,7 @@ class ScoringSummaryProcessor(object):
             knee_valgus_scores = scoring_processor.get_knee_valgus_scores(session.asymmetry, session.movement_patterns)
             knee_valgus_scores.overall_score.color = 11
             session_scoring_summary.knee_valgus = self.get_knee_valgus_moving_variable_summary(knee_valgus_scores, session)
+            session_scoring_summary.all_data_cards.extend(session_scoring_summary.knee_valgus.data_cards)
             total_score += knee_valgus_scores.overall_score.value * .20
             total_score_denom += .20
             all_scores.append(knee_valgus_scores)
@@ -67,6 +73,7 @@ class ScoringSummaryProcessor(object):
             hip_rotation_scores = scoring_processor.get_hip_rotation_scores(session.asymmetry, session.movement_patterns)
             hip_rotation_scores.overall_score.color = 11
             session_scoring_summary.hip_rotation = self.get_hip_rotation_moving_variable_summary(hip_rotation_scores, session)
+            session_scoring_summary.all_data_cards.extend(session_scoring_summary.hip_rotation.data_cards)
             total_score += hip_rotation_scores.overall_score.value * .20
             total_score_denom += .20
             all_scores.append(hip_rotation_scores)
@@ -87,7 +94,9 @@ class ScoringSummaryProcessor(object):
 
         session_scoring_summary.score.text = 'total movement efficiency score'
         session_scoring_summary.get_data_points()
-        session_scoring_summary.get_summary_pills(all_scores)
+        all_data_cards = []
+
+        session_scoring_summary.get_summary_pills()
 
         return session_scoring_summary
 
@@ -236,8 +245,10 @@ class ScoringSummaryProcessor(object):
     def get_data_cards(self, movement_scores):
 
         # These two cards are always present
-        symmetry_card = DataCard(DataCardType.categorical)
-        movement_dysfunction_card = DataCard(DataCardType.magnitude)
+        symmetry_card = DataCard(DataCardVisualType.categorical)
+        symmetry_card.data = DataCardData.symmetry
+        movement_dysfunction_card = DataCard(DataCardVisualType.magnitude)
+        movement_dysfunction_card.data = DataCardData.dysfunction
 
         # TODO: Assign proper text
         symmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
@@ -253,7 +264,8 @@ class ScoringSummaryProcessor(object):
 
         cards = [symmetry_card, movement_dysfunction_card]
         if movement_scores.fatigue_score.value is not None and  movement_scores.fatigue_score.value < 100:
-            fatigue_card = DataCard(DataCardType.boolean)
+            fatigue_card = DataCard(DataCardVisualType.boolean)
+            fatigue_card.data = DataCardData.fatigue
             fatigue_card.value = True
             fatigue_card.color = 5
             fatigue_card.title_text = "Fatigue: Present"

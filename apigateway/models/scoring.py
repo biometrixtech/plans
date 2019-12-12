@@ -1,6 +1,6 @@
 from serialisable import Serialisable
 from models.styles import LegendColor, BoldText, MovementVariableType
-from utils import format_date, none_max
+from utils import format_date
 from enum import Enum
 
 
@@ -124,6 +124,7 @@ class SessionScoringSummary(object):
         self.hip_rotation = None
         self.data_points = []  # DataPoint
         self.summary_pills = []
+        self.all_data_cards = []
 
     def get_data_points(self):
         page = 0
@@ -142,52 +143,34 @@ class SessionScoringSummary(object):
         if self.hip_rotation is not None:
             self.data_points.append(DataPoint(data_type=MovementVariableType(4), index='hip_rotation', page=page))
 
-    def get_summary_pills(self, all_scores):
-        max_asymmetry = 0
-        max_dysfunction = 0
-        max_fatigue = 0
-        for score in all_scores:
-            max_asymmetry = none_max([max_asymmetry, score.asymmetry_score.value])
-            max_dysfunction = none_max([max_dysfunction, score.movement_dysfunction_score.value])
-            max_fatigue = none_max([max_fatigue, score.fatigue_score.value])
-        if max_asymmetry >= 50:
-            asymmetry_pill = MovementSummaryPill()
-            if max_asymmetry >= 90:
-                asymmetry_pill.text = "High Asymmetry"
-                asymmetry_pill.color = 16
-                asymmetry_pill.severity = 3
-            elif max_asymmetry >= 75:
-                asymmetry_pill.text = "Mod Asymmetry"
-                asymmetry_pill.color = 14
-                asymmetry_pill.severity = 2
-            elif max_asymmetry >= 50:
-                asymmetry_pill.text = "Low Asymmetry"
-                asymmetry_pill.color = 25
-                asymmetry_pill.severity = 1
-            self.summary_pills.append(asymmetry_pill)
+    def get_summary_pills(self):
+        symmetry_data_cards = [c for c in self.all_data_cards if c.data == DataCardData.symmetry]
+        dysfunction_data_cards = [c for c in self.all_data_cards if c.data == DataCardData.dysfunction]
+        fatigue_data_cards = [c for c in self.all_data_cards if c.data == DataCardData.fatigue]
 
-        if max_fatigue > 85:
+        if len(symmetry_data_cards) > 0:
+            min_symmetry_score = min([c.score for c in symmetry_data_cards])
+            min_symmetry_card = [c for c in symmetry_data_cards if c.score == min_symmetry_score][0]
+            if min_symmetry_card.value < min_symmetry_card.max_value:
+                symmetry_pill = MovementSummaryPill()
+                symmetry_pill.color = min_symmetry_card.color
+                symmetry_pill.text = min_symmetry_card.pill_text
+                self.summary_pills.append(symmetry_pill)
+
+        if len(dysfunction_data_cards) > 0:
+            min_dysfunction_score = min([c.score for c in dysfunction_data_cards])
+            if min_dysfunction_score <= 90:  # TODO: update this threshold
+                min_dysfunction_card = [c for c in dysfunction_data_cards if c.score == min_dysfunction_score][0]
+                dysfunction_pill = MovementSummaryPill()
+                dysfunction_pill.text = min_dysfunction_card.pill_text
+                dysfunction_pill.color = min_dysfunction_card.color
+                self.summary_pills.append(dysfunction_pill)
+
+        if len(fatigue_data_cards) > 0:
             fatigue_pill = MovementSummaryPill()
             fatigue_pill.text = "Fatigue"
-            fatigue_pill.color = 16
-            fatigue_pill.severity = 3
+            fatigue_pill.color = 5
             self.summary_pills.append(fatigue_pill)
-
-        if max_dysfunction >= 50:
-            dysfunction_pill = MovementSummaryPill()
-            if max_dysfunction >= 90:
-                dysfunction_pill.text = "High Magnitude"
-                dysfunction_pill.color = 16
-                dysfunction_pill.severity = 3
-            elif max_dysfunction >= 75:
-                dysfunction_pill.text = "Mod Magnitude"
-                dysfunction_pill.color = 14
-                dysfunction_pill.severity = 2
-            elif max_dysfunction >= 50:
-                dysfunction_pill.text = "Low Magnitude"
-                dysfunction_pill.color = 25
-                dysfunction_pill.severity = 1
-            self.summary_pills.append(dysfunction_pill)
 
 
 class MovementVariableSummary(Serialisable):
@@ -315,6 +298,9 @@ class DataCard(Serialisable):
         self.summary_text = DataCardSummaryText()
         self.icon = None
         self.max_value = None
+        self.data = None
+        self.score = None
+        self.pill_text = ""
 
     def json_serialise(self):
         ret = {
@@ -340,8 +326,8 @@ class DataCard(Serialisable):
         return data
 
     def __setattr__(self, name, value):
-        if name == 'type' and value is not None and not isinstance(value, DataCardType):
-            value = DataCardType(value)
+        if name == 'type' and value is not None and not isinstance(value, DataCardVisualType):
+            value = DataCardVisualType(value)
         elif name == 'color' and value is not None and not isinstance(value, LegendColor):
             value = LegendColor(value)
         elif name == 'icon' and value is not None and not isinstance(value, DataCardIcon):
@@ -349,51 +335,60 @@ class DataCard(Serialisable):
         super().__setattr__(name, value)
 
     def assign_score_value(self, score):
-        if self.type == DataCardType.categorical:
+        self.score = score
+        if self.data == DataCardData.symmetry:
             self.max_value = 4
             if score is not None:
                 if score > 90:
                     self.value = 4
                     self.title_text = "Asymmetry: Not Present"
+                    self.pill_text = ""
                     self.color = 13
                 elif score > 75:
                     self.value = 3
                     self.title_text = "Asymmetry: Mild"
+                    self.pill_text = "Mild Asymmetry"
                     self.color = 23
                 elif score > 60:
                     self.value = 2
                     self.title_text = "Asymmetry: Moderate"
+                    self.pill_text = "Moderate Asymmetry"
                     self.color = 5
                 elif score > 50:
                     self.value = 1
                     self.title_text = "Asymmetry: High"
+                    self.pill_text = "High Asymmetry"
                     self.color = 6
                 else:
                     self.value = 1
                     self.title_text = "Asymmetry: Severe"
+                    self.pill_text = "Severe Asymmetry"
                     self.color = 27
             else:
                 self.value = 4
                 self.title_text = "Asymmetry: Not Present"
+                self.pill_text = ""
                 self.color = 13
-        elif self.type == DataCardType.magnitude:
+        elif self.data == DataCardData.dysfunction:
             if score is not None:
                 self.value = score
                 if score > 90:
                     self.color = 13
-                    self.title_text = "Magnitude: Low"
+                    self.title_text = "Dysfunction: Low"
+                    self.pill_text = ""
                 elif score > 80:
                     self.color = 5
-                    self.title_text = "Magnitude: Mod"
+                    self.title_text = "Dysfunction: Mod"
+                    self.pill_text = "Mild Dysfunction"
                 else:
                     self.color = 6
-                    self.title_text = "Magnitude: High"
+                    self.title_text = "Dysfunction: High"
+                    self.pill_text = "High Dysfunction"
             else:
                 self.value = 100
-                if score > 90:
-                    self.color = 13
-                    self.title_text = "Magnitude: Low"
-
+                self.color = 13
+                self.title_text = "Dysfunction: Low"
+                self.pill_text = ""
 
 
 class DataCardSummaryText(Serialisable):
@@ -468,10 +463,16 @@ class DataPoint(Serialisable):
         return cls(data_type=input_dict.get('data_type'), index=input_dict.get('index', ''), page=input_dict.get('page', 0))
 
 
-class DataCardType(Enum):
+class DataCardVisualType(Enum):
     categorical = 0
     magnitude = 1
     boolean = 2
+
+
+class DataCardData(Enum):
+    symmetry = 0
+    dysfunction = 1
+    fatigue = 2
 
 
 class DataCardIcon(Enum):

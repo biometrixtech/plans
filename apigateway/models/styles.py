@@ -51,6 +51,7 @@ class LegendColor(Enum):
     yellow_xx_light = 25
     splash = 26
     error = 27
+    super_light = 28
 
 
 class Legend(object):

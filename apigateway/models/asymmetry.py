@@ -262,7 +262,7 @@ class SessionAsymmetry(Serialisable):
                             'flag': 1
                         },
                         {
-                            'color': [11, 11],
+                            'color': [28, 28],
                             'text': 'Symmetric Steps',
                             'active': False,
                             'flag': 0
