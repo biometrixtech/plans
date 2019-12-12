@@ -1,4 +1,5 @@
 import abc
+import uuid
 import datetime
 from enum import Enum
 from serialisable import Serialisable
@@ -80,8 +81,19 @@ class DosageDuration(object):
         self.comprehensive_duration = comprehensive_duration
 
 
+    @staticmethod
+    def generate_uuid(body):
+        unique_key = 'http://session.fathomai.com/{}_{}_{}_{}'.format(
+            body.get('accessory_id'),
+            ','.join(sorted(body.get('sensor_ids', []))),
+            body.get('user_id'),
+            body.get('event_date'),
+        )
+        return str(uuid.uuid5(uuid.NAMESPACE_URL, unique_key))
+
 class Modality(object):
     def __init__(self, event_date_time, modality_type, relative_load_level=3):
+        self.id = None
         self.type = modality_type
         self.title = self.type.get_display_name().upper()
         self.when = ""
@@ -109,6 +121,7 @@ class Modality(object):
 
     def json_serialise(self):
          return {
+             "id": self.id,
              "type": self.type.value,
              "title": self.title,
              "when": self.when,
@@ -144,6 +157,7 @@ class Modality(object):
             modality = FunctionalStrength(event_date_time=input_dict.get('event_date_time'))
         else:
             raise ValueError("Unknown modality type")
+        modality.id = input_dict.get("id")
         modality.start_date_time = input_dict.get('start_date_time', None)
         modality.completed_date_time = input_dict.get('completed_date_time', None)
         modality.event_date_time = input_dict.get('event_date_time', None)
@@ -163,6 +177,8 @@ class Modality(object):
         if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
+        if name == 'id' and value is None:
+            value = str(uuid.uuid4())
         super().__setattr__(name, value)
 
     @abc.abstractmethod
