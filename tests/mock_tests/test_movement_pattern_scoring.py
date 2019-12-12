@@ -32,7 +32,7 @@ def get_run_a_sessions():
 
     for i in range(days):
         if history[i] is not None:
-            movement_patterns_response = mph.create_elastticity_adf(history[i])
+            movement_patterns_response = mph.create_elasticity_adf(history[i])
             movement_patterns = MovementPatterns.json_deserialise(movement_patterns_response)
             asymmetry = Asymmetry()
             apt = AnteriorPelvicTilt(6, 8)
@@ -65,7 +65,7 @@ def test_get_apt_scores():
     days = len(history)
     for i in range(days):
         if history[i] is not None:
-            movement_patterns_response = mph.create_elastticity_adf(history[i])
+            movement_patterns_response = mph.create_elasticity_adf(history[i])
             movement_patterns = MovementPatterns.json_deserialise(movement_patterns_response)
             asymmetry = Asymmetry()
             apt = AnteriorPelvicTilt(6, 8)
