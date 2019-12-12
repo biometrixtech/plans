@@ -20,7 +20,54 @@ def pre_pad_with_nones(existing_dict, total_days=35):
         return existing_dict
 
 
-def create_elastticity_adf(history):
+def create_asymmetry(history):
+
+    apt_history = history["apt"]
+    ankle_pitch_history = history["ankle_pitch"]
+    hip_drop_history = history["hip_drop"]
+    knee_valgus_history = history["knee_valgus"]
+    hip_rotation_history = history["hip_rotation"]
+
+    return {
+        "apt": {
+            "left": apt_history["left"],
+            "right": apt_history["right"],
+            "asymmetric_events": apt_history["asymmetric_events"],
+            "symmetric_events": apt_history["symmetric_events"],
+            "percent_events_asymmetric": apt_history["percent_events_asymmetric"]
+        },
+        "ankle_pitch": {
+            "left": ankle_pitch_history["left"],
+            "right": ankle_pitch_history["right"],
+            "asymmetric_events": ankle_pitch_history["asymmetric_events"],
+            "symmetric_events": ankle_pitch_history["symmetric_events"],
+            "percent_events_asymmetric": ankle_pitch_history["percent_events_asymmetric"]
+        },
+        "hip_drop": {
+            "left": hip_drop_history["left"],
+            "right": hip_drop_history["right"],
+            "asymmetric_events": hip_drop_history["asymmetric_events"],
+            "symmetric_events": hip_drop_history["symmetric_events"],
+            "percent_events_asymmetric": hip_drop_history["percent_events_asymmetric"]
+        },
+        "knee_valgus": {
+            "left": knee_valgus_history["left"],
+            "right": knee_valgus_history["right"],
+            "asymmetric_events": knee_valgus_history["asymmetric_events"],
+            "symmetric_events": knee_valgus_history["symmetric_events"],
+            "percent_events_asymmetric": knee_valgus_history["percent_events_asymmetric"]
+        },
+        "hip_rotation": {
+            "left": hip_rotation_history["left"],
+            "right": hip_rotation_history["right"],
+            "asymmetric_events": hip_rotation_history["asymmetric_events"],
+            "symmetric_events": hip_rotation_history["symmetric_events"],
+            "percent_events_asymmetric": hip_rotation_history["percent_events_asymmetric"]
+        }
+    }
+
+
+def create_elasticity_adf(history):
     return {
                 "apt_ankle_pitch": {
                     "left": {
@@ -104,7 +151,211 @@ def create_elastticity_adf(history):
                 }}
 
 
+def get_asymmetry_dict(left, right, asymmetric_events, symmetric_events, percent_events_asymmetric):
+
+    dict = {}
+    dict["left"] = left
+    dict["right"] = right
+    dict["asymmetric_events"] = asymmetric_events
+    dict["symmetric_events"] = symmetric_events
+    dict["percent_events_asymmetric"] = percent_events_asymmetric
+
+    return dict
+
+
+def get_asymmetry_a():
+
+    full_history = {}
+    full_history = pre_pad_with_nones(full_history, 32)
+    n = 32
+
+    asymmetry = {}
+    asymmetry["apt"] = get_asymmetry_dict(10.54, 9.44, 9, 20, 31)
+    asymmetry["ankle_pitch"] = get_asymmetry_dict(93.105, 95.3, 11, 17, 39)
+    asymmetry["hip_drop"] = get_asymmetry_dict(6.43, 2.89, 29, 0, 100)
+    asymmetry["knee_valgus"] = get_asymmetry_dict(3.62, 1.22, 16, 13, 55)
+    asymmetry["hip_rotation"] = get_asymmetry_dict(1.27, 2.15, 23, 6, 79)
+
+    full_history[n] = asymmetry
+    full_history[n + 1] = None
+
+    asymmetry_2 = {}
+    asymmetry_2["apt"] = get_asymmetry_dict(10.4575, 7.36, 32, 0, 100)
+    asymmetry_2["ankle_pitch"] = get_asymmetry_dict(93.6725, 89.265, 26, 6, 81)
+    asymmetry_2["hip_drop"] = get_asymmetry_dict(6.065, 5.8375, 0, 32, 0)
+    asymmetry_2["knee_valgus"] = get_asymmetry_dict(2.78, 5.3775, 32, 0, 100)
+    asymmetry_2["hip_rotation"] = get_asymmetry_dict(1.125, 2.1525, 32, 0, 100)
+
+    full_history[n + 2] = asymmetry_2
+
+    return full_history
+
+def get_asymmetry_long():
+
+    full_history = {}
+    full_history = pre_pad_with_nones(full_history, 32)
+    n = 32
+
+    asymmetry = {}
+    asymmetry["apt"] = get_asymmetry_dict(5.225, 4.4475, 177, 95, 65)
+    asymmetry["ankle_pitch"] = get_asymmetry_dict(71.4725, 71.8225, 12, 152, 7)
+    asymmetry["hip_drop"] = get_asymmetry_dict(5.4825, 5.395, 72, 200, 26)
+    asymmetry["knee_valgus"] = get_asymmetry_dict(0.0, 4.8325, 22, 214, 9)
+    asymmetry["hip_rotation"] = get_asymmetry_dict(0.1, 0.54, 137, 122, 53)
+
+    full_history[n] = asymmetry
+    full_history[n + 1] = None
+
+    asymmetry_2 = {}
+    asymmetry_2["apt"] = get_asymmetry_dict(2.305, 2.89, 166, 100, 62)
+    asymmetry_2["ankle_pitch"] = get_asymmetry_dict(73.66, 72.49, 28, 237, 11)
+    asymmetry_2["hip_drop"] = get_asymmetry_dict(1.825, 3.415, 248, 18, 93)
+    asymmetry_2["knee_valgus"] = get_asymmetry_dict(2.29, 5.3175, 266, 0, 100)
+    asymmetry_2["hip_rotation"] = get_asymmetry_dict(0.0, 0.28, 0, 135, 0)
+
+    full_history[n + 2] = asymmetry_2
+
+    return full_history
+
+
+def get_asymmetry_tread():
+
+    full_history = {}
+    full_history = pre_pad_with_nones(full_history, 26)
+    n = 26
+
+    asymmetry = {}
+    asymmetry["apt"] = get_asymmetry_dict(7.36, 8.21, 1, 4, 20)
+    asymmetry["ankle_pitch"] = get_asymmetry_dict(80.6975, 79.8525, 0, 4, 0)
+    asymmetry["hip_drop"] = get_asymmetry_dict(9.25, 3.78, 5, 0, 100)
+    asymmetry["knee_valgus"] = get_asymmetry_dict(5.815, 5.16, 2, 3, 40)
+    asymmetry["hip_rotation"] = get_asymmetry_dict(2.605, 2.53, 4, 1, 80)
+
+    full_history[n] = asymmetry
+    full_history[n + 1] = None
+
+    asymmetry_2 = {}
+    asymmetry_2["apt"] = get_asymmetry_dict(5.4375, 6.3, 5, 3, 62)
+    asymmetry_2["ankle_pitch"] = get_asymmetry_dict(75.7775, 78.37, 4, 4, 50)
+    asymmetry_2["hip_drop"] = get_asymmetry_dict(5.725, 6.285, 1, 7, 12)
+    asymmetry_2["knee_valgus"] = get_asymmetry_dict(6.545, 5.3625, 7, 1, 88)
+    asymmetry_2["hip_rotation"] = get_asymmetry_dict(1.1975, 1.02, 5, 3, 62)
+
+    full_history[n + 2] = asymmetry_2
+    full_history[n + 3] = None
+
+    asymmetry_3 = {}
+    asymmetry_3["apt"] = get_asymmetry_dict(4.67, 5.23, 2, 5, 29)
+    asymmetry_3["ankle_pitch"] = get_asymmetry_dict(81.185, 88.0475, 3, 1, 75)
+    asymmetry_3["hip_drop"] = get_asymmetry_dict(5.95, 4.23, 5, 2, 71)
+    asymmetry_3["knee_valgus"] = get_asymmetry_dict(5.395, 4.28, 5, 2, 71)
+    asymmetry_3["hip_rotation"] = get_asymmetry_dict(1.2, 0.44, 5, 2, 71)
+
+    full_history[n + 4] = asymmetry_3
+    full_history[n + 5] = None
+
+    asymmetry_4 = {}
+    asymmetry_4["apt"] = get_asymmetry_dict(4.32, 5.7425, 5, 1, 83)
+    asymmetry_4["ankle_pitch"] = get_asymmetry_dict(79.745, 82.1425, 1, 5, 17)
+    asymmetry_4["hip_drop"] = get_asymmetry_dict(5.7325, 5.085, 1, 5, 17)
+    asymmetry_4["knee_valgus"] = get_asymmetry_dict(6.7, 5.165, 6, 0, 100)
+    asymmetry_4["hip_rotation"] = get_asymmetry_dict(1.0725, 0.405, 5, 1, 83)
+
+    full_history[n + 6] = asymmetry_4
+    full_history[n + 7] = None
+
+    asymmetry_5 = {}
+    asymmetry_5["apt"] = get_asymmetry_dict(4.66, 5.6, 24, 8, 75)
+    asymmetry_5["ankle_pitch"] = get_asymmetry_dict(85.685, 86.765, 7, 25, 22)
+    asymmetry_5["hip_drop"] = get_asymmetry_dict(5.695, 5.505, 4, 28, 12)
+    asymmetry_5["knee_valgus"] = get_asymmetry_dict(7.755, 6.125, 30, 2, 94)
+    asymmetry_5["hip_rotation"] = get_asymmetry_dict(0.2575, 0.2275, 7, 25, 22)
+
+    full_history[n + 8] = asymmetry_5
+
+    return full_history
+
+
+def get_asymmetry_fake():
+
+    full_history = {}
+    full_history = pre_pad_with_nones(full_history, 22)
+    n = 22
+
+    asymmetry = {}
+    asymmetry["apt"] = get_asymmetry_dict(7.36, 8.21, 1, 4, 20)
+    asymmetry["ankle_pitch"] = get_asymmetry_dict(80.6975, 79.8525, 0, 4, 0)
+    asymmetry["hip_drop"] = get_asymmetry_dict(9.25, 3.78, 5, 0, 100)
+    asymmetry["knee_valgus"] = get_asymmetry_dict(5.815, 5.16, 2, 3, 40)
+    asymmetry["hip_rotation"] = get_asymmetry_dict(2.605, 2.53, 4, 1, 80)
+
+    full_history[n] = asymmetry
+    full_history[n + 1] = None
+
+    asymmetry_2 = {}
+    asymmetry_2["apt"] = get_asymmetry_dict(5.4375, 6.3, 5, 3, 62)
+    asymmetry_2["ankle_pitch"] = get_asymmetry_dict(75.7775, 78.37, 4, 4, 50)
+    asymmetry_2["hip_drop"] = get_asymmetry_dict(5.725, 6.285, 1, 7, 12)
+    asymmetry_2["knee_valgus"] = get_asymmetry_dict(6.545, 5.3625, 7, 1, 88)
+    asymmetry_2["hip_rotation"] = get_asymmetry_dict(1.1975, 1.02, 5, 3, 62)
+
+    full_history[n + 2] = asymmetry_2
+    full_history[n + 3] = None
+
+    asymmetry_3 = {}
+    asymmetry_3["apt"] = get_asymmetry_dict(4.67, 5.23, 2, 5, 29)
+    asymmetry_3["ankle_pitch"] = get_asymmetry_dict(81.185, 88.0475, 3, 1, 75)
+    asymmetry_3["hip_drop"] = get_asymmetry_dict(5.95, 4.23, 5, 2, 71)
+    asymmetry_3["knee_valgus"] = get_asymmetry_dict(5.395, 4.28, 5, 2, 71)
+    asymmetry_3["hip_rotation"] = get_asymmetry_dict(1.2, 0.44, 5, 2, 71)
+
+    full_history[n + 4] = asymmetry_3
+    full_history[n + 5] = None
+
+    asymmetry_4 = {}
+    asymmetry_4["apt"] = get_asymmetry_dict(4.32, 5.7425, 5, 1, 83)
+    asymmetry_4["ankle_pitch"] = get_asymmetry_dict(79.745, 82.1425, 1, 5, 17)
+    asymmetry_4["hip_drop"] = get_asymmetry_dict(5.7325, 5.085, 1, 5, 17)
+    asymmetry_4["knee_valgus"] = get_asymmetry_dict(6.7, 5.165, 6, 0, 100)
+    asymmetry_4["hip_rotation"] = get_asymmetry_dict(1.0725, 0.405, 5, 1, 83)
+
+    full_history[n + 6] = asymmetry_4
+    full_history[n + 7] = None
+
+    asymmetry_5 = {}
+    asymmetry_5["apt"] = get_asymmetry_dict(4.66, 5.6, 24, 8, 75)
+    asymmetry_5["ankle_pitch"] = get_asymmetry_dict(85.685, 86.765, 7, 25, 22)
+    asymmetry_5["hip_drop"] = get_asymmetry_dict(5.695, 5.505, 4, 28, 12)
+    asymmetry_5["knee_valgus"] = get_asymmetry_dict(7.755, 6.125, 30, 2, 94)
+    asymmetry_5["hip_rotation"] = get_asymmetry_dict(0.2575, 0.2275, 7, 25, 22)
+
+    full_history[n + 8] = asymmetry_5
+    full_history[n + 9] = None
+
+    asymmetry_6 = {}
+    asymmetry_6["apt"] = get_asymmetry_dict(5.225, 4.4475, 177, 95, 65)
+    asymmetry_6["ankle_pitch"] = get_asymmetry_dict(71.4725, 71.8225, 12, 152, 7)
+    asymmetry_6["hip_drop"] = get_asymmetry_dict(5.4825, 5.395, 72, 200, 26)
+    asymmetry_6["knee_valgus"] = get_asymmetry_dict(0.0, 4.8325, 22, 214, 9)
+    asymmetry_6["hip_rotation"] = get_asymmetry_dict(0.1, 0.54, 137, 122, 53)
+
+    full_history[n + 10] = asymmetry_6
+    full_history[n + 11] = None
+
+    asymmetry_7 = {}
+    asymmetry_7["apt"] = get_asymmetry_dict(2.305, 2.89, 166, 100, 62)
+    asymmetry_7["ankle_pitch"] = get_asymmetry_dict(73.66, 72.49, 28, 237, 11)
+    asymmetry_7["hip_drop"] = get_asymmetry_dict(1.825, 3.415, 248, 18, 93)
+    asymmetry_7["knee_valgus"] = get_asymmetry_dict(2.29, 5.3175, 266, 0, 100)
+    asymmetry_7["hip_rotation"] = get_asymmetry_dict(0.0, 0.28, 0, 135, 0)
+
+    full_history[n + 12] = asymmetry_7
+
+    return full_history
+
+
 def run_fake_regressions_a():
+
     full_session_history = {}
     full_session_history = pre_pad_with_nones(full_session_history, 22)
 

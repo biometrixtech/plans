@@ -17,13 +17,13 @@ from datetime import datetime, timedelta
 import movement_pattern_history as mph
 
 
-plans_version = "4_6"
+plans_version = "4_7"
 
 
 def login_user(email, password="Fathom123!"):
     body = {"password": password, "personal_data": {"email": email}}
     headers = {"Content-Type": "application/json"}
-    url = "http://apis.{env}.fathomai.com/users/2_3/user/login".format(env=os.environ['ENVIRONMENT'])
+    url = "http://apis.{env}.fathomai.com/users/2_4/user/login".format(env=os.environ['ENVIRONMENT'])
     response = requests.post(url, data=json.dumps(body), headers=headers)
     return response.json()['user']['id'], response.json()['authorization']['jwt']
 
@@ -80,11 +80,13 @@ if __name__ == '__main__':
             print(u + "=" + user_id)
 
             history, session_details = mph.run_a_regressions()
+            asymmetry_history = mph.get_asymmetry_a()
 
             persona1 = Persona(user_id)
             persona1.elasticity_adf_dictionary = history
             persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
+            persona1.asymmetry_dictionary = asymmetry_history
             if u in ["run_a@200.com", "run_a_2@200.com"]:
                 rpes = [5, None, None, 5, None, 3, None,
                         4, None, 6, None, 5, 5, None,
@@ -139,10 +141,11 @@ if __name__ == '__main__':
             persona1.soreness_history = soreness_history
             if u in ["nc_long@200.com", "nc_long_2@200.com", "ivonna+demo2@fathomai.com"]:
                 history, session_details = mph.long_regressions()
+                asymmetry_history = mph.get_asymmetry_long()
 
                 persona1.elasticity_adf_dictionary = history
                 persona1.three_session_history = session_details
-
+                persona1.asymmetry_dictionary = asymmetry_history
                 rpes = [5, None, None, 5, None, 3, None,
                         4, None, 6, None, 5, 5, None,
                         None, 4, None, 3, 5, None, None,
@@ -171,12 +174,14 @@ if __name__ == '__main__':
             user_id, jwt = login_user(u)
             print(user_id)
             history, session_details = mph.tread_regressions()
+            asymmetry_history = mph.get_asymmetry_tread()
 
             persona1 = Persona(user_id)
 
             persona1.elasticity_adf_dictionary = history
             persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
+            persona1.asymmetry_dictionary = asymmetry_history
             rpes = [5, None, None, 5, None, 3, None,
                     4, None, 6, None, 5, 5, None,
                     None, 4, None, 3, 5, None, None,
@@ -204,12 +209,13 @@ if __name__ == '__main__':
             print(user_id)
 
             history, session_details = mph.long_regressions()
+            asymmetry_history = mph.get_asymmetry_long()
 
             persona1 = Persona(user_id)
 
             persona1.elasticity_adf_dictionary = history
             persona1.three_session_history = session_details
-
+            persona1.asymmetry_dictionary = asymmetry_history
             persona1.soreness_history = soreness_history
             rpes = [5, None, None, 5, None, 3, None,
                     4, None, 6, None, 5, 5, None,
@@ -287,12 +293,14 @@ if __name__ == '__main__':
                     None, None, 6, None, 5, None, 4]
             print(user_id)
             history, session_details = mph.tread_regressions()
+            asymmetry_history = mph.get_asymmetry_tread()
 
             persona1 = Persona(user_id)
 
             persona1.elasticity_adf_dictionary = history
             persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
+            persona1.asymmetry_dictionary = asymmetry_history
             if u == "nc_sore_tread_2@200.com":
                 last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
             else:
@@ -316,12 +324,14 @@ if __name__ == '__main__':
             user_id, jwt = login_user(u, "Fathom123!")
             print(user_id)
             history, session_details = mph.run_fake_regressions_a()
+            asymmetry_history = mph.get_asymmetry_fake()
 
             persona1 = Persona(user_id)
 
             persona1.elasticity_adf_dictionary = history
             persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
+            persona1.asymmetry_dictionary = asymmetry_history
             rpes = [None, None, 6, None, 5, None, 4,
                     None, None, 6, None, 5, None, 4,
                     None, None, 6, None, 5, None, 4,
