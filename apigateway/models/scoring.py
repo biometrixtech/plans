@@ -1,7 +1,21 @@
 from serialisable import Serialisable
-from models.styles import LegendColor, BoldText, MovementVariableType
+from models.styles import LegendColor, BoldText, DataCardIcon, DataCardVisualType
 from utils import format_date
 from enum import Enum
+
+
+class DataCardData(Enum):
+    symmetry = 0
+    dysfunction = 1
+    fatigue = 2
+
+
+class MovementVariableType(Enum):
+    apt = 0
+    ankle_pitch = 1
+    hip_drop = 2
+    knee_valgus = 3
+    hip_rotation = 4
 
 
 class MovementVariableScore(Serialisable):
@@ -67,7 +81,8 @@ class MovementSummaryPill(object):
 
 
 class MovementVariableScores(object):
-    def __init__(self):
+    def __init__(self, var_type):
+        self.variable_type = var_type
         self.asymmetry_regression_coefficient_score = 0
         self.asymmetry_medians_score = 0
         self.asymmetry_fatigue_score = 0
@@ -76,6 +91,11 @@ class MovementVariableScores(object):
         self.fatigue_score = MovementVariableScore()
         self.overall_score = MovementVariableScore()
         self.change = MovementVariableScore()
+
+    def __setattr__(self, name, value):
+        if name == 'variable_type' and value is not None and not isinstance(value, MovementVariableType):
+            value = MovementVariableType(value)
+        super().__setattr__(name, value)
 
 
 class RecoveryQuality(Serialisable):
@@ -461,24 +481,3 @@ class DataPoint(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         return cls(data_type=input_dict.get('data_type'), index=input_dict.get('index', ''), page=input_dict.get('page', 0))
-
-
-class DataCardVisualType(Enum):
-    categorical = 0
-    magnitude = 1
-    boolean = 2
-
-
-class DataCardData(Enum):
-    symmetry = 0
-    dysfunction = 1
-    fatigue = 2
-
-
-class DataCardIcon(Enum):
-    thumbs_up = 0
-    thumbs_down = 1
-    fatigue = 2
-    no_fatigue = 3
-    trending_up = 4
-    trending_down = 5
