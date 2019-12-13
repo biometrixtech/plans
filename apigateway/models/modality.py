@@ -1363,7 +1363,7 @@ class ActiveRestBeforeTraining(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.static_integrate)]
         self.when = "before training"
         self.when_card = "before training"
-        self.display_image = "foam_roll"
+        self.display_image = "inhibit"  # do not include .png or _activity or _tab
 
     # def get_total_exercises(self):
     #     total_exercises = 0
@@ -1890,7 +1890,7 @@ class ActiveRestAfterTraining(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.static_integrate)]
         self.when = "after training"
         self.when_card = "after training"
-        self.display_image = "foam_roll"
+        self.display_image = "inhibit"   # do not include .png or _activity or _tab
 
     # def get_total_exercises(self):
     #     return len(self.inhibit_exercises) + \
@@ -2386,7 +2386,7 @@ class WarmUp(Modality):
         super().__init__(event_date_time, ModalityType.warm_up)
         self.when = "before training"
         self.when_card = "before training"
-        self.display_image = "stretch"
+        self.display_image = "inhibit"   # do not include .png or _activity or _tab
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
@@ -2402,7 +2402,7 @@ class CoolDown(Modality):
         super().__init__(event_date_time, ModalityType.cool_down)
         self.when = "after training"
         self.when_card = "after training"
-        self.display_image = ""
+        self.display_image = "inhibit"   # do not include .png or _activity or _tab
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
@@ -2418,7 +2418,7 @@ class FunctionalStrength(Modality):
         super().__init__(event_date_time, ModalityType.functional_strength)
         self.when = "anytime"
         self.when_card = "anytime"
-        self.display_image = ""
+        self.display_image = "inhibit"   # do not include .png or _activity or _tab
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
