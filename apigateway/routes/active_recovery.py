@@ -60,7 +60,7 @@ def handle_exercise_modalities_complete(user_id=None):
     #     plan.post_active_rest[recovery_index].completed = True  # recovery
     #     plan.post_active_rest[recovery_index].completed_date_time = recovery_event_date
     # elif recovery_type in ['warm_up', 'cool_down', 'functional_strength']:
-    modalities = [m for m in plan.modalities if m.type.name == recovery_type and not m.completed]
+    modalities = [m for m in plan.modalities if m.type.value == recovery_type and not m.completed]
     if len(modalities) > 0:
         modality = modalities[0]
         modality.completed = True
@@ -115,7 +115,7 @@ def handle_exercise_modalities_start(user_id=None):
     #                                         body=body)
     #
     # elif recovery_type in ['warm_up', 'cool_down', 'functional_strength']:
-    modalities = [m for m in plan.modalities if m.type.name == recovery_type and not m.completed]
+    modalities = [m for m in plan.modalities if m.type.value == recovery_type and not m.completed]
     if len(modalities) > 0:
         modality = modalities[0]
         modality.start_date_time = recovery_start_date
