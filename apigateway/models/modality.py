@@ -109,6 +109,7 @@ class Modality(object):
         self.force_data = False
         self.goal_title = ""
         self.display_image = ""
+        self.locked_text = ""
         self.goal_defs = []
         self.goals = {}
         self.exercise_phases = []
@@ -135,6 +136,7 @@ class Modality(object):
              "force_data": self.force_data,
              "goal_title": self.goal_title,  ## make dynamic based on selected routine
              "display_image": self.display_image,
+             "locked_text": self.locked_text,
              # "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
              "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
              "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases]
@@ -166,7 +168,8 @@ class Modality(object):
         modality.default_plan = input_dict.get('default_plan', 'Complete')
         modality.force_data = input_dict.get('force_data', False)
         modality.goal_title = input_dict.get('goal_title', '')
-        modality.display_image = input_dict.get('display_image', '')
+        # modality.display_image = input_dict.get('display_image', '')
+        # modality.locked_text = input_dict.get('locked_text', '')
         # modality.goal_defs = [AthleteGoalDef.json_deserialise(agd) for agd in input_dict.get('goal_defs', [])]
         modality.goals = {goal_type: ModalityGoal.json_deserialise(goal) for
                                  (goal_type, goal) in input_dict.get('goals', {}).items()}
@@ -1364,6 +1367,7 @@ class ActiveRestBeforeTraining(ActiveRest):
         self.when = "before training"
         self.when_card = "before training"
         self.display_image = "inhibit"  # do not include .png or _activity or _tab
+        self.locked_text = "You've missed your window to complete mobilize"
 
     # def get_total_exercises(self):
     #     total_exercises = 0
@@ -1891,6 +1895,8 @@ class ActiveRestAfterTraining(ActiveRest):
         self.when = "after training"
         self.when_card = "after training"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
+        self.locked_text = "You've missed your window to complete mobilize"
+
 
     # def get_total_exercises(self):
     #     return len(self.inhibit_exercises) + \
@@ -2387,6 +2393,8 @@ class WarmUp(Modality):
         self.when = "before training"
         self.when_card = "before training"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
+        self.locked_text = "You've missed your window to complete warm up"
+
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
@@ -2403,6 +2411,8 @@ class CoolDown(Modality):
         self.when = "after training"
         self.when_card = "after training"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
+        self.locked_text = "You've missed your window to complete cool down"
+
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
@@ -2419,6 +2429,8 @@ class FunctionalStrength(Modality):
         self.when = "anytime"
         self.when_card = "anytime"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
+        self.locked_text = "You've missed your window to complete functional strength"
+
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
