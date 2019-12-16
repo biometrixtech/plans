@@ -24,8 +24,18 @@ class ExerciseAssignmentCalculator(object):
             active_rest.scale_all_active_time()
             active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
-                return [active_rest]
-        return []
+                functional_strength = FunctionalStrength(self.event_date_time)  # TODO: revert this
+                functional_strength.display_image = 'dynamic_flexibility'
+                # functional_strength.goals = active_rest.goals
+                functional_strength.exercise_phases = active_rest.exercise_phases[1:3]
+                functional_strength.set_plan_dosage()
+                functional_strength.set_exercise_dosage_ranking()
+                functional_strength.aggregate_dosages()
+                functional_strength.set_winners()
+                functional_strength.scale_all_active_time()
+                functional_strength.reconcile_default_plan_with_active_time()
+                return [active_rest, functional_strength]
+            return []
 
     def get_post_active_rest(self, force_data=False):
 
@@ -39,7 +49,11 @@ class ExerciseAssignmentCalculator(object):
             active_rest.scale_all_active_time()
             active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
-                return [active_rest]
+                cool_down = CoolDown(self.event_date_time)  # TODO: revert this
+                cool_down.display_image = 'dynamic_flexibility'
+                cool_down.goals = active_rest.goals
+                cool_down.exercise_phases = active_rest.exercise_phases[1:3]
+                return [active_rest, cool_down]
         return []
 
     def get_warm_up(self):

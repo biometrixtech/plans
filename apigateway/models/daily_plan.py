@@ -76,9 +76,11 @@ class DailyPlan(Serialisable):
                'completed_cool_down': [cool_down.json_serialise() for cool_down in self.completed_cool_down],
                'post_active_rest': [ar.json_serialise() for ar in self.post_active_rest],
                'completed_post_active_rest': [ar.json_serialise() for ar in self.completed_post_active_rest],
-               'ice': self.ice.json_serialise() if self.ice is not None else None,
+               # 'ice': self.ice.json_serialise() if self.ice is not None else None,
+               'ice': fake_ice(),  # TODO: revert this
                'completed_ice': [ice.json_serialise() for ice in self.completed_ice],
-               'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
+               # 'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
+               'cold_water_immersion': fake_cwi(),  # TODO: revert this
                'completed_cold_water_immersion': [cwi.json_serialise() for cwi in self.completed_cold_water_immersion],
                'last_updated': self.last_updated,
                'daily_readiness_survey': readiness,
@@ -209,6 +211,55 @@ class DailyPlan(Serialisable):
     def sort_insights(self):
         self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
 
+
+def fake_cwi():
+    return {
+            "minutes" : 10,
+            "after_training" : True,
+            "goals" : [ 
+                {
+                    "text" : "Care for soreness",
+                    "priority" : 1,
+                    "goal_type" : 1
+                }
+            ],
+            "start_date_time" : None,
+            "completed_date_time" : None,
+            "event_date_time" : None,
+            "completed" : False,
+            "active" : True,
+            "alerts" : []
+        }
+
+
+def fake_ice():
+    return {
+                "minutes" : 15,
+                "start_date_time" : None,
+                "completed_date_time" : None,
+                "event_date_time" : None,
+                "completed" : False,
+                "active" : True,
+                "body_parts" : [ 
+                    {
+                        "body_part_location" : 12,
+                        "goals" : [ 
+                            {
+                                "text" : "Care for soreness",
+                                "priority" : 1,
+                                "goal_type" : 1
+                            }
+                        ],
+                        "after_training" : True,
+                        "immediately_after_training" : False,
+                        "repeat_every_3hrs_for_24hrs" : True,
+                        "side" : 0,
+                        "completed" : False,
+                        "active" : True
+                    }
+                ],
+                "alerts" : []
+            }
 
 def fake_modality():
     return [
