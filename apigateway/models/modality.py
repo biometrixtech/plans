@@ -35,15 +35,27 @@ class ModalityType(Enum):
             }
         return display_names[self.value]
 
+    def get_image(self):
+     images = {
+            0: 'pre_active_rest',
+            1: 'post_active_rest',
+            2: 'warm_up',
+            3: 'cool_down',
+            4: 'functional_strength'
+            }
+        return images[self.value]
+
 class ModalityTypeDisplay(object):
     def __init__(self, modality_type):
         self.type = modality_type
         self.name = ModalityType.get_display_name(self.type)
+        self.image = ModalityType.get_image(self.type)
 
     def json_serialise(self):
         return {
             "type": self.type.value,
-            "name": self.name
+            "name": self.name,
+            "image": self.image
         }
 
     @classmethod
