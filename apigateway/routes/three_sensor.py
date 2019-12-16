@@ -34,7 +34,7 @@ def handle_biomechanics_detail_get(user_id=None):
 @xray_recorder.capture('routes.three_sensor.get_session')
 def handle_biomechanics_detail_get_session(user_id=None, session_id=None):
 
-    session = get_session_detail(session_id)
+    session = get_session_detail(session_id, user_id)
 
     return {'session': session}, 200
 
@@ -51,11 +51,11 @@ def get_sessions_detail(user_id, event_date, asymmetry_type_value):
     return sessions
 
 
-def get_session_detail(session_id):
+def get_session_detail(session_id, user_id):
 
     datastore = DatastoreCollection().asymmetry_datastore
 
-    session = datastore.get(session_id=session_id)
+    session = datastore.get(session_id=session_id, user_id=user_id)
     if session is not None:
         return session.json_serialise(api=True, get_all=True)
     else:
