@@ -44,8 +44,12 @@ class TimeBlockAsymmetry(Serialisable):
         # self.right = right
         # self.significant = significant
 
-    def get_left(self):
-        if self.anterior_pelvic_tilt is not None:
+    def get_left(self, var=None):
+        if var is not None:
+            mq_var = getattr(self, var)
+            if mq_var is not None:
+                return mq_var.left
+        elif self.anterior_pelvic_tilt is not None:
             return self.anterior_pelvic_tilt.left
         elif self.ankle_pitch is not None:
             return self.ankle_pitch.left
@@ -56,7 +60,11 @@ class TimeBlockAsymmetry(Serialisable):
         elif self.hip_rotation is not None:
             return self.hip_rotation.left
 
-    def get_right(self):
+    def get_right(self, var=None):
+        if var is not None:
+            mq_var = getattr(self, var)
+            if mq_var is not None:
+                return mq_var.right
         if self.anterior_pelvic_tilt is not None:
             return self.anterior_pelvic_tilt.right
         elif self.ankle_pitch is not None:
@@ -68,8 +76,12 @@ class TimeBlockAsymmetry(Serialisable):
         elif self.hip_rotation is not None:
             return self.hip_rotation.right
 
-    def get_significant(self):
-        if self.anterior_pelvic_tilt is not None:
+    def get_significant(self, var=None):
+        if var is not None:
+            mq_var = getattr(self, var)
+            if mq_var is not None:
+                return mq_var.significant
+        elif self.anterior_pelvic_tilt is not None:
             return int(self.anterior_pelvic_tilt.significant)
         elif self.ankle_pitch is not None:
             return int(self.ankle_pitch.significant)
@@ -80,13 +92,13 @@ class TimeBlockAsymmetry(Serialisable):
         elif self.hip_rotation is not None:
             return int(self.hip_rotation.significant)
 
-    def json_serialise(self, api=False):
+    def json_serialise(self, api=False, var=None):
         if api:
             ret = {
-                'flag': self.get_significant(),
+                'flag': self.get_significant(var),
                 'x': self.time_block,
-                'y1': self.get_left(),
-                'y2': -self.get_right()
+                'y1': self.get_left(var),
+                'y2': -self.get_right(var)
             }
         else:
             ret = {
@@ -204,8 +216,6 @@ class SessionAsymmetry(Serialisable):
                 elif hip_rotation is not None:
                     ret['asymmetry']['hip_rotation'] = hip_rotation
 
-
-
         else:
             ret = {
                 'session_id': self.session_id,
@@ -268,7 +278,7 @@ class SessionAsymmetry(Serialisable):
                             'flag': 0
                         }
                     ],
-                    'detail_data': [t.json_serialise(api) for t in self.time_blocks],
+                    'detail_data': [t.json_serialise(api, var) for t in self.time_blocks],
                     'detail_text': mq_data.get_detail_text(asymmetric_minutes, minutes) if mq_data is not None else '',
                     # 'detail_text': "Your Pelvic Tilt was symmetric for " + str(symmetric_minutes) + " min of your " + str(minutes) + " min workout.",
                     'detail_bold_text': [b.json_serialise() for b in mq_data.get_detail_bold_text(asymmetric_minutes) if mq_data is not None],
