@@ -43,7 +43,7 @@ class ModalityType(Enum):
             3: 'cool_down',
             4: 'functional_strength'
             }
-        return images[self.value]
+     return images[self.value]
 
 class ModalityTypeDisplay(object):
     def __init__(self, modality_type):
