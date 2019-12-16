@@ -495,27 +495,16 @@ class ScoringProcessor(object):
 
         return score
 
-    def get_median_scoring(self, left, right, percent_events_asymmetric=0):
+    def get_median_scoring(self, left, right, percent_events_asymmetric=0, max_diff=10):
 
         score = 100
         diff = abs(left - right)
         if left == right:
             percent_diff = 0
-        # else:
-        #     denom = 100 / ((left + right) / 2)
-        #     percent_diff = diff / denom * 100
-        elif diff > 10:
+        elif diff >= max_diff:
             percent_diff = 100
         else:
-            percent_diff = (diff / 10) * 100
-
-        # elif left >= right:
-        #     percent_diff = ((left - right) / 10) * 100
-        # # elif right >= left > 0:
-        # else:
-        #     percent_diff = ((right - left) / 10) * 100
-        # # else:
-        # #     percent_diff = 0
+            percent_diff = (diff / max_diff) * 100
 
         score = score - (percent_diff * .9)
 
