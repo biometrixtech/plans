@@ -80,7 +80,7 @@ class TimeBlockAsymmetry(Serialisable):
         if var is not None:
             mq_var = getattr(self, var)
             if mq_var is not None:
-                return mq_var.significant
+                return int(mq_var.significant)
         elif self.anterior_pelvic_tilt is not None:
             return int(self.anterior_pelvic_tilt.significant)
         elif self.ankle_pitch is not None:
