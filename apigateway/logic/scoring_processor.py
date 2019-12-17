@@ -309,7 +309,7 @@ class ScoringProcessor(object):
 
         scores = MovementVariableScores(MovementVariableType.apt)
         scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.anterior_pelvic_tilt.left, asymmetry.anterior_pelvic_tilt.right, asymmetry.anterior_pelvic_tilt.percent_events_asymmetric)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.anterior_pelvic_tilt.left, asymmetry.anterior_pelvic_tilt.right)
         scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
@@ -346,7 +346,7 @@ class ScoringProcessor(object):
 
         scores = MovementVariableScores(MovementVariableType.hip_drop)
         scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_drop.left, asymmetry.hip_drop.right, asymmetry.hip_drop.percent_events_asymmetric)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_drop.left, asymmetry.hip_drop.right)
         scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
@@ -431,7 +431,7 @@ class ScoringProcessor(object):
 
         scores = MovementVariableScores(MovementVariableType.knee_valgus)
         scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.knee_valgus.left, asymmetry.knee_valgus.right, asymmetry.knee_valgus.percent_events_asymmetric)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.knee_valgus.left, asymmetry.knee_valgus.right)
         scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
@@ -464,7 +464,7 @@ class ScoringProcessor(object):
 
         scores = MovementVariableScores(MovementVariableType.hip_rotation)
         scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_rotation.left, asymmetry.hip_rotation.right, asymmetry.hip_rotation.percent_events_asymmetric)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_rotation.left, asymmetry.hip_rotation.right)
         scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(right_equation_list, right_equation_list)
         scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
         scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
@@ -503,11 +503,11 @@ class ScoringProcessor(object):
 
         return score
 
-    def get_median_scoring(self, left, right, percent_events_asymmetric=0, max_diff=10):
+    def get_median_scoring(self, left, right, min_diff=0.5, max_diff=10):
 
         score = 100
         diff = abs(left - right)
-        if left == right:
+        if left == right or diff < min_diff:
             percent_diff = 0
         elif diff >= max_diff:
             percent_diff = 100
@@ -560,4 +560,3 @@ class ScoringProcessor(object):
                 score = score - (25 * ratio)
 
         return score
-
