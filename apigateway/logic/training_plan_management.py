@@ -226,10 +226,11 @@ class TrainingPlanManager(object):
                 # for post_active_rest in self.daily_plan.post_active_rest:
                 #     if post_active_rest.completed:
                 #         self.daily_plan.completed_post_active_rest.append(post_active_rest)
-                # if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
-                #     self.daily_plan.completed_ice.append(self.daily_plan.ice)
-                # if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
-                    # self.daily_plan.completed_cold_water_immersion.append(self.daily_plan.cold_water_immersion)
+                # TODO: revert
+                if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
+                    self.daily_plan.completed_ice.append(self.daily_plan.ice)
+                if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
+                    self.daily_plan.completed_cold_water_immersion.append(self.daily_plan.cold_water_immersion)
 
                 # make pre-training modalities inactive
                 # if self.daily_plan.heat is not None:
@@ -247,6 +248,10 @@ class TrainingPlanManager(object):
                 # create new post active rest
                 post_active_rests = calc.get_post_active_rest(force_data)
                 self.daily_plan.modalities.extend(post_active_rests)
+
+                # TODO: remove me
+                self.daily_plan.ice = fake_ice(modality_date_time)
+                self.daily_plan.cold_water_immersion = fake_cwi(modality_date_time)
 
                 # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
                 # self.daily_plan.ice = calc.get_ice()
@@ -349,3 +354,57 @@ class TrainingPlanManager(object):
             self.daily_plan_datastore.put(self.daily_plan)
 
         return self.daily_plan
+
+
+def fake_cwi(event_date_time):
+    from models.modalities import ColdWaterImmersion
+    cwi = {
+            "minutes" : 10,
+            "after_training" : True,
+            "goals" : [ 
+                {
+                    "text" : "Care for soreness",
+                    "priority" : 1,
+                    "goal_type" : 1
+                }
+            ],
+            "start_date_time" : None,
+            "completed_date_time" : None,
+            "event_date_time" : format_datetime(event_date_time),
+            "completed" : False,
+            "active" : True,
+            "alerts" : []
+        }
+    return ColdWaterImmersion.json_deserialise(cwi)
+
+
+def fake_ice(event_date_time):
+    from models.modalities import IceSession
+    ice = {
+                "minutes" : 15,
+                "start_date_time" : None,
+                "completed_date_time" : None,
+                "event_date_time" : format_datetime(event_date_time),
+                "completed" : False,
+                "active" : True,
+                "body_parts" : [ 
+                    {
+                        "body_part_location" : 12,
+                        "goals" : [ 
+                            {
+                                "text" : "Care for soreness",
+                                "priority" : 1,
+                                "goal_type" : 1
+                            }
+                        ],
+                        "after_training" : True,
+                        "immediately_after_training" : False,
+                        "repeat_every_3hrs_for_24hrs" : True,
+                        "side" : 0,
+                        "completed" : False,
+                        "active" : True
+                    }
+                ],
+                "alerts" : []
+            }
+    return IceSession.json_deserialise(ice)

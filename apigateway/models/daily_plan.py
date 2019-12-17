@@ -76,11 +76,9 @@ class DailyPlan(Serialisable):
                'completed_cool_down': [cool_down.json_serialise() for cool_down in self.completed_cool_down],
                'post_active_rest': [ar.json_serialise() for ar in self.post_active_rest],
                'completed_post_active_rest': [ar.json_serialise() for ar in self.completed_post_active_rest],
-               # 'ice': self.ice.json_serialise() if self.ice is not None else None,
-               'ice': fake_ice(),  # TODO: revert this
+               'ice': self.ice.json_serialise() if self.ice is not None else None,
                'completed_ice': [ice.json_serialise() for ice in self.completed_ice],
-               # 'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
-               'cold_water_immersion': fake_cwi(),  # TODO: revert this
+               'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
                'completed_cold_water_immersion': [cwi.json_serialise() for cwi in self.completed_cold_water_immersion],
                'last_updated': self.last_updated,
                'daily_readiness_survey': readiness,
