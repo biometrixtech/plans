@@ -1,6 +1,7 @@
-from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, SessionScoringSummary
+from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, SessionScoringSummary, ScoreInfluencer, EquationType
 from models.scoring import MovementVariableSummaryData, RecoveryQuality, DataCard, MovementVariableType, DataCardSummaryTextItem, DataCardData
 from models.styles import LegendColor, DataCardVisualType
+from models.asymmetry import AnteriorPelvicTilt, KneeValgus, AnklePitch
 import statistics
 
 
@@ -141,8 +142,9 @@ class ScoringSummaryProcessor(object):
                 viz.left_y = average_symmetry
                 viz.right_y = average_symmetry
         if viz.left_y == viz.right_y:
-            viz.left_y_legend_color = LegendColor(26)
-            viz.right_y_legend_color = LegendColor(26)
+            if isinstance(movement_variable_object, AnteriorPelvicTilt) or isinstance(movement_variable_object, AnklePitch) or isinstance(movement_variable_object, KneeValgus):
+                viz.left_y_legend_color = LegendColor(26)
+                viz.right_y_legend_color = LegendColor(26)
         viz.left_y_legend = viz.left_y
         viz.right_y_legend = viz.right_y
         return viz
@@ -298,6 +300,7 @@ class ScoringProcessor(object):
         combined_equations = []
         left_equation_list = []
         right_equation_list = []
+        equations = []
 
         if movement_patterns is not None:
             if movement_patterns.apt_ankle_pitch is not None:
@@ -306,13 +309,14 @@ class ScoringProcessor(object):
                 combined_equations = [left_apt_ankle_pitch, right_apt_ankle_pitch]
                 left_equation_list = [left_apt_ankle_pitch]
                 right_equation_list = [right_apt_ankle_pitch]
+                equations.append(EquationType.apt_ankle_pitch)
 
         scores = MovementVariableScores(MovementVariableType.apt)
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.anterior_pelvic_tilt.left, asymmetry.anterior_pelvic_tilt.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
-        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
-        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list, equations, scores)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.anterior_pelvic_tilt.left, asymmetry.anterior_pelvic_tilt.right, scores=scores)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list, equations, scores)
+        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations, equations, scores))
+        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations, equations, scores))
 
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + (scores.asymmetry_medians_score * .3) + (scores.asymmetry_fatigue_score * .2))
 
@@ -330,6 +334,7 @@ class ScoringProcessor(object):
         combined_equations = []
         left_equation_list = []
         right_equation_list = []
+        equations = []
         if movement_patterns is not None:
             if movement_patterns.hip_drop_apt is not None:
                 left_hip_drop_apt = movement_patterns.hip_drop_apt.left
@@ -337,19 +342,21 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_hip_drop_apt, right_hip_drop_apt])
                 left_equation_list.append(left_hip_drop_apt)
                 right_equation_list.append(right_hip_drop_apt)
+                equations.append(EquationType.hip_drop_apt)
             if movement_patterns.hip_drop_pva is not None:
                 left_hip_drop_pva = movement_patterns.hip_drop_pva.left
                 right_hip_drop_pva = movement_patterns.hip_drop_pva.right
                 combined_equations.extend([left_hip_drop_pva, right_hip_drop_pva])
                 left_equation_list.append(left_hip_drop_pva)
                 right_equation_list.append(right_hip_drop_pva)
+                equations.append(EquationType.hip_drop_pva)
 
         scores = MovementVariableScores(MovementVariableType.hip_drop)
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_drop.left, asymmetry.hip_drop.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
-        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
-        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list, equations, scores)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_drop.left, asymmetry.hip_drop.right, scores=scores)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list, equations, scores)
+        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations, equations, scores))
+        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations, equations, scores))
 
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + (scores.asymmetry_medians_score * .3) + (scores.asymmetry_fatigue_score * .2))
 
@@ -367,6 +374,7 @@ class ScoringProcessor(object):
         combined_equations = []
         left_equation_list = []
         right_equation_list = []
+        equations = []
         if movement_patterns is not None:
             if movement_patterns.apt_ankle_pitch is not None:
                 left_apt_ankle_pitch = movement_patterns.apt_ankle_pitch.left
@@ -374,6 +382,7 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_apt_ankle_pitch, right_apt_ankle_pitch])
                 left_equation_list.append(left_apt_ankle_pitch)
                 right_equation_list.append(right_apt_ankle_pitch)
+                equations.append(EquationType.apt_ankle_pitch)
 
             if movement_patterns.hip_rotation_ankle_pitch is not None:
                 left_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.left
@@ -381,12 +390,13 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch])
                 left_equation_list.append(left_hip_rotation_ankle_pitch)
                 right_equation_list.append(right_hip_rotation_ankle_pitch)
+                equations.append(EquationType.hip_rotation_ankle_pitch)
 
         scores = MovementVariableScores(MovementVariableType.ankle_pitch)
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list, equations, scores)
         scores.asymmetry_medians_score = 0
         scores.asymmetry_fatigue_score = 0
-        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
+        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations, equations, scores))
         scores.fatigue_score = self.get_score(100) # TODO: This is such that it does not appear in fatigue card
 
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + 50)
@@ -405,6 +415,7 @@ class ScoringProcessor(object):
         combined_equations = []
         left_equation_list = []
         right_equation_list = []
+        equations = []
         if movement_patterns is not None:
             if movement_patterns.knee_valgus_hip_drop is not None:
                 left_knee_valgus_hip_drop = movement_patterns.knee_valgus_hip_drop.left
@@ -412,6 +423,7 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_knee_valgus_hip_drop, right_knee_valgus_hip_drop])
                 left_equation_list.append(left_knee_valgus_hip_drop)
                 right_equation_list.append(right_knee_valgus_hip_drop)
+                equations.append(EquationType.knee_valgus_hip_drop)
 
             if movement_patterns.knee_valgus_pva is not None:
                 left_knee_valgus_pva = movement_patterns.knee_valgus_pva.left
@@ -419,6 +431,7 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_knee_valgus_pva, right_knee_valgus_pva])
                 left_equation_list.append(left_knee_valgus_pva)
                 right_equation_list.append(right_knee_valgus_pva)
+                equations.append(EquationType.knee_valgus_pva)
 
             if movement_patterns.knee_valgus_apt is not None:
                 left_knee_valgus_apt = movement_patterns.knee_valgus_apt.left
@@ -426,15 +439,16 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_knee_valgus_apt, right_knee_valgus_apt])
                 left_equation_list.append(left_knee_valgus_apt)
                 right_equation_list.append(right_knee_valgus_apt)
+                equations.append(EquationType.knee_valgus_apt)
 
         # combined_equations = [left_knee_valgus_hip_drop, right_knee_valgus_hip_drop, left_knee_valgus_pva, right_knee_valgus_pva, left_knee_valgus_apt, right_knee_valgus_apt]
 
         scores = MovementVariableScores(MovementVariableType.knee_valgus)
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.knee_valgus.left, asymmetry.knee_valgus.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list)
-        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
-        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list, equations, scores)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.knee_valgus.left, asymmetry.knee_valgus.right, scores=scores)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(left_equation_list, right_equation_list, equations, scores)
+        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations, equations, scores))
+        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations, equations, scores))
 
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + (scores.asymmetry_medians_score * .3) + (scores.asymmetry_fatigue_score * .2))
 
@@ -447,6 +461,7 @@ class ScoringProcessor(object):
         combined_equations = []
         left_equation_list = []
         right_equation_list = []
+        equations = []
         if movement_patterns is not None:
             if movement_patterns.hip_rotation_apt is not None:
                 left_hip_rotation_apt = movement_patterns.hip_rotation_apt.left
@@ -454,6 +469,7 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_hip_rotation_apt, right_hip_rotation_apt])
                 left_equation_list.append(left_hip_rotation_apt)
                 right_equation_list.append(right_hip_rotation_apt)
+                equations.append(EquationType.hip_rotation_apt)
 
             if movement_patterns.hip_rotation_ankle_pitch is not None:
                 left_hip_rotation_ankle_pitch = movement_patterns.hip_rotation_ankle_pitch.left
@@ -461,13 +477,14 @@ class ScoringProcessor(object):
                 combined_equations.extend([left_hip_rotation_ankle_pitch, right_hip_rotation_ankle_pitch])
                 left_equation_list.append(left_hip_rotation_ankle_pitch)
                 right_equation_list.append(right_hip_rotation_ankle_pitch)
+                equations.append(EquationType.hip_rotation_ankle_pitch)
 
         scores = MovementVariableScores(MovementVariableType.hip_rotation)
-        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list)
-        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_rotation.left, asymmetry.hip_rotation.right)
-        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(right_equation_list, right_equation_list)
-        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations))
-        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations))
+        scores.asymmetry_regression_coefficient_score = self.get_left_right_elasticity_difference_score(left_equation_list, right_equation_list, equations, scores)
+        scores.asymmetry_medians_score = self.get_median_scoring(asymmetry.hip_rotation.left, asymmetry.hip_rotation.right, scores=scores)
+        scores.asymmetry_fatigue_score = self.get_left_right_adf_difference_score(right_equation_list, right_equation_list, equations, scores)
+        scores.movement_dysfunction_score = self.get_score(self.get_elasticity_dysfunction_score(combined_equations, equations, scores))
+        scores.fatigue_score = self.get_score(self.get_adf_score(combined_equations, equations, scores))
 
         scores.asymmetry_score = self.get_score((scores.asymmetry_regression_coefficient_score * .5) + (scores.asymmetry_medians_score * .3) + (scores.asymmetry_fatigue_score * .2))
 
@@ -485,7 +502,7 @@ class ScoringProcessor(object):
 
         return movement_score
 
-    def get_left_right_elasticity_difference_score(self, left_equation_list, right_equation_list):
+    def get_left_right_elasticity_difference_score(self, left_equation_list, right_equation_list, equations, scores):
 
         score = 100
         if len(left_equation_list) > 0:
@@ -498,12 +515,20 @@ class ScoringProcessor(object):
             right_coefficient = max(0, right_equation_list[coefficient_count].elasticity)
 
             coefficient_diff = abs(right_coefficient - left_coefficient)
+            if coefficient_diff > 0:
+                influencer = ScoreInfluencer()
+                influencer.equation_type = equations[coefficient_count]
+                if right_coefficient > left_coefficient:
+                    influencer.side = 2
+                else:
+                    influencer.side = 1
+                scores.asymmetry_regression_coefficient_score_influencers.append(influencer)
 
             score = score - (coefficient_diff * 30 * ratio)
 
         return score
 
-    def get_median_scoring(self, left, right, min_diff=0.5, max_diff=10):
+    def get_median_scoring(self, left, right, scores, min_diff=0.5, max_diff=10):
 
         score = 100
         diff = abs(left - right)
@@ -513,12 +538,17 @@ class ScoringProcessor(object):
             percent_diff = 100
         else:
             percent_diff = (diff / max_diff) * 100
+        if percent_diff != 0:
+            if left > right:
+                scores.medians_score_side = 1
+            else:
+                scores.medians_score_side = 2
 
         score = score - (percent_diff * .9)
 
         return score
 
-    def get_left_right_adf_difference_score(self, left_equation_list, right_equation_list):
+    def get_left_right_adf_difference_score(self, left_equation_list, right_equation_list, equations, scores):
 
         score = 100
         if len(left_equation_list) > 0:
@@ -530,10 +560,18 @@ class ScoringProcessor(object):
             if ((left_equation_list[coefficient_count].y_adf != 0 and right_equation_list[coefficient_count].y_adf == 0) or
                     (left_equation_list[coefficient_count].y_adf == 0 and right_equation_list[coefficient_count].y_adf != 0)):
                 score = score - (25 * ratio)
+                # record that this equation influenced the score
+                influencer = ScoreInfluencer()
+                influencer.equation_type = equations[coefficient_count]
+                if left_equation_list[coefficient_count].y_adf != 0:
+                    influencer.side = 1
+                else:
+                    influencer.side = 2
+                scores.asymmetry_fatigue_score_influencers.append(influencer)
 
         return score
 
-    def get_elasticity_dysfunction_score(self, equation_list):
+    def get_elasticity_dysfunction_score(self, equation_list, equations, scores):
 
         score = 100
         if len(equation_list) > 0:
@@ -547,7 +585,7 @@ class ScoringProcessor(object):
 
         return score
 
-    def get_adf_score(self, equation_list):
+    def get_adf_score(self, equation_list, equations, scores):
 
         score = 100
         if len(equation_list) > 0:
