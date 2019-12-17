@@ -82,7 +82,7 @@ class MovementSummaryPill(object):
 
 class MovementVariableScores(object):
     def __init__(self, var_type):
-        self.variable_type = var_type
+        self.movement_variable_type = var_type
         self.asymmetry_regression_coefficient_score = 0
         self.asymmetry_medians_score = 0
         self.asymmetry_fatigue_score = 0
@@ -93,7 +93,7 @@ class MovementVariableScores(object):
         self.change = MovementVariableScore()
 
     def __setattr__(self, name, value):
-        if name == 'variable_type' and value is not None and not isinstance(value, MovementVariableType):
+        if name == 'movement_variable_type' and value is not None and not isinstance(value, MovementVariableType):
             value = MovementVariableType(value)
         super().__setattr__(name, value)
 
@@ -154,14 +154,14 @@ class SessionScoringSummary(object):
         if self.hip_drop is not None:
             self.data_points.append(DataPoint(data_type=MovementVariableType(2), index='hip_drop', page=page))
             page += 1
-        if self.ankle_pitch is not None:
-            self.data_points.append(DataPoint(data_type=MovementVariableType(1), index='ankle_pitch', page=page))
-            page += 1
         if self.knee_valgus is not None:
             self.data_points.append(DataPoint(data_type=MovementVariableType(3), index='knee_valgus', page=page))
             page += 1
         if self.hip_rotation is not None:
             self.data_points.append(DataPoint(data_type=MovementVariableType(4), index='hip_rotation', page=page))
+        if self.ankle_pitch is not None:
+            self.data_points.append(DataPoint(data_type=MovementVariableType(1), index='ankle_pitch', page=page))
+            page += 1
 
     def get_summary_pills(self):
         symmetry_data_cards = [c for c in self.all_data_cards if c.data == DataCardData.symmetry]
@@ -321,6 +321,8 @@ class DataCard(Serialisable):
         self.data = None
         self.score = None
         self.pill_text = ""
+        self.movement_variable = None
+        self.category = 0
 
     def json_serialise(self):
         ret = {
@@ -361,26 +363,31 @@ class DataCard(Serialisable):
             if score is not None:
                 if score > 90:
                     self.value = 4
+                    self.category = 4
                     self.title_text = "Asymmetry: Not Present"
                     self.pill_text = ""
                     self.color = 13
                 elif score > 75:
                     self.value = 3
+                    self.category = 3
                     self.title_text = "Asymmetry: Mild"
                     self.pill_text = "Mild Asymmetry"
                     self.color = 23
                 elif score > 60:
                     self.value = 2
+                    self.category = 2
                     self.title_text = "Asymmetry: Moderate"
                     self.pill_text = "Moderate Asymmetry"
                     self.color = 5
                 elif score > 50:
                     self.value = 1
+                    self.category = 1
                     self.title_text = "Asymmetry: High"
                     self.pill_text = "High Asymmetry"
                     self.color = 6
                 else:
                     self.value = 1
+                    self.category = 0
                     self.title_text = "Asymmetry: Severe"
                     self.pill_text = "Severe Asymmetry"
                     self.color = 27
@@ -396,19 +403,455 @@ class DataCard(Serialisable):
                     self.color = 13
                     self.title_text = "Dysfunction: Low"
                     self.pill_text = ""
+                    self.category = 3
                 elif score > 80:
                     self.color = 5
                     self.title_text = "Dysfunction: Mod"
                     self.pill_text = "Mild Dysfunction"
-                else:
+                    self.category = 2
+                elif score > 65:
                     self.color = 6
                     self.title_text = "Dysfunction: High"
                     self.pill_text = "High Dysfunction"
+                    self.category = 1
+                else:
+                    self.color = 6
+                    self.title_text = "Dysfunction: severe"
+                    self.pill_text = "severe Dysfunction"
+                    self.category = 0
             else:
                 self.value = 100
                 self.color = 13
                 self.title_text = "Dysfunction: Low"
                 self.pill_text = ""
+
+
+    def get_symmetry_text(self, movement_scores):
+
+        if self.movement_variable is not None:
+            if self.movement_variable == MovementVariableType.apt:
+                self.get_apt_symmetry_text()
+            elif self.movement_variable == MovementVariableType.ankle_pitch:
+                self.get_ankle_pitch_symmetry_text()
+            elif self.movement_variable == MovementVariableType.hip_drop:
+                self.get_hip_drop_symmetry_text()
+            elif self.movement_variable == MovementVariableType.knee_valgus:
+                self.get_knee_valgus_symmetry_text()
+            elif self.movement_variable == MovementVariableType.hip_rotation:
+                self.get_hip_rotation_symmetry_text()
+
+    def get_dysfunction_text(self):
+
+        if self.movement_variable is not None:
+            if self.movement_variable == MovementVariableType.apt:
+                self.get_apt_dysfunction_text()
+            elif self.movement_variable == MovementVariableType.ankle_pitch:
+                self.get_ankle_pitch_dysfunction_text()
+            elif self.movement_variable == MovementVariableType.hip_drop:
+                self.get_hip_drop_dysfunction_text()
+            elif self.movement_variable == MovementVariableType.knee_valgus:
+                self.get_knee_valgus_dysfunction_text()
+            elif self.movement_variable == MovementVariableType.hip_rotation:
+                self.get_hip_rotation_dysfunction_text()
+
+    def get_fatigue_text(self):
+
+        if self.movement_variable is not None:
+            if self.movement_variable == MovementVariableType.apt:
+                self.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
+                self.summary_text.active = True
+            elif self.movement_variable == MovementVariableType.ankle_pitch:
+                self.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
+                self.summary_text.active = True
+            elif self.movement_variable == MovementVariableType.hip_drop:
+                self.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
+                self.summary_text.active = True
+            elif self.movement_variable == MovementVariableType.knee_valgus:
+                self.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
+                self.summary_text.active = True
+            elif self.movement_variable == MovementVariableType.hip_rotation:
+                self.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
+                self.summary_text.active = True
+
+    def get_apt_symmetry_text(self):
+        if self.category == 4:  # APT asymmetry not present
+            self.summary_text.text = "APT lowest ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 3:  # APT asymmetry lowest
+            self.summary_text.text = "APT lowest ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # APT asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_ankle_pitch_symmetry_text(self):
+        if self.category == 4:  # ankle_pitch asymmetry not present
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 3:  # ankle_pitch asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # ankle_pitch asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_hip_drop_symmetry_text(self):
+        if self.category == 4:  # hip_drop asymmetry not present
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 3:  # hip_drop asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # hip_drop asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_knee_valgus_symmetry_text(self):
+        if self.category == 4:  # knee_valgus asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 3:  # knee_valgus asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # knee_valgus asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_hip_rotation_symmetry_text(self):
+        if self.category == 4:  # hip_rotation asymmetry not present
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 3:  # hip_rotation asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # hip_rotation asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_apt_dysfunction_text(self):
+        if self.category == 3:  # APT asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # APT asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_ankle_pitch_dysfunction_text(self):
+        if self.category == 3:  # ankle_pitch asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # ankle_pitch asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_hip_drop_dysfunction_text(self):
+        if self.category == 3:  # hip_drop asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # hip_drop asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_knee_valgus_dysfunction_text(self):
+        if self.category == 3:  # knee_valgus asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # knee_valgus asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+
+    def get_hip_rotation_dysfunction_text(self):
+        if self.category == 3:  # hip_rotation asymmetry lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 2:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 1:
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
+        elif self.category == 0:  # hip_rotation asymmetry highest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            text_item1 = DataCardSummaryTextItem()
+            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item2 = DataCardSummaryTextItem()
+            text_item2.text = "Stet clita kasd gubergren"
+            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.active = True
 
 
 class DataCardSummaryText(Serialisable):

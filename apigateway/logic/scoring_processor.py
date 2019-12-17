@@ -247,22 +247,27 @@ class ScoringSummaryProcessor(object):
         # These two cards are always present
         symmetry_card = DataCard(DataCardVisualType.categorical)
         symmetry_card.data = DataCardData.symmetry
+        symmetry_card.movement_variable = movement_scores.movement_variable_type
         movement_dysfunction_card = DataCard(DataCardVisualType.magnitude)
         movement_dysfunction_card.data = DataCardData.dysfunction
+        movement_dysfunction_card.movement_variable = movement_scores.movement_variable_type
 
         # TODO: Assign proper text
         symmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
-        symmetry_card.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-        text_item1 = DataCardSummaryTextItem()
-        text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-        text_item2 = DataCardSummaryTextItem()
-        text_item2.text = "Stet clita kasd gubergren"
-        symmetry_card.summary_text.text_items = [text_item1, text_item2]
-        symmetry_card.summary_text.active = True
+        symmetry_card.get_symmetry_text(movement_scores)
+
+        # symmetry_card.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+        # text_item1 = DataCardSummaryTextItem()
+        # text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+        # text_item2 = DataCardSummaryTextItem()
+        # text_item2.text = "Stet clita kasd gubergren"
+        # symmetry_card.summary_text.text_items = [text_item1, text_item2]
+        # symmetry_card.summary_text.active = True
 
         movement_dysfunction_card.assign_score_value(movement_scores.movement_dysfunction_score.value)
-        movement_dysfunction_card.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia"
-        movement_dysfunction_card.summary_text.active = True
+        movement_dysfunction_card.get_dysfunction_text()
+        # movement_dysfunction_card.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia"
+        # movement_dysfunction_card.summary_text.active = True
 
         cards = [symmetry_card, movement_dysfunction_card]
         if movement_scores.fatigue_score.value is not None and  movement_scores.fatigue_score.value < 100:
@@ -272,15 +277,18 @@ class ScoringSummaryProcessor(object):
             fatigue_card.color = 5
             fatigue_card.title_text = "Fatigue: Present"
             fatigue_card.icon = 2
-            fatigue_card.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
-            # text_item = DataCardSummaryTextItem()
-            # text_item.text = "Only reason why"
-            # fatigue_card.summary_text.text_items = [text_item]
-            fatigue_card.summary_text.active = True
+            fatigue_card.get_fatigue_text()
+            # fatigue_card.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
+            # # text_item = DataCardSummaryTextItem()
+            # # text_item.text = "Only reason why"
+            # # fatigue_card.summary_text.text_items = [text_item]
+            # fatigue_card.summary_text.active = True
             cards.append(fatigue_card)
 
         return cards
 
+
+    # def get_asymmetry_text(self, )
 
 class ScoringProcessor(object):
     def __init__(self):
