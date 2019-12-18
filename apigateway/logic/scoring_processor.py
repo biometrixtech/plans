@@ -556,6 +556,8 @@ class ScoringProcessor(object):
         else:
             return score
 
+        influencers = []
+
         for coefficient_count in range(0, len(left_equation_list)):
             if ((left_equation_list[coefficient_count].y_adf != 0 and right_equation_list[coefficient_count].y_adf == 0) or
                     (left_equation_list[coefficient_count].y_adf == 0 and right_equation_list[coefficient_count].y_adf != 0)):
@@ -567,7 +569,22 @@ class ScoringProcessor(object):
                     influencer.side = 1
                 else:
                     influencer.side = 2
-                scores.asymmetry_fatigue_score_influencers.append(influencer)
+                influencers.append(influencer)
+
+        left_adfs = 0
+        right_adfs = 0
+
+        for i in influencers:
+            if i.side == 1:
+                left_adfs += 1
+            else:
+                right_adfs += 1
+
+        if left_adfs > 0 and right_adfs > 0:
+            influencers = []
+            score = 100
+
+        scores.asymmetry_fatigue_score_influencers.extend(influencers)
 
         return score
 
