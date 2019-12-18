@@ -370,70 +370,69 @@ class DataCard(Serialisable):
                 if score == 100:
                     self.value = 4
                     self.category = 4
-                    self.title_text = "Asymmetry: Not Present"
+                    self.title_text = "Symmetric Movement"
                     self.pill_text = ""
                     self.color = 13
                 elif score > 75:
                     self.value = 3
                     self.category = 3
-                    self.title_text = "Asymmetry: Mild"
-                    self.pill_text = "Mild Asymmetry"
+                    self.title_text = "Slightly Asymmetric Movement"
+                    self.pill_text = "Slight Asymmetry"
                     self.color = 23
                 elif score > 60:
                     self.value = 2
                     self.category = 2
-                    self.title_text = "Asymmetry: Moderate"
+                    self.title_text = "Moderately Asymmetric Movement"
                     self.pill_text = "Moderate Asymmetry"
                     self.color = 5
                 elif score > 50:
                     self.value = 1
                     self.category = 1
-                    self.title_text = "Asymmetry: High"
-                    self.pill_text = "High Asymmetry"
+                    self.title_text = "Excessively Asymmetric Movement"
+                    self.pill_text = "Excessive Asymmetry"
                     self.color = 6
                 else:
                     self.value = 1
                     self.category = 0
-                    self.title_text = "Asymmetry: Severe"
+                    self.title_text = "Extremely Asymmetric Movement"
                     self.pill_text = "Severe Asymmetry"
                     self.color = 27
             else:
                 self.value = 4
                 self.category = 4
-                self.title_text = "Asymmetry: Not Present"
+                self.title_text = "Symmetric Movement"
                 self.pill_text = ""
                 self.color = 13
         elif self.data == DataCardData.dysfunction:
             self.max_value = 3
             if score is not None:
                 self.value = score
-                if score > 90:
+                if score > 99:
                     self.color = 13
-                    self.title_text = "Dysfunction: Low"
+                    self.title_text = "Functional Movement"
                     self.pill_text = ""
                     self.category = 3
                 elif score > 80:
-                    self.color = 5
-                    self.title_text = "Dysfunction: Mod"
-                    self.pill_text = "Mild Dysfunction"
+                    self.color = 23
+                    self.title_text = "Slightly Maladapted Movement"
+                    self.pill_text = "Slight Dysfunction"
                     self.category = 2
                 elif score > 65:
-                    self.color = 6
-                    self.title_text = "Dysfunction: High"
-                    self.pill_text = "High Dysfunction"
+                    self.color = 5
+                    self.title_text = "Moderately Maladapted Movement"
+                    self.pill_text = "Moderate Dysfunction"
                     self.category = 1
                 else:
                     self.color = 6
-                    self.title_text = "Dysfunction: severe"
-                    self.pill_text = "severe Dysfunction"
+                    self.title_text = "Excessively Maladapted Movement"
+                    self.pill_text = "Excessive Dysfunction"
                     self.category = 0
             else:
                 self.value = 100
                 self.color = 13
-                self.title_text = "Dysfunction: Low"
+                self.title_text = "Functional Movement"
                 self.pill_text = ""
                 self.category = 3
-
 
     def get_symmetry_text(self, movement_scores):
 
@@ -449,25 +448,28 @@ class DataCard(Serialisable):
             elif self.movement_variable == MovementVariableType.hip_rotation:
                 self.get_hip_rotation_symmetry_text(movement_scores)
 
-    def get_dysfunction_text(self):
+    def get_dysfunction_text(self, movement_scores):
 
         if self.movement_variable is not None:
             if self.movement_variable == MovementVariableType.apt:
-                self.get_apt_dysfunction_text()
+                self.get_apt_dysfunction_text(movement_scores)
             elif self.movement_variable == MovementVariableType.ankle_pitch:
-                self.get_ankle_pitch_dysfunction_text()
+                self.get_ankle_pitch_dysfunction_text(movement_scores)
             elif self.movement_variable == MovementVariableType.hip_drop:
-                self.get_hip_drop_dysfunction_text()
+                self.get_hip_drop_dysfunction_text(movement_scores)
             elif self.movement_variable == MovementVariableType.knee_valgus:
-                self.get_knee_valgus_dysfunction_text()
+                self.get_knee_valgus_dysfunction_text(movement_scores)
             elif self.movement_variable == MovementVariableType.hip_rotation:
-                self.get_hip_rotation_dysfunction_text()
+                self.get_hip_rotation_dysfunction_text(movement_scores)
 
     def get_fatigue_text(self):
 
         if self.movement_variable is not None:
             if self.movement_variable == MovementVariableType.apt:
-                self.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
+                self.summary_text.text = "We noticied a significant change in your Pelvic Tilt range of motion over the course of your run."
+                text_item = DataCardSummaryTextItem()
+                text_item.text = "This may have been due to insufficient musclar endurance in xyz, or inadequate preparation for training."
+                self.summary_text.text_items.append(text_item)
                 self.summary_text.active = True
             elif self.movement_variable == MovementVariableType.ankle_pitch:
                 self.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
@@ -484,31 +486,32 @@ class DataCard(Serialisable):
 
     def get_apt_symmetry_text(self, movement_scores=None):
         if self.category == 4:  # APT asymmetry not present
-            self.summary_text.text = "4 ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            self.summary_text.text = "Your pelvic tilt did not differ between your left and right ground contacts."
             self.summary_text.active = True
         elif self.category == 3:  # APT asymmetry lowest
-            self.summary_text.text = "3 ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            self.summary_text.text = "Your pelvic tilt differed slightly for left vs right ground contacts, distributing stress through your body unevenly. A pattern of this can lead to injury and interferes with optimal performance."
             self.summary_text.active = True
         elif self.category == 2:
-            self.summary_text.text = "2 ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            self.summary_text.text = "Your pelvic tilt differed moderately for left vs right ground contacts, distributing stress through your body unevenly. A pattern of this can lead to injury and interferes with optimal performance."
             self.summary_text.active = True
         elif self.category == 1:
-            self.summary_text.text = "1 ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            self.summary_text.text = "Your pelvic tilt differed excessively for left vs right ground contacts, distributing stress through your body unevenly. A pattern of this can lead to injury and interferes with optimal performance."
             self.summary_text.active = True
         elif self.category == 0:  # APT asymmetry highest
-            self.summary_text.text = "0 ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+            self.summary_text.text = "Your pelvic tilt differed extremely for left vs right ground contacts, distributing stress through your body unevenly. A pattern of this can lead to injury and interferes with optimal performance."
             self.summary_text.active = True
 
         # add bulleted text if needed
         if self.category != 4:
+            # add elasticity diff bullet
             for influencer in movement_scores.asymmetry_regression_coefficient_score_influencers:
                 text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, coeff"
+                if influencer.side == 1:
+                    text_item.text = "you displayed more severe signs of movement impairement during left steps vs right steps"
+                else:
+                    text_item.text = "you displayed more severe signs of movement impairement during right steps vs left steps"
                 self.summary_text.text_items.append(text_item)
-            for influencer in movement_scores.asymmetry_fatigue_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, fatigue"
-                self.summary_text.text_items.append(text_item)
+            # add medians score bullet
             if movement_scores.medians_score_side == 1:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during left foot steps"
@@ -516,6 +519,14 @@ class DataCard(Serialisable):
             elif movement_scores.medians_score_side == 2:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during right foot steps"
+                self.summary_text.text_items.append(text_item)
+            # add fatigue bullet
+            for influencer in movement_scores.asymmetry_fatigue_score_influencers:
+                text_item = DataCardSummaryTextItem()
+                if influencer.side == 1:
+                    text_item.text = "your Pelvic Tilt range of motion during left steps had a more significant change over the course of your run than your right steps"
+                else:
+                    text_item.text = "your Pelvic Tilt range of motion during right steps had a more significant change over the course of your run than your left steps"
                 self.summary_text.text_items.append(text_item)
 
     def get_ankle_pitch_symmetry_text(self, movement_scores=None):
@@ -662,174 +673,83 @@ class DataCard(Serialisable):
                 text_item.text = "you had greater range of motion during right foot steps"
                 self.summary_text.text_items.append(text_item)
 
-    def get_apt_dysfunction_text(self):
-        if self.category == 3:  # APT asymmetry lowest
-            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
+    def get_apt_dysfunction_text(self, movement_scores):
+        if self.category == 3:  # APT dysfunction lowest
+            self.summary_text.text = "Your biomechanics are apropriately aligned to receive and distribute load most efficiently throughout your body."
             self.summary_text.active = True
         elif self.category == 2:
-            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.text = "Your biomechanics show slight signs of potential strength and length imbalances which places excessive strain on your lower back and hamstrings."
             self.summary_text.active = True
         elif self.category == 1:
-            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
+            self.summary_text.text = "Your biomechanics show moderate signs of potential strength and length imbalances which places excessive strain on your lower back and hamstrings."
             self.summary_text.active = True
-        elif self.category == 0:  # APT asymmetry highest
-            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
+        elif self.category == 0:  # APT dysfunction highest
+            self.summary_text.text = "Your biomechanics show excessive signs of potential strength and length imbalances which places excessive strain on your lower back and hamstrings."
             self.summary_text.active = True
 
-    def get_ankle_pitch_dysfunction_text(self):
-        if self.category == 3:  # ankle_pitch asymmetry lowest
-            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
+        # add bulleted text if needed
+        if self.category != 3:
             text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
+            text_item1.text = "You arch your lower back, changing the position of your pelvis, in order to achieve greater leg extension."
             text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
+            text_item2.text = "This is correlated with tight xyz and weak or inhibited mno"
             self.summary_text.text_items = [text_item1, text_item2]
+
+
+    def get_ankle_pitch_dysfunction_text(self, movement_scores):
+        if self.category == 3:  # ankle_pitch dysfunction lowest
+            self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
             self.summary_text.active = True
         elif self.category == 2:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
         elif self.category == 1:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
-        elif self.category == 0:  # ankle_pitch asymmetry highest
+        elif self.category == 0:  # ankle_pitch dysfunction highest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
 
-    def get_hip_drop_dysfunction_text(self):
-        if self.category == 3:  # hip_drop asymmetry lowest
+    def get_hip_drop_dysfunction_text(self, movement_scores):
+        if self.category == 3:  # hip_drop dysfunction lowest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
         elif self.category == 2:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
         elif self.category == 1:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
-        elif self.category == 0:  # hip_drop asymmetry highest
+        elif self.category == 0:  # hip_drop dysfunction highest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
 
-    def get_knee_valgus_dysfunction_text(self):
-        if self.category == 3:  # knee_valgus asymmetry lowest
+    def get_knee_valgus_dysfunction_text(self, movement_scores):
+        if self.category == 3:  # knee_valgus dysfunction lowest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
         elif self.category == 2:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
         elif self.category == 1:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
-        elif self.category == 0:  # knee_valgus asymmetry highest
+        elif self.category == 0:  # knee_valgus dysfunction highest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
 
-    def get_hip_rotation_dysfunction_text(self):
-        if self.category == 3:  # hip_rotation asymmetry lowest
+    def get_hip_rotation_dysfunction_text(self, movement_scores):
+        if self.category == 3:  # hip_rotation dysfunction lowest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
         elif self.category == 2:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
         elif self.category == 1:
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
-        elif self.category == 0:  # hip_rotation asymmetry highest
+        elif self.category == 0:  # hip_rotation dysfunction highest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-            text_item1 = DataCardSummaryTextItem()
-            text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-            text_item2 = DataCardSummaryTextItem()
-            text_item2.text = "Stet clita kasd gubergren"
-            self.summary_text.text_items = [text_item1, text_item2]
             self.summary_text.active = True
 
 

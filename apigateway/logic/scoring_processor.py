@@ -111,7 +111,7 @@ class ScoringSummaryProcessor(object):
         apt_movement_variable_summary.child_title = "Pelvic Tilt"
         apt_movement_variable_summary.summary_text.text = "movement efficiency"
         apt_movement_variable_summary.summary_text.active = True
-        apt_movement_variable_summary.description.text = "Anterior pelvic motion asymmetry can be caused by uneven terrain or by imbalance in the lats, hip flexors, and a nearly a dozen other muscles."  # TODO: Update this
+        apt_movement_variable_summary.description.text = "Why it matters: Your pelivs' alignment effects your ability to engage your core and can cause malalignments throughout your upper and lower body."  # TODO: Update this
         apt_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
@@ -191,7 +191,7 @@ class ScoringSummaryProcessor(object):
         hip_drop_movement_variable_summary.child_title = "Hip Drop"
         hip_drop_movement_variable_summary.summary_text.text = "movement efficiency"
         hip_drop_movement_variable_summary.summary_text.active = True
-        hip_drop_movement_variable_summary.description.text = "Hip Drop motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
+        hip_drop_movement_variable_summary.description.text = "Your single leg stability while impacting the ground can be effected by an inhibited core, and can cause malalignment down the kinetic chain."  # TODO: Update this
         hip_drop_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
@@ -254,37 +254,21 @@ class ScoringSummaryProcessor(object):
         movement_dysfunction_card.data = DataCardData.dysfunction
         movement_dysfunction_card.movement_variable = movement_scores.movement_variable_type
 
-        # TODO: Assign proper text
         symmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
         symmetry_card.get_symmetry_text(movement_scores)
 
-        # symmetry_card.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
-        # text_item1 = DataCardSummaryTextItem()
-        # text_item1.text = "At vero eos et accusam et justo duo dolores et ea rebum"
-        # text_item2 = DataCardSummaryTextItem()
-        # text_item2.text = "Stet clita kasd gubergren"
-        # symmetry_card.summary_text.text_items = [text_item1, text_item2]
-        # symmetry_card.summary_text.active = True
-
         movement_dysfunction_card.assign_score_value(movement_scores.movement_dysfunction_score.value)
-        movement_dysfunction_card.get_dysfunction_text()
-        # movement_dysfunction_card.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia"
-        # movement_dysfunction_card.summary_text.active = True
+        movement_dysfunction_card.get_dysfunction_text(movement_scores)
 
-        cards = [symmetry_card, movement_dysfunction_card]
+        cards = [movement_dysfunction_card, symmetry_card]
         if movement_scores.fatigue_score.value is not None and  movement_scores.fatigue_score.value < 100:
             fatigue_card = DataCard(DataCardVisualType.boolean)
             fatigue_card.data = DataCardData.fatigue
             fatigue_card.value = True
             fatigue_card.color = 5
-            fatigue_card.title_text = "Fatigue: Present"
+            fatigue_card.title_text = "Possible Fatigue"
             fatigue_card.icon = 2
             fatigue_card.get_fatigue_text()
-            # fatigue_card.summary_text.text = "Lorem ipsum iolor sit amet, consetetur saiipscing elitr, sed dia elitr, sed dia seri"
-            # # text_item = DataCardSummaryTextItem()
-            # # text_item.text = "Only reason why"
-            # # fatigue_card.summary_text.text_items = [text_item]
-            # fatigue_card.summary_text.active = True
             cards.append(fatigue_card)
 
         return cards
@@ -596,9 +580,16 @@ class ScoringProcessor(object):
         else:
             return score
 
+        influencing_equations = set()
         for coefficient_count in range(0, len(equation_list)):
             if equation_list[coefficient_count].elasticity >= 0:
                 score = score - (equation_list[coefficient_count].elasticity * 50 * ratio)
+                # record that this equation influenced the score
+                influencing_equations.add(equations[coefficient_count//2].value)
+        for eq in influencing_equations:
+            influencer = ScoreInfluencer()
+            influencer.equation_type = eq
+            scores.movement_dysfunction_influencers.append(influencer)
 
         return score
 
@@ -610,8 +601,15 @@ class ScoringProcessor(object):
         else:
             return score
 
+        influencing_equations = set()
         for coefficient_count in range(0, len(equation_list)):
             if equation_list[coefficient_count].y_adf != 0:
                 score = score - (25 * ratio)
+                # record that this equation influenced the score
+                influencing_equations.add(equations[coefficient_count//2].value)
+        for eq in influencing_equations:
+            influencer = ScoreInfluencer()
+            influencer.equation_type = eq
+            scores.fatigue_score_influencers.append(influencer)
 
         return score
