@@ -263,6 +263,7 @@ class ScoringSummaryProcessor(object):
         cards = [movement_dysfunction_card, symmetry_card]
         if movement_scores.fatigue_score.value is not None and  movement_scores.fatigue_score.value < 100:
             fatigue_card = DataCard(DataCardVisualType.boolean)
+            fatigue_card.movement_variable = movement_scores.movement_variable_type
             fatigue_card.data = DataCardData.fatigue
             fatigue_card.value = True
             fatigue_card.color = 5
