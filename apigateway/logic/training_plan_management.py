@@ -14,6 +14,7 @@ from models.athlete_injury_risk import AthleteInjuryRisk
 from models.functional_movement_modalities import ModalityType
 from utils import format_date, parse_datetime, parse_date, format_datetime
 # from models.body_parts import BodyPartFactory
+from models.modality import CoolDown, FunctionalStrength
 import copy
 
 
@@ -247,6 +248,14 @@ class TrainingPlanManager(object):
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
                 # create new post active rest
                 post_active_rests = calc.get_post_active_rest(force_data)
+                cool_downs = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.cool_down.value]
+                if len(post_active_rests) > 0 and len(cool_downs) == 0:
+                    active_rest = post_active_rests[0]
+                    cool_down = CoolDown(modality_date_time)  # TODO: revert this
+                    cool_down.display_image = 'dynamic_flexibility'
+                    cool_down.goals = active_rest.goals
+                    cool_down.exercise_phases = active_rest.exercise_phases[1:3]
+                    post_active_rests.append(cool_down)
                 self.daily_plan.modalities.extend(post_active_rests)
 
                 # TODO: remove me
@@ -289,6 +298,19 @@ class TrainingPlanManager(object):
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
                 # get new pre active rest
                 pre_active_rests = calc.get_pre_active_rest(force_data)
+                functional_strengths = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.functional_strength.value]
+                if len(pre_active_rests) > 0 and len(functional_strengths) == 0:
+                    active_rest = pre_active_rests[0]
+                    functional_strength = FunctionalStrength(modality_date_time)  # TODO: revert this
+                    functional_strength.display_image = 'dynamic_flexibility'
+                    functional_strength.exercise_phases = active_rest.exercise_phases[1:3]
+                    functional_strength.set_plan_dosage()
+                    functional_strength.set_exercise_dosage_ranking()
+                    functional_strength.aggregate_dosages()
+                    functional_strength.set_winners()
+                    functional_strength.scale_all_active_time()
+                    functional_strength.reconcile_default_plan_with_active_time()
+                    pre_active_rests.append(functional_strength)
                 self.daily_plan.modalities.extend(pre_active_rests)
 
                 # remove existing warm_up
