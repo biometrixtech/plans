@@ -521,7 +521,8 @@ class DataCard(Serialisable):
                 text_item.text = "you had greater range of motion during right foot steps"
                 self.summary_text.text_items.append(text_item)
             # add fatigue bullet
-            for influencer in movement_scores.asymmetry_fatigue_score_influencers:
+            if len(movement_scores.asymmetry_fatigue_score_influencers) > 0:
+                influencer = movement_scores.asymmetry_fatigue_score_influencers[0]
                 text_item = DataCardSummaryTextItem()
                 if influencer.side == 1:
                     text_item.text = "your Pelvic Tilt range of motion during left steps had a more significant change over the course of your run than your right steps"
@@ -548,14 +549,23 @@ class DataCard(Serialisable):
 
         # add bulleted text if needed
         if self.category != 4:
+            # add elasticity diff bullet
             for influencer in movement_scores.asymmetry_regression_coefficient_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, coeff"
-                self.summary_text.text_items.append(text_item)
-            for influencer in movement_scores.asymmetry_fatigue_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, fatigue"
-                self.summary_text.text_items.append(text_item)
+                if influencer.equation_type == EquationType.apt_ankle_pitch:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+                elif influencer.equation_type == EquationType.hip_rotation_ankle_pitch:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+            # add medians score bullet
             if movement_scores.medians_score_side == 1:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during left foot steps"
@@ -563,6 +573,15 @@ class DataCard(Serialisable):
             elif movement_scores.medians_score_side == 2:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during right foot steps"
+                self.summary_text.text_items.append(text_item)
+            # add fatigue bullet
+            if len(movement_scores.asymmetry_fatigue_score_influencers) > 0:
+                influencer = movement_scores.asymmetry_fatigue_score_influencers[0]
+                text_item = DataCardSummaryTextItem()
+                if influencer.side == 1:
+                    text_item.text = f"{influencer.equation_type.name}, left, fatigue"
+                else:
+                    text_item.text = f"{influencer.equation_type.name}, right, fatigue"
                 self.summary_text.text_items.append(text_item)
 
     def get_hip_drop_symmetry_text(self, movement_scores=None):
@@ -584,14 +603,23 @@ class DataCard(Serialisable):
 
         # add bulleted text if needed
         if self.category != 4:
+            # add elasticity diff bullet
             for influencer in movement_scores.asymmetry_regression_coefficient_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, coeff"
-                self.summary_text.text_items.append(text_item)
-            for influencer in movement_scores.asymmetry_fatigue_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, fatigue"
-                self.summary_text.text_items.append(text_item)
+                if influencer.equation_type == EquationType.hip_drop_apt:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+                elif influencer.equation_type == EquationType.hip_drop_pva:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+            # add medians score bullet
             if movement_scores.medians_score_side == 1:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during left foot steps"
@@ -599,6 +627,15 @@ class DataCard(Serialisable):
             elif movement_scores.medians_score_side == 2:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during right foot steps"
+                self.summary_text.text_items.append(text_item)
+            # add fatigue bullet
+            if len(movement_scores.asymmetry_fatigue_score_influencers) > 0:
+                influencer = movement_scores.asymmetry_fatigue_score_influencers[0]
+                text_item = DataCardSummaryTextItem()
+                if influencer.side == 1:
+                    text_item.text = f"{influencer.equation_type.name}, left, fatigue"
+                else:
+                    text_item.text = f"{influencer.equation_type.name}, right, fatigue"
                 self.summary_text.text_items.append(text_item)
 
     def get_knee_valgus_symmetry_text(self, movement_scores=None):
@@ -620,14 +657,30 @@ class DataCard(Serialisable):
 
         # add bulleted text if needed
         if self.category != 4:
+            # add elasticity diff bullet
             for influencer in movement_scores.asymmetry_regression_coefficient_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, coeff"
-                self.summary_text.text_items.append(text_item)
-            for influencer in movement_scores.asymmetry_fatigue_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, fatigue"
-                self.summary_text.text_items.append(text_item)
+                if influencer.equation_type == EquationType.knee_valgus_hip_drop:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+                elif influencer.equation_type == EquationType.knee_valgus_pva:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+                elif influencer.equation_type == EquationType.knee_valgus_apt:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+            # add medians score bullet
             if movement_scores.medians_score_side == 1:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during left foot steps"
@@ -635,6 +688,15 @@ class DataCard(Serialisable):
             elif movement_scores.medians_score_side == 2:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during right foot steps"
+                self.summary_text.text_items.append(text_item)
+            # add fatigue bullet
+            if len(movement_scores.asymmetry_fatigue_score_influencers) > 0:
+                influencer = movement_scores.asymmetry_fatigue_score_influencers[0]
+                text_item = DataCardSummaryTextItem()
+                if influencer.side == 1:
+                    text_item.text = f"{influencer.equation_type.name}, left, fatigue"
+                else:
+                    text_item.text = f"{influencer.equation_type.name}, right, fatigue"
                 self.summary_text.text_items.append(text_item)
 
     def get_hip_rotation_symmetry_text(self, movement_scores=None):
@@ -656,14 +718,23 @@ class DataCard(Serialisable):
 
         # add bulleted text if needed
         if self.category != 4:
+            # add elasticity diff bullet
             for influencer in movement_scores.asymmetry_regression_coefficient_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, coeff"
-                self.summary_text.text_items.append(text_item)
-            for influencer in movement_scores.asymmetry_fatigue_score_influencers:
-                text_item = DataCardSummaryTextItem()
-                text_item.text = f"{influencer.equation_type.name}, {influencer.side}, fatigue"
-                self.summary_text.text_items.append(text_item)
+                if influencer.equation_type == EquationType.hip_rotation_ankle_pitch:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+                elif influencer.equation_type == EquationType.hip_rotation_apt:
+                    text_item = DataCardSummaryTextItem()
+                    if influencer.side == 1:
+                        text_item.text = f"{influencer.equation_type.name}, left, coeff"
+                    else:
+                        text_item.text = f"{influencer.equation_type.name}, right, coeff"
+                    self.summary_text.text_items.append(text_item)
+            # add medians score bullet
             if movement_scores.medians_score_side == 1:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during left foot steps"
@@ -671,6 +742,15 @@ class DataCard(Serialisable):
             elif movement_scores.medians_score_side == 2:
                 text_item = DataCardSummaryTextItem()
                 text_item.text = "you had greater range of motion during right foot steps"
+                self.summary_text.text_items.append(text_item)
+            # add fatigue bullet
+            if len(movement_scores.asymmetry_fatigue_score_influencers) > 0:
+                influencer = movement_scores.asymmetry_fatigue_score_influencers[0]
+                text_item = DataCardSummaryTextItem()
+                if influencer.side == 1:
+                    text_item.text = f"{influencer.equation_type.name}, left, fatigue"
+                else:
+                    text_item.text = f"{influencer.equation_type.name}, right, fatigue"
                 self.summary_text.text_items.append(text_item)
 
     def get_apt_dysfunction_text(self, movement_scores):
@@ -695,7 +775,6 @@ class DataCard(Serialisable):
             text_item2.text = "This is correlated with tight xyz and weak or inhibited mno"
             self.summary_text.text_items = [text_item1, text_item2]
 
-
     def get_ankle_pitch_dysfunction_text(self, movement_scores):
         if self.category == 3:  # ankle_pitch dysfunction lowest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
@@ -709,6 +788,22 @@ class DataCard(Serialisable):
         elif self.category == 0:  # ankle_pitch dysfunction highest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
             self.summary_text.active = True
+
+        # add bulleted text if needed
+        if self.category != 3:
+            for influencer in movement_scores.movement_dysfunction_influencers:
+                if influencer.equation_type == EquationType.apt_ankle_pitch:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "apt_ankle_pitch 1"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "apt_ankle_pitch 2"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
+                elif influencer.equation_type == EquationType.hip_rotation_ankle_pitch:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "hip_rotation_ankle_pitch 1"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "hip_rotation_ankle_pitch 2"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
 
     def get_hip_drop_dysfunction_text(self, movement_scores):
         if self.category == 3:  # hip_drop dysfunction lowest
@@ -724,6 +819,22 @@ class DataCard(Serialisable):
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
             self.summary_text.active = True
 
+        # add bulleted text if needed
+        if self.category != 3:
+            for influencer in movement_scores.movement_dysfunction_influencers:
+                if influencer.equation_type == EquationType.hip_drop_apt:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "You drop your opposite side hip"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "This is correlated with tight xyz and weak or inhibited mno"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
+                elif influencer.equation_type == EquationType.hip_drop_pva:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "You do not have adequate core stability to maintain your posture while loading your body."
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "This is correlated with tight xyz and weak or inhibited mno"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
+
     def get_knee_valgus_dysfunction_text(self, movement_scores):
         if self.category == 3:  # knee_valgus dysfunction lowest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
@@ -738,6 +849,28 @@ class DataCard(Serialisable):
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
             self.summary_text.active = True
 
+        # add bulleted text if needed
+        if self.category != 3:
+            for influencer in movement_scores.movement_dysfunction_influencers:
+                if influencer.equation_type == EquationType.knee_valgus_hip_drop:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "knee_valgus_hip_drop 1"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "knee_valgus_hip_drop 2"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
+                elif influencer.equation_type == EquationType.knee_valgus_pva:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "knee_valgus_pva 1"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "knee_valgus_pva 2"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
+                elif influencer.equation_type == EquationType.knee_valgus_apt:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "knee_valgus_apt 1"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "knee_valgus_apt 2"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
+
     def get_hip_rotation_dysfunction_text(self, movement_scores):
         if self.category == 3:  # hip_rotation dysfunction lowest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
@@ -751,6 +884,22 @@ class DataCard(Serialisable):
         elif self.category == 0:  # hip_rotation dysfunction highest
             self.summary_text.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed dia elitr, sed dia"
             self.summary_text.active = True
+
+        # add bulleted text if needed
+        if self.category != 3:
+            for influencer in movement_scores.movement_dysfunction_influencers:
+                if influencer.equation_type == EquationType.hip_rotation_ankle_pitch:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "hip_rotation_ankle_pitch 1"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "hip_rotation_ankle_pitch 2"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
+                elif influencer.equation_type == EquationType.hip_rotation_apt:
+                    text_item1 = DataCardSummaryTextItem()
+                    text_item1.text = "hip_rotation_apt 1"
+                    text_item2 = DataCardSummaryTextItem()
+                    text_item2.text = "hip_rotation_apt 2"
+                    self.summary_text.text_items.extend([text_item1, text_item2])
 
 
 class DataCardSummaryText(Serialisable):
