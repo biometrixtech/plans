@@ -164,9 +164,9 @@ class SessionScoringSummary(object):
             page += 1
         if self.hip_rotation is not None:
             self.data_points.append(DataPoint(data_type=MovementVariableType(4), index='hip_rotation', page=page))
+            page += 1
         if self.ankle_pitch is not None:
             self.data_points.append(DataPoint(data_type=MovementVariableType(1), index='ankle_pitch', page=page))
-            page += 1
 
     def get_summary_pills(self):
         symmetry_data_cards = [c for c in self.all_data_cards if c.data == DataCardData.symmetry]
