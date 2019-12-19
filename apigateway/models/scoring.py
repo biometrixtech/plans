@@ -466,7 +466,7 @@ class DataCard(Serialisable):
             if self.movement_variable == MovementVariableType.apt:
                 self.summary_text.text = "We noticed a significant change in your pelvic tilt range of motion over the course of your run."
                 text_item = DataCardSummaryTextItem()
-                text_item.text = "This may have been due to insufficient musclar endurance in your core & glute muscles, or inadequate preparation for training."
+                text_item.text = "This may have been due to insufficient muscular endurance in your core & glute muscles, or inadequate preparation for training."
                 self.summary_text.text_items.append(text_item)
                 self.summary_text.active = True
             elif self.movement_variable == MovementVariableType.hip_drop:
@@ -499,7 +499,7 @@ class DataCard(Serialisable):
             self.summary_text.text = "Asymmetric pelvic tilt moderately disrupts proper muscle activation and increases your risk of unilateral overuse injury."
             self.summary_text.active = True
         elif self.category == 0:  # APT asymmetry highest
-            self.summary_text.text = "Asymmetric pelvic tilt severaly disrupts proper muscle activation and increases your risk of unilateral overuse injury."
+            self.summary_text.text = "Asymmetric pelvic tilt severely disrupts proper muscle activation and increases your risk of unilateral overuse injury."
             self.summary_text.active = True
 
         # add bulleted text if needed
@@ -536,13 +536,13 @@ class DataCard(Serialisable):
             self.summary_text.text = "Maintaining symmetry as you increase your stride length, speed and power is critical to your injury resilience."
             self.summary_text.active = True
         elif self.category == 2:
-            self.summary_text.text = "Your leg extension effects your body asymmetrically, contributing to slight imbalances in unilateral muscle strength and tightness."
+            self.summary_text.text = "Your leg extension affects your body asymmetrically, contributing to slight imbalances in unilateral muscle strength and tightness."
             self.summary_text.active = True
         elif self.category == 1:
-            self.summary_text.text = "Your leg extension effects your body asymmetrically, contributing to moderate imbalances in unilateral muscle strength and tightness."
+            self.summary_text.text = "Your leg extension affects your body asymmetrically, contributing to moderate imbalances in unilateral muscle strength and tightness."
             self.summary_text.active = True
         elif self.category == 0:  # ankle_pitch asymmetry highest
-            self.summary_text.text = "Your leg extension effects your body asymmetrically, contributing to severe imbalances in unilateral muscle strength and tightness."
+            self.summary_text.text = "Your leg extension affects your body asymmetrically, contributing to severe imbalances in unilateral muscle strength and tightness."
             self.summary_text.active = True
 
         # add bulleted text if needed
@@ -772,7 +772,7 @@ class DataCard(Serialisable):
                         self.summary_text.text_items.extend([text_item, text_item2])
                     elif influencer.equation_type == EquationType.hip_rotation_ankle_pitch:
                         text_item = DataCardSummaryTextItem()
-                        text_item.text = "YYour hip rotation was made worse with greater leg extension in your stride."
+                        text_item.text = "Your hip rotation was made worse with greater leg extension in your stride."
                         text_item2 = DataCardSummaryTextItem()
                         text_item2.text = "This is correlated with tight muscles in the obliques, adductors, & lats, and weak or inhibited muscles in the core & glutes."
                         self.summary_text.text_items.extend([text_item, text_item2])
