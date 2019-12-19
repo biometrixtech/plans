@@ -101,7 +101,7 @@ class ScoringSummaryProcessor(object):
         apt_movement_variable_summary.data_cards = self.get_data_cards(apt_movement_scores)
         apt_movement_variable_summary.dashboard_title = "Pelvic Tilt Quality"
         apt_movement_variable_summary.child_title = "Pelvic Tilt"
-        apt_movement_variable_summary.summary_text.text = "movement efficiency"
+        apt_movement_variable_summary.summary_text.text = "movement quality"
         apt_movement_variable_summary.summary_text.active = True
         apt_movement_variable_summary.description.text = "Pelvic Tilt measures hip range of motion in the sagittal plane (like arching your back). Proper alignment is critical for core activation."  # TODO: Update this
         apt_movement_variable_summary.description.active = True
@@ -150,9 +150,9 @@ class ScoringSummaryProcessor(object):
         ankle_pitch_movement_variable_summary.score = ankle_pitch_movement_scores.overall_score
         ankle_pitch_movement_variable_summary.change = ankle_pitch_movement_scores.change
         ankle_pitch_movement_variable_summary.data_cards = self.get_data_cards(ankle_pitch_movement_scores)
-        ankle_pitch_movement_variable_summary.dashboard_title = "Leg Extension Efficiency"
+        ankle_pitch_movement_variable_summary.dashboard_title = "Leg Extension Quality"
         ankle_pitch_movement_variable_summary.child_title = "Leg Extension"
-        ankle_pitch_movement_variable_summary.summary_text.text = "movement efficiency"
+        ankle_pitch_movement_variable_summary.summary_text.text = "movement quality"
         ankle_pitch_movement_variable_summary.summary_text.active = True
         ankle_pitch_movement_variable_summary.description.text = "Leg extention motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
         ankle_pitch_movement_variable_summary.description.active = True
@@ -182,9 +182,9 @@ class ScoringSummaryProcessor(object):
         hip_drop_movement_variable_summary.score = hip_drop_movement_scores.overall_score
         hip_drop_movement_variable_summary.change = hip_drop_movement_scores.change
         hip_drop_movement_variable_summary.data_cards = self.get_data_cards(hip_drop_movement_scores)
-        hip_drop_movement_variable_summary.dashboard_title = "Hip Drop Efficiency"
+        hip_drop_movement_variable_summary.dashboard_title = "Hip Drop Quality"
         hip_drop_movement_variable_summary.child_title = "Hip Drop"
-        hip_drop_movement_variable_summary.summary_text.text = "movement efficiency"
+        hip_drop_movement_variable_summary.summary_text.text = "movement quality"
         hip_drop_movement_variable_summary.summary_text.active = True
         hip_drop_movement_variable_summary.description.text = "Your single leg stability while impacting the ground can be effected by an inhibited core, and can cause malalignment down the kinetic chain."  # TODO: Update this
         hip_drop_movement_variable_summary.description.active = True
@@ -203,9 +203,9 @@ class ScoringSummaryProcessor(object):
         knee_valgus_movement_variable_summary.score = knee_valgus_movement_scores.overall_score
         knee_valgus_movement_variable_summary.change = knee_valgus_movement_scores.change
         knee_valgus_movement_variable_summary.data_cards = self.get_data_cards(knee_valgus_movement_scores)
-        knee_valgus_movement_variable_summary.dashboard_title = "Knee Valgus Efficiency"
+        knee_valgus_movement_variable_summary.dashboard_title = "Knee Valgus Quality"
         knee_valgus_movement_variable_summary.child_title = "Knee Valgus"
-        knee_valgus_movement_variable_summary.summary_text.text = "movement efficiency"
+        knee_valgus_movement_variable_summary.summary_text.text = "movement quality"
         knee_valgus_movement_variable_summary.summary_text.active = True
         knee_valgus_movement_variable_summary.description.text = "Knee Valgus motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
         knee_valgus_movement_variable_summary.description.active = True
@@ -224,9 +224,9 @@ class ScoringSummaryProcessor(object):
         hip_rotation_movement_variable_summary.score = hip_rotation_movement_scores.overall_score
         hip_rotation_movement_variable_summary.change = hip_rotation_movement_scores.change
         hip_rotation_movement_variable_summary.data_cards = self.get_data_cards(hip_rotation_movement_scores, )
-        hip_rotation_movement_variable_summary.dashboard_title = "Hip Rotation Efficiency"
+        hip_rotation_movement_variable_summary.dashboard_title = "Hip Rotation Quality"
         hip_rotation_movement_variable_summary.child_title = "Hip Rotation"
-        hip_rotation_movement_variable_summary.summary_text.text = "movement efficiency"
+        hip_rotation_movement_variable_summary.summary_text.text = "movement quality"
         hip_rotation_movement_variable_summary.summary_text.active = True
         hip_rotation_movement_variable_summary.description.text = "Hip Rotation motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
         hip_rotation_movement_variable_summary.description.active = True
