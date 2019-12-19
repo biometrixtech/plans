@@ -532,7 +532,12 @@ class ScoringProcessor(object):
             else:
                 scores.medians_score_side = 2
 
-        score = score - (percent_diff * .9)
+        # score = score - (percent_diff * .9)
+
+        # alt
+        score = score - percent_diff
+
+        score = max(0, score)
 
         return score
 
@@ -579,21 +584,28 @@ class ScoringProcessor(object):
     def get_elasticity_dysfunction_score(self, equation_list, equations, scores):
 
         score = 100
-        if len(equation_list) > 0:
-            ratio = 1 / float(len(equation_list))
-        else:
-            return score
+        # if len(equation_list) > 0:
+        #     ratio = 1 / float(len(equation_list))
+        # else:
+        #     return score
+        #
+        # for coefficient_count in range(0, len(equation_list)):
+        #     if equation_list[coefficient_count].elasticity >= 0:
+        #         score = score - (equation_list[coefficient_count].elasticity * 50 * ratio)
 
         influencing_equations = set()
+        # alternative
         for coefficient_count in range(0, len(equation_list)):
             if equation_list[coefficient_count].elasticity >= 0:
-                score = score - (equation_list[coefficient_count].elasticity * 50 * ratio)
+                score = score - (equation_list[coefficient_count].elasticity * 30)
                 # record that this equation influenced the score
                 influencing_equations.add(equations[coefficient_count//2].value)
         for eq in influencing_equations:
             influencer = ScoreInfluencer()
             influencer.equation_type = eq
             scores.movement_dysfunction_influencers.append(influencer)
+
+        score = max(0, score)
 
         return score
 
