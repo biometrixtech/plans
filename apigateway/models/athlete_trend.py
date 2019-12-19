@@ -906,7 +906,7 @@ def fake_recovery_quality():
             "score": {
                     "value": 73,
                     "text": "recovery quality",
-                    "color": 5,
+                    "color": 6,
                     "active": True
                     },
 

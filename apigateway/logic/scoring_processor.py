@@ -1,7 +1,7 @@
 from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, SessionScoringSummary, ScoreInfluencer, EquationType
 from models.scoring import MovementVariableSummaryData, RecoveryQuality, DataCard, MovementVariableType, DataCardSummaryTextItem, DataCardData
 from models.styles import LegendColor, DataCardVisualType
-from models.asymmetry import AnteriorPelvicTilt, KneeValgus, AnklePitch
+from models.asymmetry import AnteriorPelvicTilt, KneeValgus, AnklePitch, HipRotation
 import statistics
 
 
@@ -39,7 +39,7 @@ class ScoringSummaryProcessor(object):
         # all_data_cards = []
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
             apt_scores = scoring_processor.get_apt_scores(session.asymmetry, session.movement_patterns)
-            apt_scores.overall_score.color = 11
+            # apt_scores.overall_score.color = 11
             session_scoring_summary.apt = self.get_apt_moving_variable_summary(apt_scores, session)
             session_scoring_summary.all_data_cards.extend(session_scoring_summary.apt.data_cards)
             total_score += apt_scores.overall_score.value * .35
@@ -47,14 +47,14 @@ class ScoringSummaryProcessor(object):
             all_scores.append(apt_scores)
         if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
             ankle_pitch_scores = scoring_processor.get_ankle_pitch_scores(session.movement_patterns)
-            ankle_pitch_scores.overall_score.color = 11
+            # ankle_pitch_scores.overall_score.color = 11
             session_scoring_summary.ankle_pitch = self.get_ankle_pitch_moving_variable_summary(ankle_pitch_scores, session)
             session_scoring_summary.all_data_cards.extend(session_scoring_summary.ankle_pitch.data_cards)
             all_scores.append(ankle_pitch_scores)
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
             hip_drop_scores = scoring_processor.get_hip_drop_scores(session.asymmetry, session.movement_patterns)
-            hip_drop_scores.overall_score.color = 11
+            # hip_drop_scores.overall_score.color = 11
             session_scoring_summary.hip_drop = self.get_hip_drop_moving_variable_summary(hip_drop_scores, session)
             session_scoring_summary.all_data_cards.extend(session_scoring_summary.hip_drop.data_cards)
             total_score += hip_drop_scores.overall_score.value * .25
@@ -63,7 +63,7 @@ class ScoringSummaryProcessor(object):
                     
         if session.asymmetry is not None and session.asymmetry.knee_valgus is not None:
             knee_valgus_scores = scoring_processor.get_knee_valgus_scores(session.asymmetry, session.movement_patterns)
-            knee_valgus_scores.overall_score.color = 11
+            # knee_valgus_scores.overall_score.color = 11
             session_scoring_summary.knee_valgus = self.get_knee_valgus_moving_variable_summary(knee_valgus_scores, session)
             session_scoring_summary.all_data_cards.extend(session_scoring_summary.knee_valgus.data_cards)
             total_score += knee_valgus_scores.overall_score.value * .20
@@ -72,7 +72,7 @@ class ScoringSummaryProcessor(object):
 
         if session.asymmetry is not None and session.asymmetry.hip_rotation is not None:
             hip_rotation_scores = scoring_processor.get_hip_rotation_scores(session.asymmetry, session.movement_patterns)
-            hip_rotation_scores.overall_score.color = 11
+            # hip_rotation_scores.overall_score.color = 11
             session_scoring_summary.hip_rotation = self.get_hip_rotation_moving_variable_summary(hip_rotation_scores, session)
             session_scoring_summary.all_data_cards.extend(session_scoring_summary.hip_rotation.data_cards)
             total_score += hip_rotation_scores.overall_score.value * .20
@@ -84,16 +84,8 @@ class ScoringSummaryProcessor(object):
 
         session_scoring_summary.event_date_time = session.event_date
         session_scoring_summary.score = scoring_processor.get_score(total_score)
-        # TODO: Update thresholds
-        if session_scoring_summary.score.value <= 60:
-            session_scoring_summary.score.color = LegendColor.error_light
-        elif 60 < session_scoring_summary.score.value <= 80:
-            session_scoring_summary.score.color = LegendColor.yellow_light
-        else:
-            session_scoring_summary.score.color = LegendColor.success_light
 
-
-        session_scoring_summary.score.text = 'total movement efficiency score'
+        session_scoring_summary.score.text = 'workout movement quality'
         session_scoring_summary.get_data_points()
         all_data_cards = []
 
@@ -107,11 +99,11 @@ class ScoringSummaryProcessor(object):
         apt_movement_variable_summary.score = apt_movement_scores.overall_score
         apt_movement_variable_summary.change = apt_movement_scores.change
         apt_movement_variable_summary.data_cards = self.get_data_cards(apt_movement_scores)
-        apt_movement_variable_summary.dashboard_title = "Pelvic Tilt Efficiency"
+        apt_movement_variable_summary.dashboard_title = "Pelvic Tilt Quality"
         apt_movement_variable_summary.child_title = "Pelvic Tilt"
         apt_movement_variable_summary.summary_text.text = "movement efficiency"
         apt_movement_variable_summary.summary_text.active = True
-        apt_movement_variable_summary.description.text = "Why it matters: Your pelivs' alignment effects your ability to engage your core and can cause malalignments throughout your upper and lower body."  # TODO: Update this
+        apt_movement_variable_summary.description.text = "Pelvic Tilt measures hip range of motion in the sagittal plane (like arching your back). Proper alignment is critical for core activation."  # TODO: Update this
         apt_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
@@ -126,7 +118,10 @@ class ScoringSummaryProcessor(object):
         viz = MovementVariableSummaryData()
         viz.left_start_angle = 0
         viz.right_start_angle = 0
-        viz.multiplier = 1.0
+        if isinstance(movement_variable_object, KneeValgus) or isinstance(movement_variable_object, HipRotation):
+            viz.multiplier = 1.5
+        else:
+            viz.multiplier = 1.0
         if session.asymmetry is not None and movement_variable_object is not None:
 
             if movement_variable_object.percent_events_asymmetric > 0:
@@ -247,17 +242,17 @@ class ScoringSummaryProcessor(object):
     def get_data_cards(self, movement_scores):
 
         # These two cards are always present
-        symmetry_card = DataCard(DataCardVisualType.categorical)
+        symmetry_card = DataCard(DataCardVisualType.magnitude)
         symmetry_card.data = DataCardData.symmetry
         symmetry_card.movement_variable = movement_scores.movement_variable_type
         movement_dysfunction_card = DataCard(DataCardVisualType.magnitude)
         movement_dysfunction_card.data = DataCardData.dysfunction
         movement_dysfunction_card.movement_variable = movement_scores.movement_variable_type
 
-        symmetry_card.assign_score_value(movement_scores.asymmetry_score.value)
+        symmetry_card.assign_score_value(movement_scores.asymmetry_score)
         symmetry_card.get_symmetry_text(movement_scores)
 
-        movement_dysfunction_card.assign_score_value(movement_scores.movement_dysfunction_score.value)
+        movement_dysfunction_card.assign_score_value(movement_scores.movement_dysfunction_score)
         movement_dysfunction_card.get_dysfunction_text(movement_scores)
 
         cards = [movement_dysfunction_card, symmetry_card]
@@ -482,7 +477,15 @@ class ScoringProcessor(object):
         movement_score = MovementVariableScore()
         movement_score.value = int(value) if value is not None else None
         movement_score.text = ""
-        movement_score.color = None
+        # Define colors based on threshold. Make sure this matches the thresholds in the data cards
+        if value == 100:
+            movement_score.color = LegendColor.success_light
+        elif value > 90:
+            movement_score.color = LegendColor.yellow_light
+        elif value > 80:
+            movement_score.color = LegendColor.warning_light
+        else:
+            movement_score.color = LegendColor.error_light
         movement_score.active = True
 
         return movement_score
