@@ -547,7 +547,9 @@ class ScoringProcessor(object):
         score = score - (percent_diff * .9)
 
         # alt
-        #score = score - percent_diff
+        # score = score - percent_diff
+        #
+        # score = max(0, score)
 
         return score
 
@@ -608,6 +610,7 @@ class ScoringProcessor(object):
         #     if equation_list[coefficient_count].elasticity >= 0:
         #         score = score - (equation_list[coefficient_count].elasticity * 30)
         #
+        # score = max(0, score)
 
         return score
 
