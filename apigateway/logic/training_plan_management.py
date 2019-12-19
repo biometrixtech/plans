@@ -248,7 +248,7 @@ class TrainingPlanManager(object):
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
                 # create new post active rest
                 post_active_rests = calc.get_post_active_rest(force_data)
-                cool_downs = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.cool_down.value]
+                cool_downs = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.cool_down.value]
                 if len(post_active_rests) > 0 and len(cool_downs) == 0:
                     active_rest = post_active_rests[0]
                     cool_down = CoolDown(modality_date_time)  # TODO: revert this

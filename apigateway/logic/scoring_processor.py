@@ -512,7 +512,7 @@ class ScoringProcessor(object):
                     influencer.side = 1
                 scores.asymmetry_regression_coefficient_score_influencers.append(influencer)
 
-            score = score - (coefficient_diff * 30 * ratio)
+            score = score - (coefficient_diff * 30) #  * ratio)
 
         return score
 
@@ -596,7 +596,7 @@ class ScoringProcessor(object):
         influencing_equations = set()
         # alternative
         for coefficient_count in range(0, len(equation_list)):
-            if equation_list[coefficient_count].elasticity >= 0:
+            if equation_list[coefficient_count].elasticity > 0:
                 score = score - (equation_list[coefficient_count].elasticity * 30)
                 # record that this equation influenced the score
                 influencing_equations.add(equations[coefficient_count//2].value)
