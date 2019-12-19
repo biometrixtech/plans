@@ -1,5 +1,5 @@
 from models.scoring import MovementVariableScore, MovementVariableScores, MovementVariableSummary, SessionScoringSummary, ScoreInfluencer, EquationType
-from models.scoring import MovementVariableSummaryData, RecoveryQuality, DataCard, MovementVariableType, DataCardSummaryTextItem, DataCardData
+from models.scoring import MovementVariableSummaryData, RecoveryQuality, DataCard, MovementVariableType, DataCardData
 from models.styles import LegendColor, DataCardVisualType
 from models.asymmetry import AnteriorPelvicTilt, KneeValgus, AnklePitch, HipRotation
 import statistics
@@ -87,7 +87,6 @@ class ScoringSummaryProcessor(object):
 
         session_scoring_summary.score.text = 'workout movement quality'
         session_scoring_summary.get_data_points()
-        all_data_cards = []
 
         session_scoring_summary.get_summary_pills()
 
