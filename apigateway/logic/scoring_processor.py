@@ -477,11 +477,11 @@ class ScoringProcessor(object):
         movement_score.value = int(value) if value is not None else None
         movement_score.text = ""
         # Define colors based on threshold. Make sure this matches the thresholds in the data cards
-        if value == 100:
+        if movement_score.value == 100:
             movement_score.color = LegendColor.success_light
-        elif value > 90:
+        elif movement_score.value > 90:
             movement_score.color = LegendColor.yellow_light
-        elif value > 80:
+        elif movement_score.value > 80:
             movement_score.color = LegendColor.warning_light
         else:
             movement_score.color = LegendColor.error_light
