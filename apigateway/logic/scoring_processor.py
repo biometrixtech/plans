@@ -85,7 +85,7 @@ class ScoringSummaryProcessor(object):
         session_scoring_summary.event_date_time = session.event_date
         session_scoring_summary.score = scoring_processor.get_score(total_score)
 
-        session_scoring_summary.score.text = 'workout movement quality'
+        session_scoring_summary.score.text = 'workout\nmovement quality'
         session_scoring_summary.get_data_points()
 
         session_scoring_summary.get_summary_pills()
@@ -102,7 +102,7 @@ class ScoringSummaryProcessor(object):
         apt_movement_variable_summary.child_title = "Pelvic Tilt"
         apt_movement_variable_summary.summary_text.text = "movement quality"
         apt_movement_variable_summary.summary_text.active = True
-        apt_movement_variable_summary.description.text = "Pelvic Tilt measures hip range of motion in the sagittal plane (like arching your back). Proper alignment is critical for core activation."  # TODO: Update this
+        apt_movement_variable_summary.description.text = "Pelvic Tilt measures hip position as you arch your back. Proper alignment is critical for core activation."
         apt_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.anterior_pelvic_tilt is not None:
@@ -153,7 +153,7 @@ class ScoringSummaryProcessor(object):
         ankle_pitch_movement_variable_summary.child_title = "Leg Extension"
         ankle_pitch_movement_variable_summary.summary_text.text = "movement quality"
         ankle_pitch_movement_variable_summary.summary_text.active = True
-        ankle_pitch_movement_variable_summary.description.text = "Leg extention motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
+        ankle_pitch_movement_variable_summary.description.text = "Leg Extension measures the range of motion accessed by hip extension & back kick."
         ankle_pitch_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.ankle_pitch is not None:
@@ -185,7 +185,7 @@ class ScoringSummaryProcessor(object):
         hip_drop_movement_variable_summary.child_title = "Hip Drop"
         hip_drop_movement_variable_summary.summary_text.text = "movement quality"
         hip_drop_movement_variable_summary.summary_text.active = True
-        hip_drop_movement_variable_summary.description.text = "Your single leg stability while impacting the ground can be effected by an inhibited core, and can cause malalignment down the kinetic chain."  # TODO: Update this
+        hip_drop_movement_variable_summary.description.text = "Hip Drop measures the position of your hips as you support the weight of your body while running."
         hip_drop_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.hip_drop is not None:
@@ -206,7 +206,7 @@ class ScoringSummaryProcessor(object):
         knee_valgus_movement_variable_summary.child_title = "Knee Valgus"
         knee_valgus_movement_variable_summary.summary_text.text = "movement quality"
         knee_valgus_movement_variable_summary.summary_text.active = True
-        knee_valgus_movement_variable_summary.description.text = "Knee Valgus motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
+        knee_valgus_movement_variable_summary.description.text = "Knee Valgus estimates how far your knees bow inward in the loading phase of your gait."
         knee_valgus_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.knee_valgus is not None:
@@ -227,7 +227,7 @@ class ScoringSummaryProcessor(object):
         hip_rotation_movement_variable_summary.child_title = "Hip Rotation"
         hip_rotation_movement_variable_summary.summary_text.text = "movement quality"
         hip_rotation_movement_variable_summary.summary_text.active = True
-        hip_rotation_movement_variable_summary.description.text = "Hip Rotation motion asymmetry can be caused by something, I don't really know what"  # TODO: Update this
+        hip_rotation_movement_variable_summary.description.text = "Hip Rotation measures the forward rotation of your hips in the loading phase of your gait."
         hip_rotation_movement_variable_summary.description.active = True
 
         if session.asymmetry is not None and session.asymmetry.hip_rotation is not None:
