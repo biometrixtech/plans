@@ -544,12 +544,12 @@ class ScoringProcessor(object):
             else:
                 scores.medians_score_side = 2
 
-        score = score - (percent_diff * .9)
+        # score = score - (percent_diff * .9)
 
         # alt
-        # score = score - percent_diff
-        #
-        # score = max(0, score)
+        score = score - percent_diff
+
+        score = max(0, score)
 
         return score
 
@@ -596,21 +596,21 @@ class ScoringProcessor(object):
     def get_elasticity_dysfunction_score(self, equation_list, equations, scores):
 
         score = 100
-        if len(equation_list) > 0:
-            ratio = 1 / float(len(equation_list))
-        else:
-            return score
-
-        for coefficient_count in range(0, len(equation_list)):
-            if equation_list[coefficient_count].elasticity >= 0:
-                score = score - (equation_list[coefficient_count].elasticity * 50 * ratio)
-
-        # alternative
+        # if len(equation_list) > 0:
+        #     ratio = 1 / float(len(equation_list))
+        # else:
+        #     return score
+        #
         # for coefficient_count in range(0, len(equation_list)):
         #     if equation_list[coefficient_count].elasticity >= 0:
-        #         score = score - (equation_list[coefficient_count].elasticity * 30)
-        #
-        # score = max(0, score)
+        #         score = score - (equation_list[coefficient_count].elasticity * 50 * ratio)
+
+        # alternative
+        for coefficient_count in range(0, len(equation_list)):
+            if equation_list[coefficient_count].elasticity >= 0:
+                score = score - (equation_list[coefficient_count].elasticity * 30)
+
+        score = max(0, score)
 
         return score
 
