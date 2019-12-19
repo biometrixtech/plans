@@ -546,6 +546,9 @@ class ScoringProcessor(object):
 
         score = score - (percent_diff * .9)
 
+        # alt
+        #score = score - percent_diff
+
         return score
 
     def get_left_right_adf_difference_score(self, left_equation_list, right_equation_list, equations, scores):
@@ -599,6 +602,12 @@ class ScoringProcessor(object):
         for coefficient_count in range(0, len(equation_list)):
             if equation_list[coefficient_count].elasticity >= 0:
                 score = score - (equation_list[coefficient_count].elasticity * 50 * ratio)
+
+        # alternative
+        # for coefficient_count in range(0, len(equation_list)):
+        #     if equation_list[coefficient_count].elasticity >= 0:
+        #         score = score - (equation_list[coefficient_count].elasticity * 30)
+        #
 
         return score
 
