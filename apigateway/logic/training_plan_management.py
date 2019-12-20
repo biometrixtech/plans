@@ -368,12 +368,12 @@ class TrainingPlanManager(object):
         else:
             new_modality = None
 
-        self.daily_plan.define_available_modalities()
         if new_modality is not None:
             self.daily_plan.modalities.extend(new_modality)
-            self.daily_plan.last_updated = format_datetime(event_date)
+        self.daily_plan.last_updated = format_datetime(event_date)
+        self.daily_plan.define_available_modalities()
 
-            self.daily_plan_datastore.put(self.daily_plan)
+        self.daily_plan_datastore.put(self.daily_plan)
 
         return self.daily_plan
 
