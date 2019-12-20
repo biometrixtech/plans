@@ -164,6 +164,7 @@ class DailyPlan(Serialisable):
                     pre_active_rest_available = False
             if pre_active_rest_available:
                 self.modalities_available_on_demand = [ModalityTypeDisplay(ModalityType(0))]
+        self.modalities_available_on_demand.append(ModalityTypeDisplay(ModalityType(3)))
 
 
     def get_past_sessions(self, trigger_date_time):
