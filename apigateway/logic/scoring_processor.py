@@ -479,9 +479,9 @@ class ScoringProcessor(object):
         # Define colors based on threshold. Make sure this matches the thresholds in the data cards
         if movement_score.value == 100:
             movement_score.color = LegendColor.success_light
-        elif movement_score.value > 90:
+        elif movement_score.value >= 90:
             movement_score.color = LegendColor.yellow_light
-        elif movement_score.value > 80:
+        elif movement_score.value >= 80:
             movement_score.color = LegendColor.warning_light
         else:
             movement_score.color = LegendColor.error_light

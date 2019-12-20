@@ -376,13 +376,13 @@ class DataCard(Serialisable):
                     self.title_text = "Mostly Symmetric"
                     self.pill_text = ""
                     # self.color = LegendColor.success_light
-                elif score > 90:
+                elif score >= 90:
                     # self.value = 3
                     self.category = 2
                     self.title_text = "Slight Asymmetry"
                     self.pill_text = "Slight Asymmetry"
                     # self.color = LegendColor.yellow_light
-                elif score > 80:
+                elif score >= 80:
                     # self.value = 2
                     self.category = 1
                     self.title_text = "Moderate Asymmetry"
@@ -410,12 +410,12 @@ class DataCard(Serialisable):
                     self.title_text = "Good Alignment"
                     self.pill_text = ""
                     # self.color = LegendColor.success_light
-                elif score > 90:
+                elif score >= 90:
                     self.category = 2
                     self.title_text = "Slight Inefficiency "
                     self.pill_text = "Slight Dysfunction"
                     # self.color = LegendColor.yellow_light
-                elif score > 80:
+                elif score >= 80:
                     self.category = 1
                     self.title_text = "Moderate Inefficiency"
                     self.pill_text = "Mod Inefficiency"
