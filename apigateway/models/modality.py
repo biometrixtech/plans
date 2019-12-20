@@ -1379,7 +1379,7 @@ class ActiveRestBeforeTraining(ActiveRest):
         self.when = "before training"
         self.when_card = "before training"
         self.display_image = "inhibit"  # do not include .png or _activity or _tab
-        self.locked_text = "You've missed your window to complete mobilize"
+        self.locked_text = "Sorry, you missed the optimal window for Mobilize today."
 
     # def get_total_exercises(self):
     #     total_exercises = 0
@@ -1907,7 +1907,7 @@ class ActiveRestAfterTraining(ActiveRest):
         self.when = "after training"
         self.when_card = "after training"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
-        self.locked_text = "You've missed your window to complete mobilize"
+        self.locked_text = "Sorry, you missed the optimal window for Mobilize today."
 
 
     # def get_total_exercises(self):
@@ -2405,7 +2405,7 @@ class WarmUp(Modality):
         self.when = "before training"
         self.when_card = "before training"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
-        self.locked_text = "You've missed your window to complete warm up"
+        self.locked_text = "Sorry, you missed the optimal window for Warm up today."
 
 
     @abc.abstractmethod
@@ -2423,7 +2423,7 @@ class CoolDown(Modality):
         self.when = "after training"
         self.when_card = "after training"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
-        self.locked_text = "You've missed your window to complete cool down"
+        self.locked_text = "Sorry, you missed the optimal window for Functional Strength today."
 
 
     @abc.abstractmethod
