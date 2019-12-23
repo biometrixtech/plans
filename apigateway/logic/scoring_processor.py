@@ -302,10 +302,10 @@ class ScoringProcessor(object):
         scores.overall_score = self.get_score((scores.asymmetry_score.value * .5) + (scores.movement_dysfunction_score.value * .3) + (scores.fatigue_score.value * .2))
 
         # TODO: update with real logic
-        scores.change.value = -1.2
-        scores.change.text = "pts"
-        scores.change.color = 6
-        scores.change.active = True
+        # scores.change.value = -1.2
+        # scores.change.text = "pts"
+        # scores.change.color = 6
+        # scores.change.active = True
 
         return scores
 
@@ -342,10 +342,10 @@ class ScoringProcessor(object):
         scores.overall_score = self.get_score((scores.asymmetry_score.value * .5) + (scores.movement_dysfunction_score.value * .3) + (scores.fatigue_score.value * .2))
 
         # TODO: update with real logic
-        scores.change.value = 2.0
-        scores.change.text = "pts"
-        scores.change.color = 13
-        scores.change.active = True
+        # scores.change.value = 2.0
+        # scores.change.text = "pts"
+        # scores.change.color = 13
+        # scores.change.active = True
 
         return scores
 
@@ -383,10 +383,10 @@ class ScoringProcessor(object):
         scores.overall_score = self.get_score((scores.asymmetry_score.value * .5) + (scores.movement_dysfunction_score.value * .3) + 20)
 
         # TODO: update with real logic
-        scores.change.value = 0.0
-        scores.change.text = "pts"
-        scores.change.color = 13
-        scores.change.active = True
+        # scores.change.value = 0.0
+        # scores.change.text = "pts"
+        # scores.change.color = 13
+        # scores.change.active = True
 
         return scores
 
