@@ -228,10 +228,10 @@ class TrainingPlanManager(object):
                 #     if post_active_rest.completed:
                 #         self.daily_plan.completed_post_active_rest.append(post_active_rest)
                 # TODO: revert
-                if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
-                    self.daily_plan.completed_ice.append(self.daily_plan.ice)
-                if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
-                    self.daily_plan.completed_cold_water_immersion.append(self.daily_plan.cold_water_immersion)
+                # if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
+                #     self.daily_plan.completed_ice.append(self.daily_plan.ice)
+                # if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
+                #     self.daily_plan.completed_cold_water_immersion.append(self.daily_plan.cold_water_immersion)
 
                 # make pre-training modalities inactive
                 # if self.daily_plan.heat is not None:
@@ -248,19 +248,7 @@ class TrainingPlanManager(object):
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
                 # create new post active rest
                 post_active_rests = calc.get_post_active_rest(force_data)
-                cool_downs = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.cool_down.value]
-                if len(post_active_rests) > 0 and len(cool_downs) == 0:
-                    active_rest = post_active_rests[0]
-                    cool_down = CoolDown(modality_date_time)  # TODO: revert this
-                    cool_down.display_image = 'dynamic_flexibility'
-                    cool_down.goals = active_rest.goals
-                    cool_down.exercise_phases = active_rest.exercise_phases[1:3]
-                    post_active_rests.append(cool_down)
                 self.daily_plan.modalities.extend(post_active_rests)
-
-                # TODO: remove me
-                self.daily_plan.ice = fake_ice(modality_date_time)
-                self.daily_plan.cold_water_immersion = fake_cwi(modality_date_time)
 
                 # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
                 # self.daily_plan.ice = calc.get_ice()
@@ -298,19 +286,6 @@ class TrainingPlanManager(object):
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
                 # get new pre active rest
                 pre_active_rests = calc.get_pre_active_rest(force_data)
-                functional_strengths = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.functional_strength.value]
-                if len(pre_active_rests) > 0 and len(functional_strengths) == 0:
-                    active_rest = pre_active_rests[0]
-                    functional_strength = FunctionalStrength(modality_date_time)  # TODO: revert this
-                    functional_strength.display_image = 'dynamic_flexibility'
-                    functional_strength.exercise_phases = active_rest.exercise_phases[1:3]
-                    functional_strength.set_plan_dosage()
-                    functional_strength.set_exercise_dosage_ranking()
-                    functional_strength.aggregate_dosages()
-                    functional_strength.set_winners()
-                    functional_strength.scale_all_active_time()
-                    functional_strength.reconcile_default_plan_with_active_time()
-                    pre_active_rests.append(functional_strength)
                 self.daily_plan.modalities.extend(pre_active_rests)
 
                 # remove existing warm_up
