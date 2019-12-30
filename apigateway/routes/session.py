@@ -78,7 +78,8 @@ def handle_session_create(user_id=None):
                 if plan.training_sessions[s].id == session_id:
                     create_new = False
                     if session.get('source', 0) == 3:
-                        session['last_updated'] = get_local_time(datetime.datetime.now(), timezone)
+                        session['last_updated'] = event_date
+                        # session['last_updated'] = get_local_time(datetime.datetime.now(), timezone)
                     new_session = Session.json_deserialise(session)
                     plan.training_sessions[s] = new_session
                     plan_update_required = True
