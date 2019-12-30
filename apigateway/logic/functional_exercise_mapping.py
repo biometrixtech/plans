@@ -25,7 +25,7 @@ class ExerciseAssignmentCalculator(object):
             active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
                 return [active_rest]
-            return []
+        return []
 
     def get_post_active_rest(self, force_data=False):
 
