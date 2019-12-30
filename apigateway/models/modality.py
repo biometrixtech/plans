@@ -2410,11 +2410,7 @@ class WarmUp(Modality):
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
-        ex_phase = ExercisePhase(0)
-        ex_phase.exercises['1'] = AssignedExercise(library_id=str(1))
-        exercise_list = [ex for ex in exercise_library if ex.id == str(1)]
-        ex_phase.exercises['1'].exercise = exercise_list[0]
-        self.exercise_phases.append(ex_phase)
+        pass
 
 
 class CoolDown(Modality):
@@ -2423,16 +2419,12 @@ class CoolDown(Modality):
         self.when = "after training"
         self.when_card = "after training"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
-        self.locked_text = "Sorry, you missed the optimal window for Functional Strength today."
+        self.locked_text = "Sorry, you missed the optimal window for Cool Down today. "
 
 
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
-        ex_phase = ExercisePhase(0)
-        ex_phase.exercises['1'] = AssignedExercise(library_id=str(1))
-        exercise_list = [ex for ex in exercise_library if ex.id == str(1)]
-        ex_phase.exercises['1'].exercise = exercise_list[0]
-        self.exercise_phases.append(ex_phase)
+        pass
 
 
 class FunctionalStrength(Modality):
@@ -2441,7 +2433,7 @@ class FunctionalStrength(Modality):
         self.when = "anytime"
         self.when_card = "anytime"
         self.display_image = "inhibit"   # do not include .png or _activity or _tab
-        self.locked_text = "You've missed your window to complete functional strength"
+        self.locked_text = "Sorry, you missed the optimal window for Functional Strength today."
 
 
     @abc.abstractmethod

@@ -103,19 +103,19 @@ class DailyPlan(Serialisable):
         if not stats_processing:
             daily_plan.heat = HeatSession.json_deserialise(input_dict['heat']) if input_dict.get('heat', None) is not None else None
             daily_plan.completed_heat = [HeatSession.json_deserialise(heat) for heat in input_dict.get('completed_heat', [])]
-            daily_plan.pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('pre_active_rest', [])]
-            daily_plan.completed_pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('completed_pre_active_rest', [])]
-            daily_plan.warm_up = [WarmUp.json_deserialise(warm_up) for warm_up in input_dict.get('warm_up', [])]
-            daily_plan.completed_warm_up = [WarmUp.json_deserialise(w) for w in input_dict.get('completed_warm_up', [])]
-            daily_plan.cool_down = [CoolDown.json_deserialise(cool_down) for cool_down in input_dict.get('cool_down', [])]
-            daily_plan.completed_cool_down = [CoolDown.json_deserialise(cd) for cd in input_dict.get('completed_cool_down', [])]
-            daily_plan.post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('post_active_rest', [])]
-            daily_plan.completed_post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('completed_post_active_rest', [])]
+            # daily_plan.pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('pre_active_rest', [])]
+            # daily_plan.completed_pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('completed_pre_active_rest', [])]
+            # daily_plan.warm_up = [WarmUp.json_deserialise(warm_up) for warm_up in input_dict.get('warm_up', [])]
+            # daily_plan.completed_warm_up = [WarmUp.json_deserialise(w) for w in input_dict.get('completed_warm_up', [])]
+            # daily_plan.cool_down = [CoolDown.json_deserialise(cool_down) for cool_down in input_dict.get('cool_down', [])]
+            # daily_plan.completed_cool_down = [CoolDown.json_deserialise(cd) for cd in input_dict.get('completed_cool_down', [])]
+            # daily_plan.post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('post_active_rest', [])]
+            # daily_plan.completed_post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('completed_post_active_rest', [])]
             daily_plan.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice', None) is not None else None
             daily_plan.completed_ice = [IceSession.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
             daily_plan.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion', None) is not None else None
             daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
-            daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
+            # daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
             daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
             daily_plan.modalities = [Modality.json_deserialise(m) for m in input_dict.get('modalities', [])]
             daily_plan.completed_modalities = [Modality.json_deserialise(m) for m in input_dict.get('completed_modalities', [])]
@@ -207,187 +207,3 @@ class DailyPlan(Serialisable):
 
     def sort_insights(self):
         self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
-
-
-def fake_cwi():
-    return {
-            "minutes" : 10,
-            "after_training" : True,
-            "goals" : [ 
-                {
-                    "text" : "Care for soreness",
-                    "priority" : 1,
-                    "goal_type" : 1
-                }
-            ],
-            "start_date_time" : None,
-            "completed_date_time" : None,
-            "event_date_time" : None,
-            "completed" : False,
-            "active" : True,
-            "alerts" : []
-        }
-
-
-def fake_ice():
-    return {
-                "minutes" : 15,
-                "start_date_time" : None,
-                "completed_date_time" : None,
-                "event_date_time" : None,
-                "completed" : False,
-                "active" : True,
-                "body_parts" : [ 
-                    {
-                        "body_part_location" : 12,
-                        "goals" : [ 
-                            {
-                                "text" : "Care for soreness",
-                                "priority" : 1,
-                                "goal_type" : 1
-                            }
-                        ],
-                        "after_training" : True,
-                        "immediately_after_training" : False,
-                        "repeat_every_3hrs_for_24hrs" : True,
-                        "side" : 0,
-                        "completed" : False,
-                        "active" : True
-                    }
-                ],
-                "alerts" : []
-            }
-
-def fake_modality():
-    return [
-            {
-                "type": 3,
-                "title": "Cool Down",
-                "when": "Immediately After Workout",
-                "when_card": "Immediately After Workout",
-                "start_date_time" : None,
-                "completed_date_time" : None,
-                "event_date_time" : "2019-05-08T00:00:00Z",
-                "completed" : False,
-                "active" : True,
-                "default_plan": "Complete",
-                "force_data": False,
-                "goal_title": " routine to:",  ## make dynamic based on selected routine
-                "display_image": "dynamic_flexibility",
-                "goals": {
-                            "Recover from Rowing" : {
-                                "efficient_active" : True,
-                                "complete_active" : True,
-                                "comprehensive_active" : True
-                            },
-                            "Recover from Running" : {
-                                "efficient_active" : False,
-                                "complete_active" : False,
-                                "comprehensive_active" : False
-                            }
-                        },
-                "exercise_phases":[
-                    {
-                        "type": 0,
-                        "name": "Dynamic Stretch Exercises",
-                        "title": "Dynamic Stretch",
-                        "exercises" : [ 
-                            {
-                                "name" : "Foam Roller - Hamstrings",
-                                "display_name" : "Foam Roll - Hamstrings",
-                                "library_id" : "3",
-                                "description" : "Place foam roller just before the glute & roll the length of your hamstring. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle. ",
-                                "youtube_id" : None,
-                                "bilateral" : True,
-                                "seconds_per_rep" : None,
-                                "seconds_per_set" : 30,
-                                "unit_of_measure" : "seconds",
-                                "position_order" : 0,
-                                "duration_efficient" : 0,
-                                "duration_complete" : 60,
-                                "duration_comprehensive" : 120,
-                                "goal_text" : "",
-                                "equipment_required" : [ 
-                                    "Foam Roller"
-                                ],
-                                "dosages" : [ 
-                                    {
-                                        "goal" : {
-                                            "text" : "Recover from Rowing",
-                                            "priority" : 1,
-                                            "goal_type" : 2
-                                        },
-                                        "priority" : "2",
-                                        "tier" : 2,
-                                        "efficient_reps_assigned" : 0,
-                                        "efficient_sets_assigned" : 0,
-                                        "complete_reps_assigned" : 30,
-                                        "complete_sets_assigned" : 1,
-                                        "comprehensive_reps_assigned" : 30,
-                                        "comprehensive_sets_assigned" : 1,
-                                        "default_efficient_reps_assigned" : 0,
-                                        "default_efficient_sets_assigned" : 0,
-                                        "default_complete_reps_assigned" : 30,
-                                        "default_complete_sets_assigned" : 1,
-                                        "default_comprehensive_reps_assigned" : 30,
-                                        "default_comprehensive_sets_assigned" : 1,
-                                        "ranking" : 2
-                                    }
-                                ]
-                            }
-                        ]
-                     },
-
-                     {
-                        "type": 1,
-                        "name": "Dynamic Integrate Exercises",
-                        "title": "Dynamic Integrate",
-                        "exercises" : [ 
-                            {
-                                "name" : "Foam Roller - Hamstrings",
-                                "display_name" : "Foam Roll - Hamstrings",
-                                "library_id" : "3",
-                                "description" : "Place foam roller just before the glute & roll the length of your hamstring. If you find a tender spot, hold for 30 seconds. Don’t have a foam roller? You can use a tennis ball or water bottle. ",
-                                "youtube_id" : None,
-                                "bilateral" : True,
-                                "seconds_per_rep" : None,
-                                "seconds_per_set" : 30,
-                                "unit_of_measure" : "seconds",
-                                "position_order" : 0,
-                                "duration_efficient" : 0,
-                                "duration_complete" : 60,
-                                "duration_comprehensive" : 120,
-                                "goal_text" : "",
-                                "equipment_required" : [ 
-                                    "Foam Roller"
-                                ],
-                                "dosages" : [ 
-                                    {
-                                        "goal" : {
-                                            "text" : "Recover from Cycling",
-                                            "priority" : 1,
-                                            "goal_type" : 2
-                                        },
-                                        "priority" : "2",
-                                        "tier" : 2,
-                                        "efficient_reps_assigned" : 0,
-                                        "efficient_sets_assigned" : 0,
-                                        "complete_reps_assigned" : 30,
-                                        "complete_sets_assigned" : 1,
-                                        "comprehensive_reps_assigned" : 30,
-                                        "comprehensive_sets_assigned" : 1,
-                                        "default_efficient_reps_assigned" : 0,
-                                        "default_efficient_sets_assigned" : 0,
-                                        "default_complete_reps_assigned" : 30,
-                                        "default_complete_sets_assigned" : 1,
-                                        "default_comprehensive_reps_assigned" : 30,
-                                        "default_comprehensive_sets_assigned" : 1,
-                                        "ranking" : 2
-                                    }
-                                ]
-                            }
-                        ]
-                     }
-                ]
-            }
-            ]
