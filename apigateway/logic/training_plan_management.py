@@ -11,10 +11,9 @@ from models.daily_plan import DailyPlan
 from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
 # from models.functional_movement_stats import FunctionalMovementSummary
-from models.functional_movement_modalities import ModalityType
+from models.functional_movement_modalities import ModalityType, CoolDown, FunctionalStrength
 from utils import format_date, parse_datetime, parse_date, format_datetime
 # from models.body_parts import BodyPartFactory
-from models.modality import CoolDown, FunctionalStrength
 import copy
 
 

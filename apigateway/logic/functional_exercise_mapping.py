@@ -1,4 +1,4 @@
-from models.modality import ActiveRestBeforeTraining, ActiveRestAfterTraining, WarmUp, CoolDown, FunctionalStrength
+from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, WarmUp, CoolDown, FunctionalStrength
 
 
 class ExerciseAssignmentCalculator(object):

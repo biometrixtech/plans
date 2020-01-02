@@ -8,8 +8,7 @@ from models.insights import AthleteInsight
 from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
 from models.soreness import Soreness
-from models.modality import Modality, ModalityTypeDisplay, ModalityType
-from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining
+from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, Modality, ModalityTypeDisplay, ModalityType
 
 
 class DailyPlan(Serialisable):
