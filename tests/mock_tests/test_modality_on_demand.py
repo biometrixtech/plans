@@ -18,7 +18,7 @@ def test_get_warm_up():
     athlete_stats.event_date = event_date
     plan = add_modality_on_demand(user_id, event_date, modality_type=2, visualizations=True, athlete_stats=athlete_stats)
     plan = DailyPlan.json_deserialise(plan, False)
-    assert plan.modalities[-1].type == ModalityType.warm_up
+    assert plan.modalities[0].type == ModalityType.warm_up
 
 
 def test_get_cool_down():
@@ -28,4 +28,4 @@ def test_get_cool_down():
     athlete_stats.event_date = event_date
     plan = add_modality_on_demand(user_id, event_date, modality_type=3, visualizations=True, athlete_stats=athlete_stats)
     plan = DailyPlan.json_deserialise(plan, False)
-    assert plan.modalities[-1].type == ModalityType.cool_down
+    assert plan.modalities[0].type == ModalityType.cool_down
