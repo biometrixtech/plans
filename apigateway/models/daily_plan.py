@@ -1,13 +1,10 @@
 from serialisable import Serialisable
 from utils import parse_date
-# import models.session as session
 from models.session import Session
 from models.daily_readiness import DailyReadiness
-from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
-from models.insights import AthleteInsight
-from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
 from models.soreness import Soreness
+from models.functional_movement_modalities import Modality, ModalityTypeDisplay, ModalityType, IceSession, HeatSession, ColdWaterImmersion
 
 
 class DailyPlan(Serialisable):
@@ -41,6 +38,9 @@ class DailyPlan(Serialisable):
         self.insights = []
         self.trends = None
         self.symptoms = []
+        self.modalities = []
+        self.completed_modalities = []
+        self.modalities_available_on_demand = []
 
     def get_id(self):
         return self.user_id
@@ -82,7 +82,10 @@ class DailyPlan(Serialisable):
                'train_later': self.train_later,
                'insights': [insight.json_serialise() for insight in self.insights],
                'trends': self.trends.json_serialise(plan=True) if self.trends is not None else None,
-               'symptoms': [soreness.json_serialise() for soreness in self.symptoms]
+               'symptoms': [soreness.json_serialise() for soreness in self.symptoms],
+               'modalities': [m.json_serialise() for m in self.modalities],
+               'completed_modalities': [m.json_serialise() for m in self.completed_modalities],
+               'modalities_available_on_demand': [m.json_serialise() for m in self.modalities_available_on_demand]
                }
 
         return ret
@@ -95,20 +98,23 @@ class DailyPlan(Serialisable):
         if not stats_processing:
             daily_plan.heat = HeatSession.json_deserialise(input_dict['heat']) if input_dict.get('heat', None) is not None else None
             daily_plan.completed_heat = [HeatSession.json_deserialise(heat) for heat in input_dict.get('completed_heat', [])]
-            daily_plan.pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('pre_active_rest', [])]
-            daily_plan.completed_pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('completed_pre_active_rest', [])]
-            daily_plan.warm_up = [WarmUp.json_deserialise(warm_up) for warm_up in input_dict.get('warm_up', [])]
-            daily_plan.completed_warm_up = [WarmUp.json_deserialise(w) for w in input_dict.get('completed_warm_up', [])]
-            daily_plan.cool_down = [CoolDown.json_deserialise(cool_down) for cool_down in input_dict.get('cool_down', [])]
-            daily_plan.completed_cool_down = [CoolDown.json_deserialise(cd) for cd in input_dict.get('completed_cool_down', [])]
-            daily_plan.post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('post_active_rest', [])]
-            daily_plan.completed_post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('completed_post_active_rest', [])]
+            # daily_plan.pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('pre_active_rest', [])]
+            # daily_plan.completed_pre_active_rest = [ActiveRestBeforeTraining.json_deserialise(ar) for ar in input_dict.get('completed_pre_active_rest', [])]
+            # daily_plan.warm_up = [WarmUp.json_deserialise(warm_up) for warm_up in input_dict.get('warm_up', [])]
+            # daily_plan.completed_warm_up = [WarmUp.json_deserialise(w) for w in input_dict.get('completed_warm_up', [])]
+            # daily_plan.cool_down = [CoolDown.json_deserialise(cool_down) for cool_down in input_dict.get('cool_down', [])]
+            # daily_plan.completed_cool_down = [CoolDown.json_deserialise(cd) for cd in input_dict.get('completed_cool_down', [])]
+            # daily_plan.post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('post_active_rest', [])]
+            # daily_plan.completed_post_active_rest = [ActiveRestAfterTraining.json_deserialise(ar) for ar in input_dict.get('completed_post_active_rest', [])]
             daily_plan.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice', None) is not None else None
             daily_plan.completed_ice = [IceSession.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
             daily_plan.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion', None) is not None else None
             daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
-            daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
+            # daily_plan.insights = [AthleteInsight.json_deserialise(insight) for insight in input_dict.get('insights', [])]
             daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
+            daily_plan.modalities = [Modality.json_deserialise(m) for m in input_dict.get('modalities', [])]
+            daily_plan.completed_modalities = [Modality.json_deserialise(m) for m in input_dict.get('completed_modalities', [])]
+            daily_plan.modalities_available_on_demand = [ModalityTypeDisplay.json_deserialise(md) for md in input_dict.get('modalities_available_on_demand', [])]
         # daily_plan.daily_readiness_survey = _daily_readiness_from_mongo(input_dict.get('daily_readiness_survey', None), daily_plan.user_id) # note that this deserialisation is still done in the datastore
         daily_plan.last_updated = input_dict.get('last_updated', None)
         daily_plan.pre_active_rest_completed = input_dict.get('pre_active_rest_completed', False)
@@ -136,6 +142,23 @@ class DailyPlan(Serialisable):
             return 1.0, None
         else:
             return 0.0, None
+
+    def define_available_modalities(self):
+        self.modalities_available_on_demand = []
+        if not self.train_later:
+            post_active_rest_available = True
+            for m in self.modalities:
+                if m.type.value == 1 and not m.completed:
+                    post_active_rest_available = False
+            if post_active_rest_available:
+                self.modalities_available_on_demand = [ModalityTypeDisplay(ModalityType(1))]
+        else:
+            pre_active_rest_available = True
+            for m in self.modalities:
+                if m.type.value == 0 and not m.completed:
+                    pre_active_rest_available = False
+            if pre_active_rest_available:
+                self.modalities_available_on_demand = [ModalityTypeDisplay(ModalityType(0))]
 
     def get_past_sessions(self, trigger_date_time):
 

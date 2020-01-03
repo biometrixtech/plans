@@ -7,7 +7,7 @@ from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
 from models.soreness import CompletedExercise
 from routes.environments import is_fathom_environment
-from logic.survey_processing import create_plan, cleanup_plan
+from logic.survey_processing import create_plan, cleanup_plan, add_modality_on_demand, process_stats
 from utils import format_date, parse_datetime, format_datetime
 from config import get_mongo_collection
 
@@ -42,52 +42,36 @@ def handle_exercise_modalities_complete(user_id=None):
     plan = daily_plan_datastore.get(user_id=user_id,
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
-    if recovery_type == 'pre_active_rest':
-        if recovery_index + 1 > len(plan.pre_active_rest):
-            raise NoSuchEntityException('No pre active rest found with that index')
-        if plan.pre_active_rest[recovery_index].completed:
-            save_exercises = False
-        plan.pre_active_rest_completed = True  # plan
-        plan.pre_active_rest[recovery_index].completed = True  # recovery
-        plan.pre_active_rest[recovery_index].completed_date_time = recovery_event_date
+    # if recovery_type == 'pre_active_rest':
+    #     if recovery_index + 1 > len(plan.pre_active_rest):
+    #         raise NoSuchEntityException('No pre active rest found with that index')
+    #     if plan.pre_active_rest[recovery_index].completed:
+    #         save_exercises = False
+    #     plan.pre_active_rest_completed = True  # plan
+    #     plan.pre_active_rest[recovery_index].completed = True  # recovery
+    #     plan.pre_active_rest[recovery_index].completed_date_time = recovery_event_date
 
-    elif recovery_type == 'post_active_rest':
-        if recovery_index + 1 > len(plan.post_active_rest):
-            raise NoSuchEntityException('No post active rest found with that index')
-        if plan.post_active_rest[recovery_index].completed:
-            save_exercises = False
-        plan.post_active_rest_completed = True  # plan
-        plan.post_active_rest[recovery_index].completed = True  # recovery
-        plan.post_active_rest[recovery_index].completed_date_time = recovery_event_date
-
-    elif recovery_type == 'warm_up':
-        if recovery_index + 1 > len(plan.warm_up):
-            raise NoSuchEntityException('No warm_up found with that index')
-        plan.warm_up[recovery_index].completed_date_time = recovery_event_date
-        plan.warm_up[recovery_index].completed = True
-        if plan.warm_up[recovery_index].completed:
-            save_exercises = False
-
-    elif recovery_type == 'cool_down':
-        if recovery_index + 1 > len(plan.cool_down):
-            raise NoSuchEntityException('No cool down found with that index')
-        plan.cool_down[recovery_index].completed_date_time = recovery_event_date
-        plan.cool_down[recovery_index].completed = True
-        if plan.cool_down[recovery_index].completed:
-            save_exercises = False
+    # elif recovery_type == 'post_active_rest':
+    #     if recovery_index + 1 > len(plan.post_active_rest):
+    #         raise NoSuchEntityException('No post active rest found with that index')
+    #     if plan.post_active_rest[recovery_index].completed:
+    #         save_exercises = False
+    #     plan.post_active_rest_completed = True  # plan
+    #     plan.post_active_rest[recovery_index].completed = True  # recovery
+    #     plan.post_active_rest[recovery_index].completed_date_time = recovery_event_date
+    # elif recovery_type in ['warm_up', 'cool_down', 'functional_strength']:
+    modalities = [m for m in plan.modalities if m.type.value == recovery_type and not m.completed]
+    if len(modalities) > 0:
+        modality = modalities[0]
+        modality.completed = True
+        modality.completed_date_time = recovery_event_date
+    else:
+        save_exercises = False
 
     daily_plan_datastore.put(plan)
 
     if save_exercises:
         save_completed_exercises(completed_exercises, user_id, recovery_event_date)
-
-    # survey_complete = plan.daily_readiness_survey_completed()
-    # landing_screen, nav_bar_indicator = plan.define_landing_screen()
-    # plan = plan.json_serialise()
-    # plan['daily_readiness_survey_completed'] = survey_complete
-    # plan['landing_screen'] = landing_screen
-    # plan['nav_bar_indicator'] = nav_bar_indicator
-    # del plan['daily_readiness_survey'], plan['user_id']
 
     plan = cleanup_plan(plan, visualizations=visualizations)
 
@@ -112,33 +96,29 @@ def handle_exercise_modalities_start(user_id=None):
     plan = daily_plan_datastore.get(user_id=user_id,
                                     start_date=plan_event_day,
                                     end_date=plan_event_day)[0]
-    plans_service = Service('plans', Config.get('API_VERSION'))
-    body = {"event_date": recovery_start_date}
-    if recovery_type == 'pre_active_rest':
-        if recovery_index + 1 > len(plan.pre_active_rest):
-            raise NoSuchEntityException('No pre active rest found with that index')
-        plan.pre_active_rest[recovery_index].start_date_time = recovery_start_date
-        plans_service.call_apigateway_async(method='POST',
-                                            endpoint=f'/athlete/{user_id}/prep_started',
-                                            body=body)
-
-    elif recovery_type == 'post_active_rest':
-        if recovery_index + 1 > len(plan.post_active_rest):
-            raise NoSuchEntityException('No post active rest found with that index')
-        plan.post_active_rest[recovery_index].start_date_time = recovery_start_date
-        plans_service.call_apigateway_async(method='POST',
-                                            endpoint=f'/athlete/{user_id}/recovery_started',
-                                            body=body)
-
-    elif recovery_type == 'warm_up':
-        if recovery_index + 1 > len(plan.warm_up):
-            raise NoSuchEntityException('No warm up found with that index')
-        plan.warm_up[recovery_index].start_date_time = recovery_start_date
-
-    elif recovery_type == 'cool_down':
-        if recovery_index + 1 > len(plan.cool_down):
-            raise NoSuchEntityException('No cool down found with that index')
-        plan.cool_down[recovery_index].start_date_time = recovery_start_date
+    # plans_service = Service('plans', Config.get('API_VERSION'))
+    # body = {"event_date": recovery_start_date}
+    # if recovery_type == 'pre_active_rest':
+    #     if recovery_index + 1 > len(plan.pre_active_rest):
+    #         raise NoSuchEntityException('No pre active rest found with that index')
+    #     plan.pre_active_rest[recovery_index].start_date_time = recovery_start_date
+    #     plans_service.call_apigateway_async(method='POST',
+    #                                         endpoint=f'/athlete/{user_id}/prep_started',
+    #                                         body=body)
+    #
+    # elif recovery_type == 'post_active_rest':
+    #     if recovery_index + 1 > len(plan.post_active_rest):
+    #         raise NoSuchEntityException('No post active rest found with that index')
+    #     plan.post_active_rest[recovery_index].start_date_time = recovery_start_date
+    #     plans_service.call_apigateway_async(method='POST',
+    #                                         endpoint=f'/athlete/{user_id}/recovery_started',
+    #                                         body=body)
+    #
+    # elif recovery_type in ['warm_up', 'cool_down', 'functional_strength']:
+    modalities = [m for m in plan.modalities if m.type.value == recovery_type and not m.completed]
+    if len(modalities) > 0:
+        modality = modalities[0]
+        modality.start_date_time = recovery_start_date
 
     daily_plan_datastore.put(plan)
 
@@ -148,7 +128,7 @@ def handle_exercise_modalities_start(user_id=None):
 @app.route('/<uuid:user_id>/get_mobilize', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date': str})
-@xray_recorder.capture('routes.active_recovery.exercise_modalities.start')
+@xray_recorder.capture('routes.active_recovery.get_mobilize')
 def handle_request_mobilize(user_id=None):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
@@ -163,19 +143,22 @@ def handle_request_mobilize(user_id=None):
     visualizations = is_fathom_environment()
 
     if plan.train_later:
-        if len(plan.pre_active_rest) == 0:
+        pre_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(pre_active_rests) == 0:
             force_data = True
-        elif plan.pre_active_rest[0].force_data:
+        elif pre_active_rests[0].force_data:
             force_data = True
         else:
             force_data = False
     else:
-        if len(plan.post_active_rest) == 0:
+        post_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(post_active_rests) == 0:
             force_data = True
-        elif plan.post_active_rest[0].force_data:
+        elif post_active_rests[0].force_data:
             force_data = True
         else:
             force_data = False
+
     hist_update = False
     athlete_stats = athlete_stats_datastore.get(user_id)
     if athlete_stats.api_version in [None, '4_4', '4_5']:
@@ -281,24 +264,54 @@ def handle_body_part_modalities_start(user_id=None):
     return {'message': 'success'}, 200
 
 
-'''deprecated
-@app.route('/active_time', methods=['PATCH'])
+@app.route('/<uuid:user_id>/get_modality', methods=['POST'])
 @require.authenticated.any
-@require.body({'event_date': str, 'active_time': int})
-@xray_recorder.capture('routes.active_time')
-def handle_workout_active_time(principal_id=None):
-    user_id = principal_id
+@require.body({'event_date': str, 'type': int})
+@xray_recorder.capture('routes.active_recovery.get_modality')
+def handle_request_modality(user_id=None):
     event_date = parse_datetime(request.json['event_date'])
-    target_minutes = request.json['active_time']
-
+    modality_type = request.json['type']
     plan_event_day = format_date(event_date)
     if not _check_plan_exists(user_id, plan_event_day):
         raise NoSuchEntityException('Plan not found for the user')
 
-    plan = create_plan(user_id, event_date, target_minutes=target_minutes, update_stats=False, datastore_collection=datastore_collection)
+    plan = daily_plan_datastore.get(user_id=user_id,
+                                    start_date=plan_event_day,
+                                    end_date=plan_event_day)[0]
+
+    visualizations = is_fathom_environment()
+
+    force_data = False
+    if modality_type == 0:
+        pre_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(pre_active_rests) == 0:
+            force_data = True
+        elif pre_active_rests[0].force_data:
+            force_data = True
+        else:
+            force_data = False
+    elif modality_type == 1:
+        post_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+        if len(post_active_rests) == 0:
+            force_data = True
+        elif post_active_rests[0].force_data:
+            force_data = True
+        else:
+            force_data = False
+
+    athlete_stats = athlete_stats_datastore.get(user_id)
+
+    hist_update = False
+    if athlete_stats.api_version in [None, '4_4', '4_5']:
+        hist_update = True
+    if hist_update:
+        athlete_stats = process_stats(user_id, event_date, athlete_stats, hist_update)
+        athlete_stats_datastore.put(athlete_stats)
+
+    plan = add_modality_on_demand(user_id, event_date, modality_type=modality_type, athlete_stats=athlete_stats,
+                                  visualizations=visualizations, force_data=force_data)
 
     return {'daily_plans': [plan]}, 200
-'''
 
 
 def save_completed_exercises(exercise_list, user_id, event_date):

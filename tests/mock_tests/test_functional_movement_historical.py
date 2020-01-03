@@ -126,8 +126,10 @@ def test_historical_update_multiple_day_data():
     calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[2])
 
-    active_rest = calc.get_pre_active_rest()
+    active_rest = calc.get_pre_active_rest()[0]
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert len(active_rest.exercise_phases[2].exercises) > 0
 
-    assert len(active_rest[0].inhibit_exercises) > 0
-    assert len(active_rest[0].active_stretch_exercises) > 0
+    # assert len(active_rest[0].inhibit_exercises) > 0
+    # assert len(active_rest[0].active_stretch_exercises) > 0
 

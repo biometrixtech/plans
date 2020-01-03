@@ -129,8 +129,12 @@ class StatsProcessing(object):
                                                     )
 
         sessions = training_volume_processing.get_training_sessions(self.all_plans)
+        # to update status for historical users before they submit a new one
+        three_sensor_sessions = [s for s in sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
+        if len(three_sensor_sessions) > 0:
+            current_athlete_stats.has_three_sensor_data = True
 
-        training_volume_processing.load_biomechanics_charts(sessions)
+        training_volume_processing.load_biomechanics_charts(three_sensor_sessions, current_athlete_stats.has_three_sensor_data)
 
         current_athlete_stats.historic_asymmetry = self.get_historic_asymmetry(sessions)
 
@@ -160,6 +164,7 @@ class StatsProcessing(object):
         current_athlete_stats.biomechanics_apt_chart = training_volume_processing.biomechanics_apt_chart
         current_athlete_stats.biomechanics_ankle_pitch_chart = training_volume_processing.biomechanics_ankle_pitch_chart
         current_athlete_stats.biomechanics_hip_drop_chart = training_volume_processing.biomechanics_hip_drop_chart
+        current_athlete_stats.biomechanics_summary_chart = training_volume_processing.biomechanics_summary_chart
 
         current_athlete_stats.body_response_chart = BodyResponseChart(self.event_date)
 
