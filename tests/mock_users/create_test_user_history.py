@@ -87,7 +87,7 @@ if __name__ == '__main__':
             persona1.three_session_history = session_details
             persona1.soreness_history = soreness_history
             persona1.asymmetry_dictionary = asymmetry_history
-            if u in ["run_a@200.com", "run_a_2@200.com"]:
+            if u in ["run_a@200.com", "run_a_2@200.com", "nc_sore_tread_3@200.com"]:
                 rpes = [5, None, None, 5, None, 3, None,
                         4, None, 6, None, 5, 5, None,
                         None, 4, None, 3, 5, None, None,
@@ -311,6 +311,34 @@ if __name__ == '__main__':
             #                         VisualizationType.prevention, jwt, last_plan_date_time)
             # clear_fte_category_view(InsightType.personalized_recovery,
             #                         VisualizationType.personalized_recovery, jwt, last_plan_date_time)
+            print(time.time() - start)
+
+        elif u in ["nc_sore_tread_3@200.com"]:
+            soreness_history = []
+            abs_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_25_days(), 3, 0, False)
+            soreness_history.append(abs_no_question)
+            right_quad_31_days_sore_no_question = sh.create_body_part_history(sh.persistent_soreness_no_question_29_days(), 6, 2, False)
+            left_quad_1_day_sore = sh.create_body_part_history(sh.pre_pad_with_nones([2, 2]), 6, 1, False)
+            soreness_history.append(right_quad_31_days_sore_no_question)
+            soreness_history.append(left_quad_1_day_sore)
+            user_id, jwt = login_user(u)
+            rpes = [None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4,
+                    None, None, 6, None, 5, None, 4]
+            print(u + "=" + user_id)
+            history, session_details = mph.tread_regressions()
+            asymmetry_history = mph.get_asymmetry_extreme_valgus_hip_rotation()
+
+            persona1 = Persona(user_id)
+
+            persona1.elasticity_adf_dictionary = history
+            persona1.three_session_history = session_details
+            persona1.soreness_history = soreness_history
+            persona1.asymmetry_dictionary = asymmetry_history
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes,
+                                                          log_output=True, jwt=jwt, user_name=u)
             print(time.time() - start)
 
         elif u == "two_pain@200.com" or u == "two_pain_2@200.com":

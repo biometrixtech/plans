@@ -49,6 +49,7 @@ merged_users = [
     # "full_fte_long", #024a6807-eef6-4556-b3b8-1c8639dd1758
     # "full_fte_tread", #33293741-bf30-479e-83e9-bc6b3a1cb7c2
     "nc_long_2",  #8f6ff382-9314-43d2-9bb5-54bd8416a682
+    "nc_sore_tread_3", #52787786-2f79-4e07-b113-326b2cb537ea
     "nc_sore_tread_2",  #3f4bd8a2-c76b-4296-8c75-7302c31468c2
     # "ts_pain_long_2",  #5dd7a148-1c0e-4ddf-a1b1-020a99347069
     # "ts_tread_2",  #93b7a075-8168-4fad-961f-cfebdee392fc
