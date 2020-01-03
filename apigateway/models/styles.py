@@ -49,6 +49,9 @@ class LegendColor(Enum):
     yellow_light = 23
     yellow_x_light = 24
     yellow_xx_light = 25
+    splash = 26
+    error = 27
+    super_light = 28
 
 
 class Legend(object):
@@ -143,3 +146,18 @@ class VisualizationTitle(object):
         viz_title.body_part_text = input_dict['body_part_text']
         viz_title.color = LegendColor(input_dict['color'])
         return viz_title
+
+
+class DataCardIcon(Enum):
+    thumbs_up = 0
+    thumbs_down = 1
+    fatigue = 2
+    no_fatigue = 3
+    trending_up = 4
+    trending_down = 5
+
+
+class DataCardVisualType(Enum):
+    categorical = 0
+    magnitude = 1
+    boolean = 2

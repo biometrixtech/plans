@@ -43,7 +43,7 @@ class SurveyProcessing(object):
             return session_obj
 
     def convert_session(self, session, historic_health_data=False):
-        existing_session_id = session.get('id', None)
+        existing_session_id = session.get('session_id') or session.get('id')
         apple_health_kit_id = session.get('apple_health_kit_id', None)
         apple_health_kit_source_name = session.get('apple_health_kit_source_name', None)
         event_date = parse_datetime(session['event_date'])
@@ -408,9 +408,18 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
     return plan
 
 
+def process_stats(user_id, event_date, athlete_stats, hist_update):
+    stats_processor = StatsProcessing(user_id,
+                                      event_date=event_date,
+                                      datastore_collection=DatastoreCollection())
+    athlete_stats = stats_processor.process_athlete_stats(current_athlete_stats=athlete_stats, force_historical_process=hist_update)
+    return athlete_stats
+
+
 def cleanup_plan(plan, visualizations=True):
     survey_complete = plan.daily_readiness_survey_completed()
     landing_screen, nav_bar_indicator = plan.define_landing_screen()
+    plan.define_available_modalities()
 
     plan = plan.json_serialise()
     plan['daily_readiness_survey_completed'] = survey_complete
@@ -422,6 +431,14 @@ def cleanup_plan(plan, visualizations=True):
         del plan['trends']
 
     del plan['daily_readiness_survey'], plan['user_id']
+
+    return plan
+
+
+def add_modality_on_demand(user_id, event_date, modality_type, athlete_stats=None, visualizations=True, force_data=False):
+    plan_manager = TrainingPlanManager(user_id, DatastoreCollection())
+    plan = plan_manager.add_modality(event_date, modality_type, athlete_stats=athlete_stats, force_data=force_data)
+    plan = cleanup_plan(plan, visualizations)
 
     return plan
 

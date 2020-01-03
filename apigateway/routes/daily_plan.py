@@ -1,8 +1,9 @@
 from flask import request, Blueprint
 import datetime
+import os
 
 from routes.environments import is_fathom_environment
-from utils import format_date, format_datetime, parse_datetime
+from utils import format_date, format_datetime, parse_datetime, get_timezone
 from datastores.datastore_collection import DatastoreCollection
 from logic.athlete_status_processing import AthleteStatusProcessing
 from logic.survey_processing import create_plan, cleanup_plan
@@ -10,6 +11,8 @@ from logic.survey_processing import create_plan, cleanup_plan
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
+from fathomapi.api.config import Config
+from fathomapi.comms.service import Service
 
 datastore_collection = DatastoreCollection()
 daily_plan_datastore = datastore_collection.daily_plan_datastore
@@ -46,12 +49,8 @@ def handle_daily_plan_get(user_id=None):
                 need_soreness_sessions = True
             if survey_complete:
                 # handle case of RS completed on old app and logging in to new app --> re-generate plan
-                # 4_3 to 4_4 changes
-                if plan.trends is not None and plan.trends.trend_categories is not None:
-                    insight_types = [tc.insight_type.value for tc in plan.trends.trend_categories]
-                else:
-                    insight_types = []
-                if plan.trends is None or plan.trends.body_response is None or 6 not in insight_types:
+                # 4_3 and back
+                if plan.trends is None or plan.trends.body_response is None:
                     need_plan_update = True
                 if not need_plan_update:
                     # check if plan update is required because three sensor session updated with data after last plan update
@@ -65,16 +64,9 @@ def handle_daily_plan_get(user_id=None):
                     hist_update = True
                     need_plan_update = True
 
-                # viz_types = set()
-                # if plan.trends is not None and plan.trends.trend_categories is not None:
-                #     for tc in plan.trends.trend_categories:
-                #         viz_types.update([trend.visualization_type.value for trend in tc.trends])
-                # if not ({12, 13, 14} & viz_types):  # new viz types are not present, update hist and create plan
-                #     hist_update = True
-                #     need_plan_update = True
-
         if plan.event_date == format_date(event_date) and need_plan_update:  # if update required for any reason, create new plan
             plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations, hist_update=hist_update)
+            update_user(user_id, event_date)
         else:
             plan = cleanup_plan(plan, visualizations=visualizations)
         daily_plans.append(plan)
@@ -86,9 +78,7 @@ def handle_daily_plan_get(user_id=None):
             clear_candidates,
             dormant_tipping_candidates,
             current_sport_name,
-            current_position,
-            # functional_strength_eligible,
-            # completed_functional_strength_sessions
+            current_position
         ) = previous_soreness_processor.get_previous_soreness()
         readiness = {
                       'body_parts': sore_body_parts,
@@ -105,10 +95,26 @@ def handle_daily_plan_get(user_id=None):
     else:
         readiness = {}
         typical_sessions = []
-
     return {'daily_plans': daily_plans,
             'readiness': readiness,
             'typical_sessions': typical_sessions}, 200
+
+
+@app.route('/<uuid:user_id>/update', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date': str})
+@xray_recorder.capture('routes.daily_plan.update_get')
+def handle_daily_plan_update_get(user_id=None):
+    event_date = request.json.get('event_date', format_datetime(datetime.datetime.utcnow()))
+    event_date = parse_datetime(event_date)
+    visualizations = is_fathom_environment()
+
+    plan = create_plan(user_id, event_date, update_stats=True, visualizations=visualizations)
+
+    update_user(user_id, event_date)
+    return {'daily_plans': [plan],
+            'readiness': [],
+            'typical_sessions': []}, 200
 
 
 def validate_input():
@@ -118,3 +124,11 @@ def validate_input():
         format_datetime(request.json.get('event_date', None))
     except Exception:
         raise InvalidSchemaException('Incorrectly formatted date')
+
+
+def update_user(user_id, event_date):
+    timezone = get_timezone(event_date)
+    Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                            endpoint=f"user/{user_id}",
+                                                                            body={"timezone": timezone,
+                                                                                  "plans_api_version": Config.get('API_VERSION')})

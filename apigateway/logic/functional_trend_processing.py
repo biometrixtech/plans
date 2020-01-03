@@ -1740,7 +1740,7 @@ class TrendProcessor(object):
             low_trigger_tile.body_parts = underactive_weak_2
             title_text = "Possible Underactivity"
             low_trigger_tile.title = title_text
-            low_trigger_tile.text = "We're starting to see a pattern of movement dysfunction emerge which points to under-activation in these muscles. We'll provide a few prevention excerciss to encourage proper activation and will continue to refine our estimates."
+            low_trigger_tile.text = "We're starting to see a pattern of movement dysfunction emerge which points to under-activation in these muscles. We'll provide a few prevention excercises to encourage proper activation and will continue to refine our estimates."
             bold_1 = BoldText()
             bold_1.text = title_text
             bold_1.color = LegendColor.splash_light

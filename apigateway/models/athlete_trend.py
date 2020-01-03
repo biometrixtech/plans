@@ -1,6 +1,6 @@
 from enum import Enum
 from models.chart_data import TrainingVolumeChartData, BodyResponseChartData, WorkoutChartData, RecoveryChartData, Prevention3sChartData, BiomechanicsAPTChart, CareChartData, BiomechanicsAnklePitchChart, BiomechanicsHipDropChart
-from models.chart_data import PreventionChartData, CareTodayChartData, PersonalizedRecoveryChartData
+from models.chart_data import PreventionChartData, CareTodayChartData, PersonalizedRecoveryChartData, BiomechanicsSummaryChart
 from models.insights import InsightType
 from models.soreness_base import BodyPartSide, BodyPartSideViz
 from models.sport import SportName
@@ -762,20 +762,22 @@ class AthleteTrends(object):
         self.workload = TrendData()
         self.trend_categories = []
         self.insight_categories = []
+        self.biomechanics_summary = None
 
     def json_serialise(self, plan=False):
         ret = {
-            'dashboard': self.dashboard.json_serialise() if self.dashboard is not None else None,
-            'stress': self.stress.json_serialise() if self.stress is not None else None,
-            'response': self.response.json_serialise() if self.response is not None else None,
-            'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
+            # 'dashboard': self.dashboard.json_serialise() if self.dashboard is not None else None,
+            # 'stress': self.stress.json_serialise() if self.stress is not None else None,
+            # 'response': self.response.json_serialise() if self.response is not None else None,
+            # 'biomechanics': self.biomechanics.json_serialise() if self.biomechanics is not None else None,
             'body_response': self.body_response.json_serialise() if self.body_response is not None else None,
             'workload': self.workload.json_serialise() if self.workload is not None else None,
-            'trend_categories': [trend_category.json_serialise(plan) for trend_category in self.trend_categories],
-            'biomechanics_apt': self.biomechanics_apt.json_serialise() if self.biomechanics_apt is not None else None,
-            'biomechanics_ankle_pitch': self.biomechanics_ankle_pitch.json_serialise() if self.biomechanics_ankle_pitch is not None else None,
-            'biomechanics_hip_drop': self.biomechanics_hip_drop.json_serialise() if self.biomechanics_hip_drop is not None else None,
-            'insight_categories': [insight_category.json_serialise() for insight_category in self.insight_categories]
+            # 'biomechanics_apt': self.biomechanics_apt.json_serialise() if self.biomechanics_apt is not None else None,
+            # 'biomechanics_ankle_pitch': self.biomechanics_ankle_pitch.json_serialise() if self.biomechanics_ankle_pitch is not None else None,
+            # 'biomechanics_hip_drop': self.biomechanics_hip_drop.json_serialise() if self.biomechanics_hip_drop is not None else None,
+            'insight_categories': [insight_category.json_serialise() for insight_category in self.insight_categories],
+            'recovery_quality': fake_recovery_quality(),
+            'biomechanics_summary': self.biomechanics_summary.json_serialise() if self.biomechanics_summary is not None else None
         }
         return ret
 
@@ -788,24 +790,25 @@ class AthleteTrends(object):
         trends.biomechanics = TrendCategory.json_deserialise(input_dict['biomechanics']) if input_dict.get('biomechanics', None) is not None else None
         trends.body_response = TrendData.json_deserialise(input_dict['body_response']) if input_dict.get('body_response', None) is not None else None
         trends.workload = TrendData.json_deserialise(input_dict['workload']) if input_dict.get('workload', None) is not None else None
-        trends.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
+        # trends.trend_categories = [TrendCategory.json_deserialise(trend_category) for trend_category in input_dict.get('trend_categories', [])]
         trends.insight_categories = [InsightCategory.json_deserialise(trend_category) for trend_category in
                                    input_dict.get('insight_categories', [])]
         trends.biomechanics_apt = BiomechanicsAPTChart.json_deserialise(
             input_dict['biomechanics_apt']) if input_dict.get('biomechanics_apt', None) is not None else None
 
-        biomechanics_summary = input_dict.get('biomechanics_summary')
+        # biomechanics_summary = input_dict.get('biomechanics_summary')
 
-        if biomechanics_summary is not None:
-            trends.biomechanics_apt = BiomechanicsAPTChart.json_deserialise(input_dict['biomechanics_summary']) if input_dict.get(
-                'biomechanics_summary', None) is not None else None
+        # if biomechanics_summary is not None:
+        #     trends.biomechanics_apt = BiomechanicsAPTChart.json_deserialise(input_dict['biomechanics_summary']) if input_dict.get(
+        #         'biomechanics_summary', None) is not None else None
 
-        trends.biomechanics_ankle_pitch = BiomechanicsAnklePitchChart.json_deserialise(input_dict['biomechanics_ankle_pitch']) if input_dict.get(
-            'biomechanics_ankle_pitch', None) is not None else None
+        # trends.biomechanics_ankle_pitch = BiomechanicsAnklePitchChart.json_deserialise(input_dict['biomechanics_ankle_pitch']) if input_dict.get(
+            # 'biomechanics_ankle_pitch', None) is not None else None
 
-        trends.biomechanics_hip_drop = BiomechanicsHipDropChart.json_deserialise(
-            input_dict['biomechanics_hip_drop']) if input_dict.get(
-            'biomechanics_hip_drop', None) is not None else None
+        # trends.biomechanics_hip_drop = BiomechanicsHipDropChart.json_deserialise(
+            # input_dict['biomechanics_hip_drop']) if input_dict.get(
+            # 'biomechanics_hip_drop', None) is not None else None
+        trends.biomechanics_summary = BiomechanicsSummaryChart.json_deserialise(input_dict.get('biomechanics_summary')) if input_dict.get('biomechanics_summary', None) is not None else None
 
         return trends
 
@@ -893,3 +896,32 @@ class AthleteTrends(object):
         self.biomechanics_apt = athlete_stats.biomechanics_apt_chart
         self.biomechanics_ankle_pitch = athlete_stats.biomechanics_ankle_pitch_chart
         self.biomechanics_hip_drop = athlete_stats.biomechanics_hip_drop_chart
+        self.biomechanics_summary = athlete_stats.biomechanics_summary_chart
+
+
+def fake_recovery_quality():
+    return {
+            "score": {
+                    "value": 73,
+                    "text": "recovery quality",
+                    "color": 6,
+                    "active": True
+                    },
+
+            "change": {
+                    "value": -3.1,
+                    "text": "pts",
+                    "color": 6,
+                    "active": True
+                    },
+            "summary_text": {
+                 "text": "Insight Text here: Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna",
+                 "bold_text": [],
+                 "text_items" : [{
+                    "text": "abc",
+                    "bold_text": []
+                 }],
+                 "active": True
+                 },
+            "active": False
+            }

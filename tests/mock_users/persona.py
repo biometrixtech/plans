@@ -19,7 +19,7 @@ from tests.mock_users.three_sensor_api import ThreeSensorAPIRequestProcessor
 import os
 import json
 import requests
-from movement_pattern_history import create_elastticity_adf
+from movement_pattern_history import create_elasticity_adf, create_asymmetry
 from collections import OrderedDict
 from datetime import timedelta
 
@@ -34,6 +34,7 @@ class Persona(object):
         self.athlete_stats = None
         self.rpes = []
         self.plans_version = plans_version
+        self.asymmetry_dictionary = {}
         self.elasticity_adf_dictionary = {}
         self.three_session_history = {}
 
@@ -64,7 +65,7 @@ class Persona(object):
                                      'pain': body_part['pain'],
                                      'severity': body_part['severity'][i]})
 
-            if len(soreness) > 0 or (len(self.rpes) > 0 and self.rpes[i] is not None) or (self.elasticity_adf_dictionary is not None and self.elasticity_adf_dictionary[i] is not None):
+            if len(soreness) > 0 or (len(self.rpes) > 0 and self.rpes[i] is not None) or (len(self.elasticity_adf_dictionary) > 0 and self.elasticity_adf_dictionary[i] is not None):
 
                 if len(soreness) > 0:
                     readiness_data = {'date_time': format_datetime(date_time),
@@ -76,14 +77,20 @@ class Persona(object):
                     self.daily_readiness = None
                     self.create_plan(event_date, i, visualizations)
 
-                if self.elasticity_adf_dictionary[i] is not None:
-                    todays_regression_history = self.elasticity_adf_dictionary[i]
+                if (len(self.elasticity_adf_dictionary) > 0 and self.elasticity_adf_dictionary[i] is not None) or (len(self.asymmetry_dictionary) > 0 and self.asymmetry_dictionary[i] is not None):
+
                     body = OrderedDict()
                     body["event_date"] = format_datetime(date_time)
                     body["session_id"] = self.three_session_history[i]["session_id"]
                     body["seconds_duration"] = self.three_session_history[i]["seconds_duration"]
                     body["end_date"] = format_datetime(date_time + timedelta(seconds=body["seconds_duration"]))
-                    body['movement_patterns'] = create_elastticity_adf(todays_regression_history)
+
+                    if len(self.elasticity_adf_dictionary) > 0 and self.elasticity_adf_dictionary[i] is not None:
+                        todays_regression_history = self.elasticity_adf_dictionary[i]
+                        body['movement_patterns'] = create_elasticity_adf(todays_regression_history)
+                    if len(self.asymmetry_dictionary) > 0 and self.asymmetry_dictionary[i] is not None:
+                        todays_asymmetry_history = self.asymmetry_dictionary[i]
+                        body['asymmetry'] = create_asymmetry(todays_asymmetry_history)
 
                     self.send_three_sensor_data_to_plans(self.user_id,jwt,body)
                     self.create_plan_light(event_date)
@@ -114,14 +121,14 @@ class Persona(object):
         daily_plan = get_mongo_collection('dailyplan', suffix)
         stats = get_mongo_collection('athletestats', suffix)
         exercises = get_mongo_collection('completedexercises', suffix)
-        asymmetry = get_mongo_collection('asymmetry', suffix)
+        #asymmetry = get_mongo_collection('asymmetry', suffix)
         injuryrisk = get_mongo_collection('injuryrisk', suffix)
 
         readiness.delete_many({"user_id": self.user_id})
         daily_plan.delete_many({"user_id": self.user_id})
         exercises.delete_many({"athlete_id": self.user_id})
         stats.delete_one({"athlete_id": self.user_id})
-        asymmetry.delete_many({"user_id": self.user_id})
+        #asymmetry.delete_many({"user_id": self.user_id})
         injuryrisk.delete_one({"user_id": self.user_id})
 
     def create_plan(self, event_date, day_number, visualizations):
@@ -181,6 +188,7 @@ class Persona(object):
             ps_event_date = event_date + datetime.timedelta(minutes=40)
             session = SessionFactory().create(SessionType(6))
             session.event_date = ps_event_date
+            session.completed_date_time = ps_event_date
             session.sport_name = 72
             session.duration_minutes = 30
             session.post_session_survey = PostSurvey(survey={'RPE': rpe, 'soreness': []}, event_date=format_datetime(ps_event_date))
@@ -189,7 +197,7 @@ class Persona(object):
             self.daily_plan.training_sessions.append(session)
 
     def send_three_sensor_data_to_plans(self, user_id, jwt, body):
-        url = 'https://apis.{env}.fathomai.com/plans/4_6/session/{user_id}/three_sensor_data'.format(
+        url = 'https://apis.{env}.fathomai.com/plans/4_7/session/{user_id}/three_sensor_data'.format(
             env=os.environ['ENVIRONMENT'], user_id=user_id, version=self.plans_version)
         # proc = ThreeSensorAPIRequestProcessor(event_date, session_id, seconds_duration, end_date)
         # body = proc.get_body(asymmetry_patterns, movement_patterns)
