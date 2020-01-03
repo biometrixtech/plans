@@ -410,7 +410,6 @@ class Modality(object):
                     d.complete_reps_assigned = d.default_complete_reps_assigned
                     d.complete_sets_assigned = d.default_complete_sets_assigned
                     self.update_goals(d)
-                    self.update_goals(d)
 
     def aggregate_dosage_by_severity_exercise_collection(self, assigned_exercises):
 
