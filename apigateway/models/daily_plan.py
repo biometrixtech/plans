@@ -1,14 +1,10 @@
 from serialisable import Serialisable
 from utils import parse_date
-# import models.session as session
 from models.session import Session
 from models.daily_readiness import DailyReadiness
-from models.modalities import IceSession, HeatSession, ColdWaterImmersion, WarmUp, CoolDown
-from models.insights import AthleteInsight
-from models.trigger import TriggerType
 from models.athlete_trend import AthleteTrends
 from models.soreness import Soreness
-from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, Modality, ModalityTypeDisplay, ModalityType
+from models.functional_movement_modalities import Modality, ModalityTypeDisplay, ModalityType, IceSession, HeatSession, ColdWaterImmersion
 
 
 class DailyPlan(Serialisable):
