@@ -149,7 +149,7 @@ class AthleteStats(Serialisable):
         self.trend_categories = []
         self.insight_categories = []
 
-        self.api_version = '4_3'
+        self.api_version = '4_7'
         self.timezone = '-04:00'
         self.historic_asymmetry = {}
         self.has_three_sensor_data = False
