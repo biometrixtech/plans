@@ -25,7 +25,7 @@ three_sensor_users = [
     "run_a", #2b4a1792-42c7-460e-9e4c-98627e72cc6f
     # "sym", #7fd0c1d4-61ac-4ce5-9621-16d69501b211
     # "half_sym", #7cf2f832-a043-468c-8f61-13d07765d2a2
-    #"run_a_2", #5c695e58-0aba-4eec-9af1-fa93970d3132
+    "run_a_2", #5c695e58-0aba-4eec-9af1-fa93970d3132
     # "sym_2" #aa1534d0-4abd-41c0-9b84-4e414b3d86d4
     # "long_3s", #928f64b5-a761-4278-8724-95a908499fae
     # "run_a_3",  #9e90e3ef-c6e0-4e2d-a430-a52f1e61a962
@@ -43,15 +43,16 @@ three_sensor_users = [
 merged_users = [
     "nc_long",  #7bb3e792-41ff-43cb-861e-87cf2bdeeadf
     "nc_sore_tread",  #917e94bc-3f56-4519-8d25-ae54878748f2
-    "ts_pain_long", #e602620d-2040-4ecc-87cc-f392d9db5eab
-    "ts_tread",  #18ad5cde-92a8-4cd4-8295-71a91c7d3aac
+    # "ts_pain_long", #e602620d-2040-4ecc-87cc-f392d9db5eab
+    # "ts_tread",  #18ad5cde-92a8-4cd4-8295-71a91c7d3aac
     # # "two_pain_tread", #25c38e39-357a-456d-84b7-61547364a2ba
     # "full_fte_long", #024a6807-eef6-4556-b3b8-1c8639dd1758
     # "full_fte_tread", #33293741-bf30-479e-83e9-bc6b3a1cb7c2
     "nc_long_2",  #8f6ff382-9314-43d2-9bb5-54bd8416a682
+    "nc_sore_tread_3", #52787786-2f79-4e07-b113-326b2cb537ea
     "nc_sore_tread_2",  #3f4bd8a2-c76b-4296-8c75-7302c31468c2
-    "ts_pain_long_2",  #5dd7a148-1c0e-4ddf-a1b1-020a99347069
-    "ts_tread_2",  #93b7a075-8168-4fad-961f-cfebdee392fc
+    # "ts_pain_long_2",  #5dd7a148-1c0e-4ddf-a1b1-020a99347069
+    # "ts_tread_2",  #93b7a075-8168-4fad-961f-cfebdee392fc
     # # # "two_pain_tread_2",  #84a5e6fd-19f2-44ed-8bbd-ed2c03769ecf
     #"full_fte_long_2",  #24882bdf-69df-4043-b832-74d6c1f7052c
     #"full_fte_tread_2",  #703b5309-78cd-46b1-82ec-45e86b6d71de

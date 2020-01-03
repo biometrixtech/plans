@@ -64,3 +64,21 @@ class AthleteGoal(object):
         #trigger_type = input_dict.get('trigger_type', None)
         #goal.trigger_type = TriggerType(trigger_type) if trigger_type is not None else None
         return goal
+
+
+class AthleteGoalDef(object):
+    def __init__(self, id, goal_type, goal_name):
+        self.id = id
+        self.goal_type = goal_type
+        self.goal_name = goal_name
+
+    def json_serialise(self):
+        return {
+            "id" : self.id,
+            "goal_type": self.goal_type.value,
+            "goal_name": self.goal_name
+        }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        return cls(input_dict.get('id'), AthleteGoalType(input_dict.get('goal_type')), input_dict.get('goal_name', ''))

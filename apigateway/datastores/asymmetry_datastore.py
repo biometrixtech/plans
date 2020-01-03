@@ -25,6 +25,8 @@ class AsymmetryDatastore(object):
 
         if session_id is not None:
             query = {'session_id': session_id}
+            if user_id is not None:
+                query['user_id'] = user_id
 
             mongo_result = mongo_collection.find_one(query)
 

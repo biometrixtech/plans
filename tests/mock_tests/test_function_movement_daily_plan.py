@@ -58,10 +58,14 @@ def test_create_plan_no_session():
 
     calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, now_date)
 
-    active_rest = calc.get_pre_active_rest()
-    assert len(active_rest[0].inhibit_exercises) > 0
-    assert len(active_rest[0].static_stretch_exercises) >0
-    assert len(active_rest[0].active_stretch_exercises) > 0
+    active_rest = calc.get_pre_active_rest()[0]
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert len(active_rest.exercise_phases[2].exercises) > 0
+
+    # assert len(active_rest[0].inhibit_exercises) > 0
+    # assert len(active_rest[0].static_stretch_exercises) > 0
+    # assert len(active_rest[0].active_stretch_exercises) > 0
 
 def test_create_plan_with_session():
 
@@ -91,8 +95,11 @@ def test_create_plan_with_session():
     calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[0])
 
-    active_rest = calc.get_pre_active_rest()
+    active_rest = calc.get_pre_active_rest()[0]
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert len(active_rest.exercise_phases[2].exercises) > 0
 
-    assert len(active_rest[0].inhibit_exercises) > 0
-    assert len(active_rest[0].static_stretch_exercises) >0
-    assert len(active_rest[0].active_stretch_exercises) > 0
+    # assert len(active_rest[0].inhibit_exercises) > 0
+    # assert len(active_rest[0].static_stretch_exercises) >0
+    # assert len(active_rest[0].active_stretch_exercises) > 0
