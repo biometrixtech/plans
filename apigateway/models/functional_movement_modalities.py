@@ -93,16 +93,6 @@ class DosageDuration(object):
         self.comprehensive_duration = comprehensive_duration
 
 
-    @staticmethod
-    def generate_uuid(body):
-        unique_key = 'http://session.fathomai.com/{}_{}_{}_{}'.format(
-            body.get('accessory_id'),
-            ','.join(sorted(body.get('sensor_ids', []))),
-            body.get('user_id'),
-            body.get('event_date'),
-        )
-        return str(uuid.uuid5(uuid.NAMESPACE_URL, unique_key))
-
 class Modality(object):
     def __init__(self, event_date_time, modality_type, relative_load_level=3):
         self.id = None

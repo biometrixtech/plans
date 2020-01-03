@@ -269,8 +269,6 @@ class ScoringSummaryProcessor(object):
         return cards
 
 
-    # def get_asymmetry_text(self, )
-
 class ScoringProcessor(object):
     def __init__(self):
         pass
