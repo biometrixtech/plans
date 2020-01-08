@@ -365,7 +365,7 @@ if __name__ == '__main__':
                     None, None, 6, None, 5, None, 4,
                     None, None, 6, None, 5, None, 4,
                     None, None, 6, None, 5, None, 4]
-            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=True, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
+            last_plan_date_time = persona1.create_history(days=history_length, suffix='', end_today=False, rpes=rpes, log_output=True, jwt=jwt, user_name=u)
             clear_fte_category(InsightType.personalized_recovery, jwt, last_plan_date_time)
             clear_fte_category_view(InsightType.personalized_recovery,
                                     VisualizationType.prevention, jwt, last_plan_date_time)
