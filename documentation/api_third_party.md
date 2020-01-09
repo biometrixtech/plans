@@ -107,6 +107,8 @@ The following simple types __may__ be used in requests and responses:
 * `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full  [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
 <div style="page-break-after: always;"></div>
+
+
 ## Endpoints
 
 ### Daily Readiness
@@ -189,6 +191,8 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
@@ -202,6 +206,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 <div style="page-break-after: always;"></div>
+
+
 ### Session
 
 #### Create
@@ -229,6 +235,8 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `sessions_planned` __should__ represent whether the user plans to train again that day
 * `user_age` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source and contains heart rate data
 <div style="page-break-after: always;"></div>
+
+
 * `session` __should__ be of the following schema
 ```
 {
@@ -307,6 +315,8 @@ Cache-Control: no-cache
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
@@ -320,6 +330,8 @@ Cache-Control: no-cache
 
 
 <div style="page-break-after: always;"></div>
+
+
 #### Mark no sessions planned
 
 This endpoint can be called to notify that no sessions are planned for the day.
@@ -362,6 +374,8 @@ Cache-Control: no-cache
 * `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 <div style="page-break-after: always;"></div>
+
+
 #### Delete
 
 This endpoint can be called to delete existing externally regimented session from today or yesterday's plan.
@@ -404,6 +418,8 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 #### Update
 
 This endpoint can be called to update and combine a manually logged session with a third party workout session
@@ -468,6 +484,8 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 #### Typical Sessions history
 
 This endpoint can be called to get typical sessions that the user logs
@@ -507,6 +525,8 @@ Authentication is required for this endpoint
 ```
 * `typical sessions` will be a list of sessions that the user has logged in the last 14 days
 <div style="page-break-after: always;"></div>
+
+
 * `session` object will be of the following schema
 
 ``` 
@@ -522,6 +542,8 @@ Authentication is required for this endpoint
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 ### Symptoms
 
 #### Submit
@@ -566,6 +588,8 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
@@ -579,6 +603,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 <div style="page-break-after: always;"></div>
+
+
 ### Active Recovery
 
 #### Mark Started (Exercise Modalities)
@@ -595,11 +621,11 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
-    "recovery_type": string
+    "recovery_type": integer
 }
 ```
 * `event_date` __should__ be the time when user checks the first exercise for the session.
-* `recovery_type` __should__ be one of `pre_active_rest` or `post_active_rest`<!--  or `cool_down` -->
+* `recovery_type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix.
 
 ```
 POST /plans/{version}/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
@@ -608,7 +634,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "pre_active_rest"
+    "recovery_type": 0
 }
 ```
 ##### Response
@@ -622,6 +648,8 @@ If the write was successful, the Service __will__ respond with HTTP Status `200 
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 #### Mark Completed (Exercise Modalities)
 
 This endpoint can be called to mark the completion of exercise-based modalities.
@@ -636,12 +664,12 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
-    "recovery_type": string
+    "recovery_type": integer
     "completed_exercises": [string]
 }
 ```
 * `event_date` __should__ be the time when user completes the session.
-* `recovery_type` __should__ be one of `pre_active_rest` or `post_active_rest`<!--  or `cool_down` -->
+* `recovery_type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix.
 * `completed_exercises` __should__ be a list representing the exercises that the user checked off
 
 ```
@@ -651,13 +679,13 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "post_active_rest",
+    "recovery_type": 1,
     "completed_exercises": ["3", "5", "20", "142"]
 }
 ```
 ##### Response
  
-If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body having the following schema:
  
 ```
 {
@@ -772,6 +800,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 <div style="page-break-after: always;"></div>
+
+
 ### Daily Plan
 
 #### Get Daily Plan
@@ -804,6 +834,8 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 ##### Response
  
 The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
@@ -854,8 +886,11 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 {
     "date": Date,
     "day_of_week": integer,
-    "pre_active_rest": [PreActiveRest],
-    "completed_pre_active_rest": [PreActiveRest],
+    "modalities": [modality],
+    "completed_modalities": [modality],
+    "modalities_available_on_demand": [modality_display]
+    "pre_active_rest": [],
+    "completed_pre_active_rest": [],
     "heat": null,
     "completed_heat": [],
     "warm_up": [],
@@ -863,8 +898,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "training_sessions": [Session],
     "cool_down": [],
     "completed_cool_down": [],
-    "post_active_rest": [PostActiveRest],
-    "completed_post_active_rest": [PostActiveRest],
+    "post_active_rest": [],
+    "completed_post_active_rest": [],
     "ice": null,
     "completed_ice": [],
     "cold_water_immersion": null,
@@ -882,9 +917,11 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 * Any of the `completed_*` attributes could be empty list
-* Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
-* `warm_up` and `cool_down` will always be empty list
+<!--* Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
+* `warm_up` and `cool_down` will always be empty list-->
 * All of the body part modalities (`heat`, `ice`, `cold_water_immersion`) will be null
 <!-- * Any of the body part modalities (`heat`, `ice`, `cold_water_immersion`) could be null -->
 <!-- * `Heat` has following example schema
@@ -966,6 +1003,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 }
 
 ``` -->
+<!--
 * `PreActiveRest` has the following example schema
 ```
 {
@@ -1003,6 +1041,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "static_stretch_exercises": [AssignedExercise, AssignedExercise]
 }
 ```
+-->
 <!-- * `CoolDown` has the following example schema
 ```
 {
@@ -1019,7 +1058,55 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "start_date_time": null
     }
 ``` -->
+* `modality` has the following example schema:
+
+```
+{
+    "id" : "ef1db466-4ccf-45cf-980a-2632a600e3ee",
+    "type" : 0,
+    "title" : "MOBILIZE",
+    "when" : "before training",
+    "when_card" : "before training",
+    "start_date_time" : null,
+    "completed_date_time" : null,
+    "event_date_time" : "2020-01-03T09:32:14Z",
+    "completed" : false,
+    "active" : false,
+    "default_plan" : "Complete",
+    "force_data" : false,
+    "goal_title" : "",
+    "display_image" : "inhibit",
+    "locked_text" : "Sorry, you missed the optimal window for Mobilize today.",
+    "goals" : {
+        "Recover from training" : {
+            "efficient_active" : true,
+            "complete_active" : true,
+            "comprehensive_active" : true
+        },
+        "Care for symptoms" : {
+            "efficient_active" : false,
+            "complete_active" : true,
+            "comprehensive_active" : true
+        }
+    },
+    "exercise_phases" : [ExercisePhase, ExercisePhase]
+}
+```
+* `type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix
+* `ExercisePhase` has the following example schema:
+
+```
+{
+    "type" : 0,
+    "name" : "inhibit",
+    "title" : "FOAM ROLL",
+    "exercises" : [AssignedExercise, AssignedExercise]
+}
+```
+* `type` __should__ be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
 <div style="page-break-after: always;"></div>
+
+
 * `AssignedExercise` has the following example schema
 
 ```
@@ -1071,6 +1158,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 ## Appendix
 
 ### Enumerations
@@ -1117,9 +1206,31 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     user_health = 2
     three_sensor = 3
 ```
+<div style="page-break-after: always;"></div>
 
+
+#### Recovery Types
+``` 
+    pre_active_rest = 0
+    post_active_rest = 1
+    warm_up = 2
+    cool_down = 3
+    functional_strength = 4
+```
+
+#### Exercise Phase Type
+```
+    inhibit = 0
+    static_stretch = 1
+    active_stretch = 2
+    dynamic_stretch = 3
+    isolated_activate = 4
+    static_integrate = 5
+```
 
 <div style="page-break-after: always;"></div>
+
+
 #### All body parts
 
 ```
@@ -1217,6 +1328,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 
 <div style="page-break-after: always;"></div>
 
+
 #### SportName
 ```
     basketball = 0
@@ -1308,6 +1420,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 ### Body Part Types
 
 #### Joints
