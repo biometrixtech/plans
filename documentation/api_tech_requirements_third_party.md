@@ -1,4 +1,4 @@
-# FathomAI - Plans API (v 4.6.0)
+# FathomAI - Plans API (v 4.7.0)
 ## Technical Summary
 
 
@@ -23,6 +23,8 @@ The __Daily Plan__ includes modalities such as  __foam rolling__, __static stret
 <!-- Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__. -->
 
 Recommended dosages are also provided for each exercise and modality.  These dosages are associated with three different active times which correspond with minimal, optimal, and comprehensive sequences of activities.  These sequences are designed to achieve each of the athlete's unique combination of goals.  Additionally, dosages are also provided by goal, allowing the athlete to further customize their recovery.
+
+<div style="page-break-after: always;"></div>
 
 
 ## Technical and Data Requirements
@@ -51,6 +53,8 @@ Each provider will also be assigned a unique set of test and production endpoint
 Unless otherwise specified, the endpoints in the API are authenticated by a JWT bearer token.  The client __must__ submit the header `Authorization: <JWT>` with all requests. Failure to do so, or submitting an invalid or expired JWT, __will__ result in a `401 Unauthorized` response.  
 
 It is expected that partners will normally generate and sign their own JWTs for their clients, providing appropriate authorization for each athlete in accordance with their business and compliance requirements.
+<div style="page-break-after: always;"></div>
+
 
 #### Signing keys
 
@@ -191,10 +195,8 @@ The following data elements are required when following the  __Post-Workout__ pa
 * `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `soreness` __should__ follow the same definition as in  _Daily Readiness_
 
-<br/>
-<br/>
-<br/>
-<br/>
+<div style="page-break-after: always;"></div>
+
 
 ### Symptom-Reporting
 #### Required Data Elements
