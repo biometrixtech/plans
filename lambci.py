@@ -70,7 +70,7 @@ def run_unit_tests():
     working_dir = os.getcwd()+"/apigateway"
     sys.path.append(working_dir)
     result = pytest.main(['-x', 'tests/mock_tests'])
-    print(result)
+    print(result, type(result))
 
 
 def main():
