@@ -6,7 +6,7 @@ xray_recorder.begin_segment(name="test")
 
 import datetime
 
-from survey_processing import add_modality_on_demand
+from logic.survey_processing import add_modality_on_demand
 from models.daily_plan import DailyPlan
 from models.stats import AthleteStats
 from models.functional_movement_modalities import ModalityType, Modality
