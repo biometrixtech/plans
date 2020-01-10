@@ -63,10 +63,18 @@ def read_config():
     with open('resource_index.json', 'r') as file:
         return json.load(file)
 
+def run_unit_tests():
+    subprocess.check_call('python3 -m pip install --quiet --user pytest', shell=True)
+    import pytest
+    working_dir = os.getcwd()+"/apigateway"
+    sys.path.append(working_dir)
+    pytest.main(['-x', 'tests/mock_tests'])
+
 
 def main():
     os.environ['PROJECT'] = os.environ['LAMBCI_REPO'].split('/')[-1].lower()
     config = read_config()
+
 
     print("Deploying Lambda functions")
     for lambda_bundle in config['lambdas']:
@@ -75,6 +83,9 @@ def main():
             lambda_bundle['s3_filename'],
             lambda_bundle['pip']
         )
+
+    print("Running Unit Tests")
+    run_unit_tests()
 
     print("Deploying CloudFormation templates")
     for template in config['templates']:
