@@ -17,6 +17,7 @@ class ExerciseLibraryDatastore(object):
             exercise_reader = csv.reader(csvfile, delimiter='\t')
             row_count = 0
             for row in exercise_reader:
+                print(row)
                 if row_count > 0:
                     exercise_descriptions[row[0]] = row[3]
                 row_count = row_count + 1
