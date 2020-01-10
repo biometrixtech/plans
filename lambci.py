@@ -66,6 +66,7 @@ def read_config():
 def run_unit_tests():
     subprocess.check_call('python3 -m pip install --quiet --user pytest', shell=True)
     import pytest
+    os.environ['AWS_DEFAULT_REGION'] = aws_region
     working_dir = os.getcwd()+"/apigateway"
     sys.path.append(working_dir)
     pytest.main(['-x', 'tests/mock_tests'])
