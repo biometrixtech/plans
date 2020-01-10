@@ -13,15 +13,16 @@ class ExerciseLibraryDatastore(object):
     def side_load_exericse_list_from_csv(self, library_file='database/Exercise_Library.csv',
                                          desc_file='database/Exercise_Descriptions.tsv'):
         exercise_descriptions = {}
-        with open(Path(__file__).resolve().parent.parent.parent / desc_file, newline='') as csvfile:
-            exercise_reader = csv.reader(csvfile, delimiter='\t')
-            row_count = 0
-            for row in exercise_reader:
-                print(row)
-                if row_count > 0:
-                    exercise_descriptions[row[0]] = row[3]
-                row_count = row_count + 1
-        csvfile.close()
+        # with open(Path(__file__).resolve().parent.parent.parent / desc_file, newline='') as csvfile:
+        #     exercise_reader = csv.reader(csvfile, delimiter='\t')
+        #     print(exercise_reader)
+        #     row_count = 0
+        #     for row in exercise_reader:
+        #         print(row)
+        #         if row_count > 0:
+        #             exercise_descriptions[row[0]] = row[3]
+        #         row_count = row_count + 1
+        # csvfile.close()
 
         exercises = []
         with open(Path(__file__).resolve().parent.parent.parent / library_file, newline='') as csvfile:
