@@ -69,7 +69,8 @@ def run_unit_tests():
     os.environ['AWS_DEFAULT_REGION'] = aws_region
     working_dir = os.getcwd()+"/apigateway"
     sys.path.append(working_dir)
-    pytest.main(['-x', 'tests/mock_tests'])
+    result = pytest.main(['-x', 'tests/mock_tests'])
+    print(result)
 
 
 def main():
@@ -85,13 +86,14 @@ def main():
             lambda_bundle['pip']
         )
 
-    print("Running Unit Tests")
-    run_unit_tests()
-
     print("Deploying CloudFormation templates")
     for template in config['templates']:
         local_filename = os.path.realpath(template['src'])
         upload_cf_template(local_filename, template['s3_filename'])
+
+    print("Running Unit Tests")
+    run_unit_tests()
+
 
 
 if __name__ == '__main__':
