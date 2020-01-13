@@ -553,7 +553,7 @@ def run_fake_regressions_a():
     session_details_3["seconds_duration"] = 8640
     session_details_3["session_id"] = 'c14f1728-b4f5-5fb4-845c-9dc830b3e9bf'
 
-    full_history[n + 4] = history
+    full_history[n + 4] = history_3
     full_session_history[n + 4] = session_details_3
 
     full_history[n + 5] = None
