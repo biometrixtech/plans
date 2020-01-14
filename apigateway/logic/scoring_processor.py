@@ -3,6 +3,7 @@ from models.scoring import MovementVariableSummaryData, RecoveryQuality, DataCar
 from models.styles import LegendColor, DataCardVisualType
 from models.asymmetry import AnteriorPelvicTilt, KneeValgus, AnklePitch, HipRotation
 import statistics
+from math import sqrt
 
 
 class ScoringSummaryProcessor(object):
@@ -509,7 +510,7 @@ class ScoringProcessor(object):
                     influencer.side = 1
                 scores.asymmetry_regression_coefficient_score_influencers.append(influencer)
 
-            score = score - (coefficient_diff * 30) #  * ratio)
+            score -= sqrt(coefficient_diff) * 30 * ratio
 
         return score
 
@@ -581,10 +582,10 @@ class ScoringProcessor(object):
     def get_elasticity_dysfunction_score(self, equation_list, equations, scores):
 
         score = 100
-        # if len(equation_list) > 0:
-        #     ratio = 1 / float(len(equation_list))
-        # else:
-        #     return score
+        if len(equation_list) > 0:
+            ratio = 1 / float(len(equation_list))
+        else:
+            return score
         #
         # for coefficient_count in range(0, len(equation_list)):
         #     if equation_list[coefficient_count].elasticity >= 0:
@@ -594,7 +595,7 @@ class ScoringProcessor(object):
         # alternative
         for coefficient_count in range(0, len(equation_list)):
             if equation_list[coefficient_count].elasticity > 0:
-                score = score - (equation_list[coefficient_count].elasticity * 30)
+                score -= sqrt(equation_list[coefficient_count].elasticity) * 30 * ratio
                 # record that this equation influenced the score
                 influencing_equations.add(equations[coefficient_count//2].value)
         for eq in influencing_equations:

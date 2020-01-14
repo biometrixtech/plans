@@ -1,7 +1,7 @@
 from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
-from models.scoring import MovementVariableScores
+from models.scoring import MovementVariableScores, MovementVariableType, EquationType
 import movement_pattern_history as mph
-from models.functional_movement import MovementPatterns
+from models.functional_movement import MovementPatterns, Elasticity
 from models.asymmetry import Asymmetry, AnteriorPelvicTilt, AnklePitch,HipDrop, KneeValgus, HipRotation
 from models.chart_data import BiomechanicsSummaryChart
 from datetime import datetime, timedelta
@@ -102,4 +102,70 @@ def test_biomechanics_summary_chart():
 
     recovery_quality_json = recovery_quality.json_serialise()
 
-    k=0
+#     k=0
+
+def get_equation_list(value_list):
+    equation_list = []
+    for value in value_list:
+        elasticity = Elasticity()
+        elasticity.elasticity = value
+        equation_list.append(elasticity)
+    return equation_list
+
+def test_elasticity_dysfunction_score():
+    sp = ScoringProcessor()
+    coefficients_list  = (
+        # examples
+        [.4, 0],
+        [0.4, .4], #  --> 76
+        [.5, .5], #  --> 85
+        [.5, 0], #  --> 85
+        [.5, 0., .5, 0],  # --> 77.5
+        [.5, 0., .5, .5],  # --> 77.5
+        [1.5, 0],  # --> 55
+        [1.5, 1.5],  # --> 10
+        [1.5, 1.5, 1.5, 1.5],  # --> 10
+        [1, 1],
+        [1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 0, 0],
+        [1, 1, 1, 0, 0, 0],
+        [1, 1, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 0],
+        [1, 0, 0],
+        [1, 0],
+        [2, 2, 2, 2],
+        [2, 2, 2, 0],
+        [2, 2, 0, 0],
+
+        # 7bbff8e0
+        [0, 0.206490226954283], # apt -->  93
+        [-0.159515012897757, -0.277147155116258, 0.0723139465482049, 0.0],  # hip_drop --> 99
+        [0.0, 0.0, 0.0, -0.350647636838605, 0.0, -0.251201252875501],  # knee_valgus --> 100
+        [0.924804782628251, 0.626882930247725, 0, 0.258772334759487],  # hip_rotation --> 73
+        [0.924804782628251, 0.626882930247725, 0.01, 0.258772334759487],  # hip_rotation --> 73
+
+        # c14f1728
+        [0.0345736161517883, 0.288488188735086], # apt --> 90
+        [0.135184178791529, 0.196180582682485, 0.0510926754299412, 0.0], # hip_drop --> 94
+        [0.0, 0.0, 0.0,  0.0, 0.0, -0.239635631923202],  # knee_valgus --> 100
+        [0.0471320102970911, -0.731835173000968, -0.228395501234287, -0.531684824385146],  # hip_rotation --> 99
+
+        # f93e004d
+        [-0.891180773774133, -1.46141158488873], # apt --> 100
+        [0.20416289977369, 0.0, 0.0, 0.0], # hip_drop --> 97
+        [0.20416289977369, 0.001, 0.001, 0.001],
+        [0.0, 0.141232487324098, 0.0, 0.0, -0.161874154731829, -0.20458903087513],  # knee_valgus --> 98
+        [1.16584437793462, 1.31813819855037, 0.0, -0.480878531935277], # hip_rotation --> 62
+        [1.16584437793462, 1.31813819855037],  # --> 25 (see f93 hip_rotation for comparision)
+
+    )
+    for coefficients in coefficients_list:
+        equation_list = get_equation_list(coefficients)
+        equations = [EquationType.apt_ankle_pitch] * 3
+        scores = MovementVariableScores(MovementVariableType.apt)
+        score = sp.get_elasticity_dysfunction_score(equation_list, equations, scores)
+        print(f"Coefficients: {coefficients} --> {round(score,1)}")
+        assert score != -999
