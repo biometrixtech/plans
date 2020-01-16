@@ -143,3 +143,15 @@ def none_max(value_array):
 def _check_plan_exists(user_id, event_date):
     mongo_collection = get_mongo_collection('dailyplan')
     return mongo_collection.count({"user_id": user_id, "date": event_date}) == 1
+
+
+def get_client():
+    try:
+        env = Config.get('ENVIRONMENT')
+        if 'soflete' in env:
+            client = "soflete"
+        else:
+            client = "fathom"
+    except:
+        client = "fathom"
+    return client
