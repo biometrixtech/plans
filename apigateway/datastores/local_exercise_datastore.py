@@ -8,12 +8,13 @@ from utils import get_client
 
 class ExerciseLibraryDatastore(object):
     @xray_recorder.capture('datastores.ExerciseLibraryDatastore.get')
-    def get(self):
-        return self._read_json()
+    def get(self, client=None):
+        return self._read_json(client)
 
     @xray_recorder.capture('datastores.ExerciseLibraryDatastore._read_json')
-    def _read_json(self):
-        client = get_client()
+    def _read_json(self, client):
+        if client is None:
+            client = get_client()
         exercise_list = []
         script_dir = os.path.dirname(__file__)
         file_path = os.path.join(script_dir,'../models', f'exercise_library_{client}.json')

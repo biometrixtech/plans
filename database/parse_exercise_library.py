@@ -1,17 +1,45 @@
 import os
 import json
 import pandas as pd
-import models.exercise
 
+if __package__ is None or __package__ == '':
+    import sys
+    working_dir = os.path.realpath('..') + "/apigateway"
+    sys.path.append(working_dir)
 
-fathom_exercises = []
-soflete_exercises = []
-body_parts = {}
-exercises_pd = pd.read_csv('Exercise_Library.tsv', sep='\t', keep_default_na=False, skiprows=1)
+from models.exercise import Exercise
 
-for index, row in exercises_pd.iterrows():
-    if row['present_in_fathom_mapping_logic'] == 'x':
-        exercise_item = models.exercise.Exercise(row['id'])
+class ExerciseLibraryParser(object):
+    def __init__(self):
+        self.exercises_pd = None
+        self.exercises_fathom = []
+        self.exercises_soflete = []
+        self.body_parts_fathom = {}
+        self.body_parts_soflete = {}
+
+    def load_data(self):
+        self.exercises_pd = pd.read_csv('Exercise_Library.tsv', sep='\t', keep_default_na=False, skiprows=1)
+        # self.body_parts_pd = pd.read_csv('Body_Parts.tsv', sep='\t', keep_default_na=False, skiprows=1)
+        fathom_exercises_pd = self.exercises_pd[self.exercises_pd[f'present_in_fathom_mapping_logic'] == 'x']
+
+        for index, row in fathom_exercises_pd.iterrows():
+            exercise_item = self.parse_row(row, source='fathom')
+            self.exercises_fathom.append(exercise_item)
+        self.write_exercise_json('fathom')
+        self.write_body_parts_json('fathom')
+
+        soflete_exercises_pd = self.exercises_pd[self.exercises_pd['present_in_soflete_mapping_logic'] == 'x']
+        for index, row in soflete_exercises_pd.iterrows():
+            exercise_item = self.parse_row(row, source='soflete')
+            self.exercises_soflete.append(exercise_item)
+        self.write_exercise_json('soflete')
+        self.write_body_parts_json('soflete')
+
+    def parse_row(self, row, source):
+        if source == 'soflete':
+            exercise_item = Exercise(str(row['soflete_id']))
+        else:
+            exercise_item = Exercise(str(row['id']))
         exercise_item.display_name = row['display_name']
         exercise_item.name = row['name']
         if row["min_sets"] in ["-", ""]:
@@ -60,54 +88,67 @@ for index, row in exercises_pd.iterrows():
         exercise_item.technical_difficulty = row["technical_difficulty"]
         exercise_item.equipment_required = row["equipment_required"].split(';')
         exercise_item.description = row["description"]
-        fathom_exercises.append(exercise_item)
-        # mapped_body_parts = row['muscle_group_joint']
-        # mapped_body_parts = json.loads(mapped_body_parts)# dict(row['muscle_group_joint'])
-        # for key, value in mapped_body_parts.items():
-        #     if key not in body_parts.keys():
-        #         body_part = {}
-        #         body_part['id'] = key
-        #         body_part['name'] = value
-        #         body_part['inhibit'] = []
-        #         body_part['static_lengthen'] = []
-        #         body_part['active_lengthen'] = []
-        #         body_part['dynamic_lengthen'] = []
-        #         body_part['activate'] = []
-        #         body_part['static_integrate'] = []
-        #         body_part['dynamic_integrate'] = []
-        #         body_parts[key] = body_part
-        #     body_part = body_parts[key]
-        #     if row['inhibit'] == 'x':
-        #         body_part['inhibit'].append(row['id'])
-        #     elif row['static_lengthen'] == 'x':
-        #         body_part['static_lengthen'].append(row['id'])
-        #     elif row['active_lengthen'] == 'x':
-        #         body_part['active_lengthen'].append(row['id'])
-        #     elif row['dynamic_lengthen'] == 'x':
-        #         body_part['dynamic_lengthen'].append(row['id'])
-        #     elif row['activate'] == 'x':
-        #         body_part['activate'].append(row['id'])
-        #     elif row['static_integrate'] == 'x':
-        #         body_part['static_integrate'].append(row['id'])
-        #     elif row['dynamic_integrate'] == 'x':
-        #         body_part['dynamic_integrate'].append(row['id'])
+        body_parts = self.__getattribute__(f"body_parts_{source}")
+        try:
+            mapped_body_parts = json.loads(row['muscle_group_joint'])
+            for key, value in mapped_body_parts.items():
+                if key not in body_parts.keys():
+                    body_part = dict()
+                    body_part['id'] = value
+                    body_part['name'] = key
+                    body_part['inhibit'] = []
+                    body_part['static_lengthen'] = []
+                    body_part['active_lengthen'] = []
+                    body_part['dynamic_lengthen'] = []
+                    body_part['activate'] = []
+                    body_part['static_integrate'] = []
+                    body_part['dynamic_integrate'] = []
+                    body_parts[key] = body_part
+                body_part = body_parts[key]
+                if row['inhibit'] == 'x':
+                    body_part['inhibit'].append(row['id'])
+                elif row['static_lengthen'] == 'x':
+                    body_part['static_lengthen'].append(row['id'])
+                elif row['active_lengthen'] == 'x':
+                    body_part['active_lengthen'].append(row['id'])
+                elif row['dynamic_lengthen'] == 'x':
+                    body_part['dynamic_lengthen'].append(row['id'])
+                elif row['activate'] == 'x':
+                    body_part['activate'].append(row['id'])
+                elif row['static_integrate'] == 'x':
+                    body_part['static_integrate'].append(row['id'])
+                elif row['dynamic_integrate'] == 'x':
+                    body_part['dynamic_integrate'].append(row['id'])
+        except:
+            pass
 
-exercise_count = len(fathom_exercises)
+        return exercise_item
 
-exercises_json = []
-for exercise_item in fathom_exercises:
-    exercises_json.append(exercise_item.json_serialise())
-json_string = json.dumps(exercises_json, indent=4)
-file_name = os.path.join(os.path.realpath('..'), 'apigateway/models/exercise_library_fathom.json')
-f1 = open(file_name, 'w')
-f1.write(json_string)
-f1.close()
+    def write_exercise_json(self, source):
+        exercise_list = self.__getattribute__(f"exercises_{source}")
+        exercises_json = []
+        for exercise_item in exercise_list:
+            exercises_json.append(exercise_item.json_serialise())
+        json_string = json.dumps(exercises_json, indent=4)
+        file_name = os.path.join(os.path.realpath('..'), f'apigateway/models/exercise_library_{source}.json')
+        print(f"writing: {file_name}")
+        f1 = open(file_name, 'w')
+        f1.write(json_string)
+        f1.close()
 
-# body_part_json = []
-# for key, value in body_parts.items():
-#     body_part_json.append(value)
-# json_string_body_parts = json.dumps(body_part_json, indent=4)
-# file_name = os.path.join(os.path.realpath('..'), 'apigateway/models/body_part_mapping_fathom.json')
-# f2 = open(file_name, 'w')
-# f2.write(json_string_body_parts)
-# f2.close()
+    def write_body_parts_json(self, source):
+        body_parts = self.__getattribute__(f"body_parts_{source}")
+        body_parts_json = []
+        for key, value in body_parts.items():
+            body_parts_json.append(value)
+        json_string = json.dumps(body_parts_json, indent=4)
+        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/body_part_mapping_{source}.json")
+        print(f"writing: {file_name}")
+        f1 = open(file_name, 'w')
+        f1.write(json_string)
+        f1.close()
+
+
+if __name__ == '__main__':
+    ex_parser = ExerciseLibraryParser()
+    ex_parser.load_data()
