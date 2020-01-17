@@ -79,7 +79,7 @@ class TrainingPlanManager(object):
         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
-    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, on_demand_mobilize_only=False, visualizations=True):
+    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
@@ -117,7 +117,7 @@ class TrainingPlanManager(object):
         # new modalities
         self.move_completed_modalities()
         if not self.daily_plan.train_later:
-            if on_demand_mobilize_only:
+            if mobilize_only:
                 # if any completed post_active rest exists, preserve it
                 # for post_active_rest in self.daily_plan.post_active_rest:
                 #     if post_active_rest.completed:
@@ -162,7 +162,7 @@ class TrainingPlanManager(object):
                 # if self.daily_plan.cold_water_immersion is not None:
                 #     self.daily_plan.ice = calc.adjust_ice_session(self.daily_plan.ice, self.daily_plan.cold_water_immersion)
         else:
-            if on_demand_mobilize_only:
+            if mobilize_only:
                 # if any completed pre active rest is present, preserve it
                 # for pre_active_rest in self.daily_plan.pre_active_rest:
                 #     if pre_active_rest.completed:
