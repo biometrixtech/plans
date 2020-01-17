@@ -1,3 +1,4 @@
+import os, json
 from random import shuffle
 
 from models.exercise import AssignedExercise
@@ -5,6 +6,14 @@ from models.soreness_base import BodyPartLocation, BodyPartSide
 from models.sport import SportName
 import random
 
+from utils import get_client
+
+client = get_client()
+script_dir = os.path.dirname(__file__)
+file_path = os.path.join(script_dir, f'body_part_mapping_{client}.json')
+with open(file_path, 'r') as f:
+    print('reading json')
+    body_part_mapping = json.load(f)
 
 class BodyPartFactory(object):
 
@@ -179,79 +188,83 @@ class BodyPartFactory(object):
     def get_body_part(self, body_part, sample=True):
 
         location = self.get_body_part_location(body_part)
-
-        if location == BodyPartLocation.general:
-            return self.get_general(sample)
-        elif location == BodyPartLocation.abdominals:
-            return self.get_abdominals(sample)
-        elif location == BodyPartLocation.achilles:
-            return self.get_achilles(sample)
-        elif location == BodyPartLocation.ankle:
-            return self.get_ankle(sample)
-        elif location == BodyPartLocation.biceps:
-            return self.get_biceps(sample)
-        elif location == BodyPartLocation.calves:
-            return self.get_calves(sample)
-        elif location == BodyPartLocation.chest:
-            return self.get_chest(sample)
-        elif location == BodyPartLocation.core_stabilizers:
-            return self.get_core_stabilizers(sample)
-        elif location == BodyPartLocation.elbow:
-            return self.get_elbow(sample)
-        elif location == BodyPartLocation.erector_spinae:
-            return self.get_erector_spinae(sample)
-        elif location == BodyPartLocation.foot:
-            return self.get_foot(sample)
-        elif location == BodyPartLocation.forearm:
-            return self.get_forearm(sample)
-        elif location == BodyPartLocation.glutes:
-            return self.get_glutes(sample)
-        elif location == BodyPartLocation.groin:
-            return self.get_groin(sample)
-        elif location == BodyPartLocation.hamstrings:
-            return self.get_hamstrings(sample)
-        elif location == BodyPartLocation.hip:
-            return self.get_hip(sample)
-        elif location == BodyPartLocation.hip_flexor:
-            return self.get_hip_flexor(sample)
-        elif location == BodyPartLocation.deep_rotators_hip:
-            return self.get_deep_rotators_hip()
-        elif location == BodyPartLocation.knee:
-            return self.get_knee(sample)
-        elif location == BodyPartLocation.lats:
-            return self.get_lats(sample)
-        elif location == BodyPartLocation.lower_back:
-            return self.get_lower_back(sample)
-        elif location == BodyPartLocation.obliques:
-            return self.get_obliques(sample)
-        elif location == BodyPartLocation.it_band:
-            return self.get_outer_thigh(sample)
-        elif location == BodyPartLocation.it_band_lateral_knee:
-            return self.get_outer_knee(sample)
-        elif location == BodyPartLocation.quads:
-            return self.get_quads(sample)
-        elif location == BodyPartLocation.shin:
-            return self.get_shin(sample)
-        elif location == BodyPartLocation.triceps:
-            return self.get_triceps(sample)
-        elif location == BodyPartLocation.shoulder:
-            return self.get_shoulder(sample)
-        elif location == BodyPartLocation.deltoid:
-            return self.get_deltoid(sample)
-        elif location == BodyPartLocation.upper_back_neck:
-            return self.get_upper_back_traps_neck(sample)
-        elif location == BodyPartLocation.wrist:
-            return self.get_wrist(sample)
-
-        elif location == BodyPartLocation.lower_body:
-            return self.get_lower_body()
-        elif location == BodyPartLocation.upper_body:
-            return self.get_upper_body()
-        elif location == BodyPartLocation.full_body:
-            return self.get_full_body()
-
-        else:
+        try:
+            return self.get_part_mapping_from_json(sample, location)
+        except KeyError:
             return self.get_base_body_part(location)
+
+        # if location == BodyPartLocation.general:
+        #     return self.get_general(sample)
+        # elif location == BodyPartLocation.abdominals:
+        #     return self.get_abdominals(sample)
+        # elif location == BodyPartLocation.achilles:
+        #     return self.get_achilles(sample)
+        # elif location == BodyPartLocation.ankle:
+        #     return self.get_ankle(sample)
+        # elif location == BodyPartLocation.biceps:
+        #     return self.get_biceps(sample)
+        # elif location == BodyPartLocation.calves:
+        #     return self.get_calves(sample)
+        # elif location == BodyPartLocation.chest:
+        #     return self.get_chest(sample)
+        # elif location == BodyPartLocation.core_stabilizers:
+        #     return self.get_core_stabilizers(sample)
+        # elif location == BodyPartLocation.elbow:
+        #     return self.get_elbow(sample)
+        # elif location == BodyPartLocation.erector_spinae:
+        #     return self.get_erector_spinae(sample)
+        # elif location == BodyPartLocation.foot:
+        #     return self.get_foot(sample)
+        # elif location == BodyPartLocation.forearm:
+        #     return self.get_forearm(sample)
+        # elif location == BodyPartLocation.glutes:
+        #     return self.get_glutes(sample)
+        # elif location == BodyPartLocation.groin:
+        #     return self.get_groin(sample)
+        # elif location == BodyPartLocation.hamstrings:
+        #     return self.get_hamstrings(sample)
+        # elif location == BodyPartLocation.hip:
+        #     return self.get_hip(sample)
+        # elif location == BodyPartLocation.hip_flexor:
+        #     return self.get_hip_flexor(sample)
+        # elif location == BodyPartLocation.deep_rotators_hip:
+        #     return self.get_deep_rotators_hip()
+        # elif location == BodyPartLocation.knee:
+        #     return self.get_knee(sample)
+        # elif location == BodyPartLocation.lats:
+        #     return self.get_lats(sample)
+        # elif location == BodyPartLocation.lower_back:
+        #     return self.get_lower_back(sample)
+        # elif location == BodyPartLocation.obliques:
+        #     return self.get_obliques(sample)
+        # elif location == BodyPartLocation.it_band:
+        #     return self.get_outer_thigh(sample)
+        # elif location == BodyPartLocation.it_band_lateral_knee:
+        #     return self.get_outer_knee(sample)
+        # elif location == BodyPartLocation.quads:
+        #     return self.get_quads(sample)
+        # elif location == BodyPartLocation.shin:
+        #     return self.get_shin(sample)
+        # elif location == BodyPartLocation.triceps:
+        #     return self.get_triceps(sample)
+        # elif location == BodyPartLocation.shoulder:
+        #     return self.get_shoulder(sample)
+        # elif location == BodyPartLocation.deltoid:
+        #     return self.get_deltoid(sample)
+        # elif location == BodyPartLocation.upper_back_neck:
+        #     return self.get_upper_back_traps_neck(sample)
+        # elif location == BodyPartLocation.wrist:
+        #     return self.get_wrist(sample)
+        #
+        # elif location == BodyPartLocation.lower_body:
+        #     return self.get_lower_body()
+        # elif location == BodyPartLocation.upper_body:
+        #     return self.get_upper_body()
+        # elif location == BodyPartLocation.full_body:
+        #     return self.get_full_body()
+        #
+        # else:
+        #     return self.get_base_body_part(location)
 
     def get_bilateral(self, body_part_location):
 
@@ -287,7 +300,40 @@ class BodyPartFactory(object):
 
         return primary_body_part
 
-    def get_general(self, sample = True):
+    def get_part_mapping_from_json(self, sample, body_part_location):
+        try:
+            part_json = body_part_mapping[str(body_part_location.value)]
+        except KeyError:
+            raise KeyError(f"{body_part_location.name} not present in mapping" )
+
+        part = BodyPart(body_part_location, part_json['treatment_priority'])
+        part.bilateral = self.get_bilateral(part.location)
+
+        if sample:
+            inhibit = self.get_exercise_dictionary(part_json['inhibit'])
+            static_stretch = self.get_exercise_dictionary(part_json['static_lengthen'])
+            active_stretch = self.get_exercise_dictionary(part_json['active_lengthen'])
+            dynamic_stretch = self.get_exercise_dictionary(part_json['dynamic_lengthen'])
+            isolated_activate = self.get_exercise_dictionary(part_json['isolated_activate'])
+            static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])
+        else:
+            inhibit = self.get_full_exercise_dictionary(part_json['inhibit'], False)
+            static_stretch = self.get_full_exercise_dictionary(part_json['static_lengthen'], False)
+            active_stretch = self.get_full_exercise_dictionary(part_json['active_lengthen'], False)
+            dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'], False)
+            isolated_activate = self.get_full_exercise_dictionary(part_json['isolated_activate'], False)
+            static_integrate = self.get_full_exercise_dictionary(part_json['static_integrate'], False)
+
+        part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activate, static_integrate)
+
+        dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'], False)
+        dynamic_integrate_with_speed = {}
+        part.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+
+        part.add_muscle_groups(part_json['agonists'], part_json['synergists'], part_json['stabilizers'], part_json['antagonists'])
+        return part
+
+    def get_general(self, sample=True):
 
         #############
         # WARNING: If you change anything here ALSO change full body
@@ -798,7 +844,7 @@ class BodyPartFactory(object):
 
     def get_obliques(self, sample=True):
 
-        part = BodyPart(BodyPartLocation.abdominals, 4)
+        part = BodyPart(BodyPartLocation.obliques, 4)
         part.bilateral = self.get_bilateral(part.location)
 
         if sample:
@@ -969,7 +1015,7 @@ class BodyPartFactory(object):
     def get_upper_back_traps_neck(self, sample=True):
 
         part = BodyPart(BodyPartLocation.upper_back_neck, 13)
-        part.bilateral = part.bilateral = self.get_bilateral(part.location)
+        part.bilateral = self.get_bilateral(part.location)
 
         if sample:
             inhibit = self.get_exercise_dictionary([102, 125, 126])

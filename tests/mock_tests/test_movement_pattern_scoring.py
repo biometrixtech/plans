@@ -1,12 +1,12 @@
-# from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
-# from models.scoring import MovementVariableScores
-# import movement_pattern_history as mph
-# from models.functional_movement import MovementPatterns
-# from models.asymmetry import Asymmetry, AnteriorPelvicTilt, AnklePitch,HipDrop, KneeValgus, HipRotation
-# from models.chart_data import BiomechanicsSummaryChart
-# from datetime import datetime, timedelta
-# from utils import format_datetime
-# from models.session import SessionFactory, SessionType, PostSurvey, SessionSource
+from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
+from models.scoring import MovementVariableScores, MovementVariableType, EquationType
+import tests.mock_users.movement_pattern_history as mph
+from models.functional_movement import MovementPatterns, Elasticity
+from models.asymmetry import Asymmetry, AnteriorPelvicTilt, AnklePitch,HipDrop, KneeValgus, HipRotation
+from models.chart_data import BiomechanicsSummaryChart
+from datetime import datetime, timedelta
+from utils import format_datetime
+from models.session import SessionFactory, SessionType, PostSurvey, SessionSource
 
 
 # def get_session(event_date, rpe):
