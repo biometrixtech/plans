@@ -390,7 +390,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
         session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
             'movement_patterns') is not None else None
-        session.workout_program_module = WorkoutProgramModule.json_serialise(input_dict['workout_program_module']) if input_dict.get('workout_program_module') is not None else None
+        session.workout_program_module = WorkoutProgramModule.json_deserialise(input_dict['workout_program_module']) if input_dict.get('workout_program_module') is not None else None
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]
         # session.underactive_weak_body_parts = [BodyPartSide.json_deserialise(u) for u in
