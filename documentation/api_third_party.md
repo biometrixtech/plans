@@ -1,4 +1,4 @@
-# FathomAI - Plans API (v 4.6.0)
+# FathomAI - Plans API (v 4.7.0)
 
 ## Common provisions
 

@@ -19,9 +19,9 @@ class ExerciseLibraryParser(object):
 
     def load_data(self):
         self.exercises_pd = pd.read_csv('Exercise_Library.tsv', sep='\t', keep_default_na=False, skiprows=1)
-        # self.body_parts_pd = pd.read_csv('Body_Parts.tsv', sep='\t', keep_default_na=False, skiprows=1)
+        self.body_parts_pd = pd.read_csv('Body_Part_Mapping.csv', keep_default_na=False)
         fathom_exercises_pd = self.exercises_pd[self.exercises_pd[f'present_in_fathom_mapping_logic'] == 'x']
-
+        self.read_body_parts()
         for index, row in fathom_exercises_pd.iterrows():
             exercise_item = self.parse_row(row, source='fathom')
             self.exercises_fathom.append(exercise_item)
@@ -90,19 +90,21 @@ class ExerciseLibraryParser(object):
         exercise_item.description = row["description"]
         body_parts = self.__getattribute__(f"body_parts_{source}")
         try:
+            mapped_body_parts = row['muscle_group_joint']
             mapped_body_parts = json.loads(row['muscle_group_joint'])
             for key, value in mapped_body_parts.items():
                 if key not in body_parts.keys():
-                    body_part = dict()
+                    body_part = self.get_empty_body_part()
+                    # body_part = dict()
                     body_part['id'] = value
                     body_part['name'] = key
-                    body_part['inhibit'] = []
-                    body_part['static_lengthen'] = []
-                    body_part['active_lengthen'] = []
-                    body_part['dynamic_lengthen'] = []
-                    body_part['activate'] = []
-                    body_part['static_integrate'] = []
-                    body_part['dynamic_integrate'] = []
+                    # body_part['inhibit'] = []
+                    # body_part['static_lengthen'] = []
+                    # body_part['active_lengthen'] = []
+                    # body_part['dynamic_lengthen'] = []
+                    # body_part['activate'] = []
+                    # body_part['static_integrate'] = []
+                    # body_part['dynamic_integrate'] = []
                     body_parts[key] = body_part
                 body_part = body_parts[key]
                 if row['inhibit'] == 'x':
@@ -123,6 +125,52 @@ class ExerciseLibraryParser(object):
             pass
 
         return exercise_item
+
+    def read_body_parts(self):
+        for index, row in self.body_parts_pd.iterrows():
+            body_part = self.get_empty_body_part()
+            body_part['id'] = row['id']
+            body_part['name'] = row['name']
+            if row['agonists'] != "":
+                agonists = row['agonists']
+                agonists = json.loads(row['agonists'])
+                for value in agonists.values():
+                    body_part['agonists'].append(value)
+
+            if row['synergists'] != "":
+                synergists = json.loads(row['synergists'])
+                for value in synergists.values():
+                    body_part['synergists'].append(value)
+
+            if row['stabilizers'] != "":
+                stabilizers = json.loads(row['stabilizers'])
+                for value in stabilizers.values():
+                    body_part['stabilizers'].append(value)
+
+            if row['antagonists'] != "":
+                antagonists = json.loads(row['antagonists'])
+                for value in antagonists.values():
+                    body_part['antagonists'].append(value)
+            self.body_parts_fathom[row['name']] = body_part
+            self.body_parts_soflete[row['name']] = body_part
+
+
+    def get_empty_body_part(self):
+        body_part = dict()
+        body_part['id'] = 999
+        body_part['name'] = ""
+        body_part['inhibit'] = []
+        body_part['static_lengthen'] = []
+        body_part['active_lengthen'] = []
+        body_part['dynamic_lengthen'] = []
+        body_part['activate'] = []
+        body_part['static_integrate'] = []
+        body_part['dynamic_integrate'] = []
+        body_part['agonists'] = []
+        body_part['synergists'] = []
+        body_part['stabilizers'] = []
+        body_part['antagonists'] = []
+        return body_part
 
     def write_exercise_json(self, source):
         exercise_list = self.__getattribute__(f"exercises_{source}")
