@@ -1,6 +1,6 @@
 from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
 from models.scoring import MovementVariableScores, MovementVariableType, EquationType
-import movement_pattern_history as mph
+import tests.mock_users.movement_pattern_history as mph
 from models.functional_movement import MovementPatterns, Elasticity
 from models.asymmetry import Asymmetry, AnteriorPelvicTilt, AnklePitch,HipDrop, KneeValgus, HipRotation
 from models.chart_data import BiomechanicsSummaryChart
