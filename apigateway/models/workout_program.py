@@ -23,7 +23,9 @@ class WorkoutProgramModule(Serialisable):
         workout_program_module.provider_id = input_dict.get('provider_id')
         workout_program_module.program_id = input_dict.get('program_id')
         workout_program_module.program_module_id = input_dict.get('program_module_id')
-        workout_program_module.workout_sections = [WorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_section', [])]
+        workout_program_module.workout_sections = [WorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_sections', [])]
+
+        return workout_program_module
 
 
 class WorkoutSection(Serialisable):
@@ -56,6 +58,8 @@ class WorkoutSection(Serialisable):
         workout_section.intensity_pace = input_dict.get('intensity_pace')
         workout_section.exercises = [WorkoutExercise.json_deserialise(workout_exercise) for workout_exercise
                                                    in input_dict.get('exercises', [])]
+
+        return workout_section
 
 
 class WorkoutExercise(Serialisable):
@@ -93,3 +97,5 @@ class WorkoutExercise(Serialisable):
         exercise.reps_per_set = input_dict.get('reps_per_set', 0)
         exercise.reps_unit = input_dict.get('reps_unit')
         exercise.intensity_pace = input_dict.get('intensity_pace')
+
+        return exercise

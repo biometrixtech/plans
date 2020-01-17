@@ -143,6 +143,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                     value = SportName(None)
         elif name == "sport_name" and isinstance(value, SportName):
             self.sport_type = self.get_sport_type(value)
+        elif name == "workout_program_module" and not isinstance(value, WorkoutProgramModule):
+            self.workout_program_module = WorkoutProgramModule.json_deserialise(value) if value is not None else None
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
             if value == '':
                 value = StrengthConditioningType(None)
