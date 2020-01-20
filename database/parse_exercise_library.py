@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 
+
 if __package__ is None or __package__ == '':
     import sys
     working_dir = os.path.realpath('..') + "/apigateway"
@@ -9,13 +10,16 @@ if __package__ is None or __package__ == '':
 
 from models.exercise import Exercise
 
+
 class ExerciseLibraryParser(object):
-    def __init__(self):
+    def __init__(self, source):
+        self.source = source
         self.exercises_pd = None
-        self.exercises_fathom = []
-        self.exercises_soflete = []
-        self.body_parts_fathom = {}
-        self.body_parts_soflete = {}
+        self.body_parts_pd = None
+        self.exercises = []
+        # self.exercises_soflete = []
+        self.body_parts = {}
+        # self.body_parts_soflete = {}
 
     def load_data(self):
         self.exercises_pd = pd.read_csv('Exercise_Library.csv', keep_default_na=False, skiprows=1)
@@ -23,20 +27,20 @@ class ExerciseLibraryParser(object):
         fathom_exercises_pd = self.exercises_pd[self.exercises_pd[f'present_in_fathom_mapping_logic'] == 'x']
         self.read_body_parts()
         for index, row in fathom_exercises_pd.iterrows():
-            exercise_item = self.parse_row(row, source='fathom')
-            self.exercises_fathom.append(exercise_item)
-        self.write_exercise_json('fathom')
-        self.write_body_parts_json('fathom')
+            exercise_item = self.parse_row(row)
+            self.exercises.append(exercise_item)
+        self.write_exercise_json()
+        self.write_body_parts_json()
 
-        soflete_exercises_pd = self.exercises_pd[self.exercises_pd['present_in_soflete_mapping_logic'] == 'x']
-        for index, row in soflete_exercises_pd.iterrows():
-            exercise_item = self.parse_row(row, source='soflete')
-            self.exercises_soflete.append(exercise_item)
-        self.write_exercise_json('soflete')
-        self.write_body_parts_json('soflete')
+        # soflete_exercises_pd = self.exercises_pd[self.exercises_pd['present_in_soflete_mapping_logic'] == 'x']
+        # for index, row in soflete_exercises_pd.iterrows():
+        #     exercise_item = self.parse_row(row, source='soflete')
+        #     self.exercises_soflete.append(exercise_item)
+        # self.write_exercise_json('soflete')
+        # self.write_body_parts_json('soflete')
 
-    def parse_row(self, row, source):
-        if source == 'soflete':
+    def parse_row(self, row):
+        if self.source == 'soflete':
             exercise_item = Exercise(str(row['soflete_id']))
         else:
             exercise_item = Exercise(str(row['id']))
@@ -154,10 +158,11 @@ class ExerciseLibraryParser(object):
                     phase_exercises.remove('')
                 body_part[phase] = [int(ex) for ex in phase_exercises]
 
-            self.body_parts_fathom[row['id']] = body_part
-            self.body_parts_soflete[row['id']] = body_part
+            self.body_parts[row['id']] = body_part
+            # self.body_parts_soflete[row['id']] = body_part
 
-    def get_empty_body_part(self):
+    @staticmethod
+    def get_empty_body_part():
         body_part = dict()
         body_part['id'] = 999
         body_part['name'] = ""
@@ -175,25 +180,24 @@ class ExerciseLibraryParser(object):
         body_part['antagonists'] = []
         return body_part
 
-    def write_exercise_json(self, source):
-        exercise_list = self.__getattribute__(f"exercises_{source}")
+    def write_exercise_json(self, ):
+        # exercise_list = self.__getattribute__(f"exercises_{source}")
         exercises_json = []
-        for exercise_item in exercise_list:
+        for exercise_item in self.exercises:
             exercises_json.append(exercise_item.json_serialise())
         json_string = json.dumps(exercises_json, indent=4)
-        file_name = os.path.join(os.path.realpath('..'), f'apigateway/models/exercise_library_{source}.json')
+        file_name = os.path.join(os.path.realpath('..'), f'apigateway/models/exercise_library_{self.source}.json')
         print(f"writing: {file_name}")
         f1 = open(file_name, 'w')
         f1.write(json_string)
         f1.close()
 
-    def write_body_parts_json(self, source):
-        body_parts = self.__getattribute__(f"body_parts_{source}")
+    def write_body_parts_json(self):
         # body_parts_json = []
         # for key, value in body_parts.items():
         #     body_parts_json.append(value)
-        json_string = json.dumps(body_parts, indent=4)
-        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/body_part_mapping_{source}.json")
+        json_string = json.dumps(self.body_parts, indent=4)
+        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/body_part_mapping_{self.source}.json")
         print(f"writing: {file_name}")
         f1 = open(file_name, 'w')
         f1.write(json_string)
@@ -201,5 +205,7 @@ class ExerciseLibraryParser(object):
 
 
 if __name__ == '__main__':
-    ex_parser = ExerciseLibraryParser()
-    ex_parser.load_data()
+    sources = ['fathom']
+    for exercise_source in sources:
+        ex_parser = ExerciseLibraryParser(exercise_source)
+        ex_parser.load_data()
