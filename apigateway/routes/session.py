@@ -20,6 +20,7 @@ from logic.survey_processing import SurveyProcessing, create_session, update_ses
 from logic.athlete_status_processing import AthleteStatusProcessing
 # from logic.session_processing import merge_sessions
 from models.functional_movement import MovementPatterns
+from logic.modalities_processing import ModalitiesProcessing
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -204,6 +205,10 @@ def handle_session_update(session_id, user_id=None):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_date = format_date(event_date)
+    recovery_type = request.json.get('recovery_type')
+    recovery_event_date = format_datetime(event_date)
+    completed_exercises = request.json.get('completed_exercises', [])
+    return_updated_plan = request.json.get('return_updated_plan', False)
 
     # create session
     survey_processor = SurveyProcessing(user_id,
@@ -211,10 +216,14 @@ def handle_session_update(session_id, user_id=None):
                                         datastore_collection=datastore_collection)
     session = request.json['sessions'][0]
 
-
     # get existing session
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")
+
+    if recovery_type is not None:
+        modalities_processing = ModalitiesProcessing(datastore_collection)
+        modalities_processing.mark_modality_completed(plan_event_date, recovery_event_date, recovery_type, user_id,
+                                                      completed_exercises)
 
     session_obj = session_datastore.get(user_id=user_id,
                                         event_date=plan_event_date,
@@ -242,8 +251,22 @@ def handle_session_update(session_id, user_id=None):
                 Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                         endpoint=f"user/{user_id}",
                                                                                         body={"health_sync_date": request.json['health_sync_date']})
+        if not return_updated_plan:
+            return {'message': 'success'}, 200
+        else:
+            athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+            visualizations = is_fathom_environment()
+            hist_update = False
+            if athlete_stats.api_version in [None, '4_4', '4_5']:
+                hist_update = True
+            plan = create_plan(user_id,
+                               event_date,
+                               athlete_stats=athlete_stats,
+                               datastore_collection=datastore_collection,
+                               visualizations=visualizations,
+                               hist_update=hist_update)
 
-        return {'message': 'success'}, 200
+            return {'daily_plans': [plan]}, 200
 
     elif session_obj.source == SessionSource.three_sensor:
         athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
