@@ -1,3 +1,7 @@
+from fathomapi.api.config import Config
+Config.set('FILENAMES', {'exercise_library': 'exercise_library_fathom.json',
+                           'body_part_mapping': 'body_part_mapping_fathom.json'})
+
 import datetime
 import logic.training_plan_management as tpm
 from tests.mocks.mock_datastore_collection import DatastoreCollection

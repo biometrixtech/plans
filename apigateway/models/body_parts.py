@@ -6,11 +6,14 @@ from models.soreness_base import BodyPartLocation, BodyPartSide
 from models.sport import SportName
 import random
 
-from utils import get_client
+from fathomapi.api.config import Config
 
-client = get_client()
+# from utils import get_client
+#
+# client = get_client()
+file_name = Config.get('FILENAMES')['body_part_mapping']
 script_dir = os.path.dirname(__file__)
-file_path = os.path.join(script_dir, f'body_part_mapping_{client}.json')
+file_path = os.path.join(script_dir, file_name)
 with open(file_path, 'r') as f:
     print('reading json')
     body_part_mapping = json.load(f)

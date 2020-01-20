@@ -3,6 +3,8 @@ os.environ['ENVIRONMENT'] = 'dev'
 from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
+os.environ['EXERCISE_LIBRARY_FILENAME'] = 'exercise_library_fathom.json'
+os.environ['BODY_PART_MAPPING_FILENAME'] = 'body_part_mapping_fathom.json'
 
 import pytest
 from models.session import SportTrainingSession
