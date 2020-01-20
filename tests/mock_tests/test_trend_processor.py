@@ -1,3 +1,7 @@
+from fathomapi.api.config import Config
+Config.set('FILENAMES', {'exercise_library': 'exercise_library_fathom.json',
+                           'body_part_mapping': 'body_part_mapping_fathom.json'})
+
 from logic.trend_processing import TrendProcessor
 from logic.trigger_processing import TriggerFactory
 from models.trigger import TriggerType, Trigger

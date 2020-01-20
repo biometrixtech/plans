@@ -1,3 +1,11 @@
+import os
+from fathomapi.api.config import Config
+Config.set('FILENAMES', {'exercise_library': 'exercise_library_fathom.json',
+                           'body_part_mapping': 'body_part_mapping_fathom.json'})
+# os.environ['FILENAMES'] = {'exercise_library': 'exercise_library_fathom.json',
+#                            'body_part_mapping': 'body_part_mapping_fathom.json'}
+# os.environ['BODY_PART_MAPPING_FILENAME'] = 'body_part_mapping_fathom.json'
+
 from models.daily_plan import DailyPlan
 from models.functional_movement_modalities import ModalityType, ActiveRestBeforeTraining, ActiveRestAfterTraining
 from utils import format_date

@@ -1,3 +1,7 @@
+from fathomapi.api.config import Config
+Config.set('FILENAMES', {'exercise_library': 'exercise_library_fathom.json',
+                           'body_part_mapping': 'body_part_mapping_fathom.json'})
+
 from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
 from models.scoring import MovementVariableScores, MovementVariableType, EquationType
 import tests.mock_users.movement_pattern_history as mph
