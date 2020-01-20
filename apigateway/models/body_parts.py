@@ -231,7 +231,7 @@ class BodyPartFactory(object):
         # elif location == BodyPartLocation.hip_flexor:
         #     return self.get_hip_flexor(sample)
         # elif location == BodyPartLocation.deep_rotators_hip:
-        #     return self.get_deep_rotators_hip()
+        #     return self.get_deep_rotators_hip(sample)
         # elif location == BodyPartLocation.knee:
         #     return self.get_knee(sample)
         # elif location == BodyPartLocation.lats:
@@ -312,26 +312,37 @@ class BodyPartFactory(object):
         part = BodyPart(body_part_location, part_json['treatment_priority'])
         part.bilateral = self.get_bilateral(part.location)
 
-        if sample:
-            inhibit = self.get_exercise_dictionary(part_json['inhibit'])
-            static_stretch = self.get_exercise_dictionary(part_json['static_lengthen'])
-            active_stretch = self.get_exercise_dictionary(part_json['active_lengthen'])
-            dynamic_stretch = self.get_exercise_dictionary(part_json['dynamic_lengthen'])
-            isolated_activate = self.get_exercise_dictionary(part_json['isolated_activate'])
-            static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])
+        if body_part_location in [BodyPartLocation.full_body, BodyPartLocation.upper_body, body_part_location.lower_body]:
+            # these three body parts always sample (either 1 or 4(full_dict)
+            inhibit = {}
+            static_stretch = {}
+            active_stretch = {}
+            dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'])  # sample 4
+            isolated_activate = {}
+            static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])  # sample 1
+            dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'])  # sample 4
+            dynamic_integrate_with_speed = {}
+
         else:
-            inhibit = self.get_full_exercise_dictionary(part_json['inhibit'], False)
-            static_stretch = self.get_full_exercise_dictionary(part_json['static_lengthen'], False)
-            active_stretch = self.get_full_exercise_dictionary(part_json['active_lengthen'], False)
-            dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'], False)
-            isolated_activate = self.get_full_exercise_dictionary(part_json['isolated_activate'], False)
-            static_integrate = self.get_full_exercise_dictionary(part_json['static_integrate'], False)
+            if sample:
+                inhibit = self.get_exercise_dictionary(part_json['inhibit'])
+                static_stretch = self.get_exercise_dictionary(part_json['static_lengthen'])
+                active_stretch = self.get_exercise_dictionary(part_json['active_lengthen'])
+                dynamic_stretch = self.get_exercise_dictionary(part_json['dynamic_lengthen'])
+                isolated_activate = self.get_exercise_dictionary(part_json['isolated_activate'])
+                static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])
+            else:
+                inhibit = self.get_full_exercise_dictionary(part_json['inhibit'], False)
+                static_stretch = self.get_full_exercise_dictionary(part_json['static_lengthen'], False)
+                active_stretch = self.get_full_exercise_dictionary(part_json['active_lengthen'], False)
+                dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'], False)
+                isolated_activate = self.get_full_exercise_dictionary(part_json['isolated_activate'], False)
+                static_integrate = self.get_full_exercise_dictionary(part_json['static_integrate'], False)
+            dynamic_integrate = {}
+            dynamic_integrate_with_speed = {}
 
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activate, static_integrate)
-
-        dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'], False)
-        dynamic_integrate_with_speed = {}
-        part.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        part.add_dynamic_exercise_phases({}, dynamic_integrate, dynamic_integrate_with_speed)  # dynamic_stretch is already added above
 
         part.add_muscle_groups(part_json['agonists'], part_json['synergists'], part_json['stabilizers'], part_json['antagonists'])
         return part
