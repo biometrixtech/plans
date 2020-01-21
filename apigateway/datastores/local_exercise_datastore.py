@@ -3,20 +3,17 @@ import json
 from aws_xray_sdk.core import xray_recorder
 
 import models.exercise
-# from utils import get_client
 from fathomapi.api.config import Config
 
 
 class ExerciseLibraryDatastore(object):
     @xray_recorder.capture('datastores.ExerciseLibraryDatastore.get')
-    def get(self, client=None):
-        return self._read_json(client)
+    def get(self):
+        return self._read_json()
 
     @xray_recorder.capture('datastores.ExerciseLibraryDatastore._read_json')
-    def _read_json(self, client):
-        file_name = Config.get('FILENAMES')['exercise_library']
-        # if client is None:
-        #     client = get_client()
+    def _read_json(self):
+        file_name = Config.get('PROVIDER_INFO')['exercise_library_filename']
         exercise_list = []
         script_dir = os.path.dirname(__file__)
         file_path = os.path.join(script_dir,'../models', file_name)

@@ -1,6 +1,6 @@
 from fathomapi.api.config import Config
-Config.set('FILENAMES', {'exercise_library': 'exercise_library_fathom.json',
-                           'body_part_mapping': 'body_part_mapping_fathom.json'})
+Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
+                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
 
 from models.soreness import Soreness
 from models.soreness_base import HistoricSorenessStatus, BodyPartLocation

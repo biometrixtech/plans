@@ -8,14 +8,11 @@ import random
 
 from fathomapi.api.config import Config
 
-# from utils import get_client
-#
-# client = get_client()
-file_name = Config.get('FILENAMES')['body_part_mapping']
+file_name = Config.get('PROVIDER_INFO')['body_part_mapping_filename']
 script_dir = os.path.dirname(__file__)
 file_path = os.path.join(script_dir, file_name)
 with open(file_path, 'r') as f:
-    print('reading json')
+    print('reading body part mapping json')
     body_part_mapping = json.load(f)
 
 class BodyPartFactory(object):
