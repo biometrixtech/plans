@@ -35,5 +35,3 @@ apigateway/session.py
 output/*
 tests/database_tests/*.csv
 output_persona/*
-
-apigateway/body_parts_mapping.py
