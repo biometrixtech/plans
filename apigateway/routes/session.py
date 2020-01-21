@@ -210,7 +210,13 @@ def handle_session_update(session_id, user_id=None):
     survey_processor = SurveyProcessing(user_id,
                                         event_date,
                                         datastore_collection=datastore_collection)
+    survey_processor.user_age = request.json.get('user_age')
+
     session = request.json['sessions'][0]
+
+    if 'hr_data' in session and len(session['hr_data']) > 0:
+        if request.json.get('user_age') is None:
+            raise InvalidSchemaException("Cannot process heart rate data without also providing user age")
 
     # get existing session
     if not _check_plan_exists(user_id, plan_event_date):
@@ -236,8 +242,6 @@ def handle_session_update(session_id, user_id=None):
                                  )
         # write hr data if it exists
         if len(survey_processor.heart_rate_data) > 0:
-            if request.json.get('user_age') is None:
-                raise InvalidSchemaException("Cannot process heart rate data without also providing user age")
             heart_rate_datastore.put(survey_processor.heart_rate_data)
         if is_fathom_environment():
             if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
