@@ -567,7 +567,7 @@ def test_active_rest_before_training_none_soreness_force_data():
     assert len(active_rest.static_stretch_exercises) > 0
     assert len(active_rest.active_stretch_exercises) > 0
     assert len(active_rest.isolated_activate_exercises) > 0
-    assert len(active_rest.static_integrate_exercises) == 0
+    assert len(active_rest.static_integrate_exercises) > 0
 
 
 

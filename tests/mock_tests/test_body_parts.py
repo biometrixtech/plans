@@ -53,8 +53,8 @@ def test_glutes():
     assert len(glutes.inhibit_exercises) == 1
     assert len(glutes.static_stretch_exercises) == 6
     assert len(glutes.active_stretch_exercises) == 3
-    assert len(glutes.dynamic_stretch_exercises) == 3
-    assert len(glutes.isolated_activate_exercises) == 7
+    assert len(glutes.dynamic_stretch_exercises) == 0
+    assert len(glutes.isolated_activate_exercises) == 10
     assert len(glutes.static_integrate_exercises) == 0
     assert len(glutes.dynamic_integrate_exercises) == 0
 
@@ -64,7 +64,7 @@ def test_glutes_sample():
     assert len(glutes.inhibit_exercises) == 1
     assert len(glutes.static_stretch_exercises) == 1
     assert len(glutes.active_stretch_exercises) == 1
-    assert len(glutes.dynamic_stretch_exercises) == 1
+    assert len(glutes.dynamic_stretch_exercises) == 0
     assert len(glutes.isolated_activate_exercises) == 1
     assert len(glutes.static_integrate_exercises) == 0
     assert len(glutes.dynamic_integrate_exercises) == 0
