@@ -20,7 +20,6 @@ from logic.survey_processing import SurveyProcessing, create_session, update_ses
 from logic.athlete_status_processing import AthleteStatusProcessing
 # from logic.session_processing import merge_sessions
 from models.functional_movement import MovementPatterns
-from logic.modalities_processing import ModalitiesProcessing
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -205,9 +204,6 @@ def handle_session_update(session_id, user_id=None):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_date = format_date(event_date)
-    recovery_type = request.json.get('recovery_type')
-    recovery_event_date = format_datetime(event_date)
-    completed_exercises = request.json.get('completed_exercises', [])
     return_updated_plan = request.json.get('return_updated_plan', False)
 
     # create session
@@ -219,11 +215,6 @@ def handle_session_update(session_id, user_id=None):
     # get existing session
     if not _check_plan_exists(user_id, plan_event_date):
         raise NoSuchEntityException("Plan does not exist for the user to update session")
-
-    if recovery_type is not None:
-        modalities_processing = ModalitiesProcessing(datastore_collection)
-        modalities_processing.mark_modality_completed(plan_event_date, recovery_event_date, recovery_type, user_id,
-                                                      completed_exercises)
 
     session_obj = session_datastore.get(user_id=user_id,
                                         event_date=plan_event_date,
