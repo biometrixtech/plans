@@ -16,18 +16,18 @@ import datetime
 # 1 body part
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def trigger_date_time():
     return datetime.datetime(2018, 6, 27, 14, 30, 0)
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def soreness_calculator():
     soreness_calc = soreness_and_injury.SorenessCalculator()
     return soreness_calc
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def get_readiness_survey(body_part_location, severity_score=None, movement=None, pain=False, tight=None, knots=None, ache=None, sharp=None):
     if severity_score is not None:
         if not pain:

@@ -14,18 +14,18 @@ import datetime
 # 1 body part
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def trigger_date_time():
     return datetime.datetime(2018, 6, 27, 14, 30, 0)
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def soreness_calculator():
     soreness_calc = soreness_and_injury.SorenessCalculator()
     return soreness_calc
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def readiness_survey_0_hours_ankle(severity_score, movement=None):
 
     soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement=movement)
@@ -34,7 +34,7 @@ def readiness_survey_0_hours_ankle(severity_score, movement=None):
 
     return survey
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def readiness_survey_12_hours_ankle(severity_score, movement=None):
 
     soreness_item = TestUtilities().body_part_soreness(9, severity_score, movement=movement)
@@ -52,7 +52,7 @@ def readiness_survey_24_hours_ankle(severity_score, movement=None):
     return survey
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def readiness_survey_0_hours_ankle_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
 
     soreness_item_1 = TestUtilities().body_part_soreness(9, severity_score_1, movement=movement_1)
@@ -64,7 +64,7 @@ def readiness_survey_0_hours_ankle_foot(severity_score_1, severity_score_2, move
     return survey
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_24_hours_ankle(severity_score, movement=None):
     surveys = []
 
@@ -80,7 +80,7 @@ def post_session_survey_24_hours_ankle(severity_score, movement=None):
 
     return surveys
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_0_hours_ankle(severity_score, movement=None):
     surveys = []
 
@@ -96,7 +96,7 @@ def post_session_survey_0_hours_ankle(severity_score, movement=None):
 
     return surveys
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_24_hours_foot(severity_score, movement=None):
     surveys = []
 
@@ -113,7 +113,7 @@ def post_session_survey_24_hours_foot(severity_score, movement=None):
     return surveys
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
@@ -129,7 +129,7 @@ def post_session_survey_24_hrs_ankle_foot(severity_score_1, severity_score_2, mo
 
     return surveys
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_after_ankle_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
@@ -145,7 +145,7 @@ def post_session_survey_after_ankle_foot(severity_score_1, severity_score_2, mov
 
     return surveys
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_48_hours_ankle(severity_score, movement=None):
     surveys = []
 
@@ -162,7 +162,7 @@ def post_session_survey_48_hours_ankle(severity_score, movement=None):
     return surveys
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
@@ -190,7 +190,7 @@ def post_session_surveys_24_48_hours_foot(severity_score_1, severity_score_2, mo
 
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2, movement_1=None, movement_2=None):
     surveys = []
 
@@ -216,7 +216,7 @@ def post_session_survey_24_0_hours_ankle(severity_score_1, severity_score_2, mov
 
     return surveys
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_49_hours_ankle(severity_score, movement=None):
     surveys = []
 
@@ -233,7 +233,7 @@ def post_session_survey_49_hours_ankle(severity_score, movement=None):
     return surveys
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def post_session_survey_24_hours_no_soreness():
     surveys = []
 
@@ -250,7 +250,7 @@ def post_session_survey_24_hours_no_soreness():
 
     return surveys
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def three_post_session_survey_24_hours_mixed_soreness():
     surveys = []
 
