@@ -240,7 +240,6 @@ def handle_session_update(session_id, user_id=None):
         session_obj.sport_name = new_session.sport_name if new_session.sport_name is not None else session_obj.sport_name
         session_obj.description = new_session.description if new_session.description != '' else session_obj.description
         session_obj.duration_minutes = new_session.duration_minutes if new_session.duration_minutes is not None else session_obj.duration_minutes
-        session_obj.strength_and_conditioning_type = new_session.strength_and_conditioning_type if new_session.strength_and_conditioning_type is not None else session_obj.strength_and_conditioning_type
         session_obj.deleted = new_session.deleted if new_session.deleted != session_obj.deleted else session_obj.deleted
         session_obj.ignored = new_session.ignored if new_session.ignored != session_obj.ignored else session_obj.ignored
         session_obj.source = new_session.source if new_session.source != session_obj.source else session_obj.source
