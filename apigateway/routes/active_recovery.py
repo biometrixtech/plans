@@ -3,7 +3,7 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
 from datastores.datastore_collection import DatastoreCollection
-from modalities_processing import ModalitiesProcessing
+from logic.modalities_processing import ModalitiesProcessing
 from routes.environments import is_fathom_environment
 from logic.survey_processing import create_plan, cleanup_plan, add_modality_on_demand, process_stats
 from utils import format_date, parse_datetime, format_datetime
