@@ -24,9 +24,9 @@ class ExerciseLibraryParser(object):
     def load_data(self):
         self.exercises_pd = pd.read_csv('Exercise_Library.csv', keep_default_na=False, skiprows=1)
         self.body_parts_pd = pd.read_csv('Body_Part_Mapping.csv', keep_default_na=False)
-        fathom_exercises_pd = self.exercises_pd[self.exercises_pd[f'present_in_fathom_mapping_logic'] == 'x']
+        mapped_exercises_pd = self.exercises_pd[self.exercises_pd[f'present_in_{self.source}_mapping_logic'] == 'x']
         self.read_body_parts()
-        for index, row in fathom_exercises_pd.iterrows():
+        for index, row in mapped_exercises_pd.iterrows():
             exercise_item = self.parse_row(row)
             self.exercises.append(exercise_item)
         self.write_exercise_json()
@@ -75,7 +75,10 @@ class ExerciseLibraryParser(object):
             exercise_item.exposure_minimum = 0
         else:
             exercise_item.exposure_minimum = int(row["exposure_minimum"])
-        exercise_item.unit_of_measure = row["unit_of_measure"]
+        try:
+            exercise_item.unit_of_measure = row["unit_of_measure"]
+        except:
+            print('here')
         if row["rest_between_sets"] in ["-", ""]:
             exercise_item.seconds_rest_between_sets = 0
         else:
@@ -94,32 +97,34 @@ class ExerciseLibraryParser(object):
         exercise_item.description = row["description"]
 
         # TODO: Update this once added to exercise library
-        # body_parts = self.__getattribute__(f"body_parts_{source}")
-        # try:
-        #     mapped_body_parts = json.loads(row['muscle_group_joint'])
-        #     for key, value in mapped_body_parts.items():
-        #         if value not in body_parts.keys():
-        #             body_part = self.get_empty_body_part()
-        #             body_part['id'] = value
-        #             body_part['name'] = key
-        #             body_parts[value] = body_part
-        #         body_part = body_parts[value]
-        #         if row['inhibit'] == 'x':
-        #             body_part['inhibit'].append(row['id'])
-        #         elif row['static_lengthen'] == 'x':
-        #             body_part['static_lengthen'].append(row['id'])
-        #         elif row['active_lengthen'] == 'x':
-        #             body_part['active_lengthen'].append(row['id'])
-        #         elif row['dynamic_lengthen'] == 'x':
-        #             body_part['dynamic_lengthen'].append(row['id'])
-        #         elif row['isolated_activate'] == 'x':
-        #             body_part['isolated_activate'].append(row['id'])
-        #         elif row['static_integrate'] == 'x':
-        #             body_part['static_integrate'].append(row['id'])
-        #         elif row['dynamic_integrate'] == 'x':
-        #             body_part['dynamic_integrate'].append(row['id'])
-        # except:
-        #     pass
+        # body_parts = self.__getattribute__(f"body_parts_{self.source}")
+        try:
+            mapped_body_parts = row['muscle_group_joint']
+            mapped_body_parts = json.loads(row['muscle_group_joint'])
+            for key, value in mapped_body_parts.items():
+                if value not in self.body_parts.keys():
+                    body_part = self.get_empty_body_part()
+                    body_part['id'] = value
+                    body_part['name'] = key
+                    self.body_parts[value] = body_part
+                body_part = self.body_parts[value]
+                if row['inhibit'] == 'x':
+                    body_part['inhibit'].append(row['id'])
+                elif row['static_lengthen'] == 'x':
+                    body_part['static_lengthen'].append(row['id'])
+                elif row['active_lengthen'] == 'x':
+                    body_part['active_lengthen'].append(row['id'])
+                elif row['dynamic_lengthen'] == 'x':
+                    body_part['dynamic_lengthen'].append(row['id'])
+                elif row['isolated_activate'] == 'x':
+                    body_part['isolated_activate'].append(row['id'])
+                elif row['static_integrate'] == 'x':
+                    body_part['static_integrate'].append(row['id'])
+                elif row['dynamic_integrate'] == 'x':
+                    body_part['dynamic_integrate'].append(row['id'])
+        except Exception as e:
+            print(e)
+            pass
 
         return exercise_item
 
@@ -152,11 +157,11 @@ class ExerciseLibraryParser(object):
                     body_part['antagonists'].append(value)
 
             # TODO: update to read from exercise library
-            for phase in ['inhibit', 'static_lengthen', 'active_lengthen', 'dynamic_lengthen', 'isolated_activate', 'static_integrate', 'dynamic_integrate']:
-                phase_exercises = row[phase].strip('][').split(',')
-                if '' in phase_exercises:
-                    phase_exercises.remove('')
-                body_part[phase] = [int(ex) for ex in phase_exercises]
+            # for phase in ['inhibit', 'static_lengthen', 'active_lengthen', 'dynamic_lengthen', 'isolated_activate', 'static_integrate', 'dynamic_integrate']:
+            #     phase_exercises = row[phase].strip('][').split(',')
+            #     if '' in phase_exercises:
+            #         phase_exercises.remove('')
+            #     body_part[phase] = [int(ex) for ex in phase_exercises]
 
             self.body_parts[row['id']] = body_part
             # self.body_parts_soflete[row['id']] = body_part
