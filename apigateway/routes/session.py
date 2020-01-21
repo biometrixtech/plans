@@ -236,6 +236,8 @@ def handle_session_update(session_id, user_id=None):
                                  )
         # write hr data if it exists
         if len(survey_processor.heart_rate_data) > 0:
+            if request.json.get('user_age') is None:
+                raise InvalidSchemaException("Cannot process heart rate data without also providing user age")
             heart_rate_datastore.put(survey_processor.heart_rate_data)
         if is_fathom_environment():
             if "health_sync_date" in request.json and request.json['health_sync_date'] is not None:
