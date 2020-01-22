@@ -28,8 +28,13 @@
       - [Mark Completed (Exercise Modalities)](#mark-completed-exercise-modalities)
       - [Mark Started (Body Part Modalities)](#mark-started-body-part-modalities)
       - [Mark Completed (Body Part Modalities)](#mark-completed-body-part-modalities)
+      - [Get Mobilize](#get-mobilize)
+      - [Get Modality](#get-modality)
     - [Daily Plans](#daily-plans)
       - [Get daily plan](#get-daily-plan)
+      - [Update daily plan](#update-daily-plan)
+    - [Three Sensor](#three-sensor)
+    - [Get Biomechanics Detail for Session](#get-biomechanics-detail-for-session)
     - [Coach Dashboard](#coach-dashboard)
       - [Get dashboard data for all users](#get-dashboard-data-for-all-users)
     - [Athlete](#athlete)
@@ -47,6 +52,9 @@
       - [side](#side)
       - [sport name](#sport-name)
       - [Session Source](#session-source)
+      - [Recovery Types](#recovery-types)
+      - [Exercise Phase Type](#exercise-phase-type)
+      - [Legend Color](#legend-color)
     - [Body Part Types](#body-part-types)
       - [Joints](#joints)
       - [Ligaments](#ligaments)
@@ -252,7 +260,7 @@ Authentication is required for this endpoint
 * `current_position` exists but `current_sport_name` does not, then it's implied that the user wants functional strength for sport-less activity `DEPRECATED`
 
 * `typical sessions` will be a list of sessions that the user has logged in the last 14 days. 
-* `session` object will be of the following schema
+* `session` object have of the following schema
 
 ``` 
 {
@@ -284,7 +292,7 @@ The client __must__ submit a request body containing a JSON object having the fo
     "event_date": Datetime,
     "sessions": [session, session],
     "health_sync_date": Datetime,
-    "sessions_planned": Boolean
+    "sessions_planned": boolean
     "user_age": number
 }
 ```
@@ -292,9 +300,10 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `health_sync_date` is __optional__ and only provided if one of the sessions is obtained from health app
 * `sessions_planned` __should__ be a boolean representing whether the user plans to train again that day.
 * `user_age` is __optional__ and only needed if one of the sessions is obtained from health app and contains heart rate data
-* `session` __should__ be of the following schema
+* `session` __should__ have the following schema
 ```
 {
+    "session_id": Uuid,
     "event_date": Datetime,
     "end_date": Datetime,
     "session_type": number,
@@ -315,6 +324,7 @@ The client __must__ submit a request body containing a JSON object having the fo
     "hr_data": [hr, hr, hr]
 }
 ```
+* `session_id` is __optional__ parameter that's only required when submitting post session survey for a 3-sensor session that already exists.
 * `event_date` __should__ reflect the start time of the session (health/three sensor data) or default date (manually logged session)
 * `end_date` is __optional__ parameter that reflects the end time of the session for health/three sensor data
 * `session_type` __should__ be an integer reflecting SessionType enumeration. NOTE: We'll only use 6 moving forward
@@ -656,11 +666,11 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
-    "recovery_type": string
+    "recovery_type": integer
 }
 ```
 * `event_date` __should__ be the time when user checks the first exercise for the session.
-* `recovery_type` __should__ be one of `pre_active_rest`, `post_active_rest` or `cool_down`
+* `recovery_type` __should__ be an integer reflecting  [recovery type](#recovery-types) enumeration.
 
 ```
 POST /plans/version/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
@@ -669,7 +679,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "pre_active_rest"
+    "recovery_type": 0
 }
 ```
 ##### Responses
@@ -696,12 +706,12 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
-    "recovery_type": string
+    "recovery_type": integer
     "completed_exercises": [string]
 }
 ```
 * `event_date` __should__ be the time when user completes the session.
-* `recovery_type` __should__ be one of `pre_active_rest`, `post_active_rest` or `cool_down`
+* `recovery_type` __should__ be an integer reflecting  [recovery type](#recovery-types) enumeration.
 * `completed_exercises` __should__ be a list representing the exercises that the user checked off
 
 ```
@@ -711,13 +721,13 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "post_active_rest",
+    "recovery_type": 1,
     "completed_exercises": ["3", "5", "20", "142"]
 }
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body having the following schema:
  
 ```
 {
@@ -789,7 +799,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `event_date` __should__ be the time when user completes the session.
 * `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
 * `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
-* `body_part` __should__ be of the following schema
+* `body_part` __should__ have the following schema
 ```
 {
     "body_part_location": number,
@@ -821,7 +831,88 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 ##### Responses
  
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return daily_plan in the body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
+
+
+
+#### Get Mobilize
+
+This endpoint can be called to request an on-demand mobilize (pre or post only as determined by users current state).
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/{User UUID}/get_mobilize`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
+* `event_date` __should__ be the local time when user makes the request.
+
+```
+PATCH /plans/version/active_recovery/{User UUID}/get_mobilize HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+{
+    "event_date": "2018-09-21T17:53:39Z"
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, and return daily_plan in the body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
+
+
+#### Get Modality
+
+This endpoint can be called to request a specific recovery modality.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/version/active_recovery/{User UUID}/get_modality`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date": Datetime,
+    "type": integer
+}
+```
+* `event_date` __should__ be the local time when user makes the request.
+
+```
+PATCH /plans/version/active_recovery/{User UUID}/get_modality HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+{
+    "event_date": "2018-09-21T17:53:39Z",
+    "type": 0
+}
+```
+##### Responses
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, and return daily_plan in the body having the following schema:
  
 ```
 {
@@ -873,45 +964,49 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "typical_sessions": [session, session]
 }
 ```
-* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined in [here](#sorenesstypical-session-history)
+* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
 * `typical_sessions` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined [here](#sorenesstypical-session-history)
 * `daily_plans` __could__ be empty list
-* each `daily_plan*` will be of following schema:
+* each `daily_plan*` will have the following schema:
 ```
 {
     "date": Date,
-    "day_of_week": Number,
-    "pre_active_rest": [PreActiveRest],
-    "completed_pre_active_rest": [PreActiveRest],
+    "day_of_week": number,
+    "modalities": [modality],
+    "completed_modalities": [modality],
+    "modalities_available_on_demand": [modality_display]
     "heat": Heat,
     "completed_heat": [Heat],
-    "warm_up": [WarmUp],
-    "completed_warm_up": [WarmUp],
     "training_sessions": [Session],
-    "cool_down": [CoolDown],
-    "completed_cool_down": [CoolDown],
-    "post_active_rest": [PostActiveRest],
-    "completed_post_active_rest": [PostActiveRest],
     "ice": Ice,
     "completed_ice": [Ice],
     "cold_water_immersion": ColdWaterImmersion,
     "completed_cold_water_immersion": [ColdWaterImmersion],
-    "cross_training_sessions": [],
-    "daily_readiness_survey_completed": Boolean,
-    "landing_screen": Number,
+    "daily_readiness_survey_completed": boolean,
+    "landing_screen": number,
     "last_sensor_sync": Datetime,
     "last_updated": Datetime,
     "nav_bar_indicator": null,
-    "post_active_rest_completed": Boolean,
-    "pre_active_rest_completed": Boolean,
-    "sessions_planned": Boolean,
-    "train_later": Bolean
+    "post_active_rest_completed": boolean,
+    "pre_active_rest_completed": boolean,
+    "sessions_planned": boolean,
+    "train_later": Bolean,
+    "trends": Trends
 }
 ```
 * Any of the `completed_*` attributes could be empty list
-* Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
+* `modality` could be empty list
+* `modalities_available_on_demand` will be a list of modality types that are available to be requested on-demand (could be an empty list)
+* `modality_display` has the following example schema:
+```
+{
+    "type": 0,
+    "name": 'Mobilize',
+    "image": 'pre_active_rest'
+}
+```
 * Any of the body part modalities (`heat`, `ice`, `cold_water_immersion`) could be null
-* `Heat` has following example schema
+* `Heat` has the following example schema:
 ```
 {
     "active": true,
@@ -939,7 +1034,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "start_date_time": null
 }
 ```
-* `Ice` has following example schema
+* `Ice` has the following example schema:
 ```
 {
     "active": true,
@@ -969,7 +1064,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "start_date_time": null
 }
 ```
-* `ColdWaterImmersion` has following example schema
+* `ColdWaterImmersion` has following example schema:
 ```
 {
     "minutes": 10,
@@ -990,61 +1085,53 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 }
 
 ```
-* `PretActiveRest` has the following example schema
-```
-{
-    "active": true,
-    "completed": false,
-    "completed_date_time": null,
-    "default_plan": "Complete",
-    "event_date_time": "2019-05-07T00:00:00Z",
-    "high_relative_intensity_logged": false,
-    "high_relative_load_session": true,
-    "active_stretch_exercises": [AssignedExercise, AssignedExercise]
-    "inhibit_exercises": [AssignedExercise, AssignedExercise],
-    "isolated_activate_exercises": [AssignedExercise, AssignedExercise],
-    "static_integrate_exercises": [AssignedExercise, AssignedExercise],
-    "static_stretch_exercises": [AssignedExercise, AssignedExercise]
-    "muscular_strain_increasing": false,
-    "start_date_time": null,
-}
-```
-* `PostActiveRest` has following example schema
-```
-{
-    "active": true,
-    "completed": false,
-    "completed_date_time": null,
-    "default_plan": "Complete",
-    "event_date_time": "2019-05-07T00:00:00Z",
-    "high_relative_intensity_logged": false,
-    "high_relative_load_session": true,
-    "inhibit_exercises": [AssignedExercise, AssignedExercise],
-    "isolated_activate_exercises": [AssignedExercise, AssignedExercise],
-    "muscular_strain_increasing": false,
-    "start_date_time": null,
-    "static_integrate_exercises": [AssignedExercise, AssignedExercise],
-    "static_stretch_exercises": [AssignedExercise, AssignedExercise]
-}
-```
-* `CoolDown` has the following example schema
-```
-{
-    "active": true,
-    "completed": false,
-    "completed_date_time": null,
-    "dynamic_integrate_exercises": [AssignedExercise, AssignedExercise],
-    "dynamic_stretch_exercises": [AssignedExercise, AssignedExercise],
-    "event_date_time": "2019-05-07T00:00:00Z",
-    "high_relative_intensity_logged": false,
-    "high_relative_load_session": true,
-    "muscular_strain_increasing": false,
-    "sport_name": 17,
-    "start_date_time": null
-    }
-```
+* `modality` has the following example schema:
 
-* `AssignedExercise` has the following example schema
+```
+{
+    "id" : "ef1db466-4ccf-45cf-980a-2632a600e3ee",
+    "type" : 0,
+    "title" : "MOBILIZE",
+    "when" : "before training",
+    "when_card" : "before training",
+    "start_date_time" : null,
+    "completed_date_time" : null,
+    "event_date_time" : "2020-01-03T09:32:14Z",
+    "completed" : false,
+    "active" : false,
+    "default_plan" : "Complete",
+    "force_data" : false,
+    "goal_title" : "",
+    "display_image" : "inhibit",
+    "locked_text" : "Sorry, you missed the optimal window for Mobilize today.",
+    "goals" : {
+        "Recover from training" : {
+            "efficient_active" : true,
+            "complete_active" : true,
+            "comprehensive_active" : true
+        },
+        "Care for symptoms" : {
+            "efficient_active" : false,
+            "complete_active" : true,
+            "comprehensive_active" : true
+        }
+    },
+    "exercise_phases" : [ExercisePhase, ExercisePhase]
+}
+```
+* `type` __should__ be an integer reflecting [Recovery Type](#recovery-types) enumeration.
+* `ExercisePhase` has the following example schema:
+
+```
+{
+    "type" : 0,
+    "name" : "inhibit",
+    "title" : "FOAM ROLL",
+    "exercises" : [AssignedExercise, AssignedExercise]
+}
+```
+* `type` __should__ be an integer reflecting [Exercise Phase Type](#exercise-phase-type) enumeration.
+* `AssignedExercise` has the following example schema:
 ```
 {
     "bilateral": true,
@@ -1092,6 +1179,124 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "youtube_id": null
 }
 ```
+* `Trends` will have the following schema:
+```            
+{
+    'body_response': BodyResponse,
+    'workload': Workload,
+    'insight_categories': [InsightCategory],
+    'recovery_quality': RecoveryQuality,
+    'biomechanics_summary': BiomechanicsSummary
+}
+```
+
+#### Update daily plan
+
+This endpoint can be called to update the user's plan to reflect the current state.
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/daily_plan/{User UUID}/update`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date": Datetime
+}
+```
+* `event_date` __should__ reflect the time (in local timezone) when the api call is made.
+```
+POST /plans/version/daily_plan/{User UUID}/update HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date": "2020-01-09T05:50:02Z",
+}
+```
+##### Responses
+ 
+The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in [Get daily plan](#get-daily-plan).
+
+
+### Three Sensor
+
+### Get Biomechanics Detail for Session
+
+This endpoint can be called to get detail data for a three sensor session
+
+##### Query String
+The client __must__ submit a request to the endpoint `/plans/version/three_sensor/{User UUID}/biomechanics_detail//{Session UUID}`. The request method __must__ be `GET`.
+
+##### Request
+```
+GET /plans/version/three_sensor/{User UUID}/biomechanics_detail//{Session UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+```
+##### Responses
+ 
+The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+```
+{
+    'session': SessionDetail
+}
+```
+* `SessionDetail` will have the following schema:
+```
+{
+    'session_id': Uuid,
+    'seconds_duration': number,
+    'asymmetry': Asymmetry
+}
+```
+* `Asymmetry` will have the following schema:
+```
+{
+    "apt": MQDetail,
+    "ankle_pitch": MQDetail,
+    "hip_drop": MQDetail,
+    "knee_valgus": MQDetail,
+    "hip_rotation": MQDetail
+}
+```
+* `MQDetail` will have the following schema:
+
+```
+{
+    'detail_legend': [Legend, Legend],
+    'detail_data': [TimeBlock],
+    'detail_text': string,
+    'detail_bold_text': [BoldText],
+```
+* `Legend` has the following sample schema
+```
+{
+    'color': [26, 7],
+    'text': 'Asymmetric Steps',
+    'active': True,
+    'flag': 1
+}
+```
+
+* `TimeBlock` has the following sample schema
+```
+{
+    'flag': 0,
+    'x': 0,
+    'y1': 5.1,
+    'y2': -5.2
+}
+```
 
 ### Coach Dashboard
 
@@ -1116,7 +1321,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 ```
 {"teams": [team, team]}
 ```
-where team has the following schema
+where team will have the following schema:
 ```
 {
     "name": string,
@@ -1126,7 +1331,7 @@ where team has the following schema
     "athletes": [athlete, athlete]
 }
 ```
-* `compliance` would be of format
+* `compliance` will have the following schema:
 ```
 {
     "completed": [user, user],
@@ -1134,7 +1339,7 @@ where team has the following schema
     "training_compliance": training_compliance
 }
 ```
-* `training_compliance` will have the following schema
+* `training_compliance` will have the following schema:
 ```
 {
   "no_response": [user, user, user],
@@ -1142,7 +1347,7 @@ where team has the following schema
   "sessions_logged": [user, user]
 }
 ```
-where `user` will have the following schema
+where `user` will have the following schema:
 ```
 {
     "user_id": Uuid,
@@ -1150,7 +1355,7 @@ where `user` will have the following schema
     "last_name": string
 }
 ```
-* `daily_insights` will have the following schema
+* `daily_insights` will have the following schema:
 ```
 {
     "all_good": [user],
@@ -1162,7 +1367,7 @@ where `user` will have the following schema
 }
 ```
 
-* `weekly_insights` will have the following schema
+* `weekly_insights` will have the following schema:
 ```
 {
     "all_good": [user],
@@ -1172,24 +1377,24 @@ where `user` will have the following schema
     "not_cleared_for_training": [user, user, user]
 }
 ```
-where `user` in `daily_insights` and `weekly_insights`has the following schema
+where `user` in `daily_insights` and `weekly_insights` will have the following schema:
 ```
 {
     "user_id": Uuid,
     "first_name": string,
     "last_name": string,
-    "cleared_to_train": Boolean,
-    "color": Number
+    "cleared_to_train": boolean,
+    "color": number
 }
 ```
-* `athlete` will have the following schema
+* `athlete` will have the following schema:
 ```
 {
     "user_id": Uuid,
     "first_name": string,
     "last_name": string,
-    "cleared_to_train": Boolean,
-    "color": Number,
+    "cleared_to_train": boolean,
+    "color": number,
     "daily_recommendation": [string, string],
     "weekly_recommendation": [string, string],
     "insights': [string, string]
@@ -1374,11 +1579,11 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
-    "copy_all": Boolean
+    "copy_all": boolean
 }
 ```
 * `event_date` __should__ reflect the local date and time when the request was made
-* `cop_all` __should__ be true if trying to copy/reset data for all personas. Setting it false would only copy/reset data for the persona logged in.
+* `copy_all` __should__ be true if trying to copy/reset data for all personas. Setting it false would only copy/reset data for the persona logged in.
 
 ```
 POST /plans/version/misc/{User UUID}/copy_test_data HTTPS/1.1
@@ -1633,6 +1838,57 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 
+#### Recovery Types
+``` 
+    pre_active_rest = 0
+    post_active_rest = 1
+    warm_up = 2
+    cool_down = 3
+    functional_strength = 4
+```
+
+#### Exercise Phase Type
+```
+    inhibit = 0
+    static_stretch = 1
+    active_stretch = 2
+    dynamic_stretch = 3
+    isolated_activate = 4
+    static_integrate = 5
+```
+
+#### Legend Color
+```
+    green = 0
+    yellow = 1
+    red = 2
+    slate_x_light = 3
+    splash_light = 4
+    warning_light = 5
+    error_light = 6
+    splash_x_light = 7
+    purple_light_opacity = 8
+    splash_light_opacity = 9
+    purple_light = 10
+    slate_light = 11
+    slate = 12
+    success_light = 13
+    splash_half = 14
+    splash_xx_light = 15
+    warning_x_light = 16
+    error_x_light = 17
+    error_xx_light = 18
+    splash_m_light = 19
+    success_x_light = 20
+    success_xx_light = 21
+    warning_xx_light = 22
+    yellow_light = 23
+    yellow_x_light = 24
+    yellow_xx_light = 25
+    splash = 26
+    error = 27
+    super_light = 28
+```
 
 ### Body Part Types
 
