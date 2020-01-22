@@ -63,6 +63,7 @@ def read_config():
     with open('resource_index.json', 'r') as file:
         return json.load(file)
 
+
 def run_unit_tests():
     subprocess.check_call('python3 -m pip install --quiet --user pytest', shell=True)
     import pytest
@@ -71,8 +72,7 @@ def run_unit_tests():
     sys.path.append(working_dir)
     result = pytest.main(['-x', 'tests/mock_tests'])
     if result.value not in [0, 5]:
-        raise Exception
-    print(result, type(result))
+        raise Exception("Error running tests or Some tests failed")
 
 
 def main():
@@ -95,7 +95,6 @@ def main():
 
     print("Running Unit Tests")
     run_unit_tests()
-
 
 
 if __name__ == '__main__':
