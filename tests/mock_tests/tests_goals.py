@@ -1,6 +1,12 @@
 from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
+import os
+os.environ['ENVIRONMENT'] = 'dev'
+os.environ['SERVICE'] = 'plans'
+# os.environ['EXERCISE_LIBRARY_FILENAME'] = 'exercise_library_fathom.json'
+# os.environ['BODY_PART_MAPPING_FILENAME'] = 'body_part_mapping_fathom.json'
+
 
 from models.exercise import AssignedExercise
 from models.goal import AthleteGoalType, AthleteGoal

@@ -1,6 +1,10 @@
 from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
+from fathomapi.api.config import Config
+Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
+                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
+
 
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
@@ -274,7 +278,7 @@ def test_muscle_deconstruction_reconstruction():
     proc = InjuryRiskProcessor(now_date, [soreness, soreness_2], [], {}, AthleteStats("Tester"), "tester")
     injury_risk_dict = proc.process(aggregate_results=True)
     body_parts = list(injury_risk_dict.keys())
-    assert len(injury_risk_dict) == 4
+    assert len(injury_risk_dict) == 3
 
 # def test_inflammation_affects_load():
 #     now_date = datetime.now()

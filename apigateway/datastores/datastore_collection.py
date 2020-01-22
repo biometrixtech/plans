@@ -5,6 +5,7 @@ from datastores import sleep_history_datastore
 from datastores import cleared_soreness_datastore
 from datastores import asymmetry_datastore
 from datastores import injury_risk_datastore, hist_injury_risk_datastore
+from datastores import local_exercise_datastore
 
 
 class DatastoreCollection(object):
@@ -14,7 +15,7 @@ class DatastoreCollection(object):
         self.completed_exercise_datastore = completed_exercise_datastore.CompletedExerciseDatastore()
         self.daily_plan_datastore = daily_plan_datastore.DailyPlanDatastore()
         self.daily_readiness_datastore = daily_readiness_datastore.DailyReadinessDatastore()
-        self.exercise_datastore = exercise_datastore.ExerciseLibraryDatastore()
+        self.exercise_datastore = local_exercise_datastore.ExerciseLibraryDatastore()
         self.heart_rate_datastore = heart_rate_datastore.HeartRateDatastore()
         self.post_session_survey_datastore = post_session_survey_datastore.PostSessionSurveyDatastore()
         self.session_datastore = session_datastore.SessionDatastore()

@@ -64,9 +64,21 @@ def read_config():
         return json.load(file)
 
 
+def run_unit_tests():
+    subprocess.check_call('python3 -m pip install --quiet --user pytest', shell=True)
+    import pytest
+    os.environ['AWS_DEFAULT_REGION'] = aws_region
+    working_dir = os.getcwd()+"/apigateway"
+    sys.path.append(working_dir)
+    result = pytest.main(['-x', 'tests/mock_tests'])
+    if result.value not in [0, 5]:
+        raise Exception("Error running tests or Some tests failed")
+
+
 def main():
     os.environ['PROJECT'] = os.environ['LAMBCI_REPO'].split('/')[-1].lower()
     config = read_config()
+
 
     print("Deploying Lambda functions")
     for lambda_bundle in config['lambdas']:
@@ -80,6 +92,9 @@ def main():
     for template in config['templates']:
         local_filename = os.path.realpath(template['src'])
         upload_cf_template(local_filename, template['s3_filename'])
+
+    print("Running Unit Tests")
+    run_unit_tests()
 
 
 if __name__ == '__main__':

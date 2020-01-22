@@ -3,6 +3,9 @@ xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 import os
 os.environ['ENVIRONMENT'] = 'dev'
+os.environ['EXERCISE_LIBRARY_FILENAME'] = 'exercise_library_fathom.json'
+os.environ['BODY_PART_MAPPING_FILENAME'] = 'body_part_mapping_fathom.json'
+
 import datetime
 from logic.survey_processing import SurveyProcessing, force_datetime_iso, cleanup_sleep_data_from_api, cleanup_hr_data_from_api, create_session
 from models.soreness import Soreness
