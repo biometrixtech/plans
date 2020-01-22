@@ -1,6 +1,7 @@
 import models.exercise
 from pathlib import Path
 import csv
+import datastores.local_exercise_datastore
 
 class ExerciseLibraryDatastore(object):
 
@@ -12,83 +13,84 @@ class ExerciseLibraryDatastore(object):
 
     def side_load_exericse_list_from_csv(self, library_file='database/Exercise_Library.csv',
                                          desc_file='database/Exercise_Descriptions.tsv'):
-        exercise_descriptions = {}
-        with open(Path(__file__).resolve().parent.parent.parent / desc_file, newline='') as csvfile:
-            exercise_reader = csv.reader(csvfile, delimiter='\t')
-            row_count = 0
-            for row in exercise_reader:
-                if row_count > 0:
-                    exercise_descriptions[row[0]] = row[3]
-                row_count = row_count + 1
-        csvfile.close()
-
-        exercises = []
-        with open(Path(__file__).resolve().parent.parent.parent / library_file, newline='') as csvfile:
-            exercise_reader = csv.reader(csvfile, delimiter=',')
-            row_count = 0
-            for row in exercise_reader:
-                if row_count > 0:
-                    #if row[8] != "x" and row[26] == "x":  #now allowing integrate exercises
-                    try:
-                        exercise_item = models.exercise.Exercise(row[0])
-                        exercise_item.display_name = row[1]
-                        exercise_item.name = row[2]
-                        if row[10] in ["-", ""]:
-                            exercise_item.min_sets = 0
-                        else:
-                            exercise_item.min_sets = int(row[10])
-                        if row[11] in ["-", ""]:
-                            exercise_item.max_sets = 0
-                        else:
-                            exercise_item.max_sets = int(row[11])
-                        if row[12] in ["-", ""]:
-                            exercise_item.min_reps = None
-                        else:
-                            exercise_item.min_reps = int(row[12])
-                        if row[13] in ["-", ""]:
-                            exercise_item.max_reps = None
-                        else:
-                            exercise_item.max_reps = int(row[13])
-                        exercise_item.bilateral = (row[14] == "Y")
-                        if row[15] in ["-", ""]:
-                            exercise_item.progression_interval = 0
-                        else:
-                            exercise_item.progression_interval = int(row[15])
-                        if row[16] in ["-", ""]:
-                            exercise_item.exposure_target = 0
-                        else:
-                            exercise_item.exposure_target = int(row[16])
-                        if row[17] in ["-", ""]:
-                            exercise_item.exposure_minimum = 0
-                        else:
-                            exercise_item.exposure_minimum = int(row[17])
-                        exercise_item.unit_of_measure = row[18]
-                        if row[19] in ["-", ""]:
-                            exercise_item.seconds_rest_between_sets = 0
-                        else:
-                            exercise_item.seconds_rest_between_sets = int(row[19])
-                        if row[20] in ["-", ""]:
-                            exercise_item.seconds_per_set = None
-                        else:
-                            exercise_item.seconds_per_set = int(row[20])
-                        if row[21] in ["-", ""]:
-                            exercise_item.seconds_per_rep = None
-                        else:
-                            exercise_item.seconds_per_rep = int(row[21])
-                        exercise_item.progresses_to = row[22]
-                        exercise_item.technical_difficulty = row[24]
-                        exercise_item.equipment_required = [row[25]]
-                        exercise_item.youtube_id = None
-                    except KeyError:
-                        pass # just an empty line
-                    try:
-                        exercise_item.description = exercise_descriptions[exercise_item.id]
-                    except KeyError:
-                        print("no description")
-                        exercise_item.description = ""
-                    exercises.append(exercise_item)
-                row_count = row_count + 1
-        self.exercise_list = exercises
+        self.exercise_list = datastores.local_exercise_datastore.ExerciseLibraryDatastore().get()
+        # exercise_descriptions = {}
+        # with open(Path(__file__).resolve().parent.parent.parent / desc_file, newline='') as csvfile:
+        #     exercise_reader = csv.reader(csvfile, delimiter='\t')
+        #     row_count = 0
+        #     for row in exercise_reader:
+        #         if row_count > 0:
+        #             exercise_descriptions[row[0]] = row[3]
+        #         row_count = row_count + 1
+        # csvfile.close()
+        #
+        # exercises = []
+        # with open(Path(__file__).resolve().parent.parent.parent / library_file, newline='') as csvfile:
+        #     exercise_reader = csv.reader(csvfile, delimiter=',')
+        #     row_count = 0
+        #     for row in exercise_reader:
+        #         if row_count > 0:
+        #             #if row[8] != "x" and row[26] == "x":  #now allowing integrate exercises
+        #             try:
+        #                 exercise_item = models.exercise.Exercise(row[0])
+        #                 exercise_item.display_name = row[1]
+        #                 exercise_item.name = row[2]
+        #                 if row[10] in ["-", ""]:
+        #                     exercise_item.min_sets = 0
+        #                 else:
+        #                     exercise_item.min_sets = int(row[10])
+        #                 if row[11] in ["-", ""]:
+        #                     exercise_item.max_sets = 0
+        #                 else:
+        #                     exercise_item.max_sets = int(row[11])
+        #                 if row[12] in ["-", ""]:
+        #                     exercise_item.min_reps = None
+        #                 else:
+        #                     exercise_item.min_reps = int(row[12])
+        #                 if row[13] in ["-", ""]:
+        #                     exercise_item.max_reps = None
+        #                 else:
+        #                     exercise_item.max_reps = int(row[13])
+        #                 exercise_item.bilateral = (row[14] == "Y")
+        #                 if row[15] in ["-", ""]:
+        #                     exercise_item.progression_interval = 0
+        #                 else:
+        #                     exercise_item.progression_interval = int(row[15])
+        #                 if row[16] in ["-", ""]:
+        #                     exercise_item.exposure_target = 0
+        #                 else:
+        #                     exercise_item.exposure_target = int(row[16])
+        #                 if row[17] in ["-", ""]:
+        #                     exercise_item.exposure_minimum = 0
+        #                 else:
+        #                     exercise_item.exposure_minimum = int(row[17])
+        #                 exercise_item.unit_of_measure = row[18]
+        #                 if row[19] in ["-", ""]:
+        #                     exercise_item.seconds_rest_between_sets = 0
+        #                 else:
+        #                     exercise_item.seconds_rest_between_sets = int(row[19])
+        #                 if row[20] in ["-", ""]:
+        #                     exercise_item.seconds_per_set = None
+        #                 else:
+        #                     exercise_item.seconds_per_set = int(row[20])
+        #                 if row[21] in ["-", ""]:
+        #                     exercise_item.seconds_per_rep = None
+        #                 else:
+        #                     exercise_item.seconds_per_rep = int(row[21])
+        #                 exercise_item.progresses_to = row[22]
+        #                 exercise_item.technical_difficulty = row[24]
+        #                 exercise_item.equipment_required = [row[25]]
+        #                 exercise_item.youtube_id = None
+        #             except KeyError:
+        #                 pass # just an empty line
+        #             try:
+        #                 exercise_item.description = exercise_descriptions[exercise_item.id]
+        #             except KeyError:
+        #                 print("no description")
+        #                 exercise_item.description = ""
+        #             exercises.append(exercise_item)
+        #         row_count = row_count + 1
+        # self.exercise_list = exercises
 
     def get(self, collection='exerciselibrary'):
         return self._query_mongodb(collection)

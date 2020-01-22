@@ -85,12 +85,6 @@ class TrainingPlanManager(object):
         self.load_data(event_date)
         date = parse_date(event_date)
 
-        # historic_soreness_present = False
-        # if self.athlete_stats is None:
-        #     historic_soreness = []
-        # else:
-        #     historic_soreness = copy.deepcopy([hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()])
-        #     historic_soreness_present = len(historic_soreness) > 0
         historic_soreness = []
 
         self.soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
@@ -99,52 +93,7 @@ class TrainingPlanManager(object):
                                                                                     historic_soreness,
                                                                                     self.symptoms)
 
-        # trigger_factory = TriggerFactory(parse_date(event_date), self.athlete_stats, self.soreness_list, self.training_sessions)
-        # trigger_factory.load_triggers()
-        # self.athlete_stats.triggers = trigger_factory.triggers
         historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
-
-        # relative_load_level = 3
-        # two_days_ago = (parse_date(event_date) - datetime.timedelta(days=1)).date()
-        #
-        # # check workload for relative load level
-        # if len(athlete_stats.high_relative_load_sessions) > 0:
-        #
-        #     max_percent = 49.9
-        #
-        #     relevant_high_load_sessions = [s for s in athlete_stats.high_relative_load_sessions if s.date.date()
-        #                                    >= two_days_ago]
-        #     if len(relevant_high_load_sessions) > 0:
-        #
-        #         for r in relevant_high_load_sessions:
-        #             if r.percent_of_max is not None:
-        #                 max_percent = max(r.percent_of_max, max_percent)
-        #
-        #     if max_percent >= 75.0:
-        #         relative_load_level = 1
-        #     elif max_percent >= 50.0:
-        #         relative_load_level = 2
-        #
-        #  # check RPE for relative load level
-        # # Low
-        # # RPE <= 1 and self.ultra_high_intensity_session
-        # # RPE <= 3 and not self.ultra_high_intensity_session():
-        # # Mod
-        # # RPE >= 3 and self.ultra_high_intensity_session
-        # # RPE >= 5 and not self.ultra_high_intensity_session():
-        # # High
-        # # RPE >= 5 and self.ultra_high_intensity_session
-        # # RPE >= 7 and not self.ultra_high_intensity_session():
-        # relevant_training_sessions = [s for s in self.daily_plan.training_sessions if s.event_date.date()
-        #                                    >= two_days_ago]
-        #
-        # for r in relevant_training_sessions:
-        #     high_intensity_session = r.ultra_high_intensity_session()
-        #     if r.session_RPE is not None:
-        #         if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
-        #             relative_load_level = 1
-        #         elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
-        #             relative_load_level = 2
 
         injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions,
                                                     historical_injury_risk_dict, self.athlete_stats,
@@ -152,48 +101,6 @@ class TrainingPlanManager(object):
         aggregated_injury_risk_dict = injury_risk_processor.process(aggregate_for_viz=True)
 
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
-
-        # body_part_factory = BodyPartFactory()
-        #
-        # for body_part_side, body_part_injury_risk in aggregated_injury_risk_dict.items():
-        #     body_part = body_part_factory.get_body_part(body_part_side)
-        #     if body_part not in consolidated_injury_risk_dict:
-        #         consolidated_injury_risk_dict[body_part] = copy.deepcopy(body_part_injury_risk)
-        #     else:
-        #         consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
-
-        # save this for later
-        #
-        # detailed_dict = injury_risk_processor.injury_risk_dict
-        #
-        # functional_movement_stats = {}
-        #
-        # for body_part_side, body_part_inury_risk in detailed_dict.items():
-        #     functional_movement_stats[body_part_side] = FunctionalMovementSummary()
-        #
-        # for body_part_side, body_part_inury_risk in detailed_dict.items():
-        #     today_volume_today = detailed_dict[body_part_side].total_volume_today()
-        #     if today_volume_today > 0:
-        #         functional_movement_stats[body_part_side].percent_total_volume_compensating = detailed_dict[body_part_side].compensating_volume_today() / today_volume_today
-        #     eccentric_volume_today = detailed_dict[body_part_side].eccentric_volume_today()
-        #     if eccentric_volume_today > 0:
-        #         functional_movement_stats[body_part_side].percent_eccentric_volume_compensating = detailed_dict[
-        #                                                                                           body_part_side].compensating_volume_today() / eccentric_volume_today
-        #     for c in detailed_dict[body_part_side].compensating_causes_volume_today:
-        #         functional_movement_stats[c].caused_compensation_count += 1
-        #
-        # percent_total_compensating_list = sorted(functional_movement_stats.items(), key=lambda x:x[1].percent_total_volume_compensating, reverse=True)
-        # percent_eccentric_compensating_list = sorted(functional_movement_stats.items(), key=lambda x:x[1].percent_eccentric_volume_compensating, reverse=True)
-        # compensation_count = sorted(functional_movement_stats.items(),
-        #                                              key=lambda x: x[1].caused_compensation_count,
-        #                                              reverse=True)
-        # compensation_count_eccentric = sorted(functional_movement_stats.items(),
-        #                             key=lambda x: (x[1].caused_compensation_count, x[1].percent_eccentric_volume_compensating),
-        #                             reverse=True)
-        #
-        # body_part_ranking = sorted(functional_movement_stats.items(),
-        #                             key=lambda x: (x[0].body_part_location.value,x[0].side),
-        #                             reverse=False)
 
         if visualizations:
                 trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date),

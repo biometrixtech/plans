@@ -1,3 +1,4 @@
+import os
 from models.modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining
 from models.soreness import Soreness
 from models.soreness_base import HistoricSorenessStatus, BodyPartLocation

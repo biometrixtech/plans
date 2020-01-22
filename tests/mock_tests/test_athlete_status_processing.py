@@ -1,3 +1,7 @@
+from fathomapi.api.config import Config
+Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
+                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
+
 import datetime
 from logic.athlete_status_processing import AthleteStatusProcessing
 from models.soreness import Soreness

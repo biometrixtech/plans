@@ -1,3 +1,7 @@
+from fathomapi.api.config import Config
+Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
+                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
+
 import pytest
 import logic.exercise_mapping as exercise_mapping
 import models.session as session
@@ -19,14 +23,14 @@ def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def recovery_session(soreness_list, target_minutes, max_severity):
     target_recovery_session = session.RecoverySession()
     target_recovery_session.set_exercise_target_minutes(soreness_list, target_minutes, max_severity)
     return target_recovery_session
 
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def soreness_one_body_part(body_enum, severity_score, treatment_priority=1):
     soreness_list = []
     soreness_item = Soreness()
@@ -37,7 +41,7 @@ def soreness_one_body_part(body_enum, severity_score, treatment_priority=1):
     soreness_list.append(soreness_item)
     return soreness_list
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def pain_one_body_part(body_enum, severity_score, treatment_priority=1):
     soreness_list = []
     soreness_item = Soreness()
@@ -49,7 +53,7 @@ def pain_one_body_part(body_enum, severity_score, treatment_priority=1):
     soreness_list.append(soreness_item)
     return soreness_list
 
-@pytest.fixture(scope="module")
+# @pytest.fixture(scope="module")
 def soreness_two_body_parts(body_enum_1, severity_score_1, body_enum_2, severity_score_2,
                             treatment_priority_1=1, treatment_priority_2=1):
     soreness_list = []

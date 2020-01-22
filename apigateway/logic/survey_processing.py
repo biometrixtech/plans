@@ -76,6 +76,7 @@ class SurveyProcessing(object):
         ignored = session.get("ignored", False)
         apple_health_kit_ids = session.get("merged_apple_health_kit_ids", [])
         apple_health_kit_source_names = session.get("merged_apple_health_kit_source_names", [])
+        workout_program_module = session.get("workout_program_module", None)
 
         duration_health = None
         if source == 1:
@@ -97,7 +98,8 @@ class SurveyProcessing(object):
                         "merged_apple_health_kit_ids": apple_health_kit_ids,
                         "merged_apple_health_kit_source_names": apple_health_kit_source_names,
                         "apple_health_kit_id": apple_health_kit_id,
-                        "apple_health_kit_source_name": apple_health_kit_source_name}
+                        "apple_health_kit_source_name": apple_health_kit_source_name,
+                        "workout_program_module": workout_program_module}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
