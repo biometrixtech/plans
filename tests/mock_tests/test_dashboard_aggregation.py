@@ -1,9 +1,9 @@
 from aws_xray_sdk.core import xray_recorder
 xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
-# import os
-# os.environ['EXERCISE_LIBRARY_FILENAME'] = 'exercise_library_fathom.json'
-# os.environ['BODY_PART_MAPPING_FILENAME'] = 'body_part_mapping_fathom.json'
+from fathomapi.api.config import Config
+Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
+                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
 
 
 from models.metrics import AthleteMetric, MetricColor, WeeklyHighLevelInsight, DailyHighLevelInsight, MetricType, SpecificAction
