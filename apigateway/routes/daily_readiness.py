@@ -72,6 +72,10 @@ def handle_daily_readiness_create(user_id):
         train_later = False
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         sessions_planned = True
+        # enable the forcing of a post_active_rest modality prior to the workout
+        if 'sessions_planned' in request.json and not request.json['sessions_planned']:
+            sessions_planned = False
+            train_later = False
         for session in request.json['sessions']:
             if session is None:
                 continue
