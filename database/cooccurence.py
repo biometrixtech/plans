@@ -27,7 +27,6 @@ def generate_co_occurrence_matrix(corpus, text_data):
                 else:
                     bigram_freq_dict[bi_gram] = 1
 
-
     # Frequency distribution of bigrams ((word1, word2), num_occurrences)
     # bigram_freq = nltk.FreqDist(bi_grams).most_common(len(bi_grams))
 
