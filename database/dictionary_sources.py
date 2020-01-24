@@ -53,7 +53,7 @@ def get_direction_of_movement_dictionary():
     dict["movement direction - axis: lateral"] = ["lateral", "medial"]
     dict["movement direction - axis: horizontal"] = ["horizontal", "anterior", "posterior"]
     dict["movement direction - axis: rotational"] = ["rotations-", "extension-rotation", "rotation", "rotational", "w/rotation"]
-    
+
     return dict
 
 
