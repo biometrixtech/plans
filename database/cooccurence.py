@@ -1,4 +1,3 @@
-
 import numpy as np
 # import nltk
 # from nltk import bigrams
@@ -26,7 +25,6 @@ def generate_co_occurrence_matrix(corpus, text_data):
                     bigram_freq_dict[bi_gram] += 1
                 else:
                     bigram_freq_dict[bi_gram] = 1
-
 
     # Frequency distribution of bigrams ((word1, word2), num_occurrences)
     # bigram_freq = nltk.FreqDist(bi_grams).most_common(len(bi_grams))
@@ -56,7 +54,7 @@ def generate_co_occurrence_matrix(corpus, text_data):
 def cleanup_word(word):
     word = word.lower()
     if word[-1] == 's':
-        if word not in ['press', 'across', 'legless']:
+        if word not in ['press', 'across', 'legless', 'bench-press']:
             word = word[0:-1]
     if word == 'bb':
         word = 'barbell'
@@ -64,32 +62,32 @@ def cleanup_word(word):
         word = 'kettlebell'
     if word == 'db':
         word = 'dumbbell'
-    if word == 'lunges':
-        word = 'lunge'
-    if word == 'squats':
-        word = 'squat'
-    if word == 'squats':
-        word = 'squat'
-    if word == 'pulls':
-        word = 'pull'
+    # if word == 'lunges':
+    #     word = 'lunge'
+    # if word == 'squats':
+    #     word = 'squat'
+    # if word == 'squats':
+    #     word = 'squat'
+    # if word == 'pulls':
+    #     word = 'pull'
     if word == 'w/':
         word = 'with'
-    if word == 'push-ups':
-        word = 'push-up'
-    if word == 'pull-ups':
-        word = 'pull-up'
-    if word == 'curls':
-        word = 'curl'
-    if word == 'deadlifts':
-        word = 'deadlift'
-    if word == 'extensions':
-        word = 'extension'
-    if word == 'step-ups':
-        word = 'step-up'
-    if word == 'get-ups':
-        word = 'get-up'
-    if word == 'hands':
-        word = 'hand'
+    # if word == 'push-ups':
+    #     word = 'push-up'
+    # if word == 'pull-ups':
+    #     word = 'pull-up'
+    # if word == 'curls':
+    #     word = 'curl'
+    # if word == 'deadlifts':
+    #     word = 'deadlift'
+    # if word == 'extensions':
+    #     word = 'extension'
+    # if word == 'step-ups':
+    #     word = 'step-up'
+    # if word == 'get-ups':
+    #     word = 'get-up'
+    # if word == 'hands':
+    #     word = 'hand'
 
     return word
 
