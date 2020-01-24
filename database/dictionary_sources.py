@@ -1,9 +1,9 @@
 def get_equipment_dictionary():
 
     equipment_dict = {}
-    equipment_dict["equipment: barbells"] = ["barbells", "barbell", "w/barbell"]
-    equipment_dict["equipment: dumbbells"] = ["dumbbells", "dumbbell", "dumbell", "kettlebell/dumbbell"]
-    equipment_dict["equipment: kettlebells"] = ["kettlebells", "kettlebell", "kettlebell/dumbbell"]
+    equipment_dict["equipment: barbells"] = ["barbells", "barbell", "w/barbell", "bb"]
+    equipment_dict["equipment: dumbbells"] = ["dumbbells", "dumbbell", "dumbell", "kettlebell/dumbbell", "db"]
+    equipment_dict["equipment: kettlebells"] = ["kettlebells", "kettlebell", "kettlebell/dumbbell", "kb"]
     equipment_dict["equipment: sandbags"] = ["sandbags", "sandbag", "sandbag-"]
     equipment_dict["equipment: atlas stones"] = ["atlas stones", "atlas stone", "stone"]
     equipment_dict["equipment: yoke"] = ["yoke"]
@@ -30,10 +30,10 @@ def get_body_position_dictionary():
 
     dict = {}
 
-    dict["body position: supine"] = ["supine", "supinated", "(supine)", "row-supinated"]
+    dict["body position: supine"] = ["supine", "supinated", "\(supine\)", "row-supinated"]
     dict["body position: prone"] = ["prone", "(prone)", "row-pronated", "pronated"]
-    dict["body position: side lying"] = ["sidelying", "side lying"]
-    dict["body position: kneeling"] = ["kneeling", "(kneeling", "half-kneeling"]
+    dict["body position: side lying"] = ["sidelying", "side lying", "side-lying"]
+    dict["body position: kneeling"] = ["kneeling", "\(kneeling", "half-kneeling"]
     dict["body position: double leg standing"] = ["double leg"]
     dict["body position: split leg standing"] = ["split leg"]
     dict["body position: single leg standing"] = ["single leg"]
@@ -57,3 +57,42 @@ def get_direction_of_movement_dictionary():
     return dict
 
 
+def get_basic_execise_dictionary():
+
+    dict = {
+                    "basic_exercise: push-ups": ["push up", "push ups", "push-up", "push-ups"],
+                    "basic_exercise: pull-ups": ["pull up", "pull ups", "pull-up", "pull-ups"],
+                    "basic_exercise: box jumps": ["box jump", "box jumps", "box-jump", "box-jumps"],
+                    "basic_exercise: depth jumps": ["depth jump", "depth jumps", "depth-jump", "depth-jumps"],
+                    "basic_exercise: dips": ["dip", "dips"],
+                    "basic_exercise: broad jumps": ["broad jump", "broad jumps", "broad-jump", "broad-jumps"],
+                    "basic_exercise: vertical jumps": ["vertical jump", "vertical jumps", "vertical-jump", "vertical-jumps"],
+                    "basic_exercise: bench press": ["bench press", "bench presses"],
+                    "basic_exercise: step-up": ["step-ups", "step-up", "step up", "step ups"],
+                    "basic_exercise: carry": ["carry", "carries", "carrys"],
+    }
+    return dict
+
+
+def get_olympic_lift_dictionary():
+    dict = {
+                    "olympic_lift: hang clean": ["hang clean", "hang cleans", "hang-clean", "hang-cleans"],
+                    "olympic_lift: power clean": ["power clean", "power cleans", "power-clean", "power-cleans"],
+                    "olympic_lift: push press": ["push press", "push-press", "push presses", "push-presses"],
+                    "olympic_lift: clean and press": ["clean and press", "clean press", "clean and presses", "clean and presses"],
+                    "olympic_lift: deadlift": ["deadlift", "deadlifts"],
+                    "olympic_lift: snatch": ["snatch", "snatches"],
+                    "olympic_lift: romanian deadlift": ["romanian deadlift", "romanian deadlifts", "rdl", "rdls"],
+                    "olympic_lift: clean and jerk": ["clean and jerk", "clean jerk", "clean and jerks", "clean and jerks"]
+    }
+    return dict
+
+
+def get_all_dict():
+    all_dicts = {}
+    all_dicts.update(get_basic_execise_dictionary())
+    all_dicts.update(get_olympic_lift_dictionary())
+    all_dicts.update(get_equipment_dictionary())
+    all_dicts.update(get_body_position_dictionary())
+    all_dicts.update(get_direction_of_movement_dictionary())
+    return all_dicts
