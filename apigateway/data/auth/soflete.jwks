@@ -1,0 +1,13 @@
+{
+    "keys": [
+        {
+            "kty": "RSA",
+            "e": "AQAB",
+            "use": "sig",
+            "kid": "soflete_001",
+            "alg": "RS256",
+            "n": "nXpxcX2T-ue2ANHjmsfN7GE2ymRm3sIPj82Tz8ERQKQkekDYBrboByjJ0RHGLJkB7rICaCTZqYU41Ygiy5t3K7JZrEKgkEvIaNHKfBe3tAAETEbs5775LqFzmu-IjfdIiW-tMUJksPFfnaHXqAsOSCFd5g4unBFkeK-x_z-SPYsCop9y98yCzLe8n4IwUnBhINvjjB0NllK6ISCPizwvtorpilCaC3XESBKVSXv_gNQ-ryvGCrTS5E8P5m_UcxUArZ5SAYZKbEYrreZuIfd-D3ou7Yn7_0v_jPKB6FDxtAYa72F_M6or9VfOQoV945IBdu7RuuSKNnGh20ZDj65ZOQ",
+            "_env": ["soflete-test"]
+        }
+    ]
+}
