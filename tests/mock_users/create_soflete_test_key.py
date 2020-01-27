@@ -4,7 +4,7 @@ import calendar
 import time
 import cryptography
 import os
-os.environ['ENVIRONMENT'] = 'dev'
+os.environ['ENVIRONMENT'] = 'soflete-test'
 from tests.mock_users.aws_jwt import get_secret
 
 
