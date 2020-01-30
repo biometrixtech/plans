@@ -31,5 +31,6 @@ for name, tags in mov_tags_dict.items():
     # tags_pd = tags_pd.append(pd.Series(mov_dict), ignore_index=True)
 # tags_pd.to_csv('movement_tags.csv', index=False)
 tags_pd_2 = pd.DataFrame(move_dict_list)
-tags_pd_2.to_csv('movement_tags_2.csv', index=False)
+combined = pd.concat([movements_pd, tags_pd_2], axis=1, sort=False)
+combined.to_csv('soflete_movements_tagged_new.csv', columns=['id', 'name', 'youtube_link', 'tags'], index=False)
 print('here')
