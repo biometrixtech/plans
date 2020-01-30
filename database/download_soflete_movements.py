@@ -30,27 +30,29 @@ def get_soflete_movements():
         movement = {}
         movement['id'] = mov['_id']
         movement['name'] = mov['name']
-        movement['summary'] = mov.get('summary', '')
-        instructions = []
-        if mov.get('instructions') is not None and mov.get('instructions').get('blocks') is not None:
-            for block in mov['instructions']['blocks']:
-                instructions.append(block['text'])
-        movement['instructions'] = ",".join(instructions)
+        # movement['summary'] = mov.get('summary', '')
+        movement['youtube_link'] = mov.get('url', '')
+        # instructions = []
+        # if mov.get('instructions') is not None and mov.get('instructions').get('blocks') is not None:
+        #     for block in mov['instructions']['blocks']:
+        #         instructions.append(block['text'])
+        # movement['instructions'] = ",".join(instructions)
         all_movements.append(movement)
     movements_pd = pd.DataFrame(all_movements)
-    movements_pd.to_csv('soflete_movements.csv')
+    movements_pd.to_csv('soflete_movements.csv', columns=['id', 'name', 'youtube_link'])
 
 
 def get_soflete_exercises():
     database = get_mongo_database()
     collection = database['exercises']
-    cursor = list(collection.find({}, {'name': 1, "_movement": 1}))
+    cursor = list(collection.find({}, {'name': 1, "_movement": 1, 'baseYLabel': 1}))
     all_exercises = []
     for cur in cursor:
         exercise = {}
         exercise['id'] = cur['_id']
         exercise['name'] = cur['name']
         exercise['movement'] = cur.get('_movement')
+        exercise['base_y_label'] = cur.get('baseYLabel', "")
        
         all_exercises.append(exercise)
     exercises_pd = pd.DataFrame(all_exercises)
@@ -77,5 +79,5 @@ def get_soflete_sections():
 
 if __name__ == '__main__':
     # get_soflete_movements()
-    get_soflete_sections()
-    # get_soflete_exercises()
+    # get_soflete_sections()
+    get_soflete_exercises()
