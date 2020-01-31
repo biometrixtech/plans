@@ -1,5 +1,5 @@
 from serialisable import Serialisable
-from models.movement_tags import AdaptationType, BodyPosition, MovementAction, TrainingType
+from models.movement_tags import AdaptationType, BodyPosition, MovementAction, TrainingType, Equipment
 
 
 class WorkoutProgramModule(Serialisable):
@@ -158,10 +158,11 @@ class Movement(Serialisable):
     def __init__(self, id, name):
         self.id = id
         self.name = name
-
+        self.adaptation_type = None
         self.body_position = None
         self.movement_action = None
         self.training_type = None
+        self.equipment = None
         self.explosive = 0
 
     def json_serialise(self):
@@ -171,6 +172,7 @@ class Movement(Serialisable):
             'body_position': self.body_position.value if self.body_position is not None else None,
             'movement_action': self.movement_action.value if self.movement_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
+            'equipment': self.equipment.value if self.equipment is not None else None,
             'explosive': self.explosive
         }
         return ret
@@ -184,6 +186,7 @@ class Movement(Serialisable):
         movement.movement_action = MovementAction(input_dict['movement_action']) if input_dict.get(
             'movement_action') is not None else None
         movement.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
+        movement.equipment = Equipment(input_dict['equipment']) if input_dict.get('equipment') is not None else None
         movement.explosive = input_dict.get('explosive', 0)
 
         return movement
