@@ -128,11 +128,11 @@ class WorkoutExercise(Serialisable):
         if self.unit_of_measure == UnitOfMeasure.count:
             return self.reps_per_set * self.sets
         elif self.unit_of_measure == UnitOfMeasure.yards:
-            return 5 * self.reps_per_set * self.sets
+            return (self.reps_per_set * self.sets) / 5
         elif self.unit_of_measure == UnitOfMeasure.meters:
-            return 5 * self.reps_per_set * self.sets
+            return (self.reps_per_set * self.sets) / 5
         elif self.unit_of_measure == UnitOfMeasure.feet:
-            return 15 * self.reps_per_set * self.sets
+            return (self.reps_per_set * self.sets) / 15
         else:
             return 0
 

@@ -143,18 +143,18 @@ def test_get_training_volume_reps_sets():
 
 def test_get_training_volume_reps_sets_yards():
     workout_exercise = WorkoutExercise()
-    workout_exercise.reps_per_set = 5
+    workout_exercise.reps_per_set = 50
     workout_exercise.sets = 2
     workout_exercise.unit_of_measure = UnitOfMeasure.yards
 
-    assert workout_exercise.get_training_volume() == 50
+    assert workout_exercise.get_training_volume() == 20
 
 
 def test_get_training_volume_reps_sets_feet():
     workout_exercise = WorkoutExercise()
-    workout_exercise.reps_per_set = 5
+    workout_exercise.reps_per_set = 150
     workout_exercise.sets = 2
     workout_exercise.unit_of_measure = UnitOfMeasure.feet
 
-    assert workout_exercise.get_training_volume() == 150
+    assert workout_exercise.get_training_volume() == 20
 
