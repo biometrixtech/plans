@@ -290,6 +290,10 @@ def find_weighted_exercises_and_movements():
                     else:
                         columns["z_unweighted_actual"] = 0
                     weight_list.append(columns)
+                    if row[2] != "0.0" and "Actual" in row[1] and ('lbs' in metric_label or columns["x_rep_max"] == 0):
+                        columns["z_weighted_actual_lbs"] = 1
+                    else:
+                        columns["z_weighted_actual_lbs"] = 0
 
         weight_pd = pd.DataFrame(weight_list)
         weight_pd.to_csv('soflete_weighted_movements.csv')
