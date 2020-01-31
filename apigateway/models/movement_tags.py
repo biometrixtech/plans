@@ -7,16 +7,17 @@ class TrainingType(Enum):
     core = 2
     balance = 3
     plyometrics = 4
-    speed_agility_quickness = 5
-    integrated_resistance = 6
-    olympic_lifting = 7
-    skill_development = 8
+    plyometrics_drills = 5
+    speed_agility_quickness = 6
+    integrated_resistance = 7
+    olympic_lifting = 8
+    skill_development = 9
 
 
 class AdaptationType(Enum):
     not_tracked = None
-    strength_indurance_cardiorespiratory = 1
-    strength_indurance_strength = 2
+    strength_endurance_cardiorespiratory = 1
+    strength_endurance_strength = 2
     maximal_strength_hypertrophic = 3
     power_explosive_action = 4
     power_drill = 5
