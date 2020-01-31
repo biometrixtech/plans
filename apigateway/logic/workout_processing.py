@@ -16,29 +16,29 @@ class WorkoutProcessor(object):
 
 class MovementProcessor(object):
 
-    def get_adaptation_type_from_training_type(self, training_type, exericse_intensity):
+    def get_adaptation_type(self, movement):
 
-        if training_type == TrainingType.flexibility:
+        if movement.training_type == TrainingType.flexibility:
             return AdaptationType.not_tracked
-        elif training_type == TrainingType.cardiorespiratory:
+        elif movement.training_type == TrainingType.cardiorespiratory:
             return AdaptationType.strength_endurance_cardiorespiratory
-        elif training_type == TrainingType.core:
+        elif movement.training_type == TrainingType.core:
             return AdaptationType.strength_endurance_strength
-        elif training_type == TrainingType.balance:
+        elif movement.training_type == TrainingType.balance:
             return AdaptationType.strength_endurance_strength
-        elif training_type == TrainingType.plyometrics:
+        elif movement.training_type == TrainingType.plyometrics:
             return AdaptationType.power_explosive_action
-        elif training_type == TrainingType.plyometrics_drills:
+        elif movement.training_type == TrainingType.plyometrics_drills:
             return AdaptationType.power_drill
-        elif training_type == TrainingType.speed_agility_quickness:
+        elif movement.training_type == TrainingType.speed_agility_quickness:
             return AdaptationType.power_drill
-        elif training_type == TrainingType.integrated_resistance:
-            if exericse_intensity >= 75:
+        elif movement.training_type == TrainingType.integrated_resistance:
+            if movement.intensity >= 75:
                 return AdaptationType.maximal_strength_hypertrophic
             else:
                 return AdaptationType.strength_endurance_strength
-        elif training_type == TrainingType.olympic_lifting:
-            if exericse_intensity >= 75:
+        elif movement.training_type == TrainingType.olympic_lifting:
+            if not movement.explosive:
                 return AdaptationType.maximal_strength_hypertrophic
             else:
                 return AdaptationType.power_explosive_action
