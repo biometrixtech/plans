@@ -176,22 +176,124 @@ def analyze_exercises():
         total_count = -1
         max_count = 0
         how_set = set()
+        lbs_set = set()
+        max_set = set()
+        rm_set = set()
         for row in csv_reader:
             total_count += 1
-            if 'MAX' in row[1]:
-                max_count += 1
+            if 'RM' in row[4] or 'Rep Max' in row[4] or 'Rep max' in row[4] or 'rep max' in row[4] or 'rep mx' in row[4]:
+                rm_count += 1
+                rm_set.add(row[4])
             elif 'lbs' in row[4]:
                 lbs_count += 1
-            elif 'RM' in row[4] or 'Rep Max' in row[4] or 'Rep max' in row[4] or 'rep max' in row[4] or 'rep mx' in row[4]:
-                rm_count += 1
+                lbs_set.add(row[4])
+
+            elif 'MAX' in row[1]:
+                max_count += 1
+                max_set.add(row[4])
+
             else:
                 if len(row[4]) > 0:
                     how_set.add(row[4])
                 other_count += 1
 
         how_list = list(how_set)
+        lbs_list = list(lbs_set)
+        max_list = list(max_set)
+        rm_list = list(rm_set)
 
-        j=0
+        how_pd = pd.DataFrame(how_list)
+        how_pd.to_csv('soflete_exercises_other.csv')
+        lbs_pd = pd.DataFrame(lbs_list)
+        lbs_pd.to_csv('soflete_exercises_lbs.csv')
+        max_pd = pd.DataFrame(max_list)
+        max_pd.to_csv('soflete_exercises_max.csv')
+        rep_max_pd = pd.DataFrame(rm_list)
+        rep_max_pd.to_csv('soflete_exercises_rep_max.csv')
+
+
+def find_weighted_exercises_and_movements():
+
+    weight_list = []
+
+    soflete_movement_dictionary = {}
+    with open('soflete_movements.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        count = 0
+        for row in csv_reader:
+            if count > 1:
+                soflete_movement_dictionary[row[1]] = row[3]
+            count += 1
+
+    exercise_movement_dictionary = {}
+    exercise_metric_label_dictionary = {}
+    with open('soflete_exercises_detailed.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        count = 0
+        for row in csv_reader:
+            if count > 1:
+                exercise_movement_dictionary[row[3]] = row[5]
+                exercise_metric_label_dictionary[row[3]] = row[4]
+
+            count += 1
+
+    with open('soflete_exercise_metrics.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            if "Weight" in row[1] or "weight" in row[1]:
+                columns = {}
+                columns["exercise_id"] = row[3]
+                columns["exercise_name"] = row[4]
+                if row[3] in exercise_movement_dictionary:
+                    columns["movement_id"] = exercise_movement_dictionary[row[3]]
+                    if columns["movement_id"] in soflete_movement_dictionary:
+                        columns["movement_name"] = soflete_movement_dictionary[columns["movement_id"]]
+                    columns["weight_label"] = row[1]
+                    columns["weight_value"] = row[2]
+                    metric_label = exercise_metric_label_dictionary[row[3]]
+                    columns["metric_label"] = metric_label
+                    if 'RM' in metric_label or 'Rep Max' in metric_label or 'Rep max' in metric_label or 'rep max' in metric_label or 'rep mx' in metric_label:
+                        columns["x_rep_max"] = 1
+                    else:
+                        columns["x_rep_max"] = 0
+                    if 'lbs' in metric_label:
+                        columns["x_lbs"] = 1
+                    else:
+                        columns["x_lbs"] = 0
+                    if 'Bodyweight' in metric_label or 'body weight' in metric_label or 'bodyweight' in metric_label:
+                        columns["x_body_weight"] = 1
+                    else:
+                        columns["x_body_weight"] = 0
+                    if columns['x_rep_max'] == 0 and columns["x_lbs"] == 0 and columns["x_body_weight"] == 0:
+                        columns["x_x_other"] = 1
+                    else:
+                        columns["x_x_other"] = 0
+                    column_sum = columns["x_rep_max"] + columns["x_lbs"] + columns["x_body_weight"]
+                    if column_sum > 1:
+                        columns["x_x_multiple"] = 1
+                    else:
+                        columns["x_x_multiple"] = 0
+                    if "Actual" in row[1]:
+                        columns["y_actual"] = 1
+                    else:
+                        columns["y_actual"] = 0
+                    if "RM" in row[1]:
+                        columns["y_rep_max"] = 1
+                    else:
+                        columns["y_rep_max"] = 0
+                    if "%" in row[1]:
+                        columns["y_body_weight"] = 1
+                    else:
+                        columns["y_body_weight"] = 0
+                    if row[2] == "0.0" and "Actual" in row[1]:
+                        columns["z_unweighted_actual"] = 1
+                    else:
+                        columns["z_unweighted_actual"] = 0
+                    weight_list.append(columns)
+
+        weight_pd = pd.DataFrame(weight_list)
+        weight_pd.to_csv('soflete_weighted_movements.csv')
+
 
 if __name__ == '__main__':
     # get_soflete_movements()
@@ -199,4 +301,5 @@ if __name__ == '__main__':
     # get_soflete_exercises()
     #get_soflete_exercises_detailed()
     #get_soflete_user_exercises()
-    analyze_exercises()
+    #analyze_exercises()
+    find_weighted_exercises_and_movements()
