@@ -33,7 +33,7 @@ class MovementAction(Enum):
     cut = 6
     row = 7
     cycle = 8
-    skierg = 9
+    ski_erg = 9
     swim_freestyle = 10
     ruck = 11
     run = 12
@@ -53,3 +53,25 @@ class BodyPosition(Enum):
     staggered_leg_standing = 10
     single_leg_standing = 11
     non_stationary = 12
+
+
+class Equipment(Enum):
+    no_equipment = 0
+    rower = 1
+    airbike = 2
+    bike = 3
+    ski_erg = 4
+    swimming = 5
+    ruck = 6
+    barbells = 7
+    dumbbells = 8
+    kettlebells = 9
+    sandbags = 10
+    atlas_stones = 11
+    yoke = 12
+    dip_belt = 13
+    medicine_balls = 14
+    sled = 15
+    farmers_carry_handles = 16
+    resistence_bands = 17
+    machine = 18
