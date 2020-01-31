@@ -1,5 +1,6 @@
 from models.workout_program import Movement, WorkoutExercise
 from models.movement_tags import AdaptationType, TrainingType
+from models.exercise import UnitOfMeasure
 
 
 def test_training_type_flexibility():
@@ -118,4 +119,42 @@ def test_training_type_olympic_lifting_low():
     workout_exercise.process_movement(movement)
 
     assert workout_exercise.adaptation_type == AdaptationType.maximal_strength_hypertrophic
+
+
+def test_get_training_volume_reps():
+
+    workout_exercise = WorkoutExercise()
+    workout_exercise.reps_per_set = 5
+    workout_exercise.unit_of_measure = UnitOfMeasure.count
+    workout_exercise.sets = 1
+
+    assert workout_exercise.get_training_volume() == 5
+
+
+def test_get_training_volume_reps_sets():
+
+    workout_exercise = WorkoutExercise()
+    workout_exercise.reps_per_set = 5
+    workout_exercise.sets = 2
+    workout_exercise.unit_of_measure = UnitOfMeasure.count
+
+    assert workout_exercise.get_training_volume() == 10
+
+
+def test_get_training_volume_reps_sets_yards():
+    workout_exercise = WorkoutExercise()
+    workout_exercise.reps_per_set = 5
+    workout_exercise.sets = 2
+    workout_exercise.unit_of_measure = UnitOfMeasure.yards
+
+    assert workout_exercise.get_training_volume() == 50
+
+
+def test_get_training_volume_reps_sets_feet():
+    workout_exercise = WorkoutExercise()
+    workout_exercise.reps_per_set = 5
+    workout_exercise.sets = 2
+    workout_exercise.unit_of_measure = UnitOfMeasure.feet
+
+    assert workout_exercise.get_training_volume() == 150
 
