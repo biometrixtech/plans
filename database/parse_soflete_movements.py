@@ -3,7 +3,7 @@ from models.workout_program import Movement
 from movement_tags import *
 import os, json
 
-movements_pd = pd.read_csv('soflete_movements.csv', keep_default_na=False)
+movements_pd = pd.read_csv('soflete_movements_library.csv', keep_default_na=False)
 
 movements = []
 
