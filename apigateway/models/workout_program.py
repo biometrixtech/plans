@@ -110,6 +110,7 @@ class Movement(Serialisable):
         self.training_type = None
 
         self.explosive = False
+        self.intensity = None
 
     def json_serialise(self):
         ret = {
@@ -117,7 +118,8 @@ class Movement(Serialisable):
             'body_position': self.body_position.value if self.body_position is not None else None,
             'movement_action': self.movement_action.value if self.movement_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
-            'explosive': self.explosive
+            'explosive': self.explosive,
+            'intensity': self.intensity if self.intensity is not None else None
         }
         return ret
 
@@ -132,5 +134,6 @@ class Movement(Serialisable):
             'movement_action') is not None else None
         movement.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
         movement.explosive = input_dict.get('explosive', False)
+        movement.intensity = input_dict.get('intensity')
 
         return movement
