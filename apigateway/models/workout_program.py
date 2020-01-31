@@ -129,31 +129,29 @@ class WorkoutExercise(Serialisable):
     def set_adaption_type(self, movement):
 
         if movement.training_type == TrainingType.flexibility:
-            return AdaptationType.not_tracked
+            self.adaptation_type = AdaptationType.not_tracked
         elif movement.training_type == TrainingType.cardiorespiratory:
-            return AdaptationType.strength_endurance_cardiorespiratory
+            self.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
         elif movement.training_type == TrainingType.core:
-            return AdaptationType.strength_endurance_strength
+            self.adaptation_type = AdaptationType.strength_endurance_strength
         elif movement.training_type == TrainingType.balance:
-            return AdaptationType.strength_endurance_strength
+            self.adaptation_type = AdaptationType.strength_endurance_strength
         elif movement.training_type == TrainingType.plyometrics:
-            return AdaptationType.power_explosive_action
+            self.adaptation_type = AdaptationType.power_explosive_action
         elif movement.training_type == TrainingType.plyometrics_drills:
-            return AdaptationType.power_drill
+            self.adaptation_type = AdaptationType.power_drill
         elif movement.training_type == TrainingType.speed_agility_quickness:
-            return AdaptationType.power_drill
+            self.adaptation_type = AdaptationType.power_drill
         elif movement.training_type == TrainingType.integrated_resistance:
             if self.intensity_pace >= 75:
-                return AdaptationType.maximal_strength_hypertrophic
+                self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
-                return AdaptationType.strength_endurance_strength
+                self.adaptation_type = AdaptationType.strength_endurance_strength
         elif movement.training_type == TrainingType.olympic_lifting:
             if movement.explosive < 2:
-                return AdaptationType.maximal_strength_hypertrophic
+                self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
-                return AdaptationType.power_explosive_action
-        else:
-            return
+                self.adaptation_type = AdaptationType.power_explosive_action
 
 
 class Movement(Serialisable):
