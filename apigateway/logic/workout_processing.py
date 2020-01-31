@@ -1,4 +1,4 @@
-from models.workout_program import Movement
+from models.workout_program import AdaptationType, Movement, TrainingType
 
 
 class WorkoutProcessor(object):
@@ -12,3 +12,39 @@ class WorkoutProcessor(object):
         movements.append(movement)
 
         return movements
+
+
+class MovementProcessor(object):
+
+    def get_adaptation_type_from_training_type(self, training_type, exericse_intensity):
+
+        if training_type == TrainingType.flexibility:
+            return AdaptationType.not_tracked
+        elif training_type == TrainingType.cardiorespiratory:
+            return AdaptationType.strength_endurance_cardiorespiratory
+        elif training_type == TrainingType.core:
+            return AdaptationType.strength_endurance_strength
+        elif training_type == TrainingType.balance:
+            return AdaptationType.strength_endurance_strength
+        elif training_type == TrainingType.plyometrics:
+            return AdaptationType.power_explosive_action
+        elif training_type == TrainingType.plyometrics_drills:
+            return AdaptationType.power_drill
+        elif training_type == TrainingType.speed_agility_quickness:
+            return AdaptationType.power_drill
+        elif training_type == TrainingType.integrated_resistance:
+            if exericse_intensity >= 75:
+                return AdaptationType.maximal_strength_hypertrophic
+            else:
+                return AdaptationType.strength_endurance_strength
+        elif training_type == TrainingType.olympic_lifting:
+            if exericse_intensity >= 75:
+                return AdaptationType.maximal_strength_hypertrophic
+            else:
+                return AdaptationType.power_explosive_action
+        else:
+            return
+
+    def get_exercise_intensity_for_olympic_lifting(self, olympic_lifting_type):
+
+        pass
