@@ -1,4 +1,5 @@
 from serialisable import Serialisable
+from models.movement_tags import AdaptationType, BodyPosition, MovementAction, TrainingType
 
 
 class WorkoutProgramModule(Serialisable):
@@ -99,3 +100,37 @@ class WorkoutExercise(Serialisable):
         exercise.intensity_pace = input_dict.get('intensity_pace')
 
         return exercise
+
+
+class Movement(Serialisable):
+    def __init__(self):
+        self.adaptation_type = None
+        self.body_position = None
+        self.movement_action = None
+        self.training_type = None
+
+        self.explosive = False
+
+    def json_serialise(self):
+        ret = {
+            'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
+            'body_position': self.body_position.value if self.body_position is not None else None,
+            'movement_action': self.movement_action.value if self.movement_action is not None else None,
+            'training_type': self.training_type.value if self.training_type is not None else None,
+            'explosive': self.explosive
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        movement = cls()
+        movement.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
+            'adaptation_type') is not None else None
+        movement.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
+            'body_position') is not None else None
+        movement.movement_action = MovementAction(input_dict['movement_action']) if input_dict.get(
+            'movement_action') is not None else None
+        movement.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
+        movement.explosive = input_dict.get('explosive', False)
+
+        return movement
