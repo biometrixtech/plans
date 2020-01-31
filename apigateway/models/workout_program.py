@@ -73,6 +73,11 @@ class WorkoutExercise(Serialisable):
         self.reps_per_set = 0
         self.reps_unit = None
         self.intensity_pace = None
+        self.adaptation_type = None
+        self.body_position = None
+        self.movement_action = None
+        self.training_type = None
+        self.explosive = 0
 
     def json_serialise(self):
         ret = {
@@ -83,7 +88,12 @@ class WorkoutExercise(Serialisable):
             'sets': self.sets,
             'reps_per_set': self.reps_per_set,
             'reps_unit': self.reps_unit,
-            'intensity_pace': self.intensity_pace
+            'intensity_pace': self.intensity_pace,
+            'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
+            'body_position': self.body_position.value if self.body_position is not None else None,
+            'movement_action': self.movement_action.value if self.movement_action is not None else None,
+            'training_type': self.training_type.value if self.training_type is not None else None,
+            'explosive': self.explosive
         }
         return ret
 
@@ -98,42 +108,84 @@ class WorkoutExercise(Serialisable):
         exercise.reps_per_set = input_dict.get('reps_per_set', 0)
         exercise.reps_unit = input_dict.get('reps_unit')
         exercise.intensity_pace = input_dict.get('intensity_pace')
+        exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
+            'adaptation_type') is not None else None
+        exercise.explosive = input_dict.get('explosive', False)
+
+        # not yet sure if these are needed
+        exercise.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
+            'body_position') is not None else None
+        exercise.movement_action = MovementAction(input_dict['movement_action']) if input_dict.get(
+            'movement_action') is not None else None
+        exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
+            'training_type') is not None else None
 
         return exercise
 
+    def process_movement(self, movement):
+
+        self.set_adaption_type(movement)
+
+    def set_adaption_type(self, movement):
+
+        if movement.training_type == TrainingType.flexibility:
+            return AdaptationType.not_tracked
+        elif movement.training_type == TrainingType.cardiorespiratory:
+            return AdaptationType.strength_endurance_cardiorespiratory
+        elif movement.training_type == TrainingType.core:
+            return AdaptationType.strength_endurance_strength
+        elif movement.training_type == TrainingType.balance:
+            return AdaptationType.strength_endurance_strength
+        elif movement.training_type == TrainingType.plyometrics:
+            return AdaptationType.power_explosive_action
+        elif movement.training_type == TrainingType.plyometrics_drills:
+            return AdaptationType.power_drill
+        elif movement.training_type == TrainingType.speed_agility_quickness:
+            return AdaptationType.power_drill
+        elif movement.training_type == TrainingType.integrated_resistance:
+            if self.intensity_pace >= 75:
+                return AdaptationType.maximal_strength_hypertrophic
+            else:
+                return AdaptationType.strength_endurance_strength
+        elif movement.training_type == TrainingType.olympic_lifting:
+            if movement.explosive < 2:
+                return AdaptationType.maximal_strength_hypertrophic
+            else:
+                return AdaptationType.power_explosive_action
+        else:
+            return
+
 
 class Movement(Serialisable):
-    def __init__(self):
-        self.adaptation_type = None
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
         self.body_position = None
         self.movement_action = None
         self.training_type = None
-
-        self.explosive = False
-        self.intensity = None
+        self.explosive = 0
 
     def json_serialise(self):
         ret = {
-            'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
+            'id': self.id,
+            'name': self.name,
             'body_position': self.body_position.value if self.body_position is not None else None,
             'movement_action': self.movement_action.value if self.movement_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
-            'explosive': self.explosive,
-            'intensity': self.intensity if self.intensity is not None else None
+            'explosive': self.explosive
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        movement = cls()
-        movement.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
-            'adaptation_type') is not None else None
+        movement = cls(input_dict.get('id'), input_dict.get('name'))
+
         movement.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
             'body_position') is not None else None
         movement.movement_action = MovementAction(input_dict['movement_action']) if input_dict.get(
             'movement_action') is not None else None
         movement.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
-        movement.explosive = input_dict.get('explosive', False)
-        movement.intensity = input_dict.get('intensity')
+        movement.explosive = input_dict.get('explosive', 0)
 
         return movement
