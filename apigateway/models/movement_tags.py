@@ -2,17 +2,16 @@ from enum import Enum
 
 
 class TrainingType(Enum):
-    flexibility = 0
-    cardiorespiratory = 1
-    core = 2
-    balance = 3
-    plyometrics = 4
-    plyometrics_drills = 5
-    speed_agility_quickness = 6
-    integrated_resistance = 7
-    olympic_lifting = 8
-    skill_development = 9
-
+    movement_prep = 0
+    strength_endurance_cardiorespiratory_training = 1
+    strength_endurance_strength_training = 2
+    integrated_resistance = 3
+    integrated_resistance_olympic_lift = 4
+    power_action_olympic_lift = 5
+    power_action_plyometrics = 6
+    power_drills_plyometrics = 7
+    skill_development = 8
+    flexibility = 9
 
 class AdaptationType(Enum):
     not_tracked = None
@@ -42,17 +41,22 @@ class MovementAction(Enum):
 class BodyPosition(Enum):
     supine = 0
     prone = 1
-    side = 2
-    lying = 3
-    quadruped = 4
-    bridge = 5
-    kneeling = 6
-    half_kneeling = 7
-    double_leg_standing = 8
-    split_leg_standing = 9
-    staggered_leg_standing = 10
-    single_leg_standing = 11
-    non_stationary = 12
+    side_lying = 2
+    quadruped = 3
+    bridge = 4
+    kneeling = 5
+    half_kneeling = 6
+    double_leg_standing = 7
+    split_leg_standing = 8
+    staggered_leg_standing = 9
+    single_leg_standing = 10
+    non_stationary_single_leg = 11
+    seated = 12
+    non_stationary_double_leg = 13
+    non_stationary_lunge = 14
+    non_stationary_other = 15
+    two_arms = 16
+    single_arm = 17
 
 
 class Equipment(Enum):
@@ -75,3 +79,4 @@ class Equipment(Enum):
     farmers_carry_handles = 16
     resistence_bands = 17
     machine = 18
+    plate = 19

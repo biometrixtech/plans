@@ -26,16 +26,19 @@ class MovementLibraryParser(object):
         movement = Movement(row['id'], row['name'])
         movement.name = row['name']
         if row.get('action') is not None and row['action'] != "":
-            movement.movement_action = MovementAction[row['action']]
-        if row.get('training_type_original') is not None and row['training_type_original'] != "" and row['training_type_original'] != "none":
-            movement.training_type = TrainingType[row['training_type_original']]
+            try:
+                movement.movement_action = MovementAction[row['action']]
+            except KeyError:
+                print(f"action: {row['action']}")
+        if row.get('training_type') is not None and row['training_type'] != "" and row['training_type'] != "none":
+            movement.training_type = TrainingType[row['training_type']]
         if row.get('body_position') is not None and row['body_position'] != "" and row['body_position'] != "none":
             movement.body_position = BodyPosition[row['body_position']]
         if row.get('equipment') is not None and row['equipment'] != "":
             try:
                 movement.equipment = Equipment[row['equipment']]
             except KeyError:
-                pass
+                print(f"equipment: {row['equipment']}")
         return movement
 
     def write_movements_json(self):
