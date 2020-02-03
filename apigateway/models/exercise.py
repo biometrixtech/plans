@@ -32,6 +32,10 @@ class UnitOfMeasure(Enum):
     seconds = 0
     count = 1
     yards = 2
+    feet = 3
+    meters = 4
+    miles = 5
+    kilometers = 6
 
 
 class Tempo(Enum):

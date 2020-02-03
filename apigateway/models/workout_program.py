@@ -1,3 +1,4 @@
+from models.exercise import UnitOfMeasure
 from serialisable import Serialisable
 from models.movement_tags import AdaptationType, BodyPosition, MovementAction, TrainingType, Equipment
 
@@ -69,9 +70,9 @@ class WorkoutExercise(Serialisable):
         self.name = ''
         self.weight_in_lbs = None
         self.weight_type = None
-        self.sets = 0
-        self.reps_per_set = 0
-        self.reps_unit = None
+        self.sets = 1
+        self.reps_per_set = 1
+        self.unit_of_measure = None
         self.intensity_pace = None
         self.adaptation_type = None
         self.body_position = None
@@ -87,7 +88,7 @@ class WorkoutExercise(Serialisable):
             'weight_type': self.weight_type,
             'sets': self.sets,
             'reps_per_set': self.reps_per_set,
-            'reps_unit': self.reps_unit,
+            'unit_of_measure': self.unit_of_measure.value,
             'intensity_pace': self.intensity_pace,
             'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
             'body_position': self.body_position.value if self.body_position is not None else None,
@@ -106,7 +107,7 @@ class WorkoutExercise(Serialisable):
         exercise.weight_type = input_dict.get('weight_type')
         exercise.sets = input_dict.get('sets', 0)
         exercise.reps_per_set = input_dict.get('reps_per_set', 0)
-        exercise.reps_unit = input_dict.get('reps_unit')
+        exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None
@@ -121,6 +122,19 @@ class WorkoutExercise(Serialisable):
             'training_type') is not None else None
 
         return exercise
+
+    def get_training_volume(self):
+
+        if self.unit_of_measure == UnitOfMeasure.count:
+            return self.reps_per_set * self.sets
+        elif self.unit_of_measure == UnitOfMeasure.yards:
+            return (self.reps_per_set * self.sets) / 5
+        elif self.unit_of_measure == UnitOfMeasure.meters:
+            return (self.reps_per_set * self.sets) / 5
+        elif self.unit_of_measure == UnitOfMeasure.feet:
+            return (self.reps_per_set * self.sets) / 15
+        else:
+            return 0
 
     def process_movement(self, movement):
 
