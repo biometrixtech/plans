@@ -30,6 +30,18 @@ class FunctionalMovementType(Enum):
     trunk_rotation = 19
     trunk_flexion_and_rotation = 20
     trunk_extension_with_rotation = 21
+    elbow_flexion = 22
+    elbow_extension = 23
+    shoulder_horizontal_adduction = 24
+    shoulder_horizontal_abduction = 25
+    shoulder_flexion_and_scapular_upward_rotation = 26
+    shoulder_extension_and_scapular_downward_rotation = 27
+    shoulder_abduction_and_scapular_upward_rotation = 28
+    shoulder_adduction_and_scapular_downward_rotation = 29
+    internal_rotation = 30
+    external_rotation = 31
+    scapular_elevation = 32
+    scapular_depression = 33
 
 
 class BodyPartFunction(Enum):
@@ -1912,7 +1924,30 @@ class FunctionalMovementFactory(object):
             return self.get_pelvic_anterior_tilt()
         elif movement_type == FunctionalMovementType.pelvic_posterior_tilt:
             return self.get_pelvic_posterior_tilt()
-
+        elif movement_type == FunctionalMovementType.elbow_flexion:
+            return self.get_elbow_flexion()
+        elif movement_type == FunctionalMovementType.elbow_extension:
+            return self.get_elbow_extension()
+        elif movement_type == FunctionalMovementType.shoulder_horizontal_adduction:
+            return self.get_shoulder_horizontal_adduction_and_scapular_protraction()
+        elif movement_type == FunctionalMovementType.shoulder_horizontal_abduction:
+            return self.get_shoulder_horizontal_abduction_and_scapular_retraction()
+        elif movement_type == FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation:
+            return self.get_shoulder_flexion_and_scapular_upward_rotation()
+        elif movement_type == FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation:
+            return self.get_shoulder_extension_and_scapular_downward_rotation()
+        elif movement_type == FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation:
+            return self.get_shoulder_abduction_and_scapular_upward_rotation()
+        elif movement_type == FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation:
+            return self.get_shoulder_adduction_and_scapular_downward_rotation()
+        elif movement_type == FunctionalMovementType.internal_rotation:
+            return self.get_internal_rotation()
+        elif movement_type == FunctionalMovementType.external_rotation:
+            return self.get_external_rotation()
+        elif movement_type == FunctionalMovementType.scapular_elevation:
+            return self.get_scapular_elevation()
+        elif movement_type == FunctionalMovementType.scapular_depression:
+            return self.get_scapular_depression()
 
     def get_ankle_dorsiflexion(self):
 
@@ -2045,4 +2080,100 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.trunk_flexion)
         functional_movement.prime_movers = []
         functional_movement.synergists = []
+        functional_movement.parts_receiving_compensation = []
+
+    def get_elbow_flexion(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.elbow_flexion)
+        functional_movement.prime_movers = [126]
+        functional_movement.synergists = [127, 128]
+        functional_movement.antagonists = [130, 131, 132]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_elbow_extension(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.elbow_extension)
+        functional_movement.prime_movers = [130, 131, 132]
+        functional_movement.synergists = []
+        functional_movement.antagonists = [126, 127, 128]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_horizontal_adduction_and_scapular_protraction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_horizontal_adduction)
+        functional_movement.prime_movers = [125, 82]
+        functional_movement.synergists = [83, 81]
+        functional_movement.antagonists = [78, 80, 85]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_horizontal_abduction_and_scapular_retraction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_horizontal_abduction)
+        functional_movement.prime_movers = [78, 85]
+        functional_movement.synergists = [80]
+        functional_movement.antagonists = [83, 125, 81, 82]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_flexion_and_scapular_upward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation)
+        functional_movement.prime_movers = [83, 125]
+        functional_movement.synergists = [76, 79, 82, 127, 129]
+        functional_movement.antagonists = [21, 77, 80, 120, 85, 81, 132]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_extension_and_scapular_downward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation)
+        functional_movement.prime_movers = [21, 81]
+        functional_movement.synergists = [77, 80, 120, 85, 132]
+        functional_movement.antagonists = [76, 79, 83, 125, 82, 127, 129]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_abduction_and_scapular_upward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation)
+        functional_movement.prime_movers = [83, 84, 125]
+        functional_movement.synergists = [76, 79, 121]
+        functional_movement.antagonists = [21, 77, 80, 120, 122, 123, 124, 81, 82, 129, 132]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_adduction_and_scapular_downward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation)
+        functional_movement.prime_movers = [21, 81]
+        functional_movement.synergists = [77, 80, 120, 122, 123, 124, 82, 129, 132]
+        functional_movement.antagonists = [76, 79, 121, 83, 84, 125]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_internal_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.internal_rotation)
+        functional_movement.prime_movers = [122]
+        functional_movement.synergists = [21, 120, 83, 82]
+        functional_movement.antagonists = [123, 124, 85]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_external_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.external_rotation)
+        functional_movement.prime_movers = [123, 124]
+        functional_movement.synergists = [85]
+        functional_movement.antagonists = [21, 120, 122, 83, 82]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_scapular_elevation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.scapular_elevation)
+        functional_movement.prime_movers = [76]
+        functional_movement.synergists = [77, 80]
+        functional_movement.antagonists = [79, 81]
+        functional_movement.parts_receiving_compensation = []
+
+    def get_scapular_depression(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.scapular_elevation)
+        functional_movement.prime_movers = [79]
+        functional_movement.synergists = [81]
+        functional_movement.antagonists = [76, 77, 80]
         functional_movement.parts_receiving_compensation = []

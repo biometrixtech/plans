@@ -191,6 +191,24 @@ class BodyPartLocation(Enum):
 
     hip_flexor_merge = 108
 
+    rotator_cuff = 119
+    teres_major = 120
+    supraspinatus = 121
+    subscapularis = 122
+    infraspinatus = 123
+    teres_minor = 124
+
+    serratus_anterior = 125
+
+    brachialis = 126
+    biceps_brachii = 127
+    brachioradialis = 128
+    coracobrachialis = 129
+
+    medial_head = 130
+    lateral_head = 131
+    long_head = 132
+
     @classmethod
     def get_muscle_group(cls, muscle):
         muscle_groups = cls.muscle_groups()
