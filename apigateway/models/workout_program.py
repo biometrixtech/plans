@@ -3,6 +3,7 @@ from serialisable import Serialisable
 from models.movement_tags import AdaptationType, BodyPosition, CardioAction, TrainingType, Equipment
 import re
 
+
 class WorkoutProgramModule(Serialisable):
     def __init__(self):
         self.provider_id = None
@@ -28,6 +29,14 @@ class WorkoutProgramModule(Serialisable):
         workout_program_module.workout_sections = [WorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_sections', [])]
 
         return workout_program_module
+
+    def get_training_load(self):
+        total_load = 0
+
+        for section in self.workout_sections:
+            total_load += section.get_training_load()
+
+        return total_load
 
 
 class WorkoutSection(Serialisable):
@@ -74,6 +83,13 @@ class WorkoutSection(Serialisable):
         return True
 
     def get_training_load(self):
+
+        total_load = 0
+
+        for exercise in self.exercises:
+            total_load += exercise.get_training_load()
+
+        return total_load
 
 
 class WorkoutExercise(Serialisable):
