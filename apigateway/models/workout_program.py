@@ -169,28 +169,25 @@ class WorkoutExercise(Serialisable):
 
         if movement.training_type == TrainingType.flexibility:
             self.adaptation_type = AdaptationType.not_tracked
-        elif movement.training_type == TrainingType.cardiorespiratory:
+        if movement.training_type == TrainingType.movement_prep:
+            self.adaptation_type = AdaptationType.not_tracked
+        if movement.training_type == TrainingType.skill_development:
+            self.adaptation_type = AdaptationType.not_tracked
+        elif movement.training_type == TrainingType.strength_cardiorespiratory:
             self.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
-        elif movement.training_type == TrainingType.core:
+        elif movement.training_type == TrainingType.strength_endurance:
             self.adaptation_type = AdaptationType.strength_endurance_strength
-        elif movement.training_type == TrainingType.balance:
-            self.adaptation_type = AdaptationType.strength_endurance_strength
-        elif movement.training_type == TrainingType.plyometrics:
+        elif movement.training_type == TrainingType.power_action_plyometrics:
             self.adaptation_type = AdaptationType.power_explosive_action
-        elif movement.training_type == TrainingType.plyometrics_drills:
+        elif movement.training_type == TrainingType.power_action_olympic_lift:
+            self.adaptation_type = AdaptationType.power_explosive_action
+        elif movement.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
-        elif movement.training_type == TrainingType.speed_agility_quickness:
-            self.adaptation_type = AdaptationType.power_drill
-        elif movement.training_type == TrainingType.integrated_resistance:
+        elif movement.training_type == TrainingType.strength_integrated_resistance:
             if self.intensity_pace >= 75:
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
-        elif movement.training_type == TrainingType.olympic_lifting:
-            if movement.explosive < 2:
-                self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
-            else:
-                self.adaptation_type = AdaptationType.power_explosive_action
 
     def convert_to_duration(self):
         # distance to duration

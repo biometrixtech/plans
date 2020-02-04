@@ -7,7 +7,6 @@ import json
 
 def get_cardio_data(provider='soflete'):
     file_name = f'cardiorespiratory_data_{provider}.json'
-    script_dir = os.path.dirname(__file__)
     file_path = os.path.join("../../apigateway/models", file_name)
     with open(file_path, 'r') as f:
         cardio_data = json.load(f)
@@ -27,7 +26,7 @@ def test_training_type_flexibility():
 def test_training_type_cardiorespiratory():
 
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.cardiorespiratory
+    movement.training_type = TrainingType.strength_cardiorespiratory
 
     workout_exercise = WorkoutExercise()
     workout_exercise.process_movement(movement)
@@ -35,10 +34,10 @@ def test_training_type_cardiorespiratory():
     assert workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory
 
 
-def test_training_type_core():
+def test_training_type_strength_endurance():
 
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.core
+    movement.training_type = TrainingType.strength_endurance
 
     workout_exercise = WorkoutExercise()
     workout_exercise.process_movement(movement)
@@ -46,19 +45,19 @@ def test_training_type_core():
     assert workout_exercise.adaptation_type == AdaptationType.strength_endurance_strength
 
 
-def test_training_type_balance():
+# def test_training_type_balance():
+#     movement = Movement("1", "test")
+#     movement.training_type = TrainingType.balance
+#
+#     workout_exercise = WorkoutExercise()
+#     workout_exercise.process_movement(movement)
+#
+#     assert workout_exercise.adaptation_type == AdaptationType.strength_endurance_strength
+
+
+def test_training_type_power_action_plyometrics():
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.balance
-
-    workout_exercise = WorkoutExercise()
-    workout_exercise.process_movement(movement)
-
-    assert workout_exercise.adaptation_type == AdaptationType.strength_endurance_strength
-
-
-def test_training_type_plyometrics():
-    movement = Movement("1", "test")
-    movement.training_type = TrainingType.plyometrics
+    movement.training_type = TrainingType.power_action_plyometrics
 
     workout_exercise = WorkoutExercise()
     workout_exercise.process_movement(movement)
@@ -68,7 +67,7 @@ def test_training_type_plyometrics():
 
 def test_training_type_plyometrics_drills():
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.plyometrics_drills
+    movement.training_type = TrainingType.power_drills_plyometrics
 
     workout_exercise = WorkoutExercise()
     workout_exercise.process_movement(movement)
@@ -76,19 +75,19 @@ def test_training_type_plyometrics_drills():
     assert workout_exercise.adaptation_type == AdaptationType.power_drill
 
 
-def test_training_type_speed_agility_quickness():
-    movement = Movement("1", "test")
-    movement.training_type = TrainingType.speed_agility_quickness
-
-    workout_exercise = WorkoutExercise()
-    workout_exercise.process_movement(movement)
-
-    assert workout_exercise.adaptation_type == AdaptationType.power_drill
+# def test_training_type_speed_agility_quickness():
+#     movement = Movement("1", "test")
+#     movement.training_type = TrainingType.speed_agility_quickness
+#
+#     workout_exercise = WorkoutExercise()
+#     workout_exercise.process_movement(movement)
+#
+#     assert workout_exercise.adaptation_type == AdaptationType.power_drill
 
 
 def test_training_type_integrated_resistance_high():
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.integrated_resistance
+    movement.training_type = TrainingType.strength_integrated_resistance
 
     workout_exercise = WorkoutExercise()
     workout_exercise.intensity_pace = 80
@@ -99,7 +98,7 @@ def test_training_type_integrated_resistance_high():
 
 def test_training_type_integrated_resistance_low():
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.integrated_resistance
+    movement.training_type = TrainingType.strength_integrated_resistance
 
     workout_exercise = WorkoutExercise()
     workout_exercise.intensity_pace = 60
@@ -110,7 +109,7 @@ def test_training_type_integrated_resistance_low():
 
 def test_training_type_olympic_lifting_high():
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.olympic_lifting
+    movement.training_type = TrainingType.power_action_olympic_lift
     movement.explosive = 3
 
     workout_exercise = WorkoutExercise()
@@ -122,13 +121,13 @@ def test_training_type_olympic_lifting_high():
 
 def test_training_type_olympic_lifting_low():
     movement = Movement("1", "test")
-    movement.training_type = TrainingType.olympic_lifting
+    movement.training_type = TrainingType.power_action_olympic_lift
     movement.explosive = 1
 
     workout_exercise = WorkoutExercise()
     workout_exercise.process_movement(movement)
 
-    assert workout_exercise.adaptation_type == AdaptationType.maximal_strength_hypertrophic
+    assert workout_exercise.adaptation_type == AdaptationType.power_explosive_action
 
 
 def test_get_training_volume_reps():
