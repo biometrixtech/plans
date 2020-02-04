@@ -1,5 +1,5 @@
 from models.workout_program import Movement
-from movement_tags import MovementAction, TrainingType, BodyPosition, Equipment
+from movement_tags import CardioAction, TrainingType, BodyPosition, Equipment
 import os
 import json
 import pandas as pd
@@ -23,22 +23,22 @@ class MovementLibraryParser(object):
         self.write_movements_json()
 
     def parse_row(self, row):
-        movement = Movement(row['id'], row['name'])
-        movement.name = row['name']
-        if row.get('action') is not None and row['action'] != "":
-            try:
-                movement.movement_action = MovementAction[row['action']]
-            except KeyError:
-                print(f"action: {row['action']}")
+        movement = Movement(row['id'], row['soflete_name'])
+
         if row.get('training_type') is not None and row['training_type'] != "" and row['training_type'] != "none":
             movement.training_type = TrainingType[row['training_type']]
+            if movement.training_type == TrainingType.strength_cardiorespiratory:
+                try:
+                    movement.movement_action = CardioAction[row['cardio_action']]
+                except KeyError:
+                    print(f"cardio_action: {row['cardio_action']}")
         if row.get('body_position') is not None and row['body_position'] != "" and row['body_position'] != "none":
             movement.body_position = BodyPosition[row['body_position']]
-        if row.get('equipment') is not None and row['equipment'] != "":
-            try:
-                movement.equipment = Equipment[row['equipment']]
-            except KeyError:
-                print(f"equipment: {row['equipment']}")
+        # if row.get('equipment') is not None and row['equipment'] != "":
+        #     try:
+        #         movement.equipment = Equipment[row['equipment']]
+        #     except KeyError:
+        #         print(f"equipment: {row['equipment']}")
         return movement
 
     def write_movements_json(self):

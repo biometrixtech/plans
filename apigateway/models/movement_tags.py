@@ -3,15 +3,16 @@ from enum import Enum
 
 class TrainingType(Enum):
     movement_prep = 0
-    strength_endurance_cardiorespiratory_training = 1
-    strength_endurance_strength_training = 2
-    integrated_resistance = 3
-    integrated_resistance_olympic_lift = 4
-    power_action_olympic_lift = 5
-    power_action_plyometrics = 6
-    power_drills_plyometrics = 7
-    skill_development = 8
-    flexibility = 9
+    strength_cardiorespiratory = 1
+    strength_endurance = 2
+    strength_integrated_resistance = 3
+    integrated_resistance_olympic_lift = 3
+    power_action_olympic_lift = 4
+    power_action_plyometrics = 5
+    power_drills_plyometrics = 6
+    skill_development = 7
+    flexibility = 8
+
 
 class AdaptationType(Enum):
     not_tracked = None
@@ -22,20 +23,15 @@ class AdaptationType(Enum):
     power_drill = 5
 
 
-class MovementAction(Enum):
+class CardioAction(Enum):
     walk = 0
-    step = 1
-    lunge = 2
-    skips = 3
-    jump = 4
-    sprint = 5
-    cut = 6
-    row = 7
-    cycle = 8
-    ski_erg = 9
-    swim_freestyle = 10
-    ruck = 11
-    run = 12
+    run = 1
+    sprint = 2
+    row = 3
+    cycle = 4
+    ski_erg = 5
+    swim = 6
+    ruck = 7
 
 
 class BodyPosition(Enum):
