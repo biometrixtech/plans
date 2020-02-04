@@ -465,6 +465,7 @@ class MixedActivitySession(Session):
         self.leads_to_soreness = False
         self.atypical_session_type = False
         self.atypical_high_load = False
+        self.sport_name = SportName.other
 
     def session_type(self):
         return SessionType.mixed_activity
