@@ -254,6 +254,8 @@ class Movement(Serialisable):
         self.training_type = None
         self.equipment = None
         self.explosive = 0
+        self.primary_actions = []
+        self.secondary_actions = []
 
     def json_serialise(self):
         ret = {
@@ -280,3 +282,22 @@ class Movement(Serialisable):
         movement.explosive = input_dict.get('explosive', 0)
 
         return movement
+
+
+class ExerciseAction(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+        self.body_position = None
+        self.body_weight = 0.0
+        self.resistance_applied = False
+        self.explosiveness = None
+        self.muscle_action = None
+        self.functional_movements = []
+
+
+class ExerciseCompoundAction(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+        self.actions = []
