@@ -21,6 +21,7 @@ class SessionType(Enum):
     bump_up = 4
     corrective = 5
     sport_training = 6
+    mixed_activity = 7
 
     @classmethod
     def has_value(cls, value):
@@ -165,14 +166,14 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def create(self):
         return None
 
-    @abc.abstractmethod
-    def missing_post_session_survey(self):
-        if self.session_RPE is None:
-            return True
-        elif self.post_session_soreness is None and (self.movement_limited or self.same_muscle_discomfort_over_72_hrs):
-            return True
-        else:
-            return False
+    # @abc.abstractmethod
+    # def missing_post_session_survey(self):
+    #     if self.session_RPE is None:
+    #         return True
+    #     elif self.post_session_soreness is None and (self.movement_limited or self.same_muscle_discomfort_over_72_hrs):
+    #         return True
+    #     else:
+    #         return False
 
     def cycling_training_volume(self):
         return self.get_distance_training_volume(SportName.cycling)
@@ -431,6 +432,8 @@ class SessionFactory(object):
             session_object = Tournament()
         elif session_type == SessionType.sport_training:
             session_object = SportTrainingSession()
+        elif session_type == SessionType.mixed_activity:
+            session_object = MixedActivitySession()
         else:
             session_object = CorrectiveSession()
 
@@ -452,8 +455,55 @@ class BumpUpSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
+
+
+class MixedActivitySession(Session):
+    def __init__(self):
+        Session.__init__(self)
+        self.leads_to_soreness = False
+        self.atypical_session_type = False
+        self.atypical_high_load = False
+
+    def session_type(self):
+        return SessionType.mixed_activity
+
+    def create(self):
+        new_session = MixedActivitySession()
+        new_session.id = str(uuid.uuid4())
+        return new_session
+
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
+
+    def ultra_high_intensity_session(self):
+
+        ultra_high_intensity_sports = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
+                                       SportName.strength, SportName.functional_strength_training,
+                                       SportName.traditional_strength_training, SportName.core_training,
+                                       SportName.high_intensity_interval_training, SportName.pilates]
+
+        if self.sport_name in ultra_high_intensity_sports:
+            return True
+        else:
+            return False
+
+    def high_intensity_RPE(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5:
+            return True
+        else:
+            return False
+
+    def high_intensity(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5 and self.ultra_high_intensity_session():
+            return True
+        elif self.session_RPE is not None and self.session_RPE >= 7 and not self.ultra_high_intensity_session():
+            return True
+        else:
+            return False
 
 
 class SportTrainingSession(Session):
@@ -471,8 +521,8 @@ class SportTrainingSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
     def ultra_high_intensity_session(self):
 
@@ -515,8 +565,8 @@ class StrengthConditioningSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class Game(Session):
@@ -531,8 +581,8 @@ class Game(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class Tournament(Session):
@@ -550,8 +600,8 @@ class Tournament(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class CorrectiveSession(Session):
@@ -567,11 +617,11 @@ class CorrectiveSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        if self.session_RPE is None:
-            return True
-        else:
-            return False
+    # def missing_post_session_survey(self):
+    #     if self.session_RPE is None:
+    #         return True
+    #     else:
+    #         return False
 
 
 class HighLoadSession(Serialisable):

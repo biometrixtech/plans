@@ -73,6 +73,8 @@ class WorkoutSection(Serialisable):
                 return False
         return True
 
+    def get_training_load(self):
+
 
 class WorkoutExercise(Serialisable):
     def __init__(self):
@@ -160,6 +162,13 @@ class WorkoutExercise(Serialisable):
                 return self.rpe  # able to take RPE value, if provided
         else:
             return 0
+
+    def get_training_load(self):
+
+        training_volume = self.get_training_volume()
+        training_intensity = self.get_training_intensity()
+
+        return training_volume * training_intensity
 
     def process_movement(self, movement):
 
