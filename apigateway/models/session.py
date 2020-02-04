@@ -174,19 +174,19 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return False
 
-    def cycling_load(self):
-        return self.get_distance_load(SportName.cycling)
+    def cycling_training_volume(self):
+        return self.get_distance_training_volume(SportName.cycling)
 
-    def running_load(self):
-        return self.get_distance_load(SportName.distance_running)
+    def running_training_volume(self):
+        return self.get_distance_training_volume(SportName.distance_running)
 
-    def swimming_load(self):
-        return self.get_distance_load(SportName.swimming)
+    def swimming_training_volume(self):
+        return self.get_distance_training_volume(SportName.swimming)
 
-    def walking_load(self):
-        return self.get_distance_load(SportName.walking)
+    def walking_training_volume(self):
+        return self.get_distance_training_volume(SportName.walking)
 
-    def duration_minutes_load(self):
+    def duration_minutes_training_volume(self):
         return self.duration_minutes
 
         # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
@@ -197,7 +197,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         # else:
         #     return None
 
-    def duration_health_load(self):
+    def duration_health_training_volume(self):
         return self.duration_health
 
         # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
@@ -209,13 +209,13 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         # else:
         #     return None
 
-    def training_volume(self, load_stats):
+    def training_load(self, load_stats):
 
         normalized_intensity = self.normalized_intensity()
-        normalized_load = self.normalized_load(load_stats)
+        normalized_training_volume = self.normalized_training_volume(load_stats)
 
-        if normalized_intensity is not None and normalized_load is not None:
-            return normalized_intensity * normalized_load
+        if normalized_intensity is not None and normalized_training_volume is not None:
+            return normalized_intensity * normalized_training_volume
         else:
             return None
 
@@ -228,14 +228,14 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return 0
 
-    def normalized_load(self, load_stats):
+    def normalized_training_volume(self, load_stats):
 
-        duration_minutes_load = self.duration_minutes_load()
-        duration_health_load = self.duration_health_load()
-        walking_load = self.walking_load()
-        swimming_load = self.swimming_load()
-        running_load = self.running_load()
-        cycling_load = self.cycling_load()
+        duration_minutes_load = self.duration_minutes_training_volume()
+        duration_health_load = self.duration_health_training_volume()
+        walking_load = self.walking_training_volume()
+        swimming_load = self.swimming_training_volume()
+        running_load = self.running_training_volume()
+        cycling_load = self.cycling_training_volume()
 
         load = 0
 
@@ -266,7 +266,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
         return  load
 
-    def get_distance_load(self, sport_name):
+    def get_distance_training_volume(self, sport_name):
         if self.sport_name == sport_name is not None and self.distance is not None:
             return self.distance
         else:

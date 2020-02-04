@@ -1605,7 +1605,7 @@ class SessionFunctionalMovement(object):
                     functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                     m.parts_receiving_compensation.append(functional_movement_body_part_side)
 
-            m.attribute_training_volume(self.session.training_volume(load_stats), self.injury_risk_dict, event_date)
+            m.attribute_training_volume(self.session.training_load(load_stats), self.injury_risk_dict, event_date)
             # TODO - ensure we're using the correct (and all) intensity measures
             if self.session.session_RPE is not None:
                 m.attribute_intensity(self.session.session_RPE, self.injury_risk_dict, event_date)

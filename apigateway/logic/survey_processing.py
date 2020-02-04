@@ -315,7 +315,7 @@ class SurveyProcessing(object):
                                                                              self.athlete_stats.load_stats):
                 high_relative_load_session_present = True
                 # session_load = session.duration_minutes * session.session_RPE
-                session_load = session.training_volume(self.athlete_stats.load_stats)
+                session_load = session.training_load(self.athlete_stats.load_stats)
                 if session_load > load:
                     sport_name = session.sport_name
         self.athlete_stats.high_relative_load_session = high_relative_load_session_present
