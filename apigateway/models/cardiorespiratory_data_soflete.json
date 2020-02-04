@@ -1,0 +1,43 @@
+{
+    "distance_conversion": {
+        "normalizing_factors":
+            {
+                "run": 1,
+                "swim": 4,
+                "cycle": 0.33,
+                "row": 2,
+                "ski_erg": 2,
+                "ruck": 2,
+                "walk": 0.2,
+                "sprint": 2
+            },
+        "time_per_unit": 0.336
+    },
+    "calorie_conversion": {
+        "calories_per_unit":
+            {
+                "run": 644,
+                "swim": 355,
+                "cycle": 466,
+                "row": 311,
+                "ski_erg": 422,
+                "ruck": 289,
+                "walk": 100,
+                "sprint": 1000
+            },
+        "unit": 1800
+    },
+    "no_load_sections": [
+        "prehab", "pre_hab",
+        "warm_up", "warm up", "warm_ups", "warm ups", "warmup",
+        "cool_down", "cool down", "cool_downs", "cool downs", "cooldown",
+        "movement prep", "movement_prep", "movement work",
+        "skill development", "skill_development",
+        "recovery protocol",
+        "blood flow",
+        "mobility",
+        "recovery",
+        "corrective", "correctives",
+        "breathing", "breathin"
+    ]
+}

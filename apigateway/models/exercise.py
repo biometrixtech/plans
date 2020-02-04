@@ -36,6 +36,7 @@ class UnitOfMeasure(Enum):
     meters = 4
     miles = 5
     kilometers = 6
+    calories = 7
 
 
 class Tempo(Enum):
