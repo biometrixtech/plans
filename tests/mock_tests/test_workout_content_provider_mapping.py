@@ -161,7 +161,7 @@ def test_get_training_volume_reps_sets_feet():
 
 
 def test_get_training_volume_cardioresp_swim_mile():
-    cardio_data = get_cardio_data('soflete')
+    cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
     workout_exercise.distance_params = cardio_data['distance_conversion']
     workout_exercise.calorie_params = cardio_data['calorie_conversion']
@@ -175,7 +175,7 @@ def test_get_training_volume_cardioresp_swim_mile():
 
 
 def test_get_training_volume_cardioresp_rowyards():
-    cardio_data = get_cardio_data('soflete')
+    cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
     workout_exercise.distance_params = cardio_data['distance_conversion']
     workout_exercise.calorie_params = cardio_data['calorie_conversion']
@@ -189,7 +189,7 @@ def test_get_training_volume_cardioresp_rowyards():
 
 
 def test_get_training_volume_cardioresp_cycle_mile():
-    cardio_data = get_cardio_data('soflete')
+    cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
     workout_exercise.distance_params = cardio_data['distance_conversion']
     workout_exercise.calorie_params = cardio_data['calorie_conversion']
@@ -203,7 +203,7 @@ def test_get_training_volume_cardioresp_cycle_mile():
 
 
 def test_get_training_volume_cardioresp_ruck_feet():
-    cardio_data = get_cardio_data('soflete')
+    cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
     workout_exercise.distance_params = cardio_data['distance_conversion']
     workout_exercise.calorie_params = cardio_data['calorie_conversion']
@@ -217,7 +217,7 @@ def test_get_training_volume_cardioresp_ruck_feet():
 
 
 def test_get_training_volume_cardioresp_row_calories():
-    cardio_data = get_cardio_data('soflete')
+    cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
     workout_exercise.distance_params = cardio_data['distance_conversion']
     workout_exercise.calorie_params = cardio_data['calorie_conversion']
@@ -231,7 +231,7 @@ def test_get_training_volume_cardioresp_row_calories():
 
 
 def test_no_load_section_warmup():
-    cardio_data = get_cardio_data('soflete')
+    cardio_data = get_cardio_data()
     workout_section = WorkoutSection()
     workout_section.name = "Warmup"
 
@@ -239,7 +239,7 @@ def test_no_load_section_warmup():
 
 
 def test_laod_section_stamina():
-    cardio_data = get_cardio_data('soflete')
+    cardio_data = get_cardio_data()
     workout_section = WorkoutSection()
     workout_section.name = "stamina 2"
 

@@ -1,7 +1,3 @@
-from fathomapi.api.config import Config
-Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
-                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
-
 import pytest
 import logic.soreness_processing as soreness_and_injury
 from models.soreness import Soreness
