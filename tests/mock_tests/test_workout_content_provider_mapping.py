@@ -1,16 +1,8 @@
 from models.workout_program import Movement, WorkoutExercise, WorkoutSection
 from models.movement_tags import AdaptationType, TrainingType, CardioAction
 from models.exercise import UnitOfMeasure
+from models.cardio_data import get_cardio_data
 
-import os
-import json
-
-def get_cardio_data(provider='soflete'):
-    file_name = f'cardiorespiratory_data_{provider}.json'
-    file_path = os.path.join("../../apigateway/models", file_name)
-    with open(file_path, 'r') as f:
-        cardio_data = json.load(f)
-    return cardio_data
 
 def test_training_type_flexibility():
 
@@ -243,14 +235,15 @@ def test_no_load_section_warmup():
     workout_section = WorkoutSection()
     workout_section.name = "Warmup"
 
-    assert workout_section.should_assess_load(cardio_data['no_load_sections']) == False
+    assert workout_section.should_assess_load(cardio_data['no_load_sections']) is False
+
 
 def test_laod_section_stamina():
     cardio_data = get_cardio_data()
     workout_section = WorkoutSection()
     workout_section.name = "stamina 2"
 
-    assert workout_section.should_assess_load(cardio_data['no_load_sections']) == True
+    assert workout_section.should_assess_load(cardio_data['no_load_sections']) is True
 
 
 def test_training_intensity_cardioresp():

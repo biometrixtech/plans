@@ -48,7 +48,6 @@ class WorkoutSection(Serialisable):
         self.intensity_pace = None
         self.exercises = []
 
-
     def json_serialise(self):
         ret = {
             'name': self.name,
@@ -159,6 +158,7 @@ class WorkoutExercise(Serialisable):
     def get_training_volume(self):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             self.convert_to_duration()
+            self.unit_of_measure = UnitOfMeasure.seconds
             return self.reps_per_set * self.sets
         else:
             if self.unit_of_measure == UnitOfMeasure.count:
@@ -220,7 +220,6 @@ class WorkoutExercise(Serialisable):
         # distance to duration
         if self.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
             self.convert_distance_to_meters()
-            self.unit_of_measure = UnitOfMeasure.meters
             self.convert_meters_to_seconds()
         elif self.unit_of_measure == UnitOfMeasure.calories:
             self.convert_calories_to_seconds()
