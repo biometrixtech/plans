@@ -24,7 +24,7 @@ class AdaptationType(Enum):
 
 
 class CardioAction(Enum):
-    walk = 0
+    race_walking = 0
     run = 1
     sprint = 2
     row = 3

@@ -8,8 +8,8 @@
                 "row": 2,
                 "ski_erg": 2,
                 "ruck": 2,
-                "walk": 0.2,
-                "sprint": 2
+                "race_walking": 1,
+                "sprint": 1
             },
         "time_per_unit": 0.336
     },
@@ -22,8 +22,8 @@
                 "row": 311,
                 "ski_erg": 422,
                 "ruck": 289,
-                "walk": 100,
-                "sprint": 1000
+                "race_walking": 289,
+                "sprint": 733
             },
         "unit": 1800
     },

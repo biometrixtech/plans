@@ -2,6 +2,7 @@ from models.workout_program import Movement, WorkoutExercise, WorkoutSection
 from models.movement_tags import AdaptationType, TrainingType, CardioAction
 from models.exercise import UnitOfMeasure
 from models.cardio_data import get_cardio_data
+from logic.workout_processing import WorkoutProcessor
 
 
 def test_training_type_flexibility():
@@ -161,73 +162,87 @@ def test_get_training_volume_reps_sets_feet():
 
 
 def test_get_training_volume_cardioresp_swim_mile():
-    cardio_data = get_cardio_data()
+    # cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
-    workout_exercise.distance_params = cardio_data['distance_conversion']
-    workout_exercise.calorie_params = cardio_data['calorie_conversion']
-    workout_exercise.cardio_action = CardioAction.swim  # swim=4*run
-    workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    # workout_exercise.distance_params = cardio_data['distance_conversion']
+    # workout_exercise.calorie_params = cardio_data['calorie_conversion']
+    # workout_exercise.cardio_action = CardioAction.swim  # swim=4*run
+    # workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     workout_exercise.reps_per_set = 1
     workout_exercise.sets = 1
     workout_exercise.unit_of_measure = UnitOfMeasure.miles  # mile=1609.34
+    workout_exercise.movement_id = "5a4d3b5d5a0778000fd6a4c6"  # freestyle swim
+    WorkoutProcessor().add_movement_detail_to_exercise(workout_exercise)
 
-    assert workout_exercise.get_training_volume() == 1 * 1609.34 * 4 * .336
+    assert workout_exercise.get_training_volume() == int(1 * 1609.34 * 4 * .336)
 
 
 def test_get_training_volume_cardioresp_rowyards():
-    cardio_data = get_cardio_data()
+    # cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
-    workout_exercise.distance_params = cardio_data['distance_conversion']
-    workout_exercise.calorie_params = cardio_data['calorie_conversion']
-    workout_exercise.cardio_action = CardioAction.row  # row=2*run
-    workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    # workout_exercise.distance_params = cardio_data['distance_conversion']
+    # workout_exercise.calorie_params = cardio_data['calorie_conversion']
+    # workout_exercise.cardio_action = CardioAction.row  # row=2*run
+    # workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     workout_exercise.reps_per_set = 100
     workout_exercise.sets = 1
     workout_exercise.unit_of_measure = UnitOfMeasure.yards  # yard = .9144m
+    workout_exercise.movement_id = '582cb0d8dcab1710003331e9'  # rowing movement
 
-    assert workout_exercise.get_training_volume() == 100 * .9144 * 2 * .336
+    WorkoutProcessor().add_movement_detail_to_exercise(workout_exercise)
+
+    assert workout_exercise.get_training_volume() == int(100 * .9144 * 2 * .336)
 
 
 def test_get_training_volume_cardioresp_cycle_mile():
-    cardio_data = get_cardio_data()
+    # cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
-    workout_exercise.distance_params = cardio_data['distance_conversion']
-    workout_exercise.calorie_params = cardio_data['calorie_conversion']
-    workout_exercise.cardio_action = CardioAction.cycle  # cycle=.33*run
-    workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    # workout_exercise.distance_params = cardio_data['distance_conversion']
+    # workout_exercise.calorie_params = cardio_data['calorie_conversion']
+    # workout_exercise.cardio_action = CardioAction.cycle  # cycle=.33*run
+    # workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     workout_exercise.reps_per_set = 5
     workout_exercise.sets = 1
     workout_exercise.unit_of_measure = UnitOfMeasure.miles  # mile=1609.34
+    workout_exercise.movement_id = "57e2fd3a4c6a031dc777e90c"  # airdyne
 
-    assert workout_exercise.get_training_volume() == 5 * 1609.34 * .33 * .336
+    WorkoutProcessor().add_movement_detail_to_exercise(workout_exercise)
+
+    assert workout_exercise.get_training_volume() == int(5 * 1609.34 * .33 * .336)
 
 
 def test_get_training_volume_cardioresp_ruck_feet():
-    cardio_data = get_cardio_data()
+    # cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
-    workout_exercise.distance_params = cardio_data['distance_conversion']
-    workout_exercise.calorie_params = cardio_data['calorie_conversion']
-    workout_exercise.cardio_action = CardioAction.ruck  # ruck=2*run
-    workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    # workout_exercise.distance_params = cardio_data['distance_conversion']
+    # workout_exercise.calorie_params = cardio_data['calorie_conversion']
+    # workout_exercise.cardio_action = CardioAction.ruck  # ruck=2*run
+    # workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     workout_exercise.reps_per_set = 5000
     workout_exercise.sets = 1
     workout_exercise.unit_of_measure = UnitOfMeasure.feet  # feet=.3048m
+    workout_exercise.movement_id = "5873d05eb06dc50011d08796"
 
-    assert workout_exercise.get_training_volume() == 5000 * 0.3048 * 2 * .336
+    WorkoutProcessor().add_movement_detail_to_exercise(workout_exercise)
+
+    assert workout_exercise.get_training_volume() == int(5000 * 0.3048 * 2 * .336)
 
 
 def test_get_training_volume_cardioresp_row_calories():
-    cardio_data = get_cardio_data()
+    # cardio_data = get_cardio_data()
     workout_exercise = WorkoutExercise()
-    workout_exercise.distance_params = cardio_data['distance_conversion']
-    workout_exercise.calorie_params = cardio_data['calorie_conversion']
-    workout_exercise.cardio_action = CardioAction.row
-    workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    # workout_exercise.distance_params = cardio_data['distance_conversion']
+    # workout_exercise.calorie_params = cardio_data['calorie_conversion']
+    # workout_exercise.cardio_action = CardioAction.row
+    # workout_exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     workout_exercise.reps_per_set = 500
     workout_exercise.sets = 1
     workout_exercise.unit_of_measure = UnitOfMeasure.calories
+    workout_exercise.movement_id = '582cb0d8dcab1710003331e9'  # rowing movement
 
-    assert workout_exercise.get_training_volume() == 500 / 311 * 1800
+    WorkoutProcessor().add_movement_detail_to_exercise(workout_exercise)
+
+    assert workout_exercise.get_training_volume() == int(500 / 311 * 1800)
 
 
 def test_no_load_section_warmup():
@@ -235,7 +250,8 @@ def test_no_load_section_warmup():
     workout_section = WorkoutSection()
     workout_section.name = "Warmup"
 
-    assert workout_section.should_assess_load(cardio_data['no_load_sections']) is False
+    workout_section.should_assess_load(cardio_data['no_load_sections'])
+    assert workout_section.track_load is False
 
 
 def test_laod_section_stamina():
@@ -243,7 +259,8 @@ def test_laod_section_stamina():
     workout_section = WorkoutSection()
     workout_section.name = "stamina 2"
 
-    assert workout_section.should_assess_load(cardio_data['no_load_sections']) is True
+    workout_section.should_assess_load(cardio_data['no_load_sections'])
+    assert workout_section.track_load is True
 
 
 def test_training_intensity_cardioresp():

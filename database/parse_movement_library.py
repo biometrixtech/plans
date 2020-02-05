@@ -12,7 +12,7 @@ class MovementLibraryParser(object):
         self.movements = []
 
     def load_data(self):
-        self.movements_pd = pd.read_csv(f'movement_library_{self.source}.csv', keep_default_na=False)
+        self.movements_pd = pd.read_csv(f'movement_library_{self.source}.csv', keep_default_na=False, skiprows=1)
 
         self.movements = []
 
@@ -29,7 +29,7 @@ class MovementLibraryParser(object):
             movement.training_type = TrainingType[row['training_type']]
             if movement.training_type == TrainingType.strength_cardiorespiratory:
                 try:
-                    movement.movement_action = CardioAction[row['cardio_action']]
+                    movement.cardio_action = CardioAction[row['cardio_action']]
                 except KeyError:
                     print(f"cardio_action: {row['cardio_action']}")
         if row.get('body_position') is not None and row['body_position'] != "" and row['body_position'] != "none":

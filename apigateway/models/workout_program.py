@@ -46,6 +46,7 @@ class WorkoutSection(Serialisable):
         self.workout_section_type = None
         self.difficulty = None
         self.intensity_pace = None
+        self.track_load = True
         self.exercises = []
 
     def json_serialise(self):
@@ -73,20 +74,19 @@ class WorkoutSection(Serialisable):
         return workout_section
 
     def should_assess_load(self, no_load_sections):
-        # no_load_sections = cardio_data['no_load_sections']
         section = self.name.lower().replace("-", "_")
         for keyword in no_load_sections:
             pat = r'\b' + keyword + r'\b'
             if re.search(pat, section) is not None:
-                return False
-        return True
+                self.track_load = False
 
     def get_training_load(self):
 
         total_load = 0
 
-        for exercise in self.exercises:
-            total_load += exercise.get_training_load()
+        if self.track_load:
+            for exercise in self.exercises:
+                total_load += exercise.get_training_load()
 
         return total_load
 
@@ -100,13 +100,19 @@ class WorkoutExercise(Serialisable):
         self.sets = 1
         self.reps_per_set = 1
         self.unit_of_measure = None
+        self.movement_id = ""
+        self.rpe = None
+
+
         self.intensity_pace = None
+
+
         self.adaptation_type = None
         self.body_position = None
         self.cardio_action = None
         self.training_type = None
         self.explosive = 0
-        self.rpe = None
+        self.action_ids = []
         self.distance_params = {}
         self.calorie_params = {}
 
@@ -124,7 +130,9 @@ class WorkoutExercise(Serialisable):
             'body_position': self.body_position.value if self.body_position is not None else None,
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
-            'explosive': self.explosive
+            'explosive': self.explosive,
+            'rpe': self.rpe,
+            'action_ids': self.action_ids
         }
         return ret
 
@@ -150,13 +158,16 @@ class WorkoutExercise(Serialisable):
             'cardio_action') is not None else None
         exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
             'training_type') is not None else None
+        exercise.rpe = input_dict.get('rpe')
+        exercise.action_ids = input_dict.get('action_ids', [])
 
         return exercise
 
     def get_training_volume(self):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-            self.convert_to_duration()
-            self.unit_of_measure = UnitOfMeasure.seconds
+            # cardio_respiratory should always be stored in seconds as unit of measure
+            # self.convert_to_duration()
+            # self.unit_of_measure = UnitOfMeasure.seconds
             return self.reps_per_set * self.sets
         else:
             if self.unit_of_measure == UnitOfMeasure.count:
@@ -187,7 +198,12 @@ class WorkoutExercise(Serialisable):
         return training_volume * training_intensity
 
     def process_movement(self, movement):
-
+        self.action_ids = movement.primary_actions
+        self.action_ids.extend(movement.secondary_actions)
+        self.body_position = movement.body_position
+        self.cardio_action = movement.cardio_action
+        self.training_type = movement.training_type
+        self.explosive = movement.explosive
         self.set_adaption_type(movement)
 
     def set_adaption_type(self, movement):
@@ -222,6 +238,8 @@ class WorkoutExercise(Serialisable):
         elif self.unit_of_measure == UnitOfMeasure.calories:
             self.convert_calories_to_seconds()
 
+        self.unit_of_measure = UnitOfMeasure.seconds
+
     def convert_distance_to_meters(self):
         if self.unit_of_measure == UnitOfMeasure.yards:
             self.reps_per_set *= .9144
@@ -236,12 +254,12 @@ class WorkoutExercise(Serialisable):
         # distance_params = cardio_data["distance_conversion"]
         conversion_ratio = self.distance_params["normalizing_factors"][self.cardio_action.name]
         time_per_meter = self.distance_params['time_per_unit']
-        self.reps_per_set *= (conversion_ratio * time_per_meter)
+        self.reps_per_set = int(self.reps_per_set * conversion_ratio * time_per_meter)
 
     def convert_calories_to_seconds(self):
         # calorie_params = cardio_data["calorie_conversion"]
         time_per_unit = self.calorie_params['unit'] / self.calorie_params["calories_per_unit"][self.cardio_action.name]
-        self.reps_per_set *= time_per_unit
+        self.reps_per_set = int(self.reps_per_set * time_per_unit)
 
 
 class Movement(Serialisable):
@@ -249,7 +267,7 @@ class Movement(Serialisable):
         self.id = id
         self.name = name
         self.body_position = None
-        self.movement_action = None
+        self.cardio_action = None
         self.training_type = None
         self.equipment = None
         self.explosive = 0
@@ -261,7 +279,7 @@ class Movement(Serialisable):
             'id': self.id,
             'name': self.name,
             'body_position': self.body_position.value if self.body_position is not None else None,
-            'cardio_action': self.movement_action.value if self.movement_action is not None else None,
+            'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
             'equipment': self.equipment.value if self.equipment is not None else None,
             'explosive': self.explosive
@@ -274,11 +292,13 @@ class Movement(Serialisable):
 
         movement.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
             'body_position') is not None else None
-        movement.movement_action = CardioAction(input_dict['cardio_action']) if input_dict.get(
+        movement.cardio_action = CardioAction(input_dict['cardio_action']) if input_dict.get(
             'cardio_action') is not None else None
         movement.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
         movement.equipment = Equipment(input_dict['equipment']) if input_dict.get('equipment') is not None else None
         movement.explosive = input_dict.get('explosive', 0)
+        movement.primary_actions = input_dict.get('primary_actions', [])
+        movement.secondary_actions = input_dict.get('secondary_actions', [])
 
         return movement
 
