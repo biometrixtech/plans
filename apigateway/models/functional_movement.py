@@ -1,11 +1,12 @@
 from enum import IntEnum, Enum
 from serialisable import Serialisable
 from models.sport import SportName
+from models.session import SessionType
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPart, BodyPartFactory
 from datetime import timedelta, date, datetime
 from utils import format_date, parse_date, format_datetime, parse_datetime
-
+from models.functional_movement_mapping import ActionMappingMovementFactory
 
 class FunctionalMovementType(Enum):
     ankle_dorsiflexion = 0
@@ -1371,219 +1372,23 @@ class SessionFunctionalMovement(object):
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
 
-    # def process_anc_and_muscle_imbalance(self, event_date):
-    #
-    #     if self.session.movement_patterns is not None and self.session.movement_patterns.apt_ankle_pitch is not None:
-    #
-    #         # Left
-    #         self.process_apt_ankle_side(event_date, 1)
-    #
-    #         # Right
-    #         self.process_apt_ankle_side(event_date, 2)
-    #
-    # def process_apt_ankle_side(self, event_date, side):
-    #
-    #     movement_factory = FunctionalMovementFactory()
-    #     if self.session.movement_patterns is not None and self.session.movement_patterns.apt_ankle_pitch is not None:
-    #         apt_ankle = self.session.movement_patterns.apt_ankle_pitch
-    #
-    #         if side == 1:
-    #             if apt_ankle.left is not None:
-    #                 key_elasticity_value = apt_ankle.left.elasticity
-    #                 key_adf_value = apt_ankle.left.y_adf
-    #             else:
-    #                 key_elasticity_value = 0.0
-    #                 key_adf_value = 0.0
-    #         else:
-    #             if apt_ankle.right is not None:
-    #                 key_elasticity_value = apt_ankle.right.elasticity
-    #                 key_adf_value = apt_ankle.right.y_adf
-    #             else:
-    #                 key_elasticity_value = 0.0
-    #                 key_adf_value = 0.0
-    #
-    #         if key_elasticity_value != 0:
-    #             pelvic_tilt_movement = movement_factory.get_functional_movement(FunctionalMovementType.pelvic_anterior_tilt)
-    #             # are any muscles associated with Pelvic Anterior Tilt considered to be short with adhesions or muscle spasm?
-    #             any_short_confirmed = False
-    #             body_part_factory = BodyPartFactory()
-    #
-    #             # presence of elasticity indicates overactivity
-    #             for p in pelvic_tilt_movement.prime_movers:
-    #                 bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
-    #                 if bilateral:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), side)
-    #                 else:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
-    #                 if body_part_side in self.injury_risk_dict:
-    #                     if (self.injury_risk_dict[body_part_side].last_overactive_date is not None and
-    #                             self.injury_risk_dict[body_part_side].last_overactive_date < event_date):
-    #                         self.injury_risk_dict[body_part_side].last_overactive_date = event_date
-    #                         self.injury_risk_dict[body_part_side].overactive_count_last_0_20_days += 1
-    #                         self.session.overactive_body_parts.append(body_part_side)
-    #                 else:
-    #                     body_part_injury_risk = BodyPartInjuryRisk()
-    #                     body_part_injury_risk.last_overactive_short_date = event_date
-    #                     body_part_injury_risk.overactive_count_last_0_20_days += 1
-    #                     self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                     self.session.overactive_body_parts.append(body_part_side)
-    #                 self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #
-    #             for p in pelvic_tilt_movement.prime_movers:
-    #                 bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
-    #                 if bilateral:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), side)
-    #                 else:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
-    #                 if body_part_side in self.injury_risk_dict:
-    #                     if self.injury_risk_dict[body_part_side].last_adhesions_date is not None and \
-    #                             self.injury_risk_dict[body_part_side].last_adhesions_date == event_date:
-    #                         any_short_confirmed = True
-    #                     #
-    #                     # if self.injury_risk_dict[body_part_side].last_muscle_spasm_date is not None and \
-    #                     #         self.injury_risk_dict[body_part_side].last_muscle_spasm_date == event_date:
-    #                     #     any_short_confirmed = True
-    #
-    #             if any_short_confirmed:  # mark all muscle imbalance and short
-    #                 for p in pelvic_tilt_movement.prime_movers:
-    #                     bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
-    #                     if bilateral:
-    #                         body_part_side = BodyPartSide(BodyPartLocation(p), side)
-    #                     else:
-    #                         body_part_side = BodyPartSide(BodyPartLocation(p), 0)
-    #                     if body_part_side in self.injury_risk_dict:
-    #                         self.injury_risk_dict[body_part_side].last_short_date = event_date
-    #                         self.injury_risk_dict[body_part_side].last_muscle_imbalance_date = event_date
-    #                     else:
-    #                         body_part_injury_risk = BodyPartInjuryRisk()
-    #                         body_part_injury_risk.last_short_date = event_date
-    #                         body_part_injury_risk.last_muscle_imbalance_date = event_date
-    #                         self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                     self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #                     self.session.short_body_parts.append(body_part_side)
-    #
-    #                 self.mark_hip_extension_compensating(side)
-    #
-    #             # checking for underactive inhibited or weak
-    #             # check for evidence of short else assume and mark long (by muscle)
-    #             # adhesions reported or (63, 64, 66, 73, 74, 21) is short muscle imbalance
-    #             if key_adf_value != 0:
-    #                 for b in [63, 64, 66, 73, 74]:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(b), side)
-    #                     if body_part_side in self.injury_risk_dict:
-    #                         if (self.injury_risk_dict[body_part_side].last_underactive_date is not None and
-    #                                 self.injury_risk_dict[body_part_side].last_underactive_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-    #                             self.injury_risk_dict[body_part_side].underactive_weak_count_last_0_20_days += 1
-    #                         if (self.injury_risk_dict[body_part_side].last_weak_date is not None and
-    #                              self.injury_risk_dict[body_part_side].last_weak_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_weak_date = event_date
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(self.injury_risk_dict[body_part_side], event_date)
-    #
-    #                         if not is_short:
-    #                             self.injury_risk_dict[body_part_side].last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.session.underactive_weak_body_parts.append(body_part_side)
-    #                     else:
-    #                         body_part_injury_risk = BodyPartInjuryRisk()
-    #                         body_part_injury_risk.last_underactive_short_date = event_date
-    #                         body_part_injury_risk.last_weak_date = event_date
-    #                         body_part_injury_risk.underactive_weak_count_last_0_20_days += 1
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(body_part_injury_risk, event_date)
-    #
-    #                         if not is_short:
-    #                             body_part_injury_risk.last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                         self.session.underactive_weak_body_parts.append(body_part_side)
-    #                     self.injury_risk_dict[
-    #                         body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #
-    #                 self.mark_hip_extension_compensating(side)
-    #             else:
-    #                 for b in [63, 64, 66, 73, 74]:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(b), side)
-    #                     if body_part_side in self.injury_risk_dict:
-    #                         if (self.injury_risk_dict[body_part_side].last_underactive_date is not None and
-    #                                 self.injury_risk_dict[body_part_side].last_underactive_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-    #                             self.injury_risk_dict[body_part_side].underactive_inhibited_count_last_0_20_days += 1
-    #                         if (self.injury_risk_dict[body_part_side].last_inhibited_date and
-    #                                 self.injury_risk_dict[body_part_side].last_inhibited_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_inhibited_date = event_date
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(
-    #                             self.injury_risk_dict[body_part_side], event_date)
-    #
-    #                         if not is_short:
-    #                             self.injury_risk_dict[body_part_side].last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.session.underactive_inhibited_body_parts.append(body_part_side)
-    #                     else:
-    #                         body_part_injury_risk = BodyPartInjuryRisk()
-    #                         body_part_injury_risk.last_underactive_short_date = event_date
-    #                         body_part_injury_risk.last_inhibited_date = event_date
-    #                         body_part_injury_risk.underactive_short_count_last_0_20_days += 1
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(body_part_injury_risk,
-    #                                                                                     event_date)
-    #
-    #                         if not is_short:
-    #                             body_part_injury_risk.last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                         self.session.underactive_inhibited_body_parts.append(body_part_side)
-    #                     self.injury_risk_dict[
-    #                         body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #
-    #                 self.mark_hip_extension_compensating(side)
-
-    # def is_short_from_adhesions_or_muscle_imbalance(self, body_part_injury_risk, event_date):
-    #
-    #     is_short = False
-    #     if body_part_injury_risk.last_adhesions_date is not None and body_part_injury_risk.last_adhesions_date == event_date:
-    #         is_short = True
-    #     if body_part_injury_risk.last_short_date is not None and body_part_injury_risk.last_short_date == event_date:
-    #         is_short = True
-    #
-    #     return is_short
-    #
-    # def mark_hip_extension_compensating(self, side):
-    #
-    #     movement_factory = FunctionalMovementFactory()
-    #
-    #     hip_extension = movement_factory.get_functional_movement(
-    #         FunctionalMovementType.hip_extension)
-    #     body_part_factory = BodyPartFactory()
-    #     for m in hip_extension.prime_movers:
-    #         bilateral = body_part_factory.get_bilateral(BodyPartLocation(m))
-    #         if bilateral:
-    #             body_part_side = BodyPartSide(BodyPartLocation(m), side)
-    #         else:
-    #             body_part_side = BodyPartSide(BodyPartLocation(m), 0)
-    #         if body_part_side in self.injury_risk_dict:
-    #             self.injury_risk_dict[body_part_side].is_compensationg = True
-    #         else:
-    #             body_part_injury_risk = BodyPartInjuryRisk()
-    #             body_part_injury_risk.is_compensationg = True
-    #             self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #         self.injury_risk_dict[
-    #             body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #         self.session.compensating_body_parts.append(body_part_side)
-
     def process(self, event_date, load_stats):
         activity_factory = ActivityFunctionalMovementFactory()
+        action_factory = ActionMappingMovementFactory()
         movement_factory = FunctionalMovementFactory()
 
-        #self.process_anc_and_muscle_imbalance(event_date)
+        if self.session.session_type == SessionType.mixed_activity:
 
-        self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
+            for section in self.session.workout_program_module.workout_sections:
+                for exercise in section.exercises:
+                    for primary_action in exercise.primary_actions:
+                        self.functional_movement_mappings.extend(action_factory.get_functional_movement_mappings(primary_action))
+                    for secondary_action in exercise.secondary_actions:
+                        self.functional_movement_mappings.extend(action_factory.get_functional_movement_mappings(secondary_action))
+
+        else:
+
+            self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
 
         for m in self.functional_movement_mappings:
             functional_movement = movement_factory.get_functional_movement(m.functional_movement_type)

@@ -110,6 +110,8 @@ class WorkoutExercise(Serialisable):
         self.rpe = None
         self.distance_params = {}
         self.calorie_params = {}
+        self.primary_actions = []
+        self.secondary_actions = []
 
     def json_serialise(self):
         ret = {
