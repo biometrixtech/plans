@@ -3,6 +3,7 @@ from serialisable import Serialisable
 from models.movement_tags import AdaptationType, BodyPosition, CardioAction, TrainingType, Equipment
 import re
 
+
 class WorkoutProgramModule(Serialisable):
     def __init__(self):
         self.provider_id = None
@@ -28,6 +29,14 @@ class WorkoutProgramModule(Serialisable):
         workout_program_module.workout_sections = [WorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_sections', [])]
 
         return workout_program_module
+
+    def get_training_load(self):
+        total_load = 0
+
+        for section in self.workout_sections:
+            total_load += section.get_training_load()
+
+        return total_load
 
 
 class WorkoutSection(Serialisable):
@@ -72,6 +81,15 @@ class WorkoutSection(Serialisable):
             if re.search(pat, section) is not None:
                 return False
         return True
+
+    def get_training_load(self):
+
+        total_load = 0
+
+        for exercise in self.exercises:
+            total_load += exercise.get_training_load()
+
+        return total_load
 
 
 class WorkoutExercise(Serialisable):
@@ -161,6 +179,13 @@ class WorkoutExercise(Serialisable):
         else:
             return 0
 
+    def get_training_load(self):
+
+        training_volume = self.get_training_volume()
+        training_intensity = self.get_training_intensity()
+
+        return training_volume * training_intensity
+
     def process_movement(self, movement):
 
         self.set_adaption_type(movement)
@@ -229,6 +254,8 @@ class Movement(Serialisable):
         self.training_type = None
         self.equipment = None
         self.explosive = 0
+        self.primary_actions = []
+        self.secondary_actions = []
 
     def json_serialise(self):
         ret = {
@@ -255,3 +282,22 @@ class Movement(Serialisable):
         movement.explosive = input_dict.get('explosive', 0)
 
         return movement
+
+
+class ExerciseAction(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+        self.body_position = None
+        self.body_weight = 0.0
+        self.resistance_applied = False
+        self.explosiveness = None
+        self.muscle_action = None
+        self.functional_movements = []
+
+
+class ExerciseCompoundAction(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+        self.actions = []

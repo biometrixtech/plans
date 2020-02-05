@@ -21,6 +21,7 @@ class SessionType(Enum):
     bump_up = 4
     corrective = 5
     sport_training = 6
+    mixed_activity = 7
 
     @classmethod
     def has_value(cls, value):
@@ -165,28 +166,28 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def create(self):
         return None
 
-    @abc.abstractmethod
-    def missing_post_session_survey(self):
-        if self.session_RPE is None:
-            return True
-        elif self.post_session_soreness is None and (self.movement_limited or self.same_muscle_discomfort_over_72_hrs):
-            return True
-        else:
-            return False
+    # @abc.abstractmethod
+    # def missing_post_session_survey(self):
+    #     if self.session_RPE is None:
+    #         return True
+    #     elif self.post_session_soreness is None and (self.movement_limited or self.same_muscle_discomfort_over_72_hrs):
+    #         return True
+    #     else:
+    #         return False
 
-    def cycling_load(self):
-        return self.get_distance_load(SportName.cycling)
+    def cycling_training_volume(self):
+        return self.get_distance_training_volume(SportName.cycling)
 
-    def running_load(self):
-        return self.get_distance_load(SportName.distance_running)
+    def running_training_volume(self):
+        return self.get_distance_training_volume(SportName.distance_running)
 
-    def swimming_load(self):
-        return self.get_distance_load(SportName.swimming)
+    def swimming_training_volume(self):
+        return self.get_distance_training_volume(SportName.swimming)
 
-    def walking_load(self):
-        return self.get_distance_load(SportName.walking)
+    def walking_training_volume(self):
+        return self.get_distance_training_volume(SportName.walking)
 
-    def duration_minutes_load(self):
+    def duration_minutes_training_volume(self):
         return self.duration_minutes
 
         # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
@@ -197,7 +198,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         # else:
         #     return None
 
-    def duration_health_load(self):
+    def duration_health_training_volume(self):
         return self.duration_health
 
         # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
@@ -209,13 +210,13 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         # else:
         #     return None
 
-    def training_volume(self, load_stats):
+    def training_load(self, load_stats):
 
         normalized_intensity = self.normalized_intensity()
-        normalized_load = self.normalized_load(load_stats)
+        normalized_training_volume = self.normalized_training_volume(load_stats)
 
-        if normalized_intensity is not None and normalized_load is not None:
-            return normalized_intensity * normalized_load
+        if normalized_intensity is not None and normalized_training_volume is not None:
+            return normalized_intensity * normalized_training_volume
         else:
             return None
 
@@ -228,14 +229,14 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return 0
 
-    def normalized_load(self, load_stats):
+    def normalized_training_volume(self, load_stats):
 
-        duration_minutes_load = self.duration_minutes_load()
-        duration_health_load = self.duration_health_load()
-        walking_load = self.walking_load()
-        swimming_load = self.swimming_load()
-        running_load = self.running_load()
-        cycling_load = self.cycling_load()
+        duration_minutes_load = self.duration_minutes_training_volume()
+        duration_health_load = self.duration_health_training_volume()
+        walking_load = self.walking_training_volume()
+        swimming_load = self.swimming_training_volume()
+        running_load = self.running_training_volume()
+        cycling_load = self.cycling_training_volume()
 
         load = 0
 
@@ -266,7 +267,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
         return  load
 
-    def get_distance_load(self, sport_name):
+    def get_distance_training_volume(self, sport_name):
         if self.sport_name == sport_name is not None and self.distance is not None:
             return self.distance
         else:
@@ -431,6 +432,8 @@ class SessionFactory(object):
             session_object = Tournament()
         elif session_type == SessionType.sport_training:
             session_object = SportTrainingSession()
+        elif session_type == SessionType.mixed_activity:
+            session_object = MixedActivitySession()
         else:
             session_object = CorrectiveSession()
 
@@ -452,8 +455,62 @@ class BumpUpSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
+
+
+class MixedActivitySession(Session):
+    def __init__(self):
+        Session.__init__(self)
+        self.leads_to_soreness = False
+        self.atypical_session_type = False
+        self.atypical_high_load = False
+        self.sport_name = SportName.other
+
+    def session_type(self):
+        return SessionType.mixed_activity
+
+    def create(self):
+        new_session = MixedActivitySession()
+        new_session.id = str(uuid.uuid4())
+        return new_session
+
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
+
+    def ultra_high_intensity_session(self):
+
+        ultra_high_intensity_sports = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
+                                       SportName.strength, SportName.functional_strength_training,
+                                       SportName.traditional_strength_training, SportName.core_training,
+                                       SportName.high_intensity_interval_training, SportName.pilates]
+
+        if self.sport_name in ultra_high_intensity_sports:
+            return True
+        else:
+            return False
+
+    def high_intensity_RPE(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5:
+            return True
+        else:
+            return False
+
+    def high_intensity(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5 and self.ultra_high_intensity_session():
+            return True
+        elif self.session_RPE is not None and self.session_RPE >= 7 and not self.ultra_high_intensity_session():
+            return True
+        else:
+            return False
+
+    def training_load(self, load_stats):
+
+        training_load = self.workout_program_module.get_training_load()
+
+        return training_load
 
 
 class SportTrainingSession(Session):
@@ -471,8 +528,8 @@ class SportTrainingSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
     def ultra_high_intensity_session(self):
 
@@ -515,8 +572,8 @@ class StrengthConditioningSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class Game(Session):
@@ -531,8 +588,8 @@ class Game(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class Tournament(Session):
@@ -550,8 +607,8 @@ class Tournament(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class CorrectiveSession(Session):
@@ -567,11 +624,11 @@ class CorrectiveSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        if self.session_RPE is None:
-            return True
-        else:
-            return False
+    # def missing_post_session_survey(self):
+    #     if self.session_RPE is None:
+    #         return True
+    #     else:
+    #         return False
 
 
 class HighLoadSession(Serialisable):
