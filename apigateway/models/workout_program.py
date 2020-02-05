@@ -46,7 +46,7 @@ class WorkoutSection(Serialisable):
         self.workout_section_type = None
         self.difficulty = None
         self.intensity_pace = None
-        self.track_load = True
+        self.assess_load = True
         self.exercises = []
 
     def json_serialise(self):
@@ -56,6 +56,7 @@ class WorkoutSection(Serialisable):
             'workout_section_type': self.workout_section_type,
             'difficulty': self.difficulty,
             'intensity_pace': self.intensity_pace,
+            'assess_load': self.assess_load,
             'exercises': [e.json_serialise() for e in self.exercises]
         }
         return ret
@@ -68,6 +69,7 @@ class WorkoutSection(Serialisable):
         workout_section.workout_section_type = input_dict.get('workout_section_type')
         workout_section.difficulty = input_dict.get('difficulty')
         workout_section.intensity_pace = input_dict.get('intensity_pace')
+        workout_section.assess_load = input_dict.get('assess_load', True)
         workout_section.exercises = [WorkoutExercise.json_deserialise(workout_exercise) for workout_exercise
                                                    in input_dict.get('exercises', [])]
 
@@ -78,13 +80,13 @@ class WorkoutSection(Serialisable):
         for keyword in no_load_sections:
             pat = r'\b' + keyword + r'\b'
             if re.search(pat, section) is not None:
-                self.track_load = False
+                self.assess_load = False
 
     def get_training_load(self):
 
         total_load = 0
 
-        if self.track_load:
+        if self.assess_load:
             for exercise in self.exercises:
                 total_load += exercise.get_training_load()
 
@@ -103,18 +105,13 @@ class WorkoutExercise(Serialisable):
         self.movement_id = ""
         self.rpe = None
 
-
         self.intensity_pace = None
-
 
         self.adaptation_type = None
         self.body_position = None
         self.cardio_action = None
         self.training_type = None
         self.explosive = 0
-        self.action_ids = []
-        self.distance_params = {}
-        self.calorie_params = {}
         self.primary_actions = []
         self.secondary_actions = []
 
@@ -134,7 +131,8 @@ class WorkoutExercise(Serialisable):
             'training_type': self.training_type.value if self.training_type is not None else None,
             'explosive': self.explosive,
             'rpe': self.rpe,
-            'action_ids': self.action_ids
+            'primary_actions': self.primary_actions,
+            'secondary_actions': self.secondary_actions
         }
         return ret
 
@@ -161,13 +159,14 @@ class WorkoutExercise(Serialisable):
         exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
             'training_type') is not None else None
         exercise.rpe = input_dict.get('rpe')
-        exercise.action_ids = input_dict.get('action_ids', [])
+        exercise.primary_actions = input_dict.get('primary_actions', [])
+        exercise.secondary_actions = input_dict.get('secondary_actions', [])
 
         return exercise
 
     def get_training_volume(self):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-            # cardio_respiratory should always be stored in seconds as unit of measure
+            # cardiorespiratory should always be stored in seconds as unit of measure
             # self.convert_to_duration()
             # self.unit_of_measure = UnitOfMeasure.seconds
             return self.reps_per_set * self.sets
@@ -200,8 +199,8 @@ class WorkoutExercise(Serialisable):
         return training_volume * training_intensity
 
     def process_movement(self, movement):
-        self.action_ids = movement.primary_actions
-        self.action_ids.extend(movement.secondary_actions)
+        self.primary_actions = movement.primary_actions
+        self.secondary_actions = movement.secondary_actions
         self.body_position = movement.body_position
         self.cardio_action = movement.cardio_action
         self.training_type = movement.training_type
@@ -232,13 +231,15 @@ class WorkoutExercise(Serialisable):
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
 
-    def convert_to_duration(self):
+    def convert_reps_to_duration(self, cardio_data):
         # distance to duration
         if self.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
+            distance_parameters = cardio_data['distance_parameters']
             self.convert_distance_to_meters()
-            self.convert_meters_to_seconds()
+            self.convert_meters_to_seconds(distance_parameters)
         elif self.unit_of_measure == UnitOfMeasure.calories:
-            self.convert_calories_to_seconds()
+            calorie_parameters = cardio_data['calorie_parameters']
+            self.convert_calories_to_seconds(calorie_parameters)
 
         self.unit_of_measure = UnitOfMeasure.seconds
 
@@ -252,15 +253,13 @@ class WorkoutExercise(Serialisable):
         elif self.unit_of_measure == UnitOfMeasure.kilometers:
             self.reps_per_set *= 1000
 
-    def convert_meters_to_seconds(self):
-        # distance_params = cardio_data["distance_conversion"]
-        conversion_ratio = self.distance_params["normalizing_factors"][self.cardio_action.name]
-        time_per_meter = self.distance_params['time_per_unit']
+    def convert_meters_to_seconds(self, distance_parameters):
+        conversion_ratio = distance_parameters["normalizing_factors"][self.cardio_action.name]
+        time_per_meter = distance_parameters['time_per_unit']
         self.reps_per_set = int(self.reps_per_set * conversion_ratio * time_per_meter)
 
-    def convert_calories_to_seconds(self):
-        # calorie_params = cardio_data["calorie_conversion"]
-        time_per_unit = self.calorie_params['unit'] / self.calorie_params["calories_per_unit"][self.cardio_action.name]
+    def convert_calories_to_seconds(self, calorie_parameters):
+        time_per_unit = calorie_parameters['unit'] / calorie_parameters["calories_per_unit"][self.cardio_action.name]
         self.reps_per_set = int(self.reps_per_set * time_per_unit)
 
 
@@ -284,7 +283,9 @@ class Movement(Serialisable):
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
             'equipment': self.equipment.value if self.equipment is not None else None,
-            'explosive': self.explosive
+            'explosive': self.explosive,
+            'primary_actions': self.primary_actions,
+            'secondary_actions': self.secondary_actions
         }
         return ret
 

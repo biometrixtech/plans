@@ -34,6 +34,14 @@ class MovementLibraryParser(object):
                     print(f"cardio_action: {row['cardio_action']}")
         if row.get('body_position') is not None and row['body_position'] != "" and row['body_position'] != "none":
             movement.body_position = BodyPosition[row['body_position']]
+
+        if row.get('primary_actions') is not None and row["primary_actions"] != "" and row['primary_actions'] != "none":
+            primary_actions = row['primary_actions'].split(",")
+            movement.primary_actions = [action.strip() for action in primary_actions]
+        if row.get('secondary_actions') is not None and row["secondary_actions"] != "" and row['secondary_actions'] != "none":
+            row['secondary_actions'].replace(", ", ",")
+            secondary_actions = row['secondary_actions'].split(",")
+            movement.secondary_actions = [action.strip() for action in secondary_actions]
         # if row.get('equipment') is not None and row['equipment'] != "":
         #     try:
         #         movement.equipment = Equipment[row['equipment']]
