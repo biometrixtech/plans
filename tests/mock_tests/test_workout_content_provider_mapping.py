@@ -3,15 +3,6 @@ from models.movement_tags import AdaptationType, TrainingType, CardioAction
 from models.exercise import UnitOfMeasure
 from models.cardio_data import get_cardio_data
 
-# import os
-# import json
-
-# def get_cardio_data(provider='soflete'):
-#     file_name = f'cardiorespiratory_data_{provider}.json'
-#     file_path = os.path.join("../../apigateway/models", file_name)
-#     with open(file_path, 'r') as f:
-#         cardio_data = json.load(f)
-#     return cardio_data
 
 def test_training_type_flexibility():
 
