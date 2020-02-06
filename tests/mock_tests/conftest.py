@@ -4,7 +4,8 @@ xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 from fathomapi.api.config import Config
 
-def pytest_configure(config):
+
+def pytest_configure():
     os.environ['ENVIRONMENT'] = 'dev'
     Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
                                  'body_part_mapping_filename': 'body_part_mapping_fathom.json',
