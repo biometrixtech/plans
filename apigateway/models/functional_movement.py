@@ -276,6 +276,8 @@ class FunctionalMovementActionMapping(object):
         self.shoulder_scapula_joint_functional_movement = None
         self.elbow_joint_functional_movement = None
 
+        self.set_muscles()
+
     def set_muscles(self):
 
         if self.exercise_action is not None:
@@ -298,7 +300,7 @@ class FunctionalMovementActionMapping(object):
             functional_movement = FunctionalMovement(functional_movement_type, target_joint_action.priority)
 
         return functional_movement
-    
+
 
 class FunctionalMovementActivityMapping(object):
     def __init__(self, functional_movement_type, is_concentric, concentric_level, is_eccentric, eccentric_level):
