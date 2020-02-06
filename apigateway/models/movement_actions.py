@@ -1,5 +1,12 @@
+from enum import Enum
 from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment
 from serialisable import Serialisable
+
+
+class MuscleAction(Enum):
+    concentric = 0
+    eccentric = 1
+    isometric = 2
 
 
 class ExerciseAction(object):
@@ -11,7 +18,18 @@ class ExerciseAction(object):
         self.resistance_applied = False
         self.explosiveness = None
         self.muscle_action = None
-        self.functional_movements = []
+        self.hip_joint_action = None
+        self.knee_joint_action = None
+        self.ankle_joint_action = None
+        self.trunk_joint_action = None
+        self.shoulder_scapula_joint_action = None
+        self.elbow_joint_action = None
+
+
+class PrioritizedJointAction(object):
+    def __init__(self):
+        self.priority = 0
+        self.joint_action = None
 
 
 class ExerciseCompoundAction(object):

@@ -1,9 +1,11 @@
 from enum import Enum
+from collections import namedtuple
 from models.session import SessionType
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPartFactory
 from datetime import timedelta
 from models.functional_movement_mapping import ActionMappingMovementFactory
+from models.movement_actions import MuscleAction
 
 
 class FunctionalMovementType(Enum):
@@ -27,7 +29,7 @@ class FunctionalMovementType(Enum):
     trunk_extension = 17
     trunk_lateral_flexion = 18
     trunk_rotation = 19
-    trunk_flexion_and_rotation = 20
+    trunk_flexion_with_rotation = 20
     trunk_extension_with_rotation = 21
     elbow_flexion = 22
     elbow_extension = 23
@@ -43,6 +45,68 @@ class FunctionalMovementType(Enum):
     scapular_depression = 33
 
 
+FunctionalMovementPair = namedtuple('FunctionalMovementPair',['movement_1', 'movement_2'])
+
+
+class FunctionalMovementPairs(object):
+    def __init__(self):
+        self.pairs = []
+        self.populate_pairs()
+
+    def populate_pairs(self):
+
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.ankle_dorsiflexion,
+                                                 FunctionalMovementType.ankle_plantar_flexion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.inversion_of_the_foot,
+                                                 FunctionalMovementType.eversion_of_the_foot))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.knee_flexion,
+                                                 FunctionalMovementType.knee_extension))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.tibial_external_rotation,
+                                                 FunctionalMovementType.tibial_internal_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.hip_adduction,
+                                                 FunctionalMovementType.hip_abduction))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.hip_internal_rotation,
+                                                 FunctionalMovementType.hip_external_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.hip_extension,
+                                                 FunctionalMovementType.hip_flexion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.pelvic_anterior_tilt,
+                                                 FunctionalMovementType.pelvic_posterior_tilt))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_flexion,
+                                                 FunctionalMovementType.trunk_extension))
+        # note no pair
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_lateral_flexion,
+                                                 FunctionalMovementType.trunk_lateral_flexion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_rotation,
+                                                 FunctionalMovementType.trunk_rotation))
+
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_flexion_with_rotation,
+                                                 FunctionalMovementType.trunk_extension_with_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.elbow_flexion,
+                                                 FunctionalMovementType.elbow_extension))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.shoulder_horizontal_abduction,
+                                                 FunctionalMovementType.shoulder_horizontal_adduction))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation,
+                                                 FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation,
+                                                 FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.internal_rotation,
+                                                 FunctionalMovementType.external_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.scapular_elevation,
+                                                 FunctionalMovementType.scapular_depression))
+
+    def get_functional_movement_for_muscle_action(self, muscle_action, functional_movement_type):
+
+        if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
+            return functional_movement_type
+        elif muscle_action == MuscleAction.eccentric:
+            pair = [i for i, v in enumerate(self.pairs) if v[0] == functional_movement_type or v[1] == functional_movement_type]
+
+            if self.pairs[2][0] == functional_movement_type:
+                return self.pairs[2][1]
+            else:
+                return self.pairs[2][0]
+
+
 class BodyPartFunction(Enum):
     prime_mover = 0
     antagonist = 1
@@ -50,8 +114,9 @@ class BodyPartFunction(Enum):
 
 
 class FunctionalMovement(object):
-    def __init__(self, functional_movement_type):
+    def __init__(self, functional_movement_type, priority=0):
         self.functional_movement_type = functional_movement_type
+        self.priority = priority
         self.prime_movers = []
         self.antagonists = []
         self.synergists = []
@@ -200,6 +265,40 @@ class SessionFunctionalMovement(object):
 
         return body_part_side_list
 
+
+class FunctionalMovementActionMapping(object):
+    def __init__(self, exercise_action):
+        self.exercise_action = exercise_action
+        self.hip_joint_functional_movement = None
+        self.knee_joint_functional_movement = None
+        self.ankle_joint_functional_movement = None
+        self.trunk_joint_functional_movement = None
+        self.shoulder_scapula_joint_functional_movement = None
+        self.elbow_joint_functional_movement = None
+
+    def set_muscles(self):
+
+        if self.exercise_action is not None:
+            self.hip_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.hip_joint_action)
+            self.knee_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.knee_joint_action)
+            self.ankle_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.ankle_joint_action)
+            self.trunk_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.trunk_joint_action)
+            self.shoulder_scapula_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
+            self.elbow_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.elbow_joint_action)
+
+    def get_functional_movement_for_joint_action(self, target_joint_action):
+        pairs = FunctionalMovementPairs()
+
+        functional_movement = None
+
+        if target_joint_action is not None:
+            functional_movement_type = pairs.get_functional_movement_for_muscle_action(
+                self.exercise_action.muscle_action, target_joint_action.joint_action)
+
+            functional_movement = FunctionalMovement(functional_movement_type, target_joint_action.priority)
+
+        return functional_movement
+    
 
 class FunctionalMovementActivityMapping(object):
     def __init__(self, functional_movement_type, is_concentric, concentric_level, is_eccentric, eccentric_level):
