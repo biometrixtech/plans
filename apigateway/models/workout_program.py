@@ -199,8 +199,8 @@ class WorkoutExercise(Serialisable):
         return training_volume * training_intensity
 
     def process_movement(self, movement):
-        self.primary_actions = movement.primary_actions
-        self.secondary_actions = movement.secondary_actions
+        # self.primary_actions = movement.primary_actions
+        # self.secondary_actions = movement.secondary_actions
         self.body_position = movement.body_position
         self.cardio_action = movement.cardio_action
         self.training_type = movement.training_type
@@ -261,5 +261,3 @@ class WorkoutExercise(Serialisable):
     def convert_calories_to_seconds(self, calorie_parameters):
         time_per_unit = calorie_parameters['unit'] / calorie_parameters["calories_per_unit"][self.cardio_action.name]
         self.reps_per_set = int(self.reps_per_set * time_per_unit)
-
-

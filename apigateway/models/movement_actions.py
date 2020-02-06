@@ -30,22 +30,21 @@ class ExerciseAction(object):
         self.shoulder_scapula_joint_action = None
         self.elbow_joint_action = None
 
-
-        self.external_weight = {}  # in % body weight. # comes from exercise
+        self.external_weight = []  # list of ExternalWeight objects, weight is in %bodyweight
 
 
     def distribute_weight(self):
         total_weight_0 = 0
         total_weight_1 = 0
         if self.apply_resistance:
-            for equipment, weight in self.external_weight.items():
-                if equipment in self.eligible_external_resistance:
-                    if equipment.distribute:
-                        total_weight_0 += weight / 2
-                        total_weight_1 += weight / 2
+            for ex_weight in self.external_weight:
+                if ex_weight.equipment in self.eligible_external_resistance:
+                    if ex_weight.distribute_weight:
+                        total_weight_0 += ex_weight.value / 2
+                        total_weight_1 += ex_weight.value / 2
                     else:
-                        total_weight_0 += weight
-                        total_weight_1 += weight
+                        total_weight_0 += ex_weight.value
+                        total_weight_1 += ex_weight.value
 
         if self.bilateral_distribution_of_weight == WeightDistribution.bilateral:
             total_weight_0 += self.percent_body_weight[0] / 2
@@ -59,6 +58,7 @@ class ExerciseAction(object):
         elif self.bilateral_distribution_of_weight == WeightDistribution.unilateral_alternating:
             total_weight_0 += self.percent_body_weight[0] / 2
             total_weight_1 += self.percent_body_weight[0] / 2
+        return total_weight_0, total_weight_1
 
 
 class PrioritizedJointAction(object):
@@ -115,3 +115,10 @@ class Movement(Serialisable):
         movement.secondary_actions = input_dict.get('secondary_actions', [])
 
         return movement
+
+
+class ExternalWeight(object):
+    def __init__(self, equipment, value, distribute_weight=False):
+        self.equipment = equipment
+        self.value = value
+        self.distribute_weight = distribute_weight
