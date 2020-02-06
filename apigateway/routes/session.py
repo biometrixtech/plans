@@ -19,7 +19,7 @@ from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 # from logic.session_processing import merge_sessions
-from models.functional_movement import MovementPatterns
+from models.movement_patterns import MovementPatterns
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore

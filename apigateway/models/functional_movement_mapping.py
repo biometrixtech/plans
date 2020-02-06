@@ -1,4 +1,5 @@
-from models.workout_program import ExerciseAction
+from models.movement_actions import ExerciseAction
+
 
 class ActionMappingMovementFactory(object):
 
