@@ -40,7 +40,7 @@ class ExerciseAction(object):
         if self.apply_resistance:
             for equipment, weight in self.external_weight.items():
                 if equipment in self.eligible_external_resistance:
-                    if equipement.distribute:
+                    if equipment.distribute:
                         total_weight_0 += weight / 2
                         total_weight_1 += weight / 2
                     else:
