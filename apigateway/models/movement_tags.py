@@ -76,3 +76,11 @@ class Equipment(Enum):
     resistence_bands = 17
     machine = 18
     plate = 19
+
+
+class WeightDistribution(Enum):
+    bilateral = 0
+    bilateral_uneven = 1
+    unilateral = 2
+    unilateral_alternating = 3
+

@@ -1,5 +1,5 @@
 from enum import Enum
-from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment
+from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution
 from serialisable import Serialisable
 
 
@@ -13,17 +13,52 @@ class ExerciseAction(object):
     def __init__(self, id, name):
         self.id = id
         self.name = name
+        self.sets = 1
+        self.reps_per_set = 1
         self.body_position = None
         self.body_weight = 0.0
-        self.resistance_applied = False
+        self.apply_resistance = False
         self.explosiveness = None
         self.muscle_action = None
+        self.bilateral_distribution_of_weight = WeightDistribution.bilateral
+        self.eligible_external_resistance = []
+        self.percent_body_weight = []
         self.hip_joint_action = None
         self.knee_joint_action = None
         self.ankle_joint_action = None
         self.trunk_joint_action = None
         self.shoulder_scapula_joint_action = None
         self.elbow_joint_action = None
+
+
+        self.external_weight = {}  # in % body weight. # comes from exercise
+
+
+    def distribute_weight(self):
+        total_weight_0 = 0
+        total_weight_1 = 0
+        if self.apply_resistance:
+            for equipment, weight in self.external_weight.items():
+                if equipment in self.eligible_external_resistance:
+                    if equipement.distribute:
+                        total_weight_0 += weight / 2
+                        total_weight_1 += weight / 2
+                    else:
+                        total_weight_0 += weight
+                        total_weight_1 += weight
+
+        if self.bilateral_distribution_of_weight == WeightDistribution.bilateral:
+            total_weight_0 += self.percent_body_weight[0] / 2
+            total_weight_1 += self.percent_body_weight[0] / 2
+        elif self.bilateral_distribution_of_weight == WeightDistribution.bilateral_uneven:
+            total_weight_0 += self.percent_body_weight[0]
+            total_weight_1 += self.percent_body_weight[1]
+        elif self.bilateral_distribution_of_weight == WeightDistribution.unilateral:
+            total_weight_0 += self.percent_body_weight[0] / 2
+            total_weight_1 += self.percent_body_weight[0] / 2
+        elif self.bilateral_distribution_of_weight == WeightDistribution.unilateral_alternating:
+            total_weight_0 += self.percent_body_weight[0] / 2
+            total_weight_1 += self.percent_body_weight[0] / 2
 
 
 class PrioritizedJointAction(object):
