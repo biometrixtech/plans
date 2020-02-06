@@ -1,5 +1,6 @@
 from models.soreness_base import BodyPartSide, BodyPartLocation
-from models.functional_movement import BodyPartInjuryRisk
+from models.body_part_injury_risk import BodyPartInjuryRisk
+
 
 class FunctionalMovementSummary(object):
     def __init__(self):
