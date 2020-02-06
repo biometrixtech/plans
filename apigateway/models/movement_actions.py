@@ -29,6 +29,8 @@ class ExerciseAction(object):
         self.trunk_joint_action = None
         self.shoulder_scapula_joint_action = None
         self.elbow_joint_action = None
+        self.total_load_left = 0
+        self.total_load_right = 0
 
         self.external_weight = []  # list of ExternalWeight objects, weight is in %bodyweight
 

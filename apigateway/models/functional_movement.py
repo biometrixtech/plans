@@ -305,28 +305,50 @@ class FunctionalMovementActionMapping(object):
 
     def set_muscle_load(self):
 
-        load = 0
+        self.apply_load_to_functional_movement(self.hip_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movement(self.knee_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movement(self.ankle_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movement(self.trunk_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movement(self.shoulder_scapula_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movement(self.elbow_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
 
-        self.apply_load_to_functional_movement(self.hip_joint_functional_movement, load)
-        self.apply_load_to_functional_movement(self.knee_joint_functional_movement, load)
-        self.apply_load_to_functional_movement(self.ankle_joint_functional_movement, load)
-        self.apply_load_to_functional_movement(self.trunk_joint_functional_movement, load)
-        self.apply_load_to_functional_movement(self.shoulder_scapula_joint_functional_movement, load)
-        self.apply_load_to_functional_movement(self.elbow_joint_functional_movement, load)
+    def apply_load_to_functional_movement(self, functional_movement, left_load, right_load):
 
-    def apply_load_to_functional_movement(self, functional_movement, load):
+        body_part_factory = BodyPartFactory()
+
         for p in functional_movement.prime_movers:
-            attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                          BodyPartFunction.prime_mover, load)
-            self.update_muscle_dictionary(p, attributed_muscle_load)
+            body_part_side_list = body_part_factory.get_body_part_side_list(p)
+            for body_part_side in body_part_side_list:
+                if body_part_side.side == 1 or body_part_side == 0:
+                    attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                  BodyPartFunction.prime_mover, left_load)
+                    self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
+                if body_part_side.side == 2 or body_part_side == 0:
+                    attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                  BodyPartFunction.prime_mover, right_load)
+                    self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
         for s in functional_movement.synergists:
-            attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                          BodyPartFunction.synergist, load)
-            self.update_muscle_dictionary(s, attributed_muscle_load)
+            body_part_side_list = body_part_factory.get_body_part_side_list(s)
+            for body_part_side in body_part_side_list:
+                if body_part_side.side == 1 or body_part_side == 0:
+                    attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                  BodyPartFunction.synergist, left_load)
+                    self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
+                if body_part_side.side == 2 or body_part_side == 0:
+                    attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                  BodyPartFunction.synergist, right_load)
+                    self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
         for t in functional_movement.stabilizers:
-            attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                          BodyPartFunction.stabilizer, load)
-            self.update_muscle_dictionary(t, attributed_muscle_load)
+            body_part_side_list = body_part_factory.get_body_part_side_list(t)
+            for body_part_side in body_part_side_list:
+                if body_part_side.side == 1 or body_part_side == 0:
+                    attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                  BodyPartFunction.stabilizer, left_load)
+                    self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
+                if body_part_side.side == 2 or body_part_side == 0:
+                    attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                  BodyPartFunction.stabilizer, right_load)
+                    self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
 
     def update_muscle_dictionary(self, muscle, attributed_muscle_load):
         if muscle in self.muscle_load:
@@ -334,7 +356,10 @@ class FunctionalMovementActionMapping(object):
         else:
             self.muscle_load[muscle] = attributed_muscle_load
 
-    def get_muscle_load(self, functional_movement_priority, muscle_role, load, stability_rating=0.5):
+    def get_muscle_load(self, functional_movement_priority, muscle_role, load):
+
+        stability_rating = 0.5
+        # TODO: get stability from exercise action
 
         if functional_movement_priority == 1:
             priority_ratio = 1.00

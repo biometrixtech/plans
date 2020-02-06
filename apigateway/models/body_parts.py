@@ -72,6 +72,28 @@ class BodyPartFactory(object):
             location = body_part
         return location
 
+    def get_body_part_side_list(self, body_part_enum):
+
+        body_part_side_list = []
+
+        body_part_factory = BodyPartFactory()
+        #body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
+        bilateral = body_part_factory.get_bilateral(BodyPartLocation(body_part_enum))
+
+        # if bilateral:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), side)
+        # else:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
+        if not bilateral:
+            sides = [0]
+        else:
+            sides = [1, 2]
+        for side in sides:
+            body_part_side = BodyPartSide(BodyPartLocation(body_part_enum), side=side)
+            body_part_side_list.append(body_part_side)
+
+        return body_part_side_list
+
     def get_progression_list(self, exercise):
 
         dict = {}
