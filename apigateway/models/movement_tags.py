@@ -83,4 +83,3 @@ class WeightDistribution(Enum):
     bilateral_uneven = 1
     unilateral = 2
     unilateral_alternating = 3
-
