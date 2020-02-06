@@ -8,7 +8,7 @@ from models.sport import SportName, SportType, BaseballPosition, BasketballPosit
 from models.post_session_survey import PostSurvey
 from models.load_stats import LoadStats
 from models.asymmetry import Asymmetry
-from models.functional_movement import MovementPatterns
+from models.movement_patterns import MovementPatterns
 from models.soreness_base import BodyPartSide
 from models.workout_program import WorkoutProgramModule
 

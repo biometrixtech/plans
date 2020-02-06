@@ -1,4 +1,5 @@
-from models.workout_program import Movement, WorkoutExercise, WorkoutSection
+from models.workout_program import WorkoutExercise, WorkoutSection
+from models.movement_actions import Movement
 from models.movement_tags import AdaptationType, TrainingType, CardioAction
 from models.exercise import UnitOfMeasure
 from datastores.movement_library_datastore import MovementLibraryDatastore

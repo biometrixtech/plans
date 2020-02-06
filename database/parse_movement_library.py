@@ -1,4 +1,4 @@
-from models.workout_program import Movement
+from models.movement_actions import Movement
 from movement_tags import CardioAction, TrainingType, BodyPosition, Equipment
 import os
 import json

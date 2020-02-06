@@ -2,7 +2,7 @@ import os
 import json
 from aws_xray_sdk.core import xray_recorder
 
-from models.workout_program import Movement
+from models.movement_actions import Movement
 from fathomapi.api.config import Config
 
 
