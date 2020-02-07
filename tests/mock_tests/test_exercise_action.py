@@ -66,15 +66,26 @@ def test_external_intensity_dumbell_bilateral():
     assert action.training_volume_right == 10
 
 
-def test_external_intensity_dumbell_bilateral_uneven():
+def test_external_intensity_dumbell_bilateral_uneven_no_side():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50)
-    action = get_action('100', "test action", exercise=workout_exercise)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral_uneven, body_weight=[60, 0])
 
-    assert action.external_intensity_left == 50
-    assert action.external_intensity_right == 50
+    assert action.external_intensity_left == 25
+    assert action.external_intensity_right == 25
 
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
+
+
+def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
+    workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50, side=1)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral_uneven, body_weight=[60, 0])
+
+    assert action.external_intensity_left == 50
+    assert action.external_intensity_right == 0
+
+    assert action.training_volume_left == 10
+    assert action.training_volume_right == 0
 
 
 def test_external_intensity_unilateral_dumbbell_no_side_defined():
@@ -185,3 +196,25 @@ def test_bodyweight_intensity_bilateral_uneven_nondominant_2():
 
     assert action.training_volume_left == 10
     assert action.training_volume_right == 0
+
+
+def test_bodyweight_intensity_bilateral_uneven_dominant_not_defined_dominant():
+    workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral_uneven, body_weight=[60, 0])
+
+    assert action.bodyweight_intensity_left == 30
+    assert action.bodyweight_intensity_right == 30
+
+    assert action.training_volume_left == 10
+    assert action.training_volume_right == 10
+
+
+def test_bodyweight_intensity_bilateral_uneven_dominant_not_defined_nondominant():
+    workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral_uneven, body_weight=[0, 40])
+
+    assert action.bodyweight_intensity_left == 20
+    assert action.bodyweight_intensity_right == 20
+
+    assert action.training_volume_left == 10
+    assert action.training_volume_right == 10

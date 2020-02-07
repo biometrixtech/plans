@@ -65,8 +65,8 @@ class ExerciseAction(object):
                                 else:  # non-dominant action
                                     left = ex_weight.value / 2
                             else:
-                                left = ex_weight.value / 2
-                                right = ex_weight.value / 2
+                                left = ex_weight.value / 4
+                                right = ex_weight.value / 4
                         elif self.bilateral_distribution_of_weight == WeightDistribution.unilateral:
                             if self.side == 1:  # performed left only
                                 left = ex_weight.value
@@ -100,8 +100,8 @@ class ExerciseAction(object):
                                 else:  # non-dominant action
                                     left = ex_weight.value
                             else:
-                                left = ex_weight.value
-                                right = ex_weight.value
+                                left = ex_weight.value / 2
+                                right = ex_weight.value / 2
                         else:  # bilateral and unilateral alternating get full amount for each side
                             left = ex_weight.value
                             right = ex_weight.value
