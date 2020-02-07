@@ -10,7 +10,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     exercise.sets = sets
     exercise.unit_of_measure = unit
     exercise.movement_id = movement_id
-    exercise.weight_type = equipment
+    exercise.equipment = equipment
     exercise.weight_in_lbs = weight
     exercise.side = side
     return exercise
@@ -19,7 +19,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
 def get_action(action_id, name, exercise, weight_dist=WeightDistribution.bilateral, body_weight=(0, 0)):
     action = ExerciseAction(action_id, name)
 
-    external_weight = ExternalWeight(exercise.weight_type, exercise.weight_in_lbs)
+    external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
     action.external_weight = [external_weight]
 
     action.reps = exercise.reps_per_set

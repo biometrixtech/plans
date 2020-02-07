@@ -66,7 +66,7 @@ class Equipment(Enum):
     barbells = 7
     dumbbells = 8
     kettlebells = 9
-    double_kettlebells = 10
+    double_kettlebell = 10
     sandbags = 11
     atlas_stones = 12
     yoke = 13

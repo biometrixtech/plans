@@ -27,14 +27,22 @@ class WorkoutProcessor(object):
         for action_id in movement.primary_actions:
             action = action_library.get(action_id)
             if action is not None:
-                external_weight = ExternalWeight(exercise.weight_type, exercise.weight_in_lbs)
+                external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
                 action.external_weight = [external_weight]
+
+                action.reps = exercise.reps_per_set
+                action.side = exercise.side
+                action.get_external_intensity()
+                action.get_body_weight_intensity()
+                action.get_training_volume()
+                action.get_training_load()
+
                 exercise.primary_actions.append(action)
 
         for action_id in movement.secondary_actions:
             action = action_library.get(action_id)
             if action is not None:
-                external_weight = ExternalWeight(exercise.weight_type, exercise.weight_in_lbs)
+                external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
                 action.external_weight = [external_weight]
 
                 action.reps = exercise.reps_per_set

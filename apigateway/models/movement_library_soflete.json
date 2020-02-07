@@ -7,7 +7,11 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000x8",
+            "4202",
+            "4202"
+        ],
         "secondary_actions": []
     },
     "58459de6dc2ce90011f93d86": {
@@ -40,7 +44,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -51,11 +55,11 @@
         "body_position": 13,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 0,
         "explosive": 0,
         "primary_actions": [
-            "2004",
-            "2003b"
+            "4001",
+            "3004b"
         ],
         "secondary_actions": []
     },
@@ -67,7 +71,10 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4103",
+            "4201"
+        ],
         "secondary_actions": []
     },
     "5cf5bc00cc3ad8000f2db379": {
@@ -76,14 +83,14 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [
             "2151"
         ],
         "secondary_actions": [
-            "2005",
-            "1103a"
+            "4101",
+            "2303a"
         ]
     },
     "588a1c5a65dcf3000f912414": {
@@ -105,7 +112,11 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000x16",
+            "4202",
+            "4202"
+        ],
         "secondary_actions": []
     },
     "5a465706b0d8ca000f2f5360": {
@@ -125,7 +136,7 @@
         "body_position": null,
         "cardio_action": 3,
         "training_type": 1,
-        "equipment": null,
+        "equipment": 1,
         "explosive": 0,
         "primary_actions": [
             "200"
@@ -140,7 +151,14 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000x6",
+            "4202",
+            "4202",
+            "4203",
+            "4203",
+            "4203"
+        ],
         "secondary_actions": []
     },
     "58bacf5fe8f951000fbfe4eb": {
@@ -151,7 +169,10 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000",
+            "4202"
+        ],
         "secondary_actions": []
     },
     "5c7d600431c07b000f591edb": {
@@ -171,7 +192,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -182,7 +203,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -193,7 +214,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -204,7 +225,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -215,7 +236,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -226,7 +247,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -237,7 +258,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -251,10 +272,10 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "sprint",
-            "shuffle",
-            "backward run",
-            "shuffle"
+            "4000",
+            "4103",
+            "4003",
+            "4103"
         ],
         "secondary_actions": []
     },
@@ -290,7 +311,12 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000x4",
+            "4203",
+            "4203",
+            "4203"
+        ],
         "secondary_actions": []
     },
     "5a5030f2b0d8ca000f30c99c": {
@@ -310,12 +336,12 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [
-            "2101",
-            "2102",
-            "2102"
+            "3101",
+            "3102",
+            "3102"
         ],
         "secondary_actions": [
             "1000",
@@ -349,7 +375,11 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000x4",
+            "4202",
+            "4202"
+        ],
         "secondary_actions": []
     },
     "57e2fd3a4c6a031dc777e925": {
@@ -358,12 +388,12 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [
-            "2101",
-            "2102",
-            "2102"
+            "3101",
+            "3102",
+            "3102"
         ],
         "secondary_actions": [
             "1000"
@@ -378,7 +408,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -402,7 +433,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -415,7 +447,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -471,7 +504,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 0,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -482,7 +515,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 20,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -570,7 +603,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -603,7 +636,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -614,10 +647,10 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 21,
         "explosive": 0,
         "primary_actions": [
-            "2002"
+            "3002"
         ],
         "secondary_actions": []
     },
@@ -638,7 +671,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -693,7 +726,7 @@
         "body_position": null,
         "cardio_action": 4,
         "training_type": 1,
-        "equipment": null,
+        "equipment": 2,
         "explosive": 0,
         "primary_actions": [
             "100"
@@ -706,7 +739,7 @@
         "body_position": null,
         "cardio_action": 4,
         "training_type": 1,
-        "equipment": null,
+        "equipment": 2,
         "explosive": 0,
         "primary_actions": [
             "100"
@@ -721,7 +754,9 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4001xreps/2"
+        ],
         "secondary_actions": []
     },
     "5ac640bdd4365e000f26e0f8": {
@@ -730,7 +765,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -752,7 +787,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -774,10 +809,10 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [
-            "1200",
+            "2100",
             "1201"
         ],
         "secondary_actions": [
@@ -790,7 +825,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [
             "trunk rotation",
@@ -804,10 +839,10 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [
-            "1200",
+            "2100",
             "1201"
         ],
         "secondary_actions": []
@@ -840,7 +875,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -851,7 +886,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1027,13 +1062,13 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [
-            "2103"
+            "3103"
         ],
         "secondary_actions": [
-            "1104a"
+            "2304a"
         ]
     },
     "5905e466825920000fabbb37": {
@@ -1042,7 +1077,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1053,11 +1088,11 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 0,
         "explosive": 0,
         "primary_actions": [
-            "2001",
-            "2006"
+            "3001",
+            "3020"
         ],
         "secondary_actions": [
             "1004"
@@ -1069,7 +1104,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1091,7 +1126,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 20,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1102,7 +1137,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1113,7 +1148,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1124,7 +1159,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1135,7 +1170,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1146,7 +1181,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1157,7 +1192,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1182,7 +1217,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "302"
+            "302",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -1238,7 +1274,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1273,7 +1309,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1284,7 +1320,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1405,7 +1441,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1416,7 +1452,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1427,7 +1463,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1438,7 +1474,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1449,7 +1485,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1460,7 +1496,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1482,7 +1518,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1493,7 +1529,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1504,7 +1540,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1515,7 +1551,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1526,7 +1562,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1537,7 +1573,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1548,7 +1584,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1559,7 +1595,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1570,7 +1606,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1581,7 +1617,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1603,7 +1639,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1614,7 +1650,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1625,7 +1661,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1636,7 +1672,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1647,7 +1683,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1669,7 +1705,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1680,7 +1716,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1691,7 +1727,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1702,7 +1738,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1713,7 +1749,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1724,7 +1760,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1735,7 +1771,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1746,7 +1782,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1757,7 +1793,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1768,7 +1804,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1779,7 +1815,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1790,7 +1826,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1801,7 +1837,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1812,7 +1848,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1823,7 +1859,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1834,7 +1870,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1845,7 +1881,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1856,7 +1892,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1867,7 +1903,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1878,7 +1914,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1889,7 +1925,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1900,7 +1936,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1911,7 +1947,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1922,7 +1958,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1933,7 +1969,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1944,7 +1980,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1955,7 +1991,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1966,7 +2002,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1977,7 +2013,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1988,7 +2024,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -1999,7 +2035,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 0,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2010,7 +2046,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2021,7 +2057,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2032,7 +2068,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2043,7 +2079,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2054,7 +2090,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2065,7 +2101,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2076,7 +2112,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2087,7 +2123,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2098,7 +2134,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2109,7 +2145,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2120,7 +2156,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2131,7 +2167,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2142,7 +2178,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2153,7 +2189,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2164,7 +2200,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2175,7 +2211,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2186,7 +2222,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2197,7 +2233,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2208,7 +2244,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2241,7 +2277,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2252,7 +2288,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2263,7 +2299,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2274,7 +2310,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2285,7 +2321,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2296,7 +2332,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2307,7 +2343,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2318,7 +2354,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2329,7 +2365,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2340,7 +2376,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2351,7 +2387,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2362,7 +2398,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2373,7 +2409,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2384,7 +2420,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2395,7 +2431,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2406,7 +2442,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2417,7 +2453,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2428,7 +2464,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2439,7 +2475,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2450,7 +2486,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2461,7 +2497,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2472,7 +2508,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2483,7 +2519,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2494,7 +2530,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2505,7 +2541,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2516,7 +2552,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2527,7 +2563,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2538,7 +2574,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2560,7 +2596,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2571,7 +2607,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2593,7 +2629,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2603,8 +2639,8 @@
         "name": "Bear Crawl Sled Drag",
         "body_position": null,
         "cardio_action": null,
-        "training_type": 6,
-        "equipment": null,
+        "training_type": 5,
+        "equipment": 16,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2626,7 +2662,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 20,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2637,7 +2673,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2659,7 +2695,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2670,7 +2706,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2681,7 +2717,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2694,7 +2730,10 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000xdosage/5",
+            "3020"
+        ],
         "secondary_actions": []
     },
     "5c5fb5a782c07a00126c9a38": {
@@ -2703,7 +2742,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2714,7 +2753,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 14,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2758,7 +2797,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2813,7 +2852,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2824,7 +2863,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2835,7 +2874,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -2846,7 +2885,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3011,7 +3050,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3022,7 +3061,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3299,7 +3338,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3420,7 +3459,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3442,7 +3481,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 13,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3643,7 +3682,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -3697,7 +3737,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3719,7 +3759,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3730,7 +3770,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3829,7 +3869,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 20,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3895,7 +3935,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -3994,7 +4034,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4074,7 +4114,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -4120,7 +4161,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -4165,7 +4207,10 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000x3",
+            "4003x3"
+        ],
         "secondary_actions": []
     },
     "5c14630e2fa17a000f535900": {
@@ -4177,16 +4222,9 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "change of direction",
-            "sprint",
-            "change of direction",
-            "sprint",
-            "change of direction",
-            "sprint",
-            "change of direction",
-            "sprint",
-            "change of direction",
-            "sprint"
+            "4000x6",
+            "4203x3",
+            "4200x3"
         ],
         "secondary_actions": []
     },
@@ -4198,7 +4236,11 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000x4",
+            "4103x2",
+            "4203x2"
+        ],
         "secondary_actions": []
     },
     "57e2fd3a4c6a031dc777e946": {
@@ -4493,7 +4535,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4559,7 +4601,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4570,7 +4612,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4581,7 +4623,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4691,7 +4733,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4702,7 +4744,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4713,7 +4755,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4724,7 +4766,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4735,7 +4777,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4746,7 +4788,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4757,7 +4799,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4768,7 +4810,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4779,7 +4821,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4790,7 +4832,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4801,7 +4843,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4812,7 +4854,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4922,7 +4964,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4977,7 +5019,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -4999,7 +5041,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5177,7 +5219,12 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4101",
+            "4101",
+            "4101",
+            "4000"
+        ],
         "secondary_actions": []
     },
     "57e2fd3a4c6a031dc777e876": {
@@ -5296,7 +5343,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5318,7 +5365,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5329,7 +5376,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5340,7 +5387,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5351,7 +5398,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5362,7 +5409,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5373,7 +5420,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5384,7 +5431,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5406,7 +5453,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5417,7 +5464,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5428,7 +5475,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5439,7 +5486,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5450,7 +5497,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5461,7 +5508,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5472,7 +5519,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5483,7 +5530,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5494,7 +5541,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5505,7 +5552,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5516,7 +5563,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5527,7 +5574,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5538,7 +5585,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5549,7 +5596,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5560,7 +5607,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5571,7 +5618,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5582,7 +5629,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5593,7 +5640,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5604,7 +5651,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5615,7 +5662,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5626,7 +5673,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5637,7 +5684,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5670,7 +5717,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 10,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5780,7 +5827,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5791,7 +5838,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5802,7 +5849,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5824,7 +5871,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5835,7 +5882,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5846,7 +5893,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5857,7 +5904,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5868,7 +5915,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5879,7 +5926,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5890,7 +5937,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5901,7 +5948,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5912,7 +5959,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5923,7 +5970,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5934,7 +5981,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5945,7 +5992,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5956,7 +6003,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5967,7 +6014,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5978,7 +6025,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -5989,7 +6036,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6000,7 +6047,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6011,7 +6058,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6022,7 +6069,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6033,7 +6080,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6044,7 +6091,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6055,7 +6102,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6066,7 +6113,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6077,7 +6124,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6088,7 +6135,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6099,7 +6146,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6110,7 +6157,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6121,7 +6168,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6132,7 +6179,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6143,7 +6190,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6154,7 +6201,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6165,7 +6212,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6176,7 +6223,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6187,7 +6234,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6198,7 +6245,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6209,7 +6256,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6220,7 +6267,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6231,7 +6278,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6242,7 +6289,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6253,7 +6300,7 @@
         "body_position": 10,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6264,7 +6311,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6275,7 +6322,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6286,7 +6333,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6297,7 +6344,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6308,7 +6355,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6319,7 +6366,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6330,7 +6377,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6341,7 +6388,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6352,7 +6399,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6363,7 +6410,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6374,7 +6421,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6385,7 +6432,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6396,7 +6443,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6407,7 +6454,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6418,7 +6465,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6429,7 +6476,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6440,7 +6487,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6451,7 +6498,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6462,7 +6509,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6572,7 +6619,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -6673,7 +6720,9 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000xdosage/5 if meters"
+        ],
         "secondary_actions": []
     },
     "58c3432fc7cfd3000f0d0129": {
@@ -6850,7 +6899,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -6896,7 +6946,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -6909,7 +6960,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -7175,7 +7227,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -7262,7 +7315,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7273,7 +7326,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7284,7 +7337,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7295,7 +7348,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7361,7 +7414,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7394,7 +7447,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7427,7 +7480,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7449,7 +7502,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 13,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7460,7 +7513,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 13,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7669,7 +7722,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7779,7 +7832,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7878,7 +7931,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7889,7 +7942,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7900,7 +7953,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7911,7 +7964,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7922,7 +7975,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7944,7 +7997,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7966,7 +8019,7 @@
         "body_position": 6,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7977,7 +8030,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7988,7 +8041,7 @@
         "body_position": 6,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -7999,7 +8052,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8010,7 +8063,7 @@
         "body_position": 6,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8021,7 +8074,7 @@
         "body_position": 6,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8054,7 +8107,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8065,7 +8118,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8076,7 +8129,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8087,7 +8140,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8219,7 +8272,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8232,7 +8285,9 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000xdosage/5 if meters"
+        ],
         "secondary_actions": []
     },
     "5a05e9ceff5148000f6a4d49": {
@@ -8263,7 +8318,7 @@
         "body_position": 6,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8318,7 +8373,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -8659,7 +8714,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9123,7 +9178,9 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000xdosage/5 if meters"
+        ],
         "secondary_actions": []
     },
     "588113a79f4d4d000f6e0887": {
@@ -9286,7 +9343,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9297,7 +9354,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9308,7 +9365,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9319,7 +9376,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9385,7 +9442,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9484,7 +9541,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9803,7 +9860,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9814,7 +9871,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9825,7 +9882,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9836,7 +9893,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9847,7 +9904,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9858,7 +9915,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9869,7 +9926,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9880,7 +9937,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9891,7 +9948,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9902,7 +9959,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9913,7 +9970,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9924,7 +9981,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9935,7 +9992,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9946,7 +10003,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9957,7 +10014,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9968,7 +10025,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9979,7 +10036,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -9990,7 +10047,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10001,7 +10058,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10012,7 +10069,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10023,7 +10080,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10034,7 +10091,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10045,7 +10102,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10056,7 +10113,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10078,7 +10135,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10089,7 +10146,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10100,7 +10157,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10111,7 +10168,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10122,7 +10179,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10133,7 +10190,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10144,7 +10201,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10155,7 +10212,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10166,7 +10223,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10177,7 +10234,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10188,7 +10245,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10199,7 +10256,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10210,7 +10267,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10221,7 +10278,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10232,7 +10289,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10243,7 +10300,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10254,7 +10311,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10265,7 +10322,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10276,7 +10333,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10287,7 +10344,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10298,7 +10355,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10309,7 +10366,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10320,7 +10377,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10331,7 +10388,7 @@
         "body_position": 10,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10342,7 +10399,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10353,7 +10410,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10364,7 +10421,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10375,7 +10432,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10507,7 +10564,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10562,7 +10619,7 @@
         "body_position": 6,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10597,7 +10654,9 @@
         "training_type": 6,
         "equipment": null,
         "explosive": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000xdosage/5 if meters"
+        ],
         "secondary_actions": []
     },
     "587d1cd4b06dc50011d09514": {
@@ -10815,7 +10874,7 @@
         "body_position": 7,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10848,7 +10907,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10859,7 +10918,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10870,7 +10929,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -10881,7 +10940,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11024,7 +11083,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11057,7 +11116,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11125,7 +11184,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11525,7 +11584,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11569,7 +11628,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11624,7 +11683,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11635,7 +11694,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11646,7 +11705,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11657,7 +11716,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11690,7 +11749,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11701,7 +11760,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11712,7 +11771,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11723,7 +11782,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11734,7 +11793,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11745,7 +11804,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11756,7 +11815,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 6,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11767,7 +11826,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11778,7 +11837,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11789,7 +11848,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11800,7 +11859,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11811,7 +11870,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11943,7 +12002,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11987,7 +12046,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -11998,7 +12057,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12009,7 +12068,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12108,7 +12167,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12119,7 +12178,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12144,7 +12203,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -12220,7 +12280,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12242,7 +12302,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12275,7 +12335,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12286,7 +12346,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12297,7 +12357,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12330,7 +12390,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12341,7 +12401,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12396,7 +12456,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 6,
-        "equipment": null,
+        "equipment": 16,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12407,7 +12467,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 13,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12759,7 +12819,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -12858,7 +12918,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 20,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13102,7 +13162,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13113,7 +13173,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13124,7 +13184,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13135,7 +13195,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13223,7 +13283,7 @@
         "body_position": 1,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13256,7 +13316,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 16,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13740,7 +13800,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13927,7 +13987,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13938,7 +13998,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -13993,7 +14053,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14004,7 +14064,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14246,7 +14306,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14312,7 +14372,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14367,7 +14427,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14400,7 +14460,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14411,7 +14471,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14446,7 +14506,7 @@
         "body_position": null,
         "cardio_action": 7,
         "training_type": 1,
-        "equipment": null,
+        "equipment": 6,
         "explosive": 0,
         "primary_actions": [
             "0"
@@ -14571,7 +14631,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14648,7 +14708,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14659,7 +14719,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14670,7 +14730,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14681,7 +14741,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14692,7 +14752,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14703,7 +14763,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14714,7 +14774,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14725,7 +14785,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14736,7 +14796,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14747,7 +14807,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14758,7 +14818,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14769,7 +14829,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14780,7 +14840,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14791,7 +14851,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14802,7 +14862,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14824,7 +14884,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14835,7 +14895,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14846,7 +14906,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14857,7 +14917,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14868,7 +14928,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14879,7 +14939,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14890,11 +14950,11 @@
         "body_position": null,
         "cardio_action": 1,
         "training_type": 1,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [
             "1",
-            "1005"
+            "2005"
         ],
         "secondary_actions": []
     },
@@ -14904,7 +14964,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14915,7 +14975,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14926,7 +14986,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14937,7 +14997,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14948,7 +15008,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 6,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14959,7 +15019,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14970,7 +15030,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14981,7 +15041,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -14992,7 +15052,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15003,7 +15063,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15014,7 +15074,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15025,7 +15085,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15036,7 +15096,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15047,7 +15107,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15058,7 +15118,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15069,7 +15129,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15080,7 +15140,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15204,7 +15264,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -15269,7 +15330,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15280,7 +15341,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15313,7 +15374,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15324,7 +15385,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15368,7 +15429,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15401,7 +15462,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15445,7 +15506,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15456,7 +15517,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15533,7 +15594,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15621,7 +15682,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15676,7 +15737,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15701,7 +15762,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -15942,7 +16004,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 11,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -15953,7 +16015,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16063,7 +16125,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16107,7 +16169,7 @@
         "body_position": 2,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16305,7 +16367,7 @@
         "body_position": 2,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16316,7 +16378,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16349,7 +16411,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16360,7 +16422,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16371,7 +16433,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16393,7 +16455,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16404,7 +16466,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16415,7 +16477,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16426,7 +16488,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16437,7 +16499,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16448,7 +16510,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16462,7 +16524,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -16475,7 +16538,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -16485,7 +16549,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16496,7 +16560,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16507,7 +16571,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16518,7 +16582,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16529,7 +16593,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16540,7 +16604,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16551,7 +16615,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16562,7 +16626,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16573,7 +16637,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 4,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16584,7 +16648,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16595,7 +16659,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16606,7 +16670,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16617,7 +16681,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16639,7 +16703,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16650,7 +16714,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16661,7 +16725,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16672,7 +16736,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16683,7 +16747,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16694,7 +16758,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16705,7 +16769,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16716,7 +16780,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16727,7 +16791,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16738,7 +16802,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16749,7 +16813,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16760,7 +16824,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16793,7 +16857,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16837,7 +16901,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16848,7 +16912,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16892,7 +16956,7 @@
         "body_position": 1,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -16991,7 +17055,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17178,7 +17242,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17189,7 +17253,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17200,7 +17264,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17277,7 +17341,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17332,7 +17396,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17346,7 +17410,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -17359,7 +17424,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -17369,7 +17435,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17677,7 +17743,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17699,7 +17765,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17908,7 +17974,7 @@
         "body_position": null,
         "cardio_action": 5,
         "training_type": 1,
-        "equipment": null,
+        "equipment": 4,
         "explosive": 0,
         "primary_actions": [
             "201"
@@ -17932,7 +17998,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 16,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17954,7 +18020,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 16,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17965,7 +18031,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 16,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -17987,7 +18053,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 16,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18020,7 +18086,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18031,7 +18097,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18097,7 +18163,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18438,7 +18504,7 @@
         "body_position": 8,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18482,7 +18548,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18493,7 +18559,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18515,7 +18581,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18537,7 +18603,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18548,7 +18614,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18592,7 +18658,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18790,7 +18856,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18834,7 +18900,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18878,7 +18944,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18889,7 +18955,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18900,7 +18966,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -18911,7 +18977,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19021,7 +19087,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19076,7 +19142,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19153,7 +19219,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 12,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19164,7 +19230,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 12,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19186,7 +19252,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19230,7 +19296,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 2,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19329,7 +19395,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19340,7 +19406,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19362,7 +19428,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19373,7 +19439,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19384,7 +19450,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19439,7 +19505,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19450,7 +19516,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19461,7 +19527,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19505,7 +19571,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19527,7 +19593,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 8,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19538,7 +19604,7 @@
         "body_position": 0,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19571,7 +19637,7 @@
         "body_position": 0,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19582,7 +19648,7 @@
         "body_position": 0,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19706,7 +19772,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -19719,7 +19786,8 @@
         "equipment": null,
         "explosive": 0,
         "primary_actions": [
-            "300"
+            "300",
+            "303"
         ],
         "secondary_actions": []
     },
@@ -19894,7 +19962,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19905,7 +19973,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19916,7 +19984,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19927,7 +19995,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19938,7 +20006,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 18,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19949,7 +20017,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -19971,7 +20039,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20015,7 +20083,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20026,7 +20094,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20037,7 +20105,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20048,7 +20116,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20059,7 +20127,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20070,7 +20138,7 @@
         "body_position": 5,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20114,7 +20182,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20125,7 +20193,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20136,7 +20204,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20312,7 +20380,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20422,7 +20490,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 8,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20653,7 +20721,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20730,7 +20798,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20774,7 +20842,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20785,7 +20853,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": null,
-        "equipment": null,
+        "equipment": 9,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -20884,7 +20952,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -21071,7 +21139,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 5,
-        "equipment": null,
+        "equipment": 15,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -21445,7 +21513,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -21544,7 +21612,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 13,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -21577,7 +21645,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []
@@ -21599,7 +21667,7 @@
         "body_position": null,
         "cardio_action": null,
         "training_type": 3,
-        "equipment": null,
+        "equipment": 7,
         "explosive": 0,
         "primary_actions": [],
         "secondary_actions": []

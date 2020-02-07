@@ -42,11 +42,11 @@ class MovementLibraryParser(object):
             row['secondary_actions'].replace(", ", ",")
             secondary_actions = row['secondary_actions'].split(",")
             movement.secondary_actions = [action.strip() for action in secondary_actions]
-        # if row.get('equipment') is not None and row['equipment'] != "":
-        #     try:
-        #         movement.equipment = Equipment[row['equipment']]
-        #     except KeyError:
-        #         print(f"equipment: {row['equipment']}")
+        if row.get('equipment') is not None and row['equipment'] != "":
+            try:
+                movement.equipment = Equipment[row['equipment']]
+            except KeyError:
+                print(f"equipment: {row['equipment']}")
         return movement
 
     def write_movements_json(self):
