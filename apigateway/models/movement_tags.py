@@ -66,16 +66,24 @@ class Equipment(Enum):
     barbells = 7
     dumbbells = 8
     kettlebells = 9
-    sandbags = 10
-    atlas_stones = 11
-    yoke = 12
-    dip_belt = 13
-    medicine_balls = 14
-    sled = 15
-    farmers_carry_handles = 16
-    resistence_bands = 17
-    machine = 18
-    plate = 19
+    double_kettlebells = 10
+    sandbags = 11
+    atlas_stones = 12
+    yoke = 13
+    dip_belt = 14
+    medicine_balls = 15
+    sled = 16
+    farmers_carry_handles = 17
+    resistence_bands = 18
+    machine = 19
+    plate = 20
+    assistance_resistence_bands = 21
+
+    def distribute_weights(self):
+        if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells', 'double_kettlebells']:
+            return False
+        else:
+            return True
 
 
 class WeightDistribution(Enum):

@@ -104,6 +104,7 @@ class WorkoutExercise(Serialisable):
         self.unit_of_measure = None
         self.movement_id = ""
         self.rpe = None
+        self.side = 0
 
         self.intensity_pace = None
 

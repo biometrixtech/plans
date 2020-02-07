@@ -36,4 +36,12 @@ class WorkoutProcessor(object):
             if action is not None:
                 external_weight = ExternalWeight(exercise.weight_type, exercise.weight_in_lbs)
                 action.external_weight = [external_weight]
+
+                action.reps = exercise.reps_per_set
+                action.side = exercise.side
+                action.get_external_intensity()
+                action.get_body_weight_intensity()
+                action.get_training_volume()
+                action.get_training_load()
+
                 exercise.secondary_actions.append(action)
