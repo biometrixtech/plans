@@ -225,9 +225,9 @@ class ExerciseAction(object):
 
 
 class PrioritizedJointAction(object):
-    def __init__(self):
-        self.priority = 0
-        self.joint_action = None
+    def __init__(self, priority, joint_action):
+        self.priority = priority
+        self.joint_action = joint_action
 
 
 class ExerciseCompoundAction(object):
