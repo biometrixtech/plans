@@ -1,7 +1,8 @@
 from models.workout_program import WorkoutExercise
-from models.movement_tags import Equipment, WeightDistribution
+from models.movement_tags import Equipment, WeightDistribution, TrainingType, CardioAction
 from models.exercise import UnitOfMeasure
-from models.movement_actions import ExerciseAction, ExternalWeight
+from models.movement_actions import ExerciseAction
+from logic.workout_processing import WorkoutProcessor
 
 
 def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment.barbells, weight=100, side=0, movement_id=""):
@@ -16,22 +17,28 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     return exercise
 
 
-def get_action(action_id, name, exercise, weight_dist=WeightDistribution.bilateral, body_weight=(0, 0)):
+def get_action(action_id, name, exercise, training_type=TrainingType.strength_integrated_resistance, weight_dist=WeightDistribution.bilateral, body_weight=(0, 0)):
     action = ExerciseAction(action_id, name)
-
-    external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
-    action.external_weight = [external_weight]
-
-    action.reps = exercise.reps_per_set
-    action.side = exercise.side
+    action.training_type = training_type
     action.percent_body_weight = body_weight
     action.apply_resistance = True
     action.eligible_external_resistance = [Equipment.barbells, Equipment.dumbbells]
     action.bilateral_distribution_of_weight = weight_dist
-    action.get_external_intensity()
-    action.get_body_weight_intensity()
-    action.get_training_volume()
-    action.get_training_load()
+
+    WorkoutProcessor().process_action(action, exercise)
+    # external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
+    # action.external_weight = [external_weight]
+    #
+    # action.reps = exercise.reps_per_set
+    # action.side = exercise.side
+    # action.percent_body_weight = body_weight
+    # action.apply_resistance = True
+    # action.eligible_external_resistance = [Equipment.barbells, Equipment.dumbbells]
+    # action.bilateral_distribution_of_weight = weight_dist
+    # action.get_external_intensity()
+    # action.get_body_weight_intensity()
+    # action.get_training_volume()
+    # action.get_training_load()
     return action
 
 
@@ -218,3 +225,33 @@ def test_bodyweight_intensity_bilateral_uneven_dominant_not_defined_nondominant(
 
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
+
+
+def test_training_volume_cardioresp():
+    workout_exercise = get_exercise(reps=100, sets=1, unit=UnitOfMeasure.seconds)
+    action = get_action('100', "test action", exercise=workout_exercise, training_type=TrainingType.strength_cardiorespiratory)
+    # both sides get all the volume
+    assert action.training_volume_left == 100
+    assert action.training_volume_right == 100
+
+    assert action.rpe == 4
+
+    assert action.total_load_left == 400
+    assert action.total_load_right == 400
+
+
+def test_convert_distance_seconds_cardioresp_sandbag_run_mile():
+    workout_exercise = get_exercise(reps=100, sets=1, unit=UnitOfMeasure.seconds)
+    workout_exercise.cardio_action = CardioAction.run
+    workout_exercise.reps_per_set = 1
+    workout_exercise.sets = 1
+    workout_exercise.unit_of_measure = UnitOfMeasure.miles  # mile=1609.34
+
+    action1 = get_action('1', "run", exercise=workout_exercise, training_type=TrainingType.strength_cardiorespiratory)
+    action2 = get_action('2005', "hold weight on shoulder", exercise=workout_exercise, training_type=TrainingType.strength_integrated_resistance)
+    # action1.get_training_load()
+    # action2.get_training_load()
+    assert action1.reps == int(1609.34 * 1 * .336)
+    assert action1.training_volume_left == int(1609.34 * 1 * .336) == action1.training_volume_right
+    assert action2.reps == int(1609.34 / 5)  # 1 rep per 5 meters
+    assert action2.training_volume_left == int(1609.34 / 5) == action2.training_volume_right

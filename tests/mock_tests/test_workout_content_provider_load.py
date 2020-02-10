@@ -1,5 +1,6 @@
 from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
-from models.movement_tags import AdaptationType, CardioAction
+from models.movement_actions import ExerciseAction
+from models.movement_tags import AdaptationType, CardioAction, TrainingType
 from models.exercise import UnitOfMeasure
 from models.cardio_data import get_cardio_data
 
@@ -13,6 +14,14 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, adaptation_type=Ada
     exercise.unit_of_measure = unit
     exercise.adaptation_type = adaptation_type
     exercise.cardio_action = cardio_action
+    action = ExerciseAction('0', 'test_action')
+    action.training_type = TrainingType.strength_cardiorespiratory
+    action.reps = reps
+    action.percent_body_weight = [0, 0]
+    action.apply_resistance = True
+    action.eligible_external_resistance = []
+    action.bilateral_distribution_of_weight = None
+    exercise.primary_actions = [action]
 
     return exercise
 
@@ -37,5 +46,6 @@ def test_one_load_section_one_no_load():
 
     total_training_load = workout.get_training_load()
     assert section1.get_training_load() == 0
+    assert section2.get_training_load() != 0
     assert section2.get_training_load() == workout_exercise1.get_training_load() + workout_exercise2.get_training_load()
     assert total_training_load == section2.get_training_load()

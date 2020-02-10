@@ -1,5 +1,5 @@
 from enum import Enum
-from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution
+from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType
 from serialisable import Serialisable
 
 
@@ -13,9 +13,12 @@ class ExerciseAction(object):
     def __init__(self, id, name):
         self.id = id
         self.name = name
+        self.rpe = None
         self.sets = 1
         self.reps = 1
         self.side = 0  # both
+        self.training_type = None
+        self.adaptation_type = None
         self.body_position = None
         self.body_weight = 0.0
         self.apply_resistance = False
@@ -147,39 +150,78 @@ class ExerciseAction(object):
         return left, right
 
     def get_training_load(self):
-        self.total_load_left = self.training_volume_left * self.external_intensity_left
-        self.total_load_right = self.training_volume_right * self.external_intensity_right
+        self.get_training_intensity()
+        self.set_adaption_type()
+        self.get_training_volume()
+        if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            # both sides have same volume (duration) and intensity (rpe)
+            if self.rpe is None:
+                self.rpe = 4
+            self.total_load_left = self.training_volume_left * self.rpe
+            self.total_load_right = self.training_volume_right * self.rpe
+        else:
+            # TODO: Currently only capturing external load. update based on decision of what to do with body_weight + external_weight.
+            self.total_load_left = self.training_volume_left * self.external_intensity_left
+            self.total_load_right = self.training_volume_right * self.external_intensity_right
 
     def get_training_volume(self):
-        if self.bilateral_distribution_of_weight == WeightDistribution.unilateral:
-            if self.side == 1:
-                self.training_volume_left = self.reps
-            elif self.side == 2:
-                self.training_volume_right = self.reps
-            else:
-                self.training_volume_left = self.reps
-                self.training_volume_right = self.reps
-        elif self.bilateral_distribution_of_weight == WeightDistribution.bilateral_uneven:
-            if self.side == 1:
-                if self.percent_body_weight[0] != 0:
-                    self.training_volume_left = self.reps
-                else:
-                    self.training_volume_right = self.reps
-            elif self.side == 2:
-                if self.percent_body_weight[0] != 0:
-                    self.training_volume_right = self.reps
-                else:
-                    self.training_volume_left = self.reps
-            else:
-                self.training_volume_left = self.reps
-                self.training_volume_right = self.reps
-        else:
+        if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            # both sides are assigned all the reps (duration)
             self.training_volume_left = self.reps
             self.training_volume_right = self.reps
+        else:
+            if self.bilateral_distribution_of_weight == WeightDistribution.unilateral:
+                if self.side == 1:
+                    self.training_volume_left = self.reps
+                elif self.side == 2:
+                    self.training_volume_right = self.reps
+                else:
+                    self.training_volume_left = self.reps
+                    self.training_volume_right = self.reps
+            elif self.bilateral_distribution_of_weight == WeightDistribution.bilateral_uneven:
+                if self.side == 1:
+                    if self.percent_body_weight[0] != 0:
+                        self.training_volume_left = self.reps
+                    else:
+                        self.training_volume_right = self.reps
+                elif self.side == 2:
+                    if self.percent_body_weight[0] != 0:
+                        self.training_volume_right = self.reps
+                    else:
+                        self.training_volume_left = self.reps
+                else:
+                    self.training_volume_left = self.reps
+                    self.training_volume_right = self.reps
+            else:
+                self.training_volume_left = self.reps
+                self.training_volume_right = self.reps
 
     def get_training_intensity(self):
         self.get_external_intensity()
         self.get_body_weight_intensity()
+
+    def set_adaption_type(self):
+        if self.training_type == TrainingType.flexibility:
+            self.adaptation_type = AdaptationType.not_tracked
+        if self.training_type == TrainingType.movement_prep:
+            self.adaptation_type = AdaptationType.not_tracked
+        if self.training_type == TrainingType.skill_development:
+            self.adaptation_type = AdaptationType.not_tracked
+        elif self.training_type == TrainingType.strength_cardiorespiratory:
+            self.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+        elif self.training_type == TrainingType.strength_endurance:
+            self.adaptation_type = AdaptationType.strength_endurance_strength
+        elif self.training_type == TrainingType.power_action_plyometrics:
+            self.adaptation_type = AdaptationType.power_explosive_action
+        elif self.training_type == TrainingType.power_action_olympic_lift:
+            self.adaptation_type = AdaptationType.power_explosive_action
+        elif self.training_type == TrainingType.power_drills_plyometrics:
+            self.adaptation_type = AdaptationType.power_drill
+        elif self.training_type == TrainingType.strength_integrated_resistance:
+            if max([self.external_intensity_left, self.external_intensity_right]) >= 100:
+                self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
+            else:
+                self.adaptation_type = AdaptationType.strength_endurance_strength
 
 
 class PrioritizedJointAction(object):

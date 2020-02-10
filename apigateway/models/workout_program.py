@@ -193,15 +193,23 @@ class WorkoutExercise(Serialisable):
             return 0
 
     def get_training_load(self):
+        training_load = 0
+        for action in self.primary_actions:
+            action.get_training_load()
+            training_load += action.total_load_left
+            training_load += action.total_load_right
+        for action in self.secondary_actions:
+            action.get_training_load()
+            training_load += action.total_load_left
+            training_load += action.total_load_right
+        return training_load
 
-        training_volume = self.get_training_volume()
-        training_intensity = self.get_training_intensity()
+        # training_volume = self.get_training_volume()
+        # training_intensity = self.get_training_intensity()
 
-        return training_volume * training_intensity
+        # return training_volume * training_intensity
 
     def process_movement(self, movement):
-        # self.primary_actions = movement.primary_actions
-        # self.secondary_actions = movement.secondary_actions
         self.body_position = movement.body_position
         self.cardio_action = movement.cardio_action
         self.training_type = movement.training_type
