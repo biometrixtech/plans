@@ -26,19 +26,6 @@ def get_action(action_id, name, exercise, training_type=TrainingType.strength_in
     action.bilateral_distribution_of_weight = weight_dist
 
     WorkoutProcessor().process_action(action, exercise)
-    # external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
-    # action.external_weight = [external_weight]
-    #
-    # action.reps = exercise.reps_per_set
-    # action.side = exercise.side
-    # action.percent_body_weight = body_weight
-    # action.apply_resistance = True
-    # action.eligible_external_resistance = [Equipment.barbells, Equipment.dumbbells]
-    # action.bilateral_distribution_of_weight = weight_dist
-    # action.get_external_intensity()
-    # action.get_body_weight_intensity()
-    # action.get_training_volume()
-    # action.get_training_load()
     return action
 
 
@@ -51,6 +38,8 @@ def test_external_intensity_barbell():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
+    assert action.total_load_left == action.total_load_right == 500
+
 
 def test_external_intensity_barbell_unilateral_no_side_defined():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.barbells, weight=100)
@@ -60,6 +49,21 @@ def test_external_intensity_barbell_unilateral_no_side_defined():
 
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
+
+    assert action.total_load_left == action.total_load_right == 1000
+
+
+def test_external_intensity_unilateral_alternating_barbell():
+    workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.barbells, weight=100)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral_alternating)
+
+    assert action.external_intensity_left == 100
+    assert action.external_intensity_right == 100
+
+    assert action.training_volume_left == 10
+    assert action.training_volume_right == 10
+
+    assert action.total_load_left == action.total_load_right == 1000
 
 
 def test_external_intensity_dumbell_bilateral():
@@ -72,6 +76,8 @@ def test_external_intensity_dumbell_bilateral():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
+    assert action.total_load_left == action.total_load_right == 500
+
 
 def test_external_intensity_dumbell_bilateral_uneven_no_side():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50)
@@ -83,6 +89,8 @@ def test_external_intensity_dumbell_bilateral_uneven_no_side():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
+    assert action.total_load_left == action.total_load_right == 250
+
 
 def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50, side=1)
@@ -93,6 +101,9 @@ def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
 
     assert action.training_volume_left == 10
     assert action.training_volume_right == 0
+
+    assert action.total_load_left == 500
+    assert action.total_load_right == 0
 
 
 def test_external_intensity_unilateral_dumbbell_no_side_defined():
@@ -115,6 +126,17 @@ def test_external_intensity_unilateral_dumbbell_side_defined():
 
     assert action.training_volume_left == 10
     assert action.training_volume_right == 0
+
+
+def test_external_intensity_unilateral_alternating_dumbbell():
+    workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=100)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral_alternating)
+
+    assert action.external_intensity_left == 100
+    assert action.external_intensity_right == 100
+
+    assert action.training_volume_left == 10
+    assert action.training_volume_right == 10
 
 
 def test_bodyweight_intensity_bilateral():
@@ -227,7 +249,7 @@ def test_bodyweight_intensity_bilateral_uneven_dominant_not_defined_nondominant(
     assert action.training_volume_right == 10
 
 
-def test_training_volume_cardioresp():
+def test_training_volume_load_cardioresp():
     workout_exercise = get_exercise(reps=100, sets=1, unit=UnitOfMeasure.seconds)
     action = get_action('100', "test action", exercise=workout_exercise, training_type=TrainingType.strength_cardiorespiratory)
     # both sides get all the volume
@@ -249,8 +271,7 @@ def test_convert_distance_seconds_cardioresp_sandbag_run_mile():
 
     action1 = get_action('1', "run", exercise=workout_exercise, training_type=TrainingType.strength_cardiorespiratory)
     action2 = get_action('2005', "hold weight on shoulder", exercise=workout_exercise, training_type=TrainingType.strength_integrated_resistance)
-    # action1.get_training_load()
-    # action2.get_training_load()
+
     assert action1.reps == int(1609.34 * 1 * .336)
     assert action1.training_volume_left == int(1609.34 * 1 * .336) == action1.training_volume_right
     assert action2.reps == int(1609.34 / 5)  # 1 rep per 5 meters

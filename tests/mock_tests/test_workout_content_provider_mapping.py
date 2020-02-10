@@ -9,6 +9,7 @@ from models.cardio_data import get_cardio_data
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
 
+
 def test_training_type_flexibility():
 
     movement = Movement("1", "test")
@@ -227,7 +228,7 @@ def test_get_training_volume_cardioresp_row_calories():
     # workout_exercise.movement_id = '582cb0d8dcab1710003331e9'  # rowing movement
 
     workout_exercise.convert_reps_to_duration(cardio_data)
-    assert workout_exercise.reps_per_set== int(500 / 311 * 1800)
+    assert workout_exercise.reps_per_set == int(500 / 311 * 1800)
 
 
 def test_no_load_section_warmup():
