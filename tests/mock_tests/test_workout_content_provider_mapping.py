@@ -108,7 +108,7 @@ def test_training_type_integrated_resistance_low():
 def test_training_type_olympic_lifting_high():
     movement = Movement("1", "test")
     movement.training_type = TrainingType.power_action_olympic_lift
-    movement.explosive = 3
+    movement.explosiveness_rating = 3
 
     workout_exercise = WorkoutExercise()
 
@@ -120,7 +120,7 @@ def test_training_type_olympic_lifting_high():
 def test_training_type_olympic_lifting_low():
     movement = Movement("1", "test")
     movement.training_type = TrainingType.power_action_olympic_lift
-    movement.explosive = 1
+    movement.explosiveness_rating = 1
 
     workout_exercise = WorkoutExercise()
     workout_exercise.process_movement(movement)

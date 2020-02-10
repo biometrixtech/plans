@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType
 from serialisable import Serialisable
 
@@ -22,7 +22,8 @@ class ExerciseAction(object):
         self.body_position = None
         self.body_weight = 0.0
         self.apply_resistance = False
-        self.explosiveness = 0
+        self.explosiveness_rating = 0
+        self.explosiveness = None
         self.muscle_action = None
         self.bilateral_distribution_of_weight = WeightDistribution.bilateral
         self.eligible_external_resistance = []
@@ -250,6 +251,14 @@ class MovementResistance(Enum):
     max_resistance = 3
 
 
+class Explosiveness(IntEnum):
+    no_speed = 0
+    low_force = 1
+    mod_force = 2
+    high_force = 3
+    max_force = 4
+
+
 class Movement(Serialisable):
     def __init__(self, id, name):
         self.id = id
@@ -260,7 +269,7 @@ class Movement(Serialisable):
         self.equipment = None
         self.speed = None
         self.resistance = None
-        self.explosive = 0
+        self.explosiveness_rating = 0
         self.primary_actions = []
         self.secondary_actions = []
 
@@ -274,7 +283,7 @@ class Movement(Serialisable):
             'equipment': self.equipment.value if self.equipment is not None else None,
             'speed': self.speed.value if self.speed is not None else None,
             'resistance': self.resistance.value if self.resistance is not None else None,
-            'explosive': self.explosive,
+            'explosiveness_rating': self.explosiveness_rating,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions
         }
@@ -300,29 +309,58 @@ class Movement(Serialisable):
 
     def set_explosiveness_rating(self):
 
-        self.explosive = 0
+        self.explosiveness_rating = 0
 
         if self.speed is not None and self.resistance is not None:
             if self.resistance == MovementResistance.low_resistance:
                 if self.speed == MovementSpeed.max_speed:
-                    self.explosive = 4
+                    self.explosiveness_rating = 4
                 else:
-                    self.explosive = 3
+                    self.explosiveness_rating = 3
             elif self.resistance == MovementResistance.mod_resistance:
                 if self.speed == MovementSpeed.max_speed:
-                    self.explosive = 6
+                    self.explosiveness_rating = 6
                 else:
-                    self.explosive = 5
+                    self.explosiveness_rating = 5
             elif self.resistance == MovementResistance.high_resistance:
                 if self.speed == MovementSpeed.max_speed:
-                    self.explosive = 8
+                    self.explosiveness_rating = 8
                 else:
-                    self.explosive = 7
+                    self.explosiveness_rating = 7
             elif self.resistance == MovementResistance.max_resistance:
                 if self.speed == MovementSpeed.max_speed:
-                    self.explosive = 10
+                    self.explosiveness_rating = 10
                 else:
-                    self.explosive = 9
+                    self.explosiveness_rating = 9
+
+    def apply_explosiveness_to_actions(self):
+        self.apply_explosiveness(self.primary_actions)
+        self.apply_explosiveness(self.secondary_actions)
+
+    def apply_explosiveness(self, action_list):
+
+        if len(action_list) > 0:
+            action_explosiveness = [a.explosiveness for a in self.primary_actions if a.explosiveness is not None]
+            if len(action_explosiveness) > 0:
+                max_action_explosiveness = max(action_explosiveness)
+                for a in self.primary_actions:
+                    if a.explosiveness.value == max_action_explosiveness:
+                        a.explosiveness_rating = self.explosiveness_rating
+                    else:
+                        explosive_factor = self.get_scaled_explosiveness_factor(max_action_explosiveness, a.explosiveness)
+                        a.explosiveness_rating = explosive_factor * self.explosiveness_rating
+
+    def get_scaled_explosiveness_factor(self, explosive_value_1, explosive_value_2):
+
+        min_explosive_value = min(explosive_value_1, explosive_value_2)
+        max_explosive_value = max(explosive_value_1, explosive_value_2)
+
+        if max_explosive_value == 0:
+            return 0
+
+        scaled_explosion_factor = float(min_explosive_value) / float(max_explosive_value)
+
+        return scaled_explosion_factor
 
 
 class ExternalWeight(object):

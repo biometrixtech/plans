@@ -37,6 +37,8 @@ class WorkoutProcessor(object):
                 self.process_action(action, exercise)
                 exercise.secondary_actions.append(action)
 
+        movement.apply_explosiveness_to_actions()
+
     def process_action(self, action, exercise):
         external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
         action.external_weight = [external_weight]
@@ -56,6 +58,7 @@ class WorkoutProcessor(object):
         action.rpe = exercise.rpe
         action.get_training_load()
 
+
     def convert_reps_to_duration(self, reps, unit_of_measure, cardio_action):
         # distance to duration
         if unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -64,6 +67,7 @@ class WorkoutProcessor(object):
         elif unit_of_measure == UnitOfMeasure.calories:
             reps = self.convert_calories_to_seconds(reps, cardio_action)
         return reps
+
 
     @staticmethod
     def convert_seconds_to_reps(reps):

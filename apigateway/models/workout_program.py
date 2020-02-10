@@ -112,7 +112,7 @@ class WorkoutExercise(Serialisable):
         self.body_position = None
         self.cardio_action = None
         self.training_type = None
-        self.explosive = 0
+        self.explosiveness_rating = 0
         self.primary_actions = []
         self.secondary_actions = []
 
@@ -130,7 +130,7 @@ class WorkoutExercise(Serialisable):
             'body_position': self.body_position.value if self.body_position is not None else None,
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
-            'explosive': self.explosive,
+            'explosiveness_rating': self.explosiveness_rating,
             'rpe': self.rpe,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions
@@ -150,7 +150,7 @@ class WorkoutExercise(Serialisable):
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None
-        exercise.explosive = input_dict.get('explosive', False)
+        exercise.explosiveness_rating = input_dict.get('explosiveness_rating', False)
 
         # not yet sure if these are needed
         exercise.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
@@ -213,7 +213,7 @@ class WorkoutExercise(Serialisable):
         self.body_position = movement.body_position
         self.cardio_action = movement.cardio_action
         self.training_type = movement.training_type
-        self.explosive = movement.explosive
+        self.explosiveness_rating = movement.explosiveness_rating
         self.set_adaption_type(movement)
 
     def set_adaption_type(self, movement):
@@ -270,3 +270,4 @@ class WorkoutExercise(Serialisable):
     def convert_calories_to_seconds(self, calorie_parameters):
         time_per_unit = calorie_parameters['unit'] / calorie_parameters["calories_per_unit"][self.cardio_action.name]
         self.reps_per_set = int(self.reps_per_set * time_per_unit)
+
