@@ -22,7 +22,7 @@ class ExerciseAction(object):
         self.body_position = None
         self.body_weight = 0.0
         self.apply_resistance = False
-        self.explosiveness = None
+        self.explosiveness = 0
         self.muscle_action = None
         self.bilateral_distribution_of_weight = WeightDistribution.bilateral
         self.eligible_external_resistance = []
@@ -237,6 +237,19 @@ class ExerciseCompoundAction(object):
         self.actions = []
 
 
+class MovementSpeed(Enum):
+    no_speed= 0
+    speed = 1
+    max_speed = 2
+
+
+class MovementResistance(Enum):
+    low_resistance = 0
+    mod_resistance = 1
+    high_resistance = 2
+    max_resistance = 3
+
+
 class Movement(Serialisable):
     def __init__(self, id, name):
         self.id = id
@@ -245,6 +258,8 @@ class Movement(Serialisable):
         self.cardio_action = None
         self.training_type = None
         self.equipment = None
+        self.speed = None
+        self.resistance = None
         self.explosive = 0
         self.primary_actions = []
         self.secondary_actions = []
@@ -257,6 +272,8 @@ class Movement(Serialisable):
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
             'equipment': self.equipment.value if self.equipment is not None else None,
+            'speed': self.speed.value if self.speed is not None else None,
+            'resistance': self.resistance.value if self.resistance is not None else None,
             'explosive': self.explosive,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions
@@ -273,11 +290,39 @@ class Movement(Serialisable):
             'cardio_action') is not None else None
         movement.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
         movement.equipment = Equipment(input_dict['equipment']) if input_dict.get('equipment') is not None else None
-        movement.explosive = input_dict.get('explosive', 0)
+        movement.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
+        movement.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
+        movement.set_explosiveness_rating()
         movement.primary_actions = input_dict.get('primary_actions', [])
         movement.secondary_actions = input_dict.get('secondary_actions', [])
 
         return movement
+
+    def set_explosiveness_rating(self):
+
+        self.explosive = 0
+
+        if self.speed is not None and self.resistance is not None:
+            if self.resistance == MovementResistance.low_resistance:
+                if self.speed == MovementSpeed.max_speed:
+                    self.explosive = 4
+                else:
+                    self.explosive = 3
+            elif self.resistance == MovementResistance.mod_resistance:
+                if self.speed == MovementSpeed.max_speed:
+                    self.explosive = 6
+                else:
+                    self.explosive = 5
+            elif self.resistance == MovementResistance.high_resistance:
+                if self.speed == MovementSpeed.max_speed:
+                    self.explosive = 8
+                else:
+                    self.explosive = 7
+            elif self.resistance == MovementResistance.max_resistance:
+                if self.speed == MovementSpeed.max_speed:
+                    self.explosive = 10
+                else:
+                    self.explosive = 9
 
 
 class ExternalWeight(object):
