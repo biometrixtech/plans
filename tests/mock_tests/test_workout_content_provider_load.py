@@ -17,10 +17,10 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, adaptation_type=Ada
     action = ExerciseAction('0', 'test_action')
     action.training_type = TrainingType.strength_cardiorespiratory
     action.reps = reps
-    action.percent_body_weight = [0, 0]
+    action.lateral_distribution = [0, 0]
     action.apply_resistance = True
     action.eligible_external_resistance = []
-    action.bilateral_distribution_of_weight = None
+    action.lateral_distribution_pattern = None
     exercise.primary_actions = [action]
 
     return exercise
