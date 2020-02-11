@@ -301,7 +301,7 @@ class FunctionalMovementActionMapping(object):
 
         if target_joint_action is not None:
             functional_movement_type = pairs.get_functional_movement_for_muscle_action(
-                self.exercise_action.muscle_action, target_joint_action.joint_action)
+                self.exercise_action.primary_muscle_action, target_joint_action.joint_action)
 
             #functional_movement = FunctionalMovement(functional_movement_type, target_joint_action.priority)
 

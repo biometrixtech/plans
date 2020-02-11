@@ -113,6 +113,8 @@ class WorkoutProcessor(object):
                 return 0.2
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 0.3
+            else:
+                return 0.0
         elif exercise.equipment in [Equipment.atlas_stones, Equipment.yoke, Equipment.dip_belt,
                                     Equipment.medicine_balls, Equipment.farmers_carry_handles, Equipment.sandbags,
                                     Equipment.rower, Equipment.airbike, Equipment.bike, Equipment.ski_erg,
@@ -126,6 +128,8 @@ class WorkoutProcessor(object):
                 return 0.7
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 0.8
+            else:
+                return 0.0
         elif exercise.equipment in [Equipment.barbells, Equipment.plate, Equipment.sandbags, Equipment.medicine_balls,
                                     Equipment.swimming]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
@@ -136,6 +140,8 @@ class WorkoutProcessor(object):
                 return 1.3
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 1.5
+            else:
+                return 0.0
         elif exercise.equipment in [Equipment.dumbbells, Equipment.double_kettlebell, Equipment.resistence_bands]:
             # this first action is improvised/estimated based on logic gaps
             if action.upper_body_stance == UpperBodyStance.double_arm:
@@ -146,6 +152,8 @@ class WorkoutProcessor(object):
                 return 1.8
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 2.0
+            else:
+                return 0.0
 
     def apply_explosiveness(self, exercise, action_list):
 
