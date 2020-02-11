@@ -34,25 +34,18 @@ class ExerciseAction(object):
     def __init__(self, id, name):
         self.id = id
         self.name = name
-        self.rpe = None
-        self.reps = 1
-        self.side = 0  # both
-        self.training_type = None
-        self.adaptation_type = None
-        self.body_position = None
-        self.percent_bodyweight = 0.0
-        self.apply_resistance = False
-        self.explosiveness_rating = 0
-        self.explosiveness = None
 
-        self.lower_body_stability_rating = 0
-        self.upper_body_stability_rating = 0
+        # defined per action
+        self.training_type = None
+        self.eligible_external_resistance = []
         self.lower_body_stance = None
         self.upper_body_stance = None
-        self.apply_instability = False
         self.lateral_distribution_pattern = WeightDistribution.bilateral
-        self.eligible_external_resistance = []
+        self.percent_bodyweight = 0.0
         self.lateral_distribution = [0, 0]
+        self.apply_resistance = False
+        self.explosiveness = None
+        self.apply_instability = False
 
         self.primary_muscle_action = None
         self.hip_joint_action = None
@@ -71,6 +64,17 @@ class ExerciseAction(object):
         self.elbow_stability_action = None
         self.sij_stability_action = None
 
+        # obtained from exercise
+        self.rpe = None
+        self.reps = 1
+        self.side = 0  # both
+        self.external_weight = []  # list of ExternalWeight objects, weight is in %bodyweight
+
+        # derived
+        self.adaptation_type = None
+        self.lower_body_stability_rating = 0
+        self.upper_body_stability_rating = 0
+        self.explosiveness_rating = 0
         self.total_load_left = 0
         self.total_load_right = 0
         self.external_intensity_left = 0
@@ -80,24 +84,21 @@ class ExerciseAction(object):
         self.training_volume_left = 0
         self.training_volume_right = 0
 
-        self.external_weight = []  # list of ExternalWeight objects, weight is in %bodyweight
-
-    def json_serialise(self):
+    def json_serialise(self, initial_read=False):
         ret = {
             "id": self.id,
             "name": self.name,
-            "rpe": self.rpe,
-            "reps": self.reps,
-            "side": self.side,
             "training_type": self.training_type.value if self.training_type is not None else None,
-            "adaptation_type": self.adaptation_type.value if self.adaptation_type is not None else None,
-            "body_position": self.body_position,
+            "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
+            "lower_body_stance": self.lower_body_stance.value if self.lower_body_stance is not None else None,
+            "upper_body_stance": self.upper_body_stance.value if self.upper_body_stance is not None else None,
+            "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
             "percent_bodyweight": self.percent_bodyweight,
+            "lateral_distribution": self.lateral_distribution,
             "apply_resistance": self.apply_resistance,
             "explosiveness": self.explosiveness,
-            "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
-            "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
-            "lateral_distribution": self.lateral_distribution,
+            "apply_instability": self.apply_instability,
+
             "primary_muscle_action": self.primary_muscle_action,
             "hip_joint_action": self.hip_joint_action,
             "knee_joint_action": self.knee_joint_action,
@@ -114,17 +115,27 @@ class ExerciseAction(object):
             "shoulder_stability_action": self.shoulder_stability_action,
             "elbow_stability_action": self.elbow_stability_action,
             "sij_stability_action": self.sij_stability_action,
-
-            "total_load_left": self.total_load_left,
-            "total_load_right": self.total_load_right,
-            "external_intensity_left": self.external_intensity_left,
-            "external_intensity_right": self.external_intensity_right,
-            "bodyweight_intensity_left": self.bodyweight_intensity_left,
-            "bodyweight_intensity_right": self.bodyweight_intensity_right,
-            "training_volume_left": self.training_volume_left,
-            "training_volume_right": self.training_volume_right,
-            "external_weight": [ex_weight.json_serialise() for ex_weight in self.external_weight]
         }
+        if not initial_read:
+            additional_params = {
+                # obtained from exercises
+                "rpe": self.rpe,
+                "reps": self.reps,
+                "side": self.side,
+                "external_weight": [ex_weight.json_serialise() for ex_weight in self.external_weight],
+
+                # derived/calculated
+                "adaptation_type": self.adaptation_type.value if self.adaptation_type is not None else None,
+                "total_load_left": self.total_load_left,
+                "total_load_right": self.total_load_right,
+                "external_intensity_left": self.external_intensity_left,
+                "external_intensity_right": self.external_intensity_right,
+                "bodyweight_intensity_left": self.bodyweight_intensity_left,
+                "bodyweight_intensity_right": self.bodyweight_intensity_right,
+                "training_volume_left": self.training_volume_left,
+                "training_volume_right": self.training_volume_right
+                }
+            ret.update(additional_params)
         return ret
 
     def get_external_intensity(self):
