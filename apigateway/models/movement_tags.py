@@ -91,3 +91,9 @@ class WeightDistribution(Enum):
     bilateral_uneven = 1
     unilateral = 2
     unilateral_alternating = 3
+
+
+class MovementSurfaceStability(Enum):
+    stable = 0
+    unstable = 1
+    very_unstable = 2
