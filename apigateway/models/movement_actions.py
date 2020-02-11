@@ -37,7 +37,7 @@ class ExerciseAction(object):
         self.apply_resistance = False
         self.explosiveness_rating = 0
         self.explosiveness = None
-        self.muscle_action = None
+
         self.lower_body_stability_rating = 0
         self.upper_body_stability_rating = 0
         self.lower_body_stance = None
@@ -46,12 +46,24 @@ class ExerciseAction(object):
         self.lateral_distribution_pattern = WeightDistribution.bilateral
         self.eligible_external_resistance = []
         self.lateral_distribution = [0, 0]
+
+        self.primary_muscle_action = None
         self.hip_joint_action = None
         self.knee_joint_action = None
         self.ankle_joint_action = None
         self.trunk_joint_action = None
         self.shoulder_scapula_joint_action = None
         self.elbow_joint_action = None
+
+        self.ancillary_muscle_action = None
+        self.hip_stability_action = None
+        self.ankle_stability_action = None
+        self.trunk_stability_action = None
+        self.pelvis_stability_action = None
+        self.shoulder_stability_action = None
+        self.elbow_stability_action = None
+        self.sij_stability_action = None
+
         self.total_load_left = 0
         self.total_load_right = 0
         self.external_intensity_left = 0
@@ -76,16 +88,26 @@ class ExerciseAction(object):
             "percent_bodyweight": self.percent_bodyweight,
             "apply_resistance": self.apply_resistance,
             "explosiveness": self.explosiveness,
-            "muscle_action": self.muscle_action,
             "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
             "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
             "lateral_distribution": self.lateral_distribution,
+            "primary_muscle_action": self.primary_muscle_action,
             "hip_joint_action": self.hip_joint_action,
             "knee_joint_action": self.knee_joint_action,
             "ankle_joint_action": self.ankle_joint_action,
             "trunk_joint_action": self.trunk_joint_action,
             "shoulder_scapula_joint_action": self.shoulder_scapula_joint_action,
             "elbow_joint_action": self.elbow_joint_action,
+
+            "ancillary_muscle_action": self.ancillary_muscle_action,
+            "hip_stability_action": self.hip_stability_action,
+            "ankle_stability_action": self.ankle_stability_action,
+            "trunk_stability_action": self.trunk_stability_action,
+            "pelvis_stability_action": self.pelvis_stability_action,
+            "shoulder_stability_action": self.shoulder_stability_action,
+            "elbow_stability_action": self.elbow_stability_action,
+            "sij_stability_action": self.sij_stability_action,
+
             "total_load_left": self.total_load_left,
             "total_load_right": self.total_load_right,
             "external_intensity_left": self.external_intensity_left,
