@@ -1,7 +1,7 @@
 from logic.workout_processing import WorkoutProcessor
 from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
 from models.movement_tags import AdaptationType, CardioAction, TrainingType
-from models.movement_actions import ExerciseAction
+from models.movement_actions import ExerciseAction, Movement, Explosiveness
 from models.exercise import UnitOfMeasure
 
 
@@ -61,3 +61,21 @@ def test_one_load_section_one_no_load():
     assert section2.get_training_load() != 0
     assert section2.get_training_load() == workout_exercise3.get_training_load() + workout_exercise4.get_training_load()
     assert total_training_load == section2.get_training_load()
+
+
+def test_apply_explosiveness_to_actions():
+
+    exercise = WorkoutExercise()
+    exercise.explosiveness_rating = 8
+    action_1 = ExerciseAction("2", "Action1")
+    action_1.explosiveness = Explosiveness.high_force
+    action_2 = ExerciseAction("3", "Action2")
+    action_2.explosiveness = Explosiveness.max_force
+
+    exercise.primary_actions.append(action_1)
+    exercise.primary_actions.append(action_2)
+
+    exercise.apply_explosiveness_to_actions()
+
+    assert action_1.explosiveness_rating == 8 * 0.75
+    assert action_2.explosiveness_rating == 8 * 1.00

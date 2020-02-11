@@ -112,7 +112,7 @@ class WorkoutExercise(Serialisable):
         self.body_position = None
         self.cardio_action = None
         self.training_type = None
-        self.explosive = 0
+        self.explosiveness_rating = 0
         self.primary_actions = []
         self.secondary_actions = []
 
@@ -130,7 +130,7 @@ class WorkoutExercise(Serialisable):
             'body_position': self.body_position.value if self.body_position is not None else None,
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
-            'explosive': self.explosive,
+            'explosiveness_rating': self.explosiveness_rating,
             'rpe': self.rpe,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions
@@ -150,7 +150,7 @@ class WorkoutExercise(Serialisable):
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None
-        exercise.explosive = input_dict.get('explosive', False)
+        exercise.explosiveness_rating = input_dict.get('explosiveness_rating', False)
 
         # not yet sure if these are needed
         exercise.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
@@ -213,7 +213,7 @@ class WorkoutExercise(Serialisable):
         self.body_position = movement.body_position
         self.cardio_action = movement.cardio_action
         self.training_type = movement.training_type
-        self.explosive = movement.explosive
+        self.explosiveness_rating = movement.explosiveness_rating
         self.set_adaption_type(movement)
 
     def set_adaption_type(self, movement):
@@ -270,3 +270,32 @@ class WorkoutExercise(Serialisable):
     def convert_calories_to_seconds(self, calorie_parameters):
         time_per_unit = calorie_parameters['unit'] / calorie_parameters["calories_per_unit"][self.cardio_action.name]
         self.reps_per_set = int(self.reps_per_set * time_per_unit)
+
+    def apply_explosiveness_to_actions(self):
+        self.apply_explosiveness(self.primary_actions)
+        self.apply_explosiveness(self.secondary_actions)
+
+    def apply_explosiveness(self, action_list):
+
+        if len(action_list) > 0:
+            action_explosiveness = [a.explosiveness for a in self.primary_actions if a.explosiveness is not None]
+            if len(action_explosiveness) > 0:
+                max_action_explosiveness = max(action_explosiveness)
+                for a in self.primary_actions:
+                    if a.explosiveness.value == max_action_explosiveness:
+                        a.explosiveness_rating = self.explosiveness_rating
+                    else:
+                        explosive_factor = self.get_scaled_explosiveness_factor(max_action_explosiveness, a.explosiveness)
+                        a.explosiveness_rating = explosive_factor * self.explosiveness_rating
+
+    def get_scaled_explosiveness_factor(self, explosive_value_1, explosive_value_2):
+
+        min_explosive_value = min(explosive_value_1, explosive_value_2)
+        max_explosive_value = max(explosive_value_1, explosive_value_2)
+
+        if max_explosive_value == 0:
+            return 0
+
+        scaled_explosion_factor = float(min_explosive_value) / float(max_explosive_value)
+
+        return scaled_explosion_factor
