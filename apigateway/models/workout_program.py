@@ -1,6 +1,6 @@
 from models.exercise import UnitOfMeasure
 from serialisable import Serialisable
-from models.movement_tags import AdaptationType, BodyPosition, CardioAction, TrainingType, Equipment
+from models.movement_tags import AdaptationType, BodyPosition, CardioAction, TrainingType, Equipment, MovementSurfaceStability
 import re
 
 
@@ -113,6 +113,7 @@ class WorkoutExercise(Serialisable):
         self.cardio_action = None
         self.training_type = None
         self.explosiveness_rating = 0
+        self.surface_stability = None
         self.primary_actions = []
         self.secondary_actions = []
 
@@ -131,6 +132,7 @@ class WorkoutExercise(Serialisable):
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
             'explosiveness_rating': self.explosiveness_rating,
+            'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             'rpe': self.rpe,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions
@@ -160,6 +162,7 @@ class WorkoutExercise(Serialisable):
         exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
             'training_type') is not None else None
         exercise.rpe = input_dict.get('rpe')
+        exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         exercise.primary_actions = input_dict.get('primary_actions', [])
         exercise.secondary_actions = input_dict.get('secondary_actions', [])
 
@@ -214,6 +217,7 @@ class WorkoutExercise(Serialisable):
         self.cardio_action = movement.cardio_action
         self.training_type = movement.training_type
         self.explosiveness_rating = movement.explosiveness_rating
+        self.surface_stability = movement.surface_stability
         self.set_adaption_type(movement)
 
     def set_adaption_type(self, movement):

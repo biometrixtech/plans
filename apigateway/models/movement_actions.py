@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType
+from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType, MovementSurfaceStability
 from serialisable import Serialisable
 
 
@@ -7,6 +7,20 @@ class MuscleAction(Enum):
     concentric = 0
     eccentric = 1
     isometric = 2
+
+
+class LowerBodyStance(Enum):
+    double_leg = 0
+    staggered_stance = 1
+    split_stance = 2
+    single_leg = 3
+
+
+class UpperBodyStance(Enum):
+    double_arm = 0
+    alternating_arms = 1
+    single_arm = 2
+    single_arm_with_trunk_rotation = 3
 
 
 class ExerciseAction(object):
@@ -25,6 +39,8 @@ class ExerciseAction(object):
         self.explosiveness_rating = 0
         self.explosiveness = None
         self.muscle_action = None
+        self.lower_body_stability_rating = 0
+        self.upper_body_stability_rating = 0
         self.bilateral_distribution_of_weight = WeightDistribution.bilateral
         self.eligible_external_resistance = []
         self.percent_body_weight = []
@@ -251,6 +267,7 @@ class MovementResistance(Enum):
     max_resistance = 3
 
 
+
 class Explosiveness(IntEnum):
     no_speed = 0
     low_force = 1
@@ -270,6 +287,7 @@ class Movement(Serialisable):
         self.speed = None
         self.resistance = None
         self.explosiveness_rating = 0
+        self.surface_stability = None
         self.primary_actions = []
         self.secondary_actions = []
 
@@ -284,6 +302,7 @@ class Movement(Serialisable):
             'speed': self.speed.value if self.speed is not None else None,
             'resistance': self.resistance.value if self.resistance is not None else None,
             'explosiveness_rating': self.explosiveness_rating,
+            'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions
         }
@@ -302,6 +321,7 @@ class Movement(Serialisable):
         movement.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
         movement.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
         movement.set_explosiveness_rating()
+        movement.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         movement.primary_actions = input_dict.get('primary_actions', [])
         movement.secondary_actions = input_dict.get('secondary_actions', [])
 
