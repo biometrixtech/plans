@@ -65,17 +65,17 @@ def test_one_load_section_one_no_load():
 
 def test_apply_explosiveness_to_actions():
 
-    movement = Movement("1", "Failure")
-    movement.explosiveness_rating = 8
+    exercise = WorkoutExercise()
+    exercise.explosiveness_rating = 8
     action_1 = ExerciseAction("2", "Action1")
     action_1.explosiveness = Explosiveness.high_force
     action_2 = ExerciseAction("3", "Action2")
     action_2.explosiveness = Explosiveness.max_force
 
-    movement.primary_actions.append(action_1)
-    movement.primary_actions.append(action_2)
+    exercise.primary_actions.append(action_1)
+    exercise.primary_actions.append(action_2)
 
-    movement.apply_explosiveness_to_actions()
+    exercise.apply_explosiveness_to_actions()
 
     assert action_1.explosiveness_rating == 8 * 0.75
     assert action_2.explosiveness_rating == 8 * 1.00

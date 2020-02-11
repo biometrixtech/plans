@@ -37,7 +37,7 @@ class WorkoutProcessor(object):
                 self.process_action(action, exercise)
                 exercise.secondary_actions.append(action)
 
-        movement.apply_explosiveness_to_actions()
+        exercise.apply_explosiveness_to_actions()
 
     def process_action(self, action, exercise):
         external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
