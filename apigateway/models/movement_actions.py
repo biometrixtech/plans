@@ -11,10 +11,17 @@ class MuscleAction(Enum):
 
 class LowerBodyStance(Enum):
     double_leg = 0
-    staggered_stance = 1
-    split_stance = 2
+    staggered_leg = 1
+    split_leg = 2
     single_leg = 3
-
+    supine = 4
+    prone = 5
+    side_lying = 6
+    quadruped = 7
+    bridge = 8
+    kneeling = 9
+    half_kneeling = 10
+    seated = 11
 
 class UpperBodyStance(Enum):
     double_arm = 0

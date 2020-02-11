@@ -79,9 +79,9 @@ class WorkoutProcessor(object):
         if exercise.surface_stability == MovementSurfaceStability.stable:
             if action.lower_body_stance == LowerBodyStance.double_leg:
                 return 0.0
-            elif action.lower_body_stance == LowerBodyStance.staggered_stance:
+            elif action.lower_body_stance == LowerBodyStance.staggered_leg:
                 return 0.3
-            elif action.lower_body_stance == LowerBodyStance.split_stance:
+            elif action.lower_body_stance == LowerBodyStance.split_leg:
                 return 0.8
             elif action.lower_body_stance == LowerBodyStance.single_leg:
                 return 1.0
@@ -90,9 +90,9 @@ class WorkoutProcessor(object):
         elif exercise.surface_stability == MovementSurfaceStability.unstable or exercise.surface_stability == MovementSurfaceStability.very_unstable:
             if action.lower_body_stance == LowerBodyStance.double_leg:
                 return 1.2
-            elif action.lower_body_stance == LowerBodyStance.staggered_stance:
+            elif action.lower_body_stance == LowerBodyStance.staggered_leg:
                 return 1.3
-            elif action.lower_body_stance == LowerBodyStance.split_stance:
+            elif action.lower_body_stance == LowerBodyStance.split_leg:
                 return 1.5
             elif action.lower_body_stance == LowerBodyStance.single_leg:
                 return 2.0
