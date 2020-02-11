@@ -17,7 +17,8 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     return exercise
 
 
-def get_action(action_id, name, exercise, training_type=TrainingType.strength_integrated_resistance, perc_bodyweight=0, weight_dist=WeightDistribution.bilateral, lateral_distribution=(0, 0)):
+def get_action(action_id, name, exercise, training_type=TrainingType.strength_integrated_resistance, perc_bodyweight=0,
+               weight_dist=WeightDistribution.bilateral, lateral_distribution=(50, 50)):
     action = ExerciseAction(action_id, name)
     action.percent_bodyweight = perc_bodyweight
     action.training_type = training_type
@@ -44,7 +45,7 @@ def test_external_intensity_barbell():
 
 def test_external_intensity_barbell_unilateral_no_side_defined():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.barbells, weight=100)
-    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral, lateral_distribution=[100, 0])
     assert action.external_intensity_left == 100
     assert action.external_intensity_right == 100
 
@@ -56,7 +57,7 @@ def test_external_intensity_barbell_unilateral_no_side_defined():
 
 def test_external_intensity_unilateral_alternating_barbell():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.barbells, weight=100)
-    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral_alternating)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral_alternating, lateral_distribution=[100, 100])
 
     assert action.external_intensity_left == 100
     assert action.external_intensity_right == 100
@@ -109,7 +110,7 @@ def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
 
 def test_external_intensity_unilateral_dumbbell_no_side_defined():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50)
-    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral, lateral_distribution=[100, 0])
 
     assert action.external_intensity_left == 50
     assert action.external_intensity_right == 50
@@ -120,7 +121,7 @@ def test_external_intensity_unilateral_dumbbell_no_side_defined():
 
 def test_external_intensity_unilateral_dumbbell_side_defined():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50, side=1)
-    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral, lateral_distribution=[100, 0])
 
     assert action.external_intensity_left == 50
     assert action.external_intensity_right == 0
@@ -131,7 +132,7 @@ def test_external_intensity_unilateral_dumbbell_side_defined():
 
 def test_external_intensity_unilateral_alternating_dumbbell():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=100)
-    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral_alternating)
+    action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.unilateral_alternating, lateral_distribution=[100, 100])
 
     assert action.external_intensity_left == 100
     assert action.external_intensity_right == 100
