@@ -40,6 +40,9 @@ class ExerciseAction(object):
         self.muscle_action = None
         self.lower_body_stability_rating = 0
         self.upper_body_stability_rating = 0
+        self.lower_body_stance = None
+        self.upper_body_stance = None
+        self.apply_instability = False
         self.lateral_distribution_pattern = WeightDistribution.bilateral
         self.eligible_external_resistance = []
         self.lateral_distribution = [0, 0]

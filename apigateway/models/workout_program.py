@@ -275,31 +275,3 @@ class WorkoutExercise(Serialisable):
         time_per_unit = calorie_parameters['unit'] / calorie_parameters["calories_per_unit"][self.cardio_action.name]
         self.reps_per_set = int(self.reps_per_set * time_per_unit)
 
-    def apply_explosiveness_to_actions(self):
-        self.apply_explosiveness(self.primary_actions)
-        self.apply_explosiveness(self.secondary_actions)
-
-    def apply_explosiveness(self, action_list):
-
-        if len(action_list) > 0:
-            action_explosiveness = [a.explosiveness for a in self.primary_actions if a.explosiveness is not None]
-            if len(action_explosiveness) > 0:
-                max_action_explosiveness = max(action_explosiveness)
-                for a in self.primary_actions:
-                    if a.explosiveness.value == max_action_explosiveness:
-                        a.explosiveness_rating = self.explosiveness_rating
-                    else:
-                        explosive_factor = self.get_scaled_explosiveness_factor(max_action_explosiveness, a.explosiveness)
-                        a.explosiveness_rating = explosive_factor * self.explosiveness_rating
-
-    def get_scaled_explosiveness_factor(self, explosive_value_1, explosive_value_2):
-
-        min_explosive_value = min(explosive_value_1, explosive_value_2)
-        max_explosive_value = max(explosive_value_1, explosive_value_2)
-
-        if max_explosive_value == 0:
-            return 0
-
-        scaled_explosion_factor = float(min_explosive_value) / float(max_explosive_value)
-
-        return scaled_explosion_factor
