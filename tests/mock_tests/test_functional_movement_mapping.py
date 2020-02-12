@@ -29,9 +29,9 @@ def test_apply_load_concentric():
 
     exercise_action = ExerciseAction("1", "flail")
     exercise_action.primary_muscle_action = MuscleAction.concentric
-    exercise_action.hip_joint_action = PrioritizedJointAction(1, FunctionalMovementType.hip_extension)
-    exercise_action.knee_joint_action = PrioritizedJointAction(2, FunctionalMovementType.knee_extension)
-    exercise_action.ankle_joint_action = PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)
+    exercise_action.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
+    exercise_action.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
+    exercise_action.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
     exercise_action.total_load_left = 100
     exercise_action.total_load_right = 200
 
@@ -84,9 +84,9 @@ def test_apply_load_eccentric():
 
     exercise_action = ExerciseAction("2", "flail")
     exercise_action.primary_muscle_action = MuscleAction.eccentric
-    exercise_action.hip_joint_action = PrioritizedJointAction(1, FunctionalMovementType.hip_flexion)
-    exercise_action.knee_joint_action = PrioritizedJointAction(2, FunctionalMovementType.knee_flexion)
-    exercise_action.ankle_joint_action = PrioritizedJointAction(3, FunctionalMovementType.ankle_dorsiflexion)
+    exercise_action.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_flexion)]
+    exercise_action.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_flexion)]
+    exercise_action.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_dorsiflexion)]
     exercise_action.total_load_left = 100
     exercise_action.total_load_right = 200
 
