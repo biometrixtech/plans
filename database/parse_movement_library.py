@@ -1,5 +1,5 @@
-from models.movement_actions import Movement
-from movement_tags import CardioAction, TrainingType, BodyPosition, Equipment
+from models.movement_actions import Movement, MovementSpeed, MovementResistance
+from movement_tags import CardioAction, TrainingType, MovementSurfaceStability, Equipment, PowerAction, PowerDrillAction
 import os
 import json
 import pandas as pd
@@ -25,29 +25,43 @@ class MovementLibraryParser(object):
     def parse_row(self, row):
         movement = Movement(row['id'], row['soflete_name'])
 
-        if row.get('training_type') is not None and row['training_type'] != "" and row['training_type'] != "none":
+        if self.is_valid(row, 'training_type'):
             movement.training_type = TrainingType[row['training_type']]
+        if self.is_valid(row, 'cardio_action'):
             if movement.training_type == TrainingType.strength_cardiorespiratory:
-                try:
-                    movement.cardio_action = CardioAction[row['cardio_action']]
-                except KeyError:
-                    print(f"cardio_action: {row['cardio_action']}")
-        if row.get('body_position') is not None and row['body_position'] != "" and row['body_position'] != "none":
-            movement.body_position = BodyPosition[row['body_position']]
+                movement.cardio_action = CardioAction[row['cardio_action']]
+        if self.is_valid(row, 'power_drill_action'):
+            movement.power_drill_action = PowerDrillAction[row['power_drill_action']]
+        if self.is_valid(row, 'power_action'):
+            movement.power_action = PowerAction[row['power_action']]
 
-        if row.get('primary_actions') is not None and row["primary_actions"] != "" and row['primary_actions'] != "none":
+        if self.is_valid(row, 'primary_actions'):
             primary_actions = row['primary_actions'].split(",")
             movement.primary_actions = [action.strip() for action in primary_actions]
-        if row.get('secondary_actions') is not None and row["secondary_actions"] != "" and row['secondary_actions'] != "none":
+        if self.is_valid(row, 'secondary_actions'):
             row['secondary_actions'].replace(", ", ",")
             secondary_actions = row['secondary_actions'].split(",")
             movement.secondary_actions = [action.strip() for action in secondary_actions]
-        if row.get('equipment') is not None and row['equipment'] != "":
-            try:
-                movement.equipment = Equipment[row['equipment']]
-            except KeyError:
-                print(f"equipment: {row['equipment']}")
+
+        if self.is_valid(row, 'surface_stability'):
+            movement.surface_stability = MovementSurfaceStability[row['surface_stability']]
+        if self.is_valid(row, 'external_weight_implement'):
+            row['external_weight_implement'].replace(", ", ",")
+            external_weight_implement = row['external_weight_implement'].split(",")
+            movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
+
+        if self.is_valid(row, 'resistance'):
+            movement.resistance = MovementResistance[row['resistance']]
+        if self.is_valid(row, 'speed'):
+            movement.speed = MovementSpeed[row['speed']]
+
         return movement
+
+    @staticmethod
+    def is_valid(row, name):
+        if row.get(name) is not None and row[name] != "" and row[name] != "none":
+            return True
+        return False
 
     def write_movements_json(self):
         movements_json = {}
