@@ -271,12 +271,12 @@ class SessionFunctionalMovement(object):
 class FunctionalMovementActionMapping(object):
     def __init__(self, exercise_action):
         self.exercise_action = exercise_action
-        self.hip_joint_functional_movement = None
-        self.knee_joint_functional_movement = None
-        self.ankle_joint_functional_movement = None
-        self.trunk_joint_functional_movement = None
-        self.shoulder_scapula_joint_functional_movement = None
-        self.elbow_joint_functional_movement = None
+        self.hip_joint_functional_movements = []
+        self.knee_joint_functional_movements = []
+        self.ankle_joint_functional_movements = []
+        self.trunk_joint_functional_movements = []
+        self.shoulder_scapula_joint_functional_movements = []
+        self.elbow_joint_functional_movements = []
         self.muscle_load = {}
 
         self.set_functional_movements()
@@ -285,45 +285,44 @@ class FunctionalMovementActionMapping(object):
     def set_functional_movements(self):
 
         if self.exercise_action is not None:
-            self.hip_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.hip_joint_action)
-            self.knee_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.knee_joint_action)
-            self.ankle_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.ankle_joint_action)
-            self.trunk_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.trunk_joint_action)
-            self.shoulder_scapula_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
-            self.elbow_joint_functional_movement = self.get_functional_movement_for_joint_action(self.exercise_action.elbow_joint_action)
+            self.hip_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.hip_joint_action)
+            self.knee_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.knee_joint_action)
+            self.ankle_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.ankle_joint_action)
+            self.trunk_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.trunk_joint_action)
+            self.shoulder_scapula_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
+            self.elbow_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.elbow_joint_action)
 
-    def get_functional_movement_for_joint_action(self, target_joint_action):
+    def get_functional_movements_for_joint_action(self, target_joint_action_list):
 
         movement_factory = FunctionalMovementFactory()
         pairs = FunctionalMovementPairs()
 
-        functional_movement = None
+        functional_movement_list = []
 
-        if target_joint_action is not None:
+        for target_joint_action in target_joint_action_list:
             functional_movement_type = pairs.get_functional_movement_for_muscle_action(
                 self.exercise_action.primary_muscle_action, target_joint_action.joint_action)
 
-            #functional_movement = FunctionalMovement(functional_movement_type, target_joint_action.priority)
-
             functional_movement = movement_factory.get_functional_movement(functional_movement_type)
             functional_movement.priority = target_joint_action.priority
+            functional_movement_list.append(functional_movement)
 
-        return functional_movement
+        return functional_movement_list
 
     def set_muscle_load(self):
 
-        self.apply_load_to_functional_movement(self.hip_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movement(self.knee_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movement(self.ankle_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movement(self.trunk_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movement(self.shoulder_scapula_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movement(self.elbow_joint_functional_movement, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movements(self.hip_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movements(self.knee_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movements(self.ankle_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movements(self.trunk_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movements(self.shoulder_scapula_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movements(self.elbow_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
 
-    def apply_load_to_functional_movement(self, functional_movement, left_load, right_load):
+    def apply_load_to_functional_movements(self, functional_movement_list, left_load, right_load):
 
         body_part_factory = BodyPartFactory()
 
-        if functional_movement is not None:
+        for functional_movement in functional_movement_list:
 
             for p in functional_movement.prime_movers:
                 body_part_side_list = body_part_factory.get_body_part_side_list(p)
