@@ -312,51 +312,96 @@ class FunctionalMovementActionMapping(object):
 
     def set_muscle_load(self):
 
-        self.apply_load_to_functional_movements(self.hip_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movements(self.knee_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movements(self.ankle_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movements(self.trunk_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movements(self.shoulder_scapula_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
-        self.apply_load_to_functional_movements(self.elbow_joint_functional_movements, self.exercise_action.total_load_left, self.exercise_action.total_load_right)
+        self.apply_load_to_functional_movements(self.hip_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.knee_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.ankle_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.trunk_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.shoulder_scapula_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.elbow_joint_functional_movements, self.exercise_action)
 
-    def apply_load_to_functional_movements(self, functional_movement_list, left_load, right_load):
+    def get_matching_stability_rating(self, functional_movement_type, lower_stability_rating, upper_stability_rating):
+
+        if functional_movement_type in [FunctionalMovementType.ankle_dorsiflexion,
+                                        FunctionalMovementType.ankle_plantar_flexion,
+                                        FunctionalMovementType.inversion_of_the_foot,
+                                        FunctionalMovementType.eversion_of_the_foot,
+                                        FunctionalMovementType.knee_flexion,
+                                        FunctionalMovementType.knee_extension,
+                                        FunctionalMovementType.tibial_internal_rotation,
+                                        FunctionalMovementType.tibial_external_rotation]:
+            return lower_stability_rating
+        elif functional_movement_type in [FunctionalMovementType.elbow_extension,
+                                          FunctionalMovementType.elbow_flexion,
+                                          FunctionalMovementType.shoulder_horizontal_adduction,
+                                          FunctionalMovementType.shoulder_horizontal_abduction,
+                                          FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation,
+                                          FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation,
+                                          FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation,
+                                          FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation,
+                                          FunctionalMovementType.internal_rotation,
+                                          FunctionalMovementType.external_rotation,
+                                          FunctionalMovementType.scapular_depression,
+                                          FunctionalMovementType.scapular_elevation]:
+            return upper_stability_rating
+        elif functional_movement_type in [FunctionalMovementType.hip_abduction,
+                                          FunctionalMovementType.hip_adduction,
+                                          FunctionalMovementType.hip_internal_rotation,
+                                          FunctionalMovementType.hip_external_rotation,
+                                          FunctionalMovementType.hip_extension,
+                                          FunctionalMovementType.hip_flexion,
+                                          FunctionalMovementType.pelvic_anterior_tilt,
+                                          FunctionalMovementType.pelvic_posterior_tilt,
+                                          FunctionalMovementType.trunk_flexion,
+                                          FunctionalMovementType.trunk_extension,
+                                          FunctionalMovementType.trunk_lateral_flexion,
+                                          FunctionalMovementType.trunk_rotation,
+                                          FunctionalMovementType.trunk_flexion_with_rotation,
+                                          FunctionalMovementType.trunk_extension_with_rotation]:
+            return max(lower_stability_rating, upper_stability_rating)
+
+    def apply_load_to_functional_movements(self, functional_movement_list, exercise_action):
 
         body_part_factory = BodyPartFactory()
 
+        left_load = exercise_action.total_left_load
+        right_load = exercise_action.total_right_load
+
         for functional_movement in functional_movement_list:
+
+            stability_rating = self.get_matching_stability_rating(functional_movement, exercise_action)
 
             for p in functional_movement.prime_movers:
                 body_part_side_list = body_part_factory.get_body_part_side_list(p)
                 for body_part_side in body_part_side_list:
                     if body_part_side.side == 1 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                                      BodyPartFunction.prime_mover, left_load)
+                                                                      BodyPartFunction.prime_mover, left_load, stability_rating)
                         self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
                     if body_part_side.side == 2 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                                      BodyPartFunction.prime_mover, right_load)
+                                                                      BodyPartFunction.prime_mover, right_load, stability_rating)
                         self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
             for s in functional_movement.synergists:
                 body_part_side_list = body_part_factory.get_body_part_side_list(s)
                 for body_part_side in body_part_side_list:
                     if body_part_side.side == 1 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                                      BodyPartFunction.synergist, left_load)
+                                                                      BodyPartFunction.synergist, left_load, stability_rating)
                         self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
                     if body_part_side.side == 2 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                                      BodyPartFunction.synergist, right_load)
+                                                                      BodyPartFunction.synergist, right_load, stability_rating)
                         self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
             for t in functional_movement.stabilizers:
                 body_part_side_list = body_part_factory.get_body_part_side_list(t)
                 for body_part_side in body_part_side_list:
                     if body_part_side.side == 1 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                                      BodyPartFunction.stabilizer, left_load)
+                                                                      BodyPartFunction.stabilizer, left_load, stability_rating)
                         self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
                     if body_part_side.side == 2 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-                                                                      BodyPartFunction.stabilizer, right_load)
+                                                                      BodyPartFunction.stabilizer, right_load, stability_rating)
                         self.update_muscle_dictionary(body_part_side, attributed_muscle_load)
 
     def update_muscle_dictionary(self, muscle, attributed_muscle_load):
@@ -365,10 +410,7 @@ class FunctionalMovementActionMapping(object):
         else:
             self.muscle_load[muscle] = attributed_muscle_load
 
-    def get_muscle_load(self, functional_movement_priority, muscle_role, load):
-
-        stability_rating = 0.5
-        # TODO: get stability from exercise action
+    def get_muscle_load(self, functional_movement_priority, muscle_role, load, stability_rating):
 
         if functional_movement_priority == 1:
             priority_ratio = 1.00
