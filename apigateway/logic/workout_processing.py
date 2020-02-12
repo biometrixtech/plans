@@ -5,6 +5,7 @@ from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceSt
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
+from math import ceil
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -72,14 +73,16 @@ class WorkoutProcessor(object):
     def get_rpe_from_rep_max(self, rep_max, reps):
 
         # assume 100 bodyweight as we just want relative percentages
-        one_rep_max_weight = (100 * 0.033 * rep_max) + 100
-        actual_reps_weight = (100 * 0.033 * reps) + 100
+        one_rep_max_weight = (96.7 * 0.033 * rep_max) + 96.7
+        actual_reps_weight = (96.7 * 0.033 * reps) + 96.7
 
-        rep_max_percentage = min((one_rep_max_weight / actual_reps_weight) * 100, 100)
+        rep_max_percentage = round(min((float(actual_reps_weight) / one_rep_max_weight) * 96.7, 100),0)
+
+        # even though we base it on 100, math is off by ~ 3.3%
 
         rpe_lookup_tuples = []
-        rpe_lookup_tuples.append((10, 100, 101))
-        rpe_lookup_tuples.append((9, 94, 100))
+        rpe_lookup_tuples.append((10, 97, 100))
+        rpe_lookup_tuples.append((9, 94, 97))
         rpe_lookup_tuples.append((8, 91, 94))
         rpe_lookup_tuples.append((7, 89, 91))
         rpe_lookup_tuples.append((6, 86, 89))
@@ -94,23 +97,33 @@ class WorkoutProcessor(object):
 
         if len(rpe_tuple) > 0:
 
-            perc_diff = rpe_tuple[0][2] - rep_max_percentage
-            rpe_diff = perc_diff / (rpe_tuple[0][2] - rpe_tuple[0][1])
+            perc_diff = rep_max_percentage - rpe_tuple[0][1]
+            rpe_diff = perc_diff / float(rpe_tuple[0][2] - rpe_tuple[0][1])
             rpe = rpe_tuple[0][0] + rpe_diff
+
+            rpe = min(10, rpe)
+            rpe = max(0, rpe)
 
         else:
              rpe = 0
 
-        return rpe
+        return round(rpe,1)
 
     def get_reps_for_percent_rep_max(self, rep_max_percent):
 
         if rep_max_percent >= 100:
             return 1
 
-        base_percent = 100 - rep_max_percent
+        rep_max = 1
+        one_rep_max_weight_1 = (96.7 * 0.033 * rep_max) + 96.7
+        one_rep_max_weight = 100
+        rebased_percent = one_rep_max_weight_1 / (float(rep_max_percent)/96.7)
 
-        reps = round(base_percent / (100 * .033), 0)
+        actual_reps_weight = (rebased_percent - 96.7)
+        unrounded_reps = actual_reps_weight / (96.7 * .033)
+        #ceil_reps = ceil(unrounded_reps)
+
+        reps = round(unrounded_reps, 0)
 
         return reps
 
