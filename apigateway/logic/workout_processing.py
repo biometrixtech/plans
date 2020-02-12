@@ -46,7 +46,7 @@ class WorkoutProcessor(object):
 
     def process_action(self, action, exercise):
         athlete_bodyweight = 100
-        estimated_rpe = self.get_rpe_from_weight(exercise, athlete_bodyweight)
+        estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
 
         external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
@@ -149,7 +149,7 @@ class WorkoutProcessor(object):
     def get_action_rep_max_bodyweight_ratio(self, athlete_bodyweight, action, weight_used):
 
         # if weight_used = 0, assume it's a bodyweight only exercise
-
+        # TODO - test this assumption
         if weight_used == 0:
             weight_used = athlete_bodyweight
 
@@ -166,35 +166,34 @@ class WorkoutProcessor(object):
 
         return bodyweight_ratio
 
-    def get_rpe_from_weight(self, workout_exercise, athlete_bodyweight):
+    def get_rpe_from_weight(self, workout_exercise, action, athlete_bodyweight):
 
         rpe = 0
 
         reps = workout_exercise.reps_per_set * workout_exercise.sets
 
-        for action in workout_exercise.primary_actions:
-            if workout_exercise.weight_measure == WeightMeasure.rep_max:
+        if workout_exercise.weight_measure == WeightMeasure.rep_max:
 
-                rpe = self.get_rpe_from_rep_max(workout_exercise.rep_max, reps)
+            rpe = self.get_rpe_from_rep_max(workout_exercise.rep_max, reps)
+
+        else:
+            if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
+
+                weight = workout_exercise.percent_bodyweight * athlete_bodyweight
+
+            elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
+
+                weight = workout_exercise.weight_in_lbs
 
             else:
-                if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
+                return rpe
 
-                    weight = workout_exercise.percent_bodyweight * athlete_bodyweight
+            bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, action, weight)
+            one_rep_max_weight = bodyweight_ratio * athlete_bodyweight
+            percent_one_rep_max_weight = min(100, (weight/one_rep_max_weight) * 100)
+            rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
 
-                elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
-
-                    weight = workout_exercise.weight_in_lbs
-
-                else:
-                    return rpe
-
-                bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, action, weight)
-                one_rep_max_weight = bodyweight_ratio * athlete_bodyweight
-                percent_one_rep_max_weight = min(100, (weight/one_rep_max_weight) * 100)
-                rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
-
-                rpe = self.get_rpe_from_rep_max(rep_max_reps, reps)
+            rpe = self.get_rpe_from_rep_max(rep_max_reps, reps)
 
         return rpe
 
