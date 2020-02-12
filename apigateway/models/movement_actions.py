@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction
-from functional_movement_type import FunctionalMovementType
+from models.functional_movement_type import FunctionalMovementType
 from serialisable import Serialisable
 
 
