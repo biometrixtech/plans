@@ -1,5 +1,5 @@
-from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness
-from movement_tags import CardioAction, TrainingType, BodyPosition, Equipment, WeightDistribution
+from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness, MuscleAction
+from movement_tags import CardioAction, TrainingType, Equipment, WeightDistribution
 import os
 import json
 import pandas as pd
@@ -26,41 +26,90 @@ class ActionLibraryParser(object):
         if row['id'] is not None and row['id'] != '':
             action = ExerciseAction(row['id'], row['action'])
 
-            if row.get('training_type') is not None and row['training_type'] != "" and row['training_type'] != "none":
+            if self.is_valid(row, 'training_type'):
                 action.training_type = TrainingType[row['training_type']]
-                # if action.training_type == TrainingType.strength_cardiorespiratory:
-                #     try:
-                #         action.cardio_action = CardioAction[row['cardio_action']]
-                #     except KeyError:
-                #         print(f"cardio_action: {row['cardio_action']}")
-            if row.get('eligible_external_resistance') is not None and row['eligible_external_resistance'] != "":
+            if self.is_valid(row, 'eligible_external_resistance'):
                 row['eligible_external_resistance'].replace(", ", ",")
                 resistances = row.get('eligible_external_resistance').split(",")
                 try:
                     action.eligible_external_resistance = [Equipment[ex_res] for ex_res in resistances]
                 except:
                     print(f"eligible_external_resistance: {row['eligible_external_resistance']}")
-            if row.get('stance_lower_body') is not None and row['stance_lower_body'] != "":
+            if self.is_valid(row, 'stance_lower_body'):
                 action.lower_body_stance = LowerBodyStance[row['stance_lower_body']]
-            if row.get('stance_upper_body') is not None and row['stance_upper_body'] != "":
+            if self.is_valid(row, 'stance_upper_body'):
                 action.upper_body_stance = UpperBodyStance[row['stance_upper_body']]
-            if row.get('lateral_distribution_pattern') is not None and row['lateral_distribution_pattern'] != "":
+            if self.is_valid(row, 'lateral_distribution_pattern'):
                 action.lateral_distribution_pattern = WeightDistribution[row['lateral_distribution_pattern']]
-            if row.get('percent_bodyweight') is not None and row['percent_bodyweight'] != "":
+            if self.is_valid(row, 'percent_bodyweight'):
                 action.percent_bodyweight = int(row.get('percent_bodyweight', 0))
-            action.lateral_distribution = [0, 0]
-            action.apply_resistance = row['apply_resistance'].lower() == "true"
-            if row.get('relative_explosiveness') is not None and row['relative_explosiveness'] != "" and row['relative_explosiveness'] != "none":
+            if self.is_valid(row, 'lateral_distribution'):
+                action.lateral_distribution = [0, 0]
+            if self.is_valid(row, 'apply_resistance'):
+                action.apply_resistance = row['apply_resistance'].lower() == "true"
+            if self.is_valid(row, 'relative_explosiveness'):
                 action.explosiveness = Explosiveness[row['relative_explosiveness']]
-            action.apply_instability = row['apply_instability'].lower() == "true"
+            if self.is_valid(row, 'apply_instability'):
+                action.apply_instability = row['apply_instability'].lower() == "true"
+
+            # primary
+            if self.is_valid(row, 'muscle_action'):
+                self.primary_muscle_action = MuscleAction(row['muscle_action'])
+            if self.is_valid(row, 'hip_joint_rating'):
+                pass
+            if self.is_valid(row, 'hip_joint_action'):
+                pass
+            if self.is_valid(row, 'knee_joint_rating'):
+                pass
+            if self.is_valid(row, 'knee_joint_action'):
+                pass
+            if self.is_valid(row, 'ankle_joint_rating'):
+                pass
+            if self.is_valid(row, 'ankle_joint_action'):
+                pass
+            if self.is_valid(row, 'trunk_joint_rating'):
+                pass
+            if self.is_valid(row, 'trunk_joint_action'):
+                pass
+            if self.is_valid(row, 'shoulder_scapula_joint_rating'):
+                pass
+            if self.is_valid(row, 'shoulder_scapula_joint_action'):
+                pass
+            if self.is_valid(row, 'elbow_joint_rating'):
+                pass
+            if self.is_valid(row, 'elbow_joint_action'):
+                pass
+            # secondary
+            if self.is_valid(row, 'muscle_action'):
+                pass
+            if self.is_valid(row, 'hip_stability'):
+                pass
+            if self.is_valid(row, 'ankle_stability'):
+                pass
+            if self.is_valid(row, 'trunk_stability_fm'):
+                pass
+            if self.is_valid(row, 'pelvis_stability_fm'):
+                pass
+            if self.is_valid(row, 'shoulder_stability'):
+                pass
+            if self.is_valid(row, 'elbow_stability'):
+                pass
+            if self.is_valid(row, 'sij_stability'):
+                pass
             return action
         else:
             return None
 
+    @staticmethod
+    def is_valid(row, name):
+        if row.get(name) is not None and row[name] != "" and row[name] != "none":
+            return True
+        return False
+
     def write_actions_json(self):
         actions_json = {}
         for action in self.actions:
-            actions_json[action.id] = action.json_serialise()
+            actions_json[action.id] = action.json_serialise(initial_read=True)
 
         json_string = json.dumps(actions_json, indent=4)
         file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/actions_library.json")

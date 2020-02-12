@@ -34,6 +34,19 @@ class CardioAction(Enum):
     ruck = 7
 
 
+class PowerDrillAction(Enum):
+    drills_speed_agility = 0
+    hurdles_speed_agility = 1
+    sprints_speed_agility = 2
+
+
+class PowerAction(Enum):
+    jump = 0
+    throw = 1
+    olympic_lift = 2
+    strength_action = 3
+
+
 class BodyPosition(Enum):
     supine = 0
     prone = 1
