@@ -273,3 +273,9 @@ class AssignedExercise(Serialisable):
                'dosages': [dosage.json_serialise() for dosage in self.dosages]
                }
         return ret
+
+
+class WeightMeasure(Enum):
+    rep_max = 0
+    percent_bodyweight = 1
+    actual_weight = 2

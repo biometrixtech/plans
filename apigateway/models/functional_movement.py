@@ -319,7 +319,10 @@ class FunctionalMovementActionMapping(object):
         self.apply_load_to_functional_movements(self.shoulder_scapula_joint_functional_movements, self.exercise_action)
         self.apply_load_to_functional_movements(self.elbow_joint_functional_movements, self.exercise_action)
 
-    def get_matching_stability_rating(self, functional_movement_type, lower_stability_rating, upper_stability_rating):
+    def get_matching_stability_rating(self, functional_movement_type, exercise_action):
+
+        lower_stability_rating = exercise_action.lower_body_stability_rating
+        upper_stability_rating = exercise_action.upper_body_stability_rating
 
         if functional_movement_type in [FunctionalMovementType.ankle_dorsiflexion,
                                         FunctionalMovementType.ankle_plantar_flexion,
@@ -363,8 +366,8 @@ class FunctionalMovementActionMapping(object):
 
         body_part_factory = BodyPartFactory()
 
-        left_load = exercise_action.total_left_load
-        right_load = exercise_action.total_right_load
+        left_load = exercise_action.total_load_left
+        right_load = exercise_action.total_load_right
 
         for functional_movement in functional_movement_list:
 
