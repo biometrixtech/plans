@@ -1,4 +1,5 @@
-from models.functional_movement import FunctionalMovementPairs, FunctionalMovementType, FunctionalMovementActionMapping
+from models.functional_movement import FunctionalMovementPairs, FunctionalMovementActionMapping
+from models.functional_movement_type import FunctionalMovementType
 from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
 from models.soreness_base import BodyPartLocation, BodyPartSide
 

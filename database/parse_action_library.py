@@ -1,5 +1,6 @@
-from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness, MuscleAction
+from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness, MuscleAction, PrioritizedJointAction
 from movement_tags import CardioAction, TrainingType, Equipment, WeightDistribution
+from models.functional_movement_type import FunctionalMovementType
 import os
 import json
 import pandas as pd
@@ -29,7 +30,7 @@ class ActionLibraryParser(object):
             if self.is_valid(row, 'training_type'):
                 action.training_type = TrainingType[row['training_type']]
             if self.is_valid(row, 'eligible_external_resistance'):
-                row['eligible_external_resistance'].replace(", ", ",")
+                row['eligible_external_resistance'] = row['eligible_external_resistance'].replace(", ", ",")
                 resistances = row.get('eligible_external_resistance').split(",")
                 try:
                     action.eligible_external_resistance = [Equipment[ex_res] for ex_res in resistances]
@@ -54,31 +55,35 @@ class ActionLibraryParser(object):
 
             # primary
             if self.is_valid(row, 'muscle_action'):
-                self.primary_muscle_action = MuscleAction(row['muscle_action'])
-            if self.is_valid(row, 'hip_joint_rating'):
-                pass
-            if self.is_valid(row, 'hip_joint_action'):
-                pass
-            if self.is_valid(row, 'knee_joint_rating'):
-                pass
-            if self.is_valid(row, 'knee_joint_action'):
-                pass
-            if self.is_valid(row, 'ankle_joint_rating'):
-                pass
-            if self.is_valid(row, 'ankle_joint_action'):
-                pass
-            if self.is_valid(row, 'trunk_joint_rating'):
-                pass
-            if self.is_valid(row, 'trunk_joint_action'):
-                pass
-            if self.is_valid(row, 'shoulder_scapula_joint_rating'):
-                pass
-            if self.is_valid(row, 'shoulder_scapula_joint_action'):
-                pass
-            if self.is_valid(row, 'elbow_joint_rating'):
-                pass
-            if self.is_valid(row, 'elbow_joint_action'):
-                pass
+                self.primary_muscle_action = MuscleAction[row['muscle_action']]
+
+            action.hip_joint_action = self.get_prioritized_joint_actions(row, 'hip_joint')
+            action.knee_joint_action = self.get_prioritized_joint_actions(row, 'knee_joint')
+            action.ankle_joint_action = self.get_prioritized_joint_actions(row, 'ankle_joint')
+            action.trunk_joint_action = self.get_prioritized_joint_actions(row, 'trunk_joint')
+            action.shoulder_scapula_joint_action = self.get_prioritized_joint_actions(row, 'shoulder_scapula_joint')
+            action.elbow_joint_action = self.get_prioritized_joint_actions(row, 'elbow_joint')
+
+            # # if self.is_valid(row, 'knee_joint_priority'):
+            # #     pass
+            # if self.is_valid(row, 'knee_joint_action'):
+            #     pass
+            # # if self.is_valid(row, 'ankle_joint_priority'):
+            # #     pass
+            # if self.is_valid(row, 'ankle_joint_action'):
+            #     pass
+            # # if self.is_valid(row, 'trunk_joint_priority'):
+            # #     pass
+            # if self.is_valid(row, 'trunk_joint_action'):
+            #     pass
+            # # if self.is_valid(row, 'shoulder_scapula_joint_priority'):
+            # #     pass
+            # if self.is_valid(row, 'shoulder_scapula_joint_action'):
+            #     pass
+            # # if self.is_valid(row, 'elbow_joint_priority'):
+            # #     pass
+            # if self.is_valid(row, 'elbow_joint_action'):
+            #     pass
             # secondary
             if self.is_valid(row, 'muscle_action'):
                 pass
@@ -100,11 +105,29 @@ class ActionLibraryParser(object):
         else:
             return None
 
+    def get_prioritized_joint_actions(self, row, joint):
+        if self.is_valid(row, f'{joint}_action'):
+            joint_priority = 0
+            if self.is_valid(row, f'{joint}_priority'):
+                joint_priority = int(row[f'{joint}_priority'])
+            joint_actions = row[f'{joint}_action']
+            joint_actions = joint_actions.replace(", ", ",")
+            joint_actions = joint_actions.replace(" ", "_")
+            joint_actions = joint_actions.lower().split(",")
+            try:
+                return [PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]) for j_action in joint_actions]
+            except:
+                print(joint_actions)
+        return []
+
+
     @staticmethod
     def is_valid(row, name):
         if row.get(name) is not None and row[name] != "" and row[name] != "none":
             return True
         return False
+
+
 
     def write_actions_json(self):
         actions_json = {}
