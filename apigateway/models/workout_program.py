@@ -1,4 +1,4 @@
-from models.exercise import UnitOfMeasure
+from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 from models.movement_tags import AdaptationType, BodyPosition, CardioAction, TrainingType, Equipment, MovementSurfaceStability
 import re
@@ -99,6 +99,9 @@ class WorkoutExercise(Serialisable):
         self.name = ''
         self.weight_in_lbs = None
         self.equipment = None
+        self.weight_measure = None
+        self.rep_max = None
+        self.percent_bodyweight = None
         self.sets = 1
         self.reps_per_set = 1
         self.unit_of_measure = None
@@ -123,6 +126,9 @@ class WorkoutExercise(Serialisable):
             'name': self.name,
             'weight_in_lbs': self.weight_in_lbs,
             'equipment': self.equipment.value if self.equipment is not None else None,
+            'weight_measure': self.weight_measure.value if self.weight_measure is not None else None,
+            'rep_max': self.rep_max,
+            'percent_bodyweight': self.percent_bodyweight,
             'sets': self.sets,
             'reps_per_set': self.reps_per_set,
             'unit_of_measure': self.unit_of_measure.value,
@@ -146,6 +152,9 @@ class WorkoutExercise(Serialisable):
         exercise.name = input_dict.get('name', '')
         exercise.weight_in_lbs = input_dict.get('weight_in_lbs')
         exercise.equipment = Equipment(input_dict['equipment']) if input_dict.get('equipment') is not None else None
+        exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get('weight_measure') is not None else None
+        exercise.rep_max = input_dict.get('rep_max')
+        exercise.percent_bodyweight = input_dict.get('percent_bodyweight')
         exercise.sets = input_dict.get('sets', 0)
         exercise.reps_per_set = input_dict.get('reps_per_set', 0)
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None

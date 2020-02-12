@@ -3,7 +3,9 @@ from datastores.action_library_datastore import ActionLibraryDatastore
 from models.cardio_data import get_cardio_data
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance
-from models.exercise import UnitOfMeasure
+from models.exercise import UnitOfMeasure, WeightMeasure
+from models.functional_movement import FunctionalMovementFactory
+
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
 action_library = ActionLibraryDatastore().get()
@@ -42,6 +44,10 @@ class WorkoutProcessor(object):
         self.apply_explosiveness(exercise, exercise.secondary_actions)
 
     def process_action(self, action, exercise):
+        athlete_bodyweight = 100
+        estimated_rpe = self.get_rpe_from_weight(exercise, athlete_bodyweight)
+        # sooooo, now what do we do with this estimated_rpe value !?!?!
+
         external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
         action.external_weight = [external_weight]
 
@@ -62,6 +68,122 @@ class WorkoutProcessor(object):
         action.side = exercise.side
         action.rpe = exercise.rpe
         action.get_training_load()
+
+    def get_rpe_from_rep_max(self, rep_max, reps):
+
+        # assume 100 bodyweight as we just want relative percentages
+        one_rep_max_weight = (100 * 0.033 * rep_max) + 100
+        actual_reps_weight = (100 * 0.033 * reps) + 100
+
+        rep_max_percentage = min((one_rep_max_weight / actual_reps_weight) * 100, 100)
+
+        rpe_lookup_tuples = []
+        rpe_lookup_tuples.append((10, 100, 101))
+        rpe_lookup_tuples.append((9, 94, 100))
+        rpe_lookup_tuples.append((8, 91, 94))
+        rpe_lookup_tuples.append((7, 89, 91))
+        rpe_lookup_tuples.append((6, 86, 89))
+        rpe_lookup_tuples.append((5, 83, 86))
+        rpe_lookup_tuples.append((4, 81, 83))
+        rpe_lookup_tuples.append((3, 79, 81))
+        rpe_lookup_tuples.append((2, 77, 79))
+        rpe_lookup_tuples.append((1, 75, 77))
+        rpe_lookup_tuples.append((0, 73, 75))
+
+        rpe_tuple = [r for r in rpe_lookup_tuples if r[1] <= rep_max_percentage < r[2]]
+
+        if len(rpe_tuple) > 0:
+
+            perc_diff = rpe_tuple[0][2] - rep_max_percentage
+            rpe_diff = perc_diff / (rpe_tuple[0][2] - rpe_tuple[0][1])
+            rpe = rpe_tuple[0][0] + rpe_diff
+
+        else:
+             rpe = 0
+
+        return rpe
+
+    def get_reps_for_percent_rep_max(self, rep_max_percent):
+
+        if rep_max_percent >= 100:
+            return 1
+
+        base_percent = 100 - rep_max_percent
+
+        reps = round(base_percent / (100 * .033), 0)
+
+        return reps
+
+    def get_prime_movers_from_joint_actions(self, joint_action_list):
+
+        functional_movement_factory = FunctionalMovementFactory()
+
+        prime_movers = []
+
+        for prioritized_joint_action in joint_action_list:
+            joint_action_type = prioritized_joint_action.functional_movement_type
+            functional_movement = functional_movement_factory.get_functional_movement(joint_action_type)
+            prime_movers.extend(functional_movement.prime_movers)
+
+        return prime_movers
+
+    def get_bodyweight_ratio_from_model(self, action, weight_used, prime_movers):
+
+        dipesh_god_mode_l = 0.75
+
+        return dipesh_god_mode_l
+
+    def get_action_rep_max_bodyweight_ratio(self, athlete_bodyweight, action, weight_used):
+
+        # if weight_used = 0, assume it's a bodyweight only exercise
+
+        if weight_used == 0:
+            weight_used = athlete_bodyweight
+
+        # get prime movers from action
+        prime_movers = []
+        prime_movers.extend(self.get_prime_movers_from_joint_actions(action.hip_joint_action))
+        prime_movers.extend(self.get_prime_movers_from_joint_actions(action.knee_joint_action))
+        prime_movers.extend(self.get_prime_movers_from_joint_actions(action.ankle_joint_action))
+        prime_movers.extend(self.get_prime_movers_from_joint_actions(action.trunk_joint_action))
+        prime_movers.extend(self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action))
+        prime_movers.extend(self.get_prime_movers_from_joint_actions(action.elbow_joint_action))
+
+        bodyweight_ratio = self.get_bodyweight_ratio_from_model(action, weight_used, prime_movers)
+
+        return bodyweight_ratio
+
+    def get_rpe_from_weight(self, workout_exercise, athlete_bodyweight):
+
+        rpe = 0
+
+        reps = workout_exercise.reps_per_set * workout_exercise.sets
+
+        for action in workout_exercise.primary_actions:
+            if workout_exercise.weight_measure == WeightMeasure.rep_max:
+
+                rpe = self.get_rpe_from_rep_max(workout_exercise.rep_max, reps)
+
+            else:
+                if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
+
+                    weight = workout_exercise.percent_bodyweight * athlete_bodyweight
+
+                elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
+
+                    weight = workout_exercise.weight_in_lbs
+
+                else:
+                    return rpe
+
+                bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, action, weight)
+                one_rep_max_weight = bodyweight_ratio * athlete_bodyweight
+                percent_one_rep_max_weight = min(100, (weight/one_rep_max_weight) * 100)
+                rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
+
+                rpe = self.get_rpe_from_rep_max(rep_max_reps, reps)
+
+        return rpe
 
     def convert_reps_to_duration(self, reps, unit_of_measure, cardio_action):
         # distance to duration
