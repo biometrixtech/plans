@@ -384,7 +384,7 @@ class FunctionalMovementActionMapping(object):
         elif muscle_role == BodyPartFunction.synergist:
             muscle_ratio = 0.60
         elif muscle_role == BodyPartFunction.stabilizer:
-            muscle_ratio = (0.15 * stability_rating) + 0.5
+            muscle_ratio = (0.15 * stability_rating) + 0.05
         else:
             muscle_ratio = 0.0
 
