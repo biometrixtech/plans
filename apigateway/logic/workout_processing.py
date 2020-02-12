@@ -1,11 +1,12 @@
 from datastores.movement_library_datastore import MovementLibraryDatastore
+from datastores.action_library_datastore import ActionLibraryDatastore
 from models.cardio_data import get_cardio_data
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance
 from models.exercise import UnitOfMeasure
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
-action_library = {}
+action_library = ActionLibraryDatastore().get()
 
 
 class WorkoutProcessor(object):
