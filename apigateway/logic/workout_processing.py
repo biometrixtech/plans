@@ -190,9 +190,14 @@ class WorkoutProcessor(object):
 
             bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, action, weight)
             one_rep_max_weight = bodyweight_ratio * athlete_bodyweight
+
+            # find the % 1RM value
             percent_one_rep_max_weight = min(100, (weight/one_rep_max_weight) * 100)
+
+            # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
             rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
 
+            # given the amount of reps they completed and the n of nRM, find the RPE
             rpe = self.get_rpe_from_rep_max(rep_max_reps, reps)
 
         return rpe

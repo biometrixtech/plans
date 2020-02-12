@@ -421,6 +421,8 @@ class FunctionalMovementActionMapping(object):
             priority_ratio = 0.6
         elif functional_movement_priority == 3:
             priority_ratio = 0.3
+        elif functional_movement_priority == 4:
+            priority_ratio = 0.15
         else:
             priority_ratio = 0.00
 
