@@ -34,13 +34,16 @@ def test_apply_load_concentric():
     exercise_action.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
     exercise_action.total_load_left = 100
     exercise_action.total_load_right = 200
+    exercise_action.lower_body_stability_rating = 1.1
+    exercise_action.upper_body_stability_rating = 0.6
+
 
     synergist_ratio = 0.6
     priority_2_ratio = 0.6
     priority_3_ratio = 0.3
 
     functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action)
-    assert len(functional_movement_action_mapping.muscle_load) == 28
+    assert len(functional_movement_action_mapping.muscle_load) == 38
 
     # Priority 1, prime movers
     assert functional_movement_action_mapping.muscle_load[BodyPartSide(BodyPartLocation(66), 1)] == 100
@@ -89,13 +92,15 @@ def test_apply_load_eccentric():
     exercise_action.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_dorsiflexion)]
     exercise_action.total_load_left = 100
     exercise_action.total_load_right = 200
+    exercise_action.lower_body_stability_rating = 1.1
+    exercise_action.upper_body_stability_rating = 0.6
 
     synergist_ratio = 0.6
     priority_2_ratio = 0.6
     priority_3_ratio = 0.3
 
     functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action)
-    assert len(functional_movement_action_mapping.muscle_load) == 28
+    assert len(functional_movement_action_mapping.muscle_load) == 38
 
     # Priority 1, prime movers
     assert functional_movement_action_mapping.muscle_load[BodyPartSide(BodyPartLocation(66), 1)] == 100
