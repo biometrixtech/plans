@@ -389,7 +389,10 @@ class FunctionalMovementActionMapping(object):
 
         for functional_movement in functional_movement_list:
 
-            stability_rating = self.get_matching_stability_rating(functional_movement, exercise_action)
+            if exercise_action.apply_instability:
+                stability_rating = self.get_matching_stability_rating(functional_movement, exercise_action)
+            else:
+                stability_rating = 0.0
 
             for p in functional_movement.prime_movers:
                 body_part_side_list = body_part_factory.get_body_part_side_list(p)
@@ -462,6 +465,8 @@ class FunctionalMovementActionMapping(object):
             muscle_ratio = 0.60
         elif muscle_role == BodyPartFunction.stabilizer:
             muscle_ratio = (0.15 * stability_rating) + 0.05
+        elif muscle_role == BodyPartFunction.fixator:
+            muscle_ratio = (0.10 * stability_rating) + 0.20
         else:
             muscle_ratio = 0.0
 
