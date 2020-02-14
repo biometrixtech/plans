@@ -1192,7 +1192,7 @@ class FunctionalMovementFactory(object):
 
     def get_scapular_depression(self):
 
-        functional_movement = FunctionalMovement(FunctionalMovementType.scapular_elevation)
+        functional_movement = FunctionalMovement(FunctionalMovementType.scapular_depression)
         functional_movement.prime_movers = [79]
         functional_movement.synergists = [81]
         functional_movement.antagonists = [76, 77, 80]
