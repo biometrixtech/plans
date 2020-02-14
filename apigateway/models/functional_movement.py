@@ -799,7 +799,7 @@ class FunctionalMovementFactory(object):
 
     def get_ankle_fixators(self):
 
-        return [44, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66, 57, 58]
+        return [44, 68, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66, 57, 58]
 
     def get_knee_fixators(self):
 
@@ -895,9 +895,9 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_flexion)
         functional_movement.prime_movers = [45, 46, 47, 48]
-        functional_movement.synergists = [44, 61, 53]
+        functional_movement.synergists = [44, 61, 53, 68]
         functional_movement.antagonists = [55, 56, 57, 58]
-        functional_movement.stabilizers = [44, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66]
+        functional_movement.stabilizers = [44, 68, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66]
         functional_movement.fixators = self.get_knee_fixators()
         functional_movement.parts_receiving_compensation = [44, 61, 53]
         return functional_movement
@@ -907,7 +907,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_extension)
         functional_movement.prime_movers = [55, 56, 57, 58]
         functional_movement.synergists = []
-        functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53]
+        functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53, 68]
         functional_movement.stabilizers = [44, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66]
         functional_movement.fixators = self.get_knee_fixators()
         functional_movement.parts_receiving_compensation = []
@@ -918,7 +918,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_extension)
         functional_movement.prime_movers = [66]
         functional_movement.synergists = [45, 47, 48, 51]
-        functional_movement.antagonists = [50, 54, 58, 59, 71]
+        functional_movement.antagonists = [50, 54, 58, 59, 71, 72, 49, 52]
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [45, 47, 48, 51]
@@ -927,8 +927,8 @@ class FunctionalMovementFactory(object):
     def get_hip_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_flexion)
-        functional_movement.prime_movers = [54, 71]
-        functional_movement.synergists = [49, 50, 52, 53, 58, 59, 65]
+        functional_movement.prime_movers = [71]
+        functional_movement.synergists = [49, 50, 52, 54, 58, 59, 72]
         functional_movement.antagonists = [45, 47, 48, 51, 66]
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
@@ -938,9 +938,9 @@ class FunctionalMovementFactory(object):
     def get_hip_internal_rotation(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_internal_rotation)
-        functional_movement.prime_movers = [54, 65]
-        functional_movement.synergists = [46, 47, 48, 49, 50, 52, 53, 59, 63]
-        functional_movement.antagonists = [45, 51, 67, 64, 66]
+        functional_movement.prime_movers = [65]
+        functional_movement.synergists = [47, 48, 49, 50, 52, 54, 59, 63]
+        functional_movement.antagonists = [45, 51, 60, 67, 64, 66]
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [46, 47, 48, 49, 50, 52, 53, 59, 63]
@@ -951,7 +951,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_external_rotation)
         functional_movement.prime_movers = [60]
         functional_movement.synergists = [45, 51, 67, 64, 66]
-        functional_movement.antagonists = [47, 48, 49, 50, 52, 53, 54, 59, 63, 65]
+        functional_movement.antagonists = [47, 48, 49, 50, 52, 54, 59, 63, 65]
         functional_movement.stabilizers = [60, 67, 63, 64, 65]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [45, 51, 67, 64, 66]
@@ -971,8 +971,8 @@ class FunctionalMovementFactory(object):
     def get_hip_adduction(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_adduction)
-        functional_movement.prime_movers = [49, 50, 51, 52, 53]
-        functional_movement.synergists = [47, 48, 54, 67, 66]
+        functional_movement.prime_movers = [49, 50, 51, 52, 53, 54]
+        functional_movement.synergists = [47, 48, 67, 66]
         functional_movement.antagonists = [55, 59, 63, 64, 65]
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
@@ -993,9 +993,9 @@ class FunctionalMovementFactory(object):
     def get_hip_horizontal_adduction(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_horizontal_adduction)
-        functional_movement.prime_movers = [49, 50, 52, 53, 54]
+        functional_movement.prime_movers = [49, 50, 52, 54]
         functional_movement.synergists = [51]
-        functional_movement.antagonists = [59, 67, 63, 64, 65, 66]
+        functional_movement.antagonists = [59, 67, 60, 63, 64, 65, 66]
         functional_movement.stabilizers = [54, 60, 67, 63, 64, 65]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [47, 48, 54, 67, 66]
@@ -1004,8 +1004,8 @@ class FunctionalMovementFactory(object):
     def get_pelvic_anterior_tilt(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_anterior_tilt)
-        functional_movement.prime_movers = [58, 71, 72, 26, 70, 21]
-        functional_movement.synergists = [54, 59]
+        functional_movement.prime_movers = [58, 71, 72, 26, 21]
+        functional_movement.synergists = [34, 53, 49, 50, 52, 54, 59]
         functional_movement.antagonists = [74, 75]
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71, 60, 63, 64, 65]
         functional_movement.parts_receiving_compensation = [54, 59]
@@ -1015,7 +1015,7 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_posterior_tilt)
         functional_movement.prime_movers = [74, 75]
-        functional_movement.synergists = [45, 69]
+        functional_movement.synergists = [45, 69, 51, 66]
         functional_movement.antagonists = [58, 71, 72, 26, 70, 21]
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71, 60, 63, 64, 65]
         functional_movement.parts_receiving_compensation = [45, 69]
@@ -1034,7 +1034,7 @@ class FunctionalMovementFactory(object):
     def get_trunk_extension(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.trunk_extension)
-        functional_movement.prime_movers = [26, 21]
+        functional_movement.prime_movers = [26, 21, 34]
         functional_movement.synergists = []
         functional_movement.antagonists = [71, 74, 69, 75]
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
@@ -1086,7 +1086,7 @@ class FunctionalMovementFactory(object):
         functional_movement = FunctionalMovement(FunctionalMovementType.elbow_flexion)
         functional_movement.prime_movers = [126]
         functional_movement.synergists = [127, 128]
-        functional_movement.antagonists = [130, 131, 132]
+        functional_movement.antagonists = [130, 131, 132, 32]
         functional_movement.stabilizers = [33]
         functional_movement.fixators = self.get_elbow_fixators()
         functional_movement.parts_receiving_compensation = []
@@ -1095,7 +1095,7 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.elbow_extension)
         functional_movement.prime_movers = [130, 131, 132]
-        functional_movement.synergists = []
+        functional_movement.synergists = [32]
         functional_movement.antagonists = [126, 127, 128]
         functional_movement.stabilizers = [33]
         functional_movement.fixators = self.get_elbow_fixators()

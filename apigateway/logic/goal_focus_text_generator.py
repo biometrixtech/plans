@@ -116,7 +116,7 @@ class RecoveryTextGenerator(object):
         #     return side_text + "shoulder"
         # elif body_part_location == BodyPartLocation.upper_back_neck:
         #     return "upper back/neck"
-        # elif body_part_location == BodyPartLocation.lats:
+        # elif body_part_location == BodyPartLocation.latissmus_dorsi:
         #     return side_text + "lat"
         # elif body_part_location == BodyPartLocation.wrist:
         #     return side_text + "wrist"
@@ -199,8 +199,8 @@ class RecoveryTextGenerator(object):
         #     return side_text + "shoulders"
         # elif body_part_location == BodyPartLocation.upper_back_neck:
         #     return "upper back/neck"
-        # elif body_part_location == BodyPartLocation.lats:
-        #     return side_text + "lats"
+        # elif body_part_location == BodyPartLocation.latissmus_dorsi:
+        #     return side_text + "latissmus_dorsi"
         # elif body_part_location == BodyPartLocation.wrist:
         #     return side_text + "wrists"
         # elif body_part_location == BodyPartLocation.elbow:

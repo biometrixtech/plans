@@ -77,7 +77,7 @@ class BodyPartLocation(Enum):
     upper_back_neck = 18
     elbow = 19
     wrist = 20
-    lats = 21
+    latissmus_dorsi = 21
     biceps = 22
     triceps = 23
     forearm = 24
@@ -98,6 +98,9 @@ class BodyPartLocation(Enum):
     intrinsic_muscles_of_spine = 34
     diaphragm = 35
     pelvic_floor = 36
+
+    # lats muscle group
+    lats = 37
 
     # shin
     anterior_tibialis = 40
@@ -303,9 +306,9 @@ class BodyPartLocation(Enum):
     def muscle_groups(cls):
         grouped_muscles = {
             cls.shin: [cls.anterior_tibialis, cls.peroneals_longus],
-            cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius_medial, cls.gastrocnemius_lateral],
+            cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius_medial, cls.gastrocnemius_lateral, cls.popliteus],
             cls.hamstrings: [cls.bicep_femoris_long_head, cls.bicep_femoris_short_head, cls.semimembranosus, cls.semitendinosus],
-            cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis, cls.pectineus],
+            cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis],
             cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris],
             cls.hip_flexor: [cls.tensor_fascia_latae, cls.psoas, cls.iliacus],
             cls.deep_rotators_hip: [cls.piriformis, cls.quadratus_femoris],
@@ -320,7 +323,7 @@ class BodyPartLocation(Enum):
             cls.chest: [cls.pectoralis_minor, cls.pectoralis_major],
             cls.upper_back_neck: [cls.upper_trapezius, cls.levator_scapulae, cls.middle_trapezius, cls.lower_trapezius, cls.rhomboids],
             # cls.erector_spinae: [],
-            cls.lats: [cls.lats, cls.teres_major],
+            cls.lats: [cls.latissmus_dorsi, cls.teres_major],
             cls.abdominals: [cls.rectus_abdominis],
             cls.lower_back: [cls.erector_spinae, cls.quadratus_lumorum],
             cls.rotator_cuff: [cls.supraspinatus, cls.subscapularis, cls.infraspinatus, cls.teres_minor]
