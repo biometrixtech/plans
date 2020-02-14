@@ -253,7 +253,7 @@ class BodyPartFactory(object):
         #     return self.get_deep_rotators_hip(sample)
         # elif location == BodyPartLocation.knee:
         #     return self.get_knee(sample)
-        # elif location == BodyPartLocation.lats:
+        # elif location == BodyPartLocation.latissmus_dorsi:
         #     return self.get_lats(sample)
         # elif location == BodyPartLocation.lower_back:
         #     return self.get_lower_back(sample)
@@ -832,7 +832,7 @@ class BodyPartFactory(object):
 
     def get_lats(self, sample=True):
 
-        part = BodyPart(BodyPartLocation.lats, 15)
+        part = BodyPart(BodyPartLocation.latissmus_dorsi, 15)
 
         if sample:
             inhibit = self.get_exercise_dictionary([55])

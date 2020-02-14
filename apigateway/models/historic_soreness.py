@@ -254,7 +254,7 @@ class HistoricSoreness(BaseSoreness, Serialisable):
                 self.body_part_location == BodyPartLocation.hamstrings or
                 self.body_part_location == BodyPartLocation.calves or
                 self.body_part_location == BodyPartLocation.upper_back_neck or
-                self.body_part_location == BodyPartLocation.lats):
+                self.body_part_location == BodyPartLocation.latissmus_dorsi):
             return True
         else:
             return False
