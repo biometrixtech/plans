@@ -4,7 +4,7 @@ from models.cardio_data import get_cardio_data
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.functional_movement import FunctionalMovementFactory
+from models.functional_movement import FunctionalMovementFactory, FunctionalMovementActionMapping
 from math import ceil
 
 movement_library = MovementLibraryDatastore().get()
@@ -15,10 +15,42 @@ action_library = ActionLibraryDatastore().get()
 class WorkoutProcessor(object):
 
     def process_workout(self, workout_program):
+
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
             for workout_exercise in workout_section.exercises:
                 self.add_movement_detail_to_exercise(workout_exercise)
+
+    def process_workout_load(self, workout_program):
+
+        workout_load = {}
+
+        for workout_section in workout_program.workout_sections:
+            if workout_section.assess_load:
+                section_load = {}  # load by adaptation type
+                for workout_exercise in workout_section.exercises:
+                    exercise_load = self.apply_load(workout_exercise.primary_actions)
+                    for adaptation_type, muscle_load in exercise_load.items():
+                        if adaptation_type not in section_load:
+                            section_load[adaptation_type] = muscle_load
+                        else:
+                            for muscle, load in muscle_load.items():
+                                if muscle not in section_load[adaptation_type].items():
+                                    section_load[adaptation_type][muscle] = load
+                                else:
+                                    section_load[adaptation_type][muscle] += load
+
+                for adaptation_type, muscle_load in section_load.items():
+                    if adaptation_type not in workout_load:
+                        workout_load[adaptation_type] = muscle_load
+                    else:
+                        for muscle, load in muscle_load.items():
+                            if muscle not in workout_load[adaptation_type].items():
+                                workout_load[adaptation_type][muscle] = load
+                            else:
+                                workout_load[adaptation_type][muscle] += load
+
+        return workout_load
 
     def add_movement_detail_to_exercise(self, exercise):
         movement = movement_library[exercise.movement_id]
@@ -69,6 +101,23 @@ class WorkoutProcessor(object):
         action.side = exercise.side
         action.rpe = exercise.rpe
         action.get_training_load()
+
+    def apply_load(self, action_list):
+
+        total_load = {}  # load by adaptation type
+
+        for action in action_list:
+            functional_movement_action_mapping = FunctionalMovementActionMapping(action)
+            if action.adaptation_type.value not in total_load:
+                total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
+            else:
+                for muscle, load in functional_movement_action_mapping.muscle_load.items:
+                    if muscle not in total_load[action.adaptation_type.value]:
+                        total_load[action.adaptation_type.value][muscle] = load
+                    else:
+                        total_load[action.adaptation_type.value][muscle] += load
+
+        return total_load
 
     def get_rpe_from_rep_max(self, rep_max, reps):
 
