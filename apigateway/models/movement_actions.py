@@ -244,14 +244,14 @@ class ExerciseAction(object):
                                 right = ex_weight.value * self.lateral_distribution[0] / 100
                         elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:  # first item in percent body weight is the dominant side
                             if self.side == 1:  # left dominant activity
-                                left = ex_weight.value * self.lateral_distribution[0] / 100
-                                right = ex_weight.value * self.lateral_distribution[1] / 100
+                                left = ex_weight.value * 2 * self.lateral_distribution[0] / 100
+                                right = ex_weight.value * 2 * self.lateral_distribution[1] / 100
                             elif self.side == 2:  # right dominant activity
-                                left = ex_weight.value * self.lateral_distribution[1] / 100
-                                right = ex_weight.value * self.lateral_distribution[0] / 100
+                                left = ex_weight.value * 2 * self.lateral_distribution[1] / 100
+                                right = ex_weight.value * 2 * self.lateral_distribution[0] / 100
                             else:  # since we don't know which side was loaded more, apply evenly
-                                left = ex_weight.value * sum(self.lateral_distribution) / 2 / 100
-                                right = ex_weight.value * sum(self.lateral_distribution) / 2 / 100
+                                left = ex_weight.value * 2 * sum(self.lateral_distribution) / 2 / 100
+                                right = ex_weight.value * 2 * sum(self.lateral_distribution) / 2 / 100
                         elif self.lateral_distribution_pattern == WeightDistribution.unilateral_alternating:  # bilateral and unilateral alternating get full amount for each side
                             left = ex_weight.value * self.lateral_distribution[0] / 100
                             right = ex_weight.value * self.lateral_distribution[1] / 100
