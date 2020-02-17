@@ -5,7 +5,7 @@ from logic.workout_processing import WorkoutProcessor
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
 
 
-def test_apply_load_concentric():
+def test_aggregate_load_concentric():
 
     exercise_action_1 = ExerciseAction("1", "flail")
     exercise_action_1.primary_muscle_action = MuscleAction.concentric
