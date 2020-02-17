@@ -77,7 +77,9 @@ class BodyPartLocation(Enum):
     upper_back_neck = 18
     elbow = 19
     wrist = 20
-    latissmus_dorsi = 21
+    # lats muscle group
+    lats = 21
+
     biceps = 22
     triceps = 23
     forearm = 24
@@ -99,8 +101,7 @@ class BodyPartLocation(Enum):
     diaphragm = 35
     pelvic_floor = 36
 
-    # lats muscle group
-    lats = 37
+    latissmus_dorsi = 37
 
     # shin
     anterior_tibialis = 40

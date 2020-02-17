@@ -2,6 +2,7 @@ from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 from models.movement_tags import AdaptationType, BodyPosition, CardioAction, TrainingType, Equipment, MovementSurfaceStability
 import re
+from utils import format_datetime, parse_datetime
 
 
 class WorkoutProgramModule(Serialisable):
@@ -42,6 +43,8 @@ class WorkoutProgramModule(Serialisable):
 class WorkoutSection(Serialisable):
     def __init__(self):
         self.name = ''
+        self.start_time = None
+        self.end_time = None
         self.duration_seconds = None
         self.workout_section_type = None
         self.difficulty = None
@@ -52,6 +55,8 @@ class WorkoutSection(Serialisable):
     def json_serialise(self):
         ret = {
             'name': self.name,
+            'start_time': format_datetime(self.start_time) if self.start_time is not None else None,
+            'end_time': format_datetime(self.end_time) if self.end_time is not None else None,
             'duration_seconds': self.duration_seconds,
             'workout_section_type': self.workout_section_type,
             'difficulty': self.difficulty,
@@ -65,6 +70,8 @@ class WorkoutSection(Serialisable):
     def json_deserialise(cls, input_dict):
         workout_section = cls()
         workout_section.name = input_dict.get('name')
+        workout_section.start_time = parse_datetime(input_dict['start_time']) if input_dict.get('start_time') is not None else None
+        workout_section.end_time = parse_datetime(input_dict['end_time']) if input_dict.get('end_time') is not None else None
         workout_section.duration_seconds = input_dict.get('duration_seconds')
         workout_section.workout_section_type = input_dict.get('workout_section_type')
         workout_section.difficulty = input_dict.get('difficulty')
