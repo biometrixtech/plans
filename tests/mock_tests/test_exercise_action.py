@@ -85,13 +85,13 @@ def test_external_intensity_dumbell_bilateral_uneven_no_side():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=50)
     action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral_uneven, lateral_distribution=[60, 40])
 
-    assert action.external_intensity_left == 25
-    assert action.external_intensity_right == 25
+    assert action.external_intensity_left == 50
+    assert action.external_intensity_right == 50
 
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
-    assert action.total_load_left == action.total_load_right == 250
+    assert action.total_load_left == action.total_load_right == 500
 
 
 def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
