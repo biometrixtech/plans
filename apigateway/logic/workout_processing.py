@@ -6,6 +6,7 @@ from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodySt
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory, FunctionalMovementActionMapping
 from math import ceil
+import statistics
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -118,6 +119,44 @@ class WorkoutProcessor(object):
                         total_load[action.adaptation_type.value][muscle] += load
 
         return total_load
+
+    def normalize_and_consolidate_load(self, total_load_dict):
+
+        normalized_dict = {}
+
+        for adaptation_type, muscle_load_dict in total_load_dict.items():
+            scalar = self.get_adaption_type_scalar(adaptation_type)
+            concentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c > 0]
+            eccentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c > 0]
+            all_values = []
+            all_values.extend(concentric_values)
+            all_values.extend(eccentric_values)
+            if len(all_values) > 0:
+                average = statistics.mean(all_values)
+                std_dev = statistics.stdev(all_values)
+                for muscle in muscle_load_dict.keys():
+                    normalized_load = scalar * ((muscle_load_dict[muscle] - average) / std_dev)
+                    if muscle not in normalized_dict:
+                        normalized_dict[muscle] = normalized_load
+                    else:
+                        normalized_dict[muscle] += normalized_load
+
+        return normalized_dict
+
+    def get_adaption_type_scalar(self, adaption_type):
+
+        if adaption_type == AdaptationType.strength_endurance_cardiorespiratory.value:
+            return 0.20
+        elif adaption_type == AdaptationType.strength_endurance_strength.value:
+            return 0.40
+        elif adaption_type == AdaptationType.power_drill.value:
+            return 0.60
+        elif adaption_type == AdaptationType.maximal_strength_hypertrophic.value:
+            return 0.80
+        elif adaption_type == AdaptationType.power_explosive_action.value:
+            return 1.00
+        else:
+            return 0.00
 
     def get_rpe_from_rep_max(self, rep_max, reps):
 
