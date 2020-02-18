@@ -91,6 +91,7 @@ class Equipment(Enum):
     machine = 19
     plate = 20
     assistance_resistence_bands = 21
+    cable = 22
 
     def distribute_weights(self):
         if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells', 'double_kettlebells']:

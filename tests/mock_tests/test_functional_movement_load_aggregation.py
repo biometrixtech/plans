@@ -3,6 +3,7 @@ from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJoi
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
 from logic.workout_processing import WorkoutProcessor
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
+from models.exercise import WeightMeasure
 
 
 def test_aggregate_load_concentric():
@@ -30,6 +31,10 @@ def test_aggregate_load_concentric():
     exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
 
     exercise_1 = WorkoutExercise()
+    exercise_1.weight_measure = WeightMeasure.actual_weight
+    exercise_1.weight_in_lbs = 100
+    exercise_1.reps_per_set = 5
+    exercise_1.equipment = Equipment.dumbbells
     exercise_1.primary_actions.append(exercise_action_1)
 
     exercise_2 = WorkoutExercise()
