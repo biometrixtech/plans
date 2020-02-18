@@ -126,8 +126,8 @@ class WorkoutProcessor(object):
 
         for adaptation_type, muscle_load_dict in total_load_dict.items():
             scalar = self.get_adaption_type_scalar(adaptation_type)
-            concentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c > 0]
-            eccentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c > 0]
+            concentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c.concentric_volume > 0]
+            eccentric_values = [c.eccentric_volume for c in muscle_load_dict.values() if c.eccentric_volume > 0]
             all_values = []
             all_values.extend(concentric_values)
             all_values.extend(eccentric_values)
@@ -135,11 +135,15 @@ class WorkoutProcessor(object):
                 average = statistics.mean(all_values)
                 std_dev = statistics.stdev(all_values)
                 for muscle in muscle_load_dict.keys():
-                    normalized_load = scalar * ((muscle_load_dict[muscle] - average) / std_dev)
+                    if muscle_load_dict[muscle].concentric_volume > 0:
+                        muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - average) / std_dev)
+                    if muscle_load_dict[muscle].eccentric_volume > 0:
+                        muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - average) / std_dev)
                     if muscle not in normalized_dict:
-                        normalized_dict[muscle] = normalized_load
+                        normalized_dict[muscle] = muscle_load_dict[muscle]
                     else:
-                        normalized_dict[muscle] += normalized_load
+                        normalized_dict[muscle].concentric_volume += muscle_load_dict[muscle].concentric_volume
+                        normalized_dict[muscle].eccentric_volume += muscle_load_dict[muscle].eccentric_volume
 
         return normalized_dict
 
