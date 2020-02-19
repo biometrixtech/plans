@@ -4,7 +4,7 @@ xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 
 import pytest
-from models.session import SportTrainingSession
+from models.session import SportTrainingSession, MixedActivitySession
 from datetime import datetime, timedelta
 from models.sport import SportName
 from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, SessionFunctionalMovement
@@ -17,6 +17,10 @@ from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
+from models.movement_tags import AdaptationType
+from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
+from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
+from models.functional_movement_type import FunctionalMovementType
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
@@ -104,3 +108,60 @@ def test_create_plan_with_session():
     # assert len(active_rest[0].inhibit_exercises) > 0
     # assert len(active_rest[0].static_stretch_exercises) >0
     # assert len(active_rest[0].active_stretch_exercises) > 0
+
+def test_create_plan_with_mixed_session():
+
+    session = MixedActivitySession()
+    session.event_date = datetime.now()
+
+    exercise_action_1 = ExerciseAction("1", "flail")
+    exercise_action_1.primary_muscle_action = MuscleAction.concentric
+    exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
+    exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
+    exercise_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
+    exercise_action_1.total_load_left = 100
+    exercise_action_1.total_load_right = 200
+    exercise_action_1.lower_body_stability_rating = 1.1
+    exercise_action_1.upper_body_stability_rating = 0.6
+    exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
+
+    exercise_action_2 = ExerciseAction("1", "flail")
+    exercise_action_2.primary_muscle_action = MuscleAction.concentric
+    exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
+    exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
+    exercise_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
+    exercise_action_2.total_load_left = 200
+    exercise_action_2.total_load_right = 100
+    exercise_action_2.lower_body_stability_rating = 1.1
+    exercise_action_2.upper_body_stability_rating = 0.6
+    exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
+
+    exercise_1 = WorkoutExercise()
+    exercise_1.primary_actions.append(exercise_action_1)
+
+    exercise_2 = WorkoutExercise()
+    exercise_2.primary_actions.append(exercise_action_2)
+
+    section_1 = WorkoutSection()
+    section_1.exercises.append(exercise_1)
+
+    section_2 = WorkoutSection()
+    section_2.exercises.append(exercise_2)
+
+    program_module = WorkoutProgramModule()
+    program_module.workout_sections.append(section_1)
+    program_module.workout_sections.append(section_2)
+
+    session.workout_program_module = program_module
+
+    proc = InjuryRiskProcessor(session.event_date, [], [session], {}, AthleteStats("tester"), "tester")
+    injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
+
+    calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+                                        session.event_date)
+
+    active_rest = calc.get_post_active_rest()[0]
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert len(active_rest.exercise_phases[2].exercises) > 0
