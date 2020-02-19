@@ -4,9 +4,7 @@ from models.cardio_data import get_cardio_data
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.functional_movement import FunctionalMovementFactory, FunctionalMovementActionMapping
-from math import ceil
-import statistics
+from models.functional_movement import FunctionalMovementFactory
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -21,37 +19,6 @@ class WorkoutProcessor(object):
             workout_section.should_assess_load(cardio_data['no_load_sections'])
             for workout_exercise in workout_section.exercises:
                 self.add_movement_detail_to_exercise(workout_exercise)
-
-    def process_workout_load(self, workout_program):
-
-        workout_load = {}
-
-        for workout_section in workout_program.workout_sections:
-            if workout_section.assess_load:
-                section_load = {}  # load by adaptation type
-                for workout_exercise in workout_section.exercises:
-                    exercise_load = self.apply_load(workout_exercise.primary_actions)
-                    for adaptation_type, muscle_load in exercise_load.items():
-                        if adaptation_type not in section_load:
-                            section_load[adaptation_type] = muscle_load
-                        else:
-                            for muscle, load in muscle_load.items():
-                                if muscle not in section_load[adaptation_type].items():
-                                    section_load[adaptation_type][muscle] = load
-                                else:
-                                    section_load[adaptation_type][muscle] += load
-
-                for adaptation_type, muscle_load in section_load.items():
-                    if adaptation_type not in workout_load:
-                        workout_load[adaptation_type] = muscle_load
-                    else:
-                        for muscle, load in muscle_load.items():
-                            if muscle not in workout_load[adaptation_type].items():
-                                workout_load[adaptation_type][muscle] = load
-                            else:
-                                workout_load[adaptation_type][muscle] += load
-
-        return workout_load
 
     def add_movement_detail_to_exercise(self, exercise):
         movement = movement_library[exercise.movement_id]
@@ -102,65 +69,6 @@ class WorkoutProcessor(object):
         action.side = exercise.side
         action.rpe = exercise.rpe
         action.get_training_load()
-
-    def apply_load(self, action_list):
-
-        total_load = {}  # load by adaptation type
-
-        for action in action_list:
-            functional_movement_action_mapping = FunctionalMovementActionMapping(action)
-            if action.adaptation_type.value not in total_load:
-                total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
-            else:
-                for muscle, load in functional_movement_action_mapping.muscle_load.items:
-                    if muscle not in total_load[action.adaptation_type.value]:
-                        total_load[action.adaptation_type.value][muscle] = load
-                    else:
-                        total_load[action.adaptation_type.value][muscle] += load
-
-        return total_load
-
-    def normalize_and_consolidate_load(self, total_load_dict):
-
-        normalized_dict = {}
-
-        for adaptation_type, muscle_load_dict in total_load_dict.items():
-            scalar = self.get_adaption_type_scalar(adaptation_type)
-            concentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c.concentric_volume > 0]
-            eccentric_values = [c.eccentric_volume for c in muscle_load_dict.values() if c.eccentric_volume > 0]
-            all_values = []
-            all_values.extend(concentric_values)
-            all_values.extend(eccentric_values)
-            if len(all_values) > 0:
-                average = statistics.mean(all_values)
-                std_dev = statistics.stdev(all_values)
-                for muscle in muscle_load_dict.keys():
-                    if muscle_load_dict[muscle].concentric_volume > 0:
-                        muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - average) / std_dev)
-                    if muscle_load_dict[muscle].eccentric_volume > 0:
-                        muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - average) / std_dev)
-                    if muscle not in normalized_dict:
-                        normalized_dict[muscle] = muscle_load_dict[muscle]
-                    else:
-                        normalized_dict[muscle].concentric_volume += muscle_load_dict[muscle].concentric_volume
-                        normalized_dict[muscle].eccentric_volume += muscle_load_dict[muscle].eccentric_volume
-
-        return normalized_dict
-
-    def get_adaption_type_scalar(self, adaption_type):
-
-        if adaption_type == AdaptationType.strength_endurance_cardiorespiratory.value:
-            return 0.20
-        elif adaption_type == AdaptationType.strength_endurance_strength.value:
-            return 0.40
-        elif adaption_type == AdaptationType.power_drill.value:
-            return 0.60
-        elif adaption_type == AdaptationType.maximal_strength_hypertrophic.value:
-            return 0.80
-        elif adaption_type == AdaptationType.power_explosive_action.value:
-            return 1.00
-        else:
-            return 0.00
 
     def get_rpe_from_rep_max(self, rep_max, reps):
 
