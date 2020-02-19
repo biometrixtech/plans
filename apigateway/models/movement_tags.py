@@ -18,9 +18,9 @@ class AdaptationType(Enum):
     not_tracked = None
     strength_endurance_cardiorespiratory = 1
     strength_endurance_strength = 2
-    maximal_strength_hypertrophic = 3
-    power_explosive_action = 4
-    power_drill = 5
+    power_drill = 3
+    maximal_strength_hypertrophic = 4
+    power_explosive_action = 5
 
 
 class CardioAction(Enum):
