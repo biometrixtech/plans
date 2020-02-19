@@ -104,29 +104,28 @@ class ActionLibraryParser(object):
 
     def get_prioritized_joint_actions(self, row, joint):
         if self.is_valid(row, f'{joint}_action'):
-            joint_priority = 0
             if self.is_valid(row, f'{joint}_priority'):
                 joint_priority = int(row[f'{joint}_priority'])
-            joint_actions = row[f'{joint}_action']
-            joint_actions = joint_actions.replace(", ", ",")
-            joint_actions = joint_actions.replace(" ", "_")
-            joint_actions = joint_actions.replace("w/", "with")
-            joint_actions = joint_actions.lower().split(",")
-            joint_actions = [joint_action.split("\n") for joint_action in joint_actions]
-            all_joint_actions = []
-            for j_actions in joint_actions:
-                all_joint_actions.extend(j_actions)
-            cleaned_joint_action = []
-            for joint_action in all_joint_actions:
-                if joint_action in mapping.keys():
-                    cleaned_joint_action.append(mapping[joint_action])
-                else:
-                    cleaned_joint_action.append(joint_action)
+                joint_actions = row[f'{joint}_action']
+                joint_actions = joint_actions.replace(", ", ",")
+                joint_actions = joint_actions.replace(" ", "_")
+                joint_actions = joint_actions.replace("w/", "with")
+                joint_actions = joint_actions.lower().split(",")
+                joint_actions = [joint_action.split("\n") for joint_action in joint_actions]
+                all_joint_actions = []
+                for j_actions in joint_actions:
+                    all_joint_actions.extend(j_actions)
+                cleaned_joint_action = []
+                for joint_action in all_joint_actions:
+                    if joint_action in mapping.keys():
+                        cleaned_joint_action.append(mapping[joint_action])
+                    else:
+                        cleaned_joint_action.append(joint_action)
 
-            try:
-                return [PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]) for j_action in cleaned_joint_action]
-            except:
-                print(cleaned_joint_action)
+                try:
+                    return [PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]) for j_action in cleaned_joint_action]
+                except:
+                    print(cleaned_joint_action)
         return []
 
 

@@ -564,18 +564,8 @@
                 "joint_action": 20
             }
         ],
-        "shoulder_scapula_joint_action": [
-            {
-                "priority": 0,
-                "joint_action": 31
-            }
-        ],
-        "elbow_joint_action": [
-            {
-                "priority": 0,
-                "joint_action": 27
-            }
-        ]
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
     },
     "201_b": {
         "id": "201_b",
@@ -1376,18 +1366,8 @@
         "knee_joint_action": [],
         "ankle_joint_action": [],
         "trunk_joint_action": [],
-        "shoulder_scapula_joint_action": [
-            {
-                "priority": 0,
-                "joint_action": 28
-            }
-        ],
-        "elbow_joint_action": [
-            {
-                "priority": 0,
-                "joint_action": 27
-            }
-        ]
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
     },
     "3100_b": {
         "id": "3100_b",
@@ -1410,18 +1390,8 @@
         "knee_joint_action": [],
         "ankle_joint_action": [],
         "trunk_joint_action": [],
-        "shoulder_scapula_joint_action": [
-            {
-                "priority": 0,
-                "joint_action": 29
-            }
-        ],
-        "elbow_joint_action": [
-            {
-                "priority": 0,
-                "joint_action": 26
-            }
-        ]
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
     },
     "3103": {
         "id": "3103",
