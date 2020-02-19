@@ -30,11 +30,11 @@ def get_section(name, exercises):
 
 
 def test_one_load_section_one_no_load():
-    workout_exercise1 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.seconds, movement_id="582cb0d8dcab1710003331e9")  # row
+    workout_exercise1 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # row
     workout_exercise2 = get_exercise(reps=180, sets=1, unit=UnitOfMeasure.meters, movement_id="57e2fd3a4c6a031dc777e90c")  # airdyne
 
-    workout_exercise3 = get_exercise(reps=500, sets=1, unit=UnitOfMeasure.meters, movement_id="582cb0d8dcab1710003331e9")  # row
-    workout_exercise4 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.count, movement_id="5823768d473c06100052ed9a")  # run
+    workout_exercise3 = get_exercise(reps=500, sets=1, unit=UnitOfMeasure.meters, movement_id="58459d9ddc2ce90011f93d84")  # row
+    workout_exercise4 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.count, movement_id="58459df8dc2ce90011f93d87")  # run
 
     section1 = get_section('warm up', exercises=[workout_exercise1, workout_exercise2])
     section2 = get_section('stamina', exercises=[workout_exercise3, workout_exercise4])

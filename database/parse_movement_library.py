@@ -18,48 +18,52 @@ class MovementLibraryParser(object):
 
         for index, row in self.movements_pd.iterrows():
             movement_item = self.parse_row(row)
-            self.movements.append(movement_item)
+            if movement_item is not None:
+                self.movements.append(movement_item)
 
         self.write_movements_json()
 
     def parse_row(self, row):
-        movement = Movement(row['id'], row['soflete_name'])
+        if self.is_valid(row, 'id'):
+            movement = Movement(row['id'], row['soflete_name'])
 
-        if self.is_valid(row, 'training_type'):
-            movement.training_type = TrainingType[row['training_type']]
-        if self.is_valid(row, 'cardio_action'):
-            if movement.training_type == TrainingType.strength_cardiorespiratory:
-                movement.cardio_action = CardioAction[row['cardio_action']]
-        if self.is_valid(row, 'power_drill_action'):
-            movement.power_drill_action = PowerDrillAction[row['power_drill_action']]
-        if self.is_valid(row, 'power_action'):
-            movement.power_action = PowerAction[row['power_action']]
-        # TODO: Possibly add strength_endurance_action and strength_resistence_action
+            if self.is_valid(row, 'training_type'):
+                movement.training_type = TrainingType[row['training_type']]
+            if self.is_valid(row, 'cardio_action'):
+                if movement.training_type == TrainingType.strength_cardiorespiratory:
+                    movement.cardio_action = CardioAction[row['cardio_action']]
+            if self.is_valid(row, 'power_drill_action'):
+                movement.power_drill_action = PowerDrillAction[row['power_drill_action']]
+            if self.is_valid(row, 'power_action'):
+                movement.power_action = PowerAction[row['power_action']]
+            # TODO: Possibly add strength_endurance_action and strength_resistence_action
 
-        if self.is_valid(row, 'primary_actions'):
-            primary_actions = row['primary_actions'].split(",")
-            movement.primary_actions = [action.strip() for action in primary_actions]
-        if self.is_valid(row, 'secondary_actions'):
-            row['secondary_actions'].replace(", ", ",")
-            secondary_actions = row['secondary_actions'].split(",")
-            movement.secondary_actions = [action.strip() for action in secondary_actions]
+            if self.is_valid(row, 'primary_actions'):
+                primary_actions = row['primary_actions'].split(",")
+                movement.primary_actions = [action.strip() for action in primary_actions]
+            if self.is_valid(row, 'secondary_actions'):
+                row['secondary_actions'].replace(", ", ",")
+                secondary_actions = row['secondary_actions'].split(",")
+                movement.secondary_actions = [action.strip() for action in secondary_actions]
 
-        if self.is_valid(row, 'surface_stability'):
-            movement.surface_stability = MovementSurfaceStability[row['surface_stability']]
-        if self.is_valid(row, 'external_weight_implement'):
-            row['external_weight_implement'].replace(", ", ",")
-            external_weight_implement = row['external_weight_implement'].split(",")
-            try:
-                movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
-            except:
-                print('here')
+            if self.is_valid(row, 'surface_stability'):
+                movement.surface_stability = MovementSurfaceStability[row['surface_stability']]
+            if self.is_valid(row, 'external_weight_implement'):
+                row['external_weight_implement'].replace(", ", ",")
+                external_weight_implement = row['external_weight_implement'].split(",")
+                try:
+                    movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
+                except:
+                    print('here')
 
-        if self.is_valid(row, 'resistance'):
-            movement.resistance = MovementResistance[row['resistance']]
-        if self.is_valid(row, 'speed'):
-            movement.speed = MovementSpeed[row['speed']]
+            if self.is_valid(row, 'resistance'):
+                movement.resistance = MovementResistance[row['resistance']]
+            if self.is_valid(row, 'speed'):
+                movement.speed = MovementSpeed[row['speed']]
 
-        return movement
+            return movement
+        else:
+            return None
 
     @staticmethod
     def is_valid(row, name):

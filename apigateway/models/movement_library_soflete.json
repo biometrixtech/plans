@@ -140,21 +140,6 @@
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
-    "": {
-        "id": "",
-        "name": "",
-        "training_type": null,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
-        "surface_stability": null,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0
-    },
     "586540fd4d0fec0011c031a4": {
         "id": "586540fd4d0fec0011c031a4",
         "name": "Med Ball Chest Pass",
