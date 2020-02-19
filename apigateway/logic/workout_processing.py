@@ -22,12 +22,13 @@ class WorkoutProcessor(object):
                 self.add_movement_detail_to_exercise(workout_exercise)
 
     def add_movement_detail_to_exercise(self, exercise):
-        movement = movement_library[exercise.movement_id]
-        exercise.process_movement(movement)
-        self.add_action_details_to_exercise(exercise, movement)
+        if exercise.movement_id in movement_library.keys():
+            movement = movement_library[exercise.movement_id]
+            exercise.process_movement(movement)
+            self.add_action_details_to_exercise(exercise, movement)
 
-        if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-            exercise.convert_reps_to_duration(cardio_data)
+            if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+                exercise.convert_reps_to_duration(cardio_data)
 
     def add_action_details_to_exercise(self, exercise, movement):
         for action_id in movement.primary_actions:

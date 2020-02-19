@@ -145,6 +145,7 @@ class WorkoutExercise(Serialisable):
             'reps_per_set': self.reps_per_set,
             'unit_of_measure': self.unit_of_measure.value,
             'intensity_pace': self.intensity_pace,
+            'movement_id': self.movement_id,
             'equipments': [equipment.value for equipment in self.equipments],
             'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
             # 'body_position': self.body_position.value if self.body_position is not None else None,
@@ -175,6 +176,7 @@ class WorkoutExercise(Serialisable):
         exercise.sets = input_dict.get('sets', 0)
         exercise.reps_per_set = input_dict.get('reps_per_set', 0)
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
+        exercise.movement_id = input_dict.get('movement_id')
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None
