@@ -111,7 +111,7 @@ class WorkoutExercise(Serialisable):
         self.percent_bodyweight = None
         self.sets = 1
         self.reps_per_set = 1
-        self.unit_of_measure = None
+        self.unit_of_measure = UnitOfMeasure.count
         self.rpe = None
         self.side = 0
         self.bilateral = True
@@ -143,7 +143,7 @@ class WorkoutExercise(Serialisable):
             'percent_bodyweight': self.percent_bodyweight,
             'sets': self.sets,
             'reps_per_set': self.reps_per_set,
-            'unit_of_measure': self.unit_of_measure.value,
+            'unit_of_measure': self.unit_of_measure.value if self.unit_of_measure is not None else None,
             'intensity_pace': self.intensity_pace,
             'movement_id': self.movement_id,
             'equipments': [equipment.value for equipment in self.equipments],
