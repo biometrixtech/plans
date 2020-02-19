@@ -71,7 +71,7 @@ class ActionLibraryParser(object):
 
             # primary
             if self.is_valid(row, 'muscle_action'):
-                self.primary_muscle_action = MuscleAction[row['muscle_action']]
+                action.primary_muscle_action = MuscleAction[row['muscle_action']]
 
             action.hip_joint_action = self.get_prioritized_joint_actions(row, 'hip_joint')
             action.knee_joint_action = self.get_prioritized_joint_actions(row, 'knee_joint')

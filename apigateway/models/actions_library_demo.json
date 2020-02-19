@@ -15,7 +15,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -62,7 +62,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -109,7 +109,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -156,7 +156,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -203,7 +203,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -250,7 +250,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -299,7 +299,7 @@
         "apply_resistance": true,
         "explosiveness": 1,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -346,7 +346,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -393,7 +393,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -440,7 +440,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -487,7 +487,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -534,7 +534,7 @@
         "apply_resistance": true,
         "explosiveness": 1,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -591,7 +591,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -648,7 +648,7 @@
         "apply_resistance": true,
         "explosiveness": 1,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -705,7 +705,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -767,7 +767,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -809,7 +809,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -854,7 +854,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -891,7 +891,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [],
         "knee_joint_action": [
             {
@@ -928,7 +928,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -965,7 +965,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [],
         "knee_joint_action": [
             {
@@ -1002,7 +1002,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1059,7 +1059,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1119,7 +1119,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1179,7 +1179,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1239,7 +1239,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1299,7 +1299,7 @@
         "apply_resistance": true,
         "explosiveness": 3,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1341,7 +1341,7 @@
         "apply_resistance": true,
         "explosiveness": 1,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1383,7 +1383,7 @@
         "apply_resistance": false,
         "explosiveness": 1,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1420,7 +1420,7 @@
         "apply_resistance": false,
         "explosiveness": 1,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1467,7 +1467,7 @@
         "apply_resistance": false,
         "explosiveness": 1,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1504,7 +1504,7 @@
         "apply_resistance": false,
         "explosiveness": 1,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -1551,7 +1551,7 @@
         "apply_resistance": true,
         "explosiveness": 2,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1597,7 +1597,7 @@
         "apply_resistance": true,
         "explosiveness": 2,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1643,7 +1643,7 @@
         "apply_resistance": true,
         "explosiveness": 2,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1685,7 +1685,7 @@
         "apply_resistance": true,
         "explosiveness": 2,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1727,7 +1727,7 @@
         "apply_resistance": true,
         "explosiveness": 3,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1771,7 +1771,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1815,7 +1815,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1859,7 +1859,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1903,7 +1903,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1942,7 +1942,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -1986,7 +1986,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2025,7 +2025,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2069,7 +2069,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2113,7 +2113,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2167,7 +2167,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2211,7 +2211,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2250,7 +2250,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2289,7 +2289,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2333,7 +2333,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2372,7 +2372,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2411,7 +2411,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2450,7 +2450,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2499,7 +2499,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2548,7 +2548,7 @@
         "apply_resistance": true,
         "explosiveness": null,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 2,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2592,7 +2592,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2641,7 +2641,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2680,7 +2680,7 @@
         "apply_resistance": true,
         "explosiveness": 4,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2724,7 +2724,7 @@
         "apply_resistance": true,
         "explosiveness": 4,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2763,7 +2763,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2807,7 +2807,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2856,7 +2856,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2895,7 +2895,7 @@
         "apply_resistance": true,
         "explosiveness": 4,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -2944,7 +2944,7 @@
         "apply_resistance": false,
         "explosiveness": 0,
         "apply_instability": false,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [],
         "knee_joint_action": [],
         "ankle_joint_action": [],
@@ -2983,7 +2983,7 @@
         "apply_resistance": true,
         "explosiveness": 3,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 1,
         "hip_joint_action": [
             {
                 "priority": 0,
@@ -3032,7 +3032,7 @@
         "apply_resistance": true,
         "explosiveness": 0,
         "apply_instability": true,
-        "primary_muscle_action": null,
+        "primary_muscle_action": 0,
         "hip_joint_action": [
             {
                 "priority": 0,
