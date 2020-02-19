@@ -11,8 +11,8 @@ class ActionLibraryParser(object):
         self.actions_pd = None
         self.actions = []
 
-    def load_data(self):
-        self.actions_pd = pd.read_csv(f'action_library_demo.csv', keep_default_na=False, skiprows=1)
+    def load_data(self, file=""):
+        self.actions_pd = pd.read_csv(f'action_library{file}.csv', keep_default_na=False, skiprows=1)
 
         self.actions = []
 
@@ -142,7 +142,7 @@ class ActionLibraryParser(object):
             actions_json[action.id] = action.json_serialise(initial_read=True)
 
         json_string = json.dumps(actions_json, indent=4)
-        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/actions_library_demo.json")
+        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/actions_library.json")
         print(f"writing: {file_name}")
         f1 = open(file_name, 'w')
         f1.write(json_string)
@@ -162,4 +162,4 @@ mapping = {
 
 if __name__ == '__main__':
     action_parser = ActionLibraryParser()
-    action_parser.load_data()
+    action_parser.load_data("_demo")

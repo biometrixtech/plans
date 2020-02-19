@@ -73,7 +73,8 @@ class MovementLibraryParser(object):
             movements_json[movement.id] = movement.json_serialise()
 
         json_string = json.dumps(movements_json, indent=4)
-        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_{self.source}.json")
+        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_soflete.json")
+        # file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_{self.source}.json")
         print(f"writing: {file_name}")
         f1 = open(file_name, 'w')
         f1.write(json_string)
