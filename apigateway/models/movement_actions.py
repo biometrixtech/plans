@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction
+from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction, StrengthResistanceAction, StrengthEnduranceAction
 from models.functional_movement_type import FunctionalMovementType
 from serialisable import Serialisable
 
@@ -57,20 +57,21 @@ class ExerciseAction(object):
         self.shoulder_scapula_joint_action = []
         self.elbow_joint_action = []
 
-        self.ancillary_muscle_action = None
-        self.hip_stability_action = []
-        self.ankle_stability_action = []
-        self.trunk_stability_action = []
-        self.pelvis_stability_action = []
-        self.shoulder_stability_action = []
-        self.elbow_stability_action = []
-        self.sij_stability_action = []
+        # self.ancillary_muscle_action = None
+        # self.hip_stability_action = []
+        # self.ankle_stability_action = []
+        # self.trunk_stability_action = []
+        # self.pelvis_stability_action = []
+        # self.shoulder_stability_action = []
+        # self.elbow_stability_action = []
+        # self.sij_stability_action = []
 
         # obtained from exercise
         self.rpe = None
         self.reps = 1
-        self.side = 0  # both
         self.external_weight = []  # list of ExternalWeight objects, weight is in %bodyweight
+        self.bilateral = True
+        self.side = 0  # both
 
         # derived
         self.adaptation_type = None
@@ -83,6 +84,9 @@ class ExerciseAction(object):
         self.external_intensity_right = 0
         self.bodyweight_intensity_left = 0
         self.bodyweight_intensity_right = 0
+        self.training_intensity = 0
+        self.training_intensity_left = 0
+        self.training_intensity_right = 0
         self.training_volume_left = 0
         self.training_volume_right = 0
 
@@ -109,14 +113,14 @@ class ExerciseAction(object):
             "shoulder_scapula_joint_action": [ac.json_serialise() for ac in self.shoulder_scapula_joint_action],
             "elbow_joint_action": [ac.json_serialise() for ac in self.elbow_joint_action],
 
-            "ancillary_muscle_action": self.ancillary_muscle_action,
-            "hip_stability_action": self.hip_stability_action,
-            "ankle_stability_action": self.ankle_stability_action,
-            "trunk_stability_action": self.trunk_stability_action,
-            "pelvis_stability_action": self.pelvis_stability_action,
-            "shoulder_stability_action": self.shoulder_stability_action,
-            "elbow_stability_action": self.elbow_stability_action,
-            "sij_stability_action": self.sij_stability_action,
+            # "ancillary_muscle_action": self.ancillary_muscle_action,
+            # "hip_stability_action": self.hip_stability_action,
+            # "ankle_stability_action": self.ankle_stability_action,
+            # "trunk_stability_action": self.trunk_stability_action,
+            # "pelvis_stability_action": self.pelvis_stability_action,
+            # "shoulder_stability_action": self.shoulder_stability_action,
+            # "elbow_stability_action": self.elbow_stability_action,
+            # "sij_stability_action": self.sij_stability_action,
         }
         if not initial_read:
             additional_params = {
@@ -125,15 +129,19 @@ class ExerciseAction(object):
                 "reps": self.reps,
                 "side": self.side,
                 "external_weight": [ex_weight.json_serialise() for ex_weight in self.external_weight],
+                "bilateral": self.bilateral,
 
                 # derived/calculated
                 "adaptation_type": self.adaptation_type.value if self.adaptation_type is not None else None,
                 "total_load_left": self.total_load_left,
                 "total_load_right": self.total_load_right,
-                "external_intensity_left": self.external_intensity_left,
-                "external_intensity_right": self.external_intensity_right,
-                "bodyweight_intensity_left": self.bodyweight_intensity_left,
-                "bodyweight_intensity_right": self.bodyweight_intensity_right,
+                # "external_intensity_left": self.external_intensity_left,
+                # "external_intensity_right": self.external_intensity_right,
+                # "bodyweight_intensity_left": self.bodyweight_intensity_left,
+                # "bodyweight_intensity_right": self.bodyweight_intensity_right,
+                "training_intensity": self.training_intensity,
+                "training_intensity_left": self.training_intensity_left,
+                "training_intensity_right": self.training_intensity_right,
                 "training_volume_left": self.training_volume_left,
                 "training_volume_right": self.training_volume_right
                 }
@@ -149,7 +157,7 @@ class ExerciseAction(object):
         action.eligible_external_resistance = [Equipment(equip) for equip in input_dict.get('eligible_external_resistance', [])]
         action.lower_body_stance = LowerBodyStance(input_dict['lower_body_stance']) if input_dict.get('lower_body_stance') is not None else None
         action.upper_body_stance = UpperBodyStance(input_dict['upper_body_stance']) if input_dict.get('upper_body_stance') is not None else None
-        action.lateral_distribution_pattern = WeightDistribution.bilateral
+        action.lateral_distribution_pattern = WeightDistribution(input_dict['lateral_distribution_pattern']) if input_dict.get('lateral_distribution_pattern') is not None else WeightDistribution.bilateral
         action.percent_bodyweight = input_dict.get('percent_bodyweight', 0.0)
         action.lateral_distribution = input_dict.get('lateral_distribution', [0, 0])
         action.apply_resistance = input_dict.get('apply_resistance', False)
@@ -165,20 +173,21 @@ class ExerciseAction(object):
         action.shoulder_scapula_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('shoulder_scapula_joint_action', [])]
         action.elbow_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('elbow_joint_action', [])]
 
-        action.ancillary_muscle_action = MuscleAction(input_dict['ancillary_muscle_action']) if input_dict.get('ancillary_muscle_action') is not None else None
-        action.hip_stability_action = []
-        action.ankle_stability_action = []
-        action.trunk_stability_action = []
-        action.pelvis_stability_action = []
-        action.shoulder_stability_action = []
-        action.elbow_stability_action = []
-        action.sij_stability_action = []
+        # action.ancillary_muscle_action = MuscleAction(input_dict['ancillary_muscle_action']) if input_dict.get('ancillary_muscle_action') is not None else None
+        # action.hip_stability_action = []
+        # action.ankle_stability_action = []
+        # action.trunk_stability_action = []
+        # action.pelvis_stability_action = []
+        # action.shoulder_stability_action = []
+        # action.elbow_stability_action = []
+        # action.sij_stability_action = []
 
         # obtained from exercise
         action.rpe = input_dict.get('rpe')
         action.reps = input_dict.get('reps', 1)
         action.side = input_dict.get('side', 0)  # both
         action.external_weight = [ExternalWeight.json_deserialise(ex_weight) for ex_weight in input_dict.get('external_weight', [])]  # list of ExternalWeight objects, weight is in %bodyweight
+        action.bilateral = input_dict.get('bilateral', True)
 
         # derived
         action.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get('adaptation_type') is not None else None
@@ -187,15 +196,23 @@ class ExerciseAction(object):
         action.explosiveness_rating = input_dict.get('explosiveness_rating', 0)
         action.total_load_left = input_dict.get('total_load_left', 0)
         action.total_load_right = input_dict.get('total_load_right', 0)
-        action.external_intensity_left = input_dict.get('external_intensity_left', 0)
-        action.external_intensity_right = input_dict.get('external_intensity_right', 0)
-        action.bodyweight_intensity_left = input_dict.get('bodyweight_intensity_left', 0)
-        action.bodyweight_intensity_right = input_dict.get('bodyweight_intensity_right', 0)
+        # action.external_intensity_left = input_dict.get('external_intensity_left', 0)
+        # action.external_intensity_right = input_dict.get('external_intensity_right', 0)
+        # action.bodyweight_intensity_left = input_dict.get('bodyweight_intensity_left', 0)
+        # action.bodyweight_intensity_right = input_dict.get('bodyweight_intensity_right', 0)
+        action.training_intensity = input_dict.get('training_intensity', 0)
+        action.training_intensity_left = input_dict.get('training_intensity_left', 0)
+        action.training_intensity_right = input_dict.get('training_intensity_right', 0)
         action.training_volume_left = input_dict.get('training_volume_left', 0)
         action.training_volume_right = input_dict.get('training_volume_right', 0)
 
         return action
 
+    def get_power_training_intensity(self):
+        self.training_intensity = self.explosiveness_rating
+
+    def get_strength_training_intensity(self):
+        self.training_intensity = 8
 
     def get_external_intensity(self):
         external_weight_left = 0
@@ -300,18 +317,31 @@ class ExerciseAction(object):
         self.get_training_volume()
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             # both sides have same volume (duration) and intensity (rpe)
-            if self.rpe is None:
-                self.rpe = 4
-            self.total_load_left = self.training_volume_left * self.rpe
-            self.total_load_right = self.training_volume_right * self.rpe
+            self.total_load_left = self.training_volume_left * self.training_intensity
+            self.total_load_right = self.training_volume_right * self.training_intensity
         else:
-            # TODO: Currently only capturing external load. update based on decision of what to do with body_weight + external_weight.
-            self.total_load_left = self.training_volume_left * self.external_intensity_left
-            self.total_load_right = self.training_volume_right * self.external_intensity_right
+            left_dist = 1
+            right_dist = 1
+            if self.lateral_distribution_pattern == WeightDistribution.unilateral:
+                if self.side == 1:
+                    left_dist = self.lateral_distribution[0] / 100
+                    right_dist = self.lateral_distribution[1] / 100
+                elif self.side == 2:
+                    left_dist = self.lateral_distribution[1] / 100
+                    right_dist = self.lateral_distribution[0] / 100
+            elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:
+                if self.side == 1:
+                    left_dist = self.lateral_distribution[0] / 100 * 2
+                    right_dist = self.lateral_distribution[1] / 100 * 2
+                elif self.side == 2:
+                    left_dist = self.lateral_distribution[1] / 100 * 2
+                    right_dist = self.lateral_distribution[0] / 100 * 2
+            self.total_load_left = self.training_volume_left * self.training_intensity * left_dist
+            self.total_load_right = self.training_volume_right * self.training_intensity * right_dist
 
     def get_training_volume(self):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-            # both sides are assigned all the reps (duration)
+            # both sides are assigned all the reps (already in duration)
             self.training_volume_left = self.reps
             self.training_volume_right = self.reps
         else:
@@ -342,6 +372,14 @@ class ExerciseAction(object):
                 self.training_volume_right = self.reps
 
     def get_training_intensity(self):
+        if self.training_type == TrainingType.strength_cardiorespiratory:
+            if self.rpe is None:
+                self.rpe = 4
+            self.training_intensity = self.rpe
+        elif self.training_type in [TrainingType.strength_endurance, TrainingType.strength_integrated_resistance]:
+            self.get_strength_training_intensity()
+        else:
+            self.get_power_training_intensity()
         self.get_external_intensity()
         self.get_body_weight_intensity()
 
@@ -363,7 +401,11 @@ class ExerciseAction(object):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            if max([self.external_intensity_left, self.external_intensity_right]) >= 100:
+            # if max([self.external_intensity_left, self.external_intensity_right]) >= 100:
+            #     self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
+            # else:
+            #     self.adaptation_type = AdaptationType.strength_endurance_strength
+            if self.training_intensity >= 6:
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
@@ -428,6 +470,8 @@ class Movement(Serialisable):
         self.cardio_action = None
         self.power_drill_action = None
         self.power_action = None
+        self.strength_resistance_action = None
+        self.strength_endurance_action = None
 
         # calculated
         self.explosiveness_rating = 0
@@ -440,6 +484,8 @@ class Movement(Serialisable):
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
             'power_drill_action': self.power_drill_action.value if self.power_drill_action is not None else None,
             'power_action': self.power_action.value if self.power_action is not None else None,
+            'strength_resistance_action': self.strength_resistance_action.value if self.strength_resistance_action is not None else None,
+            'strength_endurance_action': self.strength_endurance_action.value if self.strength_endurance_action is not None else None,
             'external_weight_implement': [equipment.value for equipment in self.external_weight_implement],
             'speed': self.speed.value if self.speed is not None else None,
             'resistance': self.resistance.value if self.resistance is not None else None,
@@ -462,8 +508,12 @@ class Movement(Serialisable):
             'power_drill_action') is not None else None
         movement.power_action = PowerAction(input_dict['power_action']) if input_dict.get(
             'power_action') is not None else None
+        movement.strength_resistance_action = StrengthResistanceAction(input_dict['strength_resistance_action']) if input_dict.get(
+            'strength_resistance_action') is not None else None
+        movement.strength_endurance_action = StrengthEnduranceAction(input_dict['strength_endurance_action']) if input_dict.get(
+            'strength_endurance_action') is not None else None
         movement.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
-        movement.equipment = Equipment(input_dict['equipment']) if input_dict.get('equipment') is not None else None
+        movement.external_weight_implement = [Equipment(equipment) for equipment in input_dict.get('external_weight_implement', [])]
         movement.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
         movement.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
         movement.set_explosiveness_rating()
@@ -505,6 +555,11 @@ class ExternalWeight(object):
         self.equipment = equipment
         self.value = value
         self.distribute_weight = self.equipment.distribute_weights()
+
+    def __setattr__(self, key, value):
+        if key == 'equipment' and not isinstance(value, Equipment):
+            value = Equipment(value)
+        super().__setattr__(key, value)
 
     def json_serialise(self):
         return {

@@ -1,6 +1,7 @@
 from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 from models.movement_tags import AdaptationType, BodyPosition, CardioAction, TrainingType, Equipment, MovementSurfaceStability
+from models.movement_actions import ExerciseAction
 import re
 from utils import format_datetime, parse_datetime
 
@@ -104,25 +105,30 @@ class WorkoutExercise(Serialisable):
     def __init__(self):
         self.id = ''
         self.name = ''
-        self.weight_in_lbs = None
-        self.equipment = None
         self.weight_measure = None
+        self.weight_in_lbs = None
         self.rep_max = None
         self.percent_bodyweight = None
         self.sets = 1
         self.reps_per_set = 1
         self.unit_of_measure = None
-        self.movement_id = ""
         self.rpe = None
         self.side = 0
+        self.bilateral = True
+        self.movement_id = ""
 
-        self.intensity_pace = None
+        self.intensity_pace = 0
 
+        self.training_type = None
+        self.explosiveness_rating = 0
+        self.equipments = []   # TODO: do we get this from the api
         self.adaptation_type = None
         self.body_position = None
         self.cardio_action = None
-        self.training_type = None
-        self.explosiveness_rating = 0
+        self.power_action = None
+        self.power_drill_action = None
+        self.strength_endurance_action = None
+        self.strength_resistance_action = None
         self.surface_stability = None
         self.primary_actions = []
         self.secondary_actions = []
@@ -132,7 +138,6 @@ class WorkoutExercise(Serialisable):
             'id': self.id,
             'name': self.name,
             'weight_in_lbs': self.weight_in_lbs,
-            'equipment': self.equipment.value if self.equipment is not None else None,
             'weight_measure': self.weight_measure.value if self.weight_measure is not None else None,
             'rep_max': self.rep_max,
             'percent_bodyweight': self.percent_bodyweight,
@@ -140,15 +145,20 @@ class WorkoutExercise(Serialisable):
             'reps_per_set': self.reps_per_set,
             'unit_of_measure': self.unit_of_measure.value,
             'intensity_pace': self.intensity_pace,
+            'equipments': [equipment.value for equipment in self.equipments],
             'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
-            'body_position': self.body_position.value if self.body_position is not None else None,
+            # 'body_position': self.body_position.value if self.body_position is not None else None,
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
+            'power_action': self.power_action.value if self.power_action is not None else None,
+            'power_drill_action': self.power_drill_action.value if self.power_drill_action is not None else None,
+            'strength_endurance_action': self.strength_endurance_action.value if self.strength_endurance_action is not None else None,
+            'strength_resistance_action': self.strength_resistance_action.value if self.strength_resistance_action is not None else None,
             'training_type': self.training_type.value if self.training_type is not None else None,
             'explosiveness_rating': self.explosiveness_rating,
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             'rpe': self.rpe,
-            'primary_actions': self.primary_actions,
-            'secondary_actions': self.secondary_actions
+            'primary_actions': [action.json_serialise() for action in self.primary_actions],
+            'secondary_actions': [action.json_serialise() for action in self.secondary_actions]
         }
         return ret
 
@@ -158,7 +168,7 @@ class WorkoutExercise(Serialisable):
         exercise.id = input_dict.get('id', '')
         exercise.name = input_dict.get('name', '')
         exercise.weight_in_lbs = input_dict.get('weight_in_lbs')
-        exercise.equipment = Equipment(input_dict['equipment']) if input_dict.get('equipment') is not None else None
+        exercise.equipments = [Equipment(equipment) for equipment in input_dict.get('equipments', [])]
         exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get('weight_measure') is not None else None
         exercise.rep_max = input_dict.get('rep_max')
         exercise.percent_bodyweight = input_dict.get('percent_bodyweight')
@@ -169,18 +179,20 @@ class WorkoutExercise(Serialisable):
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None
         exercise.explosiveness_rating = input_dict.get('explosiveness_rating', False)
+        exercise.side = input_dict.get('side', 0)
+        exercise.bilateral = input_dict.get('bilateral', True)
 
         # not yet sure if these are needed
-        exercise.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
-            'body_position') is not None else None
+        # exercise.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
+        #     'body_position') is not None else None
         exercise.cardio_action = CardioAction(input_dict['cardio_action']) if input_dict.get(
             'cardio_action') is not None else None
         exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
             'training_type') is not None else None
         exercise.rpe = input_dict.get('rpe')
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
-        exercise.primary_actions = input_dict.get('primary_actions', [])
-        exercise.secondary_actions = input_dict.get('secondary_actions', [])
+        exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
+        exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
 
         return exercise
 
@@ -231,9 +243,14 @@ class WorkoutExercise(Serialisable):
     def process_movement(self, movement):
         # self.body_position = movement.body_position
         self.cardio_action = movement.cardio_action
+        self.power_drill_action = movement.power_drill_action
+        self.power_action = movement.power_action
+        self.strength_endurance_action = movement.strength_endurance_action
+        self.strength_resistance_action = movement.strength_resistance_action
         self.training_type = movement.training_type
         self.explosiveness_rating = movement.explosiveness_rating
         self.surface_stability = movement.surface_stability
+        self.equipments = movement.external_weight_implement  # TODO: do we get it from the api
         self.set_adaption_type(movement)
 
     def set_adaption_type(self, movement):

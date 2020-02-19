@@ -48,6 +48,23 @@ class PowerAction(Enum):
     strength_action = 3
 
 
+class StrengthResistanceAction(Enum):
+    olympic_lift = 0
+
+class StrengthEnduranceAction(Enum):
+    supine = 0
+    prone = 1
+    side_lying = 2
+    quadruped = 3
+    bridge = 4
+    kneeling = 5
+    half_kneeling = 6
+    seated = 7
+    double_leg = 8
+    staggered_leg = 9
+    split_leg = 10
+
+
 class BodyPosition(Enum):
     supine = 0
     prone = 1
@@ -67,6 +84,7 @@ class BodyPosition(Enum):
     non_stationary_other = 15
     two_arms = 16
     single_arm = 17
+    single_leg = 11
 
 
 class Equipment(Enum):

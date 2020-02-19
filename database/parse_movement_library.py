@@ -1,5 +1,5 @@
 from models.movement_actions import Movement, MovementSpeed, MovementResistance
-from movement_tags import CardioAction, TrainingType, MovementSurfaceStability, Equipment, PowerAction, PowerDrillAction
+from movement_tags import CardioAction, TrainingType, MovementSurfaceStability, Equipment, PowerAction, PowerDrillAction, StrengthEnduranceAction, StrengthResistanceAction
 import os
 import json
 import pandas as pd
@@ -36,7 +36,11 @@ class MovementLibraryParser(object):
                 movement.power_drill_action = PowerDrillAction[row['power_drill_action']]
             if self.is_valid(row, 'power_action'):
                 movement.power_action = PowerAction[row['power_action']]
-            # TODO: Possibly add strength_endurance_action and strength_resistence_action
+            if self.is_valid(row, 'strength_endurance_action'):
+                movement.strength_endurance_action = StrengthEnduranceAction[row['strength_endurance_action']]
+            if self.is_valid(row, 'strength_resistance_action'):
+                movement.strength_resistance_action = StrengthResistanceAction[row['strength_resistance_action']]
+            # TODO: Possibly add strength_endurance_action and strength_resistance_action
 
             if self.is_valid(row, 'primary_actions'):
                 primary_actions = row['primary_actions'].split(",")

@@ -14,7 +14,7 @@ class ActionLibraryDatastore(object):
     # @xray_recorder.capture('datastores.ActionLibraryDatastore._read_json')
     def _read_json(self):
         actions = {}
-        file_name = 'action_library.json'
+        file_name = 'actions_library.json'
         # try:
         #     file_name = Config.get('PROVIDER_INFO')['movement_library_filename']
         # except KeyError:

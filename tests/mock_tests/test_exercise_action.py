@@ -11,14 +11,14 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     exercise.sets = sets
     exercise.unit_of_measure = unit
     exercise.movement_id = movement_id
-    exercise.equipment = equipment
+    exercise.equipments = [equipment]
     exercise.weight_in_lbs = weight
     exercise.side = side
     return exercise
 
 
 def get_action(action_id, name, exercise, training_type=TrainingType.strength_integrated_resistance, perc_bodyweight=0,
-               weight_dist=WeightDistribution.bilateral, lateral_distribution=(50, 50)):
+               weight_dist=WeightDistribution.bilateral, lateral_distribution=(50, 50), explosiveness=1):
     action = ExerciseAction(action_id, name)
     action.percent_bodyweight = perc_bodyweight
     action.training_type = training_type
@@ -28,6 +28,8 @@ def get_action(action_id, name, exercise, training_type=TrainingType.strength_in
     action.lateral_distribution_pattern = weight_dist
 
     WorkoutProcessor().process_action(action, exercise)
+    action.explosiveness_rating = explosiveness
+    action.get_training_load()
     return action
 
 
@@ -40,7 +42,7 @@ def test_external_intensity_barbell():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
-    assert action.total_load_left == action.total_load_right == 500
+    assert action.total_load_left == action.total_load_right == 80
 
 
 def test_external_intensity_barbell_unilateral_no_side_defined():
@@ -52,7 +54,7 @@ def test_external_intensity_barbell_unilateral_no_side_defined():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
-    assert action.total_load_left == action.total_load_right == 1000
+    assert action.total_load_left == action.total_load_right == 80
 
 
 def test_external_intensity_unilateral_alternating_barbell():
@@ -65,7 +67,7 @@ def test_external_intensity_unilateral_alternating_barbell():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
-    assert action.total_load_left == action.total_load_right == 1000
+    assert action.total_load_left == action.total_load_right == 80
 
 
 def test_external_intensity_dumbell_bilateral():
@@ -78,7 +80,7 @@ def test_external_intensity_dumbell_bilateral():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
-    assert action.total_load_left == action.total_load_right == 500
+    assert action.total_load_left == action.total_load_right == 80
 
 
 def test_external_intensity_dumbell_bilateral_uneven_no_side():
@@ -91,7 +93,7 @@ def test_external_intensity_dumbell_bilateral_uneven_no_side():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
-    assert action.total_load_left == action.total_load_right == 500
+    assert action.total_load_left == action.total_load_right == 80
 
 
 def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
@@ -104,8 +106,8 @@ def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
     assert action.training_volume_left == 10
     assert action.training_volume_right == 10
 
-    assert action.total_load_left == 600
-    assert action.total_load_right == 400
+    assert action.total_load_left == 96
+    assert action.total_load_right == 64
 
 
 def test_external_intensity_unilateral_dumbbell_no_side_defined():
@@ -278,3 +280,15 @@ def test_convert_distance_seconds_cardioresp_sandbag_run_mile():
     assert action1.training_volume_left == int(1609.34 * 1 * .336) == action1.training_volume_right
     assert action2.reps == int(1609.34 / 5)  # 1 rep per 5 meters
     assert action2.training_volume_left == int(1609.34 / 5) == action2.training_volume_right
+
+
+def test_power_intensity():
+    workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=100)
+    action = get_action('100', "test action", training_type=TrainingType.power_drills_plyometrics, exercise=workout_exercise, weight_dist=WeightDistribution.bilateral, explosiveness=5)
+
+    assert action.training_intensity == 5
+
+    assert action.training_volume_left == 10
+    assert action.training_volume_right == 10
+
+    assert action.total_load_right == action.total_load_left == 50

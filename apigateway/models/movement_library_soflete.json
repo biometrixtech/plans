@@ -6,6 +6,8 @@
         "cardio_action": 1,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 2,
         "resistance": 1,
@@ -25,6 +27,8 @@
         "cardio_action": 1,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 1,
         "resistance": 1,
@@ -44,6 +48,8 @@
         "cardio_action": 3,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             1
         ],
@@ -64,6 +70,8 @@
         "cardio_action": 6,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 0,
         "resistance": 0,
@@ -86,6 +94,8 @@
         "cardio_action": 4,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             2
         ],
@@ -106,6 +116,8 @@
         "cardio_action": 7,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             6
         ],
@@ -127,6 +139,8 @@
         "cardio_action": 5,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             4
         ],
@@ -147,6 +161,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 1,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             15
         ],
@@ -167,6 +183,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 1,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             15
         ],
@@ -188,6 +206,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 1,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             15
         ],
@@ -209,6 +229,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 0,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 2,
         "resistance": 1,
@@ -233,6 +255,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 0,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 2,
         "resistance": 0,
@@ -253,6 +277,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             8
         ],
@@ -273,6 +299,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             7
         ],
@@ -295,6 +323,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             7
         ],
@@ -316,6 +346,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             14
         ],
@@ -341,6 +373,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": 0,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             7
         ],
@@ -370,6 +404,8 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
         "external_weight_implement": [
             8
         ],

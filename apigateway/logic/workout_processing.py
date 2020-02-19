@@ -35,23 +35,27 @@ class WorkoutProcessor(object):
             if action is not None:
                 self.process_action(action, exercise)
                 exercise.primary_actions.append(action)
+        self.apply_explosiveness(exercise, exercise.primary_actions)
+        for action in exercise.primary_actions:
+            action.get_training_load()
 
         for action_id in movement.secondary_actions:
             action = action_library.get(action_id)
             if action is not None:
                 self.process_action(action, exercise)
                 exercise.secondary_actions.append(action)
-
-        self.apply_explosiveness(exercise, exercise.primary_actions)
         self.apply_explosiveness(exercise, exercise.secondary_actions)
+        for action in exercise.secondary_actions:
+            action.get_training_load()
+
 
     def process_action(self, action, exercise):
         # athlete_bodyweight = 100
         # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
 
-        external_weight = ExternalWeight(exercise.equipment, exercise.weight_in_lbs)
-        action.external_weight = [external_weight]
+        action.external_weight = [ExternalWeight(equipment, exercise.weight_in_lbs) for equipment in exercise.equipments]
+        # action.external_weight = [external_weight]
 
         # action.reps = exercise.reps_per_set
         if action.training_type == TrainingType.strength_cardiorespiratory:
@@ -69,7 +73,8 @@ class WorkoutProcessor(object):
 
         action.side = exercise.side
         action.rpe = exercise.rpe
-        action.get_training_load()
+        action.bilateral = exercise.bilateral
+        # action.get_training_load()
 
     def get_rpe_from_rep_max(self, rep_max, reps):
 
@@ -274,11 +279,10 @@ class WorkoutProcessor(object):
                 return 0.0
 
     def calculate_upper_body_stability_rating(self, exercise, action):
-
-        if exercise.equipment is None or action.upper_body_stance is None:
+        if len(exercise.equipments) == 0 or action.upper_body_stance is None:
             return 0.0
-
-        if exercise.equipment in [Equipment.machine, Equipment.assistance_resistence_bands, Equipment.sled]:
+        equipment = exercise.equipments[0]
+        if equipment in [Equipment.machine, Equipment.assistance_resistence_bands, Equipment.sled]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.0
             elif action.upper_body_stance == UpperBodyStance.alternating_arms:
@@ -289,10 +293,10 @@ class WorkoutProcessor(object):
                 return 0.3
             else:
                 return 0.0
-        elif exercise.equipment in [Equipment.atlas_stones, Equipment.yoke, Equipment.dip_belt,
-                                    Equipment.medicine_balls, Equipment.farmers_carry_handles, Equipment.sandbags,
-                                    Equipment.rower, Equipment.airbike, Equipment.bike, Equipment.ski_erg,
-                                    Equipment.ruck]:
+        elif equipment in [Equipment.atlas_stones, Equipment.yoke, Equipment.dip_belt,
+                            Equipment.medicine_balls, Equipment.farmers_carry_handles, Equipment.sandbags,
+                            Equipment.rower, Equipment.airbike, Equipment.bike, Equipment.ski_erg,
+                            Equipment.ruck]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.5
             # these were all improvised/estimated based on logic gaps
@@ -304,8 +308,8 @@ class WorkoutProcessor(object):
                 return 0.8
             else:
                 return 0.0
-        elif exercise.equipment in [Equipment.barbells, Equipment.plate, Equipment.sandbags, Equipment.medicine_balls,
-                                    Equipment.swimming]:
+        elif equipment in [Equipment.barbells, Equipment.plate, Equipment.sandbags, Equipment.medicine_balls,
+                            Equipment.swimming]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.8
             elif action.upper_body_stance == UpperBodyStance.alternating_arms:
@@ -316,7 +320,7 @@ class WorkoutProcessor(object):
                 return 1.5
             else:
                 return 0.0
-        elif exercise.equipment in [Equipment.dumbbells, Equipment.double_kettlebell, Equipment.resistence_bands]:
+        elif equipment in [Equipment.dumbbells, Equipment.double_kettlebell, Equipment.resistence_bands]:
             # this first action is improvised/estimated based on logic gaps
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 1.3
@@ -332,10 +336,10 @@ class WorkoutProcessor(object):
     def apply_explosiveness(self, exercise, action_list):
 
         if len(action_list) > 0:
-            action_explosiveness = [a.explosiveness for a in exercise.primary_actions if a.explosiveness is not None]
+            action_explosiveness = [a.explosiveness for a in action_list if a.explosiveness is not None]
             if len(action_explosiveness) > 0:
                 max_action_explosiveness = max(action_explosiveness)
-                for a in exercise.primary_actions:
+                for a in action_list:
                     if a.explosiveness.value == max_action_explosiveness:
                         a.explosiveness_rating = exercise.explosiveness_rating
                     else:
