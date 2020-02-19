@@ -34,6 +34,7 @@ class MovementLibraryParser(object):
             movement.power_drill_action = PowerDrillAction[row['power_drill_action']]
         if self.is_valid(row, 'power_action'):
             movement.power_action = PowerAction[row['power_action']]
+        # TODO: Possibly add strength_endurance_action and strength_resistence_action
 
         if self.is_valid(row, 'primary_actions'):
             primary_actions = row['primary_actions'].split(",")
@@ -48,7 +49,10 @@ class MovementLibraryParser(object):
         if self.is_valid(row, 'external_weight_implement'):
             row['external_weight_implement'].replace(", ", ",")
             external_weight_implement = row['external_weight_implement'].split(",")
-            movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
+            try:
+                movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
+            except:
+                print('here')
 
         if self.is_valid(row, 'resistance'):
             movement.resistance = MovementResistance[row['resistance']]
@@ -77,7 +81,7 @@ class MovementLibraryParser(object):
 
 
 if __name__ == '__main__':
-    sources = ['soflete']
+    sources = ['demo']
     for movements_source in sources:
         mov_parser = MovementLibraryParser(movements_source)
         mov_parser.load_data()

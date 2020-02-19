@@ -38,6 +38,7 @@ class PowerDrillAction(Enum):
     drills_speed_agility = 0
     hurdles_speed_agility = 1
     sprints_speed_agility = 2
+    power_production = 3
 
 
 class PowerAction(Enum):
@@ -92,6 +93,9 @@ class Equipment(Enum):
     plate = 20
     assistance_resistence_bands = 21
     cable = 22
+    barbell_without_plates = 23
+    step = 24
+    bodyweight = 25
 
     def distribute_weights(self):
         if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells', 'double_kettlebells']:

@@ -1,0 +1,359 @@
+{
+    "58459de6dc2ce90011f93d86": {
+        "id": "58459de6dc2ce90011f93d86",
+        "name": "100 Meter Sprint",
+        "training_type": 1,
+        "cardio_action": 1,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "58459df8dc2ce90011f93d87": {
+        "id": "58459df8dc2ce90011f93d87",
+        "name": "400 Meter Sprint",
+        "training_type": 1,
+        "cardio_action": 1,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [],
+        "speed": 1,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "58459d9ddc2ce90011f93d84": {
+        "id": "58459d9ddc2ce90011f93d84",
+        "name": "2k Row",
+        "training_type": 1,
+        "cardio_action": 3,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            1
+        ],
+        "speed": 1,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "200"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "58459d78dc2ce90011f93d83": {
+        "id": "58459d78dc2ce90011f93d83",
+        "name": "500 Meter Swim",
+        "training_type": 1,
+        "cardio_action": 6,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [],
+        "speed": 0,
+        "resistance": 0,
+        "surface_stability": 0,
+        "primary_actions": [
+            "300",
+            "303"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "57e2fd3a4c6a031dc777e90c": {
+        "id": "57e2fd3a4c6a031dc777e90c",
+        "name": "Airdyne",
+        "training_type": 1,
+        "cardio_action": 4,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            2
+        ],
+        "speed": 1,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "100"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "5873d05eb06dc50011d08796": {
+        "id": "5873d05eb06dc50011d08796",
+        "name": "Ruck",
+        "training_type": 1,
+        "cardio_action": 7,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            6
+        ],
+        "speed": 0,
+        "resistance": 0,
+        "surface_stability": 1,
+        "primary_actions": [
+            "0"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "5a4d2a085a0778000fd6a22e": {
+        "id": "5a4d2a085a0778000fd6a22e",
+        "name": "Ski Erg",
+        "training_type": 1,
+        "cardio_action": 5,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            4
+        ],
+        "speed": 1,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "201"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "": {
+        "id": "",
+        "name": "",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": null,
+        "primary_actions": [],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "586540fd4d0fec0011c031a4": {
+        "id": "586540fd4d0fec0011c031a4",
+        "name": "Med Ball Chest Pass",
+        "training_type": 5,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": 1,
+        "external_weight_implement": [
+            15
+        ],
+        "speed": 1,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "3100"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "57e2fd3b4c6a031dc777e9bd": {
+        "id": "57e2fd3b4c6a031dc777e9bd",
+        "name": "Around the World Ball Slams",
+        "training_type": 5,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": 1,
+        "external_weight_implement": [
+            15
+        ],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "3103"
+        ],
+        "secondary_actions": [
+            "2304a"
+        ],
+        "explosiveness_rating": 0
+    },
+    "57e2fd3a4c6a031dc777e8eb": {
+        "id": "57e2fd3a4c6a031dc777e8eb",
+        "name": "Ball Slam",
+        "training_type": 5,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": 1,
+        "external_weight_implement": [
+            15
+        ],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "3103"
+        ],
+        "secondary_actions": [
+            "2305a"
+        ],
+        "explosiveness_rating": 0
+    },
+    "57e2fd3a4c6a031dc777e913": {
+        "id": "57e2fd3a4c6a031dc777e913",
+        "name": "Athletic Burpee",
+        "training_type": 5,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": 0,
+        "external_weight_implement": [],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "3001",
+            "3020"
+        ],
+        "secondary_actions": [
+            "1004"
+        ],
+        "explosiveness_rating": 0
+    },
+    "59271bd3d8d39b000f703a5a": {
+        "id": "59271bd3d8d39b000f703a5a",
+        "name": "Clapping Push-Ups",
+        "training_type": 5,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": 0,
+        "external_weight_implement": [],
+        "speed": 2,
+        "resistance": 0,
+        "surface_stability": 0,
+        "primary_actions": [
+            "3021"
+        ],
+        "secondary_actions": [
+            "1004"
+        ],
+        "explosiveness_rating": 0
+    },
+    "57e2fd3a4c6a031dc777e847": {
+        "id": "57e2fd3a4c6a031dc777e847",
+        "name": "Dumbbell Bench Press",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2400"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "57e2fd3a4c6a031dc777e849": {
+        "id": "57e2fd3a4c6a031dc777e849",
+        "name": "Incline Bench Press",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            7
+        ],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2401"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "57e2fd3a4c6a031dc777e936": {
+        "id": "57e2fd3a4c6a031dc777e936",
+        "name": "Bent Over Row",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            7
+        ],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2402"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "58459d00dc2ce90011f93d81": {
+        "id": "58459d00dc2ce90011f93d81",
+        "name": "Weighted Dip",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            14
+        ],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2403"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "588d2e3aba4bcd000fd7b5f2": {
+        "id": "588d2e3aba4bcd000fd7b5f2",
+        "name": "Clean & Jerk",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            7
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2405"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "5c9cefebcc3ad8000f18e06b": {
+        "id": "5c9cefebcc3ad8000f18e06b",
+        "name": "Dumbbell Reverse Lunge",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2404"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    }
+}

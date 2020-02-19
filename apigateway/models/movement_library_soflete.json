@@ -57,7 +57,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            23
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -132,9 +134,11 @@
         "power_action": null,
         "external_weight_implement": [],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 0,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4070"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -179,7 +183,9 @@
         "cardio_action": 3,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            1
+        ],
         "speed": 1,
         "resistance": 1,
         "surface_stability": 0,
@@ -256,7 +262,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            8
+        ],
         "speed": null,
         "resistance": null,
         "surface_stability": null,
@@ -276,7 +284,7 @@
         ],
         "speed": 2,
         "resistance": 3,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -288,7 +296,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
         "surface_stability": null,
@@ -303,7 +313,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
         "surface_stability": null,
@@ -318,7 +330,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
         "surface_stability": null,
@@ -333,7 +347,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
         "surface_stability": null,
@@ -975,7 +991,9 @@
         "cardio_action": 4,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            2
+        ],
         "speed": 1,
         "resistance": 1,
         "surface_stability": 0,
@@ -992,7 +1010,9 @@
         "cardio_action": 4,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            2
+        ],
         "speed": 1,
         "resistance": 1,
         "surface_stability": 0,
@@ -1007,11 +1027,11 @@
         "name": "Alternate Bounding",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": 2,
+        "power_drill_action": 3,
         "power_action": null,
         "external_weight_implement": [],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "4001xreps/2"
@@ -1056,10 +1076,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            9
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -3670,10 +3692,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -5347,10 +5371,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -5362,10 +5388,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": 2,
         "resistance": 3,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -5620,7 +5648,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -6489,10 +6519,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            8
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -6549,10 +6581,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            8
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -6755,7 +6789,7 @@
     "5adf94e41a4308000fc558a0": {
         "id": "5adf94e41a4308000fc558a0",
         "name": "Deadbug Bilateral KB Hold",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -6800,7 +6834,7 @@
     "57e2fd3a4c6a031dc777e953": {
         "id": "57e2fd3a4c6a031dc777e953",
         "name": "Deadlift to Power Clean Complex",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -7102,11 +7136,11 @@
         "name": "Diagonal Bounds to Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": 2,
+        "power_drill_action": 3,
         "power_action": null,
         "external_weight_implement": [],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "4101",
@@ -7257,13 +7291,17 @@
         "name": "Dot Drills",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 0,
         "power_action": null,
         "external_weight_implement": [],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 0,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4550",
+            "4551",
+            "4552"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -7274,7 +7312,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            8
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -7446,7 +7486,7 @@
         ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -7599,7 +7639,7 @@
         ],
         "speed": 2,
         "resistance": 3,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -7701,7 +7741,7 @@
         ],
         "speed": 2,
         "resistance": 3,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -8012,10 +8052,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            9
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -8198,10 +8240,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            8
+        ],
         "speed": 2,
         "resistance": 3,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -8483,7 +8527,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            8
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -9066,7 +9112,7 @@
     "57e2fd3a4c6a031dc777e961": {
         "id": "57e2fd3a4c6a031dc777e961",
         "name": "Elevated Single Arm Kettlebell Romanian Deadlift",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -11434,10 +11480,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -12610,7 +12658,18 @@
         "speed": 1,
         "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4300",
+            "4301",
+            "4300",
+            "4301",
+            "4300",
+            "4301",
+            "4300",
+            "4301",
+            "4300",
+            "4301"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -12652,10 +12711,12 @@
         "power_drill_action": 1,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": 1,
+        "speed": 2,
         "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4104"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -13224,7 +13285,7 @@
         "external_weight_implement": [],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -13239,7 +13300,7 @@
         "external_weight_implement": [],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -13566,7 +13627,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            10
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -13973,10 +14036,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            10
+        ],
         "speed": 2,
         "resistance": 3,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -14149,7 +14214,7 @@
     "5d032318fce115001256fd45": {
         "id": "5d032318fce115001256fd45",
         "name": "Kettlebell Pullover to Deadbug",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -14575,7 +14640,7 @@
         "name": "Kneeling Start to Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
         "speed": 2,
@@ -14789,7 +14854,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            23
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -15092,10 +15159,12 @@
         "power_drill_action": 1,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4105"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -15137,10 +15206,12 @@
         "power_drill_action": 1,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4104"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -15243,14 +15314,17 @@
         "name": "Lateral Plyo Skiers",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": 0,
+        "power_drill_action": 3,
         "power_action": null,
-        "external_weight_implement": [],
-        "speed": 1,
+        "external_weight_implement": [
+            24
+        ],
+        "speed": 2,
         "resistance": 1,
         "surface_stability": 0,
         "primary_actions": [
-            "single leg lateral hop"
+            "4403",
+            "4403"
         ],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -15337,13 +15411,16 @@
         "name": "Lateral Shuttle Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 1,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4103",
+            "4202"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -15412,14 +15489,16 @@
         "name": "Lateral Sled Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            16
+        ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
-            "lateral run"
+            "4100"
         ],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -15444,14 +15523,14 @@
         "name": "Lateral Speed Skater",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 3,
         "power_action": null,
         "external_weight_implement": [],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
-            "lateral bounding"
+            "4106"
         ],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -16178,13 +16257,18 @@
         "name": "Med Ball Throw to Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 3,
         "power_action": null,
-        "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "external_weight_implement": [
+            15
+        ],
+        "speed": 2,
+        "resistance": 2,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "3104",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -17063,7 +17147,7 @@
     "5d573b1e3980560012f9b2ad": {
         "id": "5d573b1e3980560012f9b2ad",
         "name": "Overhead Y Sled Drag",
-        "training_type": 6,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -17277,10 +17361,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -17817,10 +17903,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -17847,10 +17935,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -18359,10 +18449,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -18374,7 +18466,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -18402,13 +18496,17 @@
         "name": "Push-Up Start Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "2100",
+            "1004",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -18895,7 +18993,7 @@
     "5cf9a243fce115001254cd20": {
         "id": "5cf9a243fce115001254cd20",
         "name": "Rear Foot Elevated Kettlebell Deadlift",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -19047,13 +19145,17 @@
         "name": "Resisted Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
-        "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "external_weight_implement": [
+            16
+        ],
+        "speed": 2,
+        "resistance": 2,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4005"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -19852,7 +19954,9 @@
         "cardio_action": 3,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            1
+        ],
         "speed": 1,
         "resistance": 1,
         "surface_stability": 0,
@@ -19918,13 +20022,21 @@
         "name": "Run Shuffle Run",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000",
+            "4103",
+            "4000",
+            "4202",
+            "4000",
+            "4103",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -19933,13 +20045,19 @@
         "name": "Run Shuffle Shuffle Run",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000",
+            "4103",
+            "4201",
+            "4103",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -20008,13 +20126,17 @@
         "name": "Running Ladder Drill",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 0,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 0,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4500x10",
+            "4501x20",
+            "4502x20"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -20453,7 +20575,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            11
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -20483,7 +20607,9 @@
         "cardio_action": 1,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            11
+        ],
         "speed": 0,
         "resistance": 0,
         "surface_stability": 0,
@@ -20559,7 +20685,7 @@
     "58c5dad5e8f951000fc0e944": {
         "id": "58c5dad5e8f951000fc0e944",
         "name": "Sandbag Sprint",
-        "training_type": 6,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -21989,13 +22115,25 @@
         "name": "Shuttle Run",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -22004,13 +22142,23 @@
         "name": "Shuttle Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000",
+            "4202",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -22019,13 +22167,25 @@
         "name": "Shuttle Sprints",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -22794,7 +22954,9 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": 2,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            8
+        ],
         "speed": 2,
         "resistance": 3,
         "surface_stability": null,
@@ -23683,13 +23845,20 @@
         "name": "Single Leg Bound to Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 3,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 2,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4006",
+            "4006",
+            "4006",
+            "4006",
+            "4006",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -23698,13 +23867,19 @@
         "name": "Single Leg Bounds",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 3,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 2,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4006",
+            "4006",
+            "4006",
+            "4006",
+            "4006"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -24169,13 +24344,15 @@
         "name": "Single Leg Lateral Bounds",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 3,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 2,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4007"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -24184,13 +24361,18 @@
         "name": "Single Leg Lateral Hops to Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4402",
+            "4403",
+            "4402",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -24317,7 +24499,7 @@
     "5cac3f43cc3ad8000f1ccca9": {
         "id": "5cac3f43cc3ad8000f1ccca9",
         "name": "Single Leg Romanian Deadlift w/ Upper Body Reach",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -24452,7 +24634,7 @@
     "5c40ecacdafb11000fb783e1": {
         "id": "5c40ecacdafb11000fb783e1",
         "name": "Single Leg Wall Romanian Deadlift",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -24621,7 +24803,9 @@
         "cardio_action": 5,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            4
+        ],
         "speed": 1,
         "resistance": 1,
         "surface_stability": 0,
@@ -24711,13 +24895,17 @@
         "name": "Sled Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
-        "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "external_weight_implement": [
+            16
+        ],
+        "speed": 2,
+        "resistance": 2,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4005"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -24908,10 +25096,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -25298,10 +25488,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -25662,20 +25854,22 @@
         "name": "Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
     "57e2fd3b4c6a031dc777e9ed": {
         "id": "57e2fd3b4c6a031dc777e9ed",
         "name": "Sprint Prep Sequence 1",
-        "training_type": 6,
+        "training_type": 0,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -26414,7 +26608,7 @@
     "57e2fd3a4c6a031dc777e83b": {
         "id": "57e2fd3a4c6a031dc777e83b",
         "name": "Straight Leg Deadlift",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -26536,13 +26730,42 @@
         "name": "Suicide Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 1,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4000",
+            "4202",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4000",
+            "4000",
+            "4202",
+            "4000",
+            "4000",
+            "4000",
+            "4000",
+            "4202"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -27309,10 +27532,12 @@
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            7
+        ],
         "speed": null,
         "resistance": null,
-        "surface_stability": null,
+        "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
@@ -28755,13 +28980,22 @@
         "name": "W Drill",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 2,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 1,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4003",
+            "4203",
+            "4000",
+            "4203",
+            "4003",
+            "4203",
+            "4000",
+            "4203"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -28967,13 +29201,15 @@
         "name": "Wall Drill",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 0,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 0,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4071"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -28982,13 +29218,15 @@
         "name": "Wall Drill Singles",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 0,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 0,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4071"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -28997,13 +29235,15 @@
         "name": "Wall Drill Triples",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 0,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 2,
+        "resistance": 0,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4071"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -29040,7 +29280,7 @@
     "59c2817b514bb0000fa59ce0": {
         "id": "59c2817b514bb0000fa59ce0",
         "name": "Wall Press Deadbug",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -29777,13 +30017,16 @@
         "name": "Zig Zag Bound to Sprint",
         "training_type": 6,
         "cardio_action": null,
-        "power_drill_action": null,
+        "power_drill_action": 3,
         "power_action": null,
         "external_weight_implement": [],
-        "speed": null,
-        "resistance": null,
+        "speed": 1,
+        "resistance": 2,
         "surface_stability": 0,
-        "primary_actions": [],
+        "primary_actions": [
+            "4101",
+            "4000"
+        ],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
