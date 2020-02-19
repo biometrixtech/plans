@@ -18,7 +18,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -36,15 +36,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "0_b": {
         "id": "0_b",
@@ -65,7 +57,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -83,15 +75,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "0_c": {
         "id": "0_c",
@@ -112,7 +96,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -130,15 +114,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "1_a": {
         "id": "1_a",
@@ -159,7 +135,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -177,15 +153,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "1_b": {
         "id": "1_b",
@@ -206,7 +174,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -224,15 +192,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "1_c": {
         "id": "1_c",
@@ -253,7 +213,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -271,15 +231,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2_a": {
         "id": "2_a",
@@ -302,7 +254,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -320,15 +272,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2_b": {
         "id": "2_b",
@@ -349,7 +293,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -367,15 +311,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2_c": {
         "id": "2_c",
@@ -396,7 +332,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -414,15 +350,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "100_a": {
         "id": "100_a",
@@ -443,7 +371,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -461,15 +389,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "100_b": {
         "id": "100_b",
@@ -490,7 +410,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -508,15 +428,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "200_a": {
         "id": "200_a",
@@ -537,7 +449,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -565,15 +477,7 @@
                 "priority": 2,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "200_b": {
         "id": "200_b",
@@ -594,7 +498,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 3,
                 "joint_action": 15
             }
         ],
@@ -622,15 +526,7 @@
                 "priority": 3,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "201_a": {
         "id": "201_a",
@@ -651,7 +547,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 2,
                 "joint_action": 15
             }
         ],
@@ -679,15 +575,7 @@
                 "priority": 0,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "201_b": {
         "id": "201_b",
@@ -708,7 +596,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 2,
                 "joint_action": 14
             }
         ],
@@ -741,15 +629,7 @@
                 "priority": 2,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "300_a": {
         "id": "300_a",
@@ -783,15 +663,7 @@
                 "joint_action": 31
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "300_b": {
         "id": "300_b",
@@ -828,15 +700,7 @@
                 "joint_action": 34
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "303_a": {
         "id": "303_a",
@@ -857,7 +721,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -865,15 +729,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "303_b": {
         "id": "303_b",
@@ -902,15 +758,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "303_c": {
         "id": "303_c",
@@ -931,7 +779,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -939,15 +787,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "303_d": {
         "id": "303_d",
@@ -976,15 +816,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "1004": {
         "id": "1004",
@@ -1005,7 +837,7 @@
         "primary_muscle_action": 2,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -1033,15 +865,7 @@
                 "joint_action": 31
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2304_a": {
         "id": "2304_a",
@@ -1062,7 +886,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -1093,15 +917,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2304_b": {
         "id": "2304_b",
@@ -1122,7 +938,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -1153,15 +969,7 @@
                 "joint_action": 31
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2305_a": {
         "id": "2305_a",
@@ -1182,7 +990,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -1213,15 +1021,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2305_b": {
         "id": "2305_b",
@@ -1242,7 +1042,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -1273,15 +1073,7 @@
                 "joint_action": 31
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "3001_a": {
         "id": "3001_a",
@@ -1302,7 +1094,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -1315,15 +1107,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "3001_b": {
         "id": "3001_b",
@@ -1344,7 +1128,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -1357,15 +1141,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "3020_a": {
         "id": "3020_a",
@@ -1394,15 +1170,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "3020_b": {
         "id": "3020_b",
@@ -1423,7 +1191,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -1441,15 +1209,7 @@
             }
         ],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "3020_c": {
         "id": "3020_c",
@@ -1478,15 +1238,7 @@
                 "joint_action": 31
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "3020_d": {
         "id": "3020_d",
@@ -1507,7 +1259,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -1525,15 +1277,7 @@
             }
         ],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "3021_a": {
         "id": "3021_a",
@@ -1571,15 +1315,7 @@
                 "priority": 2,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "3021_b": {
         "id": "3021_b",
@@ -1617,15 +1353,7 @@
                 "priority": 2,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "3100_a": {
         "id": "3100_a",
@@ -1659,15 +1387,7 @@
                 "priority": 0,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "3100_b": {
         "id": "3100_b",
@@ -1701,15 +1421,7 @@
                 "priority": 0,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "3103": {
         "id": "3103",
@@ -1743,15 +1455,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2400_a": {
         "id": "2400_a",
@@ -1787,15 +1491,7 @@
                 "priority": 1,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2400_b": {
         "id": "2400_b",
@@ -1831,15 +1527,7 @@
                 "priority": 1,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2401_a": {
         "id": "2401_a",
@@ -1875,15 +1563,7 @@
                 "priority": 1,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2401_b": {
         "id": "2401_b",
@@ -1914,15 +1594,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2401_c": {
         "id": "2401_c",
@@ -1958,15 +1630,7 @@
                 "priority": 1,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2401_d": {
         "id": "2401_d",
@@ -1997,15 +1661,7 @@
                 "joint_action": 31
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2402_a": {
         "id": "2402_a",
@@ -2041,15 +1697,7 @@
                 "priority": 0,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2402_b": {
         "id": "2402_b",
@@ -2085,15 +1733,7 @@
                 "priority": 0,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2402_c": {
         "id": "2402_c",
@@ -2116,7 +1756,7 @@
         "primary_muscle_action": 2,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -2139,15 +1779,7 @@
             }
         ],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2403_a": {
         "id": "2403_a",
@@ -2183,15 +1815,7 @@
                 "priority": 2,
                 "joint_action": 27
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2403_b": {
         "id": "2403_b",
@@ -2222,15 +1846,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2403_c": {
         "id": "2403_c",
@@ -2261,15 +1877,7 @@
                 "joint_action": 37
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2403_d": {
         "id": "2403_d",
@@ -2305,15 +1913,7 @@
                 "priority": 2,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2403_e": {
         "id": "2403_e",
@@ -2344,15 +1944,7 @@
                 "joint_action": 31
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2403_f": {
         "id": "2403_f",
@@ -2383,15 +1975,7 @@
                 "joint_action": 36
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2403_g": {
         "id": "2403_g",
@@ -2414,7 +1998,7 @@
         "primary_muscle_action": 2,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 3,
                 "joint_action": 14
             }
         ],
@@ -2422,15 +2006,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2404_a": {
         "id": "2404_a",
@@ -2453,7 +2029,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 15
             }
         ],
@@ -2471,15 +2047,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2404_b": {
         "id": "2404_b",
@@ -2502,7 +2070,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -2520,15 +2088,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2404_c": {
         "id": "2404_c",
@@ -2564,15 +2124,7 @@
                 "joint_action": 29
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_a": {
         "id": "2405_a",
@@ -2595,7 +2147,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 3,
                 "joint_action": 14
             }
         ],
@@ -2613,15 +2165,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_b": {
         "id": "2405_b",
@@ -2644,7 +2188,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -2652,15 +2196,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_c": {
         "id": "2405_c",
@@ -2683,7 +2219,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 1,
                 "joint_action": 14
             }
         ],
@@ -2696,15 +2232,7 @@
         "ankle_joint_action": [],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_d": {
         "id": "2405_d",
@@ -2735,15 +2263,7 @@
                 "joint_action": 36
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_e": {
         "id": "2405_e",
@@ -2779,15 +2299,7 @@
                 "priority": 4,
                 "joint_action": 26
             }
-        ],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        ]
     },
     "2405_f": {
         "id": "2405_f",
@@ -2810,7 +2322,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 3,
                 "joint_action": 15
             }
         ],
@@ -2828,15 +2340,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_g": {
         "id": "2405_g",
@@ -2867,15 +2371,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_h": {
         "id": "2405_h",
@@ -2898,7 +2394,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 3,
                 "joint_action": 14
             }
         ],
@@ -2916,15 +2412,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_i": {
         "id": "2405_i",
@@ -2955,15 +2443,7 @@
                 "joint_action": 30
             }
         ],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_j": {
         "id": "2405_j",
@@ -2986,7 +2466,7 @@
         "primary_muscle_action": 1,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 3,
                 "joint_action": 15
             }
         ],
@@ -3004,15 +2484,7 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     },
     "2405_k": {
         "id": "2405_k",
@@ -3035,7 +2507,7 @@
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 0,
+                "priority": 3,
                 "joint_action": 14
             }
         ],
@@ -3053,14 +2525,6 @@
         ],
         "trunk_joint_action": [],
         "shoulder_scapula_joint_action": [],
-        "elbow_joint_action": [],
-        "ancillary_muscle_action": null,
-        "hip_stability_action": [],
-        "ankle_stability_action": [],
-        "trunk_stability_action": [],
-        "pelvis_stability_action": [],
-        "shoulder_stability_action": [],
-        "elbow_stability_action": [],
-        "sij_stability_action": []
+        "elbow_joint_action": []
     }
 }
