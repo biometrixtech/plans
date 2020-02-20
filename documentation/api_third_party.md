@@ -1,4 +1,4 @@
-# FathomAI - Plans API (v 4.7.0)
+# FathomAI - Plans API (v 4.8.0)
 
 ## Common provisions
 
@@ -254,8 +254,7 @@ The client __must__ submit a request body containing a JSON object having the fo
     "post_session_survey": {
                             "event_date": Datetime
                             "RPE": integer,
-                            "soreness": [sore_part, sore_part],
-                            "clear_candidates": [sore_part]}
+                            "soreness": [sore_part, sore_part]
                         },
     "hr_data": [hr, hr, hr],
 }
@@ -272,6 +271,13 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the third party workout. Each hr will have `startDate`, `endDate` and `value` _(only needed for third party workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
+* `post_session_survey` __should__ follow requirements below
+`post_session_survey` data elements
+
+* `event_date` __should__ be a Datetime and reflect the local date and time when the survey (associated with the workout) was completed
+* `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
+* `soreness` __should__ follow the same definition as in _Daily Readiness_
+
 
 ```
 POST /plans/{version}/session/{User UUID} HTTP/1.1
@@ -1461,5 +1467,5 @@ The following reportable body parts are considered muscles
     hip_flexor = 28
     deltoid = 29
 ```
-###### Last Modified: November 22, 2019
+###### Last Modified: February 20, 2020
 
