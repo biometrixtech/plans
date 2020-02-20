@@ -12,6 +12,7 @@ cardio_data = get_cardio_data()
 action_library = ActionLibraryDatastore().get()
 bodyweight_coefficients = get_bodyweight_coefficients()
 
+
 class WorkoutProcessor(object):
 
     def process_workout(self, workout_program):
@@ -49,16 +50,13 @@ class WorkoutProcessor(object):
         for action in exercise.secondary_actions:
             action.get_training_load()
 
-
     def process_action(self, action, exercise):
         # athlete_bodyweight = 100
         # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
 
         action.external_weight = [ExternalWeight(equipment, exercise.weight_in_lbs) for equipment in exercise.equipments]
-        # action.external_weight = [external_weight]
 
-        # action.reps = exercise.reps_per_set
         if action.training_type == TrainingType.strength_cardiorespiratory:
             action.reps = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
         elif exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -77,13 +75,14 @@ class WorkoutProcessor(object):
         action.bilateral = exercise.bilateral
         # action.get_training_load()
 
-    def get_rpe_from_rep_max(self, rep_max, reps):
+    @staticmethod
+    def get_rpe_from_rep_max(rep_max, reps):
 
         # assume 100 bodyweight as we just want relative percentages
         one_rep_max_weight = (96.7 * 0.033 * rep_max) + 96.7
         actual_reps_weight = (96.7 * 0.033 * reps) + 96.7
 
-        rep_max_percentage = round(min((float(actual_reps_weight) / one_rep_max_weight) * 96.7, 100),0)
+        rep_max_percentage = round(min((float(actual_reps_weight) / one_rep_max_weight) * 96.7, 100), 0)
 
         # even though we base it on 100, math is off by ~ 3.3%
 
@@ -112,29 +111,31 @@ class WorkoutProcessor(object):
             rpe = max(0, rpe)
 
         else:
-             rpe = 0
+            rpe = 0
 
-        return round(rpe,1)
+        return round(rpe, 1)
 
-    def get_reps_for_percent_rep_max(self, rep_max_percent):
+    @staticmethod
+    def get_reps_for_percent_rep_max(rep_max_percent):
 
         if rep_max_percent >= 100:
             return 1
 
         rep_max = 1
         one_rep_max_weight_1 = (96.7 * 0.033 * rep_max) + 96.7
-        one_rep_max_weight = 100
+        # one_rep_max_weight = 100
         rebased_percent = one_rep_max_weight_1 / (float(rep_max_percent)/96.7)
 
         actual_reps_weight = (rebased_percent - 96.7)
         unrounded_reps = actual_reps_weight / (96.7 * .033)
-        #ceil_reps = ceil(unrounded_reps)
+        # ceil_reps = ceil(unrounded_reps)
 
         reps = round(unrounded_reps, 0)
 
         return reps
 
-    def get_prime_movers_from_joint_actions(self, joint_action_list, prime_movers):
+    @staticmethod
+    def get_prime_movers_from_joint_actions(joint_action_list, prime_movers):
 
         functional_movement_factory = FunctionalMovementFactory()
         # prime_movers = []
@@ -160,7 +161,8 @@ class WorkoutProcessor(object):
             elif prioritized_joint_action.priority == 4:
                 prime_movers['fourth_prime_movers'].extend(functional_movement.prime_movers)
 
-    def get_bodyweight_ratio_from_model(self, bodyweight, prime_movers, equipment):
+    @staticmethod
+    def get_bodyweight_ratio_from_model(bodyweight, prime_movers, equipment):
         bodyweight_ratio = bodyweight_coefficients['const']
         if equipment == Equipment.dumbbells:
             bodyweight_ratio += bodyweight_coefficients['equipment_dumbbells']
@@ -180,7 +182,7 @@ class WorkoutProcessor(object):
                 bodyweight_ratio += bodyweight_coefficients[var]
         return bodyweight_ratio
 
-    def get_action_rep_max_bodyweight_ratio(self, athlete_bodyweight, exercise, weight_used):
+    def get_action_rep_max_bodyweight_ratio(self, athlete_bodyweight, exercise):
 
         # # if weight_used = 0, assume it's a bodyweight only exercise
         # # TODO - test this assumption
@@ -228,7 +230,7 @@ class WorkoutProcessor(object):
             else:
                 return rpe
 
-            bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, workout_exercise, weight)
+            bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, workout_exercise)
             one_rep_max_weight = bodyweight_ratio * athlete_bodyweight
 
             # find the % 1RM value
@@ -251,7 +253,8 @@ class WorkoutProcessor(object):
             reps = self.convert_calories_to_seconds(reps, cardio_action)
         return reps
 
-    def calculate_lower_body_stability_rating(self, exercise, action):
+    @staticmethod
+    def calculate_lower_body_stability_rating(exercise, action):
 
         if exercise.surface_stability is None or action.lower_body_stance is None:
             return 0.0
@@ -279,7 +282,8 @@ class WorkoutProcessor(object):
             else:
                 return 0.0
 
-    def calculate_upper_body_stability_rating(self, exercise, action):
+    @staticmethod
+    def calculate_upper_body_stability_rating(exercise, action):
         if len(exercise.equipments) == 0 or action.upper_body_stance is None:
             return 0.0
         equipment = exercise.equipments[0]
@@ -295,9 +299,9 @@ class WorkoutProcessor(object):
             else:
                 return 0.0
         elif equipment in [Equipment.atlas_stones, Equipment.yoke, Equipment.dip_belt,
-                            Equipment.medicine_balls, Equipment.farmers_carry_handles, Equipment.sandbags,
-                            Equipment.rower, Equipment.airbike, Equipment.bike, Equipment.ski_erg,
-                            Equipment.ruck]:
+                           Equipment.medicine_balls, Equipment.farmers_carry_handles, Equipment.sandbags,
+                           Equipment.rower, Equipment.airbike, Equipment.bike, Equipment.ski_erg,
+                           Equipment.ruck]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.5
             # these were all improvised/estimated based on logic gaps
@@ -310,7 +314,7 @@ class WorkoutProcessor(object):
             else:
                 return 0.0
         elif equipment in [Equipment.barbells, Equipment.plate, Equipment.sandbags, Equipment.medicine_balls,
-                            Equipment.swimming]:
+                           Equipment.swimming]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.8
             elif action.upper_body_stance == UpperBodyStance.alternating_arms:
@@ -347,7 +351,8 @@ class WorkoutProcessor(object):
                         explosive_factor = self.get_scaled_explosiveness_factor(max_action_explosiveness, a.explosiveness)
                         a.explosiveness_rating = explosive_factor * exercise.explosiveness_rating
 
-    def get_scaled_explosiveness_factor(self, explosive_value_1, explosive_value_2):
+    @staticmethod
+    def get_scaled_explosiveness_factor(explosive_value_1, explosive_value_2):
 
         min_explosive_value = min(explosive_value_1, explosive_value_2)
         max_explosive_value = max(explosive_value_1, explosive_value_2)
@@ -358,7 +363,6 @@ class WorkoutProcessor(object):
         scaled_explosion_factor = float(min_explosive_value) / float(max_explosive_value)
 
         return scaled_explosion_factor
-
 
     @staticmethod
     def convert_seconds_to_reps(reps):

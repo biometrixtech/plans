@@ -1,5 +1,6 @@
 from enum import Enum, IntEnum
-from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution, AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction, StrengthResistanceAction, StrengthEnduranceAction
+from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution,\
+    AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction, StrengthResistanceAction, StrengthEnduranceAction
 from models.functional_movement_type import FunctionalMovementType
 from serialisable import Serialisable
 
@@ -49,7 +50,6 @@ class ExerciseAction(object):
         self.apply_instability = False
 
         self.primary_muscle_action = None
-        # self.hip_joint_rating = None
         self.hip_joint_action = []
         self.knee_joint_action = []
         self.ankle_joint_action = []
@@ -69,7 +69,7 @@ class ExerciseAction(object):
         # obtained from exercise
         self.rpe = None
         self.reps = 1
-        self.external_weight = []  # list of ExternalWeight objects, weight is in %bodyweight
+        self.external_weight = []  # list of ExternalWeight objects
         self.bilateral = True
         self.side = 0  # both
 
@@ -80,6 +80,7 @@ class ExerciseAction(object):
         self.explosiveness_rating = 0
         self.total_load_left = 0
         self.total_load_right = 0
+        # TODO: Remove these once strength-level intensity is implemented
         self.external_intensity_left = 0
         self.external_intensity_right = 0
         self.bodyweight_intensity_left = 0
@@ -186,7 +187,7 @@ class ExerciseAction(object):
         action.rpe = input_dict.get('rpe')
         action.reps = input_dict.get('reps', 1)
         action.side = input_dict.get('side', 0)  # both
-        action.external_weight = [ExternalWeight.json_deserialise(ex_weight) for ex_weight in input_dict.get('external_weight', [])]  # list of ExternalWeight objects, weight is in %bodyweight
+        action.external_weight = [ExternalWeight.json_deserialise(ex_weight) for ex_weight in input_dict.get('external_weight', [])]  # list of ExternalWeight objects
         action.bilateral = input_dict.get('bilateral', True)
 
         # derived
@@ -401,11 +402,7 @@ class ExerciseAction(object):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            # if max([self.external_intensity_left, self.external_intensity_right]) >= 100:
-            #     self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
-            # else:
-            #     self.adaptation_type = AdaptationType.strength_endurance_strength
-            if self.training_intensity >= 6:
+            if self.training_intensity >= 6:  # TODO: validate this number
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength

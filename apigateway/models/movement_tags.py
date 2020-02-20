@@ -51,6 +51,7 @@ class PowerAction(Enum):
 class StrengthResistanceAction(Enum):
     olympic_lift = 0
 
+
 class StrengthEnduranceAction(Enum):
     supine = 0
     prone = 1
