@@ -199,30 +199,33 @@ The following data elements are required when following the  __Post-Workout__ pa
 * `soreness` __should__ follow the same definition as in  _Daily Readiness_
 
 `workout_program_module` data elements
+
 * `provider_id` __should__ be an unique identifier for the partner
 * `program_id` __should__ be an identifier of the workout program
 * `program_module_id` __should__ be an identifier for the specific program module
 * `workout_sections` __should__ be a list of individual _workout_section_ elements contained within the module
 
-Each `workout_section` data elements
+`workout_section` data elements
+
 * `name` __should__ be an identifying section name
 * `duration_seconds` __should__ be total time assigned or taken to complete the section
 * `difficulty` __should__ be the difficulty rating for the section
 * `intensity_pace` __should__ be the intensity rating for the section
 * `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
 
-Each `exercise` data elements 
+`exercise` data elements
+
 * `id` __should__ be provider's unique identifier for the exercise
 * `name` __should__ be the exercise name
-* `weight_measure` __should__ be the unit in which external weight used is measured
+* `weight_measure` __should__ be the unit external weight used is measured in
 * `weight_in_lbs` __should__ be present if `weight_measure` is actual_weight and should represent the weight used
 * `rep_max` __should__ be present if `weight_measure` is rep_max and should represent the weight used
 * `percent_bodyweight` __should__ be present if `weight_measure` is percent_bodyweight and should represent the weight used
-* `bilateral` __should__ be a boolean representation of whether the exercise should be performed on both sides
+* `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
 * `side` __should__ represent the side (left or right) on which the exercise is performed if `bilateral` is false
 * `sets` __should__ be an integer representation of total sets of the exercise to be performed
-* `reps_per_set` __should__ be an integer representation of total reps of the exercise to be performed per set
-* `unit_of_measure` __should__ be an enum representation of the unit of measure for reps
+* `reps_per_set` __should__ be an integer representing of total reps of exercise to be performed per set
+* `unit_of_measure` __should__ be an enum representation of the unit the reps are measured in
 * `intensity_pace` __should__
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
