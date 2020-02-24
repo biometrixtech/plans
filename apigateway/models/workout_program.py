@@ -106,9 +106,9 @@ class WorkoutExercise(Serialisable):
         self.id = ''
         self.name = ''
         self.weight_measure = None
-        self.weight_in_lbs = None
-        self.rep_max = None
-        self.percent_bodyweight = None
+        self.weight = None
+        #self.rep_max = None
+        #self.percent_bodyweight = None
         self.sets = 1
         self.reps_per_set = 1
         self.unit_of_measure = UnitOfMeasure.count
@@ -137,10 +137,10 @@ class WorkoutExercise(Serialisable):
         ret = {
             'id': self.id,
             'name': self.name,
-            'weight_in_lbs': self.weight_in_lbs,
+            'weight': self.weight,
             'weight_measure': self.weight_measure.value if self.weight_measure is not None else None,
-            'rep_max': self.rep_max,
-            'percent_bodyweight': self.percent_bodyweight,
+            #'rep_max': self.rep_max,
+            #'percent_bodyweight': self.percent_bodyweight,
             'sets': self.sets,
             'reps_per_set': self.reps_per_set,
             'unit_of_measure': self.unit_of_measure.value if self.unit_of_measure is not None else None,
@@ -168,11 +168,11 @@ class WorkoutExercise(Serialisable):
         exercise = cls()
         exercise.id = input_dict.get('id', '')
         exercise.name = input_dict.get('name', '')
-        exercise.weight_in_lbs = input_dict.get('weight_in_lbs')
+        exercise.weight = input_dict.get('weight')
         exercise.equipments = [Equipment(equipment) for equipment in input_dict.get('equipments', [])]
         exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get('weight_measure') is not None else None
-        exercise.rep_max = input_dict.get('rep_max')
-        exercise.percent_bodyweight = input_dict.get('percent_bodyweight')
+        #exercise.rep_max = input_dict.get('rep_max')
+        #exercise.percent_bodyweight = input_dict.get('percent_bodyweight')
         exercise.sets = input_dict.get('sets', 0)
         exercise.reps_per_set = input_dict.get('reps_per_set', 0)
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None

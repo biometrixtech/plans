@@ -217,10 +217,8 @@ The following data elements are required when following the  __Post-Workout__ pa
 
 * `id` __should__ be provider's unique identifier for the exercise
 * `name` __should__ be the exercise name
-* `weight_measure` __should__ be the unit external weight used is measured in
-* `weight_in_lbs` __should__ be present if `weight_measure` is actual_weight and should represent the weight used
-* `rep_max` __should__ be present if `weight_measure` is rep_max and should represent the weight used
-* `percent_bodyweight` __should__ be present if `weight_measure` is percent_bodyweight and should represent the weight used
+* `weight_measure` __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
+* `weight` __should__ represent the numeric value of the weight used according to the `weight_measure` attribute
 * `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
 * `side` __should__ represent the side (left or right) on which the exercise is performed if `bilateral` is false
 * `sets` __should__ be an integer representation of total sets of the exercise to be performed
