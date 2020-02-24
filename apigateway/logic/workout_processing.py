@@ -55,7 +55,7 @@ class WorkoutProcessor(object):
         # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
 
-        action.external_weight = [ExternalWeight(equipment, exercise.weight_in_lbs) for equipment in exercise.equipments]
+        action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
         if action.training_type == TrainingType.strength_cardiorespiratory:
             action.reps = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
@@ -216,12 +216,12 @@ class WorkoutProcessor(object):
 
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
 
-            rpe = self.get_rpe_from_rep_max(workout_exercise.rep_max, reps)
+            rpe = self.get_rpe_from_rep_max(workout_exercise.weight, reps)
 
         else:
             if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
 
-                weight = workout_exercise.percent_bodyweight * athlete_bodyweight
+                weight = workout_exercise.weight * athlete_bodyweight
 
             elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
 

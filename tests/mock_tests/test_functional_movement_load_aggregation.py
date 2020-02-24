@@ -33,7 +33,7 @@ def test_aggregate_load_concentric():
 
     exercise_1 = WorkoutExercise()
     exercise_1.weight_measure = WeightMeasure.actual_weight
-    exercise_1.weight_in_lbs = 100
+    exercise_1.weight = 100
     exercise_1.reps_per_set = 5
     exercise_1.equipment = Equipment.dumbbells
     exercise_1.primary_actions.append(exercise_action_1)

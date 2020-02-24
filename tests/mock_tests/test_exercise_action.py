@@ -12,7 +12,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     exercise.unit_of_measure = unit
     exercise.movement_id = movement_id
     exercise.equipments = [equipment]
-    exercise.weight_in_lbs = weight
+    exercise.weight = weight
     exercise.side = side
     return exercise
 
