@@ -1099,10 +1099,12 @@ class Modality(object):
             for phase in self.exercise_phases:
                 self.prioritize_dosages(phase.exercises, current_ranking, r + 1)
 
+
 class ActiveRest(Modality):
-    def __init__(self, event_date_time, modality_type, force_data=False, relative_load_level=3):
+    def __init__(self, event_date_time, modality_type, force_data=False, relative_load_level=3, force_on_demand=False):
         super().__init__(event_date_time, modality_type, relative_load_level)
         self.force_data = force_data
+        self.force_on_demand = force_on_demand
 
     @abc.abstractmethod
     def check_recovery(self, body_part_side, body_part_injury_risk, exercise_library, max_severity):
@@ -1292,16 +1294,20 @@ class ActiveRest(Modality):
         if self.force_data:
             self.get_general_exercises(exercise_library, max_severity)
         else:
-            for body_part, body_part_injury_risk in injury_risk_dict.items():
-                #self.check_recovery_excessive_strain(body_part, body_part_injury_risk, exercise_library, max_severity)
-                #self.check_recovery_compensation(body_part, body_part_injury_risk, exercise_library, max_severity)
-                self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity)
-                #self.check_care_inflammation(body_part, body_part_injury_risk, exercise_library, max_severity)
-                #self.check_care_muscle_spasm(body_part, body_part_injury_risk, exercise_library, max_severity)
-                self.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
-                #self.check_care_knots(body_part, body_part_injury_risk, exercise_library, max_severity)
-                #self.check_care_movement_pattern(body_part, body_part_injury_risk, exercise_library, max_severity)
-                self.check_prevention(body_part, body_part_injury_risk, exercise_library, max_severity)
+            if len(injury_risk_dict) > 0:
+                for body_part, body_part_injury_risk in injury_risk_dict.items():
+                    #self.check_recovery_excessive_strain(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    #self.check_recovery_compensation(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    #self.check_care_inflammation(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    #self.check_care_muscle_spasm(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    self.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    #self.check_care_knots(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    #self.check_care_movement_pattern(body_part, body_part_injury_risk, exercise_library, max_severity)
+                    self.check_prevention(body_part, body_part_injury_risk, exercise_library, max_severity)
+            else:
+                if self.force_on_demand:
+                    self.get_general_exercises(exercise_library, max_severity)
 
     def get_last_severity(self, body_part_injury_risk):
 
@@ -1358,8 +1364,8 @@ class ActiveRest(Modality):
 
 
 class ActiveRestBeforeTraining(ActiveRest):
-    def __init__(self, event_date_time, force_data=False, relative_load_level=3):
-        super().__init__(event_date_time, ModalityType.pre_active_rest, force_data, relative_load_level)
+    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=False):
+        super().__init__(event_date_time, ModalityType.pre_active_rest, force_data, relative_load_level, force_on_demand)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.active_stretch),
@@ -1887,8 +1893,8 @@ class ActiveRestBeforeTraining(ActiveRest):
         #                    self.static_integrate_exercises])
 
 class ActiveRestAfterTraining(ActiveRest):
-    def __init__(self, event_date_time, force_data=False, relative_load_level=3):
-        super().__init__(event_date_time, ModalityType.post_active_rest, force_data, relative_load_level)
+    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=False):
+        super().__init__(event_date_time, ModalityType.post_active_rest, force_data, relative_load_level, force_on_demand)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.isolated_activate),

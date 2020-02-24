@@ -12,10 +12,10 @@ class ExerciseAssignmentCalculator(object):
         self.event_date_time = event_date_time
         self.relative_load_level = relative_load_level
 
-    def get_pre_active_rest(self, force_data=False):
+    def get_pre_active_rest(self, force_data=False, force_on_demand=False):
 
         if len(self.injury_risk_dict) > 0 or force_data:
-            active_rest = ActiveRestBeforeTraining(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level)
+            active_rest = ActiveRestBeforeTraining(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
             active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
             active_rest.set_plan_dosage()
             active_rest.set_exercise_dosage_ranking()
@@ -27,10 +27,10 @@ class ExerciseAssignmentCalculator(object):
                 return [active_rest]
         return []
 
-    def get_post_active_rest(self, force_data=False):
+    def get_post_active_rest(self, force_data=False, force_on_demand=False):
 
         if len(self.injury_risk_dict) > 0 or force_data:
-            active_rest = ActiveRestAfterTraining(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level)
+            active_rest = ActiveRestAfterTraining(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
             active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
             active_rest.set_plan_dosage()
             active_rest.set_exercise_dosage_ranking()

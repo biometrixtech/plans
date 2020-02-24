@@ -15,6 +15,8 @@ from routes.insights import app as insights_routes
 from routes.trends import app as trend_routes
 from routes.three_sensor import app as three_sensor_routes
 from routes.symptoms import app as symptoms_routes
+from routes.movement_prep import app as movement_prep_routes
+
 app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 app.register_blueprint(session_routes, url_prefix='/session')
 app.register_blueprint(athlete_routes, url_prefix='/athlete')
@@ -28,6 +30,7 @@ app.register_blueprint(insights_routes, url_prefix='/insights')
 app.register_blueprint(trend_routes, url_prefix='/trends')
 app.register_blueprint(three_sensor_routes, url_prefix='/three_sensor')
 app.register_blueprint(symptoms_routes, url_prefix='/symptoms')
+app.register_blueprint(movement_prep_routes, url_prefix='/movement_prep')
 
 
 def handler(event, context):
