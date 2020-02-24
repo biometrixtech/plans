@@ -233,7 +233,7 @@ The following data elements are required when following the  __Post-Workout__ pa
 
 ### Symptom-Reporting
 #### Required Data Elements
-The following data elements are required when following the  __Symptom-Reporing__ pathway to __Daily Plan__ generation.
+The following data elements are required when following the  __Symptom-Reporting__ pathway to __Daily Plan__ generation.
 
 * `event_date` __should__ be a Datetime and reflect the local time that survey was taken
 * `soreness` __should__ follow the same definition as in _Daily Readiness_

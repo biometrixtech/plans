@@ -1,10 +1,7 @@
 from flask import request, Blueprint
-import os
-import copy
 
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
-from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
@@ -12,9 +9,7 @@ from models.daily_readiness import DailyReadiness
 from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
-from models.sleep_data import DailySleepData, SleepEvent
-from routes.environments import is_fathom_environment
-from logic.survey_processing import SurveyProcessing, cleanup_sleep_data_from_api, create_plan
+from logic.survey_processing import SurveyProcessing, create_plan
 from config import get_mongo_collection
 from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone
 
