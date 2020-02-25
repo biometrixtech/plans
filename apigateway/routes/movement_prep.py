@@ -96,3 +96,8 @@ def validate_data():
             except ValueError:
                 raise InvalidSchemaException('body_part not recognized')
             symptom['body_part'] = int(symptom['body_part'])
+
+    if 'sessions' in request.json:
+        if not isinstance(request.json['symptoms'], list):
+            raise InvalidSchemaException(f"Property sessions must be of type list")
+        request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
