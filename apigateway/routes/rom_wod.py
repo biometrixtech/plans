@@ -69,6 +69,15 @@ def handle_rom_wod_create(user_id):
             # attach symptoms to the last session
             sessions[-1]['post_session_survey'] = post_session_survey
         for session in sessions:
+            if 'RPE' in session:
+                if 'post_session_survey' in session:
+                    session['post_session_survey']['RPE'] = session['RPE']
+                else:
+                    session['post_session_survey'] = {
+                        'event_date': event_date,
+                        'RPE': session['RPE'],
+                        'soreness': []
+                    }
             survey_processor.create_session_from_survey(session)
     plan.training_sessions.extend(survey_processor.sessions)
 
