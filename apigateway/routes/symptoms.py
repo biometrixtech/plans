@@ -44,10 +44,16 @@ def handle_add_symptoms(user_id=None):
                                         athlete_stats=athlete_stats,
                                         datastore_collection=datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
-    for soreness in request.json['soreness']:
-        if soreness is None:
+    if 'soreness' in request.json:
+        symptoms = request.json['soreness']
+    elif 'symptoms' in request.json:
+        symptoms = request.json['symptoms']
+    else:
+        symptoms = []
+    for symptom in symptoms:
+        if symptom is None:
             continue
-        survey_processor.create_soreness_from_survey(soreness)
+        survey_processor.create_soreness_from_survey(symptom)
 
     visualizations = is_fathom_environment()
 
@@ -65,24 +71,27 @@ def handle_add_symptoms(user_id=None):
 
     daily_plan_datastore.put(plan)
 
-    # update plan
-    if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
-        plan_copy = copy.deepcopy(plan)
-        if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
-            survey_processor.stats_processor.all_plans.remove([p for p in survey_processor.stats_processor.all_plans if p.event_date == plan_event_date][0])
-        survey_processor.stats_processor.all_plans.append(plan_copy)
-    plan = create_plan(user_id,
-                       event_date,
-                       athlete_stats=survey_processor.athlete_stats,
-                       stats_processor=survey_processor.stats_processor,
-                       datastore_collection=datastore_collection,
-                       visualizations=visualizations,
-                       hist_update=hist_update)
-
-    # update users database if health data received
     if is_fathom_environment():
-        Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                                endpoint=f"user/{user_id}",
-                                                                                body={"timezone": timezone,
-                                                                                      "plans_api_version": Config.get('API_VERSION')})
-    return {'daily_plans': [plan]}, 201
+        # update plan
+        if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
+            plan_copy = copy.deepcopy(plan)
+            if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
+                survey_processor.stats_processor.all_plans.remove([p for p in survey_processor.stats_processor.all_plans if p.event_date == plan_event_date][0])
+            survey_processor.stats_processor.all_plans.append(plan_copy)
+        plan = create_plan(user_id,
+                           event_date,
+                           athlete_stats=survey_processor.athlete_stats,
+                           stats_processor=survey_processor.stats_processor,
+                           datastore_collection=datastore_collection,
+                           visualizations=visualizations,
+                           hist_update=hist_update)
+
+        # update users database if health data received
+        if is_fathom_environment():
+            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                    endpoint=f"user/{user_id}",
+                                                                                    body={"timezone": timezone,
+                                                                                          "plans_api_version": Config.get('API_VERSION')})
+        return {'daily_plans': [plan]}, 201
+    else:
+        return {'message': 'success'}, 201

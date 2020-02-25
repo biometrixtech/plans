@@ -4,11 +4,12 @@ import copy
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
-from models.session import Session
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
-from logic.survey_processing import SurveyProcessing, create_plan, cleanup_plan
+from models.soreness_base import BodyPartLocation
+from logic.survey_processing import SurveyProcessing, create_plan
 from utils import parse_datetime, format_date, fix_early_survey_event_date, get_timezone, _check_plan_exists
 
 datastore_collection = DatastoreCollection()
@@ -27,12 +28,20 @@ def handle_post_training_recovery_create(user_id):
     validate_data()
     event_date = parse_datetime(request.json['event_date_time'])
     event_date = fix_early_survey_event_date(event_date)
-
     timezone = get_timezone(event_date)
-    plan_update_required = False
-    train_later = False
-    hist_update = False
 
+    # find/create daily plan
+    plan_event_date = format_date(event_date)
+    if _check_plan_exists(user_id, plan_event_date):
+        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
+    else:
+        plan = DailyPlan(event_date=plan_event_date)
+        plan.user_id = user_id
+    plan.train_later = False
+
+    # set up processing
+    hist_update = False
+    valid_sessions_exist = False
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
@@ -41,61 +50,52 @@ def handle_post_training_recovery_create(user_id):
         hist_update = True
     athlete_stats.api_version = Config.get('API_VERSION')
     athlete_stats.timezone = timezone
-
-    plan_event_date = format_date(event_date)
     survey_processor = SurveyProcessing(user_id, event_date,
                                         athlete_stats=athlete_stats,
                                         datastore_collection=datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
 
-    # check if plan exists, if not create a new one
-    if not _check_plan_exists(user_id, plan_event_date):
-        plan = DailyPlan(event_date=plan_event_date)
-        plan.user_id = user_id
-    else:
-        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-
-    for session in request.json['sessions']:
-        create_new = True
-        if session is None:
-            continue
-        # if id is already present, it's potentially a patch. Check if session already exists and overwrite if it does
-        if session.get('session_id') or session.get('id') is not None:
-            session_id = session.get('session_id') or session.get('id')
-            for s in range(0, len(plan.training_sessions)):
-                if plan.training_sessions[s].id == session_id:
-                    create_new = False
-                    if session.get('source', 0) == 3:
-                        session['last_updated'] = event_date
-
-                    new_session = Session.json_deserialise(session)
-                    plan.training_sessions[s] = new_session
-                    plan_update_required = True
-                    if new_session.post_session_survey is not None:
-                        survey_processor.soreness.extend(new_session.post_session_survey.soreness)
-                    break
-        if create_new:
+    # process new session, if any sent
+    if len(request.json.get('sessions', [])) > 0:
+        sessions = request.json['sessions']
+        # check if any symptoms sent
+        symptoms = request.json.get('symptoms', [])
+        if len(symptoms) > 0:
+            post_session_survey = {
+                'event_date': event_date,
+                'RPE': None,
+                'soreness': symptoms
+            }
+            # attach symptoms to the last session
+            sessions[-1]['post_session_survey'] = post_session_survey
+        for session in sessions:
+            if 'RPE' in session:
+                if 'post_session_survey' in session:
+                    session['post_session_survey']['RPE'] = session['RPE']
+                else:
+                    session['post_session_survey'] = {
+                        'event_date': event_date,
+                        'RPE': session['RPE'],
+                        'soreness': []
+                    }
             survey_processor.create_session_from_survey(session)
+    plan.training_sessions.extend(survey_processor.sessions)
 
-    # check if any of the non-ignored and non-deleted sessions are high load
-    for session in survey_processor.sessions:
+    # check if there are any valid sessions
+    for session in plan.training_sessions:
         if not session.deleted and not session.ignored:
-            plan_update_required = True
+            valid_sessions_exist = True
             if not plan.sessions_planned:
                 plan.sessions_planned = True
             break
-
-    plan.training_sessions.extend(survey_processor.sessions)
-    plan.train_later = train_later
-
     daily_plan_datastore.put(plan)
 
     # save heart_rate_data if it exists in any of the sessions
     if len(survey_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(survey_processor.heart_rate_data)
 
-    # update plan
-    if plan_update_required:
+    # Update plan if there's at least one valid session (either sent with request or sent earlier when requesting movement prep)
+    if valid_sessions_exist:
         if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
             plan_copy = copy.deepcopy(plan)
             if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
@@ -110,7 +110,7 @@ def handle_post_training_recovery_create(user_id):
                            hist_update=hist_update,
                            force_on_demand=True)
     else:
-        plan = cleanup_plan(plan, False)
+        return {'message': "There are no valid sessions to provide Post-Training Responsive Recovery!"}, 404
 
     return {'daily_plans': [plan]}, 201
 
@@ -118,3 +118,18 @@ def handle_post_training_recovery_create(user_id):
 @xray_recorder.capture('routes.post_training_recovery.validate')
 def validate_data():
     parse_datetime(request.json['event_date_time'])
+
+    if 'symptoms' in request.json:
+        if not isinstance(request.json['symptoms'], list):
+            raise InvalidSchemaException(f"Property symptoms must be of type list")
+        for symptom in request.json['symptoms']:
+            try:
+                BodyPartLocation(symptom['body_part'])
+            except ValueError:
+                raise InvalidSchemaException('body_part not recognized')
+            symptom['body_part'] = int(symptom['body_part'])
+
+    if 'sessions' in request.json:
+        if not isinstance(request.json['sessions'], list):
+            raise InvalidSchemaException(f"Property sessions must be of type list")
+        request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
