@@ -331,11 +331,11 @@ The client __must__ submit a request body containing a JSON object having the fo
 <div style="page-break-after: always;"></div>
 
 ```
-POST /plans/{version}/session/{User UUID} HTTP/1.1
+POST /plans/{version}/rom_wod/{User UUID} HTTP/1.1
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJ0eX...xA8
-Cache-Control: no-cache
+
 {
     "event_date": "2019-01-12T16:54:57Z",
     "sessions":[
