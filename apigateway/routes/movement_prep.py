@@ -10,15 +10,12 @@ from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from logic.survey_processing import SurveyProcessing, create_plan
-from config import get_mongo_collection
-from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone
+from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone, _check_plan_exists
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
 daily_plan_datastore = datastore_collection.daily_plan_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
-session_datastore = datastore_collection.session_datastore
-sleep_history_datastore = datastore_collection.sleep_history_datastore
 
 app = Blueprint('movement_prep', __name__)
 
@@ -33,7 +30,6 @@ def handle_movement_prep_create(user_id):
     event_date = fix_early_survey_event_date(event_date)
 
     timezone = get_timezone(event_date)
-    # user_id = principal_id
     daily_readiness = DailyReadiness(
         user_id=user_id,
         event_date=format_datetime(event_date),
@@ -109,12 +105,3 @@ def validate_data():
             except ValueError:
                 raise InvalidSchemaException('body_part not recognized')
             soreness['body_part'] = int(soreness['body_part'])
-
-
-def _check_plan_exists(user_id, event_date):
-    mongo_collection = get_mongo_collection('dailyplan')
-    if mongo_collection.count({"user_id": user_id,
-                               "date": event_date}) == 1:
-        return True
-    else:
-        return False

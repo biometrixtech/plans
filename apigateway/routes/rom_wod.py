@@ -4,22 +4,19 @@ import copy
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+# from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.session import Session
-from models.soreness_base import BodyPartLocation
+# from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from logic.survey_processing import SurveyProcessing, create_plan, cleanup_plan
-from config import get_mongo_collection
-from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone
+from utils import parse_datetime, format_date, fix_early_survey_event_date, get_timezone, _check_plan_exists
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
 daily_plan_datastore = datastore_collection.daily_plan_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
-session_datastore = datastore_collection.session_datastore
-sleep_history_datastore = datastore_collection.sleep_history_datastore
 
 app = Blueprint('rom_wod', __name__)
 
@@ -84,7 +81,7 @@ def handle_rom_wod_create(user_id):
             survey_processor.create_session_from_survey(session)
 
     # update daily pain and soreness in athlete_stats
-    survey_processor.patch_daily_and_historic_soreness(survey='post_session')
+    # survey_processor.patch_daily_and_historic_soreness(survey='post_session')
 
     # check if any of the non-ignored and non-deleted sessions are high load
     for session in survey_processor.sessions:
@@ -128,21 +125,12 @@ def handle_rom_wod_create(user_id):
 def validate_data():
     parse_datetime(request.json['event_date_time'])
 
-    if 'soreness' in request.json:
-        if not isinstance(request.json['soreness'], list):
-            raise InvalidSchemaException(f"Property soreness must be of type list")
-        for soreness in request.json['soreness']:
-            try:
-                BodyPartLocation(soreness['body_part'])
-            except ValueError:
-                raise InvalidSchemaException('body_part not recognized')
-            soreness['body_part'] = int(soreness['body_part'])
-
-
-def _check_plan_exists(user_id, event_date):
-    mongo_collection = get_mongo_collection('dailyplan')
-    if mongo_collection.count({"user_id": user_id,
-                               "date": event_date}) == 1:
-        return True
-    else:
-        return False
+    # if 'soreness' in request.json:
+    #     if not isinstance(request.json['soreness'], list):
+    #         raise InvalidSchemaException(f"Property soreness must be of type list")
+    #     for soreness in request.json['soreness']:
+    #         try:
+    #             BodyPartLocation(soreness['body_part'])
+    #         except ValueError:
+    #             raise InvalidSchemaException('body_part not recognized')
+    #         soreness['body_part'] = int(soreness['body_part'])
