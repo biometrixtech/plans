@@ -72,6 +72,28 @@ class BodyPartFactory(object):
             location = body_part
         return location
 
+    def get_body_part_side_list(self, body_part_enum):
+
+        body_part_side_list = []
+
+        body_part_factory = BodyPartFactory()
+        #body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
+        bilateral = body_part_factory.get_bilateral(BodyPartLocation(body_part_enum))
+
+        # if bilateral:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), side)
+        # else:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
+        if not bilateral:
+            sides = [0]
+        else:
+            sides = [1, 2]
+        for side in sides:
+            body_part_side = BodyPartSide(BodyPartLocation(body_part_enum), side=side)
+            body_part_side_list.append(body_part_side)
+
+        return body_part_side_list
+
     def get_progression_list(self, exercise):
 
         dict = {}
@@ -231,7 +253,7 @@ class BodyPartFactory(object):
         #     return self.get_deep_rotators_hip(sample)
         # elif location == BodyPartLocation.knee:
         #     return self.get_knee(sample)
-        # elif location == BodyPartLocation.lats:
+        # elif location == BodyPartLocation.latissmus_dorsi:
         #     return self.get_lats(sample)
         # elif location == BodyPartLocation.lower_back:
         #     return self.get_lower_back(sample)
@@ -810,7 +832,7 @@ class BodyPartFactory(object):
 
     def get_lats(self, sample=True):
 
-        part = BodyPart(BodyPartLocation.lats, 15)
+        part = BodyPart(BodyPartLocation.latissmus_dorsi, 15)
 
         if sample:
             inhibit = self.get_exercise_dictionary([55])

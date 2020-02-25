@@ -16,7 +16,7 @@ class ExerciseLibraryDatastore(object):
         file_name = Config.get('PROVIDER_INFO')['exercise_library_filename']
         exercise_list = []
         script_dir = os.path.dirname(__file__)
-        file_path = os.path.join(script_dir,'../models', file_name)
+        file_path = os.path.join(script_dir, '../models', file_name)
         with open(file_path, 'r') as f:
             exercises = json.load(f)
 

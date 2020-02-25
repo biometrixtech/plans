@@ -14,6 +14,7 @@ from logic.training_plan_management import TrainingPlanManager
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.heart_rate_processing import HeartRateProcessing
 from logic.metrics_processing import MetricsProcessing
+from logic.workout_processing import WorkoutProcessor
 from datastores.datastore_collection import DatastoreCollection
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from copy import deepcopy
@@ -125,6 +126,8 @@ class SurveyProcessing(object):
                         self.athlete_stats.session_RPE = survey.RPE
                         self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
+        if session_obj.workout_program_module is not None:
+            WorkoutProcessor().process_workout(session_obj.workout_program_module)
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:
@@ -315,7 +318,7 @@ class SurveyProcessing(object):
                                                                              self.athlete_stats.load_stats):
                 high_relative_load_session_present = True
                 # session_load = session.duration_minutes * session.session_RPE
-                session_load = session.training_volume(self.athlete_stats.load_stats)
+                session_load = session.training_load(self.athlete_stats.load_stats)
                 if session_load > load:
                     sport_name = session.sport_name
         self.athlete_stats.high_relative_load_session = high_relative_load_session_present

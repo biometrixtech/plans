@@ -32,6 +32,11 @@ class UnitOfMeasure(Enum):
     seconds = 0
     count = 1
     yards = 2
+    feet = 3
+    meters = 4
+    miles = 5
+    kilometers = 6
+    calories = 7
 
 
 class Tempo(Enum):
@@ -268,3 +273,9 @@ class AssignedExercise(Serialisable):
                'dosages': [dosage.json_serialise() for dosage in self.dosages]
                }
         return ret
+
+
+class WeightMeasure(Enum):
+    rep_max = 0
+    percent_bodyweight = 1
+    actual_weight = 2

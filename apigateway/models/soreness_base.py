@@ -77,7 +77,9 @@ class BodyPartLocation(Enum):
     upper_back_neck = 18
     elbow = 19
     wrist = 20
+    # lats muscle group
     lats = 21
+
     biceps = 22
     triceps = 23
     forearm = 24
@@ -91,6 +93,15 @@ class BodyPartLocation(Enum):
 
     deep_rotators_hip = 30
     obliques = 31
+
+    forearm_intrinsic_muscles = 32
+    forearm_extrinsic_muscles = 33
+
+    intrinsic_muscles_of_spine = 34
+    diaphragm = 35
+    pelvic_floor = 36
+
+    latissmus_dorsi = 37
 
     # shin
     anterior_tibialis = 40
@@ -191,6 +202,24 @@ class BodyPartLocation(Enum):
 
     hip_flexor_merge = 108
 
+    rotator_cuff = 119
+    teres_major = 120
+    supraspinatus = 121
+    subscapularis = 122
+    infraspinatus = 123
+    teres_minor = 124
+
+    serratus_anterior = 125
+
+    brachialis = 126
+    biceps_brachii = 127
+    brachioradialis = 128
+    coracobrachialis = 129
+
+    tricep_brachii_medial_head = 130
+    tricep_brachii_lateral_head = 131
+    tricep_brachii_long_head = 132
+
     @classmethod
     def get_muscle_group(cls, muscle):
         muscle_groups = cls.muscle_groups()
@@ -261,7 +290,7 @@ class BodyPartLocation(Enum):
     def muscle_groups_viz(cls):
         grouped_muscles = {
             cls.semimembranosus_semitendinosus: [cls.semimembranosus, cls.semitendinosus],
-            cls.anterior_adductors: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_brevis, cls.adductor_magnus_posterior_fibers],
+            cls.anterior_adductors: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_brevis, cls.pectineus],
             cls.rectus_femoris_vastus_intermedius: [cls.rectus_femoris, cls.vastus_intermedius],
             cls.hip_flexor_merge: [cls.psoas, cls.iliacus],
             cls.quadratus_femoris: [cls.piriformis, cls.quadratus_femoris], # this is intentional
@@ -278,25 +307,27 @@ class BodyPartLocation(Enum):
     def muscle_groups(cls):
         grouped_muscles = {
             cls.shin: [cls.anterior_tibialis, cls.peroneals_longus],
-            cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius_medial, cls.gastrocnemius_lateral],
+            cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius_medial, cls.gastrocnemius_lateral, cls.popliteus],
             cls.hamstrings: [cls.bicep_femoris_long_head, cls.bicep_femoris_short_head, cls.semimembranosus, cls.semitendinosus],
-            cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis, cls.pectineus],
+            cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis],
             cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris],
             cls.hip_flexor: [cls.tensor_fascia_latae, cls.psoas, cls.iliacus],
             cls.deep_rotators_hip: [cls.piriformis, cls.quadratus_femoris],
-            cls.core_stabilizers: [cls.transverse_abdominis],
+            cls.core_stabilizers: [cls.transverse_abdominis, cls.intrinsic_muscles_of_spine, cls.diaphragm, cls.pelvic_floor],
             cls.obliques: [cls.internal_obliques, cls.external_obliques],
             cls.glutes: [cls.gluteus_medius_anterior_fibers, cls.gluteus_medius_posterior_fibers, cls.gluteus_minimus, cls.gluteus_maximus],
-            cls.forearm: [],
-            cls.biceps: [],
-            cls.triceps: [],
+            cls.forearm: [cls.forearm_intrinsic_muscles, cls.forearm_extrinsic_muscles],
+            cls.biceps: [cls.brachialis, cls.biceps_brachii, cls.brachioradialis, cls.coracobrachialis],
+            cls.triceps: [cls.tricep_brachii_medial_head, cls.tricep_brachii_lateral_head, cls.tricep_brachii_long_head],
             cls.deltoid: [cls.anterior_deltoid, cls.medial_deltoid, cls.posterior_deltoid],
+            cls.serratus_anterior: [],
             cls.chest: [cls.pectoralis_minor, cls.pectoralis_major],
             cls.upper_back_neck: [cls.upper_trapezius, cls.levator_scapulae, cls.middle_trapezius, cls.lower_trapezius, cls.rhomboids],
             # cls.erector_spinae: [],
-            cls.lats: [],
+            cls.lats: [cls.latissmus_dorsi, cls.teres_major],
             cls.abdominals: [cls.rectus_abdominis],
-            cls.lower_back: [cls.erector_spinae, cls.quadratus_lumorum]
+            cls.lower_back: [cls.erector_spinae, cls.quadratus_lumorum],
+            cls.rotator_cuff: [cls.supraspinatus, cls.subscapularis, cls.infraspinatus, cls.teres_minor]
         }
         return grouped_muscles
 

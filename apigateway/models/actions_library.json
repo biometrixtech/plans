@@ -1,0 +1,2500 @@
+{
+    "0_a": {
+        "id": "0_a",
+        "name": "Propulsion",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "0_b": {
+        "id": "0_b",
+        "name": "Loading",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "0_c": {
+        "id": "0_c",
+        "name": "Swing",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 20,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "1_a": {
+        "id": "1_a",
+        "name": "Propulsion",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "1_b": {
+        "id": "1_b",
+        "name": "Loading",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "1_c": {
+        "id": "1_c",
+        "name": "Swing",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 20,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2_a": {
+        "id": "2_a",
+        "name": "Propulsion",
+        "training_type": 1,
+        "eligible_external_resistance": [
+            16
+        ],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 1,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2_b": {
+        "id": "2_b",
+        "name": "Loading",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2_c": {
+        "id": "2_c",
+        "name": "Swing",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 20,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "100_a": {
+        "id": "100_a",
+        "name": "power phase",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 20,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "100_b": {
+        "id": "100_b",
+        "name": "recovery phase",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 3,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 20,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "200_a": {
+        "id": "200_a",
+        "name": "power phase",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 0,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 1,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 21
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 29
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 26
+            }
+        ]
+    },
+    "200_b": {
+        "id": "200_b",
+        "name": "recovery phase",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 0,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 20
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 28
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 27
+            }
+        ]
+    },
+    "201_a": {
+        "id": "201_a",
+        "name": "power phase",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 59,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 1,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 20
+            }
+        ],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "201_b": {
+        "id": "201_b",
+        "name": "recovery phase",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 59,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 21
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 26
+            }
+        ]
+    },
+    "300_a": {
+        "id": "300_a",
+        "name": "against resistence",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": null,
+        "upper_body_stance": 1,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 0,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 23
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "300_b": {
+        "id": "300_b",
+        "name": "return to start",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": null,
+        "upper_body_stance": 1,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 4,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 30
+            },
+            {
+                "priority": 1,
+                "joint_action": 35
+            },
+            {
+                "priority": 1,
+                "joint_action": 34
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "303_a": {
+        "id": "303_a",
+        "name": "kick towards belly",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 0,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "303_b": {
+        "id": "303_b",
+        "name": "hold leg straight while kick towards belly",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 0,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "303_c": {
+        "id": "303_c",
+        "name": "kick towards butt",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 0,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "303_d": {
+        "id": "303_d",
+        "name": "hold leg straight while kick towards butt",
+        "training_type": 1,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 3,
+        "percent_bodyweight": 0,
+        "lateral_distribution": [
+            100,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "1004": {
+        "id": "1004",
+        "name": "",
+        "training_type": 2,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 5,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 90,
+        "lateral_distribution": [
+            100,
+            100
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 20
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2304_a": {
+        "id": "2304_a",
+        "name": "floor, side, above head",
+        "training_type": 3,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            30,
+            30
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 25
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            },
+            {
+                "priority": 1,
+                "joint_action": 29
+            },
+            {
+                "priority": 1,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2304_b": {
+        "id": "2304_b",
+        "name": "above head, side, floor",
+        "training_type": 3,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            30,
+            30
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 24
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            },
+            {
+                "priority": 1,
+                "joint_action": 29
+            },
+            {
+                "priority": 1,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2305_a": {
+        "id": "2305_a",
+        "name": "floor, above head",
+        "training_type": 3,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            30,
+            30
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 21
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            },
+            {
+                "priority": 1,
+                "joint_action": 29
+            },
+            {
+                "priority": 1,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2305_b": {
+        "id": "2305_b",
+        "name": "above head, floor",
+        "training_type": 3,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            30,
+            30
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 20
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            },
+            {
+                "priority": 1,
+                "joint_action": 29
+            },
+            {
+                "priority": 1,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "3001_a": {
+        "id": "3001_a",
+        "name": "squat jump take off",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            100
+        ],
+        "apply_resistance": true,
+        "explosiveness": 3,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "3001_b": {
+        "id": "3001_b",
+        "name": "squat jump landing",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            100,
+            100
+        ],
+        "apply_resistance": true,
+        "explosiveness": 1,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "3020_a": {
+        "id": "3020_a",
+        "name": "arms stabilize",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 5,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 1,
+        "apply_instability": true,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "3020_b": {
+        "id": "3020_b",
+        "name": "leg extension",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 1,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 21
+            }
+        ],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "3020_c": {
+        "id": "3020_c",
+        "name": "arms stabilize",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 5,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 1,
+        "apply_instability": true,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "3020_d": {
+        "id": "3020_d",
+        "name": "feet to hands",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": false,
+        "explosiveness": 1,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 20
+            }
+        ],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "3021_a": {
+        "id": "3021_a",
+        "name": "push up",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 5,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 2,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            },
+            {
+                "priority": 1,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 27
+            }
+        ]
+    },
+    "3021_b": {
+        "id": "3021_b",
+        "name": "catch",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": 5,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 2,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 29
+            },
+            {
+                "priority": 1,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 26
+            }
+        ]
+    },
+    "3100_a": {
+        "id": "3100_a",
+        "name": "throw",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 2,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "3100_b": {
+        "id": "3100_b",
+        "name": "loading / catch",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 2,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "3103": {
+        "id": "3103",
+        "name": "throw",
+        "training_type": 5,
+        "eligible_external_resistance": [],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            0,
+            0
+        ],
+        "apply_resistance": true,
+        "explosiveness": 3,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 20
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2400_a": {
+        "id": "2400_a",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": 4,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 27
+            }
+        ]
+    },
+    "2400_b": {
+        "id": "2400_b",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": 4,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 29
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 26
+            }
+        ]
+    },
+    "2401_a": {
+        "id": "2401_a",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 4,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 27
+            }
+        ]
+    },
+    "2401_b": {
+        "id": "2401_b",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 4,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2401_c": {
+        "id": "2401_c",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 4,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 29
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 26
+            }
+        ]
+    },
+    "2401_d": {
+        "id": "2401_d",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 4,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2402_a": {
+        "id": "2402_a",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 0,
+                "joint_action": 26
+            }
+        ]
+    },
+    "2402_b": {
+        "id": "2402_b",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 0,
+                "joint_action": 27
+            }
+        ]
+    },
+    "2402_c": {
+        "id": "2402_c",
+        "name": "stance",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 21
+            }
+        ],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2403_a": {
+        "id": "2403_a",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            25
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 28
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 27
+            }
+        ]
+    },
+    "2403_b": {
+        "id": "2403_b",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            25
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2403_c": {
+        "id": "2403_c",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            25
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 37
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2403_d": {
+        "id": "2403_d",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            25
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 29
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 26
+            }
+        ]
+    },
+    "2403_e": {
+        "id": "2403_e",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            25
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 31
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2403_f": {
+        "id": "2403_f",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            25
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 36
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2403_g": {
+        "id": "2403_g",
+        "name": "stance",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            25
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 40,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2404_a": {
+        "id": "2404_a",
+        "name": "positive",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 1,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            75,
+            25
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2404_b": {
+        "id": "2404_b",
+        "name": "negative",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 1,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            75,
+            25
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2404_c": {
+        "id": "2404_c",
+        "name": "holding weight",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            8
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": null,
+        "apply_instability": false,
+        "primary_muscle_action": 2,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 21
+            }
+        ],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 29
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2405_a": {
+        "id": "2405_a",
+        "name": "Deadlift: positive:bar from floor to knee",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 4,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2405_b": {
+        "id": "2405_b",
+        "name": "Deadlift: positive:bar from knee to hip",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2405_c": {
+        "id": "2405_c",
+        "name": "Explosive Extension with shrug",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 4,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2405_d": {
+        "id": "2405_d",
+        "name": "Explosive Extension with shrug",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 4,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 36
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2405_e": {
+        "id": "2405_e",
+        "name": "bending arm",
+        "training_type": 3,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 4,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": [
+            {
+                "priority": 4,
+                "joint_action": 26
+            }
+        ]
+    },
+    "2405_f": {
+        "id": "2405_f",
+        "name": "Push Jerk: Negative:Drop and Receive",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2405_g": {
+        "id": "2405_g",
+        "name": "Push Jerk: Negative: Drop and Receive",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2405_h": {
+        "id": "2405_h",
+        "name": "Push Jerk: Positive: explode upward",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": null,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 4,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2405_i": {
+        "id": "2405_i",
+        "name": "Push Jerk: Positive: explode upward",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": null,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 9,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": false,
+        "explosiveness": 0,
+        "apply_instability": false,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [],
+        "knee_joint_action": [],
+        "ankle_joint_action": [],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 30
+            }
+        ],
+        "elbow_joint_action": []
+    },
+    "2405_j": {
+        "id": "2405_j",
+        "name": "Push Jerk: Positive: drop and catch",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 3,
+        "apply_instability": true,
+        "primary_muscle_action": 1,
+        "hip_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 15
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 6
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 0
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    },
+    "2405_k": {
+        "id": "2405_k",
+        "name": "Push Jerk: Positive: drive upward",
+        "training_type": 4,
+        "eligible_external_resistance": [
+            7
+        ],
+        "lower_body_stance": 0,
+        "upper_body_stance": 0,
+        "lateral_distribution_pattern": 0,
+        "percent_bodyweight": 100,
+        "lateral_distribution": [
+            50,
+            50
+        ],
+        "apply_resistance": true,
+        "explosiveness": 0,
+        "apply_instability": true,
+        "primary_muscle_action": 0,
+        "hip_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 14
+            }
+        ],
+        "knee_joint_action": [
+            {
+                "priority": 1,
+                "joint_action": 7
+            }
+        ],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
+        "trunk_joint_action": [],
+        "shoulder_scapula_joint_action": [],
+        "elbow_joint_action": []
+    }
+}

@@ -1,11 +1,7 @@
-from fathomapi.api.config import Config
-Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
-                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
-
 from logic.scoring_processor import ScoringProcessor, ScoringSummaryProcessor
 from models.scoring import MovementVariableScores, MovementVariableType, EquationType
 import tests.mock_users.movement_pattern_history as mph
-from models.functional_movement import MovementPatterns, Elasticity
+from models.movement_patterns import Elasticity, MovementPatterns
 from models.asymmetry import Asymmetry, AnteriorPelvicTilt, AnklePitch,HipDrop, KneeValgus, HipRotation
 from models.chart_data import BiomechanicsSummaryChart
 from datetime import datetime, timedelta

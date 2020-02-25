@@ -1,5 +1,5 @@
 from models.soreness_base import BodyPartSide
-from models.functional_movement import BodyPartInjuryRisk, BodyPartHistInjuryRisk
+from models.body_part_injury_risk import BodyPartInjuryRisk, BodyPartHistInjuryRisk
 
 
 class AthleteInjuryRisk(object):

@@ -2,7 +2,8 @@ from fathomapi.utils.xray import xray_recorder
 from datetime import datetime, timedelta
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness_base import BodyPartSide, BodyPartLocation
-from models.functional_movement import BodyPartInjuryRisk, SessionFunctionalMovement
+from models.functional_movement import SessionFunctionalMovement
+from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
 from datastores.session_datastore import SessionDatastore
@@ -230,8 +231,8 @@ class InjuryRiskProcessor(object):
         eccentric_compensation_muscles = [c.eccentric_compensation_percent for c in injury_risk_dict.values() if c.eccentric_compensation_percent > 0]
         total_volume_muscles = [c.total_volume_today() for c in injury_risk_dict.values() if
                                       c.total_volume_today() > 0]
-        eccentric_volume_muscles = [c.eccentric_volume_today() for c in injury_risk_dict.values() if
-                                          c.eccentric_volume_today() > 0]
+        eccentric_volume_muscles = [c.eccentric_volume_today for c in injury_risk_dict.values() if
+                                          c.eccentric_volume_today > 0]
         
         max_total_compensation = None
         max_eccentric_compensation = None
@@ -425,7 +426,7 @@ class InjuryRiskProcessor(object):
                         body_part_injury_risk.total_volume_percent_tier = 0
 
                 if max_eccentric_volume is not None:
-                    eccentric_volume_today = body_part_injury_risk.eccentric_volume_today()
+                    eccentric_volume_today = body_part_injury_risk.eccentric_volume_today
 
                     if eccentric_volume_today >= eccentric_volume_tier_1:
                         body_part_injury_risk.eccentric_volume_percent_tier = 1
@@ -672,7 +673,8 @@ class InjuryRiskProcessor(object):
 
                 injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, d)
 
-                session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
+                # session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
+                session_mapping_dict[current_session] = session_functional_movement.session_load_dict
 
             daily_injury_risk_dict = self.merge_daily_sessions(d, session_mapping_dict, injury_risk_dict)
 
@@ -1102,56 +1104,14 @@ class InjuryRiskProcessor(object):
             self.eccentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
         if d not in self.eccentric_volume_dict[body_part_side]:
             self.eccentric_volume_dict[body_part_side][d] = 0
-        self.eccentric_volume_dict[body_part_side][d] = body_part_injury_risk.eccentric_volume_today()
-        
-        # if body_part_side not in self.prime_mover_eccentric_volume_dict:
-        #     self.prime_mover_eccentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.prime_mover_eccentric_volume_dict[body_part_side]:
-        #     self.prime_mover_eccentric_volume_dict[body_part_side][d] = 0
-        # self.prime_mover_eccentric_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.prime_mover_eccentric_volume_today
-        # 
-        # if body_part_side not in self.synergist_eccentric_volume_dict:
-        #     self.synergist_eccentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_eccentric_volume_dict[body_part_side]:
-        #     self.synergist_eccentric_volume_dict[body_part_side][d] = 0
-        # self.synergist_eccentric_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_eccentric_volume_today
-        # 
-        # if body_part_side not in self.synergist_compensating_eccentric_volume_dict:
-        #     self.synergist_compensating_eccentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_compensating_eccentric_volume_dict[body_part_side]:
-        #     self.synergist_compensating_eccentric_volume_dict[body_part_side][d] = 0
-        # self.synergist_compensating_eccentric_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_compensating_eccentric_volume_today
+        self.eccentric_volume_dict[body_part_side][d] = body_part_injury_risk.eccentric_volume_today
         
         # concentric volume
         if body_part_side not in self.concentric_volume_dict:
             self.concentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
         if d not in self.concentric_volume_dict[body_part_side]:
             self.concentric_volume_dict[body_part_side][d] = 0
-        self.concentric_volume_dict[body_part_side][d] = body_part_injury_risk.concentric_volume_today()
-        
-        # if body_part_side not in self.prime_mover_concentric_volume_dict:
-        #     self.prime_mover_concentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.prime_mover_concentric_volume_dict[body_part_side]:
-        #     self.prime_mover_concentric_volume_dict[body_part_side][d] = 0
-        # self.prime_mover_concentric_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.prime_mover_concentric_volume_today
-        # 
-        # if body_part_side not in self.synergist_concentric_volume_dict:
-        #     self.synergist_concentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_concentric_volume_dict[body_part_side]:
-        #     self.synergist_concentric_volume_dict[body_part_side][d] = 0
-        # self.synergist_concentric_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_concentric_volume_today
-        # 
-        # if body_part_side not in self.synergist_compensating_concentric_volume_dict:
-        #     self.synergist_compensating_concentric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_compensating_concentric_volume_dict[body_part_side]:
-        #     self.synergist_compensating_concentric_volume_dict[body_part_side][d] = 0
-        # self.synergist_compensating_concentric_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_compensating_concentric_volume_today
+        self.concentric_volume_dict[body_part_side][d] = body_part_injury_risk.concentric_volume_today
         
         # total volume
         if body_part_side not in self.total_volume_dict:
@@ -1160,20 +1120,6 @@ class InjuryRiskProcessor(object):
             self.total_volume_dict[body_part_side][d] = 0
         self.total_volume_dict[body_part_side][
             d] = body_part_injury_risk.total_volume_today()
-        
-        # if body_part_side not in self.prime_mover_total_volume_dict:
-        #     self.prime_mover_total_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.prime_mover_total_volume_dict[body_part_side]:
-        #     self.prime_mover_total_volume_dict[body_part_side][d] = 0
-        # self.prime_mover_total_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.prime_mover_total_volume_today
-        # 
-        # if body_part_side not in self.synergist_total_volume_dict:
-        #     self.synergist_total_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_total_volume_dict[body_part_side]:
-        #     self.synergist_total_volume_dict[body_part_side][d] = 0
-        # self.synergist_total_volume_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_total_volume_today
 
     def populate_intensity_dictionaries(self, body_part_injury_risk, body_part_side, d):
 
@@ -1184,54 +1130,12 @@ class InjuryRiskProcessor(object):
             self.eccentric_intensity_dict[body_part_side][d] = 0
         self.eccentric_intensity_dict[body_part_side][d] += body_part_injury_risk.eccentric_intensity_today
 
-        # if body_part_side not in self.prime_mover_eccentric_intensity_dict:
-        #     self.prime_mover_eccentric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.prime_mover_eccentric_intensity_dict[body_part_side]:
-        #     self.prime_mover_eccentric_intensity_dict[body_part_side][d] = 0
-        # self.prime_mover_eccentric_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.prime_mover_eccentric_intensity_today
-        # 
-        # if body_part_side not in self.synergist_eccentric_intensity_dict:
-        #     self.synergist_eccentric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_eccentric_intensity_dict[body_part_side]:
-        #     self.synergist_eccentric_intensity_dict[body_part_side][d] = 0
-        # self.synergist_eccentric_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_eccentric_intensity_today
-        # 
-        # if body_part_side not in self.synergist_compensating_eccentric_intensity_dict:
-        #     self.synergist_compensating_eccentric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_compensating_eccentric_intensity_dict[body_part_side]:
-        #     self.synergist_compensating_eccentric_intensity_dict[body_part_side][d] = 0
-        # self.synergist_compensating_eccentric_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_compensating_eccentric_intensity_today
-
         # concentric intensity
         if body_part_side not in self.concentric_intensity_dict:
             self.concentric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
         if d not in self.concentric_intensity_dict[body_part_side]:
             self.concentric_intensity_dict[body_part_side][d] = 0
         self.concentric_intensity_dict[body_part_side][d] += body_part_injury_risk.concentric_intensity_today
-
-        # if body_part_side not in self.prime_mover_concentric_intensity_dict:
-        #     self.prime_mover_concentric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.prime_mover_concentric_intensity_dict[body_part_side]:
-        #     self.prime_mover_concentric_intensity_dict[body_part_side][d] = 0
-        # self.prime_mover_concentric_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.prime_mover_concentric_intensity_today
-        # 
-        # if body_part_side not in self.synergist_concentric_intensity_dict:
-        #     self.synergist_concentric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_concentric_intensity_dict[body_part_side]:
-        #     self.synergist_concentric_intensity_dict[body_part_side][d] = 0
-        # self.synergist_concentric_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_concentric_intensity_today
-        # 
-        # if body_part_side not in self.synergist_compensating_concentric_intensity_dict:
-        #     self.synergist_compensating_concentric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_compensating_concentric_intensity_dict[body_part_side]:
-        #     self.synergist_compensating_concentric_intensity_dict[body_part_side][d] = 0
-        # self.synergist_compensating_concentric_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_compensating_concentric_intensity_today
 
         # total intensity
         if body_part_side not in self.total_intensity_dict:
@@ -1240,20 +1144,6 @@ class InjuryRiskProcessor(object):
             self.total_intensity_dict[body_part_side][d] = 0
         self.total_intensity_dict[body_part_side][
             d] += body_part_injury_risk.concentric_intensity_today + body_part_injury_risk.eccentric_intensity_today
-
-        # if body_part_side not in self.prime_mover_total_intensity_dict:
-        #     self.prime_mover_total_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.prime_mover_total_intensity_dict[body_part_side]:
-        #     self.prime_mover_total_intensity_dict[body_part_side][d] = 0
-        # self.prime_mover_total_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.prime_mover_total_intensity_today
-        # 
-        # if body_part_side not in self.synergist_total_intensity_dict:
-        #     self.synergist_total_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
-        # if d not in self.synergist_total_intensity_dict[body_part_side]:
-        #     self.synergist_total_intensity_dict[body_part_side][d] = 0
-        # self.synergist_total_intensity_dict[body_part_side][
-        #     d] += body_part_injury_risk.synergist_total_intensity_today
     
     def process_todays_sessions(self, base_date, injury_risk_dict, load_stats):
 
@@ -1265,20 +1155,22 @@ class InjuryRiskProcessor(object):
         #reset
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 
-            injury_risk_dict[body_part_side].prime_mover_concentric_volume_today = 0
-            injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today = 0
-            injury_risk_dict[body_part_side].synergist_concentric_volume_today = 0
-            injury_risk_dict[body_part_side].synergist_eccentric_volume_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_concentric_volume_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_eccentric_volume_today = 0
+            injury_risk_dict[body_part_side].concentric_volume_today = 0
+            injury_risk_dict[body_part_side].eccentric_volume_today = 0
+            #injury_risk_dict[body_part_side].prime_mover_concentric_volume_today = 0
+            #injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today = 0
+            #injury_risk_dict[body_part_side].synergist_concentric_volume_today = 0
+            #injury_risk_dict[body_part_side].synergist_eccentric_volume_today = 0
+            injury_risk_dict[body_part_side].compensating_concentric_volume_today = 0
+            injury_risk_dict[body_part_side].compensating_eccentric_volume_today = 0
 
-            injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = 0
-            injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today = 0
+            injury_risk_dict[body_part_side].concentric_intensity_today = 0
+            injury_risk_dict[body_part_side].eccentric_intensity_today = 0
 
-            injury_risk_dict[body_part_side].synergist_concentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = 0
+            #injury_risk_dict[body_part_side].synergist_concentric_intensity_today = 0
+            #injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = 0
+            injury_risk_dict[body_part_side].compensating_concentric_intensity_today = 0
+            injury_risk_dict[body_part_side].compensating_eccentric_intensity_today = 0
 
         session_mapping_dict = {}
         injury_cycle_summary_dict = {}
@@ -1295,7 +1187,8 @@ class InjuryRiskProcessor(object):
 
             injury_risk_dict = self.update_injury_risk_dict_rankings(injury_risk_dict, base_date)
 
-            session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
+            #session_mapping_dict[current_session] = session_functional_movement.functional_movement_mappings
+            session_mapping_dict[current_session] = session_functional_movement.session_load_dict
 
         injury_risk_dict = self.merge_daily_sessions(base_date, session_mapping_dict, injury_risk_dict)
 
@@ -1310,14 +1203,16 @@ class InjuryRiskProcessor(object):
         body_part_side_list = []
 
         for session in session_functional_movement_dict_list:
-            for functional_movement_mapping in session_functional_movement_dict_list[session]:
+            for body_part_side in session_functional_movement_dict_list[session].keys():
 
-                prime_movers = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.prime_movers]
-                synergists = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.synergists]
-                compensation_parts = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.parts_receiving_compensation]
-                body_part_side_list.extend(prime_movers)
-                body_part_side_list.extend(synergists)
-                body_part_side_list.extend(compensation_parts)
+                # prime_movers = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.prime_movers]
+                # synergists = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.synergists]
+                # compensation_parts = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.parts_receiving_compensation]
+                # body_part_side_list.extend(prime_movers)
+                # body_part_side_list.extend(synergists)
+                # body_part_side_list.extend(compensation_parts)
+                #body_parts = [BodyPartSide(b.body_part_location, b.side) for b in session_functional_movement_dict_list.keys()]
+                body_part_side_list.append(body_part_side)
 
         body_part_side_set = list(set(body_part_side_list))
 
@@ -1328,102 +1223,140 @@ class InjuryRiskProcessor(object):
 
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
             # volume
-            injury_risk_dict[body_part_side].prime_mover_concentric_volume_today = 0
-            injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today = 0
+            injury_risk_dict[body_part_side].concentric_volume_today = 0
+            injury_risk_dict[body_part_side].eccentric_volume_today = 0
+            #injury_risk_dict[body_part_side].prime_mover_concentric_volume_today = 0
+            #injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today = 0
 
-            injury_risk_dict[body_part_side].synergist_concentric_volume_today = 0
-            injury_risk_dict[body_part_side].synergist_eccentric_volume_today = 0
+            #injury_risk_dict[body_part_side].synergist_concentric_volume_today = 0
+            #injury_risk_dict[body_part_side].synergist_eccentric_volume_today = 0
 
-            injury_risk_dict[body_part_side].synergist_compensating_concentric_volume_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_eccentric_volume_today = 0
+            injury_risk_dict[body_part_side].compensating_concentric_volume_today = 0
+            injury_risk_dict[body_part_side].compensating_eccentric_volume_today = 0
 
             injury_risk_dict[body_part_side].compensating_causes_volume_today = []
             injury_risk_dict[body_part_side].compensating_source_volume = None
 
             # intensity
-            injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = 0
-            injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_concentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = 0
-            injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = 0
+            #injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = 0
+            #injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today = 0
+            injury_risk_dict[body_part_side].concentric_intensity_today = 0
+            injury_risk_dict[body_part_side].eccentric_intensity_today = 0
+            injury_risk_dict[body_part_side].compensating_concentric_intensity_today = 0
+            injury_risk_dict[body_part_side].compensating_eccentric_intensity_today = 0
             injury_risk_dict[body_part_side].compensating_causes_intensity_today = []
             injury_risk_dict[body_part_side].compensating_source_intensity = None
 
             injury_risk_dict[body_part_side].last_compensation_date = None
 
-        for session, functional_movement_list in session_functional_movement_dict_list.items():
-            for functional_movement in functional_movement_list:
-                # note: BodyPartFunctionalMovement hashes on body part side
-                for prime_mover in functional_movement.prime_movers:  # list of BodyPartFunctionalMovement objects
-                    body_part_side = BodyPartSide(prime_mover.body_part_side.body_part_location, prime_mover.body_part_side.side)
-                    injury_risk_dict[body_part_side].prime_mover_concentric_volume_today += prime_mover.concentric_volume
-                    injury_risk_dict[body_part_side].prime_mover_eccentric_volume_today += prime_mover.eccentric_volume
+        for session, session_load_dict in session_functional_movement_dict_list.items():
 
-                    injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today = max(
-                        prime_mover.concentric_intensity,
-                        injury_risk_dict[body_part_side].prime_mover_concentric_intensity_today)
-                    injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today = max(
-                        prime_mover.eccentric_intensity,
-                        injury_risk_dict[body_part_side].prime_mover_eccentric_intensity_today)
-                    injury_risk_dict[body_part_side].prime_mover_total_intensity_today = max(
-                        prime_mover.total_intensity(),
-                        injury_risk_dict[body_part_side].prime_mover_total_intensity_today)
+            for body_part_side, body_part_functional_movement in session_load_dict.items():
+                injury_risk_dict[body_part_side].concentric_volume_today += body_part_functional_movement.concentric_volume
+                injury_risk_dict[body_part_side].eccentric_volume_today += body_part_functional_movement.eccentric_volume
+                injury_risk_dict[body_part_side].compensating_concentric_volume_today += body_part_functional_movement.compensated_concentric_volume
+                injury_risk_dict[body_part_side].compensating_eccentric_volume_today += body_part_functional_movement.compensated_eccentric_volume
 
-                for synergist in functional_movement.synergists:  # list of BodyPartFunctionalMovement objects
-                    body_part_side = BodyPartSide(synergist.body_part_side.body_part_location,
-                                                  synergist.body_part_side.side)
-                    injury_risk_dict[body_part_side].synergist_concentric_volume_today += synergist.concentric_volume
-                    injury_risk_dict[body_part_side].synergist_eccentric_volume_today += synergist.eccentric_volume
-                    # injury_risk_dict[
-                    #     body_part_side].prime_mover_total_volume_today = prime_mover.total_volume()
+                injury_risk_dict[body_part_side].concentric_intensity_today = max(
+                    body_part_functional_movement.concentric_intensity,
+                    injury_risk_dict[body_part_side].concentric_intensity_today)
+                injury_risk_dict[body_part_side].eccentric_intensity_today = max(
+                    body_part_functional_movement.eccentric_intensity,
+                    injury_risk_dict[body_part_side].eccentric_intensity_today)
+                injury_risk_dict[body_part_side].total_intensity_today = max(
+                    body_part_functional_movement.total_intensity(),
+                    injury_risk_dict[body_part_side].total_intensity_today)
 
-                    injury_risk_dict[body_part_side].synergist_concentric_intensity_today = max(
-                        synergist.concentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_concentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = max(
-                        synergist.eccentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_eccentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_total_intensity_today = max(
-                        synergist.total_intensity(),
-                        injury_risk_dict[body_part_side].synergist_total_intensity_today)
+                injury_risk_dict[body_part_side].compensating_concentric_intensity_today = max(
+                    body_part_functional_movement.compensated_concentric_intensity,
+                    injury_risk_dict[body_part_side].compensating_concentric_intensity_today)
+                injury_risk_dict[body_part_side].compensating_eccentric_intensity_today = max(
+                    body_part_functional_movement.compensated_eccentric_intensity,
+                    injury_risk_dict[body_part_side].compensating_eccentric_intensity_today)
+                injury_risk_dict[body_part_side].total_intensity_today = max(
+                    body_part_functional_movement.total_intensity(),
+                    injury_risk_dict[body_part_side].total_intensity_today)
 
-                for compensation_part in functional_movement.parts_receiving_compensation:
-                    body_part_side = BodyPartSide(compensation_part.body_part_side.body_part_location,
-                                                  compensation_part.body_part_side.side)
-                    injury_risk_dict[body_part_side].synergist_concentric_volume_today += compensation_part.concentric_volume
-                    injury_risk_dict[body_part_side].synergist_eccentric_volume_today += compensation_part.eccentric_volume
-                    injury_risk_dict[body_part_side].synergist_compensating_concentric_volume_today += compensation_part.compensated_concentric_volume
-                    injury_risk_dict[body_part_side].synergist_compensating_eccentric_volume_today += compensation_part.compensated_eccentric_volume
-                    # injury_risk_dict[
-                    #     body_part_side].synergist_total_volume_today = synergist.total_volume()
+                injury_risk_dict[body_part_side].compensating_causes_volume_today.extend(
+                    body_part_functional_movement.compensating_causes_volume)
+                injury_risk_dict[body_part_side].compensating_causes_intensity_today.extend(
+                    body_part_functional_movement.compensating_causes_intensity)
 
-                    injury_risk_dict[body_part_side].synergist_concentric_intensity_today = max(
-                        compensation_part.concentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_concentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_eccentric_intensity_today = max(
-                        compensation_part.eccentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_eccentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today = max(
-                        compensation_part.compensated_concentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_compensating_concentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today = max(
-                        compensation_part.compensated_eccentric_intensity,
-                        injury_risk_dict[body_part_side].synergist_compensating_eccentric_intensity_today)
-                    injury_risk_dict[body_part_side].synergist_total_intensity_today = max(
-                        compensation_part.total_intensity(),
-                        injury_risk_dict[body_part_side].synergist_total_intensity_today)
+                if len(body_part_functional_movement.compensating_causes_volume) > 0 or len(body_part_functional_movement.compensating_causes_intensity) > 0:
+                    injury_risk_dict[body_part_side].last_compensation_date = base_date
+                    #TODO - take merge compensation sources here
+                injury_risk_dict[body_part_side].compensating_source_volume = body_part_functional_movement.compensation_source_volume
+                injury_risk_dict[body_part_side].compensating_source_intensity = body_part_functional_movement.compensation_source_intensity
 
-                    injury_risk_dict[body_part_side].compensating_causes_volume_today.extend(
-                        compensation_part.compensating_causes_volume)
-                    injury_risk_dict[body_part_side].compensating_causes_intensity_today.extend(
-                        compensation_part.compensating_causes_intensity)
-
-                    if len(compensation_part.compensating_causes_volume) > 0 or len(compensation_part.compensating_causes_intensity) > 0:
-                        injury_risk_dict[body_part_side].last_compensation_date = base_date
-                        #TODO - take merge compensation sources here
-                    injury_risk_dict[body_part_side].compensating_source_volume = compensation_part.compensation_source_volume
-                    injury_risk_dict[body_part_side].compensating_source_intensity = compensation_part.compensation_source_intensity
+            # for prime_mover in functional_movement.prime_movers:  # list of BodyPartFunctionalMovement objects
+            #     body_part_side = BodyPartSide(prime_mover.body_part_side.body_part_location, prime_mover.body_part_side.side)
+            #     injury_risk_dict[body_part_side].concentric_volume_today += prime_mover.concentric_volume
+            #     injury_risk_dict[body_part_side].eccentric_volume_today += prime_mover.eccentric_volume
+            #
+            #     injury_risk_dict[body_part_side].concentric_intensity_today = max(
+            #         prime_mover.concentric_intensity,
+            #         injury_risk_dict[body_part_side].concentric_intensity_today)
+            #     injury_risk_dict[body_part_side].eccentric_intensity_today = max(
+            #         prime_mover.eccentric_intensity,
+            #         injury_risk_dict[body_part_side].eccentric_intensity_today)
+            #     injury_risk_dict[body_part_side].total_intensity_today = max(
+            #         prime_mover.total_intensity(),
+            #         injury_risk_dict[body_part_side].total_intensity_today)
+            #
+            # for synergist in functional_movement.synergists:  # list of BodyPartFunctionalMovement objects
+            #     body_part_side = BodyPartSide(synergist.body_part_side.body_part_location,
+            #                                   synergist.body_part_side.side)
+            #     injury_risk_dict[body_part_side].concentric_volume_today += synergist.concentric_volume
+            #     injury_risk_dict[body_part_side].eccentric_volume_today += synergist.eccentric_volume
+            #     # injury_risk_dict[
+            #     #     body_part_side].prime_mover_total_volume_today = prime_mover.total_volume()
+            #
+            #     injury_risk_dict[body_part_side].concentric_intensity_today = max(
+            #         synergist.concentric_intensity,
+            #         injury_risk_dict[body_part_side].concentric_intensity_today)
+            #     injury_risk_dict[body_part_side].eccentric_intensity_today = max(
+            #         synergist.eccentric_intensity,
+            #         injury_risk_dict[body_part_side].eccentric_intensity_today)
+            #     injury_risk_dict[body_part_side].total_intensity_today = max(
+            #         synergist.total_intensity(),
+            #         injury_risk_dict[body_part_side].total_intensity_today)
+            #
+            # for compensation_part in functional_movement.parts_receiving_compensation:
+            #     body_part_side = BodyPartSide(compensation_part.body_part_side.body_part_location,
+            #                                   compensation_part.body_part_side.side)
+            #     injury_risk_dict[body_part_side].concentric_volume_today += compensation_part.concentric_volume
+            #     injury_risk_dict[body_part_side].eccentric_volume_today += compensation_part.eccentric_volume
+            #     injury_risk_dict[body_part_side].compensating_concentric_volume_today += compensation_part.compensated_concentric_volume
+            #     injury_risk_dict[body_part_side].compensating_eccentric_volume_today += compensation_part.compensated_eccentric_volume
+            #     # injury_risk_dict[
+            #     #     body_part_side].synergist_total_volume_today = synergist.total_volume()
+            #
+            #     injury_risk_dict[body_part_side].concentric_intensity_today = max(
+            #         compensation_part.concentric_intensity,
+            #         injury_risk_dict[body_part_side].concentric_intensity_today)
+            #     injury_risk_dict[body_part_side].eccentric_intensity_today = max(
+            #         compensation_part.eccentric_intensity,
+            #         injury_risk_dict[body_part_side].eccentric_intensity_today)
+            #     injury_risk_dict[body_part_side].compensating_concentric_intensity_today = max(
+            #         compensation_part.compensated_concentric_intensity,
+            #         injury_risk_dict[body_part_side].compensating_concentric_intensity_today)
+            #     injury_risk_dict[body_part_side].compensating_eccentric_intensity_today = max(
+            #         compensation_part.compensated_eccentric_intensity,
+            #         injury_risk_dict[body_part_side].compensating_eccentric_intensity_today)
+            #     injury_risk_dict[body_part_side].total_intensity_today = max(
+            #         compensation_part.total_intensity(),
+            #         injury_risk_dict[body_part_side].total_intensity_today)
+            #
+            #     injury_risk_dict[body_part_side].compensating_causes_volume_today.extend(
+            #         compensation_part.compensating_causes_volume)
+            #     injury_risk_dict[body_part_side].compensating_causes_intensity_today.extend(
+            #         compensation_part.compensating_causes_intensity)
+            #
+            #     if len(compensation_part.compensating_causes_volume) > 0 or len(compensation_part.compensating_causes_intensity) > 0:
+            #         injury_risk_dict[body_part_side].last_compensation_date = base_date
+            #         #TODO - take merge compensation sources here
+            #     injury_risk_dict[body_part_side].compensating_source_volume = compensation_part.compensation_source_volume
+            #     injury_risk_dict[body_part_side].compensating_source_intensity = compensation_part.compensation_source_intensity
 
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 

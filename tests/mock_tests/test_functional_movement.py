@@ -1,15 +1,10 @@
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-from fathomapi.api.config import Config
-Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
-                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
-
-
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
 from models.sport import SportName
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartInjuryRisk, SessionFunctionalMovement, MovementPatterns, LeftRightElasticity, Elasticity
+from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, \
+    SessionFunctionalMovement
+from models.body_part_injury_risk import BodyPartInjuryRisk
+from models.movement_patterns import Elasticity, LeftRightElasticity, MovementPatterns
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
@@ -159,25 +154,25 @@ def test_body_parts_have_volume():
 
 
 
-def test_body_parts_have_intensity():
-
-    dates = [datetime.now()]
-    rpes = [5]
-    durations = [100]
-    sport_names = [SportName.distance_running]
-
-    sessions = get_sessions(dates, rpes, durations, sport_names)
-
-    s = sessions[0]
-    session_functional_movement = SessionFunctionalMovement(s, {}, )
-    session_functional_movement.process(s.event_date.date(), LoadStats())
-
-    assert len(session_functional_movement.functional_movement_mappings) > 0
-    for c in session_functional_movement.functional_movement_mappings:
-        for b in c.prime_movers:
-            assert b.concentric_intensity > 0 or b.eccentric_intensity > 0
-        for b in c.synergists:
-            assert b.concentric_intensity > 0 or b.eccentric_intensity > 0
+# def test_body_parts_have_intensity():
+#
+#     dates = [datetime.now()]
+#     rpes = [5]
+#     durations = [100]
+#     sport_names = [SportName.distance_running]
+#
+#     sessions = get_sessions(dates, rpes, durations, sport_names)
+#
+#     s = sessions[0]
+#     session_functional_movement = SessionFunctionalMovement(s, {}, )
+#     session_functional_movement.process(s.event_date.date(), LoadStats())
+#
+#     assert len(session_functional_movement.functional_movement_mappings) > 0
+#     for c in session_functional_movement.functional_movement_mappings:
+#         for b in c.prime_movers:
+#             assert b.concentric_intensity > 0 or b.eccentric_intensity > 0
+#         for b in c.synergists:
+#             assert b.concentric_intensity > 0 or b.eccentric_intensity > 0
 
 
 def test_sharp_symptom_inflammation():

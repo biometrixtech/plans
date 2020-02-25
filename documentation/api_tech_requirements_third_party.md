@@ -1,4 +1,4 @@
-# FathomAI - Plans API (v 4.7.0)
+# FathomAI - Plans API (v 4.8.0)
 ## Technical Summary
 
 
@@ -172,13 +172,15 @@ The following data elements are not required to generate a plan using the  __Dai
 The following data elements are required when following the  __Post-Workout__ pathway to __Daily Plan__ generation.  Sessions can either be logged manually be an athlete or transferred from a third party source such as Apple's HealthKit app.
 
 * `session` __should__ include the data elements as specified below
-* `sessions_planned` __should__ be a boolean representing whether the athlete plans to train again that day.
+* `return_updated_plan` __should__ be a boolean representing whether an updated plan is expected
+* `user_age` __should__ be an integer representing user's age
 
 `session` data elements
 
 * `event_date` __should__ be a Datetime and reflect the start time of the session
 * `end_date` is __optional__ Datetime parameter that reflects the end time of the session from third party source
 * `sport_name` __should__ be an integer reflecting SportName enumeration.
+* `session_type` __should__ be an integer reflecting SessionType enumeration. For session with mixed activities, it should be 7
 * `duration` __should__ be an integer and reflect the minutes duration which the athlete confirmed (third party source) or entered (manually logged session).
 * `calories` __if present__, __should__ be an integer and represent the calorie information obtained from a third party source workout _(only needed for third party source workouts)_
 * `distance` __if present__, __should__ be an integer and represent the distance information obtained from a third party source workout _(only needed for third party source workouts)_
@@ -187,13 +189,44 @@ The following data elements are required when following the  __Post-Workout__ pa
 * `ignored` __if present__, __should__ be a boolean and true for short walking workouts.  This is typically only used for sessions created by third-party apps that should be excluded from Fathom processing.
 * `hr_data` __if present__, __should__ be the heart rate data associated with a third party source workout. Each hr will have `startDate` (Datetime), `endDate` (Datetime) and `value` (integer) _(only needed for third party source workouts)_
 * `description` is __optional__ string parameter to provide a short description of the session they're adding
-* `post-session-survey` __should__ follow requirements below
+* `post_session_survey` __should__ follow requirements below
+* `workout_program_module` __should__ provide details about the workout and follow the requirements defined below
 
-`post-session-survey` data elements
+`post_session_survey` data elements
 
 * `event_date` __should__ be a Datetime and reflect the local date and time when the survey (associated with the workout) was completed
 * `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `soreness` __should__ follow the same definition as in  _Daily Readiness_
+
+`workout_program_module` data elements
+
+* `provider_id` __should__ be an unique identifier for the partner
+* `program_id` __should__ be an identifier of the workout program
+* `program_module_id` __should__ be an identifier for the specific program module
+* `workout_sections` __should__ be a list of individual _workout_section_ elements contained within the module
+
+`workout_section` data elements
+
+* `name` __should__ be an identifying section name
+* `duration_seconds` __should__ be total time assigned or taken to complete the section
+* `difficulty` __should__ be the difficulty rating for the section
+* `intensity_pace` __should__ be the intensity rating for the section
+* `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
+
+`exercise` data elements
+
+* `id` __should__ be provider's unique identifier for the exercise
+* `name` __should__ be the exercise name
+* `weight_measure` __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
+* `weight` __should__ represent the numeric value of the weight used according to the `weight_measure` attribute
+* `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
+* `side` __should__ represent the side (left or right) on which the exercise is performed if `bilateral` is false
+* `sets` __should__ be an integer representation of total sets of the exercise to be performed
+* `reps_per_set` __should__ be an integer representing of total reps of exercise to be performed per set
+* `unit_of_measure` __should__ be an enum representation of the unit the reps are measured in
+* `intensity_pace` __should__
+* `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
+* `rpe` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 
 <div style="page-break-after: always;"></div>
 

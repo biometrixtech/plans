@@ -1,1310 +1,100 @@
-from enum import IntEnum, Enum
-from serialisable import Serialisable
-from models.sport import SportName
+from enum import Enum
+from collections import namedtuple
+from models.session import SessionType
 from models.soreness_base import BodyPartSide, BodyPartLocation
-from models.body_parts import BodyPart, BodyPartFactory
-from datetime import timedelta, date, datetime
-from utils import format_date, parse_date, format_datetime, parse_datetime
+from models.body_parts import BodyPartFactory
+from datetime import timedelta
+from models.movement_actions import MuscleAction
+from models.movement_tags import AdaptationType
+from models.functional_movement_type import FunctionalMovementType
+import statistics
 
 
-class FunctionalMovementType(Enum):
-    ankle_dorsiflexion = 0
-    ankle_plantar_flexion = 1
-    inversion_of_the_foot = 2
-    eversion_of_the_foot = 3
-    knee_flexion = 4
-    knee_extension = 5
-    tibial_external_rotation = 6
-    tibial_internal_rotation = 7
-    hip_adduction = 8
-    hip_abduction = 9
-    hip_internal_rotation = 10
-    hip_external_rotation = 11
-    hip_extension = 12
-    hip_flexion = 13
-    pelvic_anterior_tilt = 14
-    pelvic_posterior_tilt = 15
-    trunk_flexion = 16
-    trunk_extension = 17
-    trunk_lateral_flexion = 18
-    trunk_rotation = 19
-    trunk_flexion_and_rotation = 20
-    trunk_extension_with_rotation = 21
+FunctionalMovementPair = namedtuple('FunctionalMovementPair',['movement_1', 'movement_2'])
+
+
+class FunctionalMovementPairs(object):
+    def __init__(self):
+        self.pairs = []
+        self.populate_pairs()
+
+    def populate_pairs(self):
+
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.ankle_dorsiflexion,
+                                                 FunctionalMovementType.ankle_plantar_flexion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.inversion_of_the_foot,
+                                                 FunctionalMovementType.eversion_of_the_foot))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.knee_flexion,
+                                                 FunctionalMovementType.knee_extension))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.tibial_external_rotation,
+                                                 FunctionalMovementType.tibial_internal_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.hip_adduction,
+                                                 FunctionalMovementType.hip_abduction))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.hip_internal_rotation,
+                                                 FunctionalMovementType.hip_external_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.hip_extension,
+                                                 FunctionalMovementType.hip_flexion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.pelvic_anterior_tilt,
+                                                 FunctionalMovementType.pelvic_posterior_tilt))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_flexion,
+                                                 FunctionalMovementType.trunk_extension))
+        # note no pair
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_lateral_flexion,
+                                                 FunctionalMovementType.trunk_lateral_flexion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_rotation,
+                                                 FunctionalMovementType.trunk_rotation))
+
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.trunk_flexion_with_rotation,
+                                                 FunctionalMovementType.trunk_extension_with_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.elbow_flexion,
+                                                 FunctionalMovementType.elbow_extension))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.shoulder_horizontal_abduction,
+                                                 FunctionalMovementType.shoulder_horizontal_adduction))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation,
+                                                 FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation,
+                                                 FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.internal_rotation,
+                                                 FunctionalMovementType.external_rotation))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.scapular_elevation,
+                                                 FunctionalMovementType.scapular_depression))
+
+    def get_functional_movement_for_muscle_action(self, muscle_action, functional_movement_type):
+
+        if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
+            return functional_movement_type
+        elif muscle_action == MuscleAction.eccentric:
+            pair = [i for i, v in enumerate(self.pairs) if v[0] == functional_movement_type or v[1] == functional_movement_type]
+            pair_item = pair[0]
+            if self.pairs[pair_item][0] == functional_movement_type:
+                return self.pairs[pair_item][1]
+            else:
+                return self.pairs[pair_item][0]
 
 
 class BodyPartFunction(Enum):
     prime_mover = 0
     antagonist = 1
     synergist = 2
+    stabilizer = 3
+    fixator = 4
 
 
 class FunctionalMovement(object):
-    def __init__(self, functional_movement_type):
+    def __init__(self, functional_movement_type, priority=0):
         self.functional_movement_type = functional_movement_type
+        self.priority = priority
         self.prime_movers = []
         self.antagonists = []
         self.synergists = []
+        self.stabilizers = []
+        self.fixators = []
         self.parts_receiving_compensation = []
-
-
-class Elasticity(Serialisable):
-    def __init__(self):
-        self.elasticity = 0.0
-        self.y_adf = 0.0
-
-    def json_serialise(self):
-        ret = {
-            'elasticity': self.elasticity,
-            'y_adf': self.y_adf
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        elasticity_data = cls()
-        elasticity_data.elasticity = input_dict.get("elasticity", 0.0)
-        elasticity_data.y_adf = input_dict.get("y_adf", 0.0)
-        return elasticity_data
-
-
-class LeftRightElasticity(Serialisable):
-    def __init__(self):
-        self.left = None
-        self.right = None
-
-    def json_serialise(self):
-        ret = {
-            'left': self.left.json_serialise() if self.left is not None else None,
-            'right': self.right.json_serialise() if self.right is not None else None
-        }
-
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        left_right = cls()
-        left_right.left = Elasticity.json_deserialise(input_dict["left"]) if input_dict.get("left") is not None else None
-        left_right.right = Elasticity.json_deserialise(input_dict["right"]) if input_dict.get("right") is not None else None
-        return left_right
-
-
-class MovementPatterns(Serialisable):
-    def __init__(self):
-        self.apt_ankle_pitch = None
-        self.hip_drop_apt = None
-        self.hip_drop_pva = None
-        self.knee_valgus_hip_drop = None
-        self.knee_valgus_pva = None
-        self.knee_valgus_apt = None
-        self.hip_rotation_ankle_pitch = None
-        self.hip_rotation_apt = None
-
-    def json_serialise(self):
-        ret = {
-            'apt_ankle_pitch': self.apt_ankle_pitch.json_serialise() if self.apt_ankle_pitch is not None else None,
-            'hip_drop_apt': self.hip_drop_apt.json_serialise() if self.hip_drop_apt is not None else None,
-            'hip_drop_pva': self.hip_drop_pva.json_serialise() if self.hip_drop_pva is not None else None,
-            'knee_valgus_hip_drop': self.knee_valgus_hip_drop.json_serialise() if self.knee_valgus_hip_drop is not None else None,
-            'knee_valgus_pva': self.knee_valgus_pva.json_serialise() if self.knee_valgus_pva is not None else None,
-            'knee_valgus_apt': self.knee_valgus_apt.json_serialise() if self.knee_valgus_apt is not None else None,
-            'hip_rotation_ankle_pitch': self.hip_rotation_ankle_pitch.json_serialise() if self.hip_rotation_ankle_pitch is not None else None,
-            'hip_rotation_apt': self.hip_rotation_apt.json_serialise() if self.hip_rotation_apt is not None else None,
-        }
-
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        movement_patterns = cls()
-        movement_patterns.apt_ankle_pitch = LeftRightElasticity.json_deserialise(
-            input_dict['apt_ankle_pitch']) if input_dict.get('apt_ankle_pitch') is not None else None
-        movement_patterns.hip_drop_apt = LeftRightElasticity.json_deserialise(
-            input_dict['hip_drop_apt']) if input_dict.get('hip_drop_apt') is not None else None
-        movement_patterns.hip_drop_pva = LeftRightElasticity.json_deserialise(
-            input_dict['hip_drop_pva']) if input_dict.get('hip_drop_pva') is not None else None
-        movement_patterns.knee_valgus_hip_drop = LeftRightElasticity.json_deserialise(
-            input_dict['knee_valgus_hip_drop']) if input_dict.get('knee_valgus_hip_drop') is not None else None
-        movement_patterns.knee_valgus_pva = LeftRightElasticity.json_deserialise(
-            input_dict['knee_valgus_pva']) if input_dict.get('knee_valgus_pva') is not None else None
-        movement_patterns.knee_valgus_apt = LeftRightElasticity.json_deserialise(
-            input_dict['knee_valgus_apt']) if input_dict.get('knee_valgus_apt') is not None else None
-        movement_patterns.hip_rotation_ankle_pitch = LeftRightElasticity.json_deserialise(
-            input_dict['hip_rotation_ankle_pitch']) if input_dict.get('hip_rotation_ankle_pitch') is not None else None
-        movement_patterns.hip_rotation_apt = LeftRightElasticity.json_deserialise(
-            input_dict['hip_rotation_apt']) if input_dict.get('hip_rotation_apt') is not None else None
-        return movement_patterns
 
 
 class CompensationSource(Enum):
     internal_processing = 0
     movement_patterns_3s = 1
-
-
-class BodyPartHistInjuryRisk(object):
-    def __init__(self):
-        self.concentric_volume_last_week = 0
-        self.concentric_volume_this_week = 0
-        self.prime_mover_concentric_volume_last_week = 0
-        self.prime_mover_concentric_volume_this_week = 0
-        self.synergist_concentric_volume_last_week = 0
-        self.synergist_concentric_volume_this_week = 0
-        self.synergist_compensating_concentric_volume_last_week = 0
-        self.synergist_compensating_concentric_volume_this_week = 0
-
-        self.eccentric_volume_last_week = 0
-        self.eccentric_volume_this_week = 0
-        self.prime_mover_eccentric_volume_last_week = 0
-        self.prime_mover_eccentric_volume_this_week = 0
-        self.synergist_eccentric_volume_last_week = 0
-        self.synergist_eccentric_volume_this_week = 0
-        self.synergist_compensating_eccentric_volume_last_week = 0
-        self.synergist_compensating_eccentric_volume_this_week = 0
-
-        # intensity
-        self.concentric_intensity_last_week = 0
-        self.concentric_intensity_this_week = 0
-        self.prime_mover_concentric_intensity_last_week = 0
-        self.prime_mover_concentric_intensity_this_week = 0
-        self.synergist_concentric_intensity_last_week = 0
-        self.synergist_concentric_intensity_this_week = 0
-        self.synergist_compensating_concentric_intensity_last_week = 0
-        self.synergist_compensating_concentric_intensity_this_week = 0
-
-        self.eccentric_intensity_last_week = 0
-        self.eccentric_intensity_this_week = 0
-        self.prime_mover_eccentric_intensity_last_week = 0
-        self.prime_mover_eccentric_intensity_this_week = 0
-        self.synergist_eccentric_intensity_last_week = 0
-        self.synergist_eccentric_intensity_this_week = 0
-        self.synergist_compensating_eccentric_intensity_last_week = 0
-        self.synergist_compensating_eccentric_intensity_this_week = 0
-
-    def json_serialise(self):
-        return {
-            "concentric_volume_last_week": self.concentric_volume_last_week,
-            "concentric_volume_this_week": self.concentric_volume_this_week,
-            "prime_mover_concentric_volume_last_week": self.prime_mover_concentric_volume_last_week,
-            "prime_mover_concentric_volume_this_week": self.prime_mover_concentric_volume_this_week,
-            "synergist_concentric_volume_last_week": self.synergist_concentric_volume_last_week,
-            "synergist_concentric_volume_this_week": self.synergist_concentric_volume_this_week,
-            "synergist_compensating_concentric_volume_last_week": self.synergist_compensating_concentric_volume_last_week,
-            "synergist_compensating_concentric_volume_this_week": self.synergist_compensating_concentric_volume_this_week,
-            "prime_mover_eccentric_volume_last_week": self.prime_mover_eccentric_volume_last_week,
-            "prime_mover_eccentric_volume_this_week": self.prime_mover_eccentric_volume_this_week,
-            "synergist_eccentric_volume_last_week": self.synergist_eccentric_volume_last_week,
-            "synergist_eccentric_volume_this_week": self.synergist_eccentric_volume_this_week,
-            "synergist_compensating_eccentric_volume_last_week": self.synergist_compensating_eccentric_volume_last_week,
-            "synergist_compensating_eccentric_volume_this_week": self.synergist_compensating_eccentric_volume_this_week,
-            "concentric_intensity_last_week": self.concentric_intensity_last_week,
-            "concentric_intensity_this_week": self.concentric_intensity_this_week,
-            "eccentric_intensity_last_week": self.eccentric_intensity_last_week,
-            "eccentric_intensity_this_week": self.eccentric_intensity_this_week,
-            "prime_mover_concentric_intensity_last_week": self.prime_mover_concentric_intensity_last_week,
-            "prime_mover_concentric_intensity_this_week": self.prime_mover_concentric_intensity_this_week,
-            "prime_mover_eccentric_intensity_last_week": self.prime_mover_eccentric_intensity_last_week,
-            "prime_mover_eccentric_intensity_this_week": self.prime_mover_eccentric_intensity_this_week,
-            "synergist_concentric_intensity_last_week": self.synergist_concentric_intensity_last_week,
-            "synergist_concentric_intensity_this_week": self.synergist_concentric_intensity_this_week,
-            "synergist_eccentric_intensity_last_week": self.synergist_eccentric_intensity_last_week,
-            "synergist_eccentric_intensity_this_week": self.synergist_eccentric_intensity_this_week,
-            "synergist_compensating_concentric_intensity_last_week": self.synergist_compensating_concentric_intensity_last_week,
-            "synergist_compensating_concentric_intensity_this_week": self.synergist_compensating_concentric_intensity_this_week,
-            "synergist_compensating_eccentric_intensity_last_week": self.synergist_compensating_eccentric_intensity_last_week,
-            "synergist_compensating_eccentric_intensity_this_week": self.synergist_compensating_eccentric_intensity_this_week,
-
-        }
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        injury_risk = cls()
-        injury_risk.concentric_volume_last_week = input_dict.get('concentric_volume_last_week', 0)
-        injury_risk.concentric_volume_this_week = input_dict.get('concentric_volume_this_week', 0)
-        injury_risk.eccentric_volume_last_week = input_dict.get('eccentric_volume_last_week', 0)
-        injury_risk.eccentric_volume_this_week = input_dict.get('eccentric_volume_this_week', 0)
-
-        injury_risk.prime_mover_concentric_volume_last_week = input_dict.get('prime_mover_concentric_volume_last_week', 0)
-        injury_risk.prime_mover_concentric_volume_this_week = input_dict.get('prime_mover_concentric_volume_this_week', 0)
-        injury_risk.prime_mover_eccentric_volume_last_week = input_dict.get('prime_mover_eccentric_volume_last_week', 0)
-        injury_risk.prime_mover_eccentric_volume_this_week = input_dict.get('prime_mover_eccentric_volume_this_week', 0)
-
-        injury_risk.synergist_concentric_volume_last_week = input_dict.get('synergist_concentric_volume_last_week', 0)
-        injury_risk.synergist_concentric_volume_this_week = input_dict.get('synergist_concentric_volume_this_week', 0)
-        injury_risk.synergist_eccentric_volume_last_week = input_dict.get('synergist_eccentric_volume_last_week', 0)
-        injury_risk.synergist_eccentric_volume_this_week = input_dict.get('synergist_eccentric_volume_this_week', 0)
-        injury_risk.synergist_compensating_concentric_volume_last_week = input_dict.get('synergist_compensating_concentric_volume_last_week', 0)
-        injury_risk.synergist_compensating_concentric_volume_this_week = input_dict.get('synergist_compensating_concentric_volume_this_week', 0)
-        injury_risk.synergist_compensating_eccentric_volume_last_week = input_dict.get('synergist_compensating_eccentric_volume_last_week', 0)
-        injury_risk.synergist_compensating_eccentric_volume_this_week = input_dict.get('synergist_compensating_eccentric_volume_this_week', 0)
-
-        injury_risk.concentric_intensity_last_week = input_dict.get('concentric_intensity_last_week', 0)
-        injury_risk.concentric_intensity_this_week = input_dict.get('concentric_intensity_this_week', 0)
-        injury_risk.eccentric_intensity_last_week = input_dict.get('eccentric_intensity_last_week', 0)
-        injury_risk.eccentric_intensity_this_week = input_dict.get('eccentric_intensity_this_week', 0)
-
-        injury_risk.prime_mover_concentric_intensity_last_week = input_dict.get('prime_mover_concentric_intensity_last_week', 0)
-        injury_risk.prime_mover_concentric_intensity_this_week = input_dict.get('prime_mover_concentric_intensity_this_week', 0)
-        injury_risk.prime_mover_eccentric_intensity_last_week = input_dict.get('prime_mover_eccentric_intensity_last_week', 0)
-        injury_risk.prime_mover_eccentric_intensity_this_week = input_dict.get('prime_mover_eccentric_intensity_this_week', 0)
-
-        injury_risk.synergist_concentric_intensity_last_week = input_dict.get('synergist_concentric_intensity_last_week', 0)
-        injury_risk.synergist_concentric_intensity_this_week = input_dict.get('synergist_concentric_intensity_this_week', 0)
-        injury_risk.synergist_eccentric_intensity_last_week = input_dict.get('synergist_eccentric_intensity_last_week', 0)
-        injury_risk.synergist_eccentric_intensity_this_week = input_dict.get('synergist_eccentric_intensity_this_week', 0)
-        injury_risk.synergist_compensating_concentric_intensity_last_week = input_dict.get('synergist_compensating_concentric_intensity_last_week', 0)
-        injury_risk.synergist_compensating_concentric_intensity_this_week = input_dict.get('synergist_compensating_concentric_intensity_this_week', 0)
-        injury_risk.synergist_compensating_eccentric_intensity_last_week = input_dict.get('synergist_compensating_eccentric_intensity_last_week', 0)
-        injury_risk.synergist_compensating_eccentric_intensity_this_week = input_dict.get('synergist_compensating_eccentric_intensity_this_week', 0)
-
-        return injury_risk
-
-    def __setattr__(self, name, value):
-        if 'date_time' in name:
-            if value is not None and not isinstance(value, datetime):
-                value = parse_datetime(value)
-        elif 'date' in name:
-            if value is not None and not isinstance(value, date):
-                value = parse_date(value).date()
-        super().__setattr__(name, value)
-
-    def merge(self, body_part_hist_injury_risk):
-
-        self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_hist_injury_risk.concentric_volume_last_week)
-        self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_hist_injury_risk.concentric_volume_this_week)
-        self.eccentric_volume_last_week = max(self.eccentric_volume_last_week, body_part_hist_injury_risk.eccentric_volume_last_week)
-        self.eccentric_volume_this_week = max(self.eccentric_volume_this_week, body_part_hist_injury_risk.eccentric_volume_this_week)
-
-        self.prime_mover_concentric_volume_last_week = max(self.prime_mover_concentric_volume_last_week, body_part_hist_injury_risk.prime_mover_concentric_volume_last_week)
-        self.prime_mover_concentric_volume_this_week = max(self.prime_mover_concentric_volume_this_week, body_part_hist_injury_risk.prime_mover_concentric_volume_this_week)
-        self.prime_mover_eccentric_volume_last_week = max(self.prime_mover_eccentric_volume_last_week, body_part_hist_injury_risk.prime_mover_eccentric_volume_last_week)
-        self.prime_mover_eccentric_volume_this_week = max(self.prime_mover_eccentric_volume_this_week, body_part_hist_injury_risk.prime_mover_eccentric_volume_this_week)
-
-        self.synergist_concentric_volume_last_week = max(self.synergist_concentric_volume_last_week, body_part_hist_injury_risk.synergist_concentric_volume_last_week)
-        self.synergist_concentric_volume_this_week = max(self.synergist_concentric_volume_this_week, body_part_hist_injury_risk.synergist_concentric_volume_this_week)
-        self.synergist_eccentric_volume_last_week = max(self.synergist_eccentric_volume_last_week, body_part_hist_injury_risk.synergist_eccentric_volume_last_week)
-        self.synergist_eccentric_volume_this_week = max(self.synergist_eccentric_volume_this_week, body_part_hist_injury_risk.synergist_eccentric_volume_this_week)
-
-    def merge_tiers(self, value_a, value_b):
-
-        if value_a > 0 and value_b > 0:
-            return min(value_a, value_b)
-        elif value_a > 0 and value_b == 0:
-            return value_a
-        elif value_a == 0 and value_b > 0:
-            return value_b
-        else:
-            return 0
-
-    def merge_with_none(self, value_a, value_b):
-
-        if value_a is None and value_b is None:
-            return None
-        if value_a is not None and value_b is None:
-            return value_a
-        if value_b is not None and value_a is None:
-            return value_b
-        if value_a is not None and value_b is not None:
-            return max(value_a, value_b)
-
-    def test_date(self, attribute, base_date):
-
-        if attribute is not None and attribute == base_date:
-            return True
-        else:
-            return False
-
-
-class BodyPartInjuryRisk(object):
-    def __init__(self):
-        # volume
-        self.concentric_volume_last_week = 0
-        self.concentric_volume_this_week = 0
-        self.prime_mover_concentric_volume_last_week = 0
-        self.prime_mover_concentric_volume_this_week = 0
-        self.synergist_concentric_volume_last_week = 0
-        self.synergist_concentric_volume_this_week = 0
-        self.synergist_compensating_concentric_volume_last_week = 0
-        self.synergist_compensating_concentric_volume_this_week = 0
-
-        self.eccentric_volume_last_week = 0
-        self.eccentric_volume_this_week = 0
-        self.prime_mover_eccentric_volume_last_week = 0
-        self.prime_mover_eccentric_volume_this_week = 0
-        self.synergist_eccentric_volume_last_week = 0
-        self.synergist_eccentric_volume_this_week = 0
-        self.synergist_compensating_eccentric_volume_last_week = 0
-        self.synergist_compensating_eccentric_volume_this_week = 0
-
-        self.prime_mover_concentric_volume_today = 0
-        self.prime_mover_eccentric_volume_today = 0
-
-        self.synergist_concentric_volume_today = 0
-        self.synergist_eccentric_volume_today = 0
-        self.synergist_compensating_concentric_volume_today = 0
-        self.synergist_compensating_eccentric_volume_today = 0
-
-        self.total_volume_ramp_today = 0
-        self.eccentric_volume_ramp_today = 0
-
-        # intensity
-        self.concentric_intensity_last_week = 0
-        self.concentric_intensity_this_week = 0
-        self.prime_mover_concentric_intensity_last_week = 0
-        self.prime_mover_concentric_intensity_this_week = 0
-        self.synergist_concentric_intensity_last_week = 0
-        self.synergist_concentric_intensity_this_week = 0
-        self.synergist_compensating_concentric_intensity_last_week = 0
-        self.synergist_compensating_concentric_intensity_this_week = 0
-
-        self.eccentric_intensity_last_week = 0
-        self.eccentric_intensity_this_week = 0
-        self.prime_mover_eccentric_intensity_last_week = 0
-        self.prime_mover_eccentric_intensity_this_week = 0
-        self.synergist_eccentric_intensity_last_week = 0
-        self.synergist_eccentric_intensity_this_week = 0
-        self.synergist_compensating_eccentric_intensity_last_week = 0
-        self.synergist_compensating_eccentric_intensity_this_week = 0
-
-        #self.concentric_intensity_today = 0
-        #self.eccentric_intensity_today = 0
-
-        self.prime_mover_concentric_intensity_today = 0
-        self.prime_mover_eccentric_intensity_today = 0
-        self.prime_mover_total_intensity_today = 0
-
-        self.synergist_concentric_intensity_today = 0
-        self.synergist_eccentric_intensity_today = 0
-        self.synergist_total_intensity_today = 0
-        self.synergist_compensating_concentric_intensity_today = 0
-        self.synergist_compensating_eccentric_intensity_today = 0
-        self.synergist_compensating_total_intensity_today = 0
-        self.total_compensation_percent = 0
-        self.eccentric_compensation_percent = 0
-        self.total_compensation_percent_tier = 0
-        self.eccentric_compensation_percent_tier = 0
-        self.total_volume_percent_tier = 0
-        self.eccentric_volume_percent_tier = 0
-        
-        self.compensating_causes_volume_today = []
-        self.compensating_causes_intensity_today = []
-        self.compensating_source_volume = None
-        self.compensating_source_intensity = None
-
-        self.last_compensation_date = None
-        self.compensation_count_last_0_20_days = 0
-
-        # ache
-        self.ache_count_last_0_10_days = 0
-        # self.ache_count_last_0_10_days = 0 # 0 to 10
-        self.ache_count_last_0_20_days = 0 # 0 to 20
-        self.last_ache_level = 0
-        self.last_ache_date = None
-
-        # excessive strain
-        self.last_excessive_strain_date = None
-        self.last_non_functional_overreaching_date = None
-        self.last_functional_overreaching_date = None
-        
-        # inflammation
-        self.last_inflammation_date = None
-
-        # knots
-        self.knots_count_last_0_20_days = 0
-        self.last_knots_level = 0
-        self.last_knots_date = None
-
-        # muscle spasm
-        self.last_muscle_spasm_date = None
-        self.last_muscle_spasm_trigger_date = None
-        self.last_muscle_spasm_level = 0
-
-        # adhesions
-        self.last_adhesions_date = None
-
-        # inhibited
-        self.last_inhibited_date = None
-
-        # long
-        self.last_long_date = None
-        self.long_count_last_0_20_days = 0
-
-        # overactive / underactive
-        self.last_overactive_short_date = None
-        self.last_overactive_long_date = None
-        self.last_underactive_short_date = None
-        self.last_underactive_long_date = None
-        self.overactive_short_count_last_0_20_days = 0
-        self.overactive_long_count_last_0_20_days = 0
-        self.underactive_short_count_last_0_20_days = 0
-        self.underactive_long_count_last_0_20_days = 0
-
-        # sharp
-        self.sharp_count_last_0_10_days = 0  
-        self.sharp_count_last_0_20_days = 0  # 0-20
-        self.last_sharp_level = 0
-        self.last_sharp_date = None
-
-        # short
-        self.last_short_date = None
-        self.short_count_last_0_20_days = 0
-
-        # tight
-        self.tight_count_last_0_20_days = 0  # 0-20
-        self.last_tight_level = 0
-        self.last_tight_date = None
-
-        # weak
-        self.last_weak_date = None
-        self.weak_count_last_0_20_days = 0
-
-        # muscle_imbalance = None
-        self.last_muscle_imbalance_date = None
-
-        # joints and ligaments
-        self.last_tendinopathy_date = None
-        self.last_tendinosis_date = None
-        self.last_altered_joint_arthokinematics_date = None
-
-        # movement dysfunction
-        self.last_movement_dysfunction_stress_date = None
-        self.last_dysfunction_cause_date = None
-
-        #votes
-        self.overactive_short_vote_count = 0
-        self.overactive_long_vote_count = 0
-        self.underactive_short_vote_count = 0
-        self.underactive_long_vote_count = 0
-        self.weak_vote_count = 0
-        self.last_vote_updated_date_time = None
-        self.limited_mobility_tier = 0
-        self.underactive_weak_tier = 0
-
-    def json_serialise(self):
-        return {
-                #"concentric_volume_last_week": self.concentric_volume_last_week,
-                #"concentric_volume_this_week": self.concentric_volume_this_week,
-                #"prime_mover_concentric_volume_last_week": self.prime_mover_concentric_volume_last_week,
-                #"prime_mover_concentric_volume_this_week": self.prime_mover_concentric_volume_this_week,
-                #"synergist_concentric_volume_last_week": self.synergist_concentric_volume_last_week,
-                #"synergist_concentric_volume_this_week": self.synergist_concentric_volume_this_week,
-                #"synergist_compensating_concentric_volume_last_week": self.synergist_compensating_concentric_volume_last_week,
-                #"synergist_compensating_concentric_volume_this_week": self.synergist_compensating_concentric_volume_this_week,
-                #"eccentric_volume_last_week": self.eccentric_volume_last_week,
-                #"eccentric_volume_this_week": self.eccentric_volume_this_week,
-
-                #"prime_mover_eccentric_volume_last_week": self.prime_mover_eccentric_volume_last_week,
-                #"prime_mover_eccentric_volume_this_week": self.prime_mover_eccentric_volume_this_week,
-                #"synergist_eccentric_volume_last_week": self.synergist_eccentric_volume_last_week,
-                #"synergist_eccentric_volume_this_week": self.synergist_eccentric_volume_this_week,
-                #"synergist_compensating_eccentric_volume_last_week": self.synergist_compensating_eccentric_volume_last_week,
-                #"synergist_compensating_eccentric_volume_this_week": self.synergist_compensating_eccentric_volume_this_week,
-
-                "prime_mover_concentric_volume_today": self.prime_mover_concentric_volume_today,
-
-                "prime_mover_eccentric_volume_today": self.prime_mover_eccentric_volume_today,
-
-                "synergist_concentric_volume_today": self.synergist_concentric_volume_today,
-                "synergist_eccentric_volume_today": self.synergist_eccentric_volume_today,
-                "synergist_compensating_concentric_volume_today": self.synergist_compensating_concentric_volume_today,
-                "synergist_compensating_eccentric_volume_today": self.synergist_compensating_eccentric_volume_today,
-                "total_compensation_percent": self.total_compensation_percent,
-                "eccentric_compensation_percent": self.eccentric_compensation_percent,
-                "total_compensation_percent_tier": self.total_compensation_percent_tier,
-                "eccentric_compensation_percent_tier": self.eccentric_compensation_percent_tier,
-                "total_volume_percent_tier": self.total_volume_percent_tier,
-                "eccentric_volume_percent_tier": self.eccentric_volume_percent_tier,
-
-                "total_volume_ramp_today": self.total_volume_ramp_today,
-                "eccentric_volume_ramp_today": self.eccentric_volume_ramp_today,
-
-                #"concentric_intensity_last_week": self.concentric_intensity_last_week,
-                #"concentric_intensity_this_week": self.concentric_intensity_this_week,
-                #"eccentric_intensity_last_week": self.eccentric_intensity_last_week,
-                #"eccentric_intensity_this_week": self.eccentric_intensity_this_week,
-                #"prime_mover_concentric_intensity_last_week": self.prime_mover_concentric_intensity_last_week,
-                #"prime_mover_concentric_intensity_this_week": self.prime_mover_concentric_intensity_this_week,
-                "prime_mover_concentric_intensity_today": self.prime_mover_concentric_intensity_today,
-                #"prime_mover_eccentric_intensity_last_week": self.prime_mover_eccentric_intensity_last_week,
-                #"prime_mover_eccentric_intensity_this_week": self.prime_mover_eccentric_intensity_this_week,
-                "prime_mover_eccentric_intensity_today": self.prime_mover_eccentric_intensity_today,
-                #"synergist_concentric_intensity_last_week": self.synergist_concentric_intensity_last_week,
-                #"synergist_concentric_intensity_this_week": self.synergist_concentric_intensity_this_week,
-                "synergist_concentric_intensity_today": self.synergist_concentric_intensity_today,
-                #"synergist_eccentric_intensity_last_week": self.synergist_eccentric_intensity_last_week,
-                #"synergist_eccentric_intensity_this_week": self.synergist_eccentric_intensity_this_week,
-                "synergist_eccentric_intensity_today": self.synergist_eccentric_intensity_today,
-                #"synergist_compensating_concentric_intensity_last_week": self.synergist_compensating_concentric_intensity_last_week,
-                #"synergist_compensating_concentric_intensity_this_week": self.synergist_compensating_concentric_intensity_this_week,
-                "synergist_compensating_concentric_intensity_today": self.synergist_compensating_concentric_intensity_today,
-                #"synergist_compensating_eccentric_intensity_last_week": self.synergist_compensating_eccentric_intensity_last_week,
-                #"synergist_compensating_eccentric_intensity_this_week": self.synergist_compensating_eccentric_intensity_this_week,
-                "synergist_compensating_eccentric_intensity_today": self.synergist_compensating_eccentric_intensity_today,
-
-                "compensating_causes_volume_today": [c.json_serialise() for c in self.compensating_causes_volume_today],
-                "compensating_causes_intensity_today": [c.json_serialise() for c in self.compensating_causes_intensity_today],
-                
-                "compensating_source_volume": self.compensating_source_volume.value if self.compensating_source_volume is not None else None,
-                "compensating_source_intensity": self.compensating_source_intensity.value if self.compensating_source_intensity is not None else None,
-                "last_compensation_date": format_date(self.last_compensation_date),
-                "compensation_count_last_0_20_days": self.compensation_count_last_0_20_days,
-                
-                # ache
-                "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
-                # "ache_count_last_0_10_days": self.ache_count_last_0_10_days,
-                "ache_count_last_0_20_days": self.ache_count_last_0_20_days,
-                "last_ache_level": self.last_ache_level,
-                "last_ache_date": format_date(self.last_ache_date),
-
-                # excessive strain
-                "last_excessive_strain_date": format_date(self.last_excessive_strain_date),
-                "last_non_functional_overreaching_date": format_date(self.last_non_functional_overreaching_date),
-                "last_functional_overreaching_date": format_date(self.last_functional_overreaching_date),
-                
-
-                # inflammation
-                "last_inflammation_date": format_date(self.last_inflammation_date),
-
-                # knots
-                "knots_count_last_0_20_days": self.knots_count_last_0_20_days,
-                "last_knots_level": self.last_knots_level,
-                "last_knots_date": format_date(self.last_knots_date),
-
-                # muscle spasm
-                "last_muscle_spasm_date": format_date(self.last_muscle_spasm_date),
-                "last_muscle_spasm_trigger_date": format_date(self.last_muscle_spasm_trigger_date),
-                "last_muscle_spasm_level": self.last_muscle_spasm_level,
-
-                # adhesions
-                "last_adhesions_date": format_date(self.last_adhesions_date),
-
-                # inhibited
-                "last_inhibited_date": format_date(self.last_inhibited_date),
-
-                # long
-                "last_long_date": format_date(self.last_long_date),
-                "long_count_last_0_20_days": self.long_count_last_0_20_days,
-
-                # overactive / underactive
-                "last_overactive_short_date": format_date(self.last_overactive_short_date),
-                "last_underactive_short_date": format_date(self.last_underactive_short_date),
-                "last_overactive_long_date": format_date(self.last_overactive_long_date),
-                "last_underactive_long_date": format_date(self.last_underactive_long_date),
-                'overactive_short_count_last_0_20_days': self.overactive_short_count_last_0_20_days,
-                'overactive_long_count_last_0_20_days': self.overactive_long_count_last_0_20_days,
-                'underactive_long_count_last_0_20_days': self.underactive_long_count_last_0_20_days,
-                'underactive_short_count_last_0_20_days': self.underactive_short_count_last_0_20_days,
-
-
-                # sharp
-                "sharp_count_last_0_10_days": self.sharp_count_last_0_10_days,
-                "sharp_count_last_0_20_days": self.sharp_count_last_0_20_days,
-                "last_sharp_level": self.last_sharp_level,
-                "last_sharp_date": format_date(self.last_sharp_date),
-
-                # short
-                "last_short_date": format_date(self.last_short_date),
-                "short_count_last_0_20_days": self.short_count_last_0_20_days,
-
-                # tight
-                "tight_count_last_0_20_days": self.tight_count_last_0_20_days,
-                "last_tight_level": self.last_tight_level,
-                "last_tight_date": format_date(self.last_tight_date),
-
-                # weak
-                "last_weak_date": format_date(self.last_weak_date),
-                'weak_count_last_0_20_days': self.weak_count_last_0_20_days,
-
-                # muscle imbalance
-                "last_muscle_imbalance_date": format_date(self.last_muscle_imbalance_date),
-
-                # joints and ligaments
-                "last_tendinopathy_date": format_date(self.last_tendinopathy_date),
-                "last_tendinosis_date": format_date(self.last_tendinosis_date),
-                "last_altered_joint_arthokinematics_date": format_date(self.last_altered_joint_arthokinematics_date),
-
-                "last_movement_dysfunction_stress_date": format_date(self.last_movement_dysfunction_stress_date),
-                "last_dysfunction_cause_date": format_date(self.last_dysfunction_cause_date),
-
-                "overactive_short_vote_count": self.overactive_short_vote_count,
-                "overactive_long_vote_count": self.overactive_long_vote_count,
-                "underactive_short_vote_count": self.underactive_short_vote_count,
-                "underactive_long_vote_count": self.underactive_long_vote_count,
-                "weak_vote_count": self.weak_vote_count,
-                "last_vote_updated_date_time": format_datetime(self.last_vote_updated_date_time),
-                "limited_mobility_tier": self.limited_mobility_tier,
-                "underactive_weak_tier": self.underactive_weak_tier,
-
-        }
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        injury_risk = cls()
-        #injury_risk.concentric_volume_last_week = input_dict.get('concentric_volume_last_week', 0)
-        #injury_risk.concentric_volume_this_week = input_dict.get('concentric_volume_this_week', 0)
-        #injury_risk.eccentric_volume_last_week = input_dict.get('eccentric_volume_last_week', 0)
-        #injury_risk.eccentric_volume_this_week = input_dict.get('eccentric_volume_this_week', 0)
-
-        #injury_risk.prime_mover_concentric_volume_last_week = input_dict.get('prime_mover_concentric_volume_last_week', 0)
-        #injury_risk.prime_mover_concentric_volume_this_week = input_dict.get('prime_mover_concentric_volume_this_week', 0)
-        injury_risk.prime_mover_concentric_volume_today = input_dict.get('prime_mover_concentric_volume_today', 0)
-        #injury_risk.prime_mover_eccentric_volume_last_week = input_dict.get('prime_mover_eccentric_volume_last_week', 0)
-        #injury_risk.prime_mover_eccentric_volume_this_week = input_dict.get('prime_mover_eccentric_volume_this_week', 0)
-        injury_risk.prime_mover_eccentric_volume_today = input_dict.get('prime_mover_eccentric_volume_today', 0)
-
-        #injury_risk.synergist_concentric_volume_last_week = input_dict.get('synergist_concentric_volume_last_week', 0)
-        #injury_risk.synergist_concentric_volume_this_week = input_dict.get('synergist_concentric_volume_this_week', 0)
-        injury_risk.synergist_concentric_volume_today = input_dict.get('synergist_concentric_volume_today', 0)
-        #injury_risk.synergist_eccentric_volume_last_week = input_dict.get('synergist_eccentric_volume_last_week', 0)
-        #injury_risk.synergist_eccentric_volume_this_week = input_dict.get('synergist_eccentric_volume_this_week', 0)
-        injury_risk.synergist_eccentric_volume_today = input_dict.get('synergist_eccentric_volume_today', 0)
-        #injury_risk.synergist_compensating_concentric_volume_last_week = input_dict.get('synergist_compensating_concentric_volume_last_week', 0)
-        #injury_risk.synergist_compensating_concentric_volume_this_week = input_dict.get('synergist_compensating_concentric_volume_this_week', 0)
-        injury_risk.synergist_compensating_concentric_volume_today = input_dict.get('synergist_compensating_concentric_volume_today', 0)
-        #injury_risk.synergist_compensating_eccentric_volume_last_week = input_dict.get('synergist_compensating_eccentric_volume_last_week', 0)
-        #injury_risk.synergist_compensating_eccentric_volume_this_week = input_dict.get('synergist_compensating_eccentric_volume_this_week', 0)
-        injury_risk.synergist_compensating_eccentric_volume_today = input_dict.get('synergist_compensating_eccentric_volume_today', 0)
-        injury_risk.total_compensation_percent = input_dict.get('total_compensation_percent', 0)
-        injury_risk.eccentric_compensation_percent = input_dict.get('eccentric_compensation_percent', 0)
-        injury_risk.total_compensation_percent_tier = input_dict.get('total_compensation_percent_tier', 0)
-        injury_risk.eccentric_compensation_percent_tier = input_dict.get('eccentric_compensation_percent_tier', 0)
-        injury_risk.total_volume_percent_tier = input_dict.get('total_volume_percent_tier', 0)
-        injury_risk.eccentric_volume_percent_tier = input_dict.get('eccentric_volume_percent_tier', 0)
-
-        injury_risk.total_volume_ramp_today = input_dict.get('total_volume_ramp_today')
-        injury_risk.eccentric_volume_ramp_today = input_dict.get('eccentric_volume_ramp_today')
-
-        #injury_risk.concentric_intensity_last_week = input_dict.get('concentric_intensity_last_week', 0)
-        #injury_risk.concentric_intensity_this_week = input_dict.get('concentric_intensity_this_week', 0)
-        injury_risk.concentric_intensity_today = input_dict.get('concentric_intensity_today', 0)
-        #injury_risk.eccentric_intensity_last_week = input_dict.get('eccentric_intensity_last_week', 0)
-        #injury_risk.eccentric_intensity_this_week = input_dict.get('eccentric_intensity_this_week', 0)
-        injury_risk.eccentric_intensity_today = input_dict.get('eccentric_intensity_today', 0)
-
-        #injury_risk.prime_mover_concentric_intensity_last_week = input_dict.get('prime_mover_concentric_intensity_last_week', 0)
-        #injury_risk.prime_mover_concentric_intensity_this_week = input_dict.get('prime_mover_concentric_intensity_this_week', 0)
-        injury_risk.prime_mover_concentric_intensity_today = input_dict.get('prime_mover_concentric_intensity_today', 0)
-        #injury_risk.prime_mover_eccentric_intensity_last_week = input_dict.get('prime_mover_eccentric_intensity_last_week', 0)
-        #injury_risk.prime_mover_eccentric_intensity_this_week = input_dict.get('prime_mover_eccentric_intensity_this_week', 0)
-        injury_risk.prime_mover_eccentric_intensity_today = input_dict.get('prime_mover_eccentric_intensity_today', 0)
-
-        #injury_risk.synergist_concentric_intensity_last_week = input_dict.get('synergist_concentric_intensity_last_week', 0)
-        #injury_risk.synergist_concentric_intensity_this_week = input_dict.get('synergist_concentric_intensity_this_week', 0)
-        injury_risk.synergist_concentric_intensity_today = input_dict.get('synergist_concentric_intensity_today', 0)
-        #injury_risk.synergist_eccentric_intensity_last_week = input_dict.get('synergist_eccentric_intensity_last_week', 0)
-        #injury_risk.synergist_eccentric_intensity_this_week = input_dict.get('synergist_eccentric_intensity_this_week', 0)
-        injury_risk.synergist_eccentric_intensity_today = input_dict.get('synergist_eccentric_intensity_today', 0)
-        #injury_risk.synergist_compensating_concentric_intensity_last_week = input_dict.get('synergist_compensating_concentric_intensity_last_week', 0)
-        #injury_risk.synergist_compensating_concentric_intensity_this_week = input_dict.get('synergist_compensating_concentric_intensity_this_week', 0)
-        injury_risk.synergist_compensating_concentric_intensity_today = input_dict.get('synergist_compensating_concentric_intensity_today', 0)
-        #injury_risk.synergist_compensating_eccentric_intensity_last_week = input_dict.get('synergist_compensating_eccentric_intensity_last_week', 0)
-        #injury_risk.synergist_compensating_eccentric_intensity_this_week = input_dict.get('synergist_compensating_eccentric_intensity_this_week', 0)
-        injury_risk.synergist_compensating_eccentric_intensity_today = input_dict.get('synergist_compensating_eccentric_intensity_today', 0)
-
-        injury_risk.compensating_causes_volume_today = [BodyPartSide.json_deserialise(c) for c in
-                                                  input_dict.get('compensating_causes_volume_today', [])]
-        injury_risk.compensating_causes_intensity_today = [BodyPartSide.json_deserialise(c) for c in
-                                                  input_dict.get('compensating_causes_intensity_today', [])]
-
-        injury_risk.last_compensation_date = input_dict.get('last_compensation_date')
-
-        injury_risk.compensating_source_volume = CompensationSource(
-            input_dict['compensating_source_volume']) if input_dict.get(
-            "compensating_source_volume") is not None else None
-        injury_risk.compensating_source_intensity = CompensationSource(
-            input_dict['compensating_source_intensity']) if input_dict.get(
-            "compensating_source_intensity") is not None else None
-
-        injury_risk.compensation_count_last_0_20_days = input_dict.get('compensation_count_last_0_20_days', 0)
-
-        # ache
-        injury_risk.ache_count_last_0_10_days = input_dict.get('ache_count_last_0_10_days', 0)
-        injury_risk.ache_count_last_0_20_days = input_dict.get('ache_count_last_0_20_days', 0)
-        injury_risk.last_ache_level = input_dict.get('last_ache_level', 0)
-        injury_risk.last_ache_date = input_dict.get('last_ache_date')
-
-        # excessive strain
-        injury_risk.last_excessive_strain_date = input_dict.get('last_excessive_strain_date')
-        injury_risk.last_non_functional_overreaching_date = input_dict.get('last_non_functional_overreaching_date')
-        injury_risk.last_functional_overreaching_date = input_dict.get('last_functional_overreaching_date')
-
-        # inflammation
-        injury_risk.last_inflammation_date = input_dict.get('last_inflammation_date')
-
-        # knots
-        injury_risk.knots_count_last_0_20_days = input_dict.get('knots_count_last_0_20_days', 0)
-        injury_risk.last_knots_level = input_dict.get('last_knots_level', 0)
-        injury_risk.last_knots_date = input_dict.get('last_knots_date')
-
-        # muscle spasm
-        injury_risk.last_muscle_spasm_date = input_dict.get('last_muscle_spasm_date')
-        injury_risk.last_muscle_spasm_trigger_date = input_dict.get('last_muscle_spasm_trigger_date')
-        injury_risk.last_muscle_spasm_level = input_dict.get('last_muscle_spasm_level', 0)
-
-        # adhesions
-        injury_risk.last_adhesions_date = input_dict.get('last_adhesions_date')
-
-        # inhibited
-        injury_risk.last_inhibited_date = input_dict.get('last_inhibited_date')
-
-        # long
-        injury_risk.last_long_date = input_dict.get('last_long_date')
-        injury_risk.long_count_last_0_20_days = input_dict.get('long_count_last_0_20_days', 0)
-
-        # overactive / underactive
-        injury_risk.last_overactive_short_date = input_dict.get('last_overactive_short_date')
-        injury_risk.last_underactive_short_date = input_dict.get('last_underactive_short_date')
-        injury_risk.last_overactive_long_date = input_dict.get('last_overactive_long_date')
-        injury_risk.last_underactive_long_date = input_dict.get('last_underactive_long_date')
-        injury_risk.overactive_short_count_last_0_20_days = input_dict.get('overactive_short_count_last_0_20_days',0)
-        injury_risk.overactive_long_count_last_0_20_days = input_dict.get('overactive_long_count_last_0_20_days',0)
-        injury_risk.underactive_short_count_last_0_20_days = input_dict.get('underactive_short_count_last_0_20_days', 0)
-        injury_risk.underactive_long_count_last_0_20_days = input_dict.get('underactive_long_count_last_0_20_days', 0)
-
-        # sharp
-        injury_risk.sharp_count_last_0_10_days = input_dict.get('sharp_count_last_0_10_days', 0)
-        injury_risk.sharp_count_last_0_20_days = input_dict.get('sharp_count_last_0_20_days', 0)
-        injury_risk.last_sharp_level = input_dict.get('last_sharp_level', 0)
-        injury_risk.last_sharp_date = input_dict.get('last_sharp_date')
-
-        # short
-        injury_risk.last_short_date = input_dict.get('last_short_date')
-        injury_risk.short_count_last_0_20_days = input_dict.get('short_count_last_0_20_days', 0)
-
-        # tight
-        injury_risk.tight_count_last_0_20_days = input_dict.get('tight_count_last_0_20_days', 0)
-        injury_risk.last_tight_level = input_dict.get('last_tight_level', 0)
-        injury_risk.last_tight_date = input_dict.get('last_tight_date')
-
-        # weak
-        injury_risk.last_weak_date = input_dict.get('last_weak_date')
-        injury_risk.weak_count_last_0_20_days = input_dict.get('weak_count_last_0_20_days', 0)
-
-        # muscle imbalance
-        injury_risk.last_muscle_imbalance_date = input_dict.get('last_muscle_imbalance_date')
-
-        # joints and ligaments
-        injury_risk.last_tendinopathy_date = input_dict.get('last_tendinopathy_date')
-        injury_risk.last_tendinosis_date = input_dict.get('last_tendinosis_date')
-        injury_risk.last_altered_joint_arthokinematics_date = input_dict.get('last_altered_joint_arthokinematics_date')
-
-        # movement dysfunction
-        injury_risk.last_movement_dysfunction_stress_date = input_dict.get('last_movement_dysfunction_stress_date')
-        injury_risk.last_dysfunction_cause_date = input_dict.get('last_dysfunction_cause_date')
-
-        injury_risk.overactive_short_vote_count = input_dict.get('overactive_short_vote_count',0)
-        injury_risk.overactive_long_vote_count = input_dict.get('overactive_long_vote_count',0)
-        injury_risk.underactive_short_vote_count = input_dict.get('underactive_short_vote_count',0)
-        injury_risk.underactive_long_vote_count = input_dict.get('underactive_long_vote_count',0)
-        injury_risk.weak_vote_count = input_dict.get('weak_vote_count', 0)
-        injury_risk.last_vote_updated_date_time = input_dict.get('last_vote_updated_date_time')
-        injury_risk.limited_mobility_tier = input_dict.get('limited_mobility_tier', 0)
-        injury_risk.underactive_weak_tier = input_dict.get('underactive_weak_tier', 0)
-
-        return injury_risk
-
-    def __setattr__(self, name, value):
-        if 'date_time' in name:
-            if value is not None and not isinstance(value, datetime):
-                value = parse_datetime(value)
-        elif 'date' in name:
-            if value is not None and not isinstance(value, date):
-                value = parse_date(value).date()
-        super().__setattr__(name, value)
-
-    def merge(self, body_part_injury_risk):
-
-        self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_injury_risk.concentric_volume_last_week)
-        self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_injury_risk.concentric_volume_this_week)
-        #self.concentric_volume_today = max(self.concentric_volume_today, body_part_injury_risk.concentric_volume_today)
-        self.eccentric_volume_last_week = max(self.eccentric_volume_last_week, body_part_injury_risk.eccentric_volume_last_week)
-        self.eccentric_volume_this_week = max(self.eccentric_volume_this_week, body_part_injury_risk.eccentric_volume_this_week)
-        #self.eccentric_volume_today = max(self.eccentric_volume_today, body_part_injury_risk.eccentric_volume_today)
-
-        self.prime_mover_concentric_volume_last_week = max(self.prime_mover_concentric_volume_last_week, body_part_injury_risk.prime_mover_concentric_volume_last_week)
-        self.prime_mover_concentric_volume_this_week = max(self.prime_mover_concentric_volume_this_week, body_part_injury_risk.prime_mover_concentric_volume_this_week)
-        self.prime_mover_concentric_volume_today = max(self.prime_mover_concentric_volume_today, body_part_injury_risk.prime_mover_concentric_volume_today)
-        self.prime_mover_eccentric_volume_last_week = max(self.prime_mover_eccentric_volume_last_week, body_part_injury_risk.prime_mover_eccentric_volume_last_week)
-        self.prime_mover_eccentric_volume_this_week = max(self.prime_mover_eccentric_volume_this_week, body_part_injury_risk.prime_mover_eccentric_volume_this_week)
-        self.prime_mover_eccentric_volume_today = max(self.prime_mover_eccentric_volume_today, body_part_injury_risk.prime_mover_eccentric_volume_today)
-
-        self.synergist_concentric_volume_last_week = max(self.synergist_concentric_volume_last_week, body_part_injury_risk.synergist_concentric_volume_last_week)
-        self.synergist_concentric_volume_this_week = max(self.synergist_concentric_volume_this_week, body_part_injury_risk.synergist_concentric_volume_this_week)
-        self.synergist_concentric_volume_today = max(self.synergist_concentric_volume_today, body_part_injury_risk.synergist_concentric_volume_today)
-        self.synergist_eccentric_volume_last_week = max(self.synergist_eccentric_volume_last_week, body_part_injury_risk.synergist_eccentric_volume_last_week)
-        self.synergist_eccentric_volume_this_week = max(self.synergist_eccentric_volume_this_week, body_part_injury_risk.synergist_eccentric_volume_this_week)
-        self.synergist_eccentric_volume_today = max(self.synergist_eccentric_volume_today, body_part_injury_risk.synergist_eccentric_volume_today)
-
-        # ache
-        self.ache_count_last_0_10_days = max(self.ache_count_last_0_10_days, body_part_injury_risk.ache_count_last_0_10_days)
-        self.ache_count_last_0_10_days = max(self.ache_count_last_0_10_days, body_part_injury_risk.ache_count_last_0_10_days)
-        self.ache_count_last_0_20_days = max(self.ache_count_last_0_20_days, body_part_injury_risk.ache_count_last_0_20_days)
-        self.last_ache_level = max(self.last_ache_level, body_part_injury_risk.last_ache_level)
-        self.last_ache_date = self.merge_with_none(self.last_ache_date, body_part_injury_risk.last_ache_date)
-
-        # excessive strain
-        self.last_excessive_strain_date = self.merge_with_none(self.last_excessive_strain_date, body_part_injury_risk.last_excessive_strain_date)
-        self.last_non_functional_overreaching_date = self.merge_with_none(self.last_non_functional_overreaching_date, body_part_injury_risk.last_non_functional_overreaching_date)
-        self.last_functional_overreaching_date = self.merge_with_none(self.last_functional_overreaching_date, body_part_injury_risk.last_functional_overreaching_date)
-        self.last_compensation_date = self.merge_with_none(self.last_compensation_date, body_part_injury_risk.last_compensation_date)
-
-        # inflammation
-        self.last_inflammation_date = self.merge_with_none(self.last_inflammation_date, body_part_injury_risk.last_inflammation_date)
-
-        # knots
-        self.last_knots_level = max(self.last_knots_level, body_part_injury_risk.last_knots_level)
-        self.last_knots_date = self.merge_with_none(self.last_knots_date, body_part_injury_risk.last_knots_date)
-
-        # muscle spasm
-        self.last_muscle_spasm_date = self.merge_with_none(self.last_muscle_spasm_date, body_part_injury_risk.last_muscle_spasm_date)
-        self.last_muscle_spasm_trigger_date = self.merge_with_none(self.last_muscle_spasm_trigger_date,
-                                                           body_part_injury_risk.last_muscle_spasm_trigger_date)
-        self.last_muscle_spasm_level = max(self.last_muscle_spasm_level, body_part_injury_risk.last_muscle_spasm_level)
-
-        # adhesions
-        self.last_adhesions_date = self.merge_with_none(self.last_adhesions_date, body_part_injury_risk.last_adhesions_date)
-
-        # inhibited
-        self.last_inhibited_date = self.merge_with_none(self.last_inhibited_date, body_part_injury_risk.last_inhibited_date)
-
-        # long
-        self.last_long_date = self.merge_with_none(self.last_long_date, body_part_injury_risk.last_long_date)
-        self.long_count_last_0_20_days = max(self.long_count_last_0_20_days, body_part_injury_risk.long_count_last_0_20_days)
-
-        # overactive / underactive
-        self.last_overactive_short_date = self.merge_with_none(self.last_overactive_short_date, body_part_injury_risk.last_overactive_short_date)
-        self.last_underactive_short_date = self.merge_with_none(self.last_underactive_short_date, body_part_injury_risk.last_underactive_short_date)
-        self.last_overactive_long_date = self.merge_with_none(self.last_overactive_long_date,
-                                                               body_part_injury_risk.last_overactive_long_date)
-        self.last_underactive_long_date = self.merge_with_none(self.last_underactive_long_date,
-                                                                body_part_injury_risk.last_underactive_long_date)
-
-        self.overactive_short_count_last_0_20_days = max(self.overactive_short_count_last_0_20_days, body_part_injury_risk.overactive_short_count_last_0_20_days)
-        self.underactive_short_count_last_0_20_days = max(self.underactive_short_count_last_0_20_days,
-                                                          body_part_injury_risk.underactive_short_count_last_0_20_days)
-        self.overactive_long_count_last_0_20_days = max(self.overactive_long_count_last_0_20_days, body_part_injury_risk.overactive_long_count_last_0_20_days)
-        self.underactive_long_count_last_0_20_days = max(self.underactive_long_count_last_0_20_days,
-                                                          body_part_injury_risk.underactive_long_count_last_0_20_days)
-
-        # sharp
-        self.sharp_count_last_0_10_days = max(self.sharp_count_last_0_10_days, body_part_injury_risk.sharp_count_last_0_10_days)
-        self.sharp_count_last_0_20_days = max(self.sharp_count_last_0_20_days, body_part_injury_risk.sharp_count_last_0_20_days)
-        self.last_sharp_level = max(self.last_sharp_level, body_part_injury_risk.last_sharp_level)
-        self.last_sharp_date = self.merge_with_none(self.last_sharp_date, body_part_injury_risk.last_sharp_date)
-
-        # short
-        self.last_short_date = self.merge_with_none(self.last_short_date, body_part_injury_risk.last_short_date)
-
-        # tight
-        self.tight_count_last_0_20_days = max(self.tight_count_last_0_20_days, body_part_injury_risk.tight_count_last_0_20_days)
-        self.last_tight_level = max(self.last_tight_level, body_part_injury_risk.last_tight_level)
-        self.last_tight_date = self.merge_with_none(self.last_tight_date, body_part_injury_risk.last_tight_date)
-
-        # weak
-        self.last_weak_date = self.merge_with_none(self.last_weak_date, body_part_injury_risk.last_weak_date)
-
-        self.weak_count_last_0_20_days = max(self.weak_count_last_0_20_days,
-                                                         body_part_injury_risk.weak_count_last_0_20_days)
-
-        # joints and ligaments
-        self.last_tendinopathy_date = self.merge_with_none(
-            self.last_tendinopathy_date, body_part_injury_risk.last_tendinopathy_date)
-        self.last_tendinosis_date = self.merge_with_none(
-            self.last_tendinosis_date, body_part_injury_risk.last_tendinosis_date)
-        self.last_altered_joint_arthokinematics_date = self.merge_with_none(
-            self.last_altered_joint_arthokinematics_date,
-            body_part_injury_risk.last_altered_joint_arthokinematics_date)
-
-        # update calcuations after new values are set
-        self.total_compensation_percent = self.percent_total_compensation()
-        self.eccentric_compensation_percent = self.percent_eccentric_compensation()
-        self.total_volume_ramp_today = self.total_volume_ramp()
-        self.eccentric_volume_ramp_today = self.eccentric_volume_ramp()
-
-        self.eccentric_volume_percent_tier = self.merge_tiers(self.eccentric_volume_percent_tier,
-                                                              body_part_injury_risk.eccentric_volume_percent_tier)
-        self.eccentric_compensation_percent_tier = self.merge_tiers(self.eccentric_compensation_percent_tier,
-                                                                    body_part_injury_risk.eccentric_compensation_percent_tier)
-        self.total_compensation_percent_tier = self.merge_tiers(self.total_compensation_percent_tier,
-                                                                body_part_injury_risk.total_compensation_percent_tier)
-        self.total_volume_percent_tier = self.merge_tiers(self.total_volume_percent_tier,
-                                                   body_part_injury_risk.total_volume_percent_tier)
-
-        self.last_movement_dysfunction_stress_date = self.merge_with_none(self.last_movement_dysfunction_stress_date,
-                                                                          body_part_injury_risk.last_movement_dysfunction_stress_date)
-        self.last_dysfunction_cause_date = self.merge_with_none(self.last_dysfunction_cause_date,
-                                                                body_part_injury_risk.last_dysfunction_cause_date)
-
-        self.overactive_short_vote_count = max(self.overactive_short_vote_count, body_part_injury_risk.overactive_short_vote_count)
-        self.overactive_long_vote_count = max(self.overactive_long_vote_count,
-                                               body_part_injury_risk.overactive_long_vote_count)
-        self.underactive_short_vote_count = max(self.underactive_short_vote_count,
-                                               body_part_injury_risk.underactive_short_vote_count)
-        self.underactive_long_vote_count = max(self.underactive_long_vote_count,
-                                               body_part_injury_risk.overactive_short_vote_count)
-
-        self.weak_vote_count = max(self.weak_vote_count, body_part_injury_risk.weak_vote_count)
-
-        self.last_vote_updated_date_time = self.merge_with_none(self.last_vote_updated_date_time,
-                                                                body_part_injury_risk.last_vote_updated_date_time)
-        self.limited_mobility_tier = self.merge_tiers(self.limited_mobility_tier, body_part_injury_risk.limited_mobility_tier)
-        self.underactive_weak_tier = self.merge_tiers(self.underactive_weak_tier,
-                                                      body_part_injury_risk.underactive_weak_tier)
-
-    def merge_tiers(self, value_a, value_b):
-
-        if value_a > 0 and value_b > 0:
-            return min(value_a, value_b)
-        elif value_a > 0 and value_b == 0:
-            return value_a
-        elif value_a == 0 and value_b > 0:
-            return value_b
-        else:
-            return 0
-
-    def merge_with_none(self, value_a, value_b):
-
-        if value_a is None and value_b is None:
-            return None
-        if value_a is not None and value_b is None:
-            return value_a
-        if value_b is not None and value_a is None:
-            return value_b
-        if value_a is not None and value_b is not None:
-            return max(value_a, value_b)
-
-    def test_date(self, attribute, base_date):
-
-        if attribute is not None and attribute == base_date:
-            return True
-        else:
-            return False
-
-    def get_percentage(self, count_attribute):
-
-        attribute_list = ["overactive_short_vote_count", "overactive_long_vote_count", "underactive_short_vote_count", "underactive_long_vote_count"]
-
-        total_count = 0
-
-        for a in attribute_list:
-            total_count += getattr(self, a)
-
-        if total_count == 0:
-            return 0.0
-
-        percent = (getattr(self, count_attribute) / total_count) * 100
-
-        return percent
-
-    def is_highest_count(self, count_attribute):
-
-        attribute_list = ["overactive_short_vote_count", "overactive_long_vote_count", "underactive_short_vote_count",
-                          "underactive_long_vote_count"]
-
-        new_attribute_list = [a for a in attribute_list if a != count_attribute]
-
-        if getattr(self, count_attribute) == 0:
-            return False
-
-        for n in new_attribute_list:
-            if getattr(self, count_attribute) < getattr(self, n):
-                return False
-
-        return True
-
-    def get_inflammation_severity(self, base_date):
-
-        max_severity = 0
-
-        if self.test_date(self.last_sharp_date, base_date):
-            max_severity = max(max_severity, self.last_sharp_level)
-        if self.test_date(self.last_ache_date, base_date):
-            max_severity = max(max_severity, self.last_ache_level)
-
-        return max_severity
-
-    def get_knots_severity(self, base_date):
-
-        max_severity = 0
-
-        if self.test_date(self.last_knots_date, base_date):
-            max_severity = max(max_severity, self.last_knots_level)
-
-        return max_severity
-
-    def get_muscle_spasm_severity(self, base_date):
-
-        max_severity = 0
-
-        if self.test_date(self.last_tight_date, base_date):
-            max_severity = max(max_severity, self.last_tight_level)
-        if self.test_date(self.last_sharp_date, base_date):
-            max_severity = max(max_severity, self.last_sharp_level)
-        if self.test_date(self.last_ache_date, base_date):
-            max_severity = max(max_severity, self.last_ache_level)
-        if self.test_date(self.last_muscle_spasm_date, base_date):
-            max_severity = max(max_severity, self.last_muscle_spasm_level)
-        if self.test_date(self.last_muscle_spasm_trigger_date, base_date):
-            max_severity = max(max_severity, self.last_muscle_spasm_level)
-
-        return max_severity
-
-    def get_adhesions_severity(self, base_date):
-
-        max_severity = 0
-
-        if self.test_date(self.last_tight_date, base_date):
-            max_severity = max(max_severity, self.last_tight_level)
-        if self.test_date(self.last_sharp_date, base_date):
-            max_severity = max(max_severity, self.last_sharp_level)
-        if self.test_date(self.last_ache_date, base_date):
-            max_severity = max(max_severity, self.last_ache_level)
-        if self.test_date(self.last_knots_date, base_date):
-            max_severity = max(max_severity, self.last_knots_level)
-
-        return max_severity
-
-    def eccentric_volume_ramp(self):
-
-        this_weeks_volume = 0
-        if self.eccentric_volume_this_week is not None:
-            this_weeks_volume += self.eccentric_volume_this_week
-        this_weeks_volume += self.eccentric_volume_today()
-
-        if self.eccentric_volume_last_week is not None and self.eccentric_volume_last_week > 0:
-            if this_weeks_volume is not None:
-                return this_weeks_volume / self.eccentric_volume_last_week
-
-        return 0
-
-    def percent_eccentric_compensation(self):
-
-        percentage = 0
-
-        eccentric_volume_today = self.eccentric_volume_today()
-
-        if eccentric_volume_today > 0:
-            percentage = (self.synergist_compensating_eccentric_volume_today / float(eccentric_volume_today)) * 100
-
-        return percentage
-
-    def percent_total_compensation(self):
-
-        percentage = 0
-
-        total_volume_today = self.total_volume_today()
-
-        if total_volume_today > 0:
-            compensating_volume_today = self.synergist_compensating_eccentric_volume_today + self.synergist_compensating_concentric_volume_today
-            percentage = (compensating_volume_today / float(total_volume_today)) * 100
-
-        return percentage
-
-    def eccentric_volume_today(self):
-
-        eccentric_volume = 0
-
-        if self.prime_mover_eccentric_volume_today is not None:
-            eccentric_volume += self.prime_mover_eccentric_volume_today
-
-        if self.synergist_eccentric_volume_today is not None:
-            eccentric_volume += self.synergist_eccentric_volume_today
-
-        if self.synergist_compensating_eccentric_volume_today is not None:
-            eccentric_volume += self.synergist_compensating_eccentric_volume_today
-
-        return eccentric_volume
-
-    def concentric_volume_today(self):
-
-        concentric_volume = 0
-
-        if self.prime_mover_concentric_volume_today is not None:
-            concentric_volume += self.prime_mover_concentric_volume_today
-
-        if self.synergist_concentric_volume_today is not None:
-            concentric_volume += self.synergist_concentric_volume_today
-
-        if self.synergist_compensating_concentric_volume_today is not None:
-            concentric_volume += self.synergist_compensating_concentric_volume_today
-
-        return concentric_volume
-
-    def compensating_volume_today(self):
-
-        volume = 0
-
-        if self.synergist_compensating_eccentric_volume_today is not None:
-            volume += self.synergist_compensating_eccentric_volume_today
-
-        if self.synergist_compensating_concentric_volume_today is not None:
-            volume += self.synergist_compensating_concentric_volume_today
-
-        return volume
-
-    def total_volume_today(self):
-
-        concentric_volume = self.concentric_volume_today()
-        eccentric_volume = self.eccentric_volume_today()
-
-        return concentric_volume + eccentric_volume
-
-    def prime_mover_total_volume_today(self):
-
-        concentric_volume = self.prime_mover_concentric_volume_today
-        eccentric_volume = self.prime_mover_eccentric_volume_today
-
-        return concentric_volume + eccentric_volume
-
-    def synergist_total_volume_today(self):
-
-        concentric_volume = self.synergist_concentric_volume_today
-        eccentric_volume = self.synergist_eccentric_volume_today
-
-        return concentric_volume + eccentric_volume + self.synergist_compensating_eccentric_volume_today + self.synergist_compensating_concentric_volume_today
-
-    def prime_mover_eccentric_volume_ramp(self):
-
-        this_weeks_volume = 0
-        if self.prime_mover_eccentric_volume_this_week is not None:
-            this_weeks_volume += self.prime_mover_eccentric_volume_this_week
-        if self.prime_mover_eccentric_volume_today is not None:
-            this_weeks_volume += self.prime_mover_eccentric_volume_today
-
-        if self.prime_mover_eccentric_volume_last_week is not None and self.prime_mover_eccentric_volume_last_week > 0:
-            if this_weeks_volume is not None:
-                return this_weeks_volume / self.prime_mover_eccentric_volume_last_week
-
-        return 0
-
-    def synegist_eccentric_volume_ramp(self):
-
-        this_weeks_volume = 0
-        if self.synergist_eccentric_volume_this_week is not None:
-            this_weeks_volume += self.synergist_eccentric_volume_this_week
-        if self.synergist_eccentric_volume_today is not None:
-            this_weeks_volume += self.synergist_eccentric_volume_today
-
-        if self.synergist_eccentric_volume_last_week is not None and self.synergist_eccentric_volume_last_week > 0:
-            if this_weeks_volume is not None:
-                return this_weeks_volume / self.synergist_eccentric_volume_last_week
-
-        return 0
-
-    def total_volume_last_week(self):
-
-        eccentric_volume_last_week = 0
-        concentric_volume_last_week = 0
-
-        if self.eccentric_volume_last_week is not None:
-            eccentric_volume_last_week = self.eccentric_volume_last_week
-
-        if self.concentric_volume_last_week is not None:
-            concentric_volume_last_week = self.concentric_volume_last_week
-
-        return eccentric_volume_last_week + concentric_volume_last_week
-
-    def prime_mover_total_volume_last_week(self):
-
-        eccentric_volume_last_week = 0
-        concentric_volume_last_week = 0
-
-        if self.prime_mover_eccentric_volume_last_week is not None:
-            eccentric_volume_last_week = self.prime_mover_eccentric_volume_last_week
-
-        if self.prime_mover_concentric_volume_last_week is not None:
-            concentric_volume_last_week = self.prime_mover_concentric_volume_last_week
-
-        return eccentric_volume_last_week + concentric_volume_last_week
-
-    def synergist_total_volume_last_week(self):
-
-        eccentric_volume_last_week = 0
-        concentric_volume_last_week = 0
-
-        if self.synergist_eccentric_volume_last_week is not None:
-            eccentric_volume_last_week = self.synergist_eccentric_volume_last_week
-
-        if self.synergist_concentric_volume_last_week is not None:
-            concentric_volume_last_week = self.synergist_concentric_volume_last_week
-
-        return eccentric_volume_last_week + concentric_volume_last_week
-
-    def total_volume_this_week(self):
-
-        eccentric_volume_this_week = 0
-        concentric_volume_this_week = 0
-
-        if self.eccentric_volume_this_week is not None:
-            eccentric_volume_this_week += self.eccentric_volume_this_week
-
-        if self.concentric_volume_this_week is not None:
-            concentric_volume_this_week += self.concentric_volume_this_week
-
-        return concentric_volume_this_week + eccentric_volume_this_week
-
-    def prime_mover_total_volume_this_week(self):
-
-        eccentric_volume_this_week = 0
-        concentric_volume_this_week = 0
-
-        if self.prime_mover_eccentric_volume_this_week is not None:
-            eccentric_volume_this_week += self.prime_mover_eccentric_volume_this_week
-
-        if self.prime_mover_concentric_volume_this_week is not None:
-            concentric_volume_this_week += self.prime_mover_concentric_volume_this_week
-
-        # if self.prime_mover_eccentric_volume_today is not None:
-        #     eccentric_volume_this_week += self.prime_mover_eccentric_volume_today
-        #
-        # if self.prime_mover_concentric_volume_today is not None:
-        #     concentric_volume_this_week += self.prime_mover_concentric_volume_today
-
-        return concentric_volume_this_week + eccentric_volume_this_week
-
-    def synergist_total_volume_this_week(self):
-
-        eccentric_volume_this_week = 0
-        concentric_volume_this_week = 0
-
-        if self.synergist_eccentric_volume_this_week is not None:
-            eccentric_volume_this_week += self.synergist_eccentric_volume_this_week
-
-        if self.synergist_concentric_volume_this_week is not None:
-            concentric_volume_this_week += self.synergist_concentric_volume_this_week
-
-        # if self.synergist_eccentric_volume_today is not None:
-        #     eccentric_volume_this_week += self.synergist_eccentric_volume_today + self.synergist_compensating_eccentric_volume_today
-        #
-        # if self.synergist_concentric_volume_today is not None:
-        #     concentric_volume_this_week += self.synergist_concentric_volume_today + self.synergist_compensating_concentric_volume_today
-
-        return concentric_volume_this_week + eccentric_volume_this_week
-
-    def total_volume_ramp(self):
-
-        total_volume_last_week = self.total_volume_last_week()
-
-        if total_volume_last_week > 0:
-            return (self.total_volume_this_week() + self.total_volume_today()) / total_volume_last_week
-
-        return 0
-
-    def prime_mover_total_volume_ramp(self):
-
-        total_volume_last_week = self.prime_mover_total_volume_last_week()
-
-        if total_volume_last_week > 0:
-            return self.prime_mover_total_volume_this_week() + self.prime_mover_total_volume_today() / total_volume_last_week
-
-        return 0
-
-    def synergist_total_volume_ramp(self):
-
-        total_volume_last_week = self.synergist_total_volume_last_week()
-
-        if total_volume_last_week > 0:
-            return self.synergist_total_volume_this_week() + self.synergist_total_volume_today() / total_volume_last_week
-
-        return 0
 
 
 class BodyPartFunctionalMovement(object):
@@ -1358,265 +148,74 @@ class SessionFunctionalMovement(object):
         self.session = session
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
-
-    # def process_anc_and_muscle_imbalance(self, event_date):
-    #
-    #     if self.session.movement_patterns is not None and self.session.movement_patterns.apt_ankle_pitch is not None:
-    #
-    #         # Left
-    #         self.process_apt_ankle_side(event_date, 1)
-    #
-    #         # Right
-    #         self.process_apt_ankle_side(event_date, 2)
-    #
-    # def process_apt_ankle_side(self, event_date, side):
-    #
-    #     movement_factory = FunctionalMovementFactory()
-    #     if self.session.movement_patterns is not None and self.session.movement_patterns.apt_ankle_pitch is not None:
-    #         apt_ankle = self.session.movement_patterns.apt_ankle_pitch
-    #
-    #         if side == 1:
-    #             if apt_ankle.left is not None:
-    #                 key_elasticity_value = apt_ankle.left.elasticity
-    #                 key_adf_value = apt_ankle.left.y_adf
-    #             else:
-    #                 key_elasticity_value = 0.0
-    #                 key_adf_value = 0.0
-    #         else:
-    #             if apt_ankle.right is not None:
-    #                 key_elasticity_value = apt_ankle.right.elasticity
-    #                 key_adf_value = apt_ankle.right.y_adf
-    #             else:
-    #                 key_elasticity_value = 0.0
-    #                 key_adf_value = 0.0
-    #
-    #         if key_elasticity_value != 0:
-    #             pelvic_tilt_movement = movement_factory.get_functional_movement(FunctionalMovementType.pelvic_anterior_tilt)
-    #             # are any muscles associated with Pelvic Anterior Tilt considered to be short with adhesions or muscle spasm?
-    #             any_short_confirmed = False
-    #             body_part_factory = BodyPartFactory()
-    #
-    #             # presence of elasticity indicates overactivity
-    #             for p in pelvic_tilt_movement.prime_movers:
-    #                 bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
-    #                 if bilateral:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), side)
-    #                 else:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
-    #                 if body_part_side in self.injury_risk_dict:
-    #                     if (self.injury_risk_dict[body_part_side].last_overactive_date is not None and
-    #                             self.injury_risk_dict[body_part_side].last_overactive_date < event_date):
-    #                         self.injury_risk_dict[body_part_side].last_overactive_date = event_date
-    #                         self.injury_risk_dict[body_part_side].overactive_count_last_0_20_days += 1
-    #                         self.session.overactive_body_parts.append(body_part_side)
-    #                 else:
-    #                     body_part_injury_risk = BodyPartInjuryRisk()
-    #                     body_part_injury_risk.last_overactive_short_date = event_date
-    #                     body_part_injury_risk.overactive_count_last_0_20_days += 1
-    #                     self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                     self.session.overactive_body_parts.append(body_part_side)
-    #                 self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #
-    #             for p in pelvic_tilt_movement.prime_movers:
-    #                 bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
-    #                 if bilateral:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), side)
-    #                 else:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
-    #                 if body_part_side in self.injury_risk_dict:
-    #                     if self.injury_risk_dict[body_part_side].last_adhesions_date is not None and \
-    #                             self.injury_risk_dict[body_part_side].last_adhesions_date == event_date:
-    #                         any_short_confirmed = True
-    #                     #
-    #                     # if self.injury_risk_dict[body_part_side].last_muscle_spasm_date is not None and \
-    #                     #         self.injury_risk_dict[body_part_side].last_muscle_spasm_date == event_date:
-    #                     #     any_short_confirmed = True
-    #
-    #             if any_short_confirmed:  # mark all muscle imbalance and short
-    #                 for p in pelvic_tilt_movement.prime_movers:
-    #                     bilateral = body_part_factory.get_bilateral(BodyPartLocation(p))
-    #                     if bilateral:
-    #                         body_part_side = BodyPartSide(BodyPartLocation(p), side)
-    #                     else:
-    #                         body_part_side = BodyPartSide(BodyPartLocation(p), 0)
-    #                     if body_part_side in self.injury_risk_dict:
-    #                         self.injury_risk_dict[body_part_side].last_short_date = event_date
-    #                         self.injury_risk_dict[body_part_side].last_muscle_imbalance_date = event_date
-    #                     else:
-    #                         body_part_injury_risk = BodyPartInjuryRisk()
-    #                         body_part_injury_risk.last_short_date = event_date
-    #                         body_part_injury_risk.last_muscle_imbalance_date = event_date
-    #                         self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                     self.injury_risk_dict[body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #                     self.session.short_body_parts.append(body_part_side)
-    #
-    #                 self.mark_hip_extension_compensating(side)
-    #
-    #             # checking for underactive inhibited or weak
-    #             # check for evidence of short else assume and mark long (by muscle)
-    #             # adhesions reported or (63, 64, 66, 73, 74, 21) is short muscle imbalance
-    #             if key_adf_value != 0:
-    #                 for b in [63, 64, 66, 73, 74]:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(b), side)
-    #                     if body_part_side in self.injury_risk_dict:
-    #                         if (self.injury_risk_dict[body_part_side].last_underactive_date is not None and
-    #                                 self.injury_risk_dict[body_part_side].last_underactive_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-    #                             self.injury_risk_dict[body_part_side].underactive_weak_count_last_0_20_days += 1
-    #                         if (self.injury_risk_dict[body_part_side].last_weak_date is not None and
-    #                              self.injury_risk_dict[body_part_side].last_weak_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_weak_date = event_date
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(self.injury_risk_dict[body_part_side], event_date)
-    #
-    #                         if not is_short:
-    #                             self.injury_risk_dict[body_part_side].last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.session.underactive_weak_body_parts.append(body_part_side)
-    #                     else:
-    #                         body_part_injury_risk = BodyPartInjuryRisk()
-    #                         body_part_injury_risk.last_underactive_short_date = event_date
-    #                         body_part_injury_risk.last_weak_date = event_date
-    #                         body_part_injury_risk.underactive_weak_count_last_0_20_days += 1
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(body_part_injury_risk, event_date)
-    #
-    #                         if not is_short:
-    #                             body_part_injury_risk.last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                         self.session.underactive_weak_body_parts.append(body_part_side)
-    #                     self.injury_risk_dict[
-    #                         body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #
-    #                 self.mark_hip_extension_compensating(side)
-    #             else:
-    #                 for b in [63, 64, 66, 73, 74]:
-    #                     body_part_side = BodyPartSide(BodyPartLocation(b), side)
-    #                     if body_part_side in self.injury_risk_dict:
-    #                         if (self.injury_risk_dict[body_part_side].last_underactive_date is not None and
-    #                                 self.injury_risk_dict[body_part_side].last_underactive_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_underactive_date = event_date
-    #                             self.injury_risk_dict[body_part_side].underactive_inhibited_count_last_0_20_days += 1
-    #                         if (self.injury_risk_dict[body_part_side].last_inhibited_date and
-    #                                 self.injury_risk_dict[body_part_side].last_inhibited_date < event_date):
-    #                             self.injury_risk_dict[body_part_side].last_inhibited_date = event_date
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(
-    #                             self.injury_risk_dict[body_part_side], event_date)
-    #
-    #                         if not is_short:
-    #                             self.injury_risk_dict[body_part_side].last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.session.underactive_inhibited_body_parts.append(body_part_side)
-    #                     else:
-    #                         body_part_injury_risk = BodyPartInjuryRisk()
-    #                         body_part_injury_risk.last_underactive_short_date = event_date
-    #                         body_part_injury_risk.last_inhibited_date = event_date
-    #                         body_part_injury_risk.underactive_short_count_last_0_20_days += 1
-    #
-    #                         is_short = self.is_short_from_adhesions_or_muscle_imbalance(body_part_injury_risk,
-    #                                                                                     event_date)
-    #
-    #                         if not is_short:
-    #                             body_part_injury_risk.last_long_date = event_date
-    #                             self.session.long_body_parts.append(body_part_side)
-    #
-    #                         self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #                         self.session.underactive_inhibited_body_parts.append(body_part_side)
-    #                     self.injury_risk_dict[
-    #                         body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #
-    #                 self.mark_hip_extension_compensating(side)
-
-    # def is_short_from_adhesions_or_muscle_imbalance(self, body_part_injury_risk, event_date):
-    #
-    #     is_short = False
-    #     if body_part_injury_risk.last_adhesions_date is not None and body_part_injury_risk.last_adhesions_date == event_date:
-    #         is_short = True
-    #     if body_part_injury_risk.last_short_date is not None and body_part_injury_risk.last_short_date == event_date:
-    #         is_short = True
-    #
-    #     return is_short
-    #
-    # def mark_hip_extension_compensating(self, side):
-    #
-    #     movement_factory = FunctionalMovementFactory()
-    #
-    #     hip_extension = movement_factory.get_functional_movement(
-    #         FunctionalMovementType.hip_extension)
-    #     body_part_factory = BodyPartFactory()
-    #     for m in hip_extension.prime_movers:
-    #         bilateral = body_part_factory.get_bilateral(BodyPartLocation(m))
-    #         if bilateral:
-    #             body_part_side = BodyPartSide(BodyPartLocation(m), side)
-    #         else:
-    #             body_part_side = BodyPartSide(BodyPartLocation(m), 0)
-    #         if body_part_side in self.injury_risk_dict:
-    #             self.injury_risk_dict[body_part_side].is_compensationg = True
-    #         else:
-    #             body_part_injury_risk = BodyPartInjuryRisk()
-    #             body_part_injury_risk.is_compensationg = True
-    #             self.injury_risk_dict[body_part_side] = body_part_injury_risk
-    #         self.injury_risk_dict[
-    #             body_part_side].compensation_source = CompensationSource.movement_patterns_3s
-    #         self.session.compensating_body_parts.append(body_part_side)
+        self.session_load_dict = {}
 
     def process(self, event_date, load_stats):
         activity_factory = ActivityFunctionalMovementFactory()
         movement_factory = FunctionalMovementFactory()
 
-        #self.process_anc_and_muscle_imbalance(event_date)
+        if self.session.session_type() == SessionType.mixed_activity:
 
-        self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
+            total_load_dict = self.process_workout_load(self.session.workout_program_module)
+            normalized_dict = self.normalize_and_consolidate_load(total_load_dict)
+            self.session_load_dict = normalized_dict
 
-        for m in self.functional_movement_mappings:
-            functional_movement = movement_factory.get_functional_movement(m.functional_movement_type)
-            for p in functional_movement.prime_movers:
-                body_part_side_list = self.get_body_part_side_list(p)
-                for b in body_part_side_list:
-                    functional_movement_body_part_side = BodyPartFunctionalMovement(b)
-                    m.prime_movers.append(functional_movement_body_part_side)
+        else:
 
-            for a in functional_movement.synergists:
-                body_part_side_list = self.get_body_part_side_list(a)
-                for b in body_part_side_list:
-                    functional_movement_body_part_side = BodyPartFunctionalMovement(b)
-                    m.synergists.append(functional_movement_body_part_side)
+            self.functional_movement_mappings = activity_factory.get_functional_movement_mappings(self.session.sport_name)
 
-            for a in functional_movement.parts_receiving_compensation:
-                body_part_side_list = self.get_body_part_side_list(a)
-                for b in body_part_side_list:
-                    functional_movement_body_part_side = BodyPartFunctionalMovement(b)
-                    m.parts_receiving_compensation.append(functional_movement_body_part_side)
+            for m in self.functional_movement_mappings:
+                functional_movement = movement_factory.get_functional_movement(m.functional_movement_type)
+                for p in functional_movement.prime_movers:
+                    body_part_side_list = self.get_body_part_side_list(p)
+                    for b in body_part_side_list:
+                        functional_movement_body_part_side = BodyPartFunctionalMovement(b)
+                        m.prime_movers.append(functional_movement_body_part_side)
 
-            m.attribute_training_volume(self.session.training_volume(load_stats), self.injury_risk_dict, event_date)
-            # TODO - ensure we're using the correct (and all) intensity measures
-            if self.session.session_RPE is not None:
-                m.attribute_intensity(self.session.session_RPE, self.injury_risk_dict, event_date)
+                for a in functional_movement.synergists:
+                    body_part_side_list = self.get_body_part_side_list(a)
+                    for b in body_part_side_list:
+                        functional_movement_body_part_side = BodyPartFunctionalMovement(b)
+                        m.synergists.append(functional_movement_body_part_side)
 
-        #self.aggregate_body_parts()
+                for a in functional_movement.parts_receiving_compensation:
+                    body_part_side_list = self.get_body_part_side_list(a)
+                    for b in body_part_side_list:
+                        functional_movement_body_part_side = BodyPartFunctionalMovement(b)
+                        m.parts_receiving_compensation.append(functional_movement_body_part_side)
+
+                m.attribute_training_volume(self.session.training_load(load_stats), self.injury_risk_dict, event_date)
+                # TODO - ensure we're using the correct (and all) intensity measures
+                # if self.session.session_RPE is not None:
+                #     m.attribute_intensity(self.session.session_RPE, self.injury_risk_dict, event_date)
+
+                self.session_load_dict = self.aggregate_body_parts()
 
         return self.session
 
     def aggregate_body_parts(self):
 
-        body_part_sides = {}
+        session_load_dict = {}
 
         for m in self.functional_movement_mappings:
-            for p in m.prime_movers:
-                if p not in body_part_sides:
-                    body_part_sides[p] = p
-                else:
-                    body_part_sides[p].concentric_volume += p.concentric_volume
-                    body_part_sides[p].eccentric_volume += p.eccentric_volume
-                    body_part_sides[p].concentric_intensity = max(p.concentric_intensity, body_part_sides[p].concentric_intensity)
-                    body_part_sides[p].eccentric_intensity = max(p.eccentric_intensity, body_part_sides[p].eccentric_intensity)
+            for body_part_side, body_part_functional_movement in m.muscle_load.items():
+                if body_part_side not in session_load_dict:
+                    session_load_dict[body_part_side] = BodyPartFunctionalMovement(body_part_side)
 
-        self.body_parts = list(body_part_sides.values())
+                session_load_dict[body_part_side].concentric_volume += body_part_functional_movement.concentric_volume
+                session_load_dict[body_part_side].eccentric_volume += body_part_functional_movement.eccentric_volume
+                session_load_dict[body_part_side].compensated_concentric_volume += body_part_functional_movement.compensated_concentric_volume
+                session_load_dict[
+                    body_part_side].compensated_eccentric_volume += body_part_functional_movement.compensated_eccentric_volume
+
+                session_load_dict[body_part_side].compensating_causes_volume.extend(body_part_functional_movement.compensating_causes_volume)
+                session_load_dict[body_part_side].compensating_causes_volume = list(set(session_load_dict[body_part_side].compensating_causes_volume))
+                session_load_dict[body_part_side].compensation_source_volume = CompensationSource.internal_processing
+
+                session_load_dict[body_part_side].concentric_intensity = max(body_part_functional_movement.concentric_intensity, session_load_dict[body_part_side].concentric_intensity)
+                session_load_dict[body_part_side].eccentric_intensity = max(body_part_functional_movement.eccentric_intensity, session_load_dict[body_part_side].eccentric_intensity)
+
+        return session_load_dict
 
     def get_body_part_side_list(self, body_part_enum):
 
@@ -1640,6 +239,326 @@ class SessionFunctionalMovement(object):
 
         return body_part_side_list
 
+    def process_workout_load(self, workout_program):
+
+        workout_load = {}
+
+        for workout_section in workout_program.workout_sections:
+            if workout_section.assess_load:
+                section_load = {}  # load by adaptation type
+                for workout_exercise in workout_section.exercises:
+                    exercise_load = self.apply_load(workout_exercise.primary_actions)
+                    for adaptation_type, muscle_load in exercise_load.items():
+                        if adaptation_type not in section_load:
+                            section_load[adaptation_type] = muscle_load
+                        else:
+                            for muscle, load in muscle_load.items():
+                                if muscle not in section_load[adaptation_type].items():
+                                    section_load[adaptation_type][muscle] = load
+                                else:
+                                    section_load[adaptation_type][muscle] += load
+
+                for adaptation_type, muscle_load in section_load.items():
+                    if adaptation_type not in workout_load:
+                        workout_load[adaptation_type] = muscle_load
+                    else:
+                        for muscle, load in muscle_load.items():
+                            if muscle not in workout_load[adaptation_type].items():
+                                workout_load[adaptation_type][muscle] = load
+                            else:
+                                workout_load[adaptation_type][muscle] += load
+
+        return workout_load
+
+    def apply_load(self, action_list):
+
+        total_load = {}  # load by adaptation type
+
+        for action in action_list:
+            functional_movement_action_mapping = FunctionalMovementActionMapping(action)
+            self.functional_movement_mappings.append(functional_movement_action_mapping)
+            if action.adaptation_type.value not in total_load:
+                total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
+            else:
+                for muscle, load in functional_movement_action_mapping.muscle_load.items():
+                    if muscle not in total_load[action.adaptation_type.value]:
+                        total_load[action.adaptation_type.value][muscle] = load
+                    else:
+                        total_load[action.adaptation_type.value][muscle] += load
+
+        return total_load
+
+    def normalize_and_consolidate_load(self, total_load_dict):
+
+        normalized_dict = {}
+
+        for adaptation_type, muscle_load_dict in total_load_dict.items():
+            scalar = self.get_adaption_type_scalar(adaptation_type)
+            concentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c.concentric_volume > 0]
+            eccentric_values = [c.eccentric_volume for c in muscle_load_dict.values() if c.eccentric_volume > 0]
+            all_values = []
+            all_values.extend(concentric_values)
+            all_values.extend(eccentric_values)
+            if len(all_values) > 0:
+                average = statistics.mean(all_values)
+                std_dev = statistics.stdev(all_values)
+                for muscle in muscle_load_dict.keys():
+                    if muscle_load_dict[muscle].concentric_volume > 0:
+                        muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - average) / std_dev)
+                    if muscle_load_dict[muscle].eccentric_volume > 0:
+                        muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - average) / std_dev)
+                    if muscle not in normalized_dict:
+                        normalized_dict[muscle] = muscle_load_dict[muscle]
+                    else:
+                        normalized_dict[muscle].concentric_volume += muscle_load_dict[muscle].concentric_volume
+                        normalized_dict[muscle].eccentric_volume += muscle_load_dict[muscle].eccentric_volume
+
+        return normalized_dict
+
+    def get_adaption_type_scalar(self, adaption_type):
+
+        if adaption_type == AdaptationType.strength_endurance_cardiorespiratory.value:
+            return 0.20
+        elif adaption_type == AdaptationType.strength_endurance_strength.value:
+            return 0.40
+        elif adaption_type == AdaptationType.power_drill.value:
+            return 0.60
+        elif adaption_type == AdaptationType.maximal_strength_hypertrophic.value:
+            return 0.80
+        elif adaption_type == AdaptationType.power_explosive_action.value:
+            return 1.00
+        else:
+            return 0.00
+
+
+class FunctionalMovementLoad(object):
+    def __init__(self, functional_movement, muscle_action):
+        self.functional_movement = functional_movement
+        self.muscle_action = muscle_action
+
+
+class FunctionalMovementActionMapping(object):
+    def __init__(self, exercise_action):
+        self.exercise_action = exercise_action
+        self.hip_joint_functional_movements = []
+        self.knee_joint_functional_movements = []
+        self.ankle_joint_functional_movements = []
+        self.trunk_joint_functional_movements = []
+        self.shoulder_scapula_joint_functional_movements = []
+        self.elbow_joint_functional_movements = []
+        self.muscle_load = {}
+
+        self.set_functional_movements()
+        self.set_muscle_load()
+
+    def set_functional_movements(self):
+
+        if self.exercise_action is not None:
+            self.hip_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.hip_joint_action)
+            self.knee_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.knee_joint_action)
+            self.ankle_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.ankle_joint_action)
+            self.trunk_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.trunk_joint_action)
+            self.shoulder_scapula_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
+            self.elbow_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.elbow_joint_action)
+
+    def get_functional_movements_for_joint_action(self, target_joint_action_list):
+
+        movement_factory = FunctionalMovementFactory()
+        pairs = FunctionalMovementPairs()
+
+        functional_movement_list = []
+
+        for target_joint_action in target_joint_action_list:
+
+            functional_movement_type = pairs.get_functional_movement_for_muscle_action(
+                self.exercise_action.primary_muscle_action, target_joint_action.joint_action)
+
+            functional_movement = movement_factory.get_functional_movement(functional_movement_type)
+            functional_movement.priority = target_joint_action.priority
+
+            functional_movement_load = FunctionalMovementLoad(functional_movement, self.exercise_action.primary_muscle_action)
+
+            functional_movement_list.append(functional_movement_load)
+
+        return functional_movement_list
+
+    def set_muscle_load(self):
+
+        self.apply_load_to_functional_movements(self.hip_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.knee_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.ankle_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.trunk_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.shoulder_scapula_joint_functional_movements, self.exercise_action)
+        self.apply_load_to_functional_movements(self.elbow_joint_functional_movements, self.exercise_action)
+
+    def get_matching_stability_rating(self, functional_movement_load, exercise_action):
+
+        functional_movement = functional_movement_load.functional_movement
+
+        lower_stability_rating = exercise_action.lower_body_stability_rating / 2.0 # normalize
+        upper_stability_rating = exercise_action.upper_body_stability_rating / 2.0 # normalize
+
+        functional_movement_type = functional_movement.functional_movement_type
+
+        if functional_movement_type in [FunctionalMovementType.ankle_dorsiflexion,
+                                        FunctionalMovementType.ankle_plantar_flexion,
+                                        FunctionalMovementType.inversion_of_the_foot,
+                                        FunctionalMovementType.eversion_of_the_foot,
+                                        FunctionalMovementType.tibial_internal_rotation,
+                                        FunctionalMovementType.tibial_external_rotation,
+                                        FunctionalMovementType.ankle_dorsiflexion_and_inversion,
+                                        FunctionalMovementType.ankle_plantar_flexion_and_eversion]:
+            return (.8 * lower_stability_rating) + (.2 * upper_stability_rating)
+
+        elif functional_movement_type in [FunctionalMovementType.knee_flexion,
+                                          FunctionalMovementType.knee_extension]:
+            return (.7 * lower_stability_rating) + (.3 * upper_stability_rating)
+
+        elif functional_movement_type in [FunctionalMovementType.elbow_extension,
+                                          FunctionalMovementType.elbow_flexion]:
+            return (.2 * lower_stability_rating) + (.8 * upper_stability_rating)
+
+        elif functional_movement_type in [FunctionalMovementType.shoulder_horizontal_adduction,
+                                          FunctionalMovementType.shoulder_horizontal_abduction,
+                                          FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation,
+                                          FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation,
+                                          FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation,
+                                          FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation,
+                                          FunctionalMovementType.internal_rotation,
+                                          FunctionalMovementType.external_rotation,
+                                          FunctionalMovementType.scapular_depression,
+                                          FunctionalMovementType.scapular_elevation]:
+            return (.3 * lower_stability_rating) + (.7 * upper_stability_rating)
+
+        elif functional_movement_type in [FunctionalMovementType.hip_abduction,
+                                          FunctionalMovementType.hip_adduction,
+                                          FunctionalMovementType.hip_internal_rotation,
+                                          FunctionalMovementType.hip_external_rotation,
+                                          FunctionalMovementType.hip_extension,
+                                          FunctionalMovementType.hip_flexion,
+                                          FunctionalMovementType.hip_horizontal_abduction,
+                                          FunctionalMovementType.hip_horizontal_adduction]:
+            return (.6 * lower_stability_rating) + (.4 * upper_stability_rating)
+
+        elif functional_movement_type in [FunctionalMovementType.pelvic_anterior_tilt,
+                                          FunctionalMovementType.pelvic_posterior_tilt]:
+            return (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+
+        elif functional_movement_type in [FunctionalMovementType.trunk_flexion,
+                                          FunctionalMovementType.trunk_extension,
+                                          FunctionalMovementType.trunk_lateral_flexion,
+                                          FunctionalMovementType.trunk_rotation,
+                                          FunctionalMovementType.trunk_flexion_with_rotation,
+                                          FunctionalMovementType.trunk_extension_with_rotation]:
+            return (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+
+    def apply_load_to_functional_movements(self, functional_movement_list, exercise_action):
+
+        body_part_factory = BodyPartFactory()
+
+        left_load = exercise_action.total_load_left
+        right_load = exercise_action.total_load_right
+
+        for functional_movement_load in functional_movement_list:
+
+            functional_movement = functional_movement_load.functional_movement
+
+            if exercise_action.apply_instability:
+                stability_rating = self.get_matching_stability_rating(functional_movement_load, exercise_action)
+            else:
+                stability_rating = 0.0
+
+            for p in functional_movement.prime_movers:
+                body_part_side_list = body_part_factory.get_body_part_side_list(p)
+                for body_part_side in body_part_side_list:
+                    functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    if body_part_side.side == 1 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.prime_mover, left_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+                    if body_part_side.side == 2 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.prime_mover, right_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+            for s in functional_movement.synergists:
+                body_part_side_list = body_part_factory.get_body_part_side_list(s)
+                for body_part_side in body_part_side_list:
+                    functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    if body_part_side.side == 1 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.synergist, left_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+                    if body_part_side.side == 2 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.synergist, right_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+            for t in functional_movement.stabilizers:
+                body_part_side_list = body_part_factory.get_body_part_side_list(t)
+                for body_part_side in body_part_side_list:
+                    functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    if body_part_side.side == 1 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.stabilizer, left_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+                    if body_part_side.side == 2 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.stabilizer, right_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+
+            for f in functional_movement.fixators:
+                body_part_side_list = body_part_factory.get_body_part_side_list(f)
+                for body_part_side in body_part_side_list:
+                    functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    if body_part_side.side == 1 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.fixator, left_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+                    if body_part_side.side == 2 or body_part_side.side == 0:
+                        attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
+                                                                      BodyPartFunction.fixator, right_load, stability_rating)
+                        self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
+
+    def update_muscle_dictionary(self, muscle, attributed_muscle_load, muscle_action):
+        if muscle.body_part_side in self.muscle_load:
+            if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
+                self.muscle_load[muscle.body_part_side].concentric_volume += attributed_muscle_load
+            else:
+                self.muscle_load[muscle.body_part_side].eccentric_volume += attributed_muscle_load
+        else:
+            self.muscle_load[muscle.body_part_side] = muscle
+            if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
+                self.muscle_load[muscle.body_part_side].concentric_volume = attributed_muscle_load
+            else:
+                self.muscle_load[muscle.body_part_side].eccentric_volume = attributed_muscle_load
+
+    def get_muscle_load(self, functional_movement_priority, muscle_role, load, stability_rating):
+
+        if functional_movement_priority == 1:
+            priority_ratio = 1.00
+        elif functional_movement_priority == 2:
+            priority_ratio = 0.6
+        elif functional_movement_priority == 3:
+            priority_ratio = 0.3
+        elif functional_movement_priority == 4:
+            priority_ratio = 0.15
+        else:
+            priority_ratio = 0.00
+
+        if muscle_role == BodyPartFunction.prime_mover:
+            muscle_ratio = 1.00
+        elif muscle_role == BodyPartFunction.synergist:
+            muscle_ratio = 0.60
+        elif muscle_role == BodyPartFunction.stabilizer:
+            muscle_ratio = (0.15 * stability_rating) + 0.05
+        elif muscle_role == BodyPartFunction.fixator:
+            muscle_ratio = (0.10 * stability_rating) + 0.20
+        else:
+            muscle_ratio = 0.0
+
+        scaled_load = load * priority_ratio * muscle_ratio
+
+        return scaled_load
+
 
 class FunctionalMovementActivityMapping(object):
     def __init__(self, functional_movement_type, is_concentric, concentric_level, is_eccentric, eccentric_level):
@@ -1652,6 +571,7 @@ class FunctionalMovementActivityMapping(object):
         self.antagonists = []
         self.synergists = []
         self.parts_receiving_compensation = []
+        self.muscle_load = {}
 
     def attribute_training_volume(self, training_volume, injury_risk_dict, event_date):
 
@@ -1682,6 +602,13 @@ class FunctionalMovementActivityMapping(object):
                     s.compensated_eccentric_volume += synergist_compensated_eccentric_volume
                     s.compensating_causes_volume.append(c)
                     s.compensation_source_volume = CompensationSource.internal_processing
+                    if s.body_part_side not in self.muscle_load:
+                        self.muscle_load[s.body_part_side] = s
+                    else:
+                        self.muscle_load[s.body_part_side].compensated_concentric_volume += synergist_compensated_concentric_volume
+                        self.muscle_load[s.body_part_side].compensated_eccentric_volume += synergist_compensated_eccentric_volume
+                        self.muscle_load[s.body_part_side].compensating_causes_volume.append(c)
+                        self.muscle_load[s.body_part_side].compensation_source_volume = CompensationSource.internal_processing
 
         for p in self.prime_movers:
             attributed_concentric_volume = training_volume * self.concentric_level * prime_mover_ratio
@@ -1689,6 +616,11 @@ class FunctionalMovementActivityMapping(object):
             p.body_part_function = BodyPartFunction.prime_mover
             p.concentric_volume = attributed_concentric_volume
             p.eccentric_volume = attributed_eccentric_volume
+            if p.body_part_side not in self.muscle_load:
+                self.muscle_load[p.body_part_side] = p
+            else:
+                self.muscle_load[p.body_part_side].concentric_volume += p.concentric_volume
+                self.muscle_load[p.body_part_side].eccentric_volume += p.eccentric_volume
 
         for s in self.synergists:
             attributed_concentric_volume = training_volume * self.concentric_level * synergist_ratio
@@ -1696,6 +628,11 @@ class FunctionalMovementActivityMapping(object):
             s.body_part_function = BodyPartFunction.synergist
             s.concentric_volume = attributed_concentric_volume
             s.eccentric_volume = attributed_eccentric_volume
+            if s.body_part_side not in self.muscle_load:
+                self.muscle_load[s.body_part_side] = s
+            else:
+                self.muscle_load[s.body_part_side].concentric_volume += s.concentric_volume
+                self.muscle_load[s.body_part_side].eccentric_volume += s.eccentric_volume
 
     def attribute_intensity(self, intensity, injury_risk_dict, event_date):
 
@@ -1882,12 +819,17 @@ class FunctionalMovementFactory(object):
 
         if movement_type == FunctionalMovementType.ankle_dorsiflexion:
             return self.get_ankle_dorsiflexion()
+        elif movement_type == FunctionalMovementType.ankle_dorsiflexion_and_inversion:
+            return self.get_ankle_dorsiflexion_and_inversion()
         elif movement_type == FunctionalMovementType.ankle_plantar_flexion:
             return self.get_ankle_plantar_flexion()
+        elif movement_type == FunctionalMovementType.ankle_plantar_flexion_and_eversion:
+            return self.get_ankle_plantar_flexion_and_eversion()
         elif movement_type == FunctionalMovementType.inversion_of_the_foot:
             return self.get_inversion_of_the_foot()
         elif movement_type == FunctionalMovementType.eversion_of_the_foot:
             return self.get_eversion_of_the_foot()
+
         elif movement_type == FunctionalMovementType.knee_flexion:
             return self.get_knee_flexion()
         elif movement_type == FunctionalMovementType.knee_extension:
@@ -1896,10 +838,15 @@ class FunctionalMovementFactory(object):
         #     return self.get_tibial_external_rotation()
         # elif movement_type == FunctionalMovementType.tibial_internal_rotation:
         #     return self.get_tibial_internal_rotation()
+
         elif movement_type == FunctionalMovementType.hip_adduction:
             return self.get_hip_adduction()
+        elif movement_type == FunctionalMovementType.hip_horizontal_adduction:
+            return self.get_hip_horizontal_adduction()
         elif movement_type == FunctionalMovementType.hip_abduction:
             return self.get_hip_abduction()
+        elif movement_type == FunctionalMovementType.hip_horizontal_abduction:
+            return self.get_hip_horizontal_abduction()
         elif movement_type == FunctionalMovementType.hip_internal_rotation:
             return self.get_hip_internal_rotation()
         elif movement_type == FunctionalMovementType.hip_external_rotation:
@@ -1908,18 +855,98 @@ class FunctionalMovementFactory(object):
             return self.get_hip_extension()
         elif movement_type == FunctionalMovementType.hip_flexion:
             return self.get_hip_flexion()
+
         elif movement_type == FunctionalMovementType.pelvic_anterior_tilt:
             return self.get_pelvic_anterior_tilt()
         elif movement_type == FunctionalMovementType.pelvic_posterior_tilt:
             return self.get_pelvic_posterior_tilt()
 
+        elif movement_type == FunctionalMovementType.trunk_flexion:
+            return self.get_trunk_flexion()
+        elif movement_type == FunctionalMovementType.trunk_extension:
+            return self.get_trunk_extension()
+        elif movement_type == FunctionalMovementType.trunk_lateral_flexion:
+            return self.get_trunk_lateral_flexion()
+        elif movement_type == FunctionalMovementType.trunk_rotation:
+            return self.get_trunk_rotation()
+        elif movement_type == FunctionalMovementType.trunk_flexion_with_rotation:
+            return self.get_trunk_flexion_with_rotation()
+        elif movement_type == FunctionalMovementType.trunk_extension_with_rotation:
+            return self.get_trunk_extension_with_rotation()
+
+        elif movement_type == FunctionalMovementType.elbow_flexion:
+            return self.get_elbow_flexion()
+        elif movement_type == FunctionalMovementType.elbow_extension:
+            return self.get_elbow_extension()
+
+        elif movement_type == FunctionalMovementType.shoulder_horizontal_adduction:
+            return self.get_shoulder_horizontal_adduction_and_scapular_protraction()
+        elif movement_type == FunctionalMovementType.shoulder_horizontal_abduction:
+            return self.get_shoulder_horizontal_abduction_and_scapular_retraction()
+        elif movement_type == FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation:
+            return self.get_shoulder_flexion_and_scapular_upward_rotation()
+        elif movement_type == FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation:
+            return self.get_shoulder_extension_and_scapular_downward_rotation()
+        elif movement_type == FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation:
+            return self.get_shoulder_abduction_and_scapular_upward_rotation()
+        elif movement_type == FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation:
+            return self.get_shoulder_adduction_and_scapular_downward_rotation()
+        elif movement_type == FunctionalMovementType.internal_rotation:
+            return self.get_internal_rotation()
+        elif movement_type == FunctionalMovementType.external_rotation:
+            return self.get_external_rotation()
+        elif movement_type == FunctionalMovementType.scapular_elevation:
+            return self.get_scapular_elevation()
+        elif movement_type == FunctionalMovementType.scapular_depression:
+            return self.get_scapular_depression()
+
+    def get_ankle_fixators(self):
+
+        return [44, 68, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66, 57, 58]
+
+    def get_knee_fixators(self):
+
+        return [73, 74, 34, 35, 36, 70, 71, 66, 63, 64, 65, 40, 42]
+
+    def get_hip_fixators(self):
+
+        return [73, 74, 34, 35, 36, 70, 71, 26, 75, 69]
+
+    def get_trunk_fixators(self):
+
+        return [66, 63, 64, 65, 67, 60, 71, 72, 58, 59, 53, 54, 49, 50, 51, 52, 45, 46, 47, 48]
+
+    def get_elbow_fixators(self):
+
+        return [82, 81, 76, 78, 79, 85, 83, 84, 125, 21, 121, 122, 123, 124]
+
+    def get_shoulder_fixators_1(self):
+
+        return [73, 74, 34, 35, 36, 70, 71, 26, 75, 69, 125, 81, 76, 78, 79, 80]
+
+    def get_shoulder_fixators_2(self):
+
+        return [73, 74, 34, 35, 36, 67, 71, 26, 70, 75, 69]
 
     def get_ankle_dorsiflexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion)
         functional_movement.prime_movers = [40]
-        functional_movement.antagonists = [41, 43, 44, 61]
         functional_movement.synergists = []
+        functional_movement.antagonists = [41, 43, 44, 61]
+        functional_movement.stabilizers = [41, 42]
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = []
+        return functional_movement
+
+    def get_ankle_dorsiflexion_and_inversion(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion_and_inversion)
+        functional_movement.prime_movers = [40]
+        functional_movement.synergists = []
+        functional_movement.antagonists = [41, 43, 61]
+        functional_movement.stabilizers = [41]
+        functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = []
         return functional_movement
 
@@ -1927,17 +954,32 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion)
         functional_movement.prime_movers = [43, 44, 61]
-        functional_movement.antagonists = [40]
         functional_movement.synergists = [41, 42]
+        functional_movement.antagonists = [40]
+        functional_movement.stabilizers = [41, 42]
+        functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [41, 42]
+        return functional_movement
+
+    def get_ankle_plantar_flexion_and_eversion(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion_and_eversion)
+        functional_movement.prime_movers = [43, 61]
+        functional_movement.synergists = [41]
+        functional_movement.antagonists = [40]
+        functional_movement.stabilizers = [41, 42]
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = [41]
         return functional_movement
 
     def get_inversion_of_the_foot(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.inversion_of_the_foot)
         functional_movement.prime_movers = [40, 42]
-        functional_movement.antagonists = [41, 43, 61]
         functional_movement.synergists = [44]
+        functional_movement.antagonists = [41, 43, 61]
+        functional_movement.stabilizers = [41]
+        functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [44]
         return functional_movement
 
@@ -1945,8 +987,10 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.eversion_of_the_foot)
         functional_movement.prime_movers = [41]
-        functional_movement.antagonists = [40, 42, 44]
         functional_movement.synergists = [43, 61]
+        functional_movement.antagonists = [40, 42, 44]
+        functional_movement.stabilizers = [40, 41, 42]
+        functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [43, 61]
         return functional_movement
 
@@ -1954,8 +998,10 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_flexion)
         functional_movement.prime_movers = [45, 46, 47, 48]
+        functional_movement.synergists = [44, 61, 53, 68]
         functional_movement.antagonists = [55, 56, 57, 58]
-        functional_movement.synergists = [44, 61, 53]
+        functional_movement.stabilizers = [44, 68, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66]
+        functional_movement.fixators = self.get_knee_fixators()
         functional_movement.parts_receiving_compensation = [44, 61, 53]
         return functional_movement
 
@@ -1963,8 +1009,10 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.knee_extension)
         functional_movement.prime_movers = [55, 56, 57, 58]
-        functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53]
         functional_movement.synergists = []
+        functional_movement.antagonists = [44, 61, 45, 46, 47, 48, 53, 68]
+        functional_movement.stabilizers = [44, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66]
+        functional_movement.fixators = self.get_knee_fixators()
         functional_movement.parts_receiving_compensation = []
         return functional_movement
 
@@ -1972,44 +1020,32 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_extension)
         functional_movement.prime_movers = [66]
-        functional_movement.antagonists = [50, 54, 58, 59, 71]
         functional_movement.synergists = [45, 47, 48, 51]
+        functional_movement.antagonists = [50, 54, 58, 59, 71, 72, 49, 52]
+        functional_movement.stabilizers = [60, 67]
+        functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [45, 47, 48, 51]
         return functional_movement
 
     def get_hip_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_flexion)
-        functional_movement.prime_movers = [54, 71]
+        functional_movement.prime_movers = [71]
+        functional_movement.synergists = [49, 50, 52, 54, 58, 59, 72]
         functional_movement.antagonists = [45, 47, 48, 51, 66]
-        functional_movement.synergists = [49, 50, 52, 53, 58, 59, 65]
+        functional_movement.stabilizers = [60, 67]
+        functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [49, 50, 52, 53, 58, 59, 65]
-        return functional_movement
-
-    def get_hip_adduction(self):
-
-        functional_movement = FunctionalMovement(FunctionalMovementType.hip_adduction)
-        functional_movement.prime_movers = [49, 50, 51, 52, 53]
-        functional_movement.antagonists = [55, 59, 63, 64, 65]
-        functional_movement.synergists = [47, 48, 54, 67, 66]
-        functional_movement.parts_receiving_compensation = [47, 48, 54, 67, 66]
-        return functional_movement
-
-    def get_hip_abduction(self):
-
-        functional_movement = FunctionalMovement(FunctionalMovementType.hip_abduction)
-        functional_movement.prime_movers = [63, 64]
-        functional_movement.antagonists = [49, 50, 51, 52, 53, 54, 67]
-        functional_movement.synergists = [55, 59, 65, 66]
-        functional_movement.parts_receiving_compensation = [55, 59, 65, 66]
         return functional_movement
 
     def get_hip_internal_rotation(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_internal_rotation)
-        functional_movement.prime_movers = [54, 65]
-        functional_movement.antagonists = [45, 51, 67, 64, 66]
-        functional_movement.synergists = [46, 47, 48, 49, 50, 52, 53, 59, 63]
+        functional_movement.prime_movers = [65]
+        functional_movement.synergists = [47, 48, 49, 50, 52, 54, 59, 63]
+        functional_movement.antagonists = [45, 51, 60, 67, 64, 66]
+        functional_movement.stabilizers = [60, 67]
+        functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [46, 47, 48, 49, 50, 52, 53, 59, 63]
         return functional_movement
 
@@ -2017,17 +1053,64 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.hip_external_rotation)
         functional_movement.prime_movers = [60]
-        functional_movement.antagonists = [47, 48, 49, 50, 52, 53, 54, 59, 63, 65]
         functional_movement.synergists = [45, 51, 67, 64, 66]
+        functional_movement.antagonists = [47, 48, 49, 50, 52, 54, 59, 63, 65]
+        functional_movement.stabilizers = [60, 67, 63, 64, 65]
+        functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [45, 51, 67, 64, 66]
+        return functional_movement
+
+    def get_hip_abduction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.hip_abduction)
+        functional_movement.prime_movers = [63, 64]
+        functional_movement.synergists = [55, 59, 65, 66]
+        functional_movement.antagonists = [49, 50, 51, 52, 53, 54, 67]
+        functional_movement.stabilizers = [60, 67]
+        functional_movement.fixators = self.get_hip_fixators()
+        functional_movement.parts_receiving_compensation = [55, 59, 65, 66]
+        return functional_movement
+
+    def get_hip_adduction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.hip_adduction)
+        functional_movement.prime_movers = [49, 50, 51, 52, 53, 54]
+        functional_movement.synergists = [47, 48, 67, 66]
+        functional_movement.antagonists = [55, 59, 63, 64, 65]
+        functional_movement.stabilizers = [60, 67]
+        functional_movement.fixators = self.get_hip_fixators()
+        functional_movement.parts_receiving_compensation = [47, 48, 54, 67, 66]
+        return functional_movement
+
+    def get_hip_horizontal_abduction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.hip_horizontal_abduction)
+        functional_movement.prime_movers = [60]
+        functional_movement.synergists = [59, 67, 63, 64, 65, 66]
+        functional_movement.antagonists = [49, 50, 51, 52, 53, 54]
+        functional_movement.stabilizers = [54, 60, 67, 63, 64, 65]
+        functional_movement.fixators = self.get_hip_fixators()
+        functional_movement.parts_receiving_compensation = [59, 67, 63, 64, 65, 66]
+        return functional_movement
+
+    def get_hip_horizontal_adduction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.hip_horizontal_adduction)
+        functional_movement.prime_movers = [49, 50, 52, 54]
+        functional_movement.synergists = [51]
+        functional_movement.antagonists = [59, 67, 60, 63, 64, 65, 66]
+        functional_movement.stabilizers = [54, 60, 67, 63, 64, 65]
+        functional_movement.fixators = self.get_hip_fixators()
+        functional_movement.parts_receiving_compensation = [47, 48, 54, 67, 66]
         return functional_movement
 
     def get_pelvic_anterior_tilt(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_anterior_tilt)
-        functional_movement.prime_movers = [58, 71, 72, 26, 70, 21]
+        functional_movement.prime_movers = [58, 71, 72, 26, 21]
+        functional_movement.synergists = [34, 53, 49, 50, 52, 54, 59]
         functional_movement.antagonists = [74, 75]
-        functional_movement.synergists = [54, 59]
+        functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71, 60, 63, 64, 65]
         functional_movement.parts_receiving_compensation = [54, 59]
         return functional_movement
 
@@ -2035,14 +1118,187 @@ class FunctionalMovementFactory(object):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.pelvic_posterior_tilt)
         functional_movement.prime_movers = [74, 75]
+        functional_movement.synergists = [45, 69, 51, 66]
         functional_movement.antagonists = [58, 71, 72, 26, 70, 21]
-        functional_movement.synergists = [45, 69]
+        functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71, 60, 63, 64, 65]
         functional_movement.parts_receiving_compensation = [45, 69]
         return functional_movement
 
     def get_trunk_flexion(self):
 
         functional_movement = FunctionalMovement(FunctionalMovementType.trunk_flexion)
-        functional_movement.prime_movers = []
+        functional_movement.prime_movers = [75]
+        functional_movement.synergists = [71, 74, 69]
+        functional_movement.antagonists = [26, 21]
+        functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
+        functional_movement.fixators = self.get_trunk_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_trunk_extension(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.trunk_extension)
+        functional_movement.prime_movers = [26, 21, 34]
         functional_movement.synergists = []
+        functional_movement.antagonists = [71, 74, 69, 75]
+        functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
+        functional_movement.fixators = self.get_trunk_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_trunk_lateral_flexion(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.trunk_lateral_flexion)
+        functional_movement.prime_movers = [70]
+        functional_movement.synergists = [26, 21, 74, 69]
+        functional_movement.antagonists = [26, 70, 21, 74, 69]
+        functional_movement.stabilizers = [58, 71, 73, 74, 34, 35, 36, 70]
+        functional_movement.fixators = self.get_trunk_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_trunk_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.trunk_rotation)
+        functional_movement.prime_movers = [74, 69]
+        functional_movement.synergists = [21, 71]
+        functional_movement.antagonists = [69, 74]
+        functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
+        functional_movement.fixators = self.get_trunk_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_trunk_flexion_with_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.trunk_flexion_with_rotation)
+        functional_movement.prime_movers = [74, 75, 69]
+        functional_movement.synergists = [21, 71]
+        functional_movement.antagonists = [69, 26, 74]
+        functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
+        functional_movement.fixators = self.get_trunk_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_trunk_extension_with_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.trunk_extension_with_rotation)
+        functional_movement.prime_movers = [26, 74, 69]
+        functional_movement.synergists = [21, 71]
+        functional_movement.antagonists = [71, 69, 75, 74]
+        functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
+        functional_movement.fixators = self.get_trunk_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_elbow_flexion(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.elbow_flexion)
+        functional_movement.prime_movers = [126]
+        functional_movement.synergists = [127, 128]
+        functional_movement.antagonists = [130, 131, 132, 32]
+        functional_movement.stabilizers = [33]
+        functional_movement.fixators = self.get_elbow_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_elbow_extension(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.elbow_extension)
+        functional_movement.prime_movers = [130, 131, 132]
+        functional_movement.synergists = [32]
+        functional_movement.antagonists = [126, 127, 128]
+        functional_movement.stabilizers = [33]
+        functional_movement.fixators = self.get_elbow_fixators()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_horizontal_adduction_and_scapular_protraction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_horizontal_adduction)
+        functional_movement.prime_movers = [125, 82]
+        functional_movement.synergists = [83, 81]
+        functional_movement.antagonists = [78, 80, 85]
+        functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_horizontal_abduction_and_scapular_retraction(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_horizontal_abduction)
+        functional_movement.prime_movers = [78, 85]
+        functional_movement.synergists = [80]
+        functional_movement.antagonists = [83, 125, 81, 82]
+        functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_flexion_and_scapular_upward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation)
+        functional_movement.prime_movers = [83, 125]
+        functional_movement.synergists = [76, 79, 82, 127, 129]
+        functional_movement.antagonists = [21, 77, 80, 120, 85, 81, 132]
+        functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_extension_and_scapular_downward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation)
+        functional_movement.prime_movers = [21, 81]
+        functional_movement.synergists = [77, 80, 120, 85, 132]
+        functional_movement.antagonists = [76, 79, 83, 125, 82, 127, 129]
+        functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_abduction_and_scapular_upward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation)
+        functional_movement.prime_movers = [83, 84, 125]
+        functional_movement.synergists = [76, 79, 121]
+        functional_movement.antagonists = [21, 77, 80, 120, 122, 123, 124, 81, 82, 129, 132]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_shoulder_adduction_and_scapular_downward_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation)
+        functional_movement.prime_movers = [21, 81]
+        functional_movement.synergists = [77, 80, 120, 122, 123, 124, 82, 129, 132]
+        functional_movement.antagonists = [76, 79, 121, 83, 84, 125]
+        functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_internal_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.internal_rotation)
+        functional_movement.prime_movers = [122]
+        functional_movement.synergists = [21, 120, 83, 82]
+        functional_movement.antagonists = [123, 124, 85]
+        functional_movement.stabilizers = [121, 122, 123, 124]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_external_rotation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.external_rotation)
+        functional_movement.prime_movers = [123, 124]
+        functional_movement.synergists = [85]
+        functional_movement.antagonists = [21, 120, 122, 83, 82]
+        functional_movement.stabilizers = [121, 122, 123, 124]
+        functional_movement.fixators = self.get_shoulder_fixators_1()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_scapular_elevation(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.scapular_elevation)
+        functional_movement.prime_movers = [76]
+        functional_movement.synergists = [77, 80]
+        functional_movement.antagonists = [79, 81]
+        functional_movement.stabilizers = [125, 77, 80]
+        functional_movement.fixators = self.get_shoulder_fixators_2()
+        functional_movement.parts_receiving_compensation = []
+
+    def get_scapular_depression(self):
+
+        functional_movement = FunctionalMovement(FunctionalMovementType.scapular_depression)
+        functional_movement.prime_movers = [79]
+        functional_movement.synergists = [81]
+        functional_movement.antagonists = [76, 77, 80]
+        functional_movement.stabilizers = [125, 77, 80]
+        functional_movement.fixators = self.get_shoulder_fixators_2()
         functional_movement.parts_receiving_compensation = []
