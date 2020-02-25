@@ -17,6 +17,7 @@ from routes.three_sensor import app as three_sensor_routes
 from routes.symptoms import app as symptoms_routes
 from routes.movement_prep import app as movement_prep_routes
 from routes.rom_wod import app as rom_wod_routes
+from routes.post_training_recovery import app as post_training_recovery
 
 app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 app.register_blueprint(session_routes, url_prefix='/session')
@@ -33,6 +34,7 @@ app.register_blueprint(three_sensor_routes, url_prefix='/three_sensor')
 app.register_blueprint(symptoms_routes, url_prefix='/symptoms')
 app.register_blueprint(movement_prep_routes, url_prefix='/movement_prep')
 app.register_blueprint(rom_wod_routes, url_prefix='/rom_wod')
+app.register_blueprint(post_training_recovery, url_prefix='/post_training_recovery')
 
 
 def handler(event, context):

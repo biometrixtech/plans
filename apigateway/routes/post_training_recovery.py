@@ -4,10 +4,8 @@ import copy
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-# from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.session import Session
-# from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from logic.survey_processing import SurveyProcessing, create_plan, cleanup_plan
@@ -18,14 +16,14 @@ athlete_stats_datastore = datastore_collection.athlete_stats_datastore
 daily_plan_datastore = datastore_collection.daily_plan_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
 
-app = Blueprint('rom_wod', __name__)
+app = Blueprint('post_training_recovery', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date_time': str})
-@xray_recorder.capture('routes.rom_wod.create')
-def handle_rom_wod_create(user_id):
+@xray_recorder.capture('routes.post_training_recovery.create')
+def handle_post_training_recovery_create(user_id):
     validate_data()
     event_date = parse_datetime(request.json['event_date_time'])
     event_date = fix_early_survey_event_date(event_date)
@@ -34,8 +32,7 @@ def handle_rom_wod_create(user_id):
     plan_update_required = False
     train_later = False
     hist_update = False
-    # if 'sessions_planned' in request.json and request.json['sessions_planned']:
-    #     train_later = True
+
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
@@ -80,9 +77,6 @@ def handle_rom_wod_create(user_id):
         if create_new:
             survey_processor.create_session_from_survey(session)
 
-    # update daily pain and soreness in athlete_stats
-    # survey_processor.patch_daily_and_historic_soreness(survey='post_session')
-
     # check if any of the non-ignored and non-deleted sessions are high load
     for session in survey_processor.sessions:
         if not session.deleted and not session.ignored:
@@ -121,16 +115,6 @@ def handle_rom_wod_create(user_id):
     return {'daily_plans': [plan]}, 201
 
 
-@xray_recorder.capture('routes.rom_wod.validate')
+@xray_recorder.capture('routes.post_training_recovery.validate')
 def validate_data():
     parse_datetime(request.json['event_date_time'])
-
-    # if 'soreness' in request.json:
-    #     if not isinstance(request.json['soreness'], list):
-    #         raise InvalidSchemaException(f"Property soreness must be of type list")
-    #     for soreness in request.json['soreness']:
-    #         try:
-    #             BodyPartLocation(soreness['body_part'])
-    #         except ValueError:
-    #             raise InvalidSchemaException('body_part not recognized')
-    #         soreness['body_part'] = int(soreness['body_part'])
