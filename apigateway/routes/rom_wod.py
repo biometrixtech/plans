@@ -4,7 +4,7 @@ import copy
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException, ValueNotFoundInDatabase
+from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
@@ -41,7 +41,6 @@ def handle_rom_wod_create(user_id):
 
     # set up processing
     hist_update = False
-    valid_sessions_exist = False
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(user_id)
@@ -70,6 +69,7 @@ def handle_rom_wod_create(user_id):
             survey_processor.create_session_from_survey(session)
         plan.training_sessions.extend(survey_processor.sessions)
 
+    # save the daily plan
     daily_plan_datastore.put(plan)
 
     # save heart_rate_data if it exists in any of the sessions
@@ -95,7 +95,7 @@ def handle_rom_wod_create(user_id):
 
 @xray_recorder.capture('routes.rom_wod.validate')
 def validate_data():
-    if not ininstance(request.json['event_date_time'], str):
+    if not isinstance(request.json['event_date_time'], str):
         raise InvalidSchemaException(f"Property event_date_time must be of type string")
     else:
         parse_datetime(request.json['event_date_time'])

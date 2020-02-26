@@ -173,8 +173,9 @@ The client __must__ submit a request body containing a JSON object having the fo
     "sessions": [session, session]
 }
 ```
-* `event_date_time` __should__ reflect the local time that survey was taken
+* `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+
 TODO: make sure example matches section
 TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
@@ -270,7 +271,7 @@ The client __must__ submit a request body containing a JSON object having the fo
     "symptoms": [symptom, symptom]
 }
 ```
-* `event_date_time` __should__ reflect the local time that survey was taken
+* `event_date_time` __should__ reflect the local time that request was submitted
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
@@ -282,14 +283,25 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
+    "sessions":[
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "end_date": "2019-01-12T10:54:57Z"
+                }],
     "symptoms":[{
-                                    "body_part": 14,
-                                    "side": 2
-                                    "tight": null,
-                                    "knots": null,
-                                    "ache": 3,
-                                    "sharp": 6,
-                                }]
+                    "body_part": 14,
+                    "side": 2
+                    "tight": null,
+                    "knots": null,
+                    "ache": 3,
+                    "sharp": 6,
+                }]
 }
 ```
 
@@ -327,8 +339,9 @@ The client __must__ submit a request body containing a JSON object having the fo
     "sessions": [session, session]
 }
 ```
-* `event_date_time` __should__ reflect the local time that survey was taken
+* `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+
 TODO: make sure example matches section
 TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
@@ -418,7 +431,7 @@ ROM WODs include 5-15-30+ minutes of Mobility work including foam rolling, stati
 Generating a ROM WOD modality requires the following data elements:
  * Local date time
  
-However, there are other optional elements that when included, provides enhanced personalization to the athlete's needs:
+However, there are other optional elements that when included, provide enhanced personalization to the athlete's needs:
 * Workout Sessions completed
 * Today's Symptoms
 
@@ -426,8 +439,56 @@ The inclusion of the optional elements impacts the ROM WOD modality returned.
 
 ### Basic Case
 
-This endpoint can be called to log a new workout session to today's plan and should include the session's information.
+ROM WOD modality can be requested by only submitting local date time of the athlete. This will generate ROM WOD based on user's history.
 
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date_time": Datetime
+}
+```
+* `event_date_time` __should__ reflect the local date and time when the request is submitted.
+
+TODO: review the schema per reqs
+```
+POST /plans/{version}/rom_wod/{User UUID} HTTP/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJ0eX...xA8
+
+{
+    "event_date_time": "2018-12-10T17:45:24Z"
+}
+```
+
+##### Response
+ 
+ If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in the Appendix.
+
+
+### Including Completed Workout Session(s)
+
+If the client includes the optional __sessions__ element, a ROM WOD modality will be returned with consideration for the workout session(s) the user completed and their history
+
+Completed workout session may be reported using one of two formats:
+
+* Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
+* Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+
+ 
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
@@ -441,14 +502,16 @@ The client __must__ submit a request body containing a JSON object having the fo
     "sessions": [session, session]
 }
 ```
-* `event_date_time` __should__ reflect the local date and time when the request is submitted.
-* `session` __should__ follow the schema of the Simple or Detailed Session format as defined in the Appendix.
-TODO: review the schema per reqs
+* `event_date_time` __should__ reflect the local time that the request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+
+TODO: make sure example matches section
+TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
-POST /plans/{version}/rom_wod/{User UUID} HTTP/1.1
+POST /plans/{version}/rom_wod/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
-Authorization: eyJ0eX...xA8
+Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
@@ -461,6 +524,7 @@ Authorization: eyJ0eX...xA8
                     "description": "Evening Practice",
                     "calories": 100,
                     "distance": 200,
+                    "session_RPE": 5,
                     "end_date": "2019-01-12T10:54:57Z"
                 },
                 {
@@ -470,6 +534,7 @@ Authorization: eyJ0eX...xA8
                     "description": "Evening Practice",
                     "calories": 100,
                     "distance": 200,
+                    "session_RPE": 7,
                     "end_date": "2019-02-12T10:54:57Z",
                     "hr_data":  [
                                 {"value": 153,
@@ -510,7 +575,7 @@ Authorization: eyJ0eX...xA8
 
 ##### Response
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
@@ -518,6 +583,8 @@ Authorization: eyJ0eX...xA8
 }
 ```
 * `daily_plan` will have the same schema as defined in the Appendix.
+
+
 
 ### Including Today's Symptoms
 
@@ -530,18 +597,16 @@ The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
-TODO: is session required here or can it just be symptoms?
 ```
 {
     "event_date_time": Datetime,
-    "sessions": [session, session],
     "symptoms": [symptom, symptom]
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ follow the schema of the Simple or Detailed Session format as defined in the Appendix.
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
 TODO: review schema
 ```
 POST /plans/{version}/rom_wod/{User UUID} HTTPS/1.1
@@ -551,17 +616,6 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
-    "sessions":[
-                    {
-                        "event_date": "2019-01-12T10:41:57Z",
-                        "session_type": 6,
-                        "sport_name": 1,
-                        "duration": 14,
-                        "description": "Evening Practice",
-                        "calories": 100,
-                        "distance": 200,
-                        "end_date": "2019-01-12T10:54:57Z"
-                    }],
     "symptoms":[{
                                     "body_part": 14,
                                     "side": 2

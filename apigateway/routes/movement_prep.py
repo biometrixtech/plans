@@ -3,14 +3,13 @@ from flask import request, Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException, ValueNotFoundInDatabase
+from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
-# from models.daily_readiness import DailyReadiness
 from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
 from logic.survey_processing import SurveyProcessing, create_plan
-from utils import parse_datetime, format_date, format_datetime, fix_early_survey_event_date, get_timezone, _check_plan_exists
+from utils import parse_datetime, format_date, fix_early_survey_event_date, get_timezone, _check_plan_exists
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -88,7 +87,6 @@ def handle_movement_prep_create(user_id):
                        force_on_demand=True)
 
     return {'daily_plans': [plan]}, 201
-
 
 
 @xray_recorder.capture('routes.movement_prep.validate')

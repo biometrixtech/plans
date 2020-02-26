@@ -53,9 +53,6 @@ def handle_add_symptoms(user_id=None):
 
     visualizations = is_fathom_environment()
 
-    # # update daily pain and soreness in athlete_stats
-    # survey_processor.patch_daily_and_historic_soreness(survey='post_session')
-
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
