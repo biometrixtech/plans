@@ -1430,6 +1430,7 @@ TODO: review once the rest of the doc is done
     "train_later": Boolean
 }
 ``` -->
+TODO: finalize this structure
 ```
 {
     "date": Date,
@@ -1461,7 +1462,7 @@ TODO: review once the rest of the doc is done
     "post_active_rest_completed": Boolean,
     "pre_active_rest_completed": Boolean,
     "sessions_planned": Boolean,
-    "train_later": Bolean
+    "train_later": Boolean
 }
 ```
 <div style="page-break-after: always;"></div>
