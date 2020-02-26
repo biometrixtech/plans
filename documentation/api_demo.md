@@ -268,17 +268,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date_time": Datetime,
-    "sessions":[
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 6,
-                    "sport_name": 1,
-                    "duration": 14,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "end_date": "2019-01-12T10:54:57Z"
-                }],
+    "sessions": [session],
     "symptoms": [symptom, symptom]
 }
 ```
