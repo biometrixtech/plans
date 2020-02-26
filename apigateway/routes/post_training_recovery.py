@@ -118,3 +118,6 @@ def validate_data():
         request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
         if len(request.json['sessions']) == 0:
             raise InvalidSchemaException("A valid session is required to generate Post-Training Recovery")
+        for session in request.json['sessions']:
+            if 'session_RPE' not in session or session['session_RPE'] is None:
+                raise InvalidSchemaException("session_RPE is a parameter for session to receive Post-Training Recovery")
