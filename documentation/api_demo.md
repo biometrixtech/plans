@@ -611,7 +611,7 @@ The client __must__ submit a request to the endpoint `/plans/version/symptoms/{U
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
-TODO - dg: make event_date_time and backward compatible
+
 ```
 {
     "event_date_time": Datetime,
@@ -858,36 +858,30 @@ TODO - dg: add SOFlete option here
 ## VI. Miscellaneous Endpoints
 
 ### Overview & Description
-TODO - dg: move to a different route and simplify (based on event_date_time)
 These APIs provide clients with additional functionality to support their users.
 
 ### Get Daily Plan
 
 ##### Query String
-The client __must__ submit a request to the endpoint `/plans/{version}/daily_plan/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/daily_plan/{User UUID}/get_plan`. The request method __must__ be `POST`.
 
 ##### Request
 The client __must__ submit a request body containing a JSON object having the following schema:
 ```
 {
-    "event_date": Datetime
-    "start_date": string,
-    "end_date": string
+    "event_date_time": Datetime
 }
 ```
-* `event_date` __should__ reflect the time (in local timezone) when the api call is made.
-* `start_date` __should__ be of format `yyyy-mm-dd`
-* `end_date` __should__ be of format `yyyy-mm-dd` but is __optional__
+* `event_date_time` __should__ reflect the time (in local timezone) when the request is made.
 
 ```
-POST /plans/{version}/daily_plan/{User UUID} HTTPS/1.1
+POST /plans/{version}/daily_plan/{User UUID}/get_plan HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date": "2018-07-31T02:50:02Z",
-    "start_date": "2018-07-31"
+    "event_date_time": "2018-07-31T02:50:02Z",
 }
 ```
 <div style="page-break-after: always;"></div>
@@ -899,14 +893,9 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
  
 ```
 {
-    "daily_plans": [daily_plan1, daily_plan2],
-    "readiness": readiness,
-    "typical_sessions": [session, session]
+    "daily_plans": [daily_plan]
 }
 ```
-* `readiness` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined in Daily Readiness
-* `typical_sessions` is only returned if readiness survey hasn't been completed for the day and will follow the schema defined in Session
-* `daily_plans` __could__ be an empty list
 * `daily_plan` will have the same schema as defined in the Appendix.
 
 <!--

@@ -24,10 +24,11 @@ app = Blueprint('symptoms', __name__)
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
-@require.body({'event_date': str})
+# @require.body({'event_date': str})
 @xray_recorder.capture('routes.symptoms.post')
 def handle_add_symptoms(user_id=None):
-    event_date = parse_datetime(request.json['event_date'])
+    event_date_string = request.json.get('event_date') or request.json.get('event_date_time')
+    event_date = parse_datetime(event_date_string)
     timezone = get_timezone(event_date)
     hist_update = False
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
@@ -44,12 +45,7 @@ def handle_add_symptoms(user_id=None):
                                         athlete_stats=athlete_stats,
                                         datastore_collection=datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
-    if 'soreness' in request.json:
-        symptoms = request.json['soreness']
-    elif 'symptoms' in request.json:
-        symptoms = request.json['symptoms']
-    else:
-        symptoms = []
+    symptoms = request.json.get('soreness') or request.json.get('symptoms') or []
     for symptom in symptoms:
         if symptom is None:
             continue
