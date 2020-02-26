@@ -1,7 +1,7 @@
 # FathomAI - Plans API (v 4.8.0)
 
 ## Overview
-TODO: need to review and have Iva, Gabby review
+__TODO: need to review and have Iva, Gabby review__
 
 FathomAI provides this limited implementation of its Plans API to demonstrate the functionality to potential customers.
 
@@ -268,10 +268,22 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date_time": Datetime,
+    "sessions":[
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "end_date": "2019-01-12T10:54:57Z"
+                }],
     "symptoms": [symptom, symptom]
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
@@ -488,6 +500,7 @@ Completed workout session may be reported using one of two formats:
 * Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
 * Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
+_For more information about __session__ formats, please see the Appendix._
  
 ##### Query String
  
@@ -652,9 +665,7 @@ TODO: Finish this section
 ## V. Improving Personalization
 
 ### Overview & Description
-FathomAI Plans API can provide a more personalized recovery plan for an athlete when more information is supplied by a client.
-
-Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
+FathomAI Plans API can provide a more personalized recovery plan for an athlete when more information is supplied by a client.  Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
 
 <!-- #### Update
 
@@ -725,7 +736,6 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Symptoms
 
-TODO: update this text to reflect whether a plan is returned.  Make consistent with Overview.
 This endpoint can be called to submit symptoms without receiving any new/updated recovery modalities.
 
 ##### Query String
@@ -980,7 +990,7 @@ TODO - dg: add SOFlete option here
 ## VI. Miscellaneous Endpoints
 
 ### Overview & Description
-These APIs provide clients with additional functionality to support their users.
+These APIs provide clients with additional functionality to support their users but do not affect the type of recovery generated for an athlete.
 
 ### Get Daily Plan
 
