@@ -130,7 +130,7 @@ Partners __may__ interact with the API on a business-to-business basis instead o
 
 In addition to the AWS API Gateway responses and the specific responses for each endpoint, the server __may__ respond with one of the following HTTP responses:
 
-TODO: Dipesh needs to review and update
+TODO - dg: needs to review and update
 * `400 Bad Request` with `Status` header equal to `InvalidSchema`, if the JSON body of the request does not match the requirements of the endpoint.
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
 * `404 Unknown` with `Status` header equal to `UnknownEndpoint`, if an invalid endpoint was requested.
@@ -141,7 +141,7 @@ The following simple types __may__ be used in requests and responses:
 
 * `string`, `number`, `integer`, `boolean`: as defined in the [JSON Schema](http://json-schema.org) standard.
 * `UUID`: a `string` matching the regular expression `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, that is, the string representation of an [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID.
-TODO: Dipesh needs to review the timezone info
+TODO - dg: review the timezone info
 * `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full  [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
 TODO: Use numbering from Intro
@@ -273,8 +273,6 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `event_date_time` __should__ reflect the local time that survey was taken
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
 TODO: make sure example matches section
-TODO: Dipesh needs to identify workout_section_type (and make it an enum)
-TODO: do we even need workout_program_module (do we just need workout_sections?)
 TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
 POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
@@ -357,7 +355,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 #### 1. Basic Case
 
-TODO: What is required vs optional? (Note: in code, symptoms require a session)
+TODO - gabby: What is required vs optional? (Note: in code, symptoms require a session)
+TODO - dg: if symptoms can be sent without session, add symptoms to daily_plan.symptoms if no session
 
 This endpoint can be called to log a new workout session to today's plan and should include the session's information.
 
@@ -526,7 +525,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Overview & Description
 
-#### Update
+<!-- #### Update
 
 This endpoint can be called to update a session that was previously logged/planned.  This update will help improve personalization but will not return a Daily Plan unless specifically requested with the `return_updated_plan` parameter.
 
@@ -537,7 +536,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/session/{
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
-TODO: Dipesh update event_date to event_date_time
+TODO - dg: Dipesh update event_date to event_date_time
 TODO: change response structure of session with PSS included
 TODO: determine/specify if patching happens at object (session) or attribute level
 ```
@@ -591,7 +590,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "message": "success"
 }
 ```
-
+-->
 
 ### Symptoms
 
@@ -606,7 +605,7 @@ The client __must__ submit a request to the endpoint `/plans/version/symptoms/{U
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
-TODO: Dipesh make event_date_time
+TODO - dg: make event_date_time and backward compatible
 ```
 {
     "event_date_time": Datetime,
@@ -642,7 +641,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- TODO: should we return a plan here? Make it optional?
+ TODO - gabby: should we update/return a plan here? Make it optional?
 ```
 {
     "daily_plans": [daily_plan]
@@ -651,7 +650,7 @@ Authorization: eyJraWQ...ajBc4VQ
 * `daily_plan` will have the same schema as defined in the Appendix
 
 
-
+<!--
 #### Mark Started (Exercise Modalities)
 
 This endpoint can be called to mark the start of exercise-based modalities.
@@ -739,7 +738,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 * `daily_plan` will have the same schema as defined in the Appendix.
 
-
+-->
 
 <!-- #### Mark Started (Body Part Modalities)
 
@@ -843,16 +842,17 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 * `daily_plan` will have the same schema as defined in Get Daily Plan. -->
 
-
+<!--
 ## VI. Post-Training Responsive Recovery (Before the Workout)
 
-TODO: add SOFlete option here
+TODO - dg: add SOFlete option here
 ### Overview & Description
 
+-->
 ## VII. Miscellaneous Endpoints
 
 ### Overview & Description
-TODO: move to a different route and simplify (based on event_date_time)
+TODO - dg: move to a different route and simplify (based on event_date_time)
 #### Get Daily Plan
 
 ##### Query String
@@ -901,9 +901,9 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 * `daily_plans` __could__ be an empty list
 * `daily_plan` will have the same schema as defined in the Appendix.
 
-
+<!--
 #### Delete
-TODO: right now, this won't delete a session with a PSS, we need to update logic accordingly; which means new route
+TODO - dg: right now, this won't delete a session with a PSS, we need to update logic accordingly; which means new route
 TODO: do we actually delete or just mark as deleted?
 TODO: should the new route be workout_sessions that combines patch and delete?
 
@@ -946,7 +946,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-
+-->
 
 ## VIII. Appendix
 TODO: review once the rest of the doc is done
