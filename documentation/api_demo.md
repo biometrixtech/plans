@@ -121,7 +121,6 @@ Partners __may__ interact with the API on a business-to-business basis instead o
 
 In addition to the AWS API Gateway responses and the specific responses for each endpoint, the server __may__ respond with one of the following HTTP responses:
 
-TODO - dg: needs to review and update
 * `400 Bad Request` with `Status` header equal to `InvalidSchema`, if the JSON body of the request does not match the requirements of the endpoint.
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
 * `404 Unknown` with `Status` header equal to `UnknownEndpoint`, if an invalid endpoint was requested.
@@ -448,6 +447,14 @@ Authorization: eyJ0eX...xA8
 }
 ```
 * `daily_plan` will have the same schema as defined in the Appendix.
+
+If no workout sessions were found for the day, the Service __will__ respond with HTTP Status `404 Not Found`, with a body having the following schema:
+ 
+```
+{
+    "message": "There are no valid sessions to provide Range of Motion Workout of the Day."
+}
+```
 
 ### Including Today's Symptoms
 

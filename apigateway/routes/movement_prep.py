@@ -85,7 +85,10 @@ def handle_movement_prep_create(user_id):
 
 @xray_recorder.capture('routes.movement_prep.validate')
 def validate_data():
-    parse_datetime(request.json['event_date_time'])
+    if not ininstance(request.json['event_date_time'], str):
+        raise InvalidSchemaException(f"Property event_date_time must be of type string")
+    else:
+        parse_datetime(request.json['event_date_time'])
 
     if 'symptoms' in request.json:
         if not isinstance(request.json['symptoms'], list):
