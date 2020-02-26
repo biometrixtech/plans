@@ -11,7 +11,7 @@ The plans service generates a  __Daily Plan__ for an athlete based on one or all
 * __Symptoms__ - information about the athlete's symptoms independent of workout and/or training plan
 * __Workout Sessions__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and symptoms following the workout
 
-TODO: this line contradicts later references to not neededing these elements
+TODO: this line contradicts later references to not needing these elements
 
 A __Daily Plan__ can be created with as little as one of the above data elements. As this information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to identify underlying imbalances unique to the athlete which influence the creation of their __Daily Plan__.
 
@@ -140,7 +140,9 @@ TODO - dg: review the timezone info
 
 ### Overview & Description
 
-This endpoint can be called to request a __Movement Prep__ modality. Generating a Movement Prep modality only requires the local date time of the athlete.  However, there are other optional elements that when included, provide enhanced personalization to the athlete's needs:
+This endpoint can be called to request a __Movement Prep__ modality which includes 2-5-10+ minutes of foam rolling, static stretching, active stretching, dynamic flexibility, and/or isolated activation based on the athlete’s needs. 
+
+Generating a Movement Prep modality only requires the local date time of the athlete.  However, there are other optional elements that when included, provide enhanced personalization to the athlete's needs:
 
 * Today's Symptoms
 * Planned Workout
@@ -344,6 +346,12 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Overview & Description
 
+This endpoint can be called to request a __ROM WOD__ (Range of Motion Workout of the Day) modality. 
+
+ROM WODs include 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
+
+TODO: specify minimum and optional elements here
+
 ### Basic Case
 
 TODO - gabby: What is required vs optional? (Note: in code, symptoms require a session)
@@ -512,12 +520,18 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Overview & Description
 
+This endpoint can be called to request a __Post-Training Responsive Recovery__ modality which includes 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
+
+TODO: specify minimum and optional elements here
+
 TODO: Finish this section
 
 ## V. Improving Personalization
 
 ### Overview & Description
-TODO: provide description here
+FathomAI Plans API can provide a more personalized recovery plan for an athlete when more information is supplied by a client.
+
+Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
 
 <!-- #### Update
 
@@ -588,6 +602,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Symptoms
 
+TODO: update this text to reflect whether a plan is returned.  Make consistent with Overview.
 This endpoint can be called to submit symptoms to receive a new plan without submitting a session.
 
 ##### Query String
@@ -845,7 +860,8 @@ TODO - dg: add SOFlete option here
 
 ### Overview & Description
 TODO - dg: move to a different route and simplify (based on event_date_time)
-TODO: provide description here
+These APIs provide clients with additional functionality to support their users.
+
 ### Get Daily Plan
 
 ##### Query String
