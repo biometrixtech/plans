@@ -653,6 +653,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Overview & Description
 
+TODO: define what types of modalities might be returned
 This endpoint can be called to request __Post-Training Responsive Recovery__ modalities which includes 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
 
 Generating Post-Training Responsive Recovery modalities requires the following data elements:
