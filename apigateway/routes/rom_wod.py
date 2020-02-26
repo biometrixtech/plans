@@ -4,7 +4,7 @@ import copy
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, ValueNotFoundInDatabase
 from fathomapi.utils.xray import xray_recorder
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
@@ -110,14 +110,17 @@ def handle_rom_wod_create(user_id):
                            hist_update=hist_update,
                            force_on_demand=True)
     else:
-        return {'message': "There are no valid sessions to provide Range of Motion Workout of the Day!"}, 404
+        raise ValueNotFoundInDatabase("There are no valid sessions to provide Range of Motion Workout of the Day.")
 
     return {'daily_plans': [plan]}, 201
 
 
 @xray_recorder.capture('routes.rom_wod.validate')
 def validate_data():
-    parse_datetime(request.json['event_date_time'])
+    if not ininstance(request.json['event_date_time'], str):
+        raise InvalidSchemaException(f"Property event_date_time must be of type string")
+    else:
+        parse_datetime(request.json['event_date_time'])
 
     if 'symptoms' in request.json:
         if not isinstance(request.json['symptoms'], list):
