@@ -345,9 +345,11 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Overview & Description
 
-#### ROM WOD (Basic Request)
+#### 1. Basic Case
 
-This endpoint can be called to log a new session to today's plan and should include the session's information as well as a post-session survey.
+TODO: What is required vs optional? (Note: in code, symptoms require a session)
+
+This endpoint can be called to log a new workout session to today's plan and should include the session's information.
 
 ##### Query String
  
@@ -362,20 +364,19 @@ The client __must__ submit a request body containing a JSON object having the fo
     "sessions": [session, session]
 }
 ```
-* `event_date_time` __should__ reflect the date and time when the survey is submitted.
-<div style="page-break-after: always;"></div>
+TODO: Is this even needed since we have the info from the sessions?
 
-
+* `event_date_time` __should__ reflect the local date and time when the survey is submitted.
 * `session` __should__ follow the schema of the Simple or Detailed Session format as defined in the Appendix.
 
 ```
 POST /plans/{version}/rom_wod/{User UUID} HTTP/1.1
-Host: apis.{env}.fathomai.com
+Host: apis.dev.fathomai.com
 Content-Type: application/json
 Authorization: eyJ0eX...xA8
 
 {
-    "event_date": "2019-01-12T16:54:57Z",
+    "event_date_time": "2018-12-10T17:45:24Z",
     "sessions":[
                 {
                     "event_date": "2019-01-12T10:41:57Z",
@@ -385,59 +386,50 @@ Authorization: eyJ0eX...xA8
                     "description": "Evening Practice",
                     "calories": 100,
                     "distance": 200,
+                    "end_date": "2019-01-12T10:54:57Z"
+                },
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 7,
+                    "duration": 840,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
                     "end_date": "2019-02-12T10:54:57Z",
-                    "source": 1,
-                    "deleted": false,
-                    "ignored": false,
                     "hr_data":  [
                                 {"value": 153,
                                  "startDate": "2019-01-12T10:43:08.490-0500",
                                  "endDate": "2019-01-12T10:43:08.490-0500"
                                  },
                             ],
-                    "post_session_survey": {
-                                            "event_date": "2019-02-08T16:54:57Z",
-                                            "RPE": 5,
-                                            "soreness": [],
-                                            "clear_candidates": []
-                                            },
                     "workout_program_module": {
-                                            "provider_id": "test_id",
-                                            "program_id": "23G",
-                                            "program_module_id": "56",
                                             "workout_sections": [{
                                                 "name": "Upper Body Work",
                                                 "duration_seconds": 360,
-                                                "workout_section_type": "1",
-                                                "difficulty": 5,
-                                                "intensity_pace": 5,
+                                                "workout_section_type": 1,
+                                                "start_date_time": "2019-01-12T10:43:08Z",
+                                                "end_date_time": "2019-01-12T12:17:12Z"
                                                 "exercises": [
                                                     {
                                                         "id": "1",
                                                         "name": "Bent over Row",
                                                         "weight_measure": 2,
-```
-```
-                                                        "weight_in_lbs": 150,
-                                                        "rep_max": null,
-                                                        "percent_bodyweight": null,
+                                                        "weight": 150,
                                                         "sets": 2,
                                                         "reps_per_set": 10,
                                                         "unit_of_measure": 1,
                                                         "intensity_pace": 5,
-                                                        "movement_id": "",
+                                                        "movement_id": "2356",
                                                         "bilateral": true,
                                                         "side": 0,
-                                                        "rpe": 5
+                                                        "rpe": 5.0
                                                     }
                                                     ]
                                             }]
                                         }
                     }
                     
-                ],
-    "sessions_planned": true,
-    "health_sync_date": "2019-02-08T16:54:57Z"
+                ]
 }
 ```
 
@@ -451,6 +443,70 @@ Authorization: eyJ0eX...xA8
 }
 ```
 * `daily_plan` will have the same schema as defined in the Appendix.
+
+#### 2. Including Today's Symptoms
+
+If the client includes the optional __symptoms__ element, a Movement Prep modality will be returned with consideration for the symptoms the athlete is experiencing today.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date_time": Datetime,
+    "sessions": [session, session],
+    "symptoms": [body_part, body_part]
+}
+```
+* `event_date_time` __should__ reflect the local time that survey was taken
+* `session` __should__ follow the schema of the Simple or Detailed Session format as defined in the Appendix.
+* `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
+* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
+```
+POST /plans/{version}/rom_wod/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24Z",
+    "sessions":[
+                    {
+                        "event_date": "2019-01-12T10:41:57Z",
+                        "session_type": 6,
+                        "sport_name": 1,
+                        "duration": 14,
+                        "description": "Evening Practice",
+                        "calories": 100,
+                        "distance": 200,
+                        "end_date": "2019-01-12T10:54:57Z"
+                    }],
+    "symptoms":[{
+                                    "body_part": 14,
+                                    "side": 2
+                                    "tight": null,
+                                    "knots": null,
+                                    "ache": 3,
+                                    "sharp": 6,
+                                }]
+}
+```
+
+##### Response
+ 
+ If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 
 ## IV. Post-Training Responsive Recovery
