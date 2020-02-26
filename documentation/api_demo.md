@@ -32,6 +32,8 @@ V. Improving Personalization<br/>
 VI. Miscellaneous Endpoints<br/>
 VII. Appendix <br/>
 
+<div style="page-break-after: always;"></div>
+
 ## I.  Common provisions
 
 #### Terminology
@@ -134,6 +136,9 @@ The following simple types __may__ be used in requests and responses:
 TODO - dg: review the timezone info
 * `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full  [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
+
+<div style="page-break-after: always;"></div>
+
 ## II. Movement Prep
 
 ### Overview & Description
@@ -187,58 +192,58 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date_time": "2018-12-10T17:45:24Z",
     "sessions":[
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 6,
-                    "sport_name": 1,
-                    "duration": 14,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "end_date": "2019-01-12T10:54:57Z"
-                },
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 7,
-                    "duration": 840,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "end_date": "2019-02-12T10:54:57Z",
-                    "hr_data":  [
-                                {"value": 153,
-                                 "startDate": "2019-01-12T10:43:08.490-0500",
-                                 "endDate": "2019-01-12T10:43:08.490-0500"
-                                 },
-                            ],
-                    "workout_program_module": {
-                                            "workout_sections": [{
-                                                "name": "Upper Body Work",
-                                                "duration_seconds": 360,
-                                                "workout_section_type": 1,
-                                                "start_date_time": "2019-01-12T10:43:08Z",
-                                                "end_date_time": "2019-01-12T12:17:12Z"
-                                                "exercises": [
-                                                    {
-                                                        "id": "1",
-                                                        "name": "Bent over Row",
-                                                        "weight_measure": 2,
-                                                        "weight": 150,
-                                                        "sets": 2,
-                                                        "reps_per_set": 10,
-                                                        "unit_of_measure": 1,
-                                                        "intensity_pace": 5,
-                                                        "movement_id": "2356",
-                                                        "bilateral": true,
-                                                        "side": 0,
-                                                        "rpe": 5.0
-                                                    }
-                                                    ]
-                                            }]
-                                        }
-                    }
-                    
-                ]
+            {
+                "event_date": "2019-01-12T10:41:57Z",
+                "session_type": 6,
+                "sport_name": 1,
+                "duration": 14,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "end_date": "2019-01-12T10:54:57Z"
+            },
+            {
+                "event_date": "2019-01-12T10:41:57Z",
+                "session_type": 7,
+                "duration": 840,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "end_date": "2019-02-12T10:54:57Z",
+                "hr_data":  [
+                            {"value": 153,
+                             "startDate": "2019-01-12T10:43:08.490-0500",
+                             "endDate": "2019-01-12T10:43:08.490-0500"
+                             },
+                        ],
+                "workout_program_module": {
+                                        "workout_sections": [{
+                                            "name": "Upper Body Work",
+                                            "duration_seconds": 360,
+                                            "workout_section_type": 1,
+                                            "start_date_time": "2019-01-12T10:43:08Z",
+                                            "end_date_time": "2019-01-12T12:17:12Z"
+                                            "exercises": [
+                                                {
+                                                    "id": "1",
+                                                    "name": "Bent over Row",
+                                                    "weight_measure": 2,
+                                                    "weight": 150,
+                                                    "sets": 2,
+                                                    "reps_per_set": 10,
+                                                    "unit_of_measure": 1,
+                                                    "intensity_pace": 5,
+                                                    "movement_id": "2356",
+                                                    "bilateral": true,
+                                                    "side": 0,
+                                                    "rpe": 5.0
+                                                }
+                                                ]
+                                        }]
+                                    }
+                }
+                
+            ]
 }
 ```
 
@@ -286,24 +291,25 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date_time": "2018-12-10T17:45:24Z",
     "sessions":[
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 6,
-                    "sport_name": 1,
-                    "duration": 14,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "end_date": "2019-01-12T10:54:57Z"
-                }],
-    "symptoms":[{
-                    "body_part": 14,
-                    "side": 2
-                    "tight": null,
-                    "knots": null,
-                    "ache": 3,
-                    "sharp": 6,
-                }]
+            {
+                "event_date": "2019-01-12T10:41:57Z",
+                "session_type": 6,
+                "sport_name": 1,
+                "duration": 14,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "end_date": "2019-01-12T10:54:57Z"
+            }],
+    "symptoms":[
+            {
+                "body_part": 14,
+                "side": 2
+                "tight": null,
+                "knots": null,
+                "ache": 3,
+                "sharp": 6,
+            }]
 }
 ```
 
@@ -490,7 +496,7 @@ Completed workout session may be reported using one of two formats:
 * Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
 * Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
-_For more information about __session__ formats, please see the Appendix._
+_For more information about  __session__ formats, please see the Appendix._
  
 ##### Query String
  
@@ -519,60 +525,60 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date_time": "2018-12-10T17:45:24Z",
     "sessions":[
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 6,
-                    "sport_name": 1,
-                    "duration": 14,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "session_RPE": 5,
-                    "end_date": "2019-01-12T10:54:57Z"
-                },
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 7,
-                    "duration": 840,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "session_RPE": 7,
-                    "end_date": "2019-02-12T10:54:57Z",
-                    "hr_data":  [
-                                {"value": 153,
-                                 "startDate": "2019-01-12T10:43:08.490-0500",
-                                 "endDate": "2019-01-12T10:43:08.490-0500"
-                                 },
-                            ],
-                    "workout_program_module": {
-                                            "workout_sections": [{
-                                                "name": "Upper Body Work",
-                                                "duration_seconds": 360,
-                                                "workout_section_type": 1,
-                                                "start_date_time": "2019-01-12T10:43:08Z",
-                                                "end_date_time": "2019-01-12T12:17:12Z"
-                                                "exercises": [
-                                                    {
-                                                        "id": "1",
-                                                        "name": "Bent over Row",
-                                                        "weight_measure": 2,
-                                                        "weight": 150,
-                                                        "sets": 2,
-                                                        "reps_per_set": 10,
-                                                        "unit_of_measure": 1,
-                                                        "intensity_pace": 5,
-                                                        "movement_id": "2356",
-                                                        "bilateral": true,
-                                                        "side": 0,
-                                                        "rpe": 5.0
-                                                    }
-                                                    ]
-                                            }]
-                                        }
-                    }
-                    
-                ]
+            {
+                "event_date": "2019-01-12T10:41:57Z",
+                "session_type": 6,
+                "sport_name": 1,
+                "duration": 14,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "session_RPE": 5,
+                "end_date": "2019-01-12T10:54:57Z"
+            },
+            {
+                "event_date": "2019-01-12T10:41:57Z",
+                "session_type": 7,
+                "duration": 840,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "session_RPE": 7,
+                "end_date": "2019-02-12T10:54:57Z",
+                "hr_data":  [
+                            {"value": 153,
+                             "startDate": "2019-01-12T10:43:08.490-0500",
+                             "endDate": "2019-01-12T10:43:08.490-0500"
+                             },
+                        ],
+                "workout_program_module": {
+                                        "workout_sections": [{
+                                            "name": "Upper Body Work",
+                                            "duration_seconds": 360,
+                                            "workout_section_type": 1,
+                                            "start_date_time": "2019-01-12T10:43:08Z",
+                                            "end_date_time": "2019-01-12T12:17:12Z"
+                                            "exercises": [
+                                                {
+                                                    "id": "1",
+                                                    "name": "Bent over Row",
+                                                    "weight_measure": 2,
+                                                    "weight": 150,
+                                                    "sets": 2,
+                                                    "reps_per_set": 10,
+                                                    "unit_of_measure": 1,
+                                                    "intensity_pace": 5,
+                                                    "movement_id": "2356",
+                                                    "bilateral": true,
+                                                    "side": 0,
+                                                    "rpe": 5.0
+                                                }
+                                                ]
+                                        }]
+                                    }
+                }
+                
+            ]
 }
 ```
 
@@ -619,14 +625,15 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
-    "symptoms":[{
-                                    "body_part": 14,
-                                    "side": 2
-                                    "tight": null,
-                                    "knots": null,
-                                    "ache": 3,
-                                    "sharp": 6,
-                                }]
+    "symptoms":[
+            {
+                "body_part": 14,
+                "side": 2
+                "tight": null,
+                "knots": null,
+                "ache": 3,
+                "sharp": 6,
+            }]
 }
 ```
 
@@ -646,11 +653,187 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Overview & Description
 
-This endpoint can be called to request a __Post-Training Responsive Recovery__ modality which includes 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
+This endpoint can be called to request __Post-Training Responsive Recovery__ modalities which includes 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
 
-TODO: specify minimum and optional elements here
+Generating Post-Training Responsive Recovery modalities requires the following data elements:
+ * Local date time
+ * Completed Workout
+ 
+However, there's another optional element that when included, provides enhanced personalization to the athlete's needs:
+* Today's Symptoms
 
-TODO: Finish this section
+The inclusion of the optional element impacts the Post-Training Responsive Recovery modalities returned.
+
+### Basic Case
+
+Requesting Post-Training Responsive Recovery modalities requires the local date time of the athlete and at least one completed workout session.
+
+Completed workout sessions may be reported using one of two formats:
+
+* Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
+* Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+
+This will generate Post-Training Responsive Recovery modalities that takes into consideration the completed workout(s) and user's history. This case is illustrated below.
+ 
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/post_training_recovery/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date_time": Datetime,
+    "sessions": [session, session]
+}
+```
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+
+TODO: make sure example matches section
+TODO: get rid of duration, intensity_pace for detailed sessions?
+```
+POST /plans/{version}/post_training_recovery/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24Z",
+    "sessions":[
+            {
+                "event_date": "2019-01-12T10:41:57Z",
+                "session_type": 6,
+                "sport_name": 1,
+                "duration": 14,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                session_RPE: 5,
+                "end_date": "2019-01-12T10:54:57Z"
+            },
+            {
+                "event_date": "2019-01-12T10:41:57Z",
+                "session_type": 7,
+                "duration": 840,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "session_RPE": 7,
+                "end_date": "2019-02-12T10:54:57Z",
+                "hr_data":  [
+                            {"value": 153,
+                             "startDate": "2019-01-12T10:43:08.490-0500",
+                             "endDate": "2019-01-12T10:43:08.490-0500"
+                             },
+                        ],
+                "workout_program_module": {
+                                        "workout_sections": [{
+                                            "name": "Upper Body Work",
+                                            "duration_seconds": 360,
+                                            "workout_section_type": 1,
+                                            "start_date_time": "2019-01-12T10:43:08Z",
+                                            "end_date_time": "2019-01-12T12:17:12Z"
+                                            "exercises": [
+                                                {
+                                                    "id": "1",
+                                                    "name": "Bent over Row",
+                                                    "weight_measure": 2,
+                                                    "weight": 150,
+                                                    "sets": 2,
+                                                    "reps_per_set": 10,
+                                                    "unit_of_measure": 1,
+                                                    "intensity_pace": 5,
+                                                    "movement_id": "2356",
+                                                    "bilateral": true,
+                                                    "side": 0,
+                                                    "rpe": 5.0
+                                                }
+                                                ]
+                                        }]
+                                    }
+                }
+                
+            ]
+}
+```
+
+##### Response
+ 
+ If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in the Appendix.
+
+
+### Including Today's Symptoms
+
+If the client includes the optional __symptoms__ element, Post-Training Responsive Recovery modalities will be returned with consideration for the symptoms the athlete is experiencing today.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/post_training_recovery/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date_time": Datetime,
+    "sessions: [session],
+    "symptoms": [symptom, symptom]
+}
+```
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
+```
+POST /plans/{version}/post_training_recovery/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24Z",
+    "sessions":[
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "session_RPE": 8,
+                    "end_date": "2019-01-12T10:54:57Z"
+                }],
+    "symptoms":[{
+                    "body_part": 14,
+                    "side": 2
+                    "tight": null,
+                    "knots": null,
+                    "ache": 3,
+                    "sharp": 6,
+                }]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in the Appendix.
 
 ## V. Improving Personalization
 
