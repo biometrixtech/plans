@@ -726,7 +726,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ### Symptoms
 
 TODO: update this text to reflect whether a plan is returned.  Make consistent with Overview.
-This endpoint can be called to submit symptoms to receive a new plan without submitting a session.
+This endpoint can be called to submit symptoms without receiving any new/updated recovery modalities.
 
 ##### Query String
  
@@ -770,14 +770,12 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- TODO - gabby: should we update/return a plan here? Make it optional?
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    {'message': 'success'}
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix
 
 
 <!--
