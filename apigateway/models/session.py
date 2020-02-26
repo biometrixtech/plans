@@ -336,6 +336,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None,
             'movement_patterns': self.movement_patterns.json_serialise() if self.movement_patterns is not None else None,
             'workout_program_module': self.workout_program_module.json_serialise() if self.workout_program_module is not None else None,
+            'session_RPE': self.session_RPE
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
             # 'underactive_weak_body_parts': [u.json_serialise() for u in self.underactive_weak_body_parts],
@@ -382,12 +383,14 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                             "shrz",
                             "calories",
                             "distance",
-                            "source"]
+                            "source",
+                            "session_RPE"]
         for key in attrs_from_mongo:
             setattr(session, key, input_dict.get(key, None))
         if "post_session_survey" in input_dict and input_dict["post_session_survey"] is not None:
             session.post_session_survey = PostSurvey(input_dict["post_session_survey"], input_dict["post_session_survey"]["event_date"])
-            session.session_RPE = session.post_session_survey.RPE if session.post_session_survey.RPE is not None else None
+            if session.post_session_survey.RPE is not None:
+                session.session_RPE = session.post_session_survey.RPE
         else:
             session.post_session_survey = None
         session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None

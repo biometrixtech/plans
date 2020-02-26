@@ -140,114 +140,26 @@ TODO - dg: review the timezone info
 
 This endpoint can be called to request a __Movement Prep__ modality which includes 2-5-10+ minutes of foam rolling, static stretching, active stretching, dynamic flexibility, and/or isolated activation based on the athlete’s needs. 
 
-Generating a Movement Prep modality only requires the local date time of the athlete.  However, there are other optional elements that when included, provide enhanced personalization to the athlete's needs:
-
+Generating a Movement Prep modality requires the following data elements:
+ * Local date time
+ * Planned workout
+ 
+However, there's another optional element that when included, provides enhanced personalization to the athlete's needs:
 * Today's Symptoms
-* Planned Workout
 
-One or both of these optional elements may be included.  The inclusion of each impacts the Movement Prep modality returned.
+The inclusion of the optional element impacts the Movement Prep modality returned.
 
 ### Basic Case
 
-Requesting a Movement Prep modality only requires the local date time of the athlete.  This case is illustrated below.
+Requesting a Movement Prep modality requires the local date time of the athlete and at least one planned session.
 
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date_time": Datetime
-}
-```
-* `event_date_time` __should__ reflect the local time of the request
-
-```
-POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
-Host: apis.demo.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date_time": "2018-12-10T17:45:24Z"
-}
-```
-
-##### Response
- 
-If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same schema as defined in the Appendix.
-
-
-### Including Today's Symptoms
-
-If the client includes the optional __symptoms__ element, a Movement Prep modality will be returned with consideration for the symptoms the athlete is experiencing today.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date_time": Datetime,
-    "symptoms": [symptom, symptom]
-}
-```
-* `event_date_time` __should__ reflect the local time that survey was taken
-* `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
-* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
-
-```
-POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
-Host: apis.demo.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date_time": "2018-12-10T17:45:24Z",
-    "symptoms":[{
-                                    "body_part": 14,
-                                    "side": 2
-                                    "tight": null,
-                                    "knots": null,
-                                    "ache": 3,
-                                    "sharp": 6,
-                                }]
-}
-```
-
-##### Response
- 
-If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same schema as defined in the Appendix.
-
-### Including Planned Workouts
-
-If the athlete has one ore more workout sessions planned later that day, including the optional __sessions__ element will generate a Movement Prep modality that takes into consideration the planned workout(s).
-
-Sessions may be reported using one of two formats:
+Planned sessions may be reported using one of two formats:
 
 * Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
 * Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
+This will generate a Movement Prep modality that takes into consideration the planned workout(s) and user's history. This case is illustrated below.
+ 
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
@@ -261,8 +173,9 @@ The client __must__ submit a request body containing a JSON object having the fo
     "sessions": [session, session]
 }
 ```
-* `event_date_time` __should__ reflect the local time that survey was taken
+* `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+
 TODO: make sure example matches section
 TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
@@ -340,26 +253,82 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 * `daily_plan` will have the same schema as defined in the Appendix.
 
-## III. ROM WOD (Range of Motion Workout of the Day)
 
-### Overview & Description
+### Including Today's Symptoms
 
-This endpoint can be called to request a __ROM WOD__ (Range of Motion Workout of the Day) modality. 
-
-ROM WODs include 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
-
-TODO: specify minimum and optional elements here
-
-### Basic Case
-
-TODO - gabby: What is required vs optional? (Note: in code, symptoms require a session)
-TODO - dg: if symptoms can be sent without session, add symptoms to daily_plan.symptoms if no session
-
-This endpoint can be called to log a new workout session to today's plan and should include the session's information.
+If the client includes the optional __symptoms__ element, a Movement Prep modality will be returned with consideration for the symptoms the athlete is experiencing today.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date_time": Datetime,
+    "symptoms": [symptom, symptom]
+}
+```
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
+* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
+```
+POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24Z",
+    "sessions":[
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "end_date": "2019-01-12T10:54:57Z"
+                }],
+    "symptoms":[{
+                    "body_part": 14,
+                    "side": 2
+                    "tight": null,
+                    "knots": null,
+                    "ache": 3,
+                    "sharp": 6,
+                }]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in the Appendix.
+
+<!--
+### Including Planned Workouts
+
+If the athlete has one ore more workout sessions planned later that day, including the optional __sessions__ element will generate a Movement Prep modality that takes into consideration the planned workout(s).
+
+Sessions may be reported using one of two formats:
+
+* Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
+* Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -370,14 +339,16 @@ The client __must__ submit a request body containing a JSON object having the fo
     "sessions": [session, session]
 }
 ```
-* `event_date_time` __should__ reflect the local date and time when the request is submitted.
-* `session` __should__ follow the schema of the Simple or Detailed Session format as defined in the Appendix.
-TODO: review the schema per reqs
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+
+TODO: make sure example matches section
+TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
-POST /plans/{version}/rom_wod/{User UUID} HTTP/1.1
+POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
-Authorization: eyJ0eX...xA8
+Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
@@ -439,6 +410,65 @@ Authorization: eyJ0eX...xA8
 
 ##### Response
  
+ If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+{
+    "daily_plans": [daily_plan]
+}
+```
+* `daily_plan` will have the same schema as defined in the Appendix.
+-->
+
+## III. ROM WOD (Range of Motion Workout of the Day)
+
+### Overview & Description
+
+This endpoint can be called to request a __ROM WOD__ (Range of Motion Workout of the Day) modality. 
+
+ROM WODs include 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
+
+Generating a ROM WOD modality requires the following data elements:
+ * Local date time
+ 
+However, there are other optional elements that when included, provide enhanced personalization to the athlete's needs:
+* Workout Sessions completed
+* Today's Symptoms
+
+The inclusion of the optional elements impacts the ROM WOD modality returned.
+
+### Basic Case
+
+ROM WOD modality can be requested by only submitting local date time of the athlete. This will generate ROM WOD based on user's history.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date_time": Datetime
+}
+```
+* `event_date_time` __should__ reflect the local date and time when the request is submitted.
+
+TODO: review the schema per reqs
+```
+POST /plans/{version}/rom_wod/{User UUID} HTTP/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJ0eX...xA8
+
+{
+    "event_date_time": "2018-12-10T17:45:24Z"
+}
+```
+
+##### Response
+ 
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
@@ -448,13 +478,113 @@ Authorization: eyJ0eX...xA8
 ```
 * `daily_plan` will have the same schema as defined in the Appendix.
 
-If no workout sessions were found for the day, the Service __will__ respond with HTTP Status `404 Not Found`, with a body having the following schema:
+
+### Including Completed Workout Session(s)
+
+If the client includes the optional __sessions__ element, a ROM WOD modality will be returned with consideration for the workout session(s) the user completed and their history
+
+Completed workout session may be reported using one of two formats:
+
+* Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
+* Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+
+ 
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+```
+{
+    "event_date_time": Datetime,
+    "sessions": [session, session]
+}
+```
+* `event_date_time` __should__ reflect the local time that the request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+
+TODO: make sure example matches section
+TODO: get rid of duration, intensity_pace for detailed sessions?
+```
+POST /plans/{version}/rom_wod/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24Z",
+    "sessions":[
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "session_RPE": 5,
+                    "end_date": "2019-01-12T10:54:57Z"
+                },
+                {
+                    "event_date": "2019-01-12T10:41:57Z",
+                    "session_type": 7,
+                    "duration": 840,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "session_RPE": 7,
+                    "end_date": "2019-02-12T10:54:57Z",
+                    "hr_data":  [
+                                {"value": 153,
+                                 "startDate": "2019-01-12T10:43:08.490-0500",
+                                 "endDate": "2019-01-12T10:43:08.490-0500"
+                                 },
+                            ],
+                    "workout_program_module": {
+                                            "workout_sections": [{
+                                                "name": "Upper Body Work",
+                                                "duration_seconds": 360,
+                                                "workout_section_type": 1,
+                                                "start_date_time": "2019-01-12T10:43:08Z",
+                                                "end_date_time": "2019-01-12T12:17:12Z"
+                                                "exercises": [
+                                                    {
+                                                        "id": "1",
+                                                        "name": "Bent over Row",
+                                                        "weight_measure": 2,
+                                                        "weight": 150,
+                                                        "sets": 2,
+                                                        "reps_per_set": 10,
+                                                        "unit_of_measure": 1,
+                                                        "intensity_pace": 5,
+                                                        "movement_id": "2356",
+                                                        "bilateral": true,
+                                                        "side": 0,
+                                                        "rpe": 5.0
+                                                    }
+                                                    ]
+                                            }]
+                                        }
+                    }
+                    
+                ]
+}
+```
+
+##### Response
+ 
+ If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
 ```
 {
-    "message": "There are no valid sessions to provide Range of Motion Workout of the Day."
+    "daily_plans": [daily_plan]
 }
 ```
+* `daily_plan` will have the same schema as defined in the Appendix.
+
+
 
 ### Including Today's Symptoms
 
@@ -467,18 +597,16 @@ The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
-TODO: is session required here or can it just be symptoms?
 ```
 {
     "event_date_time": Datetime,
-    "sessions": [session, session],
     "symptoms": [symptom, symptom]
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ follow the schema of the Simple or Detailed Session format as defined in the Appendix.
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
 TODO: review schema
 ```
 POST /plans/{version}/rom_wod/{User UUID} HTTPS/1.1
@@ -488,17 +616,6 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
-    "sessions":[
-                    {
-                        "event_date": "2019-01-12T10:41:57Z",
-                        "session_type": 6,
-                        "sport_name": 1,
-                        "duration": 14,
-                        "description": "Evening Practice",
-                        "calories": 100,
-                        "distance": 200,
-                        "end_date": "2019-01-12T10:54:57Z"
-                    }],
     "symptoms":[{
                                     "body_part": 14,
                                     "side": 2
@@ -609,7 +726,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ### Symptoms
 
 TODO: update this text to reflect whether a plan is returned.  Make consistent with Overview.
-This endpoint can be called to submit symptoms to receive a new plan without submitting a session.
+This endpoint can be called to submit symptoms without receiving any new/updated recovery modalities.
 
 ##### Query String
  
@@ -653,14 +770,12 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- TODO - gabby: should we update/return a plan here? Make it optional?
+ If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    {'message': 'success'}
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix
 
 
 <!--
@@ -992,7 +1107,7 @@ TODO: review once the rest of the doc is done
     "description": string,
     "calories": integer,
     "distance": integer,
-    "RPE": integer,
+    "session_RPE": integer,
     "hr_data": [hr, hr, hr],
 }
 ```
@@ -1001,7 +1116,7 @@ TODO: review once the rest of the doc is done
 * `end_date` is an __optional__ parameter that reflects the end time of the session
 * `sport_name` __should__ reflect SportName enumeration as defined in Appendix.
 * `duration` __should__ be in minutes and reflect the duration of the workout.
-* `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
+* `session_RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `calories` __if present__, __should__ be calories burned during the workout.
 * `distance` __if present__, __should__ be distance covered during the workout.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value` 
@@ -1019,7 +1134,7 @@ TODO: review once the rest of the doc is done
     "description": string,
     "calories": integer,
     "distance": integer,
-    "RPE": number,
+    "session_RPE": number,
     "hr_data": [hr, hr, hr],
     "workout_program_module": workout_program_module
 }
@@ -1028,7 +1143,7 @@ TODO: review once the rest of the doc is done
 * `session_type` __should__ reflect SessionType enumeration. For the Detailed Session format, SessionType=7.
 * `end_date` is an __optional__ parameter that reflects the end time of the session
 * `duration` __should__ be in minutes and reflect the duration of the workout.
-* `RPE` __should__ be a number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
+* `session_RPE` __should__ be a number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `calories` __if present__, __should__ be calories burned during the workout.
 * `distance` __if present__, __should__ be distance covered during the workout.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value` 
