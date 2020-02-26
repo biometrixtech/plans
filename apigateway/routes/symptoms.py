@@ -27,6 +27,7 @@ app = Blueprint('symptoms', __name__)
 # @require.body({'event_date': str})
 @xray_recorder.capture('routes.symptoms.post')
 def handle_add_symptoms(user_id=None):
+    validate_data()
     event_date_string = request.json.get('event_date') or request.json.get('event_date_time')
     event_date = parse_datetime(event_date_string)
     timezone = get_timezone(event_date)
@@ -87,4 +88,41 @@ def handle_add_symptoms(user_id=None):
                                                                                           "plans_api_version": Config.get('API_VERSION')})
         return {'daily_plans': [plan]}, 201
     else:
-        return {'message': 'success'}, 201
+        return {'message': 'success'}, 200
+
+
+@xray_recorder.capture('routes.symptoms.validate')
+def validate_data():
+    if 'event_date' in request.json:
+        if not isinstance(request.json['event_date'], str):
+            raise InvalidSchemaException(f"Property event_date must be of type string")
+        else:
+            parse_datetime(request.json['event_date'])
+    elif 'event_date_time' in request.json:
+        if not isinstance(request.json['event_date_time'], str):
+            raise InvalidSchemaException(f"Property event_date_time must be of type string")
+        else:
+            parse_datetime(request.json['event_date_time'])
+    else:
+         InvalidSchemaException(f"event_date_time is a required field")
+
+    if 'soreness' in request.json:
+        if not isinstance(request.json['soreness'], list):
+            raise InvalidSchemaException(f"Property soreness must be of type list")
+        for symptom in request.json['soreness']:
+            try:
+                BodyPartLocation(symptom['body_part'])
+            except ValueError:
+                raise InvalidSchemaException('body_part not recognized')
+            symptom['body_part'] = int(symptom['body_part'])
+    elif 'symptoms' in request.json:
+        if not isinstance(request.json['symptoms'], list):
+            raise InvalidSchemaException(f"Property symptoms must be of type list")
+        for symptom in request.json['symptoms']:
+            try:
+                BodyPartLocation(symptom['body_part'])
+            except ValueError:
+                raise InvalidSchemaException('body_part not recognized')
+            symptom['body_part'] = int(symptom['body_part'])
+    else:
+         InvalidSchemaException(f"symptoms is a required field")

@@ -107,9 +107,9 @@ def validate_data():
             symptom['body_part'] = int(symptom['body_part'])
 
     if 'sessions' not in request.json:
-        raise InvalidSchemaException('sessions is required parameter to receive movement Prep.')
+        raise InvalidSchemaException('sessions is required parameter to receive Movement Prep')
     else:
-        if not isinstance(request.json['symptoms'], list):
+        if not isinstance(request.json['sessions'], list):
             raise InvalidSchemaException("Property sessions must be of type list")
         request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
         if len(request.json['sessions']) == 0:
