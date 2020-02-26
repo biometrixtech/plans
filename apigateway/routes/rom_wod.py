@@ -55,62 +55,40 @@ def handle_rom_wod_create(user_id):
                                         datastore_collection=datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
 
+    # process new symptoms, if any sent
+    if 'symptoms' in request.json:
+        for symptom in request.json['symptoms']:
+            if symptom is None:
+                continue
+            survey_processor.create_soreness_from_survey(symptom)
+        plan.symptoms.extend(survey_processor.soreness)
+
     # process new session, if any sent
     if len(request.json.get('sessions', [])) > 0:
         sessions = request.json['sessions']
-        # check if any symptoms sent
-        symptoms = request.json.get('symptoms', [])
-        if len(symptoms) > 0:
-            post_session_survey = {
-                'event_date': event_date,
-                'RPE': None,
-                'soreness': symptoms
-            }
-            # attach symptoms to the last session
-            sessions[-1]['post_session_survey'] = post_session_survey
         for session in sessions:
-            if 'RPE' in session:
-                if 'post_session_survey' in session:
-                    session['post_session_survey']['RPE'] = session['RPE']
-                else:
-                    session['post_session_survey'] = {
-                        'event_date': event_date,
-                        'RPE': session['RPE'],
-                        'soreness': []
-                    }
             survey_processor.create_session_from_survey(session)
-    plan.training_sessions.extend(survey_processor.sessions)
+        plan.training_sessions.extend(survey_processor.sessions)
 
-    # check if there are any valid sessions
-    for session in plan.training_sessions:
-        if not session.deleted and not session.ignored:
-            valid_sessions_exist = True
-            if not plan.sessions_planned:
-                plan.sessions_planned = True
-            break
     daily_plan_datastore.put(plan)
 
     # save heart_rate_data if it exists in any of the sessions
     if len(survey_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(survey_processor.heart_rate_data)
 
-    # Update plan if there's at least one valid session (either sent with request or sent earlier when requesting movement prep)
-    if valid_sessions_exist:
-        if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
-            plan_copy = copy.deepcopy(plan)
-            if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
-                survey_processor.stats_processor.all_plans.remove([p for p in survey_processor.stats_processor.all_plans if p.event_date == plan_event_date][0])
-            survey_processor.stats_processor.all_plans.append(plan_copy)
-        plan = create_plan(user_id,
-                           event_date,
-                           athlete_stats=survey_processor.athlete_stats,
-                           stats_processor=survey_processor.stats_processor,
-                           datastore_collection=datastore_collection,
-                           visualizations=False,
-                           hist_update=hist_update,
-                           force_on_demand=True)
-    else:
-        raise ValueNotFoundInDatabase("There are no valid sessions to provide Range of Motion Workout of the Day.")
+    if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
+        plan_copy = copy.deepcopy(plan)
+        if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
+            survey_processor.stats_processor.all_plans.remove([p for p in survey_processor.stats_processor.all_plans if p.event_date == plan_event_date][0])
+        survey_processor.stats_processor.all_plans.append(plan_copy)
+    plan = create_plan(user_id,
+                       event_date,
+                       athlete_stats=survey_processor.athlete_stats,
+                       stats_processor=survey_processor.stats_processor,
+                       datastore_collection=datastore_collection,
+                       visualizations=False,
+                       hist_update=hist_update,
+                       force_on_demand=True)
 
     return {'daily_plans': [plan]}, 201
 

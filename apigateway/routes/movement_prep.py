@@ -3,9 +3,9 @@ from flask import request, Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, ValueNotFoundInDatabase
 from fathomapi.utils.xray import xray_recorder
-from models.daily_readiness import DailyReadiness
+# from models.daily_readiness import DailyReadiness
 from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from models.daily_plan import DailyPlan
@@ -29,13 +29,13 @@ def handle_movement_prep_create(user_id):
     event_date = fix_early_survey_event_date(event_date)
     timezone = get_timezone(event_date)
 
-    daily_readiness = DailyReadiness(
-        user_id=user_id,
-        event_date=format_datetime(event_date),
-        soreness=request.json.get('symptoms', []),
-        sleep_quality=None,
-        readiness=None
-    )
+    # daily_readiness = DailyReadiness(
+    #     user_id=user_id,
+    #     event_date=format_datetime(event_date),
+    #     soreness=request.json.get('symptoms', []),
+    #     sleep_quality=None,
+    #     readiness=None
+    # )
 
     # find/create daily plan
     plan_event_date = format_date(event_date)
@@ -45,7 +45,6 @@ def handle_movement_prep_create(user_id):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
     plan.train_later = True
-    plan.daily_readiness_survey = daily_readiness
 
     # set up processing
     hist_update = False
@@ -67,6 +66,14 @@ def handle_movement_prep_create(user_id):
             survey_processor.create_session_from_survey(session)
         plan.training_sessions.extend(survey_processor.sessions)
 
+    # get symptoms
+    if 'symptoms' in request.json:
+        for symptom in request.json['symptoms']:
+            if symptom is None:
+                continue
+            survey_processor.create_soreness_from_survey(symptom)
+        plan.symptoms.extend(survey_processor.soreness)
+
     # store the plan
     daily_plan_datastore.put(plan)
 
@@ -83,9 +90,10 @@ def handle_movement_prep_create(user_id):
     return {'daily_plans': [plan]}, 201
 
 
+
 @xray_recorder.capture('routes.movement_prep.validate')
 def validate_data():
-    if not ininstance(request.json['event_date_time'], str):
+    if not isinstance(request.json['event_date_time'], str):
         raise InvalidSchemaException(f"Property event_date_time must be of type string")
     else:
         parse_datetime(request.json['event_date_time'])
@@ -100,7 +108,11 @@ def validate_data():
                 raise InvalidSchemaException('body_part not recognized')
             symptom['body_part'] = int(symptom['body_part'])
 
-    if 'sessions' in request.json:
+    if 'sessions' not in request.json:
+        raise InvalidSchemaException('sessions is required parameter to receive movement Prep.')
+    else:
         if not isinstance(request.json['symptoms'], list):
-            raise InvalidSchemaException(f"Property sessions must be of type list")
+            raise InvalidSchemaException("Property sessions must be of type list")
         request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
+        if len(request.json['sessions']) == 0:
+            raise InvalidSchemaException("A valid session is required to generate Movement Prep")
