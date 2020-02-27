@@ -24,8 +24,7 @@ II. Movement Prep<br/>
 III. ROM WOD (Range of Motion Workout of the Day)<br/>
 IV. Post-Training Responsive Recovery<br/>
 V. Improving Personalization<br/>
-VI. Miscellaneous Endpoints<br/>
-VII. Appendix <br/>
+VI. Appendix <br/>
 
 <div style="page-break-after: always;"></div>
 
@@ -361,7 +360,7 @@ ROM WOD modality can be requested by only submitting local date time of the athl
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -375,7 +374,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 TODO: review the schema per reqs
 ```
-POST /plans/{version}/rom_wod/{User UUID} HTTP/1.1
+POST /plans/{version}/mobility_wod/{User UUID} HTTP/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
 Authorization: eyJ0eX...xA8
@@ -435,7 +434,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 TODO: make sure example matches section
 TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
-POST /plans/{version}/rom_wod/{User UUID} HTTPS/1.1
+POST /plans/{version}/mobility_wod/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -633,7 +632,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 TODO: make sure example matches section
 TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
-POST /plans/{version}/post_training_recovery/{User UUID} HTTPS/1.1
+POST /plans/{version}/responsive_recovery/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -727,7 +726,7 @@ If the client includes the optional __symptoms__ element, Post-Training Responsi
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/post_training_recovery/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -744,7 +743,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
 ```
-POST /plans/{version}/post_training_recovery/{User UUID} HTTPS/1.1
+POST /plans/{version}/responsive_recovery/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -857,50 +856,7 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-## VI. Miscellaneous Endpoints
-
-### Overview & Description
-These APIs provide clients with additional functionality to support their users but do not affect the type of recovery generated for an athlete.
-
-### Get Daily Plan
-
-##### Query String
-The client __must__ submit a request to the endpoint `/plans/{version}/daily_plan/{User UUID}/get_plan`. The request method __must__ be `POST`.
-
-##### Request
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date_time": Datetime
-}
-```
-* `event_date_time` __should__ reflect the time (in local timezone) when the request is made.
-
-```
-POST /plans/{version}/daily_plan/{User UUID}/get_plan HTTPS/1.1
-Host: apis.demo.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date_time": "2018-07-31T02:50:02Z",
-}
-```
-<div style="page-break-after: always;"></div>
-
-
-##### Response
- 
-The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
- 
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same schema as defined in the Appendix.
-
-## VII. Appendix
+## VI. Appendix
 TODO: review once the rest of the doc is done
 
 ### Symptoms
@@ -1258,7 +1214,7 @@ TODO finalize structure
 
 #### Activity Types
 ``` 
-    movement_prep = 0
+    movement_integration_prep = 0
     active_rest = 1
     active_recovery = 2
     cold_water_immersion = 3
