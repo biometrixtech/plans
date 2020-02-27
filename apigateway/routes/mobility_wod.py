@@ -17,13 +17,13 @@ athlete_stats_datastore = datastore_collection.athlete_stats_datastore
 daily_plan_datastore = datastore_collection.daily_plan_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
 
-app = Blueprint('rom_wod', __name__)
+app = Blueprint('mobility_wod', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date_time': str})
-@xray_recorder.capture('routes.rom_wod.create')
+@xray_recorder.capture('routes.mobility_wod.create')
 def handle_rom_wod_create(user_id):
     validate_data()
     event_date = parse_datetime(request.json['event_date_time'])
@@ -93,7 +93,7 @@ def handle_rom_wod_create(user_id):
     return {'daily_plans': [plan]}, 201
 
 
-@xray_recorder.capture('routes.rom_wod.validate')
+@xray_recorder.capture('routes.mobility_wod.validate')
 def validate_data():
     if not isinstance(request.json['event_date_time'], str):
         raise InvalidSchemaException(f"Property event_date_time must be of type string")
