@@ -15,26 +15,26 @@ from models.exercise_phase import ExercisePhase, ExercisePhaseType
 from utils import parse_datetime, format_datetime
 
 
-class UserMovementPrep(object):
+class MovementPrep(object):
     def __init__(self, user_id, created_date_time):
         self.movement_prep_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
-        self.movement_prep = None
+        self.movement_integration_prep = None
 
     def json_serialise(self):
         return {
             "movement_prep_id": self.movement_prep_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
-            "movement_prep": self.movement_prep.json_serialise() if self.movement_prep is not None else None
+            "movement_integration_prep": self.movement_integration_prep.json_serialise() if self.movement_integration_prep is not None else None
         }
 
     @classmethod
     def json_deserialise(cls, input_dict):
         movement_prep = cls(input_dict['user_id'], input_dict['created_date_time'])
         movement_prep.movement_prep_id = input_dict.get("movement_prep_id")
-        movement_prep.movement_prep = Activity.json_deserialise(input_dict['movement_prep']) if input_dict.get('movement_prep') is not None else None
+        movement_prep.movement_integration_prep = Activity.json_deserialise(input_dict['movement_integration_prep']) if input_dict.get('movement_integration_prep') is not None else None
         return movement_prep
 
     def __setattr__(self, name, value):
@@ -118,7 +118,7 @@ class ResponsiveRecovery(object):
 
 
 class ActivityType(Enum):
-    movement_prep = 0
+    movement_integration_prep = 0
     active_rest = 1
     active_recovery = 2
     cold_water_immersion = 3
@@ -126,7 +126,7 @@ class ActivityType(Enum):
 
     def get_display_name(self):
         display_names = {
-            0: 'Movement Prep',
+            0: 'Movement Integration Prep',
             1: 'Active Rest',
             2: 'Active Recovery',
             3: 'Cold Water Immersion',
@@ -213,7 +213,7 @@ class Activity(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         modality_type = ActivityType(input_dict["type"])
-        if modality_type == ActivityType.movement_prep:
+        if modality_type == ActivityType.movement_integration_prep:
             modality = MovementPrep(event_date_time=input_dict.get('event_date_time'),
                                     force_data=input_dict.get('force_data', False))
         elif modality_type == ActivityType.active_rest:
