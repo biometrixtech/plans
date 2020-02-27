@@ -1781,107 +1781,6 @@ TODO: finalize this structure
     static_integrate = 5
 ```
 
-<div style="page-break-after: always;"></div>
-
-
-#### All body parts
-
-```
-    shoulder = 1
-    chest = 2
-    abdominals = 3
-    hip = 4
-    groin = 5
-    quads = 6
-    knee = 7
-    shin = 8
-    ankle = 9
-    foot = 10
-    it_band = 11
-    lower_back = 12
-    general = 13
-    glutes = 14
-    hamstrings = 15
-    calves = 16
-    achilles = 17
-    upper_back_neck = 18
-    elbow = 19
-    wrist = 20
-    lats = 21
-    biceps = 22
-    triceps = 23
-    forearm = 24
-    core_stabilizers = 25
-    erector_spinae = 26
-    it_band_lateral_knee = 27
-    hip_flexor = 28
-    deltoid = 29
-    deep_rotators_hip = 30
-    obliques = 31
-    anterior_tibialis = 40
-    peroneals_longus = 41
-    posterior_tibialis = 42
-    soleus = 43
-    gastrocnemius_medial = 44
-    bicep_femoris_long_head = 45
-    bicep_femoris_short_head = 46
-    semimembranosus = 47
-    semitendinosus = 48
-    adductor_longus = 49
-    adductor_magnus_anterior_fibers = 50
-    adductor_magnus_posterior_fibers = 51
-    adductor_brevis = 52
-    gracilis = 53
-    pectineus = 54
-```
-```
-    vastus_lateralis = 55
-    vastus_medialis = 56
-    vastus_intermedius = 57
-    rectus_femoris = 58
-    tensor_fascia_latae = 59 # hips
-    piriformis = 60 # deep rotator of hip
-    gastrocnemius_lateral = 61
-    sartorius = 62 
-    gluteus_medius_anterior_fibers = 63
-    gluteus_medius_posterior_fibers = 64
-    gluteus_minimus = 65
-    gluteus_maximus = 66
-    quadratus_femoris = 67
-    popliteus = 68
-    external_obliques = 69
-    quadratus_lumorum = 70
-    psoas = 71
-    iliacus = 72
-    transverse_abdominis = 73
-    internal_obliques = 74
-    rectus_abdominis = 75
-    upper_trapezius = 76
-    levator_scapulae = 77
-    middle_trapezius = 78
-    lower_trapezius = 79
-    rhomboids = 80
-    pectoralis_minor = 81
-    pectoralis_major = 82
-    anterior_deltoid = 83
-    medial_deltoid = 84
-    posterior_deltoid = 85
-    upper_body = 91
-    lower_body = 92
-    full_body = 93
-    semimembranosus_semitendinosus = 100
-    anterior_adductors = 101
-    rectus_femoris_vastus_intermedius = 102
-    glute_med = 103
-    upper_traps_levator_scapulae = 105
-    middle_traps_rhomboids = 106
-    pec_major_minor = 107
-    hip_flexor_merge = 108
-```
-
-<div style="page-break-after: always;"></div>
-
-
 #### SportName
 ```
     basketball = 0
@@ -1980,6 +1879,8 @@ TODO: finalize this structure
 #### Joints
 The following reportable body parts are considered joints
 ```
+    shoulder = 1
+    hip = 4
     elbow = 19
     wrist = 20
     knee = 7
@@ -2011,8 +1912,13 @@ The following reportable body parts are considered muscles
     biceps = 22
     triceps = 23
     forearm = 24
+    core_stabilizers = 25
     hip_flexor = 28
     deltoid = 29
+    deep_rotators_hip = 30
+    obliques = 31
+    rotator_cuff = 119
+    serratus_anterior = 125
 ```
-###### Last Modified: February 26, 2020
+###### Last Modified: February 28, 2020
 
