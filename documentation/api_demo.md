@@ -1,27 +1,22 @@
-# FathomAI - Plans API (v 4.8.0)
+# FathomAI - Recovery API (v 4.8.0) - TODO: change version?
 
 ## Overview
-__TODO: need to review and have Iva, Gabby review__
+FathomAI provides this limited implementation of its Recovery API to demonstrate the core functionality to potential customers.
 
-FathomAI provides this limited implementation of its Plans API to demonstrate the functionality to potential customers.
+The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or all of the following elements.
 
-The API requests described in this document enable clients to generate a __Daily Plan__ for an athlete based on one or all of the following data elements:
+* __Symptoms__ - information about the athlete's muscular stress that may be in response to training, posture or other habitual movements 
+* __Workout Sessions__ - information about an athlete's training volume, intensity, and movements
 
-* __Symptoms__ - information about the athlete's symptoms independent of workout and/or training plan
-* __Workout Sessions__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and symptoms following the workout
+__Historical Analysis__:  As the above information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to identify underlying imbalances unique to the athlete which influence the creation of their __Activities__.
 
-TODO: this line (and above) contradicts later references to not needing these elements
+__Sports Science Guidelines__: The __Activities__ deliver exercises and dosage optimized for efficacy, in a sequence consistent with sports science research to achieve one or multiple of the following goals: expedite tissue recovery, reduce symptoms, and prevent injury. __Activity__ efficacy may be influenced by your implementation - access to instructions, precautions and contraindications, timing relative to training.  To ensure the efficacy of each client’s implementation, Fathom will provide guideline materials containing research-based and clinical-best-practice-based recommendations.
 
-A __Daily Plan__ can be created with as little as one of the above data elements. As this information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to identify underlying imbalances unique to the athlete which influence the creation of their __Daily Plan__.
+__Dosage & Duration__: The recommended dosages provided for each exercise are associated with three different __Activity__ durations corresponding to minimal, optimal, and comprehensive achievement of the athlete’s goals. Sequences are designed to achieve each athlete's unique combination of goals with relative priority based on the severity of their need. Activities can be further configured to include / exclude each goal, allowing the content provider or athlete to customize their experience based on available time and/or preference.
 
-A __Daily Plan__ provides a personalized, research-driven prep, recovery, and corrective exercise plan for an athlete.  A plan may consist of one or more modalities, targeting one or more recovery goals Fathom analytics identifies for the athlete.
+__Exercise Types__: The __Activities__ include exercises such as foam rolling, static stretching, active stretching, dynamic stretching, targeted muscle activation, and integrated movements personalized for the athlete, for that day. 
 
-The __Daily Plan__ includes recovery modalities such as  __foam rolling__, __static stretching__, __active stretching__, __dynamic stretching__, __targeted muscle activation__, and __integrated movement__ exercises personalized for the athlete for that day.  These exercises are provided in a sequence consistent with sports science research to expedite tissue recovery, reduce pain, and prevent injury.
- 
-<!-- Other modalities do not include exercises but are assigned to a plan based on athlete needs.  These modalities include __heat__, __ice__ and __cold water immersion__. -->
-
-Recommended dosages are also provided for each exercise and modality.  These dosages are associated with three different active times which correspond with minimal, optimal, and comprehensive sequences of activities.  These sequences are designed to achieve each of the athlete's unique combination of goals.  Additionally, dosages are also provided by goal, allowing the athlete to further customize their recovery.
-
+#### Contents
 This documentation is divided into the following sections:<br/>
 
 I. Common Provisions<br/>
@@ -254,14 +249,21 @@ Authorization: eyJraWQ...ajBc4VQ
 ##### Response
  
  If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
+ ```
+ {
+    "movement_prep": movement_prep
+ }
+```
+`movement_prep` will have the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    "movement_prep_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "movement_integration_prep": movement_integration_prep
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix.
-
+* `movement_integration_prep` will have the same schema as defined in the Appendix.
 
 ### Including Today's Symptoms
 
@@ -320,119 +322,23 @@ Authorization: eyJraWQ...ajBc4VQ
 ##### Response
  
 If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
+ ```
+ {
+    "movement_prep": movement_prep
+ }
+```
+`movement_prep` will have the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    "movement_prep_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "movement_integration_prep": movement_integration_prep
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix.
+* `movement_integration_prep` will have the same schema as defined in the Appendix.
 
-<!--
-### Including Planned Workouts
-
-If the athlete has one ore more workout sessions planned later that day, including the optional __sessions__ element will generate a Movement Prep modality that takes into consideration the planned workout(s).
-
-Sessions may be reported using one of two formats:
-
-* Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
-* Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date_time": Datetime,
-    "sessions": [session, session]
-}
-```
-* `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
-
-TODO: make sure example matches section
-TODO: get rid of duration, intensity_pace for detailed sessions?
-```
-POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
-Host: apis.demo.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date_time": "2018-12-10T17:45:24Z",
-    "sessions":[
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 6,
-                    "sport_name": 1,
-                    "duration": 14,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "end_date": "2019-01-12T10:54:57Z"
-                },
-                {
-                    "event_date": "2019-01-12T10:41:57Z",
-                    "session_type": 7,
-                    "duration": 840,
-                    "description": "Evening Practice",
-                    "calories": 100,
-                    "distance": 200,
-                    "end_date": "2019-02-12T10:54:57Z",
-                    "hr_data":  [
-                                {"value": 153,
-                                 "startDate": "2019-01-12T10:43:08.490-0500",
-                                 "endDate": "2019-01-12T10:43:08.490-0500"
-                                 },
-                            ],
-                    "workout_program_module": {
-                                            "workout_sections": [{
-                                                "name": "Upper Body Work",
-                                                "duration_seconds": 360,
-                                                "workout_section_type": 1,
-                                                "start_date_time": "2019-01-12T10:43:08Z",
-                                                "end_date_time": "2019-01-12T12:17:12Z"
-                                                "exercises": [
-                                                    {
-                                                        "id": "1",
-                                                        "name": "Bent over Row",
-                                                        "weight_measure": 2,
-                                                        "weight": 150,
-                                                        "sets": 2,
-                                                        "reps_per_set": 10,
-                                                        "unit_of_measure": 1,
-                                                        "intensity_pace": 5,
-                                                        "movement_id": "2356",
-                                                        "bilateral": true,
-                                                        "side": 0,
-                                                        "rpe": 5.0
-                                                    }
-                                                    ]
-                                            }]
-                                        }
-                    }
-                    
-                ]
-}
-```
-
-##### Response
- 
- If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same schema as defined in the Appendix.
--->
-
-## III. ROM WOD (Range of Motion Workout of the Day)
+## III. Mobility WOD (Workout of the Day)
 
 ### Overview & Description
 
@@ -482,13 +388,21 @@ Authorization: eyJ0eX...xA8
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
+ ```
+ {
+    "mobility_wod": mobility_wod
+ }
+```
+`mobility_wod` will have the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    "mobility_wod_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "active_rest": active_rest
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix.
+* `active_rest` will have the same schema as defined in the Appendix.
 
 
 ### Including Completed Workout Session(s)
@@ -504,7 +418,7 @@ _For more information about  __session__ formats, please see the Appendix._
  
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -589,13 +503,21 @@ Authorization: eyJraWQ...ajBc4VQ
 ##### Response
  
  If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
+ ```
+ {
+    "mobility_wod": mobility_wod
+ }
+```
+`mobility_wod` will have the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    "mobility_wod_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "active_rest": active_rest
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix.
+* `active_rest` will have the same schema as defined in the Appendix.
 
 
 
@@ -605,7 +527,7 @@ If the client includes the optional __symptoms__ element, a ROM WOD modality wil
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/rom_wod/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -645,15 +567,24 @@ Authorization: eyJraWQ...ajBc4VQ
  
  If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
+ ```
+ {
+    "mobility_wod": mobility_wod
+ }
+```
+`mobility_wod` will have the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    "mobility_wod_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "active_rest": active_rest
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix.
+* `active_rest` will have the same schema as defined in the Appendix.
 
 
-## IV. Post-Training Responsive Recovery
+## IV. Responsive Recovery
 
 ### Overview & Description
 
@@ -685,7 +616,7 @@ _For more information on __session__ formats, please see the Appendix._
  
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/post_training_recovery/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -770,13 +701,24 @@ Authorization: eyJraWQ...ajBc4VQ
 ##### Response
  
  If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- 
+ ```
+ {
+    "responsive_recovery": responsive_recovery
+ }
+```
+`responsive_recovery` will have the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    "mobility_wod_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "active_rest": active_rest,
+    "active_recovery": active_recovery,
+    "ice": ice,
+    "cold_water_immersion": cold_water_immersion
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix.
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` will have the same schema as defined in the Appendix.
 
 
 ### Including Today's Symptoms
@@ -836,84 +778,31 @@ Authorization: eyJraWQ...ajBc4VQ
  
 If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
+ ```
+ {
+    "responsive_recovery": responsive_recovery
+ }
+```
+`responsive_recovery` will have the following schema:
 ```
 {
-    "daily_plans": [daily_plan]
+    "mobility_wod_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "active_rest": active_rest,
+    "active_recovery": active_recovery,
+    "ice": ice,
+    "cold_water_immersion": cold_water_immersion
 }
 ```
-* `daily_plan` will have the same schema as defined in the Appendix.
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` will have the same schema as defined in the Appendix.
+
+
 
 ## V. Improving Personalization
 
 ### Overview & Description
 FathomAI Plans API can provide a more personalized recovery plan for an athlete when more information is supplied by a client.  Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
-
-<!-- #### Update
-
-This endpoint can be called to update a session that was previously logged/planned.  This update will help improve personalization but will not return a Daily Plan unless specifically requested with the `return_updated_plan` parameter.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/session/{User UUID}/{session_id}`. The request method __must__ be `PATCH`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-TODO - dg: Dipesh update event_date to event_date_time
-TODO: change response structure of session with PSS included
-TODO: determine/specify if patching happens at object (session) or attribute level
-```
-{
-    "event_date_time": Datetime,
-    "return_updated_plan": boolean,
-    "user_age": integer
-    "sessions": [session],
-}
-```
-* `event_date_time` __should__ reflect the local date and time when the request is submitted
-* `return_updated_plan` __should__ reflect whether an updated plan is expected
-* `user_age` __should__ reflect the user's age if the session contains heart rate data, otherwise is __optional__
-* `session` __should__ follow the same schema as defined in Create Session
-TODO: review schema example for accuracy
-```
-PATCH /plans/{version}/session/{User UUID}/{Session ID} HTTPS/1.1
-Host: apis.demo.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date": "2019-02-08T16:30:00Z",
-    "sessions": [
-                 {
-                    "event_date": "2019-02-08T16:45:55Z",
-                    "end_date": "2019-02-08T16:45:55Z",
-                    "session_type": 6,
-                    "sport_name": 1,
-                    "duration": 90.5,
-                    "calories": 50,
-                    "distance": 100,
-                    "hr_data": [],
-                    "post_session_survey": {
-                                            "event_date": "2019-02-08T16:30:00Z",
-                                            "RPE": null,
-                                            "soreness": [],
-                                            "clear_candidates": []
-                                            }
-
-                }
-                ]
-}
-```
-##### Response
- 
- If the update was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema (if an updated plan was not requested):
- 
-```
-{
-    "message": "success"
-}
-```
--->
 
 ### Symptoms
 
@@ -968,206 +857,6 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-
-<!--
-#### Mark Started (Exercise Modalities)
-
-This endpoint can be called to mark the start of exercise-based modalities.
-
-##### Query String
- 
-TODO: change the route?
-The client __must__ submit a request to the endpoint `/plans/{version}/active_recovery/{User UUID}/exercise_modalities`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-TODO: change to event_date_time if we change route?
-```
-{
-    "event_date": Datetime,
-    "recovery_type": integer
-}
-```
-* `event_date` __should__ be the time when user checks the first exercise for the session.
-* `recovery_type` __should__ be an integer reflecting Recovery Types (modality) enumeration as defined in Appendix.
-
-```
-POST /plans/{version}/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
-Host: apis.demo.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-{
-    "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": 0
-}
-```
-##### Response
- 
-If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
- 
-```
-{
-    "message": "success"
-}
-```
-
-TODO: support non exercise modalities too?
-#### Mark Completed (Exercise Modalities)
-
-This endpoint can be called to mark the completion of exercise-based modalities.
-
-##### Query String
-TODO: change route? 
-The client __must__ submit a request to the endpoint `/plans/{version}/active_recovery/{User UUID}/exercise_modalities`. The request method __must__ be `PATCH`.
-
-##### Request
-TODO: change to event_date_time if we change route?
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date": Datetime,
-    "recovery_type": integer
-    "completed_exercises": [string]
-}
-```
-* `event_date` __should__ be the time when user completes the session.
-* `recovery_type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix.
-* `completed_exercises` __should__ be a list representing the exercises that the user checked off
-TODO: review schema
-```
-PATCH /plans/{version}/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
-Host: apis.demo.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-{
-    "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": 1,
-    "completed_exercises": ["3", "5", "20", "142"]
-}
-```
-##### Response
- 
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body having the following schema:
- TODO: not a return a plan?
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same schema as defined in the Appendix.
-
--->
-
-<!-- #### Mark Started (Body Part Modalities)
-
-This endpoint can be called to mark the start of body part based modalities.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/active_recovery/{User UUID}/body_part_modalities`. The request method __must__ be `POST`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date": Datetime,
-    "recovery_type": string
-}
-```
-* `event_date` __should__ be the time when user checks the starts the session
-* `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
-
-```
-POST /plans/{version}/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
-Host: apis.{env}.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-{
-    "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "heat"
-}
-```
-##### Response
- 
-If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
- 
-```
-{
-    "message": "success"
-}
-```
-
-#### Mark Completed (Body Part Modalities)
-
-This endpoint can be called to mark the completion of body part based modalities.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/active_recovery/{User UUID}/body_part_modalities`. The request method __must__ be `PATCH`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date": Datetime,
-    "recovery_type": string
-    "completed_body_parts": [body_part]
-}
-```
-* `event_date` __should__ be the time when user completes the session.
-* `recovery_type` __should__ be one of `heat`, `ice` or `cold_water_immersion`
-* `completed_body_parts` __should__ be a list representing the body parts that the user selected from the provided list. It should be empty for `cold_water_immersion`.
-* `body_part` __should__ be of the following schema.
-```
-{
-    "body_part_location": number,
-    "side": number
-}
-```
-* `body_part_location` __should__ be an integer reflecting Body Part enumeration as defined in Appendix
-* `side` __should__ be an integer reflecting [side](#side) enumeration
-
-```
-PATCH /plans/version/active_recovery/{User UUID}/body_part_modalities HTTPS/1.1
-Host: apis.{env}.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-{
-    "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "ice",
-    "completed_body_parts": [
-                                {
-                                    "body_part_lcoation": 3,
-                                    "side": 0,
-                                },
-                                {
-                                    "body_part_lcoation": 7,
-                                    "side": 1,
-                                }
-                        ]
-}
-```
-##### Response
- 
- If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
- 
-```
-{
-    "daily_plans": [daily_plan]
-}
-```
-* `daily_plan` will have the same schema as defined in Get Daily Plan. -->
-
-<!--
-## VI. Post-Training Responsive Recovery (Before the Workout)
-
-TODO - dg: add SOFlete option here
-### Overview & Description
-
--->
 ## VI. Miscellaneous Endpoints
 
 ### Overview & Description
@@ -1210,53 +899,6 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 }
 ```
 * `daily_plan` will have the same schema as defined in the Appendix.
-
-<!--
-#### Delete
-TODO - dg: right now, this won't delete a session with a PSS, we need to update logic accordingly; which means new route
-TODO: do we actually delete or just mark as deleted?
-TODO: should the new route be workout_sessions that combines patch and delete?
-
-This endpoint can be called to delete existing externally regimented session from today or yesterday's plan.
-
-##### Query String
- 
-The client __must__ submit a request to the endpoint `/plans/{version}/session/{User UUID}/{session_id}`. The request method __must__ be `DELETE`.
-
-##### Request
-
-The client __must__ submit a request body containing a JSON object having the following schema:
-```
-{
-    "event_date": Datetime,
-    "session_type": integer
-}
-```
-* `event_date` __should__ reflect the date and time the session was scheduled for.
-* `session_type` __should__ reflect SessionType enumeration.
-TODO: review schema
-```
-DELETE /plans/{version}/session/{User UUID}/{Session ID} HTTPS/1.1
-Host: apis.{env}.fathomai.com
-Content-Type: application/json
-Authorization: eyJraWQ...ajBc4VQ
-
-{
-    "event_date": "2018-08-10T16:30:00Z",
-    "session_type": 6
-}
-```
-##### Response
- 
- If the delete was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
- 
-```
-{
-    "message": "success"
-}
-```
-
--->
 
 ## VII. Appendix
 TODO: review once the rest of the doc is done
@@ -1404,218 +1046,43 @@ TODO: review once the rest of the doc is done
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 
-
-### Daily Plan & Recovery Modalities
-`daily_plan` will be of following schema:
-<!-- ```
-{
-    "date": Date,
-    "day_of_week": integer,
-    "pre_active_rest": [PreActiveRest],
-    "completed_pre_active_rest": [PreActiveRest],
-    "heat": Heat,
-    "completed_heat": [Heat],
-    "warm_up": [WarmUp],
-    "completed_warm_up": [WarmUp],
-    "training_sessions": [Session],
-    "cool_down": [CoolDown],
-    "completed_cool_down": [CoolDown],
-    "post_active_rest": [PostActiveRest],
-    "completed_post_active_rest": [PostActiveRest],
-    "ice": Ice,
-    "completed_ice": [Ice],
-    "cold_water_immersion": ColdWaterImmersion,
-    "completed_cold_water_immersion": [ColdWaterImmersion],
-    "cross_training_sessions": [],
-    "daily_readiness_survey_completed": Boolean,
-    "landing_screen": integer,
-    "last_sensor_sync": Datetime,
-    "last_updated": Datetime,
-    "nav_bar_indicator": null,
-    "post_active_rest_completed": Boolean,
-    "pre_active_rest_completed": Boolean,
-    "sessions_planned": Boolean,
-    "train_later": Boolean
-}
-``` -->
-TODO: finalize this structure
+### Movement Integration Prep
+`movement_integration_prep` will be of following schema:
+TODO finalize structure
 ```
 {
-    "date": Date,
-    "day_of_week": integer,
-    "modalities": [modality],
-    "completed_modalities": [modality],
-    "modalities_available_on_demand": [modality_display]
-    "pre_active_rest": [],
-    "completed_pre_active_rest": [],
-    "heat": null,
-    "completed_heat": [],
-    "warm_up": [],
-    "completed_warm_up": [],
-    "training_sessions": [Session],
-    "cool_down": [],
-    "completed_cool_down": [],
-    "post_active_rest": [],
-    "completed_post_active_rest": [],
-    "ice": null,
-    "completed_ice": [],
-    "cold_water_immersion": null,
-    "completed_cold_water_immersion": [],
-    "cross_training_sessions": [],
-    "daily_readiness_survey_completed": Boolean,
-    "landing_screen": integer,
-    "last_sensor_sync": Datetime,
-    "last_updated": Datetime,
-    "nav_bar_indicator": null,
-    "post_active_rest_completed": Boolean,
-    "pre_active_rest_completed": Boolean,
-    "sessions_planned": Boolean,
-    "train_later": Boolean
-}
-```
-<div style="page-break-after: always;"></div>
-
-
-* Any of the `completed_*` attributes could be empty list
-<!--* Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
-* `warm_up` and `cool_down` will always be empty list-->
-* All of the body part modalities (`heat`, `ice`, `cold_water_immersion`) will be null
-<!-- * Any of the body part modalities (`heat`, `ice`, `cold_water_immersion`) could be null -->
-<!-- * `Heat` has following example schema
-```
-{
-    "active": true,
-    "body_parts": [
-        {
-            "active": true,
-            "before_training": true,
-            "body_part_location": 7,
-            "completed": false,
-            "goals": [
-                {
-                    "goal_type": 0,
-                    "priority": 1,
-                    "text": "Care for Pain",
-                    "trigger": "Pain Reported Today"
-                }
-            ],
-            "side": 1
+    "id" : "ef1db466-4ccf-45cf-980a-2632a600e3ee",
+    "type" : 0,
+    "title" : "MOBILIZE",
+    "when" : "before training",
+    "when_card" : "before training",
+    "start_date_time" : null,
+    "completed_date_time" : null,
+    "event_date_time" : "2020-01-03T09:32:14Z",
+    "completed" : false,
+    "active" : false,
+    "default_plan" : "Complete",
+    "force_data" : false,
+    "goal_title" : "",
+    "display_image" : "inhibit",
+    "locked_text" : "Sorry, you missed the optimal window for Mobilize today.",
+    "goals" : {
+        "Recover from training" : {
+            "efficient_active" : true,
+            "complete_active" : true,
+            "comprehensive_active" : true
+        },
+        "Care for symptoms" : {
+            "efficient_active" : false,
+            "complete_active" : true,
+            "comprehensive_active" : true
         }
-    ],
-    "completed": false,
-    "completed_date_time": null,
-    "event_date_time": null,
-    "minutes": 10,
-    "start_date_time": null
+    },
+    "exercise_phases" : [ExercisePhase, ExercisePhase]
 }
 ```
-* `Ice` has following example schema
-```
-{
-    "active": true,
-    "body_parts": [
-        {
-            "active": true,
-            "after_training": true,
-            "body_part_location": 7,
-            "completed": false,
-            "goals": [
-                {
-                    "goal_type": 0,
-                    "priority": 1,
-                    "text": "Care for Pain",
-                    "trigger": "Pain Reported Today"
-                }
-            ],
-            "immediately_after_training": false,
-            "repeat_every_3hrs_for_24hrs": false,
-            "side": 1
-        }
-    ],
-    "completed": false,
-    "completed_date_time": null,
-    "event_date_time": null,
-    "minutes": 10,
-    "start_date_time": null
-}
-``` -->
-<!-- * `ColdWaterImmersion` has following example schema
-```
-{
-    "minutes": 10,
-    "after_training"': true,
-    "goals": [
-        {
-            "goal_type": 0,
-            "priority": 1,
-            "text": "Care for Pain",
-            "trigger": "Pain Reported Today"
-        }
-    ],
-    "start_date_time": null,
-    "completed_date_time": null,
-    "event_date_time": null,
-    "completed": false,
-    "active": true
-}
-
-``` -->
-<!--
-* `PreActiveRest` has the following example schema
-```
-{
-    "active": true,
-    "completed": false,
-    "completed_date_time": null,
-    "default_plan": "Complete",
-    "event_date_time": "2019-05-07T00:00:00Z",
-    "high_relative_intensity_logged": false,
-    "high_relative_load_session": true,
-    "active_stretch_exercises": [AssignedExercise, AssignedExercise]
-    "inhibit_exercises": [AssignedExercise, AssignedExercise],
-    "isolated_activate_exercises": [AssignedExercise, AssignedExercise],
-    "static_integrate_exercises": [AssignedExercise, AssignedExercise],
-    "static_stretch_exercises": [AssignedExercise, AssignedExercise]
-    "muscular_strain_increasing": false,
-    "start_date_time": null,
-}
-```
-* `PostActiveRest` has following example schema
-```
-{
-    "active": true,
-    "completed": false,
-    "completed_date_time": null,
-    "default_plan": "Complete",
-    "event_date_time": "2019-05-07T00:00:00Z",
-    "high_relative_intensity_logged": false,
-    "high_relative_load_session": true,
-    "inhibit_exercises": [AssignedExercise, AssignedExercise],
-    "isolated_activate_exercises": [AssignedExercise, AssignedExercise],
-    "muscular_strain_increasing": false,
-    "start_date_time": null,
-    "static_integrate_exercises": [AssignedExercise, AssignedExercise],
-    "static_stretch_exercises": [AssignedExercise, AssignedExercise]
-}
-```
--->
-<!-- * `CoolDown` has the following example schema
-```
-{
-    "active": true,
-    "completed": false,
-    "completed_date_time": null,
-    "dynamic_integrate_exercises": [AssignedExercise, AssignedExercise],
-    "dynamic_stretch_exercises": [AssignedExercise, AssignedExercise],
-    "event_date_time": "2019-05-07T00:00:00Z",
-    "high_relative_intensity_logged": false,
-    "high_relative_load_session": true,
-    "muscular_strain_increasing": false,
-    "sport_name": 17,
-    "start_date_time": null
-    }
-``` -->
-* `modality` has the following example schema:
+### Active Rest
+* `active_rest` has the following example schema:
 
 ```
 {
@@ -1649,8 +1116,81 @@ TODO: finalize this structure
     "exercise_phases" : [ExercisePhase, ExercisePhase]
 }
 ```
+### Active Recovery
+* `active_recovery` has the following example schema
+```
+{
+    "active": true,
+    "completed": false,
+    "completed_date_time": null,
+    "dynamic_integrate_exercises": [AssignedExercise, AssignedExercise],
+    "dynamic_stretch_exercises": [AssignedExercise, AssignedExercise],
+    "event_date_time": "2019-05-07T00:00:00Z",
+    "high_relative_intensity_logged": false,
+    "high_relative_load_session": true,
+    "muscular_strain_increasing": false,
+    "sport_name": 17,
+    "start_date_time": null
+    }
+```
+### Ice
+* `ice` has following example schema
+```
+{
+    "active": true,
+    "body_parts": [
+        {
+            "active": true,
+            "after_training": true,
+            "body_part_location": 7,
+            "completed": false,
+            "goals": [
+                {
+                    "goal_type": 0,
+                    "priority": 1,
+                    "text": "Care for Pain",
+                    "trigger": "Pain Reported Today"
+                }
+            ],
+            "immediately_after_training": false,
+            "repeat_every_3hrs_for_24hrs": false,
+            "side": 1
+        }
+    ],
+    "completed": false,
+    "completed_date_time": null,
+    "event_date_time": null,
+    "minutes": 10,
+    "start_date_time": null
+}
+```
+### Cold Water Immersion
+* `cold_water_immersion` has following example schema
+```
+{
+    "minutes": 10,
+    "after_training"': true,
+    "goals": [
+        {
+            "goal_type": 0,
+            "priority": 1,
+            "text": "Care for Pain",
+            "trigger": "Pain Reported Today"
+        }
+    ],
+    "start_date_time": null,
+    "completed_date_time": null,
+    "event_date_time": null,
+    "completed": false,
+    "active": true
+}
+
+```
+
 * `type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix
-* `ExercisePhase` has the following example schema:
+
+### Exercise Phase
+* `exercise_phase` has the following example schema:
 
 ```
 {
@@ -1661,10 +1201,9 @@ TODO: finalize this structure
 }
 ```
 * `type` __should__ be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
-<div style="page-break-after: always;"></div>
 
-
-* `AssignedExercise` has the following example schema
+### Assigned Exercise
+* `assigned_exercise` has the following example schema
 
 ```
 {
@@ -1716,59 +1255,14 @@ TODO: finalize this structure
 
 
 ### Enumerations
-#### BodyPart
 
-```
-    chest = 2
-    abdominals = 3
-    groin = 5
-    quads = 6
-    knee = 7
-    shin = 8
-    ankle = 9
-    foot = 10
-    it_band = 11
-    lower_back = 12
-    glutes = 14
-    hamstrings = 15
-    calves = 16
-    achilles = 17
-    upper_back_neck = 18
-    elbow = 19
-    wrist = 20
-    lats = 21
-    biceps = 22
-    triceps = 23
-    forearm = 24
-    it_band_lateral_knee = 27
-    hip_flexor = 28
-    deltoid = 29
-```
-#### Side
-
-```
-    none_unilateral = 0
-    left = 1
-    right = 2
-```
-
-#### SessionSource
+#### Activity Types
 ``` 
-    user = 0
-    health = 1
-    user_health = 2
-    three_sensor = 3
-```
-<div style="page-break-after: always;"></div>
-
-
-#### Recovery Types
-``` 
-    pre_active_rest = 0
-    post_active_rest = 1
-    warm_up = 2
-    cool_down = 3
-    functional_strength = 4
+    movement_prep = 0
+    active_rest = 1
+    active_recovery = 2
+    cold_water_immersion = 3
+    ice = 4
 ```
 
 #### Exercise Phase Type
@@ -1779,108 +1273,8 @@ TODO: finalize this structure
     dynamic_stretch = 3
     isolated_activate = 4
     static_integrate = 5
+    dynamic_integrate = 6
 ```
-
-<div style="page-break-after: always;"></div>
-
-
-#### All body parts
-
-```
-    shoulder = 1
-    chest = 2
-    abdominals = 3
-    hip = 4
-    groin = 5
-    quads = 6
-    knee = 7
-    shin = 8
-    ankle = 9
-    foot = 10
-    it_band = 11
-    lower_back = 12
-    general = 13
-    glutes = 14
-    hamstrings = 15
-    calves = 16
-    achilles = 17
-    upper_back_neck = 18
-    elbow = 19
-    wrist = 20
-    lats = 21
-    biceps = 22
-    triceps = 23
-    forearm = 24
-    core_stabilizers = 25
-    erector_spinae = 26
-    it_band_lateral_knee = 27
-    hip_flexor = 28
-    deltoid = 29
-    deep_rotators_hip = 30
-    obliques = 31
-    anterior_tibialis = 40
-    peroneals_longus = 41
-    posterior_tibialis = 42
-    soleus = 43
-    gastrocnemius_medial = 44
-    bicep_femoris_long_head = 45
-    bicep_femoris_short_head = 46
-    semimembranosus = 47
-    semitendinosus = 48
-    adductor_longus = 49
-    adductor_magnus_anterior_fibers = 50
-    adductor_magnus_posterior_fibers = 51
-    adductor_brevis = 52
-    gracilis = 53
-    pectineus = 54
-```
-```
-    vastus_lateralis = 55
-    vastus_medialis = 56
-    vastus_intermedius = 57
-    rectus_femoris = 58
-    tensor_fascia_latae = 59 # hips
-    piriformis = 60 # deep rotator of hip
-    gastrocnemius_lateral = 61
-    sartorius = 62 
-    gluteus_medius_anterior_fibers = 63
-    gluteus_medius_posterior_fibers = 64
-    gluteus_minimus = 65
-    gluteus_maximus = 66
-    quadratus_femoris = 67
-    popliteus = 68
-    external_obliques = 69
-    quadratus_lumorum = 70
-    psoas = 71
-    iliacus = 72
-    transverse_abdominis = 73
-    internal_obliques = 74
-    rectus_abdominis = 75
-    upper_trapezius = 76
-    levator_scapulae = 77
-    middle_trapezius = 78
-    lower_trapezius = 79
-    rhomboids = 80
-    pectoralis_minor = 81
-    pectoralis_major = 82
-    anterior_deltoid = 83
-    medial_deltoid = 84
-    posterior_deltoid = 85
-    upper_body = 91
-    lower_body = 92
-    full_body = 93
-    semimembranosus_semitendinosus = 100
-    anterior_adductors = 101
-    rectus_femoris_vastus_intermedius = 102
-    glute_med = 103
-    upper_traps_levator_scapulae = 105
-    middle_traps_rhomboids = 106
-    pec_major_minor = 107
-    hip_flexor_merge = 108
-```
-
-<div style="page-break-after: always;"></div>
-
 
 #### SportName
 ```
@@ -1975,11 +1369,21 @@ TODO: finalize this structure
 <div style="page-break-after: always;"></div>
 
 
-### Body Part Types
+### Body Parts
+
+#### Side
+
+```
+    none_unilateral = 0
+    left = 1
+    right = 2
+```
 
 #### Joints
 The following reportable body parts are considered joints
 ```
+    shoulder = 1
+    hip = 4
     elbow = 19
     wrist = 20
     knee = 7
@@ -2011,8 +1415,13 @@ The following reportable body parts are considered muscles
     biceps = 22
     triceps = 23
     forearm = 24
+    core_stabilizers = 25
     hip_flexor = 28
     deltoid = 29
+    deep_rotators_hip = 30
+    obliques = 31
+    rotator_cuff = 119
+    serratus_anterior = 125
 ```
-###### Last Modified: February 26, 2020
+###### Last Modified: February 28, 2020
 

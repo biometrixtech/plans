@@ -17,14 +17,14 @@ from utils import parse_datetime, format_datetime
 
 class UserMovementPrep(object):
     def __init__(self, user_id, created_date_time):
-        self.id = None
+        self.movement_prep_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
         self.movement_prep = None
 
     def json_serialise(self):
         return {
-            "id": self.id,
+            "movement_prep_id": self.movement_prep_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "movement_prep": self.movement_prep.json_serialise() if self.movement_prep is not None else None
@@ -33,7 +33,7 @@ class UserMovementPrep(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         movement_prep = cls(input_dict['user_id'], input_dict['created_date_time'])
-        movement_prep.id = input_dict.get("id")
+        movement_prep.movement_prep_id = input_dict.get("movement_prep_id")
         movement_prep.movement_prep = Activity.json_deserialise(input_dict['movement_prep']) if input_dict.get('movement_prep') is not None else None
         return movement_prep
 
@@ -48,14 +48,14 @@ class UserMovementPrep(object):
 
 class MobilityWOD(object):
     def __init__(self, user_id, created_date_time):
-        self.id = None
+        self.mobility_wod_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
         self.active_rest = None
 
     def json_serialise(self):
         return {
-            "id": self.id,
+            "mobility_wod_id": self.mobility_wod_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None
@@ -64,7 +64,7 @@ class MobilityWOD(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         mobility_wod = cls(input_dict['user_id'], input_dict['created_date_time'])
-        mobility_wod.id = input_dict.get("id")
+        mobility_wod.mobility_wod_id = input_dict.get("mobility_wod_id")
         mobility_wod.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
         return mobility_wod
 
@@ -77,9 +77,9 @@ class MobilityWOD(object):
         super().__setattr__(name, value)
 
 
-class PostTrainingResponsiveRecovery(object):
+class ResponsiveRecovery(object):
     def __init__(self, user_id, created_date_time):
-        self.id = None
+        self.responsive_recovery_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
         self.active_rest = None
@@ -89,7 +89,7 @@ class PostTrainingResponsiveRecovery(object):
 
     def json_serialise(self):
         return {
-            "id": self.id,
+            "responsive_recovery_id": self.responsive_recovery_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None,
@@ -101,7 +101,7 @@ class PostTrainingResponsiveRecovery(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         post_training_recovery = cls(input_dict['user_id'], input_dict['created_date_time'])
-        post_training_recovery.id = input_dict.get("id")
+        post_training_recovery.responsive_recovery_id = input_dict.get("responsive_recovery_id")
         post_training_recovery.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
         post_training_recovery.active_recovery = Activity.json_deserialise(input_dict['active_recovery']) if input_dict.get('active_recovery') is not None else None
         post_training_recovery.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice') is not None else None
