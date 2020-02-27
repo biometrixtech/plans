@@ -160,10 +160,14 @@ Requesting a Movement Prep modality requires the local date time of the athlete 
 
 Planned sessions may be reported using one of two formats:
 
+TODO: this may be confusing as it references "completed" workouts in a discussion of planned workouts
+
 * Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
 * Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
 This will generate a Movement Prep modality that takes into consideration the planned workout(s) and user's history. This case is illustrated below.
+
+_For more information about __session__ formats, please see the Appendix._
  
 ##### Query String
  
@@ -654,6 +658,7 @@ Authorization: eyJraWQ...ajBc4VQ
 ### Overview & Description
 
 TODO: define what types of modalities might be returned
+
 This endpoint can be called to request __Post-Training Responsive Recovery__ modalities which includes 5-15-30+ minutes of Mobility work including foam rolling, static stretching, isolated activation, and/or static integrate exercises based on the athlete’s needs.
 
 Generating Post-Training Responsive Recovery modalities requires the following data elements:
@@ -674,7 +679,9 @@ Completed workout sessions may be reported using one of two formats:
 * Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the end user should use this format.
 * Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the Recovery Plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
-This will generate Post-Training Responsive Recovery modalities that takes into consideration the completed workout(s) and user's history. This case is illustrated below.
+This will generate Post-Training Responsive Recovery modalities that takes into consideration the completed workout(s) and user's history.
+
+_For more information on __session__ formats, please see the Appendix._
  
 ##### Query String
  
@@ -1431,6 +1438,7 @@ TODO: review once the rest of the doc is done
     "train_later": Boolean
 }
 ``` -->
+TODO: finalize this structure
 ```
 {
     "date": Date,
@@ -1462,7 +1470,7 @@ TODO: review once the rest of the doc is done
     "post_active_rest_completed": Boolean,
     "pre_active_rest_completed": Boolean,
     "sessions_planned": Boolean,
-    "train_later": Bolean
+    "train_later": Boolean
 }
 ```
 <div style="page-break-after: always;"></div>
