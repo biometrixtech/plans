@@ -81,11 +81,10 @@ def handle_add_symptoms(user_id=None):
                            hist_update=hist_update)
 
         # update users database if health data received
-        if is_fathom_environment():
-            Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
-                                                                                    endpoint=f"user/{user_id}",
-                                                                                    body={"timezone": timezone,
-                                                                                          "plans_api_version": Config.get('API_VERSION')})
+        Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
+                                                                                endpoint=f"user/{user_id}",
+                                                                                body={"timezone": timezone,
+                                                                                      "plans_api_version": Config.get('API_VERSION')})
         return {'daily_plans': [plan]}, 201
     else:
         return {'message': 'success'}, 200
