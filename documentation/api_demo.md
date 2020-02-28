@@ -127,7 +127,6 @@ The following simple types __may__ be used in requests and responses:
 
 * `string`, `number`, `integer`, `boolean`: as defined in the [JSON Schema](http://json-schema.org) standard.
 * `UUID`: a `string` matching the regular expression `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, that is, the string representation of an [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID.
-TODO - dg: review the timezone info
 * `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full  [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
 
@@ -164,8 +163,6 @@ Requesting a _Movement Integration Preparation Activity_ requires the local date
 
 The planned workout session may be reported using one of two formats:
 
-TODO: this may be confusing as it references "completed" workouts in a discussion of planned workouts
-
 * Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the athlete should use this format.
 
 * Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
@@ -181,7 +178,6 @@ The client __must__ submit a request to the endpoint `/plans/{version}/movement_
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
-TODO - paul:  re: single vs multiple sessions issue here as well. Should we change schema to be "session": session or keep the schema as "sessions": [] and only have single session as example
 
 ```
 {
@@ -190,10 +186,7 @@ TODO - paul:  re: single vs multiple sessions issue here as well. Should we chan
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
-
-TODO: make sure example matches section
-TODO: get rid of duration, intensity_pace for detailed sessions?
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 
 ```
 POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
@@ -254,7 +247,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
@@ -305,7 +298,7 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
     "movement_integration_prep": movement_integration_prep
 }
 ```
-* `movement_integration_prep` will have the same schema as defined in the Appendix.
+* `movement_integration_prep` will have the schema as defined in the Appendix.
 
 ## III. Mobility WOD (Workout of the Day)
 
@@ -336,7 +329,7 @@ The _Active Rest Activity_ will also consider prior completed workouts and prior
 
 ### Basic Case
 
-An Active Rest Activity can be requested by only submitting local date time of the athlete. This will generate an Active Rest Activity based on the athlete's prior completed workouts and prior logged symptoms. In the case that an athlete has no recent history, FathomAI returns an Active Rest Activity targeting common areas of immobility.
+An Active Rest Activity can be requested by only submitting the local date time of the athlete. This will generate an Active Rest Activity based on the athlete's prior completed workouts and prior logged symptoms. In the case that an athlete has no recent history, FathomAI returns an Active Rest Activity targeting common areas of immobility.
 
 ##### Query String
  
@@ -352,7 +345,6 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 * `event_date_time` __should__ reflect the local date and time when the request is submitted.
 
-TODO: review the schema per reqs
 ```
 POST /plans/{version}/mobility_wod/{User UUID} HTTP/1.1
 Host: apis.demo.fathomai.com
@@ -381,7 +373,7 @@ Authorization: eyJ0eX...xA8
     "active_rest": active_rest
 }
 ```
-* `active_rest` will have the same schema as defined in the Appendix.
+* `active_rest` will have the schema as defined in the Appendix.
 
 TODO - paul : need clarification on whether mobility wod can be requested with multiple sessions or is this one limited to single session as well.
 ### Including Completed Workout Session(s)
@@ -389,10 +381,10 @@ TODO - paul : need clarification on whether mobility wod can be requested with m
 If the client includes the optional __sessions__ element, an Active Rest Activity will be returned with consideration for the workout session(s) the athlete completed and their history
 
 Completed workout session may be reported using one of two formats:
-TODO - paul : use bulleted list like we're doing in movementp prep section??
-Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
 
-Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information) 
+* Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
+
+* Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information) 
 
 _For more information about  __session__ formats, please see the Appendix._
  
@@ -412,8 +404,6 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `event_date_time` __should__ reflect the local time that the request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
 
-TODO: make sure example matches section
-TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
 POST /plans/{version}/mobility_wod/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
@@ -465,7 +455,6 @@ Authorization: eyJraWQ...ajBc4VQ
                                                     "sets": 2,
                                                     "reps_per_set": 10,
                                                     "unit_of_measure": 1,
-                                                    "intensity_pace": 5,
                                                     "movement_id": "2356",
                                                     "bilateral": true,
                                                     "side": 0,
@@ -497,13 +486,12 @@ Authorization: eyJraWQ...ajBc4VQ
     "active_rest": active_rest
 }
 ```
-* `active_rest` will have the same schema as defined in the Appendix.
+* `active_rest` will have the schema as defined in the Appendix.
 
 
 
 ### Including Today's Symptoms
-TODO - paul : is Mobility WOD an activity returned or active rest an activity returned using mobility wod endpoint? In the case above, the language used is Active Rest Activity
-If the client includes the optional __symptoms__ element, a Mobility WOD Activity will be returned with consideration for the symptoms the athlete is experiencing today.
+If the client includes the optional __symptoms__ element, an Active Rest Activity will be returned with consideration for the symptoms the athlete is experiencing today.
 
 ##### Query String
  
@@ -522,7 +510,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
-TODO: review schema
+
 ```
 POST /plans/{version}/mobility_wod/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
@@ -561,7 +549,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "active_rest": active_rest
 }
 ```
-* `active_rest` will have the same schema as defined in the Appendix.
+* `active_rest` will have the schema as defined in the Appendix.
 
 
 ## IV. Responsive Recovery
@@ -625,8 +613,6 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
 
-TODO: make sure example matches section
-TODO: get rid of duration, intensity_pace for detailed sessions?
 ```
 POST /plans/{version}/responsive_recovery/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
@@ -678,7 +664,6 @@ Authorization: eyJraWQ...ajBc4VQ
                                                     "sets": 2,
                                                     "reps_per_set": 10,
                                                     "unit_of_measure": 1,
-                                                    "intensity_pace": 5,
                                                     "movement_id": "2356",
                                                     "bilateral": true,
                                                     "side": 0,
@@ -713,7 +698,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "cold_water_immersion": cold_water_immersion
 }
 ```
-* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the same schema as defined in the Appendix.
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
 
 ### Including Today's Symptoms
@@ -790,7 +775,7 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
     "cold_water_immersion": cold_water_immersion
 }
 ```
-* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the same schema as defined in the Appendix.
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
 
 
@@ -851,25 +836,24 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 ## VI. Appendix
-TODO: review once the rest of the doc is done
 
 ### Symptoms
 `symptom` __should__ have the following schema:
 ```
 {
-    "body_part": number,
-    "side": number,
-    "tight": number,
-    "knots": number,
-    "ache": number,
-    "sharp": number
+    "body_part": integer,
+    "side": integer,
+    "tight": integer,
+    "knots": integer,
+    "ache": integer,
+    "sharp": integer
 }
 
 ```
-* `body_part` __should__ be an integer reflecting BodyPart enumeration as defined in this Appendix
+* `body_part` __should__ be an integer reflecting Body Part enumeration as defined in this Appendix
 * `side` __should__ be an integer reflecting Side enumeration as defined in this Appendix
 * `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
-* `knots` __should__ be reported for muscles (see _Enumerations_ later in this Appendix) only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, tigger points, and musclular adhesions felt. If not reported, it should be `null`
+* `knots` __should__ be reported for muscles (see _Enumerations_ later in this Appendix) only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, trigger points, and muscular adhesions felt. If not reported, it should be `null`
 * `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
 * `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be `null`
 
@@ -925,7 +909,7 @@ TODO: review once the rest of the doc is done
 * `event_date` __should__ reflect the start time of the start time of the session
 * `session_type` __should__ reflect SessionType enumeration. For the Detailed Session format, SessionType=7.
 * `end_date` is an __optional__ parameter that reflects the end time of the session
-* `duration` __should__ be in minutes and reflect the duration of the workout.
+* `duration` is an __optional__ parameter in minutes and reflect the duration of the workout.
 * `session_RPE` __should__ be a number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `calories` __if present__, __should__ be calories burned during the workout.
 * `distance` __if present__, __should__ be distance covered during the workout.
@@ -1027,7 +1011,6 @@ TODO finalize structure
     "complete_active": boolean
     "comprehensive_active": boolean
 ```
-TODO: explain what the above means?
 
 ### Active Rest
 * `active_rest` will be of the following schema:
