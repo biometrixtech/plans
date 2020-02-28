@@ -62,6 +62,7 @@ class SessionSource(Enum):
 class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
+        self.user_id = None
         self.id = None
         self.apple_health_kit_id = None
         self.apple_health_kit_source_name = None
@@ -296,6 +297,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def json_serialise(self):
         session_type = self.session_type()
         ret = {
+            'user_id': self.user_id,
             'session_id': self.id,
             'apple_health_kit_id': self.apple_health_kit_id,
             'apple_health_kit_source_name': self.apple_health_kit_source_name,
@@ -350,6 +352,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def json_deserialise(cls, input_dict):
         session = SessionFactory().create(SessionType(input_dict['session_type']))
         session.id = input_dict["session_id"]
+        session.user_id = input_dict.get("user_id")
         session.apple_health_kit_id = input_dict.get("apple_health_kit_id")
         session.apple_health_kit_source_name = input_dict.get("apple_health_kit_source_name")
         session.merged_apple_health_kit_ids = input_dict.get("merged_apple_health_kit_ids", [])
