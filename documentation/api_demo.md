@@ -162,6 +162,7 @@ The _Movement Integration Preparation Activity_ will also consider prior complet
 
 Requesting a _Movement Integration Preparation Activity_ requires the local date time of the athlete and one planned session. 
 
+TODO - paul: re: gabby's comment about only able to send single session, should we say planned session here
 Planned sessions may be reported using one of two formats:
 
 
@@ -182,6 +183,8 @@ The client __must__ submit a request to the endpoint `/plans/{version}/movement_
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
+TODO - paul:  re: single vs multiple sessions issue here as well. Should we change schema to be "session": session or keep the schema as "sessions": [] and only have single session as example
+
 ```
 {
     "event_date_time": Datetime,
@@ -193,6 +196,9 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 TODO: make sure example matches section
 TODO: get rid of duration, intensity_pace for detailed sessions?
+
+TODO - paul:  re: single vs multiple sessions issue here as well
+
 ```
 POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
@@ -274,6 +280,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "movement_integration_prep": movement_integration_prep
 }
 ```
+TODO - paul : should it be will have the schema as defined in the Appendix (i.e. remove same)
 * `movement_integration_prep` will have the same schema as defined in the Appendix.
 
 ### Including Today's Symptoms
@@ -425,13 +432,13 @@ Authorization: eyJ0eX...xA8
 ```
 * `active_rest` will have the same schema as defined in the Appendix.
 
-
+TODO - paul : need clarification on whether mobility wod can be requested with multiple sessions or is this one limited to single session as well.
 ### Including Completed Workout Session(s)
 
 If the client includes the optional __sessions__ element, an Active Rest Activity will be returned with consideration for the workout session(s) the athlete completed and their history
 
 Completed workout session may be reported using one of two formats:
-
+TODO - paul : use bulleted list like we're doing in movementp prep section??
 Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
 
 Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information) 
@@ -544,7 +551,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 ### Including Today's Symptoms
-
+TODO - paul : is Mobility WOD an activity returned or active rest an activity returned using mobility wod endpoint? In the case above, the language used is Active Rest Activity
 If the client includes the optional __symptoms__ element, a Mobility WOD Activity will be returned with consideration for the symptoms the athlete is experiencing today.
 
 ##### Query String
@@ -639,13 +646,14 @@ The Activities returned will also consider prior completed workouts and prior lo
 Requesting Activities using the Responsive Recovery endpoint  requires the local date time of the athlete and at least one completed workout session.
 
 Completed workout sessions may be reported using one of two formats:
-
+TODO - paul : bulleted list?
 Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
 
 Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
 The Activities returned will also consider prior completed workouts and prior logged symptoms.
 
+TODO - paul : single workout only?
 This will generate Activities that take into consideration the completed workout(s) and athlete's history. 
 
 _For more information on __session__ formats, please see the Appendix._
@@ -754,6 +762,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "cold_water_immersion": cold_water_immersion
 }
 ```
+TODO - paul : Do we need to mention here that any of these elements can be null?
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` will have the same schema as defined in the Appendix.
 
 
@@ -1040,7 +1049,6 @@ TODO: Dipesh we need the WorkoutSectionType
 ### Movement Integration Prep
 `movement_integration_prep` will be of following schema:
 TODO finalize structure
-TODO Dipesh validate goals please
 ```
 {
     "id" : UUID,
@@ -1072,7 +1080,6 @@ TODO: explain what the above means?
 ### Active Rest
 * `active_rest` will be of the following schema:
 TODO finalize structure
-TODO Dipesh validate goals please
 ```
 {
     "id" : UUID,
@@ -1095,7 +1102,6 @@ TODO Dipesh validate goals please
 ### Active Recovery
 * `active_recovery` will be of the following schema:
 TODO finalize structure
-TODO Dipesh validate goals please
 ```
 {
     "id" : UUID,
@@ -1154,7 +1160,7 @@ TODO Dipesh validate goals please
 }
 
 ```
-
+TODO - paul : is this missed deletion? seems out of place
 * `type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix
 
 ### Exercise Phase
@@ -1221,7 +1227,7 @@ TODO Dipesh validate goals please
 {
      "text" : string,
      "priority" : integer,
-     "goal_type" : GoalType
+     "goal_type" : GoalType TODO - paul : Enum below is AthleteGoalType (one of them needs to change)
            
 }
 ```
@@ -1247,7 +1253,6 @@ TODO Dipesh validate goals please
     static_integrate = 5
     dynamic_integrate = 6
 ```
-
 #### AthleteGoalType:
 ```
     pain = 0
