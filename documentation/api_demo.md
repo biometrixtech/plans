@@ -91,6 +91,8 @@ Partners __may__ include the non-standardized fields `_nbf` and `_exp` in key de
 
 Partners __may__ include the non-standardized field `_env` in key definitions; if this field is provided the value  __must__ be a String matching the regular expression `^[a-z0-9]+$` or an array of such Strings, and the API  __will__ interpret this as a list of the environments where the key should be accepted.  This allows partners to use different signing keys for production and non-production environments.
 
+<div style="page-break-after: always;"></div>
+
 ##### JWT claims
 
 The JWTs provided by clients  __must__ contain the following claims:
@@ -121,6 +123,8 @@ In addition to the AWS API Gateway responses and the specific responses for each
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
 * `404 Unknown` with `Status` header equal to `UnknownEndpoint`, if an invalid endpoint was requested.
 
+<div style="page-break-after: always;"></div>
+
 #### Schema
 
 The following simple types __may__ be used in requests and responses:
@@ -141,6 +145,7 @@ The Movement Prep endpoint can be called to request a Movement Integration Prepa
 _Movement Integration Preparation Activity_:
 
 __Expected Duration__: durations will vary based on the athlete need’s severity and diversity.
+
 * Efficient - typically 2 to 8 minutes, 
 * Complete - typically 5 to 13 minutes
 * Comprehensive - typically 10 minutes or more.
@@ -148,6 +153,7 @@ __Expected Duration__: durations will vary based on the athlete need’s severit
 __Exercise Types__: foam rolling, static stretching, active stretching or dynamic flexibility, and isolated activation based on the athlete’s needs.
 
 Generating a _Movement Integration Preparation Activity_ requires the following data elements: 
+
 * Local date time 
 * Planned workout
 
@@ -169,7 +175,7 @@ The planned workout session may be reported using one of two formats:
 
 This will generate a _Movement Prep Integration Activity_ that takes into consideration the planned workout and athlete's history. 
 
-_For more information about __session__ formats, please see the Appendix._
+_For more information about  __session__ formats, please see the Appendix._
  
 ##### Query String
  
@@ -212,12 +218,15 @@ Authorization: eyJraWQ...ajBc4VQ
 ##### Response
  
  If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- ```
+
+```
  {
     "movement_prep": movement_prep
  }
 ```
-`movement_prep` will have the following schema:
+
+* `movement_prep` will have the following schema:
+
 ```
 {
     "movement_prep_id": UUID,
@@ -226,6 +235,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "movement_integration_prep": movement_integration_prep
 }
 ```
+
 * `movement_integration_prep` will have the schema as defined in the Appendix.
 
 ### Including Today's Symptoms
@@ -239,6 +249,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/movement_
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
+
 ```
 {
     "event_date_time": Datetime,
@@ -246,6 +257,7 @@ The client __must__ submit a request body containing a JSON object having the fo
     "symptoms": [symptom, symptom]
 }
 ```
+
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
@@ -284,12 +296,15 @@ Authorization: eyJraWQ...ajBc4VQ
 ##### Response
  
 If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- ```
+
+```
  {
     "movement_prep": movement_prep
  }
 ```
-`movement_prep` will have the following schema:
+
+* `movement_prep` will have the following schema:
+
 ```
 {
     "movement_prep_id": UUID,
@@ -298,7 +313,9 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
     "movement_integration_prep": movement_integration_prep
 }
 ```
+
 * `movement_integration_prep` will have the schema as defined in the Appendix.
+
 
 ## III. Mobility WOD (Workout of the Day)
 
@@ -338,11 +355,13 @@ The client __must__ submit a request to the endpoint `/plans/{version}/mobility_
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
+
 ```
 {
     "event_date_time": Datetime
 }
 ```
+
 * `event_date_time` __should__ reflect the local date and time when the request is submitted.
 
 ```
@@ -358,13 +377,16 @@ Authorization: eyJ0eX...xA8
 
 ##### Response
  
- If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- ```
+ If the write was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
  {
     "mobility_wod": mobility_wod
  }
 ```
-`mobility_wod` will have the following schema:
+
+* `mobility_wod` will have the following schema:
+
 ```
 {
     "mobility_wod_id": UUID,
@@ -373,6 +395,7 @@ Authorization: eyJ0eX...xA8
     "active_rest": active_rest
 }
 ```
+
 * `active_rest` will have the schema as defined in the Appendix.
 
 ### Including Completed Workout Session(s)
@@ -394,12 +417,14 @@ The client __must__ submit a request to the endpoint `/plans/{version}/mobility_
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
+
 ```
 {
     "event_date_time": Datetime,
     "sessions": [session, session]
 }
 ```
+
 * `event_date_time` __should__ reflect the local time that the request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
 
@@ -469,13 +494,16 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
- If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- ```
+ If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
  {
     "mobility_wod": mobility_wod
  }
 ```
-`mobility_wod` will have the following schema:
+
+* `mobility_wod` will have the following schema:
+
 ```
 {
     "mobility_wod_id": UUID,
@@ -484,6 +512,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "active_rest": active_rest
 }
 ```
+
 * `active_rest` will have the schema as defined in the Appendix.
 
 
@@ -498,12 +527,14 @@ The client __must__ submit a request to the endpoint `/plans/{version}/mobility_
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
+
 ```
 {
     "event_date_time": Datetime,
     "symptoms": [symptom, symptom]
 }
 ```
+
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
@@ -531,14 +562,16 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
- If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
- ```
+```
  {
     "mobility_wod": mobility_wod
  }
 ```
-`mobility_wod` will have the following schema:
+
+* `mobility_wod` will have the following schema:
+
 ```
 {
     "mobility_wod_id": UUID,
@@ -547,8 +580,10 @@ Authorization: eyJraWQ...ajBc4VQ
     "active_rest": active_rest
 }
 ```
+
 * `active_rest` will have the schema as defined in the Appendix.
 
+<div style="page-break-after: always;"></div>
 
 ## IV. Responsive Recovery
 
@@ -558,6 +593,7 @@ The Responsive Recovery endpoint can be called to request Activities assembled t
 
 * __Active Rest__ Activity (see Mobility WOD section above )
 * __Active Recovery__ Activity
+
     * __Expected Duration__: durations will vary based on the athlete need’s severity and diversity.
         * Efficient - typically 2 to 5 minutes, 
         * Complete - typically 4 to 8 minutes
@@ -565,6 +601,7 @@ The Responsive Recovery endpoint can be called to request Activities assembled t
     * __Exercise Types__: dynamic flexibility and dynamic integrate exercises based on the athlete’s needs
 
 * Additional Optional Content: 
+
     * __Cold Water Immersion Activity, Ice Activity__
     
 Generating Activities using the Responsive Recovery endpoint requires the following data elements: 
@@ -590,7 +627,7 @@ The completed workout session may be reported using one of two formats:
 
 The Activities returned will also consider prior completed workouts and prior logged symptoms.
 
-_For more information on __session__ formats, please see the Appendix._
+_For more information about  __session__ formats, please see the Appendix._
  
 ##### Query String
  
@@ -599,12 +636,14 @@ The client __must__ submit a request to the endpoint `/plans/{version}/responsiv
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
+
 ```
 {
     "event_date_time": Datetime,
     "session": session
 }
 ```
+
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 
@@ -661,13 +700,16 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
- If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
- ```
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+
+```
  {
     "responsive_recovery": responsive_recovery
  }
 ```
-`responsive_recovery` will have the following schema:
+
+* `responsive_recovery` will have the following schema:
+
 ```
 {
     "responsive_recovery_id": UUID,
@@ -679,6 +721,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "cold_water_immersion": cold_water_immersion
 }
 ```
+
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
 
@@ -693,6 +736,7 @@ The client __must__ submit a request to the endpoint `/plans/{version}/responsiv
 ##### Request
 
 The client __must__ submit a request body containing a JSON object having the following schema:
+
 ```
 {
     "event_date_time": Datetime,
@@ -700,6 +744,7 @@ The client __must__ submit a request body containing a JSON object having the fo
     "symptoms": [symptom, symptom]
 }
 ```
+
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
@@ -736,14 +781,16 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
-If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
  
- ```
+```
  {
     "responsive_recovery": responsive_recovery
  }
 ```
-`responsive_recovery` will have the following schema:
+
+* `responsive_recovery` will have the following schema:
+
 ```
 {
     "mobility_wod_id": UUID,
@@ -755,9 +802,10 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
     "cold_water_immersion": cold_water_immersion
 }
 ```
+
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
-
+<div style="page-break-after: always;"></div>
 
 ## V. Improving Personalization
 
@@ -781,6 +829,7 @@ The client __must__ submit a request body containing a JSON object having the fo
     "symptoms": [symptom, symptom]
 }
 ```
+
 * `event_date_time` __should__  be a Datetime and reflect the local time the request was submitted
 * `symptoms` __should__ reflect a list of symptoms(`symptom`) as defined in the Appendix
 
@@ -808,16 +857,20 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
- If the write was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+If the write was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+
 ```
 {
     {'message': 'success'}
 }
 ```
 
+<div style="page-break-after: always;"></div>
+
 ## VI. Appendix
 
 ### Symptoms
+
 `symptom` __should__ have the following schema:
 ```
 {
@@ -828,8 +881,8 @@ Authorization: eyJraWQ...ajBc4VQ
     "ache": integer,
     "sharp": integer
 }
-
 ```
+
 * `body_part` __should__ be an integer reflecting Body Part enumeration as defined in this Appendix
 * `side` __should__ be an integer reflecting Side enumeration as defined in this Appendix
 * `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
@@ -844,6 +897,7 @@ Authorization: eyJraWQ...ajBc4VQ
 #### Simple Session Format
 
 `session` __should__ be of the following schema when using the _Simple Session_ format:
+
 ```
 {
     "event_date": Datetime,
@@ -858,6 +912,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "hr_data": [hr, hr, hr],
 }
 ```
+
 * `event_date` __should__ reflect the start time of the start time of the session
 * `session_type` __should__ reflect SessionType enumeration. For the Simple Session format, SessionType=6.
 * `end_date` is an __optional__ parameter that reflects the end time of the session
@@ -872,6 +927,7 @@ Authorization: eyJraWQ...ajBc4VQ
 #### Detailed Session Format
 
 `session` __should__ be of the following schema when using the _Detailed Session_ format:
+
 ```
 {
     "event_date": Datetime,
@@ -886,6 +942,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "workout_program_module": workout_program_module
 }
 ```
+
 * `event_date` __should__ reflect the start time of the start time of the session
 * `session_type` __should__ reflect SessionType enumeration. For the Detailed Session format, SessionType=7.
 * `end_date` is an __optional__ parameter that reflects the end time of the session
@@ -927,6 +984,8 @@ Authorization: eyJraWQ...ajBc4VQ
 * `end_date_time` __should__ reflect the end time of the workout section
 * `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
 
+<div style="page-break-after: always;"></div>
+
 `exercise` __should__ be of the following schema:
 ```
 {
@@ -956,8 +1015,12 @@ Authorization: eyJraWQ...ajBc4VQ
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 
+<div style="page-break-after: always;"></div>
+
 ### Movement Integration Prep
+
 `movement_integration_prep` will be of following schema:
+
 ```
 {
     "id" : UUID,
@@ -975,20 +1038,27 @@ Authorization: eyJraWQ...ajBc4VQ
     "exercise_phases" : [exercise_phase, exercise_phase]
 }
 ```
+
 * `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
 * `activity_goal` __will__ be an Activity Goal as defined in this Appendix
 * `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
 ### Activity Goal
+
 `activity_goal` will be of the following schema:
+
 ```
     "efficient_active": boolean
     "complete_active": boolean
     "comprehensive_active": boolean
 ```
 
+<div style="page-break-after: always;"></div>
+
 ### Active Rest
+
 * `active_rest` will be of the following schema:
+
 ```
 {
     "id" : UUID,
@@ -1006,12 +1076,15 @@ Authorization: eyJraWQ...ajBc4VQ
     "exercise_phases" : [exercise_phase, exercise_phase]
 }
 ```
+
 * `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
 * `activity_goal` __will__ be an Activity Goal as defined in this Appendix
 * `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
 ### Active Recovery
+
 * `active_recovery` will be of the following schema:
+
 ```
 {
     "id" : UUID,
@@ -1029,12 +1102,15 @@ Authorization: eyJraWQ...ajBc4VQ
     "exercise_phases" : [exercise_phase, exercise_phase]
 }
 ```
+
 * `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
 * `activity_goal` __will__ be an Activity Goal as defined in this Appendix
 * `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
 ### Ice
+
 * `ice` will be of the following schema
+
 ```
 {
     "body_parts": [
@@ -1052,10 +1128,13 @@ Authorization: eyJraWQ...ajBc4VQ
     "start_date_time": Datetime
 }
 ```
+
 *`body_part_location` will be an integer reflecting the Body Part enumeration as defined in this appendix.
 
 ### Cold Water Immersion
+
 * `cold_water_immersion` will be of the following schema
+
 ```
 {
     "minutes": integer,
@@ -1068,9 +1147,13 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 
 ```
+
 * `goal` will be a goal as defined in this Appendix.
 
+<div style="page-break-after: always;"></div>
+
 ### Exercise Phase
+
 * `exercise_phase` will be of the following schema:
 
 ```
@@ -1081,11 +1164,14 @@ Authorization: eyJraWQ...ajBc4VQ
     "exercises" : [assigned_exercise, assigned_exercise]
 }
 ```
+
 * `type` will be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
 * `assigned_exercise` will be an Assigned Exercise as defined in Appendix
 
 ### Assigned Exercise
+
 * `assigned_exercise` will be of the following schema:
+
 ```
 {
     "name" : string,
@@ -1106,12 +1192,17 @@ Authorization: eyJraWQ...ajBc4VQ
     "dosages" : [exercise_dosage, exercise_dosage]
 }
 ```
+
 * `library_id` is a string indicating the ID of the assigned exercise
 * `exercise_dosage` will be an Exercise Dosage as defined in this Appendix.
 * `unit_of_measure` will be the string representation of the Unit of Measure enumeration as defined in this Appendix (e.g. "seconds", "count", etc.). 
 
+<div style="page-break-after: always;"></div>
+
 ### Exercise Dosage
+
 `exercise_dosage` will be of the following schema:
+
 ```
 {
     "goal" : goal,
@@ -1131,10 +1222,13 @@ Authorization: eyJraWQ...ajBc4VQ
     "ranking" : integer
 }
 ```
+
 * `goal` will be a Goal as defined in this Appendix
 
 ### Goal
+
 * `goal` will have the following schema 
+
 ```
 {
      "text" : string,
@@ -1143,7 +1237,10 @@ Authorization: eyJraWQ...ajBc4VQ
            
 }
 ```
+
 * `goal_type` will be an integer reflecting the Athlete Goal Type enumeration as defined in Appendix
+
+<div style="page-break-after: always;"></div>
 
 ### Enumerations
 
@@ -1185,14 +1282,14 @@ Authorization: eyJraWQ...ajBc4VQ
 
 #### Unit of Measure
 ```
-    seconds: 0
-    count: 1
-    yards: 2
-    feet: 3
-    meters: 4
-    miles: 5
-    kilometers: 6
-    calories: 7
+    seconds = 0
+    count = 1
+    yards = 2
+    feet = 3
+    meters = 4
+    miles = 5
+    kilometers = 6
+    calories = 7
 ```
 
 #### SportName
@@ -1309,6 +1406,7 @@ The following reportable body parts are considered joints
     ankle = 9
     foot = 10
 ```
+
 #### Ligaments
 The following reportable body parts are considered ligaments
 ```
@@ -1316,6 +1414,8 @@ The following reportable body parts are considered ligaments
     it_band_lateral_knee = 27
     achilles = 17
 ```
+
+<div style="page-break-after: always;"></div>
 
 #### Muscles
 The following reportable body parts are considered muscles
