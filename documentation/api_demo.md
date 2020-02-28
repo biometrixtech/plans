@@ -1,4 +1,4 @@
-# FathomAI - Recovery API (v 4.8.0) - TODO: change version?
+# FathomAI - Recovery API (v 5.0.0)
 
 ## Overview
 FathomAI provides this limited implementation of its Recovery API to demonstrate the core functionality to potential customers.
@@ -375,7 +375,6 @@ Authorization: eyJ0eX...xA8
 ```
 * `active_rest` will have the schema as defined in the Appendix.
 
-TODO - paul : need clarification on whether mobility wod can be requested with multiple sessions or is this one limited to single session as well.
 ### Including Completed Workout Session(s)
 
 If the client includes the optional __sessions__ element, an Active Rest Activity will be returned with consideration for the workout session(s) the athlete completed and their history
