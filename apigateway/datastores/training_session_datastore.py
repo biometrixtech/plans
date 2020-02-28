@@ -1,6 +1,6 @@
 from aws_xray_sdk.core import xray_recorder
 from config import get_mongo_collection
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from utils import format_date, format_datetime
 
 from models.session import Session
@@ -11,14 +11,14 @@ class TrainingSessionDatastore(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore.get')
-    def get(self, user_id, event_date_time=None, start_date_time=None, end_date_time=None):
+    def get(self, session_id, user_id, event_date_time=None, start_date_time=None, end_date_time=None):
         """
         user_id: uuid
         event_date_time: datetime.datetime
         start_date_time: datetime.datetime
         end_date_time: datetime.datetime
         """
-        return self._query_mongodb(user_id, event_date_time, start_date_time, end_date_time)
+        return self._query_mongodb(session_id, user_id, event_date_time, start_date_time, end_date_time)
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore.put')
     def put(self, items):
@@ -31,25 +31,33 @@ class TrainingSessionDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore._query_mongodb')
-    def _query_mongodb(self, user_id, event_date_time, start_date_time, end_date_time):
+    def _query_mongodb(self, session_id, user_id, event_date_time, start_date_time, end_date_time):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        if user_id is None:
-            raise InvalidSchemaException("Need to provide user_id")
-        else:
-            query = {'user_id': user_id}
-            if event_date_time is not None:
-                event_date = format_date(event_date_time)
-                query['event_date'] = {'$regex': f'^{event_date}'}
-            elif start_date_time is not None and end_date_time is not None:
-                query['event_date'] = {'$gte': format_datetime(start_date_time), '$lte': format_datetime(end_date_time)}
+        if session_id is not None:
+            mongo_result = mongo_collection.find_one({'session_id': session_id})
+            if mongo_result is not None:
+                movement_prep = Session.json_deserialise(mongo_result)
+                return movement_prep
             else:
-                raise InvalidSchemaException("Need to provide either event_date_time or start_date_time and end_date_time")
-            mongo_cursor = mongo_collection.find(query)
+                raise NoSuchEntityException(f'Workout session with the provided id not found')
+        else:
+            if user_id is None:
+                raise InvalidSchemaException("Need to provide user_id or session_id")
+            else:
+                query = {'user_id': user_id}
+                if event_date_time is not None:
+                    event_date = format_date(event_date_time)
+                    query['event_date'] = {'$regex': f'^{event_date}'}
+                elif start_date_time is not None and end_date_time is not None:
+                    query['event_date'] = {'$gte': format_datetime(start_date_time), '$lte': format_datetime(end_date_time)}
+                else:
+                    raise InvalidSchemaException("Need to provide either event_date_time or start_date_time and end_date_time when querying by user_id")
+                mongo_cursor = mongo_collection.find(query)
 
-            ret = []
-            for movement_prep in mongo_cursor:
-                ret.append(Session.json_deserialise(movement_prep))
-            return ret
+                ret = []
+                for movement_prep in mongo_cursor:
+                    ret.append(Session.json_deserialise(movement_prep))
+                return ret
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore._put_mongodb')
     def _put_mongodb(self, item):

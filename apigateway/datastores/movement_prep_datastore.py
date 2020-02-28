@@ -11,8 +11,8 @@ class MovementPrepDatastore(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.MovementPrepDatastore.get')
-    def get(self, id=None, user_id=None, event_date_time=None):
-        return self._query_mongodb(id, user_id, event_date_time)
+    def get(self, movement_prep_id=None, user_id=None, event_date_time=None):
+        return self._query_mongodb(movement_prep_id, user_id, event_date_time)
 
     @xray_recorder.capture('datastore.MovementPrepDatastore.put')
     def put(self, items):
@@ -25,10 +25,10 @@ class MovementPrepDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.MovementPrepDatastore._query_mongodb')
-    def _query_mongodb(self, id=None, user_id=None, event_date_time=None):
+    def _query_mongodb(self, movement_prep_id=None, user_id=None, event_date_time=None):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        if id is not None:
-            mongo_result = mongo_collection.find_one({'id': id})
+        if movement_prep_id is not None:
+            mongo_result = mongo_collection.find_one({'movement_prep_id': movement_prep_id})
             if mongo_result is not None:
                 movement_prep = UserMovementPrep.json_deserialise(mongo_result)
                 return movement_prep
@@ -45,12 +45,12 @@ class MovementPrepDatastore(object):
                     ret.append(UserMovementPrep.json_deserialise(movement_prep))
                 return ret
             else:
-                raise InvalidSchemaException("Need to provide either id or user_id-event_date_time")
+                raise InvalidSchemaException("Need to provide either movement_prep_id or user_id-event_date_time")
 
     @xray_recorder.capture('datastore.MovementPrepDatastore._put_mongodb')
     def _put_mongodb(self, item):
         item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {'id': item['id']}
+        query = {'movement_prep_id': item['movement_prep_id']}
         mongo_collection.replace_one(query, item, upsert=True)

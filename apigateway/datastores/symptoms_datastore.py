@@ -42,8 +42,10 @@ class SymptomsDatastore(object):
                 query['reported_date_time'] = {'$regex': f'^{event_date}'}
             elif start_date_time is not None and end_date_time is not None:
                 query['reported_date_time'] = {'$gte': format_datetime(start_date_time), '$lte': format_datetime(end_date_time)}
+            elif start_date_time is not None:
+                query['reported_date_time'] = {'$gte': format_datetime(start_date_time)}
             else:
-                raise InvalidSchemaException("Need to provide either event_date_time or start_date_time and end_date_time")
+                raise InvalidSchemaException("Need to provide either event_date_time or start_date_time and/or end_date_time")
             mongo_cursor = mongo_collection.find(query)
 
             ret = []

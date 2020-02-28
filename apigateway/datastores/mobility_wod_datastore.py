@@ -11,8 +11,8 @@ class MobilityWODDatastore(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.MobilityWODDatastore.get')
-    def get(self, id=None, user_id=None, event_date_time=None):
-        return self._query_mongodb(id, user_id, event_date_time)
+    def get(self, mobility_wod_id=None, user_id=None, event_date_time=None):
+        return self._query_mongodb(mobility_wod_id, user_id, event_date_time)
 
     @xray_recorder.capture('datastore.MobilityWODDatastore.put')
     def put(self, items):
@@ -25,10 +25,10 @@ class MobilityWODDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.MobilityWODDatastore._query_mongodb')
-    def _query_mongodb(self, id=None, user_id=None, event_date_time=None):
+    def _query_mongodb(self, mobility_wod_id=None, user_id=None, event_date_time=None):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        if id is not None:
-            mongo_result = mongo_collection.find_one({'id': id})
+        if mobility_wod_id is not None:
+            mongo_result = mongo_collection.find_one({'mobility_wod_id': mobility_wod_id})
             if mongo_result is not None:
                 mobility_wod = MobilityWOD.json_deserialise(mongo_result)
                 return mobility_wod
@@ -52,5 +52,5 @@ class MobilityWODDatastore(object):
         item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {'id': item['id']}
+        query = {'mobility_wod_id': item['mobility_wod_id']}
         mongo_collection.replace_one(query, item, upsert=True)

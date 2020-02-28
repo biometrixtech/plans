@@ -3,7 +3,7 @@ from config import get_mongo_collection
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from utils import format_date
 
-from models.functional_movement_activities import PostTrainingResponsiveRecovery
+from models.functional_movement_activities import ResponsiveRecovery
 
 
 class ResponsiveRecovery(object):
@@ -11,8 +11,8 @@ class ResponsiveRecovery(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.ResponsiveRecovery.get')
-    def get(self, id=None, user_id=None, event_date_time=None):
-        return self._query_mongodb(id, user_id, event_date_time)
+    def get(self, responsive_recovery_id=None, user_id=None, event_date_time=None):
+        return self._query_mongodb(responsive_recovery_id, user_id, event_date_time)
 
     @xray_recorder.capture('datastore.ResponsiveRecovery.put')
     def put(self, items):
@@ -25,15 +25,15 @@ class ResponsiveRecovery(object):
             raise e
 
     @xray_recorder.capture('datastore.ResponsiveRecovery._query_mongodb')
-    def _query_mongodb(self, id=None, user_id=None, event_date_time=None):
+    def _query_mongodb(self, responsive_recovery_id=None, user_id=None, event_date_time=None):
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        if id is not None:
-            mongo_result = mongo_collection.find_one({'id': id})
+        if responsive_recovery_id is not None:
+            mongo_result = mongo_collection.find_one({'responsive_recovery_id': responsive_recovery_id})
             if mongo_result is not None:
-                post_training_recovery = PostTrainingResponsiveRecovery.json_deserialise(mongo_result)
-                return post_training_recovery
+                responsive_recovery = ResponsiveRecovery.json_deserialise(mongo_result)
+                return responsive_recovery
             else:
-                raise NoSuchEntityException(f'Post Training Responsive Recovery with the provided id not found')
+                raise NoSuchEntityException(f'Responsive Recovery with the provided id not found')
         else:
             if user_id is not None and event_date_time is not None:
                 event_date = format_date(event_date_time)
@@ -41,8 +41,8 @@ class ResponsiveRecovery(object):
                 mongo_cursor = mongo_collection.find(query)
 
                 ret = []
-                for post_training_recovery in mongo_cursor:
-                    ret.append(PostTrainingResponsiveRecovery.json_deserialise(post_training_recovery))
+                for responsive_recovery in mongo_cursor:
+                    ret.append(ResponsiveRecovery.json_deserialise(responsive_recovery))
                 return ret
             else:
                 raise InvalidSchemaException("Need to provide either id or user_id-event_date_time")
@@ -52,5 +52,5 @@ class ResponsiveRecovery(object):
         item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {'id': item['id']}
+        query = {'responsive_recovery_id': item['responsive_recovery_id']}
         mongo_collection.replace_one(query, item, upsert=True)
