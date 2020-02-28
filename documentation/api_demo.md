@@ -162,9 +162,7 @@ The _Movement Integration Preparation Activity_ will also consider prior complet
 
 Requesting a _Movement Integration Preparation Activity_ requires the local date time of the athlete and one planned session. 
 
-TODO - paul: re: gabby's comment about only able to send single session, should we say planned session here
-Planned sessions may be reported using one of two formats:
-
+The planned workout session may be reported using one of two formats:
 
 TODO: this may be confusing as it references "completed" workouts in a discussion of planned workouts
 
@@ -188,7 +186,7 @@ TODO - paul:  re: single vs multiple sessions issue here as well. Should we chan
 ```
 {
     "event_date_time": Datetime,
-    "sessions": [session, session]
+    "session": session
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
@@ -196,8 +194,6 @@ TODO - paul:  re: single vs multiple sessions issue here as well. Should we chan
 
 TODO: make sure example matches section
 TODO: get rid of duration, intensity_pace for detailed sessions?
-
-TODO - paul:  re: single vs multiple sessions issue here as well
 
 ```
 POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
@@ -207,8 +203,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
-    "sessions":[
-            {
+    "session":{
                 "event_date": "2019-01-12T10:41:57Z",
                 "session_type": 6,
                 "sport_name": 1,
@@ -217,49 +212,7 @@ Authorization: eyJraWQ...ajBc4VQ
                 "calories": 100,
                 "distance": 200,
                 "end_date": "2019-01-12T10:54:57Z"
-            },
-            {
-                "event_date": "2019-01-12T10:41:57Z",
-                "session_type": 7,
-                "duration": 840,
-                "description": "Evening Practice",
-                "calories": 100,
-                "distance": 200,
-                "end_date": "2019-02-12T10:54:57Z",
-                "hr_data":  [
-                            {"value": 153,
-                             "startDate": "2019-01-12T10:43:08.490-0500",
-                             "endDate": "2019-01-12T10:43:08.490-0500"
-                             },
-                        ],
-                "workout_program_module": {
-                                        "workout_sections": [{
-                                            "name": "Upper Body Work",
-                                            "duration_seconds": 360,
-                                            "workout_section_type": 1,
-                                            "start_date_time": "2019-01-12T10:43:08Z",
-                                            "end_date_time": "2019-01-12T12:17:12Z"
-                                            "exercises": [
-                                                {
-                                                    "id": "1",
-                                                    "name": "Bent over Row",
-                                                    "weight_measure": 2,
-                                                    "weight": 150,
-                                                    "sets": 2,
-                                                    "reps_per_set": 10,
-                                                    "unit_of_measure": 1,
-                                                    "intensity_pace": 5,
-                                                    "movement_id": "2356",
-                                                    "bilateral": true,
-                                                    "side": 0,
-                                                    "rpe": 5.0
-                                                }
-                                                ]
-                                        }]
-                                    }
-                }
-                
-            ]
+            }
 }
 ```
 
@@ -280,8 +233,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "movement_integration_prep": movement_integration_prep
 }
 ```
-TODO - paul : should it be will have the schema as defined in the Appendix (i.e. remove same)
-* `movement_integration_prep` will have the same schema as defined in the Appendix.
+* `movement_integration_prep` will have the schema as defined in the Appendix.
 
 ### Including Today's Symptoms
 
@@ -297,7 +249,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date_time": Datetime,
-    "sessions": [session],
+    "session": session,
     "symptoms": [symptom, symptom]
 }
 ```
@@ -314,8 +266,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
-    "sessions":[
-            {
+    "session": {
                 "event_date": "2019-01-12T10:41:57Z",
                 "session_type": 6,
                 "sport_name": 1,
@@ -324,7 +275,7 @@ Authorization: eyJraWQ...ajBc4VQ
                 "calories": 100,
                 "distance": 200,
                 "end_date": "2019-01-12T10:54:57Z"
-            }],
+            },
     "symptoms":[
             {
                 "body_part": 14,
@@ -646,10 +597,10 @@ The Activities returned will also consider prior completed workouts and prior lo
 Requesting Activities using the Responsive Recovery endpoint  requires the local date time of the athlete and at least one completed workout session.
 
 Completed workout sessions may be reported using one of two formats:
-TODO - paul : bulleted list?
-Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
 
-Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+* Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
+
+* Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
 The Activities returned will also consider prior completed workouts and prior logged symptoms.
 
@@ -753,7 +704,7 @@ Authorization: eyJraWQ...ajBc4VQ
 `responsive_recovery` will have the following schema:
 ```
 {
-    "mobility_wod_id": UUID,
+    "responsive_recovery_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
     "active_rest": active_rest,
@@ -762,8 +713,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "cold_water_immersion": cold_water_immersion
 }
 ```
-TODO - paul : Do we need to mention here that any of these elements can be null?
-* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` will have the same schema as defined in the Appendix.
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the same schema as defined in the Appendix.
 
 
 ### Including Today's Symptoms
@@ -840,7 +790,7 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
     "cold_water_immersion": cold_water_immersion
 }
 ```
-* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` will have the same schema as defined in the Appendix.
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the same schema as defined in the Appendix.
 
 
 
@@ -866,10 +816,9 @@ The client __must__ submit a request body containing a JSON object having the fo
     "symptoms": [symptom, symptom]
 }
 ```
-* `event_date` __should__  be a Datetime and reflect the local time the request was submitted
+* `event_date_time` __should__  be a Datetime and reflect the local time the request was submitted
 * `symptoms` __should__ reflect a list of symptoms(`symptom`) as defined in the Appendix
 
-TODO: review example schema
 ```
 POST /plans/{version}/symptoms/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
@@ -877,8 +826,8 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date": "2019-10-29T17:45:24Z",
-    "soreness":[
+    "event_date_time": "2019-10-29T17:45:24Z",
+    "symptoms":[
         {
             "body_part": 18,
             "side": 0,
@@ -1052,7 +1001,7 @@ TODO finalize structure
 ```
 {
     "id" : UUID,
-    "type" : ActivityType,
+    "type" : integer,
     "title" : string,
     "start_date_time" : Datetime,
     "completed_date_time" : Datetime,
@@ -1064,12 +1013,15 @@ TODO finalize structure
         string : activity_goal,
         string : activity_goal
     },
-    "exercise_phases" : [ExercisePhase, ExercisePhase]
+    "exercise_phases" : [exercise_phase, exercise_phase]
 }
 ```
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
+* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
+* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
-### Activity Goals
-`activity_goal` has the following schema:
+### Activity Goal
+`activity_goal` will be of the following schema:
 ```
     "efficient_active": boolean
     "complete_active": boolean
@@ -1083,7 +1035,7 @@ TODO finalize structure
 ```
 {
     "id" : UUID,
-    "type" : ActivityType,
+    "type" : integer,
     "title" : string,
     "start_date_time" : Datetime,
     "completed_date_time" : Datetime,
@@ -1095,9 +1047,12 @@ TODO finalize structure
         string : activity_goal,
         string : activity_goal
     },
-    "exercise_phases" : [ExercisePhase, ExercisePhase]
+    "exercise_phases" : [exercise_phase, exercise_phase]
 }
 ```
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
+* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
+* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
 ### Active Recovery
 * `active_recovery` will be of the following schema:
@@ -1105,7 +1060,7 @@ TODO finalize structure
 ```
 {
     "id" : UUID,
-    "type" : ActivityType,
+    "type" : integer,
     "title" : string,
     "start_date_time" : Datetime,
     "completed_date_time" : Datetime,
@@ -1117,9 +1072,12 @@ TODO finalize structure
         string : activity_goal,
         string : activity_goal
     },
-    "exercise_phases" : [ExercisePhase, ExercisePhase]
+    "exercise_phases" : [exercise_phase, exercise_phase]
 }
 ```
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
+* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
+* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
 ### Ice
 * `ice` will be of the following schema
@@ -1130,7 +1088,7 @@ TODO finalize structure
         {
             "active": boolean,
             "after_training": boolean,
-            "body_part_location": BodyPart,
+            "body_part_location": integer,
             "completed": boolean,
             "goals": [goal, goal],
             "immediately_after_training": boolean,
@@ -1145,6 +1103,8 @@ TODO finalize structure
     "start_date_time": Datetime
 }
 ```
+*`body_part_location` will be an integer reflecting the Body Part enumeration as defined in this appendix.
+
 ### Cold Water Immersion
 * `cold_water_immersion` will be of the following schema
 ```
@@ -1160,24 +1120,24 @@ TODO finalize structure
 }
 
 ```
-TODO - paul : is this missed deletion? seems out of place
-* `type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix
+* `goal` will be a goal as defined in this Appendix.
 
 ### Exercise Phase
-* `exercise_phase` has the following schema:
+* `exercise_phase` will be of the following schema:
 
 ```
 {
-    "type" : ExercisePhaseType,
+    "type" : integer,
     "name" : string,
     "title" : string,
-    "exercises" : [AssignedExercise, AssignedExercise]
+    "exercises" : [assigned_exercise, assigned_exercise]
 }
 ```
-* `type` __should__ be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
+* `type` will be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
+* `assigned_exercise` will be an Assigned Exercise as defined in Appendix
 
 ### Assigned Exercise
-* `assigned_exercise` has the following schema
+* `assigned_exercise` will be of the following schema:
 ```
 {
     "name" : string,
@@ -1198,9 +1158,10 @@ TODO - paul : is this missed deletion? seems out of place
     "dosages" : [exercise_dosage, exercise_dosage]
 }
 ```
+* `exercise_dosage` will be an Exercise Dosage as defined in this Appendix.
 
 ### Exercise Dosage
-`exercise_dosage` has the following schema:
+`exercise_dosage` will be of the following schema:
 ```
 {
     "goal" : goal,
@@ -1220,17 +1181,19 @@ TODO - paul : is this missed deletion? seems out of place
     "ranking" : integer
 }
 ```
+* `goal` will be a Goal as defined in this Appendix
 
 ### Goal
-* `goal` has the following schema 
+* `goal` will have the following schema 
 ```
 {
      "text" : string,
      "priority" : integer,
-     "goal_type" : GoalType TODO - paul : Enum below is AthleteGoalType (one of them needs to change)
+     "goal_type" : integer
            
 }
 ```
+* `goal_type` will be an integer reflecting the Athlete Goal Type enumeration as defined in Appendix
 
 ### Enumerations
 

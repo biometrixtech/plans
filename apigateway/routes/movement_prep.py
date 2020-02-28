@@ -58,10 +58,9 @@ def handle_movement_prep_create(user_id):
     survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
 
     # if planned session is sent, add it to the plan
-    if 'sessions' in request.json and len(request.json['sessions']) > 0:
-        for session in request.json['sessions']:
-            if session is None:
-                continue
+    if 'session' in request.json :
+        session = request.json['session']
+        if session is not None:
             survey_processor.create_session_from_survey(session)
         plan.training_sessions.extend(survey_processor.sessions)
 
@@ -106,11 +105,12 @@ def validate_data():
                 raise InvalidSchemaException('body_part not recognized')
             symptom['body_part'] = int(symptom['body_part'])
 
-    if 'sessions' not in request.json:
-        raise InvalidSchemaException('sessions is required parameter to receive Movement Prep')
+    if 'session' not in request.json:
+        raise InvalidSchemaException('session is required parameter to receive Movement Prep')
     else:
-        if not isinstance(request.json['sessions'], list):
-            raise InvalidSchemaException("Property sessions must be of type list")
-        request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
-        if len(request.json['sessions']) == 0:
-            raise InvalidSchemaException("A valid session is required to generate Movement Prep")
+        pass
+        # if not isinstance(request.json['session'], list):
+        #     raise InvalidSchemaException("Property sessions must be of type list")
+        # request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
+        # if len(request.json['sessions']) == 0:
+        #     raise InvalidSchemaException("A valid session is required to generate Movement Prep")
