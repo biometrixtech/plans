@@ -6,15 +6,15 @@ from utils import format_date
 from models.functional_movement_activities import ResponsiveRecovery
 
 
-class ResponsiveRecovery(object):
+class ResponsiveRecoveryDatastore(object):
     def __init__(self, mongo_collection='responsiverecovery'):
         self.mongo_collection = mongo_collection
 
-    @xray_recorder.capture('datastore.ResponsiveRecovery.get')
+    @xray_recorder.capture('datastore.ResponsiveRecoveryDatastore.get')
     def get(self, responsive_recovery_id=None, user_id=None, event_date_time=None):
         return self._query_mongodb(responsive_recovery_id, user_id, event_date_time)
 
-    @xray_recorder.capture('datastore.ResponsiveRecovery.put')
+    @xray_recorder.capture('datastore.ResponsiveRecoveryDatastore.put')
     def put(self, items):
         if not isinstance(items, list):
             items = [items]
@@ -24,7 +24,7 @@ class ResponsiveRecovery(object):
         except Exception as e:
             raise e
 
-    @xray_recorder.capture('datastore.ResponsiveRecovery._query_mongodb')
+    @xray_recorder.capture('datastore.ResponsiveRecoveryDatastore._query_mongodb')
     def _query_mongodb(self, responsive_recovery_id=None, user_id=None, event_date_time=None):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if responsive_recovery_id is not None:
@@ -47,7 +47,7 @@ class ResponsiveRecovery(object):
             else:
                 raise InvalidSchemaException("Need to provide either id or user_id-event_date_time")
 
-    @xray_recorder.capture('datastore.ResponsiveRecovery._put_mongodb')
+    @xray_recorder.capture('datastore.ResponsiveRecoveryDatastore._put_mongodb')
     def _put_mongodb(self, item):
         item = item.json_serialise()
 

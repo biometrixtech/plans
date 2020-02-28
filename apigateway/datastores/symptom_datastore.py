@@ -6,11 +6,11 @@ from utils import format_date, format_datetime
 from models.symptom import Symptom
 
 
-class SymptomsDatastore(object):
+class SymptomDatastore(object):
     def __init__(self, mongo_collection='symptoms'):
         self.mongo_collection = mongo_collection
 
-    @xray_recorder.capture('datastore.SymptomsDatastore.get')
+    @xray_recorder.capture('datastore.SymptomDatastore.get')
     def get(self, user_id, event_date_time=None, start_date_time=None, end_date_time=None):
         """
         user_id: uuid
@@ -20,7 +20,7 @@ class SymptomsDatastore(object):
         """
         return self._query_mongodb(user_id, event_date_time, start_date_time, end_date_time)
 
-    @xray_recorder.capture('datastore.SymptomsDatastore.put')
+    @xray_recorder.capture('datastore.SymptomDatastore.put')
     def put(self, items):
         if not isinstance(items, list):
             items = [items]
@@ -30,7 +30,7 @@ class SymptomsDatastore(object):
         except Exception as e:
             raise e
 
-    @xray_recorder.capture('datastore.SymptomsDatastore._query_mongodb')
+    @xray_recorder.capture('datastore.SymptomDatastore._query_mongodb')
     def _query_mongodb(self, user_id, event_date_time, start_date_time, end_date_time):
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if user_id is None:
@@ -53,7 +53,7 @@ class SymptomsDatastore(object):
                 ret.append(Symptom.json_deserialise(movement_prep))
             return ret
 
-    @xray_recorder.capture('datastore.SymptomsDatastore._put_mongodb')
+    @xray_recorder.capture('datastore.SymptomDatastore._put_mongodb')
     def _put_mongodb(self, item):
         item = item.json_serialise()
 
