@@ -3,7 +3,7 @@ from config import get_mongo_collection
 from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from utils import format_date
 
-from models.functional_movement_activities import UserMovementPrep
+from models.functional_movement_activities import MovementPrep
 
 
 class MovementPrepDatastore(object):
@@ -36,7 +36,7 @@ class MovementPrepDatastore(object):
         if movement_prep_id is not None:
             mongo_result = mongo_collection.find_one({'movement_prep_id': movement_prep_id})
             if mongo_result is not None:
-                movement_prep = UserMovementPrep.json_deserialise(mongo_result)
+                movement_prep = MovementPrep.json_deserialise(mongo_result)
                 return movement_prep
             else:
                 raise NoSuchEntityException(f'Movement Prep with the provided id not found')
@@ -48,7 +48,7 @@ class MovementPrepDatastore(object):
 
                 ret = []
                 for movement_prep in mongo_cursor:
-                    ret.append(UserMovementPrep.json_deserialise(movement_prep))
+                    ret.append(MovementPrep.json_deserialise(movement_prep))
                 return ret
             else:
                 raise InvalidSchemaException("Need to provide either movement_prep_id or user_id-event_date_time")
