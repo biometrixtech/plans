@@ -442,7 +442,6 @@ Authorization: eyJraWQ...ajBc4VQ
                                         "workout_sections": [{
                                             "name": "Upper Body Work",
                                             "duration_seconds": 360,
-                                            "workout_section_type": 1,
                                             "start_date_time": "2019-01-12T10:43:08Z",
                                             "end_date_time": "2019-01-12T12:17:12Z"
                                             "exercises": [
@@ -637,7 +636,6 @@ Authorization: eyJraWQ...ajBc4VQ
                                         "workout_sections": [{
                                             "name": "Upper Body Work",
                                             "duration_seconds": 360,
-                                            "workout_section_type": 1,
                                             "start_date_time": "2019-01-12T10:43:08Z",
                                             "end_date_time": "2019-01-12T12:17:12Z"
                                             "exercises": [
@@ -916,7 +914,6 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 {
     "name": string,
-    "workout_section_type: integer,
     "duration_seconds": integer,
     "start_date_time": datetime,
     "end_date_time": datetime,
@@ -925,8 +922,6 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 * `name` __should__ be an identifying section name
-TODO: Dipesh we need the WorkoutSectionType
-* `workout_section_type` __should__ reflect WorkoutSectionType enumeration.
 * `duration_seconds` __should__ be total time assigned or taken to complete the section
 * `start_date_time` __should__ reflect the start time of the workout section
 * `end_date_time` __should__ reflect the end time of the workout section
@@ -957,13 +952,12 @@ TODO: Dipesh we need the WorkoutSectionType
 * `side` __should__ represent the side (left or right) on which the exercise is performed if `bilateral` is false
 * `sets` __should__ be an integer representation of total sets of the exercise to be performed
 * `reps_per_set` __should__ be an integer representing of total reps of exercise to be performed per set
-* `unit_of_measure` __should__ be an enum representation of the unit the reps are measured
+* `unit_of_measure` __should__ be an integer reflecting the Unit of Measure enumeration and should indicate the unit in which the reps are measured
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 
 ### Movement Integration Prep
 `movement_integration_prep` will be of following schema:
-TODO finalize structure
 ```
 {
     "id" : UUID,
@@ -973,7 +967,6 @@ TODO finalize structure
     "completed_date_time" : Datetime,
     "event_date_time" : Datetime,
     "completed" : boolean,
-    "active" : boolean,
     "default_plan" : string,
     "goals" : {
         string : activity_goal,
@@ -996,7 +989,6 @@ TODO finalize structure
 
 ### Active Rest
 * `active_rest` will be of the following schema:
-TODO finalize structure
 ```
 {
     "id" : UUID,
@@ -1006,7 +998,6 @@ TODO finalize structure
     "completed_date_time" : Datetime,
     "event_date_time" : Datetime,
     "completed" : boolean,
-    "active" : boolean,
     "default_plan" : string,
     "goals" : {
         string : activity_goal,
@@ -1021,7 +1012,6 @@ TODO finalize structure
 
 ### Active Recovery
 * `active_recovery` will be of the following schema:
-TODO finalize structure
 ```
 {
     "id" : UUID,
@@ -1031,7 +1021,6 @@ TODO finalize structure
     "completed_date_time" : Datetime,
     "event_date_time" : Datetime,
     "completed" : boolean,
-    "active" : boolean,
     "default_plan" : string,
     "goals" : {
         string : activity_goal,
@@ -1048,16 +1037,11 @@ TODO finalize structure
 * `ice` will be of the following schema
 ```
 {
-    "active": boolean,
     "body_parts": [
         {
-            "active": boolean,
-            "after_training": boolean,
             "body_part_location": integer,
             "completed": boolean,
             "goals": [goal, goal],
-            "immediately_after_training": boolean,
-            "repeat_every_3hrs_for_24hrs": boolean,
             "side": side
         }
     ],
@@ -1080,8 +1064,7 @@ TODO finalize structure
     "start_date_time": Datetime,
     "completed_date_time": Datetime,
     "event_date_time": Datetime,
-    "completed": boolean,
-    "active": boolean
+    "completed": boolean
 }
 
 ```
@@ -1112,8 +1095,8 @@ TODO finalize structure
     "youtube_id" : null,
     "bilateral" : boolean,
     "seconds_per_rep" : integer,
-    "seconds_per_set" : 30,
-    "unit_of_measure" : "seconds",
+    "seconds_per_set" : integer,
+    "unit_of_measure" : string,
     "position_order" : integer,
     "duration_efficient" : integer,
     "duration_complete" : integer,
@@ -1123,7 +1106,9 @@ TODO finalize structure
     "dosages" : [exercise_dosage, exercise_dosage]
 }
 ```
+* `library_id` is a string indicating the ID of the assigned exercise
 * `exercise_dosage` will be an Exercise Dosage as defined in this Appendix.
+* `unit_of_measure` will be the string representation of the Unit of Measure enumeration as defined in this Appendix (e.g. "seconds", "count", etc.). 
 
 ### Exercise Dosage
 `exercise_dosage` will be of the following schema:
@@ -1196,6 +1181,18 @@ TODO finalize structure
     on_request = 10
     asymmetric_session = 20
     asymmetric_pattern = 21
+```
+
+#### Unit of Measure
+```
+    seconds: 0
+    count: 1
+    yards: 2
+    feet: 3
+    meters: 4
+    miles: 5
+    kilometers: 6
+    calories: 7
 ```
 
 #### SportName
