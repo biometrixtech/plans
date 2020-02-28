@@ -582,18 +582,15 @@ The Activities returned will also consider prior completed workouts and prior lo
 
 ### Basic Case
 
-Requesting Activities using the Responsive Recovery endpoint  requires the local date time of the athlete and at least one completed workout session.
+Requesting Activities using the Responsive Recovery endpoint  requires the local date time of the athlete and one completed workout session.
 
-Completed workout sessions may be reported using one of two formats:
+The completed workout session may be reported using one of two formats:
 
 * Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
 
 * Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
 The Activities returned will also consider prior completed workouts and prior logged symptoms.
-
-TODO - paul : single workout only?
-This will generate Activities that take into consideration the completed workout(s) and athlete's history. 
 
 _For more information on __session__ formats, please see the Appendix._
  
@@ -607,11 +604,11 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date_time": Datetime,
-    "sessions": [session, session]
+    "session": session
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 
 ```
 POST /plans/{version}/responsive_recovery/{User UUID} HTTPS/1.1
@@ -621,18 +618,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
-    "sessions":[
-            {
-                "event_date": "2019-01-12T10:41:57Z",
-                "session_type": 6,
-                "sport_name": 1,
-                "duration": 14,
-                "description": "Evening Practice",
-                "calories": 100,
-                "distance": 200,
-                session_RPE: 5,
-                "end_date": "2019-01-12T10:54:57Z"
-            },
+    "session":
             {
                 "event_date": "2019-01-12T10:41:57Z",
                 "session_type": 7,
@@ -673,8 +659,6 @@ Authorization: eyJraWQ...ajBc4VQ
                                         }]
                                     }
                 }
-                
-            ]
 }
 ```
 
@@ -715,12 +699,12 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date_time": Datetime,
-    "sessions: [session],
+    "session: session,
     "symptoms": [symptom, symptom]
 }
 ```
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
 ```
@@ -731,8 +715,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
-    "sessions":[
-                {
+    "session":{
                     "event_date": "2019-01-12T10:41:57Z",
                     "session_type": 6,
                     "sport_name": 1,
@@ -742,7 +725,7 @@ Authorization: eyJraWQ...ajBc4VQ
                     "distance": 200,
                     "session_RPE": 8,
                     "end_date": "2019-01-12T10:54:57Z"
-                }],
+                },
     "symptoms":[{
                     "body_part": 14,
                     "side": 2
