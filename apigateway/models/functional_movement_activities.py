@@ -214,11 +214,11 @@ class Activity(object):
     def json_deserialise(cls, input_dict):
         modality_type = ActivityType(input_dict["type"])
         if modality_type == ActivityType.movement_integration_prep:
-            modality = MovementPrep(event_date_time=input_dict.get('event_date_time'),
-                                    force_data=input_dict.get('force_data', False))
+            modality = MovementIntegrationPrep(event_date_time=input_dict.get('event_date_time'),
+                                               force_data=input_dict.get('force_data', False))
         elif modality_type == ActivityType.active_rest:
             modality = ActiveRest(event_date_time=input_dict.get('event_date_time'),
-                                               force_data=input_dict.get('force_data', False))
+                                  force_data=input_dict.get('force_data', False))
         elif modality_type == ActivityType.active_recovery:
             modality = ActiveRecovery(event_date_time=input_dict.get('event_date_time'))
         else:
@@ -959,9 +959,9 @@ class ActiveRestBase(Activity):
                 self.check_reactive_recover_from_sport_general(sports, exercise_library, goal, max_severity)
 
 
-class MovementPrep(ActiveRestBase):
+class MovementIntegrationPrep(ActiveRestBase):
     def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=False):
-        super().__init__(event_date_time, ActivityType.pre_active_rest, force_data, relative_load_level, force_on_demand)
+        super().__init__(event_date_time, ActivityType.movement_integration_prep, force_data, relative_load_level, force_on_demand)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.active_stretch),
@@ -1292,7 +1292,7 @@ class MovementPrep(ActiveRestBase):
 
 class ActiveRest(ActiveRestBase):
     def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=False):
-        super().__init__(event_date_time, ActivityType.post_active_rest, force_data, relative_load_level, force_on_demand)
+        super().__init__(event_date_time, ActivityType.active_rest, force_data, relative_load_level, force_on_demand)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
@@ -1583,7 +1583,6 @@ class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
 
-
     @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
         pass
@@ -1598,20 +1597,17 @@ class IceSession(Serialisable):
         self.completed = False
         self.active = True
         self.body_parts = []
-        self.alerts = []
 
     def json_serialise(self):
 
         ret = {
             'minutes': self.minutes,
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
-            'completed_date_time': format_datetime(
-                self.completed_date_time) if self.completed_date_time is not None else None,
+            'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
             'body_parts': [ice.json_serialise() for ice in self.body_parts],
-            'alerts': [alert.json_serialise() for alert in self.alerts]
         }
 
         return ret
@@ -1625,7 +1621,6 @@ class IceSession(Serialisable):
         ice_session.completed = input_dict.get('completed', False)
         ice_session.active = input_dict.get('active', True)
         ice_session.body_parts = [Ice.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
-        ice_session.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
         if len(ice_session.body_parts) > 0:
             return ice_session
         else:
@@ -1691,7 +1686,6 @@ class ColdWaterImmersion(Serialisable):
         self.completed = False
         self.active = True
         self.goals = set()
-        self.alerts = []
 
     def json_serialise(self):
         ret = {
@@ -1699,12 +1693,10 @@ class ColdWaterImmersion(Serialisable):
             'after_training': self.after_training,
             'goals': [goal.json_serialise() for goal in self.goals],
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
-            'completed_date_time': format_datetime(
-                self.completed_date_time) if self.completed_date_time is not None else None,
+            'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
             'active': self.active,
-            'alerts': [alert.json_serialise() for alert in self.alerts]
         }
 
         return ret
@@ -1719,7 +1711,6 @@ class ColdWaterImmersion(Serialisable):
         cold_water_immersion.completed = input_dict.get('completed', False)
         cold_water_immersion.active = input_dict.get('active', True)
         cold_water_immersion.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
-        cold_water_immersion.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
 
         return cold_water_immersion
 
