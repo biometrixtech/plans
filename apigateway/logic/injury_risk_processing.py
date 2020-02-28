@@ -6,7 +6,7 @@ from models.functional_movement import SessionFunctionalMovement
 from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
-from datastores.session_datastore import SessionDatastore
+from datastores.training_session_datastore import TrainingSessionDatastore
 from utils import format_date
 from models.functional_movement_stats import InjuryCycleSummary, InjuryCycleSummaryProcessor
 from fathomapi.utils.exceptions import NoSuchEntityException
@@ -661,8 +661,17 @@ class InjuryRiskProcessor(object):
             session_mapping_dict = {}
 
             for session in daily_sessions:
+
                 session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
-                current_session = session_functional_movement.process(d, load_stats)
+
+                if session.session_load_dict is None:
+                    current_session = session_functional_movement.process(d, load_stats)
+                    current_session.session_load_dict = session_functional_movement.session_load_dict
+                    session_data_store = TrainingSessionDatastore()
+                    session_data_store.put(current_session)
+                else:
+                    session_functional_movement.session_load_dict = session.session_load_dict
+                    current_session = session
 
                 injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                                injury_risk_dict, d)
@@ -1177,7 +1186,15 @@ class InjuryRiskProcessor(object):
 
         for session in daily_sessions:
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
-            current_session = session_functional_movement.process(base_date, load_stats)
+
+            if session.session_load_dict is None:
+                current_session = session_functional_movement.process(base_date, load_stats)
+                current_session.session_load_dict = session_functional_movement.session_load_dict
+                session_data_store = TrainingSessionDatastore()
+                session_data_store.put(current_session)
+            else:
+                session_functional_movement.session_load_dict = session.session_load_dict
+                current_session = session
 
             injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                            injury_risk_dict, base_date)
