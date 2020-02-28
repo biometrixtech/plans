@@ -55,10 +55,12 @@ def handle_post_training_recovery_create(user_id):
     survey_processor.user_age = request.json.get('user_age', 20)
 
     # process new session(s)
-    if len(request.json.get('sessions', [])) > 0:
-        sessions = request.json['sessions']
-        for session in sessions:
-            survey_processor.create_session_from_survey(session)
+    #if len(request.json.get('sessions', [])) > 0:
+    #    sessions = request.json['sessions']
+    if 'session' in request.json:
+        #for session in sessions:
+        session = request.json["session"]
+        survey_processor.create_session_from_survey(session)
     plan.training_sessions.extend(survey_processor.sessions)
 
     # get symptoms, if any
@@ -110,14 +112,15 @@ def validate_data():
                 raise InvalidSchemaException('body_part not recognized')
             symptom['body_part'] = int(symptom['body_part'])
 
-    if 'sessions' not in request.json:
-        raise InvalidSchemaException('sessions is required parameter to receive Post-Training Recovery')
+    if 'session' not in request.json:
+        raise InvalidSchemaException('session is required parameter to receive Responsive Recovery')
     else:
-        if not isinstance(request.json['sessions'], list):
-            raise InvalidSchemaException("Property sessions must be of type list")
-        request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
-        if len(request.json['sessions']) == 0:
-            raise InvalidSchemaException("A valid session is required to generate Post-Training Recovery")
-        for session in request.json['sessions']:
-            if 'session_RPE' not in session or session['session_RPE'] is None:
-                raise InvalidSchemaException("session_RPE is a parameter for session to receive Post-Training Recovery")
+        pass
+        # if not isinstance(request.json['sessions'], list):
+        #     raise InvalidSchemaException("Property sessions must be of type list")
+        # request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
+        # if len(request.json['sessions']) == 0:
+        #     raise InvalidSchemaException("A valid session is required to generate Responsive Recovery")
+        # for session in request.json['sessions']:
+        #     if 'session_RPE' not in session or session['session_RPE'] is None:
+        #         raise InvalidSchemaException("session_RPE is a parameter for session to receive Responsive Recovery")
