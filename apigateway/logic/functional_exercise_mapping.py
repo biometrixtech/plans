@@ -1,4 +1,5 @@
 from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, WarmUp, CoolDown, FunctionalStrength
+from models.functional_movement_activities import MovementPrep, MobilityWOD, ResponsiveRecovery, MovementIntegrationPrep, ActiveRest
 
 
 class ExerciseAssignmentCalculator(object):
@@ -56,3 +57,42 @@ class ExerciseAssignmentCalculator(object):
         functional_strength = FunctionalStrength(self.event_date_time)
         functional_strength.fill_exercises(self.exercise_library, {})
         return [functional_strength]
+
+    def get_movement_prep(self, athlete_id, force_data=False, force_on_demand=False):
+        # get activity
+        movement_integration_prep = MovementIntegrationPrep(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
+        movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict)
+        movement_integration_prep.set_plan_dosage()
+        movement_integration_prep.set_exercise_dosage_ranking()
+        movement_integration_prep.aggregate_dosages()
+        movement_integration_prep.set_winners()
+        movement_integration_prep.scale_all_active_time()
+        movement_integration_prep.reconcile_default_plan_with_active_time()
+
+        # create movement prep and add activity
+        movement_prep = MovementPrep(athlete_id, self.event_date_time)
+        movement_prep.movement_integration_prep = movement_integration_prep
+
+        return movement_prep
+
+    def get_mobility_wod(self, athlete_id, force_data=False, force_on_demand=False):
+
+        # get activity
+        active_rest = ActiveRest(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
+        active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
+        active_rest.set_plan_dosage()
+        active_rest.set_exercise_dosage_ranking()
+        active_rest.aggregate_dosages()
+        active_rest.set_winners()
+        active_rest.scale_all_active_time()
+        active_rest.reconcile_default_plan_with_active_time()
+
+        # create mobility wod and add activity
+        mobility_wod = MobilityWOD(athlete_id, self.event_date_time)
+        mobility_wod.active_rest = active_rest
+
+        return mobility_wod
+
+    def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=False):
+        responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
+        return responsive_recovery

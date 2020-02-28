@@ -10,6 +10,10 @@ class UserStatsDatastore(object):
 
     @xray_recorder.capture('datastore.UserStatsDatastore.get')
     def get(self, athlete_id):
+        """
+        :param athlete_id: uuid
+        :return:
+        """
         return self._query_mongodb(athlete_id)
 
     def put(self, items):

@@ -12,6 +12,12 @@ class MovementPrepDatastore(object):
 
     @xray_recorder.capture('datastore.MovementPrepDatastore.get')
     def get(self, movement_prep_id=None, user_id=None, event_date_time=None):
+        """
+        :param movement_prep_id: uuid
+        :param user_id: uuid
+        :param event_date_time: datetime.datetime
+        :return:
+        """
         return self._query_mongodb(movement_prep_id, user_id, event_date_time)
 
     @xray_recorder.capture('datastore.MovementPrepDatastore.put')

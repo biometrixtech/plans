@@ -12,6 +12,12 @@ class ResponsiveRecoveryDatastore(object):
 
     @xray_recorder.capture('datastore.ResponsiveRecoveryDatastore.get')
     def get(self, responsive_recovery_id=None, user_id=None, event_date_time=None):
+        """
+        :param responsive_recovery_id: uuid
+        :param user_id: uuid
+        :param event_date_time: datetime.datetime
+        :return:
+        """
         return self._query_mongodb(responsive_recovery_id, user_id, event_date_time)
 
     @xray_recorder.capture('datastore.ResponsiveRecoveryDatastore.put')
