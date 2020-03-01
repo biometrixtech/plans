@@ -11,6 +11,7 @@ from models.asymmetry import Asymmetry
 from models.movement_patterns import MovementPatterns
 from models.soreness_base import BodyPartSide
 from models.workout_program import WorkoutProgramModule
+from models.body_part_injury_risk import BodyPartInjuryRisk
 
 
 class SessionType(Enum):
@@ -129,6 +130,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
         # workout content provider
         self.workout_program_module = None
+
+        self.session_load_dict = None
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
@@ -338,7 +341,10 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None,
             'movement_patterns': self.movement_patterns.json_serialise() if self.movement_patterns is not None else None,
             'workout_program_module': self.workout_program_module.json_serialise() if self.workout_program_module is not None else None,
-            'session_RPE': self.session_RPE
+            'session_RPE': self.session_RPE,
+            'session_load_dict': [{"body_part": key.json_serialise(),
+                                   "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None else None
+
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
             # 'underactive_weak_body_parts': [u.json_serialise() for u in self.underactive_weak_body_parts],
@@ -400,6 +406,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
             'movement_patterns') is not None else None
         session.workout_program_module = WorkoutProgramModule.json_deserialise(input_dict['workout_program_module']) if input_dict.get('workout_program_module') is not None else None
+        if input_dict.get('session_load_dict') is not None:
+            for item in input_dict.get('session_load_dict', []):
+                session.session_load_dict[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartInjuryRisk.json_deserialise(item['injury_risk'])
+        else:
+            session.session_load_dict = None
+
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]
         # session.underactive_weak_body_parts = [BodyPartSide.json_deserialise(u) for u in
@@ -514,9 +526,10 @@ class MixedActivitySession(Session):
 
     def training_load(self, load_stats):
 
-        training_load = self.workout_program_module.get_training_load()
+        #training_load = self.workout_program_module.get_training_load()
 
-        return training_load
+        #return training_load
+        return None
 
 
 class SportTrainingSession(Session):

@@ -1,6 +1,6 @@
 from datetime import datetime, date
 
-from models.functional_movement import CompensationSource
+from models.compensation_source import CompensationSource
 from models.soreness_base import BodyPartSide
 from utils import format_date, format_datetime, parse_datetime, parse_date
 

@@ -1,5 +1,7 @@
 from enum import Enum
 from collections import namedtuple
+
+from models.compensation_source import CompensationSource
 from models.session import SessionType
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.body_parts import BodyPartFactory
@@ -8,6 +10,7 @@ from models.movement_actions import MuscleAction
 from models.movement_tags import AdaptationType
 from models.functional_movement_type import FunctionalMovementType
 import statistics
+from serialisable import Serialisable
 
 
 FunctionalMovementPair = namedtuple('FunctionalMovementPair',['movement_1', 'movement_2'])
@@ -92,12 +95,7 @@ class FunctionalMovement(object):
         self.parts_receiving_compensation = []
 
 
-class CompensationSource(Enum):
-    internal_processing = 0
-    movement_patterns_3s = 1
-
-
-class BodyPartFunctionalMovement(object):
+class BodyPartFunctionalMovement(Serialisable):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
         self.concentric_volume = 0
@@ -140,6 +138,59 @@ class BodyPartFunctionalMovement(object):
         # Not strictly necessary, but to avoid having both x==y and x!=y
         # True at the same time
         return not (self == other)
+
+    def json_serialise(self):
+        return {
+                'body_part_side': self.body_part_side.json_serialise(),
+                'concentric_volume': self.concentric_volume,
+                'eccentric_volume': self.eccentric_volume,
+                'compensated_concentric_volume': self.compensated_concentric_volume,
+                'compensated_eccentric_volume': self.compensated_concentric_volume,
+                'compensating_causes_volume': [c.json_serialise() for c in self.compensating_causes_volume],
+                'concentric_intensity': self.concentric_intensity,
+                'eccentric_intensity': self.eccentric_intensity,
+                'compensated_concentric_intensity': self.compensated_concentric_intensity,
+                'compensated_eccentric_intensity': self.compensated_eccentric_intensity,
+                'compensating_causes_intensity': [c.json_serialise() for c in self.compensating_causes_intensity],
+                'concentric_ramp': self.concentric_ramp,
+                'eccentric_ramp': self.eccentric_ramp,
+                'is_compensating': self.is_compensating,
+                'compensation_source_volume': self.compensation_source_volume.value if self.compensation_source_volume is not None else None,
+                'compensation_source_intensity': self.compensation_source_intensity.value if self.compensation_source_intensity is not None else None,
+                'body_part_function': self.body_part_function if self.body_part_function is not None else None,
+                'inhibited': self.inhibited if self.inhibited is not None else None,
+                'weak': self.weak,
+                'tight': self.tight,
+                'inflamed': self.inflamed,
+                'long': self.long
+            }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
+        movement.concentric_volume = input_dict.get('concentric_volume', 0)
+        movement.eccentric_volume = input_dict.get('eccentric_volume', 0)
+        movement.compensated_concentric_volume = input_dict.get('compensated_concentric_volume', 0)
+        movement.compensated_eccentric_volume = input_dict.get('compensated_eccentric_volume', 0)
+        movement.compensating_causes_volume = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_volume',[])]  # I don't know what gets saved here!
+        movement.concentric_intensity = input_dict.get('concentric_intensity', 0)
+        movement.eccentric_intensity = input_dict.get('eccentric_intensity', 0)
+        movement.compensated_concentric_intensity = input_dict.get('compensated_concentric_intensity', 0)
+        movement.compensated_eccentric_intensity = input_dict.get('compensated_eccentric_intensity', 0)
+        movement.compensating_causes_intensity = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_intensity',[])]  # I don't know what gets saved here!
+        movement.concentric_ramp = input_dict.get('concentric_ramp', 0.0)
+        movement.eccentric_ramp = input_dict.get('eccentric_ramp', 0.0)
+        movement.is_compensating = input_dict.get('is_compensating', False)
+        movement.compensation_source_volume = CompensationSource(input_dict['compensation_source_volume']) if input_dict.get('compensation_source_volume') is not None else None
+        movement.compensation_source_intensity = CompensationSource(input_dict['compensation_source_intensity']) if input_dict.get('compensation_source_intensity') is not None else None
+        movement.body_part_function = input_dict.get('body_part_function')
+        movement.inhibited = input_dict.get('inhibited', 0)
+        movement.weak = input_dict.get('weak', 0)
+        movement.tight = input_dict.get('tight', 0)
+        movement.inflamed = input_dict.get('inflamed', 0)
+        movement.long = input_dict.get('long', 0)
+        return movement
+
 
 
 class SessionFunctionalMovement(object):

@@ -36,8 +36,8 @@ class TrainingSessionDatastore(object):
         if session_id is not None:
             mongo_result = mongo_collection.find_one({'session_id': session_id})
             if mongo_result is not None:
-                movement_prep = Session.json_deserialise(mongo_result)
-                return movement_prep
+                session = Session.json_deserialise(mongo_result)
+                return session
             else:
                 raise NoSuchEntityException(f'Workout session with the provided id not found')
         else:
@@ -55,8 +55,8 @@ class TrainingSessionDatastore(object):
                 mongo_cursor = mongo_collection.find(query)
 
                 ret = []
-                for movement_prep in mongo_cursor:
-                    ret.append(Session.json_deserialise(movement_prep))
+                for session in mongo_cursor:
+                    ret.append(Session.json_deserialise(session))
                 return ret
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore._put_mongodb')
@@ -64,5 +64,5 @@ class TrainingSessionDatastore(object):
         item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {'id': item['id']}
+        query = {'session_id': item['session_id']}
         mongo_collection.replace_one(query, item, upsert=True)
