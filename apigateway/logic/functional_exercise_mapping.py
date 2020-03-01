@@ -58,7 +58,7 @@ class ExerciseAssignmentCalculator(object):
         functional_strength.fill_exercises(self.exercise_library, {})
         return [functional_strength]
 
-    def get_movement_prep(self, athlete_id, force_data=False, force_on_demand=False):
+    def get_movement_prep(self, athlete_id, force_data=False, force_on_demand=True):
         # get activity
         movement_integration_prep = MovementIntegrationPrep(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
         movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict)
@@ -75,7 +75,7 @@ class ExerciseAssignmentCalculator(object):
 
         return movement_prep
 
-    def get_mobility_wod(self, athlete_id, force_data=False, force_on_demand=False):
+    def get_mobility_wod(self, athlete_id, force_data=False, force_on_demand=True):
 
         # get activity
         active_rest = ActiveRest(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
@@ -93,7 +93,7 @@ class ExerciseAssignmentCalculator(object):
 
         return mobility_wod
 
-    def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=False):
+    def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=True):
         responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
 
         # determine if we need active rest
@@ -101,5 +101,5 @@ class ExerciseAssignmentCalculator(object):
         # determine if we need active recovery
 
         # determine if we need ice, cwi
-        
+
         return responsive_recovery
