@@ -12,6 +12,7 @@ class UserStats(Serialisable):
         self.api_version = '4_8'
         self.timezone = '-04:00'
         self.load_stats = LoadStats()
+        self.sport_max_load = {}
         self.high_relative_load_sessions = []
         self.eligible_for_high_load_trigger = False
 

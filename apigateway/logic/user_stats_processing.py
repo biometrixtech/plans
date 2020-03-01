@@ -104,10 +104,10 @@ class UserStatsProcessing(object):
                                                               self.chronic_training_sessions
                                                               )
 
-        three_sensor_sessions = [s for s in self.training_sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
-        if len(three_sensor_sessions) > 0:
-            current_user_stats.has_three_sensor_data = True
-            current_user_stats.historic_asymmetry = self.get_historic_asymmetry(self.training_sessions)
+        # three_sensor_sessions = [s for s in self.training_sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
+        # if len(three_sensor_sessions) > 0:
+        #     current_user_stats.has_three_sensor_data = True
+        #     current_user_stats.historic_asymmetry = self.get_historic_asymmetry(self.training_sessions)
 
         current_user_stats.sport_max_load = training_load_processing.sport_max_load
 
@@ -117,8 +117,8 @@ class UserStatsProcessing(object):
 
         if current_user_stats.event_date.date() == self.event_date.date():
             # persist all of soreness/pain and session_RPE
-            current_user_stats.session_RPE = current_user_stats.session_RPE
-            current_user_stats.session_RPE_event_date = current_user_stats.session_RPE_event_date
+            # current_user_stats.session_RPE = current_user_stats.session_RPE
+            # current_user_stats.session_RPE_event_date = current_user_stats.session_RPE_event_date
             if force_historical_process:
                 # New
                 historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
@@ -134,8 +134,8 @@ class UserStatsProcessing(object):
 
         else:  # nightly process (first update for the day)
             # clear these if it's a new day
-            current_user_stats.session_RPE = None
-            current_user_stats.session_RPE_event_date = None
+            # current_user_stats.session_RPE = None
+            # current_user_stats.session_RPE_event_date = None
 
             historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
             injury_risk_processor = InjuryRiskProcessor(self.event_date, self.last_25_days_symptoms,
@@ -260,40 +260,40 @@ class UserStatsProcessing(object):
         self.previous_week = self.last_week - timedelta(days=7)
         self.days_7_13 = self.previous_week + timedelta(days=1)
 
-    def get_historic_asymmetry(self, sessions):
-
-        historic_asymmetry = {}
-
-        last_15_day_sessions = [s for s in sessions if self.event_date >= s.event_date >= self.event_date - timedelta(days=15) and s.asymmetry is not None]
-        last_30_day_sessions = [s for s in sessions if
-                                self.event_date - timedelta(days=15) > s.event_date >= self.event_date - timedelta(days=30) and s.asymmetry is not None]
-
-        apt_historic_asymmetry = HistoricAsymmetry(AsymmetryType.anterior_pelvic_tilt)
-
-        if len(last_15_day_sessions) >= 4:
-            apt_asymmetric_events = 0
-            apt_symmetric_events = 0
-            for s in last_15_day_sessions:
-                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
-                    apt_asymmetric_events += s.asymmetry.anterior_pelvic_tilt.asymmetric_events
-                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
-                    apt_symmetric_events += s.asymmetry.anterior_pelvic_tilt.symmetric_events
-
-            apt_historic_asymmetry.asymmetric_events_15_days = apt_asymmetric_events
-            apt_historic_asymmetry.symmetric_events_15_days = apt_symmetric_events
-
-        if len(last_30_day_sessions) >= 4:
-            apt_asymmetric_events = 0
-            apt_symmetric_events = 0
-            for s in last_30_day_sessions:
-                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
-                    apt_asymmetric_events += s.asymmetry.anterior_pelvic_tilt.asymmetric_events
-                if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
-                    apt_symmetric_events += s.asymmetry.anterior_pelvic_tilt.symmetric_events
-
-            apt_historic_asymmetry.asymmetric_events_30_days = apt_asymmetric_events
-            apt_historic_asymmetry.symmetric_events_30_days = apt_symmetric_events
-
-        historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value] = apt_historic_asymmetry
-
-        return historic_asymmetry
+    # def get_historic_asymmetry(self, sessions):
+    #
+    #     historic_asymmetry = {}
+    #
+    #     last_15_day_sessions = [s for s in sessions if self.event_date >= s.event_date >= self.event_date - timedelta(days=15) and s.asymmetry is not None]
+    #     last_30_day_sessions = [s for s in sessions if
+    #                             self.event_date - timedelta(days=15) > s.event_date >= self.event_date - timedelta(days=30) and s.asymmetry is not None]
+    #
+    #     apt_historic_asymmetry = HistoricAsymmetry(AsymmetryType.anterior_pelvic_tilt)
+    #
+    #     if len(last_15_day_sessions) >= 4:
+    #         apt_asymmetric_events = 0
+    #         apt_symmetric_events = 0
+    #         for s in last_15_day_sessions:
+    #             if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+    #                 apt_asymmetric_events += s.asymmetry.anterior_pelvic_tilt.asymmetric_events
+    #             if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+    #                 apt_symmetric_events += s.asymmetry.anterior_pelvic_tilt.symmetric_events
+    #
+    #         apt_historic_asymmetry.asymmetric_events_15_days = apt_asymmetric_events
+    #         apt_historic_asymmetry.symmetric_events_15_days = apt_symmetric_events
+    #
+    #     if len(last_30_day_sessions) >= 4:
+    #         apt_asymmetric_events = 0
+    #         apt_symmetric_events = 0
+    #         for s in last_30_day_sessions:
+    #             if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+    #                 apt_asymmetric_events += s.asymmetry.anterior_pelvic_tilt.asymmetric_events
+    #             if s.asymmetry is not None and s.asymmetry.anterior_pelvic_tilt is not None:
+    #                 apt_symmetric_events += s.asymmetry.anterior_pelvic_tilt.symmetric_events
+    #
+    #         apt_historic_asymmetry.asymmetric_events_30_days = apt_asymmetric_events
+    #         apt_historic_asymmetry.symmetric_events_30_days = apt_symmetric_events
+    #
+    #     historic_asymmetry[AsymmetryType.anterior_pelvic_tilt.value] = apt_historic_asymmetry
+    #
+    #     return historic_asymmetry

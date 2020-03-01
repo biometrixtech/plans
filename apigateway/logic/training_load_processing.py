@@ -26,7 +26,6 @@ class TrainingLoadProcessing(object):
         self.functional_overreaching_NFO_loads = {}
         self.high_relative_load_session = False
         self.high_relative_load_sessions = []
-        self.doms = []
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
         self.last_14_days_training_sessions = []
