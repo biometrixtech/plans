@@ -95,4 +95,11 @@ class ExerciseAssignmentCalculator(object):
 
     def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=False):
         responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
+
+        # determine if we need active rest
+
+        # determine if we need active recovery
+
+        # determine if we need ice, cwi
+        
         return responsive_recovery

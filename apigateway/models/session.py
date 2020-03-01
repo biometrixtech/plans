@@ -526,9 +526,10 @@ class MixedActivitySession(Session):
 
     def training_load(self, load_stats):
 
-        training_load = self.workout_program_module.get_training_load()
+        #training_load = self.workout_program_module.get_training_load()
 
-        return training_load
+        #return training_load
+        return None
 
 
 class SportTrainingSession(Session):

@@ -58,37 +58,39 @@ class TrainingLoadProcessing(object):
 
         for p in previous_7_day_training_sessions:
 
-            if p.sport_name not in self.previous_week_sport_training_loads:
-                self.last_week_sport_training_loads[p.sport_name] = []
-                self.previous_week_sport_training_loads[p.sport_name] = []
-            training_load = p.training_load(self.load_stats)
-            if training_load is not None:
-                self.previous_week_sport_training_loads[p.sport_name].append(training_load)
-                if p.sport_name.value in self.sport_max_load:
-                    if training_load > self.sport_max_load[p.sport_name.value].load:
-                        self.sport_max_load[p.sport_name.value].load = training_load
-                        self.sport_max_load[p.sport_name.value].event_date_time = p.event_date
-                        self.sport_max_load[p.sport_name.value].first_time_logged = False
-                else:
-                    self.sport_max_load[p.sport_name.value] = SportMaxLoad(p.event_date, training_load)
-                    self.sport_max_load[p.sport_name.value].first_time_logged = True
+            if p.sport_name is not None:
+                if p.sport_name not in self.previous_week_sport_training_loads:
+                    self.last_week_sport_training_loads[p.sport_name] = []
+                    self.previous_week_sport_training_loads[p.sport_name] = []
+                training_load = p.training_load(self.load_stats)
+                if training_load is not None:
+                    self.previous_week_sport_training_loads[p.sport_name].append(training_load)
+                    if p.sport_name.value in self.sport_max_load:
+                        if training_load > self.sport_max_load[p.sport_name.value].load:
+                            self.sport_max_load[p.sport_name.value].load = training_load
+                            self.sport_max_load[p.sport_name.value].event_date_time = p.event_date
+                            self.sport_max_load[p.sport_name.value].first_time_logged = False
+                    else:
+                        self.sport_max_load[p.sport_name.value] = SportMaxLoad(p.event_date, training_load)
+                        self.sport_max_load[p.sport_name.value].first_time_logged = True
 
         for l in last_7_day_training_sessions:
 
-            if l.sport_name not in self.last_week_sport_training_loads:
-                self.last_week_sport_training_loads[l.sport_name] = []
-                self.previous_week_sport_training_loads[l.sport_name] = []
-            training_load = l.training_load(self.load_stats)
-            if training_load is not None:
-                self.last_week_sport_training_loads[l.sport_name].append(training_load)
-                if l.sport_name.value in self.sport_max_load:
-                    if training_load > self.sport_max_load[l.sport_name.value].load:
-                        self.sport_max_load[l.sport_name.value].load = training_load
-                        self.sport_max_load[l.sport_name.value].event_date_time = l.event_date
-                        self.sport_max_load[l.sport_name.value].first_time_logged = False
-                else:
-                    self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load)
-                    self.sport_max_load[l.sport_name.value].first_time_logged = True
+            if l.sport_name is not None:
+                if l.sport_name not in self.last_week_sport_training_loads:
+                    self.last_week_sport_training_loads[l.sport_name] = []
+                    self.previous_week_sport_training_loads[l.sport_name] = []
+                training_load = l.training_load(self.load_stats)
+                if training_load is not None:
+                    self.last_week_sport_training_loads[l.sport_name].append(training_load)
+                    if l.sport_name.value in self.sport_max_load:
+                        if training_load > self.sport_max_load[l.sport_name.value].load:
+                            self.sport_max_load[l.sport_name.value].load = training_load
+                            self.sport_max_load[l.sport_name.value].event_date_time = l.event_date
+                            self.sport_max_load[l.sport_name.value].first_time_logged = False
+                    else:
+                        self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load)
+                        self.sport_max_load[l.sport_name.value].first_time_logged = True
 
     @xray_recorder.capture('logic.TrainingLoadProcessing.calc_training_load_metrics')
     def calc_training_load_metrics(self, user_stats):
