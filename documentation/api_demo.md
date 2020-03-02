@@ -421,12 +421,14 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date_time": Datetime,
-    "sessions": [session, session]
+    "sessions": [session, session],
+    "user_age": integer,
 }
 ```
 
 * `event_date_time` __should__ reflect the local time that the request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
+* `user_age` __should__ be provided if heart rate data is included for any sessions
 
 ```
 POST /plans/{version}/mobility_wod/{User UUID} HTTPS/1.1
@@ -436,6 +438,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
+    "user_age": 28,
     "sessions":[
             {
                 "event_date": "2019-01-12T10:41:57Z",
@@ -457,7 +460,6 @@ Authorization: eyJraWQ...ajBc4VQ
                 "distance": 200,
                 "session_RPE": 7,
                 "end_date": "2019-02-12T10:54:57Z",
-                "user_age": 28,
                 "hr_data":  [
                             {"value": 153,
                              "startDate": "2019-01-12T10:43:08.490-0500",
@@ -641,12 +643,14 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date_time": Datetime,
-    "session": session
+    "session": session,
+    "user_age": integer
 }
 ```
 
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+* `user_age` __should__ be provided if heart rate data is included for any sessions
 
 ```
 POST /plans/{version}/responsive_recovery/{User UUID} HTTPS/1.1
@@ -656,6 +660,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 {
     "event_date_time": "2018-12-10T17:45:24Z",
+    "user_age": 28,
     "session":
             {
                 "event_date": "2019-01-12T10:41:57Z",
@@ -666,7 +671,6 @@ Authorization: eyJraWQ...ajBc4VQ
                 "distance": 200,
                 "session_RPE": 7,
                 "end_date": "2019-02-12T10:54:57Z",
-                "user_age": 28,
 ``` 
 ```
                 "hr_data":  [
@@ -915,7 +919,6 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
     "calories": integer,
     "distance": integer,
     "session_RPE": number,
-    "user_age": integer
     "hr_data": [hr, hr, hr],
 }
 ```
@@ -929,8 +932,9 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `calories` __if present__, __should__ be calories burned during the workout.
 * `distance` __if present__, __should__ be distance covered during the workout.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value`
-* `user_age` __should__ be provided if `hr_data` is supplied. 
 * `description` is an __optional__ parameter to provide short description of the session
+
+Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the specific endpoint documentation for further details.
 
 <div style="page-break-after: always;"></div>
 
@@ -949,7 +953,6 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
     "distance": integer,
     "session_RPE": number,
     "hr_data": [hr, hr, hr],
-    "user_age": integer,
     "workout_program_module": workout_program_module
 }
 ```
@@ -962,8 +965,9 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `calories` __if present__, __should__ be calories burned during the workout.
 * `distance` __if present__, __should__ be distance covered during the workout.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value` 
-* `user_age` __should__ be provided if `hr_data` is supplied.
 * `description` is an __optional__ parameter to provide short description of the session
+
+Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the specific endpoint documentation for further details.
 
 `workout_program_module` __should__ be of the following schema:
 
