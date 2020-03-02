@@ -1184,6 +1184,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [71, 74, 69]
+        return functional_movement
 
     def get_trunk_extension(self):
 
@@ -1194,6 +1195,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = []
+        return functional_movement
 
     def get_trunk_lateral_flexion(self):
 
@@ -1204,6 +1206,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [58, 71, 73, 74, 34, 35, 36, 70]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [26, 21, 74, 69]
+        return functional_movement
 
     def get_trunk_rotation(self):
 
@@ -1214,6 +1217,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [21, 71]
+        return functional_movement
 
     def get_trunk_flexion_with_rotation(self):
 
@@ -1224,6 +1228,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [21, 71]
+        return functional_movement
 
     def get_trunk_extension_with_rotation(self):
 
@@ -1234,6 +1239,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [21, 71]
+        return functional_movement
 
     def get_elbow_flexion(self):
 
@@ -1244,6 +1250,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [33]
         functional_movement.fixators = self.get_elbow_fixators()
         functional_movement.parts_receiving_compensation = [127, 128]
+        return functional_movement
 
     def get_elbow_extension(self):
 
@@ -1254,6 +1261,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [33]
         functional_movement.fixators = self.get_elbow_fixators()
         functional_movement.parts_receiving_compensation = [32]
+        return functional_movement
 
     def get_shoulder_horizontal_adduction_and_scapular_protraction(self):
 
@@ -1264,6 +1272,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [83, 81]
+        return functional_movement
 
     def get_shoulder_horizontal_abduction_and_scapular_retraction(self):
 
@@ -1274,6 +1283,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [80]
+        return functional_movement
 
     def get_shoulder_flexion_and_scapular_upward_rotation(self):
 
@@ -1284,6 +1294,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [76, 79, 82, 127, 129]
+        return functional_movement
 
     def get_shoulder_extension_and_scapular_downward_rotation(self):
 
@@ -1294,6 +1305,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [77, 80, 120, 85, 132]
+        return functional_movement
 
     def get_shoulder_abduction_and_scapular_upward_rotation(self):
 
@@ -1303,6 +1315,7 @@ class FunctionalMovementFactory(object):
         functional_movement.antagonists = [21, 77, 80, 120, 122, 123, 124, 81, 82, 129, 132]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [76, 79, 121]
+        return functional_movement
 
     def get_shoulder_adduction_and_scapular_downward_rotation(self):
 
@@ -1313,6 +1326,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [77, 80, 120, 122, 123, 124, 82, 129, 132]
+        return functional_movement
 
     def get_internal_rotation(self):
 
@@ -1323,6 +1337,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [21, 120, 83, 82]
+        return functional_movement
 
     def get_external_rotation(self):
 
@@ -1333,6 +1348,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [85]
+        return functional_movement
 
     def get_scapular_elevation(self):
 
@@ -1343,6 +1359,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_2()
         functional_movement.parts_receiving_compensation = [77, 80]
+        return functional_movement
 
     def get_scapular_depression(self):
 
@@ -1353,3 +1370,4 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_2()
         functional_movement.parts_receiving_compensation = [81]
+        return functional_movement
