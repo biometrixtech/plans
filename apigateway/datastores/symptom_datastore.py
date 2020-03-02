@@ -7,7 +7,7 @@ from models.symptom import Symptom
 
 
 class SymptomDatastore(object):
-    def __init__(self, mongo_collection='symptoms'):
+    def __init__(self, mongo_collection='symptom'):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.SymptomDatastore.get')
