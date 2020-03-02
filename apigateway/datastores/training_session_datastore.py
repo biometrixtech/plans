@@ -11,7 +11,7 @@ class TrainingSessionDatastore(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore.get')
-    def get(self, session_id, user_id, event_date_time=None, start_date_time=None, end_date_time=None):
+    def get(self, session_id=None, user_id=None, event_date_time=None, start_date_time=None, end_date_time=None):
         """
         user_id: uuid
         event_date_time: datetime.datetime
