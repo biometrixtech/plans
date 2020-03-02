@@ -58,5 +58,4 @@ class SymptomDatastore(object):
         item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {'id': item['id']}
-        mongo_collection.replace_one(query, item, upsert=True)
+        mongo_collection.replace_one(item, item, upsert=True)

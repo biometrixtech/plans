@@ -737,7 +737,7 @@ class Activity(object):
 
 
 class ActiveRestBase(Activity):
-    def __init__(self, event_date_time, modality_type, force_data=False, relative_load_level=3, force_on_demand=False):
+    def __init__(self, event_date_time, modality_type, force_data=False, relative_load_level=3, force_on_demand=True):
         super().__init__(event_date_time, modality_type, relative_load_level)
         self.force_data = force_data
         self.force_on_demand = force_on_demand
@@ -960,7 +960,7 @@ class ActiveRestBase(Activity):
 
 
 class MovementIntegrationPrep(ActiveRestBase):
-    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=False):
+    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=True):
         super().__init__(event_date_time, ActivityType.movement_integration_prep, force_data, relative_load_level, force_on_demand)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
@@ -1291,7 +1291,7 @@ class MovementIntegrationPrep(ActiveRestBase):
 
 
 class ActiveRest(ActiveRestBase):
-    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=False):
+    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=True):
         super().__init__(event_date_time, ActivityType.active_rest, force_data, relative_load_level, force_on_demand)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
