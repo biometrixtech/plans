@@ -159,7 +159,7 @@ class UserStatsProcessing(object):
                                                        start_date_time=self.start_date_time,
                                                        end_date_time=self.end_date_time)
             self.training_sessions = self.training_session_datastore.get(user_id=self.athlete_id,
-                                                                         start_date_time=self.chronic_start_date_time,
+                                                                         start_date_time=self.start_date_time,
                                                                          end_date_time=self.event_date)
         self.update_start_times()
         self.set_acute_chronic_periods()
