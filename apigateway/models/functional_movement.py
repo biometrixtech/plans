@@ -157,7 +157,7 @@ class BodyPartFunctionalMovement(Serialisable):
                 'is_compensating': self.is_compensating,
                 'compensation_source_volume': self.compensation_source_volume.value if self.compensation_source_volume is not None else None,
                 'compensation_source_intensity': self.compensation_source_intensity.value if self.compensation_source_intensity is not None else None,
-                'body_part_function': self.body_part_function if self.body_part_function is not None else None,
+                'body_part_function': self.body_part_function.value if self.body_part_function is not None else None,
                 'inhibited': self.inhibited if self.inhibited is not None else None,
                 'weak': self.weak,
                 'tight': self.tight,
@@ -183,7 +183,7 @@ class BodyPartFunctionalMovement(Serialisable):
         movement.is_compensating = input_dict.get('is_compensating', False)
         movement.compensation_source_volume = CompensationSource(input_dict['compensation_source_volume']) if input_dict.get('compensation_source_volume') is not None else None
         movement.compensation_source_intensity = CompensationSource(input_dict['compensation_source_intensity']) if input_dict.get('compensation_source_intensity') is not None else None
-        movement.body_part_function = input_dict.get('body_part_function')
+        movement.body_part_function = BodyPartFunction(input_dict['body_part_function']) if input_dict.get('body_part_function') is not None else None
         movement.inhibited = input_dict.get('inhibited', 0)
         movement.weak = input_dict.get('weak', 0)
         movement.tight = input_dict.get('tight', 0)
@@ -191,6 +191,46 @@ class BodyPartFunctionalMovement(Serialisable):
         movement.long = input_dict.get('long', 0)
         return movement
 
+    def merge(self, target):
+
+        if self.body_part_side == target.body_part_side:
+
+            self.concentric_volume += target.concentric_volume
+            self.eccentric_volume += target.eccentric_volume
+            self.compensated_concentric_volume += target.compensated_concentric_volume
+            self.compensated_eccentric_volume += target.compensated_eccentric_volume
+            self.compensating_causes_volume.extend(target.compensating_causes_volume)
+            self.compensating_causes_volume = list(set(self.compensating_causes_volume))
+            self.concentric_intensity += target.concentric_intensity
+            self.eccentric_intensity += target.eccentric_intensity
+            self.compensated_concentric_intensity += target.compensated_concentric_intensity
+            self.compensated_eccentric_intensity += target.compensated_eccentric_intensity
+            self.compensating_causes_intensity.extend(target.compensating_causes_intensity)
+            self.compensating_causes_intensity = list(set(self.compensating_causes_intensity))
+            self.concentric_ramp = max(self.concentric_ramp, target.concentric_ramp)
+            self.eccentric_ramp = max(self.eccentric_ramp, target.eccentric_ramp)
+            self.is_compensating = max(self.is_compensating, target.is_compensating)
+            self.compensation_source_volume = self.merge_with_none(self.compensation_source_volume, target.compensation_source_volume)
+            self.compensation_source_intensity = self.merge_with_none(self.compensation_source_intensity, target.compensation_source_intensity)
+
+            # not sure these are even used
+            # self.body_part_function = None
+            # self.inhibited = 0
+            # self.weak = 0
+            # self.tight = 0
+            # self.inflamed = 0
+            # self.long = 0
+
+    def merge_with_none(self, value_a, value_b):
+
+        if value_a is None and value_b is None:
+            return None
+        if value_a is not None and value_b is None:
+            return CompensationSource(value_a.value)
+        if value_b is not None and value_a is None:
+            return CompensationSource(value_b.value)
+        if value_a is not None and value_b is not None:
+            return CompensationSource(max(value_a.value, value_b.value))
 
 
 class SessionFunctionalMovement(object):
@@ -335,7 +375,7 @@ class SessionFunctionalMovement(object):
                     if muscle not in total_load[action.adaptation_type.value]:
                         total_load[action.adaptation_type.value][muscle] = load
                     else:
-                        total_load[action.adaptation_type.value][muscle] += load
+                        total_load[action.adaptation_type.value][muscle].merge(load)
 
         return total_load
 
