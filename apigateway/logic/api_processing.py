@@ -32,7 +32,7 @@ class APIProcessing(object):
         session_type = session['session_type']
         end_date = session.get('end_date', None)
         if end_date is not None:
-            end_date = parse_datetime(event_date)
+            end_date = parse_datetime(end_date)
         sport_name = session.get('sport_name', None)
         if SportName.has_value(sport_name):
             sport_name = SportName(sport_name)
