@@ -1,7 +1,7 @@
 from serialisable import Serialisable
 from models.load_stats import LoadStats
 from models.session import HighLoadSession
-from utils import format_date, parse_date
+from utils import format_date, parse_date, format_datetime, parse_datetime
 
 
 class UserStats(Serialisable):
@@ -29,6 +29,7 @@ class UserStats(Serialisable):
             'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None,
             'high_relative_load_sessions': [high_load.json_serialise() for high_load in self.high_relative_load_sessions],
             'eligible_for_high_load_trigger': self.eligible_for_high_load_trigger,
+            'sport_max_load': {str(sport_name): sport_max_load.json_serialise() for (sport_name, sport_max_load) in self.sport_max_load.items()},
             'api_version': self.api_version,
             'timezone': self.timezone
         }
@@ -43,4 +44,28 @@ class UserStats(Serialisable):
         user_stats.load_stats = LoadStats.json_deserialise(input_dict.get('load_stats', None))
         user_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])]
         user_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
+        user_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
+
         return user_stats
+
+
+class SportMaxLoad(Serialisable):
+    def __init__(self, event_date_time, load):
+        self.event_date_time = event_date_time
+        self.load = load
+        self.first_time_logged = False
+
+    def json_serialise(self):
+        ret = {
+            'event_date_time': format_datetime(self.event_date_time),
+            'load': self.load,
+            'first_time_logged': self.first_time_logged
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        sport_max_load = cls(parse_datetime(input_dict['event_date_time']), input_dict['load'])
+        sport_max_load.first_time_logged = input_dict.get('first_time_logged', False)
+        return sport_max_load
