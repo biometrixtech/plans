@@ -41,7 +41,7 @@ class MovementPrep(object):
         if name in ['created_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
-        if name == 'id' and value is None:
+        if name == 'movement_prep_id' and value is None:
             value = str(uuid.uuid4())
         super().__setattr__(name, value)
 
@@ -72,7 +72,7 @@ class MobilityWOD(object):
         if name in ['created_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
-        if name == 'id' and value is None:
+        if name == 'mobility_wod_id' and value is None:
             value = str(uuid.uuid4())
         super().__setattr__(name, value)
 
@@ -112,7 +112,7 @@ class ResponsiveRecovery(object):
         if name in ['created_date_time']:
             if value is not None and not isinstance(value, datetime.datetime):
                 value = parse_datetime(value)
-        if name == 'id' and value is None:
+        if name == 'responsive_recovery_id' and value is None:
             value = str(uuid.uuid4())
         super().__setattr__(name, value)
 
@@ -200,11 +200,11 @@ class Activity(object):
              "completed_date_time": format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
              "event_date_time": format_datetime(self.event_date_time) if self.event_date_time is not None else None,
              "completed" : self.completed,
-             "active" : self.active,
+             # "active" : self.active,
              "default_plan": self.default_plan,
-             "force_data": self.force_data,
-             "goal_title": self.goal_title,  ## make dynamic based on selected routine
-             "display_image": self.display_image,
+             # "force_data": self.force_data,
+             # "goal_title": self.goal_title,  ## make dynamic based on selected routine
+             # "display_image": self.display_image,
              # "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
              "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
              "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases]
@@ -228,9 +228,9 @@ class Activity(object):
         modality.completed_date_time = input_dict.get('completed_date_time', None)
         modality.event_date_time = input_dict.get('event_date_time', None)
         modality.completed = input_dict.get('completed', False)
-        modality.active = input_dict.get('active', True)
+        # modality.active = input_dict.get('active', True)
         modality.default_plan = input_dict.get('default_plan', 'Complete')
-        modality.force_data = input_dict.get('force_data', False)
+        # modality.force_data = input_dict.get('force_data', False)
         modality.goals = {goal_type: ActivityGoal.json_deserialise(goal) for
                                  (goal_type, goal) in input_dict.get('goals', {}).items()}
         modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]

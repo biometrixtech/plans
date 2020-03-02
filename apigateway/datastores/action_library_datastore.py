@@ -14,7 +14,7 @@ class ActionLibraryDatastore(object):
         try:
             file_name = Config.get('PROVIDER_INFO')['action_library_filename']
         except KeyError:
-            print('Action library not defined or does nto exist for this provider, using default')
+            print('Action library not defined or does not exist for this provider, using default')
             file_name = 'actions_library.json'
         try:
             script_dir = os.path.dirname(__file__)

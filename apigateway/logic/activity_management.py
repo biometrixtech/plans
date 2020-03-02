@@ -4,7 +4,6 @@ from fathomapi.utils.xray import xray_recorder
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from models.athlete_injury_risk import AthleteInjuryRisk
-from utils import parse_date
 
 
 class ActivityManager(object):
@@ -52,11 +51,10 @@ class ActivityManager(object):
     def prepare_data(self):
         self.load_data()
         # self.soreness_list = SorenessCalculator().update_soreness_list(self.soreness_list, self.symptoms)
-        date = parse_date(self.event_date_time)
 
         # process injury risk with new information
         injury_risk_processor = InjuryRiskProcessor(
-                date,
+                self.event_date_time,
                 self.symptoms,
                 self.training_sessions,
                 self.historical_injury_risk_dict,
