@@ -20,7 +20,7 @@ class ActivityManager(object):
         self.athlete_id = athlete_id
         self.event_date_time = event_date_time
         self.user_stats = user_stats
-        self.training_sessions_datastore = datastore_collection.training_sessions_datastore
+        self.training_session_datastore = datastore_collection.training_session_datastore
         self.symptom_datastore = datastore_collection.symptom_datastore
         self.user_stats_datastore = datastore_collection.user_stats_datastore
         self.injury_risk_datastore = datastore_collection.injury_risk_datastore
@@ -46,7 +46,7 @@ class ActivityManager(object):
     @xray_recorder.capture('logic.AcvitityManager.save_session_dict')
     def save_session_load_dict(self):
         for session in self.sessions_to_save_load:
-            self.training_sessions_datastore.put(session)
+            self.training_session_datastore.put(session)
 
     @xray_recorder.capture('logic.AcvitityManager.prepare_data')
     def prepare_data(self):
