@@ -90,8 +90,8 @@ class UserStatsProcessing(object):
             if current_user_stats.event_date is None:
                 current_user_stats.event_date = self.event_date
 
-        for symptom in self.last_25_days_symptoms:
-            symptom.severity = SorenessCalculator.get_severity(symptom.severity, symptom.movement)
+        # for symptom in self.last_25_days_symptoms:
+        #     symptom.severity = SorenessCalculator.get_severity(symptom.severity, symptom.movement)
 
         training_load_processing = TrainingLoadProcessing(self.start_date,
                                                           format_date(self.event_date),

@@ -61,6 +61,7 @@ class ActivityManager(object):
                 self.user_stats,
                 self.athlete_id
         )
+        injury_risk_processor.process()
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
 
         # initialize exercise assignment calculator
