@@ -667,8 +667,8 @@ class InjuryRiskProcessor(object):
                 if session.session_load_dict is None:
                     current_session = session_functional_movement.process(d, load_stats)
                     current_session.session_load_dict = session_functional_movement.session_load_dict
-                    session_data_store = TrainingSessionDatastore()
-                    session_data_store.put(current_session)
+                    # session_data_store = TrainingSessionDatastore()
+                    # session_data_store.put(current_session)
                 else:
                     session_functional_movement.session_load_dict = session.session_load_dict
                     current_session = session
@@ -1190,8 +1190,8 @@ class InjuryRiskProcessor(object):
             if session.session_load_dict is None:
                 current_session = session_functional_movement.process(base_date, load_stats)
                 current_session.session_load_dict = session_functional_movement.session_load_dict
-                session_data_store = TrainingSessionDatastore()
-                session_data_store.put(current_session)
+                # session_data_store = TrainingSessionDatastore()
+                # session_data_store.put(current_session)
             else:
                 session_functional_movement.session_load_dict = session.session_load_dict
                 current_session = session

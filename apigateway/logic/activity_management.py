@@ -33,6 +33,7 @@ class ActivityManager(object):
         self.symptoms = symptoms if symptoms is not None else []
         self.historical_injury_risk_dict = None
         self.exercise_assignemnt_calculator = None
+        self.sessions_to_save_load = [session for session in self.training_sessions if session.session_load_dict is None]
         self.prepare_data()
 
     @xray_recorder.capture('logic.AcvitityManager.load_data')
@@ -41,6 +42,11 @@ class ActivityManager(object):
         if self.user_stats is None:
             self.user_stats = self.user_stats_datastore.get(self.athlete_id)
         self.historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
+
+    @xray_recorder.capture('logic.AcvitityManager.save_session_dict')
+    def save_session_load_dict(self):
+        for session in self.sessions_to_save_load:
+            self.training_sessions_datastore.put(session)
 
     @xray_recorder.capture('logic.AcvitityManager.prepare_data')
     def prepare_data(self):
@@ -102,5 +108,6 @@ class ActivityManager(object):
         """
         responsive_recovery = self.exercise_assignemnt_calculator.get_responsive_recovery(self.athlete_id, force_on_demand=force_on_demand)
         self.responsive_recovery_datastore.put(responsive_recovery)
+        self.save_session_load_dict()
 
         return responsive_recovery
