@@ -457,6 +457,7 @@ Authorization: eyJraWQ...ajBc4VQ
                 "distance": 200,
                 "session_RPE": 7,
                 "end_date": "2019-02-12T10:54:57Z",
+                "user_age": 28,
                 "hr_data":  [
                             {"value": 153,
                              "startDate": "2019-01-12T10:43:08.490-0500",
@@ -665,14 +666,15 @@ Authorization: eyJraWQ...ajBc4VQ
                 "distance": 200,
                 "session_RPE": 7,
                 "end_date": "2019-02-12T10:54:57Z",
+                "user_age": 28,
+``` 
+```
                 "hr_data":  [
                             {"value": 153,
                              "startDate": "2019-01-12T10:43:08.490-0500",
                              "endDate": "2019-01-12T10:43:08.490-0500"
                              },
                         ],
-```
-```
                 "workout_program_module": {
                                         "workout_sections": [{
                                             "name": "Upper Body Work",
@@ -896,6 +898,8 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 ### Workout Sessions
 `session` __should__ either follow the schema of the _Simple Session_ or _Detailed Session_ format:
 
+<div style="page-break-after: always;"></div>
+
 #### Simple Session Format
 
 `session` __should__ be of the following schema when using the _Simple Session_ format:
@@ -910,7 +914,8 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
     "description": string,
     "calories": integer,
     "distance": integer,
-    "session_RPE": integer,
+    "session_RPE": number,
+    "user_age": integer
     "hr_data": [hr, hr, hr],
 }
 ```
@@ -923,8 +928,11 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `session_RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
 * `calories` __if present__, __should__ be calories burned during the workout.
 * `distance` __if present__, __should__ be distance covered during the workout.
-* `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value` 
+* `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value`
+* `user_age` __should__ be provided if `hr_data` is supplied. 
 * `description` is an __optional__ parameter to provide short description of the session
+
+<div style="page-break-after: always;"></div>
 
 #### Detailed Session Format
 
@@ -941,6 +949,7 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
     "distance": integer,
     "session_RPE": number,
     "hr_data": [hr, hr, hr],
+    "user_age": integer,
     "workout_program_module": workout_program_module
 }
 ```
@@ -953,6 +962,7 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `calories` __if present__, __should__ be calories burned during the workout.
 * `distance` __if present__, __should__ be distance covered during the workout.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value` 
+* `user_age` __should__ be provided if `hr_data` is supplied.
 * `description` is an __optional__ parameter to provide short description of the session
 
 `workout_program_module` __should__ be of the following schema:
@@ -968,6 +978,8 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `program_id` is an __optional__ parameter and is an identifier of the workout program
 * `program_module_id` is an __optional__ parameter and is an identifier for the specific program module
 * `workout_sections` __should__ be a list of individual _workout_section_ elements contained within the module
+
+<div style="page-break-after: always;"></div>
 
 `workout_section` __should__ be of the following schema:
 ```
@@ -985,8 +997,6 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `start_date_time` __should__ reflect the start time of the workout section
 * `end_date_time` __should__ reflect the end time of the workout section
 * `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
-
-<div style="page-break-after: always;"></div>
 
 `exercise` __should__ be of the following schema:
 ```
@@ -1017,7 +1027,6 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 
-<div style="page-break-after: always;"></div>
 
 ### Movement Integration Prep
 
