@@ -3,7 +3,7 @@ from fathomapi.utils.xray import xray_recorder
 from logic.training_load_processing import TrainingLoadProcessing
 from logic.soreness_processing import SorenessCalculator
 from models.user_stats import UserStats
-from models.asymmetry import HistoricAsymmetry, AsymmetryType
+# from models.asymmetry import HistoricAsymmetry, AsymmetryType
 from utils import parse_date, format_date
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.athlete_injury_risk import AthleteInjuryRisk
@@ -15,9 +15,9 @@ class UserStatsProcessing(object):
         self.athlete_id = athlete_id
         self.event_date = event_date
         self.user_stats_datastore = datastore_collection.user_stats_datastore
-        self.symptoms_datastore = datastore_collection.symptoms_datastore
+        self.symptom_datastore = datastore_collection.symptom_datastore
         self.injury_risk_datastore = datastore_collection.injury_risk_datastore
-        self.training_sessions_datastore = datastore_collection.training_sessions_datastore
+        self.training_session_datastore = datastore_collection.training_session_datastore
         self.start_date = None
         self.end_date = None
         self.start_date_time = None
@@ -48,6 +48,7 @@ class UserStatsProcessing(object):
 
         self.symptoms = []
         self.acute_symptoms = []
+        self.chronic_symptoms = []
         self.chronic_symptoms = []
         self.last_7_days_symptoms = []
         self.days_8_14_symptoms = []
@@ -93,7 +94,7 @@ class UserStatsProcessing(object):
             symptom.severity = SorenessCalculator.get_severity(symptom.severity, symptom.movement)
 
         training_load_processing = TrainingLoadProcessing(self.start_date,
-                                                          format_date( self.event_date),
+                                                          format_date(self.event_date),
                                                           current_user_stats.load_stats)  # want event date since end date = event_date + 1
 
         # this gets updated in load plan values
@@ -154,11 +155,12 @@ class UserStatsProcessing(object):
     @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
     def load_historical_data(self):
         if not self.historic_data_loaded:
-            self.symptoms = self.symptoms_datastore.get(self.athlete_id, self.start_date, self.end_date,
-                                                        stats_processing=True)
-            self.training_sessions = self.training_sessions_datastore.get(None, self.athlete_id, event_date_time=None,
-                                                                          start_date_time=self.chronic_start_date_time,
-                                                                          end_date_time=self.event_date)
+            self.symptoms = self.symptom_datastore.get(user_id=self.athlete_id,
+                                                       start_date_time=self.start_date_time,
+                                                       end_date_time=self.end_date_time)
+            self.training_sessions = self.training_session_datastore.get(user_id=self.athlete_id,
+                                                                         start_date_time=self.chronic_start_date_time,
+                                                                         end_date_time=self.event_date)
         self.update_start_times()
         self.set_acute_chronic_periods()
         self.load_historical_symptoms()
