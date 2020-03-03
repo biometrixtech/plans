@@ -66,7 +66,7 @@ def parse_datetime(datetime_string):
         try:
             date_time = datetime.datetime.strptime(datetime_string, format_string)
             if date_time.tzinfo is None:
-                date_time = date_time.replace(tzinfo=pytz.UTC)
+                date_time = date_time.replace(tzinfo=pytz.utc)
             return date_time
             # return datetime.datetime.strptime(datetime_string, format_string)
         except ValueError:
@@ -79,7 +79,7 @@ def parse_date(date_string):
         try:
             date_time = datetime.datetime.strptime(date_string, format_string)
             if date_time.tzinfo is None:
-                date_time = date_time.replace(tzinfo=pytz.UTC)
+                date_time = date_time.replace(tzinfo=pytz.utc)
             return date_time
         except ValueError:
             pass
