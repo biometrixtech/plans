@@ -47,6 +47,7 @@ class APIProcessing(object):
         session_RPE = session.get('session_RPE', None)
 
         session_data = {
+            "user_id": self.user_id,
             "event_date": event_date,
             "end_date": end_date,
             "sport_name": sport_name,
