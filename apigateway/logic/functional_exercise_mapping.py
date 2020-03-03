@@ -1,5 +1,7 @@
 from models.functional_movement_modalities import ActiveRestBeforeTraining, ActiveRestAfterTraining, WarmUp, CoolDown, FunctionalStrength
-from models.functional_movement_activities import MovementPrep, MobilityWOD, ResponsiveRecovery, MovementIntegrationPrep, ActiveRest
+from models.functional_movement_activities import MovementPrep, MobilityWOD, ResponsiveRecovery, MovementIntegrationPrep, ActiveRest, ActiveRecovery, ColdWaterImmersion, Ice, IceSession
+from models.body_parts import BodyPartLocation, BodyPartFactory
+from models.goal import AthleteGoalType, AthleteGoal
 
 
 class ExerciseAssignmentCalculator(object):
@@ -96,10 +98,126 @@ class ExerciseAssignmentCalculator(object):
     def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=True):
         responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
 
-        # determine if we need active rest
+        active_rest = ActiveRest(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
+        active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
+        active_rest.set_plan_dosage()
+        active_rest.set_exercise_dosage_ranking()
+        active_rest.aggregate_dosages()
+        active_rest.set_winners()
+        active_rest.scale_all_active_time()
+        active_rest.reconcile_default_plan_with_active_time()
+        if active_rest.get_total_exercises() > 0:
+            responsive_recovery.active_rest = active_rest
+        else:
+            responsive_recovery.active_rest = None
+        responsive_recovery.active_rest = active_rest
 
-        # determine if we need active recovery
+        active_recovery = ActiveRecovery(self.event_date_time)
+        active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict)
+        active_recovery.set_plan_dosage()
+        active_recovery.set_exercise_dosage_ranking()
+        active_recovery.aggregate_dosages()
+        active_recovery.set_winners()
+        active_recovery.scale_all_active_time()
+        active_recovery.reconcile_default_plan_with_active_time()
+        if active_recovery.get_total_exercises() > 0:
+            responsive_recovery.active_recovery = active_recovery
+        else:
+            responsive_recovery.active_recovery = None
 
-        # determine if we need ice, cwi
+        cold_water_immersion = self.get_cold_water_immersion(self.injury_risk_dict)
+        responsive_recovery.cold_water_immersion = cold_water_immersion
+
+        ice_session = self.get_ice_session(self.injury_risk_dict)
+        responsive_recovery.ice = self.adjust_ice_session(ice_session, cold_water_immersion)
 
         return responsive_recovery
+
+    def get_cold_water_immersion(self, injury_risk_dict):
+
+        cold_water_immersion = None
+
+        cwi_assigned = False
+
+        for body_part, body_part_injury_risk in injury_risk_dict.items():
+
+            base_date = self.event_date_time.date()
+
+            if (self.is_lower_body_part(body_part.body_part_location)
+                    and body_part_injury_risk.last_non_functional_overreaching_date == base_date
+                    and not cwi_assigned):
+                cold_water_immersion = ColdWaterImmersion()
+                goal = AthleteGoal("Recovery", 1, AthleteGoalType.sore)
+                cold_water_immersion.goals.add(goal)
+
+        return cold_water_immersion
+
+    def get_ice_session(self, injury_risk_dict):
+
+        ice_session = None
+
+        ice_list = []
+
+        minutes = []
+
+        cwi_assigned = False
+
+        body_part_factory = BodyPartFactory()
+
+        for body_part, body_part_injury_risk in injury_risk_dict.items():
+
+            base_date = self.event_date_time.date()
+
+            if (self.is_lower_body_part(body_part.body_part_location)
+                    and body_part_injury_risk.last_non_functional_overreaching_date == base_date
+                    and not cwi_assigned):
+                ice = Ice(body_part_location=body_part.body_part_location, side=body_part.side)
+
+                if body_part_factory.is_joint(body_part) or body_part_factory.is_ligament(body_part):
+                    ice_list.append(ice)
+                    minutes.append(10)
+                else:
+                    if body_part_injury_risk.last_sharp_date == self.event_date_time.date() and body_part_injury_risk.last_sharp_level >= 4:
+                        ice_list.append(ice)
+                        minutes.append(15)
+
+        if len(ice_list) > 0:
+            ice_session = IceSession(minutes=min(minutes))
+            ice_session.goal = AthleteGoal("Care", 1, AthleteGoalType.sore)
+            ice_session.body_parts = ice_list
+
+            return ice_session
+
+        return ice_session
+
+    def is_lower_body_part(self, body_part_location):
+
+        if (
+                body_part_location == BodyPartLocation.hip_flexor or
+                body_part_location == BodyPartLocation.hip or
+                body_part_location == BodyPartLocation.knee or
+                body_part_location == BodyPartLocation.ankle or
+                body_part_location == BodyPartLocation.foot or
+                body_part_location == BodyPartLocation.achilles or
+                body_part_location == BodyPartLocation.groin or
+                body_part_location == BodyPartLocation.quads or
+                body_part_location == BodyPartLocation.shin or
+                body_part_location == BodyPartLocation.it_band or
+                body_part_location == BodyPartLocation.it_band_lateral_knee or
+                body_part_location == BodyPartLocation.glutes or
+                body_part_location == BodyPartLocation.hamstrings or
+                body_part_location == BodyPartLocation.calves
+        ):
+            return True
+        else:
+            return False
+
+    def adjust_ice_session(self, ice_session, cold_water_immersion_session):
+
+        if ice_session is not None and cold_water_immersion_session is not None:
+            ice_session.body_parts = list(b for b in ice_session.body_parts if not self.is_lower_body_part(b.body_part_location))
+
+            if len(ice_session.body_parts) == 0:
+                ice_session = None
+
+        return ice_session
