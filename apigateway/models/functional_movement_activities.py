@@ -1352,10 +1352,10 @@ class ActiveRest(ActiveRestBase):
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
                                     exercise_library)
-                if max_severity < 3.5:
+                if max_severity < 7:
                     self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
                                         0, exercise_library)
-                if max_severity < 2.5:
+                if max_severity < 5:
                     self.copy_exercises(synergist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         2, 0, exercise_library)
 
@@ -1364,14 +1364,14 @@ class ActiveRest(ActiveRestBase):
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, 0,
                                     exercise_library)
-                if max_severity < 3.5:
+                if max_severity < 7:
                     self.copy_exercises(stabilizer.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 3,
                                         0, exercise_library)
-                if max_severity < 2.5:
+                if max_severity < 5:
                     self.copy_exercises(stabilizer.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         3, 0, exercise_library)
 
-        if max_severity < 2.5:
+        if max_severity < 5:
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, 1, 0,
                                 exercise_library)
 
@@ -1583,9 +1583,74 @@ class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
 
-    @abc.abstractmethod
     def fill_exercises(self, exercise_library, injury_risk_dict):
-        pass
+
+        max_severity = 0
+        for body_part, body_part_injury_risk in injury_risk_dict.items():
+            if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
+                    and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+                max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
+            if (body_part_injury_risk.last_ache_level > 0 and body_part_injury_risk.last_ache_date is not None
+                    and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+                max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
+
+        if len(injury_risk_dict) > 0:
+            for body_part, body_part_injury_risk in injury_risk_dict.items():
+                self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity)
+
+    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity):
+
+        goals = []
+
+        compensating = False
+        high_load = False
+
+        if body_part is not None:
+
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
+                # goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
+                high_load = True
+
+            if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
+                    body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
+
+                compensating = True
+                body_part_injury_risk.total_compensation_percent_tier = 1
+            elif (body_part_injury_risk.last_compensation_date is not None
+                  and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
+                  0 < body_part_injury_risk.total_compensation_percent_tier < 6):
+
+                compensating = True
+
+            # if compensating:
+            #     goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
+
+            # for goal in goals:
+            goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
+
+            if high_load or compensating:
+
+                high_load_tier = 0
+                comp_tier = 0
+                tier = 0
+
+                if high_load:
+                    high_load_tier = body_part_injury_risk.total_volume_percent_tier
+                if compensating:
+                    comp_tier = body_part_injury_risk.total_compensation_percent_tier
+
+                if high_load_tier > 0 and comp_tier > 0:
+                    tier = min(high_load_tier, comp_tier)
+                elif high_load_tier > 0:
+                    tier = high_load_tier
+                elif comp_tier > 0:
+                    tier = comp_tier
+
+                if tier > 0:
+
+                    if max_severity < 7.0:
+                        self.copy_exercises(body_part.dynamic_integrate_exercises, ExercisePhaseType.dynamic_integrate, goal,
+                                            tier, 0, exercise_library)
 
 
 class IceSession(Serialisable):
@@ -1597,6 +1662,7 @@ class IceSession(Serialisable):
         self.completed = False
         self.active = True
         self.body_parts = []
+        self.goal = None
 
     def json_serialise(self):
 
@@ -1608,6 +1674,7 @@ class IceSession(Serialisable):
             'completed': self.completed,
             'active': self.active,
             'body_parts': [ice.json_serialise() for ice in self.body_parts],
+            'goal': self.json_serialise() if self.goal is not None else None
         }
 
         return ret
@@ -1620,6 +1687,7 @@ class IceSession(Serialisable):
         ice_session.event_date_time = input_dict.get('event_date_time', None)
         ice_session.completed = input_dict.get('completed', False)
         ice_session.active = input_dict.get('active', True)
+        ice_session.goal = AthleteGoal.json_deserialise(input_dict['goal']) if input_dict.get('goal') is not None else None
         ice_session.body_parts = [Ice.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
         if len(ice_session.body_parts) > 0:
             return ice_session
