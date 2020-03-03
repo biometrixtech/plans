@@ -12,7 +12,7 @@ from tests.mocks.mock_athlete_stats_datastore import AthleteStatsDatastore
 from tests.testing_utilities import TestUtilities
 from models.post_session_survey import PostSurvey, PostSessionSurvey
 from models.daily_readiness import DailyReadiness
-
+import pytz
 
 def get_dates(start_date, days):
 
@@ -122,7 +122,7 @@ def get_single_historic_soreness(body_part_location):
 
 def test_symmetric_muscle_groups():
 
-    base_date_time = datetime.now()
+    base_date_time = datetime.now().replace(tzinfo=pytz.utc)
 
     acute_readiness_surveys = []
     acute_post_session_surveys = []
@@ -161,7 +161,7 @@ def test_symmetric_muscle_groups():
 
 def test_multiple_symmetric_muscle_groups():
 
-    base_date_time = datetime.now()
+    base_date_time = datetime.now().replace(tzinfo=pytz.utc)
 
     acute_readiness_surveys = []
     acute_post_session_surveys = []
@@ -202,7 +202,7 @@ def test_multiple_symmetric_muscle_groups():
 
 def test_multiple_asymmetric_muscle_groups():
 
-    base_date_time = datetime.now()
+    base_date_time = datetime.now().replace(tzinfo=pytz.utc)
 
     acute_readiness_surveys = []
     acute_post_session_surveys = []
@@ -241,7 +241,7 @@ def test_multiple_asymmetric_muscle_groups():
 
 def test_single_symmetric_muscle_groups():
 
-    base_date_time = datetime.now()
+    base_date_time = datetime.now().replace(tzinfo=pytz.utc)
 
     acute_readiness_surveys = []
     acute_post_session_surveys = []

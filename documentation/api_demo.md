@@ -201,16 +201,16 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date_time": "2018-12-10T17:45:24Z",
+    "event_date_time": "2018-12-10T17:45:24-05:00",
     "session":{
-                "event_date": "2019-01-12T10:41:57Z",
+                "event_date": "2019-01-12T10:41:57-05:00",
                 "session_type": 6,
                 "sport_name": 1,
                 "duration": 14,
                 "description": "Evening Practice",
                 "calories": 100,
                 "distance": 200,
-                "end_date": "2019-01-12T10:54:57Z"
+                "end_date": "2019-01-12T10:54:57-05:00"
             }
 }
 ```
@@ -270,16 +270,16 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date_time": "2018-12-10T17:45:24Z",
+    "event_date_time": "2018-12-10T17:45:24-05:00",
     "session": {
-                "event_date": "2019-01-12T10:41:57Z",
+                "event_date": "2019-01-12T10:41:57-05:00",
                 "session_type": 6,
                 "sport_name": 1,
                 "duration": 14,
                 "description": "Evening Practice",
                 "calories": 100,
                 "distance": 200,
-                "end_date": "2019-01-12T10:54:57Z"
+                "end_date": "2019-01-12T10:54:57-05:00"
             },
     "symptoms":[
             {
@@ -371,7 +371,7 @@ Content-Type: application/json
 Authorization: eyJ0eX...xA8
 
 {
-    "event_date_time": "2018-12-10T17:45:24Z"
+    "event_date_time": "2018-12-10T17:45:24-05:00"
 }
 ```
 
@@ -437,11 +437,11 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date_time": "2018-12-10T17:45:24Z",
+    "event_date_time": "2018-12-10T17:45:24-05:00",
     "user_age": 28,
     "sessions":[
             {
-                "event_date": "2019-01-12T10:41:57Z",
+                "event_date": "2019-01-12T10:41:57-05:00",
                 "session_type": 6,
                 "sport_name": 1,
                 "duration": 14,
@@ -449,17 +449,17 @@ Authorization: eyJraWQ...ajBc4VQ
                 "calories": 100,
                 "distance": 200,
                 "session_RPE": 5,
-                "end_date": "2019-01-12T10:54:57Z"
+                "end_date": "2019-01-12T10:54:57-05:00"
             },
             {
-                "event_date": "2019-01-12T10:41:57Z",
+                "event_date": "2019-01-12T10:41:57-05:00",
                 "session_type": 7,
                 "duration": 840,
                 "description": "Evening Practice",
                 "calories": 100,
                 "distance": 200,
                 "session_RPE": 7,
-                "end_date": "2019-02-12T10:54:57Z",
+                "end_date": "2019-02-12T10:54:57-05:00",
                 "hr_data":  [
                             {"value": 153,
                              "startDate": "2019-01-12T10:43:08.490-0500",
@@ -470,8 +470,8 @@ Authorization: eyJraWQ...ajBc4VQ
                                         "workout_sections": [{
                                             "name": "Upper Body Work",
                                             "duration_seconds": 360,
-                                            "start_date_time": "2019-01-12T10:43:08Z",
-                                            "end_date_time": "2019-01-12T12:17:12Z"
+                                            "start_date_time": "2019-01-12T10:43:08-05:00",
+                                            "end_date_time": "2019-01-12T12:17:12-05:00"
                                             "exercises": [
                                                 {
                                                     "id": "1",
@@ -550,7 +550,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date_time": "2018-12-10T17:45:24Z",
+    "event_date_time": "2018-12-10T17:45:24-05:00",
     "symptoms":[
             {
                 "body_part": 14,
@@ -659,18 +659,18 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date_time": "2018-12-10T17:45:24Z",
+    "event_date_time": "2018-12-10T17:45:24-05:00",
     "user_age": 28,
     "session":
             {
-                "event_date": "2019-01-12T10:41:57Z",
+                "event_date": "2019-01-12T10:41:57-05:00",
                 "session_type": 7,
                 "duration": 840,
                 "description": "Evening Practice",
                 "calories": 100,
                 "distance": 200,
                 "session_RPE": 7,
-                "end_date": "2019-02-12T10:54:57Z",
+                "end_date": "2019-02-12T10:54:57-05:00",
 ``` 
 ```
                 "hr_data":  [
@@ -683,8 +683,8 @@ Authorization: eyJraWQ...ajBc4VQ
                                         "workout_sections": [{
                                             "name": "Upper Body Work",
                                             "duration_seconds": 360,
-                                            "start_date_time": "2019-01-12T10:43:08Z",
-                                            "end_date_time": "2019-01-12T12:17:12Z"
+                                            "start_date_time": "2019-01-12T10:43:08-05:00",
+                                            "end_date_time": "2019-01-12T12:17:12-05:00"
                                             "exercises": [
                                                 {
                                                     "id": "1",
@@ -764,9 +764,9 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date_time": "2018-12-10T17:45:24Z",
+    "event_date_time": "2018-12-10T17:45:24-05:00",
     "session":{
-                    "event_date": "2019-01-12T10:41:57Z",
+                    "event_date": "2019-01-12T10:41:57-05:00",
                     "session_type": 6,
                     "sport_name": 1,
                     "duration": 14,
@@ -774,7 +774,7 @@ Authorization: eyJraWQ...ajBc4VQ
                     "calories": 100,
                     "distance": 200,
                     "session_RPE": 8,
-                    "end_date": "2019-01-12T10:54:57Z"
+                    "end_date": "2019-01-12T10:54:57-05:00"
                 },
     "symptoms":[{
                     "body_part": 14,
@@ -848,7 +848,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 
 {
-    "event_date_time": "2019-10-29T17:45:24Z",
+    "event_date_time": "2019-10-29T17:45:24-05:00",
     "symptoms":[
         {
             "body_part": 18,

@@ -14,6 +14,7 @@ from models.session import SessionType
 from tests.testing_utilities import TestUtilities
 from datetime import datetime, timedelta
 from utils import parse_date, format_date
+import pytz
 
 
 def get_dates(start_date, end_date):
@@ -306,7 +307,7 @@ def test_flag_acute_pain_10_days_3_day_gaps_last_reported():
 
     historic_soreness = get_historic_soreness([1, 2, 3, None, None, None, 3], "2018-05-18", historic_soreness)
 
-    assert(datetime(2018, 5, 18, 0, 0) == historic_soreness[0].last_reported_date_time)
+    assert(datetime(2018, 5, 18, 0, 0).replace(tzinfo=pytz.utc) == historic_soreness[0].last_reported_date_time)
 
 
 def test_flag_acute_pain_10_days_3_day_gaps_question():

@@ -1,4 +1,5 @@
 import datetime
+import pytz
 import math
 import uuid
 from fathomapi.utils.exceptions import InvalidSchemaException
@@ -41,8 +42,14 @@ def format_datetime(datetime_input):
     if datetime_input is None:
         return None
     if not isinstance(datetime_input, datetime.datetime):
-        datetime_input = datetime.datetime.strptime(datetime_input, "%Y-%m-%dT%H:%M:%SZ")
-    return datetime_input.strftime("%Y-%m-%dT%H:%M:%SZ")
+        datetime_input = parse_datetime(datetime_input)  # datetime.datetime.strptime(datetime_input, "%Y-%m-%dT%H:%M:%SZ")
+    if datetime_input.microsecond != 0:
+        format_string = "%Y-%m-%dT%H:%M:%S.%f%z"
+    else:
+        format_string = "%Y-%m-%dT%H:%M:%S%z"
+    if datetime_input.tzinfo == pytz.utc:
+        format_string = format_string.replace("%z", "Z")
+    return datetime_input.strftime(format_string)
 
 
 def parse_datetime(datetime_string):
@@ -50,11 +57,18 @@ def parse_datetime(datetime_string):
         "%Y-%m-%dT%H:%M:%SZ",
         "%Y-%m-%dT%H:%M:%S.%fZ",
         "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S.%f"
+        "%Y-%m-%dT%H:%M:%S.%f",
+        "%Y-%m-%dT%H:%M:%S.%f%z",
+        "%Y-%m-%dT%H:%M:%S%z",
+
     ]
     for format_string in format_strings:
         try:
-            return datetime.datetime.strptime(datetime_string, format_string)
+            date_time = datetime.datetime.strptime(datetime_string, format_string)
+            if date_time.tzinfo is None:
+                date_time = date_time.replace(tzinfo=pytz.UTC)
+            return date_time
+            # return datetime.datetime.strptime(datetime_string, format_string)
         except ValueError:
             continue
     raise InvalidSchemaException('date_time must be in ISO8601 format')
@@ -63,7 +77,10 @@ def parse_datetime(datetime_string):
 def parse_date(date_string):
     for format_string in ('%Y-%m-%d', '%m/%d/%y'):
         try:
-            return datetime.datetime.strptime(date_string, format_string)
+            date_time = datetime.datetime.strptime(date_string, format_string)
+            if date_time.tzinfo is None:
+                date_time = date_time.replace(tzinfo=pytz.UTC)
+            return date_time
         except ValueError:
             pass
     raise InvalidSchemaException('date_time must be in ISO8601 format')
@@ -96,8 +113,11 @@ def fix_early_survey_event_date(event_date):
 
 
 def get_timezone(local_time):
+    if local_time.tzinfo is not None and local_time.tzinfo != pytz.utc:
+        tz_name = local_time.strftime('%z')
+        return f"{tz_name[:3]}:{tz_name[3:]}"
     try:
-        utc_time = datetime.datetime.now()
+        utc_time = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
         diff = (local_time - utc_time).total_seconds()
         thirty_mins = round(diff / (30 * 60), 0)
         hour_diff = int(abs(thirty_mins) // 2)
@@ -112,7 +132,8 @@ def get_timezone(local_time):
         else:
             tz = f"{sign}0{hour_diff}:{min_diff}"
         return tz
-    except:
+    except Exception as e:
+        print(e)
         return '-04:00'
 
 
