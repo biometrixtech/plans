@@ -104,6 +104,7 @@ class InjuryRiskProcessor(object):
                 elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
                     self.relative_load_level = min(self.relative_load_level, 2)
 
+    @xray_recorder.capture('logic.InjuryRiskProcessor.get_consolidated_dict')
     def get_consolidated_dict(self):
 
         self.aggregate_ird()
@@ -121,6 +122,7 @@ class InjuryRiskProcessor(object):
 
         return consolidated_injury_risk_dict
 
+    @xray_recorder.capture('logic.InjuryRiskProcessor.process')
     def process(self, update_historical_data=False, aggregate_results=False, aggregate_for_viz=False):
 
         body_part_factory = BodyPartFactory()
@@ -1153,7 +1155,8 @@ class InjuryRiskProcessor(object):
             self.total_intensity_dict[body_part_side][d] = 0
         self.total_intensity_dict[body_part_side][
             d] += body_part_injury_risk.concentric_intensity_today + body_part_injury_risk.eccentric_intensity_today
-    
+
+    @xray_recorder.capture('logic.InjuryRiskProcessor.process_todays_sessions')
     def process_todays_sessions(self, base_date, injury_risk_dict, load_stats):
 
         daily_sessions = [n for n in self.training_sessions if n.event_date.date() == base_date]
