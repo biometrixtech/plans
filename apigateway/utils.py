@@ -68,7 +68,6 @@ def parse_datetime(datetime_string):
             if date_time.tzinfo is None:
                 date_time = date_time.replace(tzinfo=pytz.utc)
             return date_time
-            # return datetime.datetime.strptime(datetime_string, format_string)
         except ValueError:
             continue
     raise InvalidSchemaException('date_time must be in ISO8601 format')
