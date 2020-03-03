@@ -190,21 +190,21 @@ class UserStatsProcessing(object):
 
     def load_historical_sessions(self):
 
-        self.acute_training_sessions = sorted([p for p in self.training_sessions if self.acute_start_date_time is not None and p.get_event_datetime() >=
+        self.acute_training_sessions = sorted([p for p in self.training_sessions if self.acute_start_date_time is not None and p.event_date >=
                                                self.acute_start_date_time], key=lambda x: x.event_date)
 
         self.chronic_training_sessions = sorted([p for p in self.training_sessions if self.acute_start_date_time is not None and
                                                  self.chronic_load_start_date_time is not None and self.acute_start_date_time >
-                                                 p.get_event_datetime() >= self.chronic_load_start_date_time],
+                                                 p.event_date >= self.chronic_load_start_date_time],
                                                 key=lambda x: x.event_date)
 
-        self.last_6_days_training_sessions = [p for p in self.training_sessions if p.get_event_datetime() >= self.last_6_days]
+        self.last_6_days_training_sessions = [p for p in self.training_sessions if p.event_date >= self.last_6_days]
 
-        self.last_7_days_training_sessions = [p for p in self.training_sessions if p.get_event_datetime() >= self.last_week]
+        self.last_7_days_training_sessions = [p for p in self.training_sessions if p.event_date >= self.last_week]
 
-        self.last_7_13_training_sessions = [p for p in self.training_sessions if self.last_6_days > p.get_event_datetime() >= self.days_7_13]
+        self.last_7_13_training_sessions = [p for p in self.training_sessions if self.last_6_days > p.event_date >= self.days_7_13]
 
-        self.days_8_14_training_sessions = [p for p in self.training_sessions if self.last_week > p.get_event_datetime() >= self.previous_week]
+        self.days_8_14_training_sessions = [p for p in self.training_sessions if self.last_week > p.event_date >= self.previous_week]
 
     def update_start_times(self):
 
@@ -216,7 +216,7 @@ class UserStatsProcessing(object):
 
         if self.training_sessions is not None and len(self.training_sessions) > 0:
             self.training_sessions.sort(key=lambda x: x.event_date, reverse=False)
-            self.latest_training_session_date = parse_date(self.training_sessions[len(self.training_sessions) - 1].event_date)
+            self.latest_training_session_date = self.training_sessions[len(self.training_sessions) - 1].event_date
 
     def set_acute_chronic_periods(self):
 

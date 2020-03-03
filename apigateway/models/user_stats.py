@@ -16,6 +16,8 @@ class UserStats(Serialisable):
         self.high_relative_load_sessions = []
         self.eligible_for_high_load_trigger = False
 
+        self.expected_weekly_workouts = 3
+
     def __setattr__(self, name, value):
         if name == 'event_date' and value is not None:
             if isinstance(value, str):
