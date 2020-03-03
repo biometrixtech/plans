@@ -57,10 +57,7 @@ def parse_datetime(datetime_string):
         "%Y-%m-%dT%H:%M:%SZ",
         "%Y-%m-%dT%H:%M:%S.%fZ",
         "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S.%f",
-        "%Y-%m-%dT%H:%M:%S.%f%z",
-        "%Y-%m-%dT%H:%M:%S%z",
-
+        "%Y-%m-%dT%H:%M:%S.%f"
     ]
     for format_string in format_strings:
         try:
@@ -70,6 +67,18 @@ def parse_datetime(datetime_string):
             return date_time
         except ValueError:
             continue
+    tz_format_strings = [
+        "%Y-%m-%dT%H:%M:%S.%f%z",
+        "%Y-%m-%dT%H:%M:%S%z"
+    ]
+    if ":" == datetime_string[-3]:
+        datetime_string = datetime_string[:-3] + datetime_string[-2:]
+    for format_string in tz_format_strings:
+        try:
+            return datetime.datetime.strptime(datetime_string, format_string)
+        except ValueError:
+            continue
+
     raise InvalidSchemaException('date_time must be in ISO8601 format')
 
 
