@@ -21,10 +21,10 @@ class SessionFunctionalMovement(object):
         movement_factory = FunctionalMovementFactory()
 
         if self.session.session_type() == SessionType.mixed_activity:
-
-            total_load_dict = self.process_workout_load(self.session.workout_program_module)
-            normalized_dict = self.normalize_and_consolidate_load(total_load_dict)
-            self.session_load_dict = normalized_dict
+            if self.session.workout_program_module is not None:
+                total_load_dict = self.process_workout_load(self.session.workout_program_module)
+                normalized_dict = self.normalize_and_consolidate_load(total_load_dict)
+                self.session_load_dict = normalized_dict
 
         else:
 

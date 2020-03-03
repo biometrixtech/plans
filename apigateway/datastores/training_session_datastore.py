@@ -11,14 +11,14 @@ class TrainingSessionDatastore(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore.get')
-    def get(self, session_id=None, user_id=None, event_date_time=None, start_date_time=None, end_date_time=None):
+    def get(self, session_id=None, user_id=None, event_date_time=None, start_date_time=None, end_date_time=None, read_session_load_dict=True):
         """
         user_id: uuid
         event_date_time: datetime.datetime
         start_date_time: datetime.datetime
         end_date_time: datetime.datetime
         """
-        return self._query_mongodb(session_id, user_id, event_date_time, start_date_time, end_date_time)
+        return self._query_mongodb(session_id, user_id, event_date_time, start_date_time, end_date_time, read_session_load_dict)
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore.put')
     def put(self, items):
@@ -31,10 +31,13 @@ class TrainingSessionDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.TrainingSessionDatastore._query_mongodb')
-    def _query_mongodb(self, session_id, user_id, event_date_time, start_date_time, end_date_time):
+    def _query_mongodb(self, session_id, user_id, event_date_time, start_date_time, end_date_time, read_session_load_dict):
+        projection = None
+        if not read_session_load_dict:
+            projection= {'session_load_dict': 0}
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if session_id is not None:
-            mongo_result = mongo_collection.find_one({'session_id': session_id})
+            mongo_result = mongo_collection.find_one({'session_id': session_id}, projection)
             if mongo_result is not None:
                 session = Session.json_deserialise(mongo_result)
                 return session
@@ -52,7 +55,7 @@ class TrainingSessionDatastore(object):
                     query['event_date'] = {'$gte': format_datetime(start_date_time), '$lte': format_datetime(end_date_time)}
                 else:
                     raise InvalidSchemaException("Need to provide either event_date_time or start_date_time and end_date_time when querying by user_id")
-                mongo_cursor = mongo_collection.find(query)
+                mongo_cursor = mongo_collection.find(query, projection)
 
                 ret = []
                 for session in mongo_cursor:

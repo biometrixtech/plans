@@ -79,8 +79,6 @@ class UserStatsProcessing(object):
         if self.start_date is None:
             self.set_start_end_times()
 
-        self.load_historical_data()
-
         if current_user_stats is None:  # if no athlete_stats was passed, read from mongo
             current_user_stats = self.user_stats_datastore.get(athlete_id=self.athlete_id)
 
@@ -89,6 +87,13 @@ class UserStatsProcessing(object):
                 current_user_stats.event_date = self.event_date
             if current_user_stats.event_date is None:
                 current_user_stats.event_date = self.event_date
+
+        if current_user_stats.event_date.date() != self.event_date.date() or force_historical_process:
+            read_session_load_dict = True
+        else:
+            read_session_load_dict = False
+
+        self.load_historical_data(read_session_load_dict)
 
         # for symptom in self.last_25_days_symptoms:
         #     symptom.severity = SorenessCalculator.get_severity(symptom.severity, symptom.movement)
@@ -153,14 +158,15 @@ class UserStatsProcessing(object):
         return current_user_stats
 
     @xray_recorder.capture('logic.StatsProcessing.load_historical_data')
-    def load_historical_data(self):
+    def load_historical_data(self, read_session_load_dict=False):
         if not self.historic_data_loaded:
             self.symptoms = self.symptom_datastore.get(user_id=self.athlete_id,
                                                        start_date_time=self.start_date_time,
                                                        end_date_time=self.end_date_time)
             self.training_sessions = self.training_session_datastore.get(user_id=self.athlete_id,
                                                                          start_date_time=self.start_date_time,
-                                                                         end_date_time=self.event_date)
+                                                                         end_date_time=self.event_date,
+                                                                         read_session_load_dict=read_session_load_dict)
         self.update_start_times()
         self.set_acute_chronic_periods()
         self.load_historical_symptoms()
