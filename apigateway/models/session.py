@@ -340,7 +340,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'source': self.source.value if self.source is not None else SessionSource.user.value,
             'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None,
             'movement_patterns': self.movement_patterns.json_serialise() if self.movement_patterns is not None else None,
-            'workout_program_module': self.workout_program_module.json_serialise() if self.workout_program_module is not None else None,
+            # 'workout_program_module': self.workout_program_module.json_serialise() if self.workout_program_module is not None else None,
             'session_RPE': self.session_RPE,
             'session_load_dict': [{"body_part": key.json_serialise(),
                                    "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None else None
@@ -405,8 +405,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
         session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
             'movement_patterns') is not None else None
-        session.workout_program_module = WorkoutProgramModule.json_deserialise(input_dict['workout_program_module']) if input_dict.get('workout_program_module') is not None else None
+        # session.workout_program_module = WorkoutProgramModule.json_deserialise(input_dict['workout_program_module']) if input_dict.get('workout_program_module') is not None else None
         if input_dict.get('session_load_dict') is not None:
+            session.session_load_dict = {}
             for item in input_dict.get('session_load_dict', []):
                 session.session_load_dict[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartInjuryRisk.json_deserialise(item['injury_risk'])
         else:

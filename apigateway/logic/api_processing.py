@@ -19,6 +19,7 @@ class APIProcessing(object):
         self.user_age = None
         self.sessions = []
         self.heart_rate_data = []
+        self.workout_programs = []
         self.symptoms = []
         self.user_stats_processor = None
 
@@ -60,7 +61,11 @@ class APIProcessing(object):
         }
         session_obj = create_session(session_type, session_data)
         if session_obj.workout_program_module is not None:
+            session_obj.workout_program_module.session_id = session_obj.id
+            session_obj.workout_program_module.user_id = session_obj.user_id
+            session_obj.workout_program_module.event_date_time = session_obj.event_date
             WorkoutProcessor().process_workout(session_obj.workout_program_module)
+            self.workout_programs.append(session_obj.workout_program_module)
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:

@@ -16,6 +16,7 @@ user_stats_datastore = datastore_collection.user_stats_datastore
 symptom_datastore = datastore_collection.symptom_datastore
 training_session_datastore = datastore_collection.training_session_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
+workout_program_datastore = datastore_collection.workout_program_datastore
 
 app = Blueprint('mobility_wod', __name__)
 
@@ -58,12 +59,15 @@ def handle_rom_wod_create(user_id):
         for session in sessions:
             api_processor.create_session_from_survey(session)
 
-    # store the symptoms, session and heart rate, if any exist
+    # store the symptoms, session, workout_program and heart rate, if any exist
     if len(api_processor.symptoms) > 0:
         symptom_datastore.put(api_processor.symptoms)
 
     if len(api_processor.sessions) > 0:
         training_session_datastore.put(api_processor.sessions)
+
+    if len(api_processor.workout_programs) > 0:
+        workout_program_datastore.put(api_processor.workout_programs)
 
     if len(api_processor.heart_rate_data) > 0:
         heart_rate_datastore.put(api_processor.heart_rate_data)

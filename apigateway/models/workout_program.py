@@ -1,19 +1,27 @@
 from models.exercise import UnitOfMeasure, WeightMeasure
-from serialisable import Serialisable
 from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability
 from models.movement_actions import ExerciseAction
-import re
 from utils import format_datetime, parse_datetime
+
+import re
+import datetime
+from serialisable import Serialisable
 
 
 class WorkoutProgramModule(Serialisable):
     def __init__(self):
+        self.session_id = None
+        self.user_id = None
+        self.event_date_time = None
         self.program_id = None
         self.program_module_id = None
         self.workout_sections = []
 
     def json_serialise(self):
         ret = {
+            'session_id': self.session_id,
+            'use_id': self.user_id,
+            'event_date_time': format_datetime(self.event_date_time),
             'program_id': self.program_id,
             'program_module_id': self.program_module_id,
             'workout_sections': [w.json_serialise() for w in self.workout_sections]
@@ -23,11 +31,21 @@ class WorkoutProgramModule(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         workout_program_module = cls()
+        workout_program_module.session_id = input_dict.get('session_id')
+        workout_program_module.user_id = input_dict.get('user_id')
+        workout_program_module.event_date_time = input_dict.get('event_date_time')
         workout_program_module.program_id = input_dict.get('program_id')
         workout_program_module.program_module_id = input_dict.get('program_module_id')
         workout_program_module.workout_sections = [WorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_sections', [])]
 
         return workout_program_module
+
+    def __setattr__(self, key, value):
+        if key in ['event_date']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_datetime(value)
+
+        super().__setattr__(key, value)
 
     # def get_training_load(self):
     #     total_load = 0
@@ -285,4 +303,3 @@ class WorkoutExercise(Serialisable):
     # def convert_calories_to_seconds(self, calorie_parameters):
     #     time_per_unit = calorie_parameters['unit'] / calorie_parameters["calories_per_unit"][self.cardio_action.name]
     #     self.reps_per_set = int(self.reps_per_set * time_per_unit)
-

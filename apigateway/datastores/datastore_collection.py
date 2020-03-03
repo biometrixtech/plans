@@ -8,6 +8,7 @@ from datastores import injury_risk_datastore, hist_injury_risk_datastore
 from datastores import local_exercise_datastore
 
 from datastores import training_session_datastore
+from datastores import workout_program_datastore
 from datastores import symptom_datastore
 from datastores import user_stats_datastore
 from datastores import movement_prep_datastore
@@ -33,6 +34,7 @@ class DatastoreCollection(object):
         self.hist_injury_risk_datastore = hist_injury_risk_datastore.HistInjuryRiskDatastore()
 
         self.training_session_datastore = training_session_datastore.TrainingSessionDatastore()
+        self.workout_program_datastore = workout_program_datastore.WorkoutProgramDatastore()
         self.symptom_datastore = symptom_datastore.SymptomDatastore()
         self.user_stats_datastore = user_stats_datastore.UserStatsDatastore()
         self.movement_prep_datastore = movement_prep_datastore.MovementPrepDatastore()
