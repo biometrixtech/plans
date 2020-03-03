@@ -2,7 +2,7 @@ from fathomapi.utils.xray import xray_recorder
 from datetime import datetime, timedelta
 from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness_base import BodyPartSide, BodyPartLocation
-from models.functional_movement import SessionFunctionalMovement
+from models.session_functional_movement import SessionFunctionalMovement
 from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy

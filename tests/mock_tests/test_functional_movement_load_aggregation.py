@@ -1,9 +1,9 @@
 from models.functional_movement_type import FunctionalMovementType
 from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
-from logic.workout_processing import WorkoutProcessor
+# from logic.workout_processing import WorkoutProcessor
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
-from models.functional_movement import SessionFunctionalMovement
+from models.session_functional_movement import SessionFunctionalMovement
 from models.exercise import WeightMeasure
 
 

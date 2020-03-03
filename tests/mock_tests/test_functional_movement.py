@@ -1,11 +1,11 @@
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
 from models.sport import SportName
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, \
-    SessionFunctionalMovement
-from models.body_part_injury_risk import BodyPartInjuryRisk
-from models.movement_patterns import Elasticity, LeftRightElasticity, MovementPatterns
-from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
+# from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory
+from models.session_functional_movement import SessionFunctionalMovement
+# from models.body_part_injury_risk import BodyPartInjuryRisk
+# from models.movement_patterns import Elasticity, LeftRightElasticity, MovementPatterns
+# from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation, BodyPartSide

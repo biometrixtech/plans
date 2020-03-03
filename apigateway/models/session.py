@@ -11,7 +11,7 @@ from models.asymmetry import Asymmetry
 from models.movement_patterns import MovementPatterns
 from models.soreness_base import BodyPartSide
 from models.workout_program import WorkoutProgramModule
-from models.body_part_injury_risk import BodyPartInjuryRisk
+from models.functional_movement import BodyPartFunctionalMovement
 
 
 class SessionType(Enum):
@@ -409,7 +409,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         if input_dict.get('session_load_dict') is not None:
             session.session_load_dict = {}
             for item in input_dict.get('session_load_dict', []):
-                session.session_load_dict[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartInjuryRisk.json_deserialise(item['injury_risk'])
+                session.session_load_dict[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartFunctionalMovement.json_deserialise(item['injury_risk'])
         else:
             session.session_load_dict = None
 
