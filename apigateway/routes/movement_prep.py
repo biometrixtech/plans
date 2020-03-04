@@ -108,3 +108,6 @@ def validate_data():
             raise InvalidSchemaException('session_type is required parameter for a session')
         except ValueError:
             raise InvalidSchemaException('invalid session_type')
+        if 'hr_data' in session:
+            print("There should be no hr_data for planned session")
+            del session['hr_data']
