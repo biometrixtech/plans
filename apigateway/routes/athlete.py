@@ -12,6 +12,7 @@ from models.stats import AthleteStats
 from utils import parse_date, parse_datetime, format_date
 from routes.environments import is_fathom_environment
 import datetime
+import pytz
 import random
 import os
 
@@ -82,18 +83,18 @@ def get_athlete_metrics(athlete_id):
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
     # Make sure stats are consistent
-    # try:
-    minute_offset = _get_offset()
-    event_date = format_date(datetime.datetime.now())
-    stats_update_time = event_date + 'T03:30:00+0000'
-    trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
-                                                                      endpoint=f"athlete/{athlete_id}/stats",
-                                                                      body={"event_date": event_date},
-                                                                      execute_at=trigger_event_date)
-    # except Exception as e:
-    #     print(e)
-    #     pass
+    try:
+        minute_offset = _get_offset()
+        event_date = format_date(datetime.datetime.now())
+        stats_update_time = event_date + 'T03:30:00Z'
+        trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
+        Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
+                                                                          endpoint=f"athlete/{athlete_id}/stats",
+                                                                          body={"event_date": event_date},
+                                                                          execute_at=trigger_event_date)
+    except Exception as e:
+        print(e)
+        pass
 
     if is_fathom_environment():
         if not _is_athlete_active(athlete_id):
@@ -110,7 +111,7 @@ def process_athlete_survey(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(athlete_id)
-        athlete_stats.event_date = datetime.datetime.now()
+        athlete_stats.event_date = datetime.datetime.now().replace(tzinfo=pytz.utc)
 
     if 'typical_weekly_sessions' in request.json:
         athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']
@@ -137,7 +138,7 @@ def _schedule_notifications(athlete_id):
     body = {"event_date": trigger_event_date}
 
     # schedule readiness PN check
-    readiness_start = trigger_event_date + 'T10:00:00+0000'
+    readiness_start = trigger_event_date + 'T10:00:00Z'
     readiness_event_date = _randomize_trigger_time(readiness_start, 60*60, minute_offset)
     plans_service.call_apigateway_async(method='POST',
                                         endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
@@ -145,7 +146,7 @@ def _schedule_notifications(athlete_id):
                                         execute_at=readiness_event_date)
 
     # schedule prep and recovery PN check
-    prep_rec_start = trigger_event_date + 'T18:00:00+0000'
+    prep_rec_start = trigger_event_date + 'T18:00:00Z'
     prep_event_date = _randomize_trigger_time(prep_rec_start, 210*60, minute_offset)
     recovery_event_date = _randomize_trigger_time(prep_rec_start, 210*60, minute_offset)
 
@@ -306,7 +307,7 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     offset_from_start = random.randint(0, window)
     local_date = parse_datetime(start_time) + datetime.timedelta(seconds=offset_from_start)
     utc_date = local_date - datetime.timedelta(minutes=tz_offset)
-    return utc_date
+    return utc_date.replace(tzinfo=None)
 
 
 def _are_exercises_assigned(rec, rec_type):
@@ -329,10 +330,3 @@ def _get_offset():
     else:
         minute_offset += hour_offset * 60
     return minute_offset
-
-
-if __name__ == '__main__':
-    minute_offset = _get_offset()
-    event_date = format_date(datetime.datetime.now())
-    stats_update_time = event_date + 'T03:30:00+0000'
-    trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
