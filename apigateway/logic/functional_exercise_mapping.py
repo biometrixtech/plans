@@ -6,12 +6,12 @@ from models.goal import AthleteGoalType, AthleteGoal
 
 class ExerciseAssignmentCalculator(object):
 
-    def __init__(self, injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, event_date_time, relative_load_level=3):
-
+    def __init__(self, injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, event_date_time, relative_load_level=3, aggregated_injury_risk_dict=None):
         self.exercise_library_datastore = exercise_library_datastore
         self.completed_exercise_datastore = completed_exercise_datastore
         self.exercise_library = self.exercise_library_datastore.get()
         self.injury_risk_dict = injury_risk_dict
+        self.aggregated_injury_risk_dict = aggregated_injury_risk_dict or {}
         self.event_date_time = event_date_time
         self.relative_load_level = relative_load_level
 
@@ -125,25 +125,24 @@ class ExerciseAssignmentCalculator(object):
         else:
             responsive_recovery.active_recovery = None
 
-        cold_water_immersion = self.get_cold_water_immersion(self.injury_risk_dict)
+        cold_water_immersion = self.get_cold_water_immersion()
         responsive_recovery.cold_water_immersion = cold_water_immersion
 
-        ice_session = self.get_ice_session(self.injury_risk_dict)
+        ice_session = self.get_ice_session()
         responsive_recovery.ice = self.adjust_ice_session(ice_session, cold_water_immersion)
 
         return responsive_recovery
 
-    def get_cold_water_immersion(self, injury_risk_dict):
+    def get_cold_water_immersion(self):
 
         cold_water_immersion = None
 
         cwi_assigned = False
-
-        for body_part, body_part_injury_risk in injury_risk_dict.items():
+        for body_part, body_part_injury_risk in self.injury_risk_dict.items():
 
             base_date = self.event_date_time.date()
 
-            if (self.is_lower_body_part(body_part.body_part_location)
+            if (self.is_lower_body_part(body_part.location)
                     and body_part_injury_risk.last_non_functional_overreaching_date == base_date
                     and not cwi_assigned):
                 cold_water_immersion = ColdWaterImmersion()
@@ -152,7 +151,7 @@ class ExerciseAssignmentCalculator(object):
 
         return cold_water_immersion
 
-    def get_ice_session(self, injury_risk_dict):
+    def get_ice_session(self):
 
         ice_session = None
 
@@ -164,16 +163,17 @@ class ExerciseAssignmentCalculator(object):
 
         body_part_factory = BodyPartFactory()
 
-        for body_part, body_part_injury_risk in injury_risk_dict.items():
-
+        for body_part_side, body_part_injury_risk in self.aggregated_injury_risk_dict.items():
             base_date = self.event_date_time.date()
 
-            if (self.is_lower_body_part(body_part.body_part_location)
+            if (
+                    self.is_lower_body_part(body_part_side.body_part_location)
                     and body_part_injury_risk.last_non_functional_overreaching_date == base_date
-                    and not cwi_assigned):
-                ice = Ice(body_part_location=body_part.body_part_location, side=body_part.side)
+                    and not cwi_assigned
+            ):
+                ice = Ice(body_part_location=body_part_side.body_part_location, side=body_part_side.side)
 
-                if body_part_factory.is_joint(body_part) or body_part_factory.is_ligament(body_part):
+                if body_part_factory.is_joint(body_part_side) or body_part_factory.is_ligament(body_part_side):
                     ice_list.append(ice)
                     minutes.append(10)
                 else:
@@ -190,7 +190,8 @@ class ExerciseAssignmentCalculator(object):
 
         return ice_session
 
-    def is_lower_body_part(self, body_part_location):
+    @staticmethod
+    def is_lower_body_part(body_part_location):
 
         if (
                 body_part_location == BodyPartLocation.hip_flexor or

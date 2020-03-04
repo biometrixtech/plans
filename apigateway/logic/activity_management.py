@@ -70,11 +70,12 @@ class ActivityManager(object):
 
         # initialize exercise assignment calculator
         self.exercise_assignment_calculator = ExerciseAssignmentCalculator(
-                consolidated_injury_risk_dict,
-                self.exercise_library_datastore,
-                self.completed_exercise_datastore,
-                self.event_date_time,
-                injury_risk_processor.relative_load_level
+                injury_risk_dict=consolidated_injury_risk_dict,
+                exercise_library_datastore=self.exercise_library_datastore,
+                completed_exercise_datastore=self.completed_exercise_datastore,
+                event_date_time=self.event_date_time,
+                relative_load_level=injury_risk_processor.relative_load_level,
+                aggregated_injury_risk_dict=injury_risk_processor.aggregated_injury_risk_dict
         )
         # write updated injury risk
         athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)

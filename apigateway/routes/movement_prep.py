@@ -5,15 +5,17 @@ from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
+from models.session import SessionType
 from models.soreness_base import BodyPartLocation
-from models.stats import AthleteStats
-from models.daily_plan import DailyPlan
-from logic.survey_processing import SurveyProcessing, create_plan
-from utils import parse_datetime, format_date, fix_early_survey_event_date, get_timezone, _check_plan_exists
+from models.user_stats import UserStats
+from logic.api_processing import APIProcessing
+from utils import parse_datetime, get_timezone
 
 datastore_collection = DatastoreCollection()
-athlete_stats_datastore = datastore_collection.athlete_stats_datastore
-daily_plan_datastore = datastore_collection.daily_plan_datastore
+user_stats_datastore = datastore_collection.user_stats_datastore
+symptom_datastore = datastore_collection.symptom_datastore
+training_session_datastore = datastore_collection.training_session_datastore
+workout_program_datastore = datastore_collection.workout_program_datastore
 
 app = Blueprint('movement_prep', __name__)
 
@@ -24,68 +26,53 @@ app = Blueprint('movement_prep', __name__)
 @xray_recorder.capture('routes.movement_prep.create')
 def handle_movement_prep_create(user_id):
     validate_data()
-    event_date = parse_datetime(request.json['event_date_time'])
-    event_date = fix_early_survey_event_date(event_date)
-    timezone = get_timezone(event_date)
-
-    # daily_readiness = DailyReadiness(
-    #     user_id=user_id,
-    #     event_date=format_datetime(event_date),
-    #     soreness=request.json.get('symptoms', []),
-    #     sleep_quality=None,
-    #     readiness=None
-    # )
-
-    # find/create daily plan
-    plan_event_date = format_date(event_date)
-    if _check_plan_exists(user_id, plan_event_date):
-        plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
-    else:
-        plan = DailyPlan(event_date=plan_event_date)
-        plan.user_id = user_id
-    plan.train_later = True
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    # event_date_time = fix_early_survey_event_date(event_date_time)
+    timezone = get_timezone(event_date_time)
 
     # set up processing
-    hist_update = False
-    athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
-    if athlete_stats is None:
-        athlete_stats = AthleteStats(user_id)
-        athlete_stats.event_date = event_date
-    if athlete_stats.api_version in [None, '4_4', '4_5']:
-        hist_update = True
-    athlete_stats.api_version = Config.get('API_VERSION')
-    athlete_stats.timezone = timezone
-    survey_processor = SurveyProcessing(user_id, event_date, athlete_stats, datastore_collection)
+    user_stats = user_stats_datastore.get(athlete_id=user_id)
+    if user_stats is None:
+        athlete_stats = UserStats(user_id)
+        athlete_stats.event_date = event_date_time
+    user_stats.api_version = Config.get('API_VERSION')
+    user_stats.timezone = timezone
+    api_processor = APIProcessing(
+            user_id,
+            event_date_time,
+            user_stats=user_stats,
+            datastore_collection=datastore_collection
+    )
 
-    # if planned session is sent, add it to the plan
-    if 'session' in request.json :
+    # process planned session
+    if 'session' in request.json:
         session = request.json['session']
         if session is not None:
-            survey_processor.create_session_from_survey(session)
-        plan.training_sessions.extend(survey_processor.sessions)
+            api_processor.create_session_from_survey(session)
 
     # get symptoms
     if 'symptoms' in request.json:
         for symptom in request.json['symptoms']:
             if symptom is None:
                 continue
-            survey_processor.create_soreness_from_survey(symptom)
-        plan.symptoms.extend(survey_processor.soreness)
+            api_processor.create_symptom_from_survey(symptom)
 
-    # store the plan
-    daily_plan_datastore.put(plan)
+    # store the symptoms, session and workout_program, if any exist
+    if len(api_processor.symptoms) > 0:
+        symptom_datastore.put(api_processor.symptoms)
 
-    # update plan with modalities
-    plan = create_plan(user_id,
-                       event_date,
-                       athlete_stats=survey_processor.athlete_stats,
-                       stats_processor=survey_processor.stats_processor,
-                       datastore_collection=datastore_collection,
-                       visualizations=False,
-                       hist_update=hist_update,
-                       force_on_demand=True)
+    if len(api_processor.sessions) > 0:
+        training_session_datastore.put(api_processor.sessions)
 
-    return {'daily_plans': [plan]}, 201
+    if len(api_processor.workout_programs) > 0:
+        workout_program_datastore.put(api_processor.workout_programs)
+
+    # create movement_prep
+    movement_prep = api_processor.create_activity(
+            activity_type='movement_prep'
+    )
+
+    return {'movement_prep': movement_prep.json_serialise()}, 201
 
 
 @xray_recorder.capture('routes.movement_prep.validate')
@@ -108,9 +95,16 @@ def validate_data():
     if 'session' not in request.json:
         raise InvalidSchemaException('session is required parameter to receive Movement Prep')
     else:
-        pass
-        # if not isinstance(request.json['session'], list):
-        #     raise InvalidSchemaException("Property sessions must be of type list")
-        # request.json['sessions'] = [session for session in request.json['sessions'] if session is not None]
-        # if len(request.json['sessions']) == 0:
-        #     raise InvalidSchemaException("A valid session is required to generate Movement Prep")
+        session = request.json['session']
+        try:
+            parse_datetime(session['event_date'])
+        except KeyError:
+            raise InvalidSchemaException('event_date is required parameter for a session')
+        except ValueError:
+            raise InvalidSchemaException('event_date must be in ISO8601 format')
+        try:
+            SessionType(session['session_type'])
+        except KeyError:
+            raise InvalidSchemaException('session_type is required parameter for a session')
+        except ValueError:
+            raise InvalidSchemaException('invalid session_type')
