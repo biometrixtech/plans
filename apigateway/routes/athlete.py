@@ -82,23 +82,22 @@ def get_athlete_metrics(athlete_id):
 @xray_recorder.capture('routes.athlete.pn.manage')
 def manage_athlete_push_notification(athlete_id):
     # Make sure stats are consistent
-    try:
-        minute_offset = _get_offset()
-        event_date = format_date(datetime.datetime.now())
-        stats_update_time = event_date + 'T03:30:00+0000'
-        trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
-        print(trigger_event_date)
-        Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
-                                                                          endpoint=f"athlete/{athlete_id}/stats",
-                                                                          body={"event_date": event_date},
-                                                                          execute_at=trigger_event_date)
-    except Exception as e:
-        print(e)
-        pass
-    if not _is_athlete_active(athlete_id):
-        return {'message': 'Athlete is not active'}, 200
+    # try:
+    minute_offset = _get_offset()
+    event_date = format_date(datetime.datetime.now())
+    stats_update_time = event_date + 'T03:30:00+0000'
+    trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
+                                                                      endpoint=f"athlete/{athlete_id}/stats",
+                                                                      body={"event_date": event_date},
+                                                                      execute_at=trigger_event_date)
+    # except Exception as e:
+    #     print(e)
+    #     pass
 
     if is_fathom_environment():
+        if not _is_athlete_active(athlete_id):
+            return {'message': 'Athlete is not active'}, 200
         _schedule_notifications(athlete_id)
 
     return {'message': 'Processed'}, 202
