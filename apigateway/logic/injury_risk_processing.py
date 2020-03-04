@@ -6,10 +6,8 @@ from models.session_functional_movement import SessionFunctionalMovement
 from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
-from datastores.training_session_datastore import TrainingSessionDatastore
 from utils import format_date
 from models.functional_movement_stats import InjuryCycleSummary, InjuryCycleSummaryProcessor
-from fathomapi.utils.exceptions import NoSuchEntityException
 from math import floor
 
 
