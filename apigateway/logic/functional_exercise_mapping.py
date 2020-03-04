@@ -98,20 +98,6 @@ class ExerciseAssignmentCalculator(object):
     def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=True):
         responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
 
-        active_rest = ActiveRest(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
-        active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
-        active_rest.set_plan_dosage()
-        active_rest.set_exercise_dosage_ranking()
-        active_rest.aggregate_dosages()
-        active_rest.set_winners()
-        active_rest.scale_all_active_time()
-        active_rest.reconcile_default_plan_with_active_time()
-        if active_rest.get_total_exercises() > 0:
-            responsive_recovery.active_rest = active_rest
-        else:
-            responsive_recovery.active_rest = None
-        responsive_recovery.active_rest = active_rest
-
         active_recovery = ActiveRecovery(self.event_date_time)
         active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict)
         active_recovery.set_plan_dosage()
@@ -125,6 +111,21 @@ class ExerciseAssignmentCalculator(object):
         else:
             responsive_recovery.active_recovery = None
 
+        if responsive_recovery.active_recovery is None:
+
+            active_rest = ActiveRest(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
+            active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
+            active_rest.set_plan_dosage()
+            active_rest.set_exercise_dosage_ranking()
+            active_rest.aggregate_dosages()
+            active_rest.set_winners()
+            active_rest.scale_all_active_time()
+            active_rest.reconcile_default_plan_with_active_time()
+            if active_rest.get_total_exercises() > 0:
+                responsive_recovery.active_rest = active_rest
+            else:
+                responsive_recovery.active_rest = None
+            responsive_recovery.active_rest = active_rest
         cold_water_immersion = self.get_cold_water_immersion()
         responsive_recovery.cold_water_immersion = cold_water_immersion
 
@@ -146,8 +147,10 @@ class ExerciseAssignmentCalculator(object):
                     and body_part_injury_risk.last_non_functional_overreaching_date == base_date
                     and not cwi_assigned):
                 cold_water_immersion = ColdWaterImmersion()
-                goal = AthleteGoal("Recovery", 1, AthleteGoalType.sore)
+                goal = AthleteGoal("Recovery", 1, AthleteGoalType.high_load)
                 cold_water_immersion.goals.add(goal)
+                cwi_assigned = True
+                continue
 
         return cold_water_immersion
 
@@ -159,32 +162,26 @@ class ExerciseAssignmentCalculator(object):
 
         minutes = []
 
-        cwi_assigned = False
-
         body_part_factory = BodyPartFactory()
 
         for body_part_side, body_part_injury_risk in self.aggregated_injury_risk_dict.items():
             base_date = self.event_date_time.date()
 
-            if (
-                    self.is_lower_body_part(body_part_side.body_part_location)
-                    and body_part_injury_risk.last_non_functional_overreaching_date == base_date
-                    and not cwi_assigned
-            ):
-                ice = Ice(body_part_location=body_part_side.body_part_location, side=body_part_side.side)
+            if body_part_injury_risk.last_inflammation_date == base_date:
+                #ice = Ice(body_part_location=body_part.body_part_location, side=body_part.side)
 
-                if body_part_factory.is_joint(body_part_side) or body_part_factory.is_ligament(body_part_side):
-                    ice_list.append(ice)
+                if body_part_factory.is_joint(body_part) or body_part_factory.is_ligament(body_part):
+                    ice_list.append(body_part)
                     minutes.append(10)
                 else:
-                    if body_part_injury_risk.last_sharp_date == self.event_date_time.date() and body_part_injury_risk.last_sharp_level >= 4:
-                        ice_list.append(ice)
+                    if body_part_injury_risk.last_sharp_date == self.event_date_time.date() and body_part_injury_risk.last_sharp_level >= 7:
+                        ice_list.append(body_part)
                         minutes.append(15)
 
         if len(ice_list) > 0:
             ice_session = IceSession(minutes=min(minutes))
-            ice_session.goal = AthleteGoal("Care", 1, AthleteGoalType.sore)
-            ice_session.body_parts = ice_list
+            ice_session.goal = AthleteGoal("Care", 1, AthleteGoalType.pain)
+            ice_session.body_parts = list(set(ice_list))
 
             return ice_session
 
@@ -196,6 +193,7 @@ class ExerciseAssignmentCalculator(object):
         if (
                 body_part_location == BodyPartLocation.hip_flexor or
                 body_part_location == BodyPartLocation.hip or
+                body_part_location == BodyPartLocation.deep_rotators_hip or
                 body_part_location == BodyPartLocation.knee or
                 body_part_location == BodyPartLocation.ankle or
                 body_part_location == BodyPartLocation.foot or

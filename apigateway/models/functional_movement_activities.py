@@ -1648,7 +1648,7 @@ class ActiveRecovery(Activity):
 
                 if tier > 0:
 
-                    if max_severity < 7.0:
+                    if max_severity < 4.0:
                         self.copy_exercises(body_part.dynamic_integrate_exercises, ExercisePhaseType.dynamic_integrate, goal,
                                             tier, 0, exercise_library)
 
