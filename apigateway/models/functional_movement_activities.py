@@ -1653,14 +1653,13 @@ class ActiveRecovery(Activity):
                                             tier, 0, exercise_library)
 
 
-class IceSession(Serialisable):
+class IceSession(object):
     def __init__(self, minutes=0):
         self.minutes = minutes
         self.start_date_time = None
         self.completed_date_time = None
         self.event_date_time = None
         self.completed = False
-        self.active = True
         self.body_parts = []
         self.goal = None
 
@@ -1672,9 +1671,8 @@ class IceSession(Serialisable):
             'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
             'completed': self.completed,
-            'active': self.active,
             'body_parts': [ice.json_serialise() for ice in self.body_parts],
-            'goal': self.json_serialise() if self.goal is not None else None
+            'goal': self.goal.json_serialise() if self.goal is not None else None
         }
 
         return ret
@@ -1686,7 +1684,6 @@ class IceSession(Serialisable):
         ice_session.completed_date_time = input_dict.get('completed_date_time', None)
         ice_session.event_date_time = input_dict.get('event_date_time', None)
         ice_session.completed = input_dict.get('completed', False)
-        ice_session.active = input_dict.get('active', True)
         ice_session.goal = AthleteGoal.json_deserialise(input_dict['goal']) if input_dict.get('goal') is not None else None
         ice_session.body_parts = [Ice.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
         if len(ice_session.body_parts) > 0:
@@ -1701,27 +1698,17 @@ class IceSession(Serialisable):
         super().__setattr__(name, value)
 
 
-class Ice(Serialisable):
+class Ice(object):
     def __init__(self, body_part_location=None, side=0):
         self.body_part_location = body_part_location
         self.side = side
-        self.after_training = True
-        self.immediately_after_training = False
-        self.repeat_every_3hrs_for_24hrs = False
         self.completed = False
-        self.active = True
-        self.goals = set()
 
     def json_serialise(self):
         ret = {
             'body_part_location': self.body_part_location.value,
-            'goals': [goal.json_serialise() for goal in self.goals],
-            'after_training': self.after_training,
-            'immediately_after_training': self.immediately_after_training,
-            'repeat_every_3hrs_for_24hrs': self.repeat_every_3hrs_for_24hrs,
             'side': self.side,
-            'completed': self.completed,
-            'active': self.active
+            'completed': self.completed
         }
 
         return ret
@@ -1733,12 +1720,7 @@ class Ice(Serialisable):
     def json_deserialise(cls, input_dict):
         ice = cls(body_part_location=BodyPartLocation(input_dict['body_part_location']),
                   side=input_dict['side'])
-        ice.after_training = input_dict.get('after_training', False)
-        ice.immediately_after_training = input_dict.get('immediately_after_training', False)
-        ice.repeat_every_3hrs_for_24hrs = input_dict.get('repeat_every_3hrs_for_24hrs', False)
         ice.completed = input_dict.get('completed', False)
-        ice.active = input_dict.get('active', True)
-        ice.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
 
         return ice
 
@@ -1752,7 +1734,6 @@ class ColdWaterImmersion(Serialisable):
         self.completed_date_time = None
         self.event_date_time = None
         self.completed = False
-        self.active = True
         self.goals = set()
 
     def json_serialise(self):
@@ -1763,8 +1744,7 @@ class ColdWaterImmersion(Serialisable):
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
             'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
             'event_date_time': format_datetime(self.event_date_time) if self.event_date_time is not None else None,
-            'completed': self.completed,
-            'active': self.active,
+            'completed': self.completed
         }
 
         return ret
@@ -1777,7 +1757,6 @@ class ColdWaterImmersion(Serialisable):
         cold_water_immersion.completed_date_time = input_dict.get('completed_date_time', None)
         cold_water_immersion.event_date_time = input_dict.get('event_date_time', None)
         cold_water_immersion.completed = input_dict.get('completed', False)
-        cold_water_immersion.active = input_dict.get('active', True)
         cold_water_immersion.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
 
         return cold_water_immersion

@@ -170,18 +170,19 @@ class ExerciseAssignmentCalculator(object):
             if body_part_injury_risk.last_inflammation_date == base_date:
                 #ice = Ice(body_part_location=body_part.body_part_location, side=body_part.side)
 
-                if body_part_factory.is_joint(body_part) or body_part_factory.is_ligament(body_part):
-                    ice_list.append(body_part)
+                if body_part_factory.is_joint(body_part_side) or body_part_factory.is_ligament(body_part_side):
+                    ice_list.append(body_part_side)
                     minutes.append(10)
                 else:
                     if body_part_injury_risk.last_sharp_date == self.event_date_time.date() and body_part_injury_risk.last_sharp_level >= 7:
-                        ice_list.append(body_part)
+                        ice_list.append(body_part_side)
                         minutes.append(15)
 
         if len(ice_list) > 0:
             ice_session = IceSession(minutes=min(minutes))
             ice_session.goal = AthleteGoal("Care", 1, AthleteGoalType.pain)
-            ice_session.body_parts = list(set(ice_list))
+            body_part_ice_list = list(set(ice_list))
+            ice_session.body_parts = [Ice.json_deserialise(body_part_side.json_serialise()) for body_part_side in body_part_ice_list]
 
             return ice_session
 
