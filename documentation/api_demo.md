@@ -1131,20 +1131,21 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
     "body_parts": [
         {
             "body_part_location": integer,
-            "completed": boolean,
-            "goals": [goal, goal],
-            "side": side
+            "side": side,
+            "completed": boolean
         }
     ],
     "completed": boolean,
     "completed_date_time": Datetime,
     "event_date_time": Datetime,
     "minutes": integer,
-    "start_date_time": Datetime
+    "start_date_time": Datetime,
+    "goal": goal,
 }
 ```
 
-*`body_part_location` will be an integer reflecting the Body Part enumeration as defined in this appendix.
+* `body_part_location` will be an integer reflecting the Body Part enumeration as defined in this Appendix.
+* `goal` will be a goal as defined in this Appendix.
 
 ### Cold Water Immersion
 
@@ -1153,7 +1154,6 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 ```
 {
     "minutes": integer,
-    "after_training"': boolean,
     "goals": [goal, goal],
     "start_date_time": Datetime,
     "completed_date_time": Datetime,
