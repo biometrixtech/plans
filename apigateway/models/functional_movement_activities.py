@@ -1654,11 +1654,11 @@ class ActiveRecovery(Activity):
 
 
 class IceSession(object):
-    def __init__(self, minutes=0):
+    def __init__(self, event_date_time, minutes=0):
         self.minutes = minutes
         self.start_date_time = None
         self.completed_date_time = None
-        self.event_date_time = None
+        self.event_date_time = event_date_time
         self.completed = False
         self.body_parts = []
         self.goal = None
@@ -1726,20 +1726,18 @@ class Ice(object):
 
 
 class ColdWaterImmersion(Serialisable):
-    def __init__(self, minutes=10):
+    def __init__(self, event_date_time, minutes=10):
         self.id = None
         self.minutes = minutes
-        self.after_training = True
         self.start_date_time = None
         self.completed_date_time = None
-        self.event_date_time = None
+        self.event_date_time = event_date_time
         self.completed = False
         self.goals = set()
 
     def json_serialise(self):
         ret = {
             'minutes': self.minutes,
-            'after_training': self.after_training,
             'goals': [goal.json_serialise() for goal in self.goals],
             'start_date_time': format_datetime(self.start_date_time) if self.start_date_time is not None else None,
             'completed_date_time': format_datetime(self.completed_date_time) if self.completed_date_time is not None else None,
@@ -1752,7 +1750,6 @@ class ColdWaterImmersion(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         cold_water_immersion = cls(minutes=input_dict['minutes'])
-        cold_water_immersion.after_training = input_dict.get('after_training', True)
         cold_water_immersion.start_date_time = input_dict.get('start_date_time', None)
         cold_water_immersion.completed_date_time = input_dict.get('completed_date_time', None)
         cold_water_immersion.event_date_time = input_dict.get('event_date_time', None)

@@ -146,7 +146,7 @@ class ExerciseAssignmentCalculator(object):
             if (self.is_lower_body_part(body_part.location)
                     and body_part_injury_risk.last_non_functional_overreaching_date == base_date
                     and not cwi_assigned):
-                cold_water_immersion = ColdWaterImmersion()
+                cold_water_immersion = ColdWaterImmersion(self.event_date_time)
                 goal = AthleteGoal("Recovery", 1, AthleteGoalType.high_load)
                 cold_water_immersion.goals.add(goal)
                 cwi_assigned = True
@@ -179,7 +179,7 @@ class ExerciseAssignmentCalculator(object):
                         minutes.append(15)
 
         if len(ice_list) > 0:
-            ice_session = IceSession(minutes=min(minutes))
+            ice_session = IceSession(self.event_date_time, minutes=min(minutes))
             ice_session.goal = AthleteGoal("Care", 1, AthleteGoalType.pain)
             body_part_ice_list = list(set(ice_list))
             ice_session.body_parts = [Ice.json_deserialise(body_part_side.json_serialise()) for body_part_side in body_part_ice_list]
