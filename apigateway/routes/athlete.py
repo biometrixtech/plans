@@ -7,6 +7,7 @@ from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
+from logic.user_stats_processing import UserStatsProcessing
 from models.stats import AthleteStats
 from utils import parse_date, parse_datetime, format_date
 from routes.environments import is_fathom_environment
@@ -49,13 +50,18 @@ def create_daily_plan(athlete_id):
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
     event_date = request.json.get('event_date', None)
-    athlete_stats = StatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_athlete_stats()
+    if is_fathom_environment():
+        athlete_stats = StatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_athlete_stats()
 
-    if event_date is not None:
-        metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
-        athlete_stats.metrics = metrics
+        if event_date is not None:
+            metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
+            athlete_stats.metrics = metrics
 
-    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+        DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+    else:
+        user_stats = UserStatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_user_stats(force_historical_process=False)
+        DatastoreCollection().user_stats_datastore.put(user_stats)
+
     return {'message': 'Update requested'}, 202
 
 
@@ -79,7 +85,7 @@ def manage_athlete_push_notification(athlete_id):
     try:
         minute_offset = _get_offset()
         event_date = format_date(datetime.datetime.now())
-        stats_update_time = event_date + 'T03:30:00Z'
+        stats_update_time = event_date + 'T03:30:00+0000'
         trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
 
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
@@ -92,7 +98,8 @@ def manage_athlete_push_notification(athlete_id):
     if not _is_athlete_active(athlete_id):
         return {'message': 'Athlete is not active'}, 200
 
-    _schedule_notifications(athlete_id)
+    if is_fathom_environment():
+        _schedule_notifications(athlete_id)
 
     return {'message': 'Processed'}, 202
 
@@ -131,7 +138,7 @@ def _schedule_notifications(athlete_id):
     body = {"event_date": trigger_event_date}
 
     # schedule readiness PN check
-    readiness_start = trigger_event_date + 'T10:00:00Z'
+    readiness_start = trigger_event_date + 'T10:00:00+0000'
     readiness_event_date = _randomize_trigger_time(readiness_start, 60*60, minute_offset)
     plans_service.call_apigateway_async(method='POST',
                                         endpoint=f"athlete/{athlete_id}/send_daily_readiness_notification",
@@ -139,7 +146,7 @@ def _schedule_notifications(athlete_id):
                                         execute_at=readiness_event_date)
 
     # schedule prep and recovery PN check
-    prep_rec_start = trigger_event_date + 'T18:00:00Z'
+    prep_rec_start = trigger_event_date + 'T18:00:00+0000'
     prep_event_date = _randomize_trigger_time(prep_rec_start, 210*60, minute_offset)
     recovery_event_date = _randomize_trigger_time(prep_rec_start, 210*60, minute_offset)
 
