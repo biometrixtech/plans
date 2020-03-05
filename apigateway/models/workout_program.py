@@ -239,7 +239,7 @@ class WorkoutExercise(Serialisable):
     #
     #     # return training_volume * training_intensity
 
-    def process_movement(self, movement):
+    def initialize_from_movement(self, movement):
         # self.body_position = movement.body_position
         self.cardio_action = movement.cardio_action
         self.power_drill_action = movement.power_drill_action

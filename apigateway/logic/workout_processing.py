@@ -25,7 +25,7 @@ class WorkoutProcessor(object):
     def add_movement_detail_to_exercise(self, exercise):
         if exercise.movement_id in movement_library.keys():
             movement = movement_library[exercise.movement_id]
-            exercise.process_movement(movement)
+            exercise.initialize_from_movement(movement)
             self.add_action_details_to_exercise(exercise, movement)
 
             if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
@@ -39,7 +39,7 @@ class WorkoutProcessor(object):
                 exercise.primary_actions.append(action)
         self.apply_explosiveness(exercise, exercise.primary_actions)
         for action in exercise.primary_actions:
-            action.get_training_load()
+            action.set_training_load()
 
         for action_id in movement.secondary_actions:
             action = action_library.get(action_id)
@@ -48,7 +48,7 @@ class WorkoutProcessor(object):
                 exercise.secondary_actions.append(action)
         self.apply_explosiveness(exercise, exercise.secondary_actions)
         for action in exercise.secondary_actions:
-            action.get_training_load()
+            action.set_training_load()
 
     def process_action(self, action, exercise):
         # athlete_bodyweight = 100
