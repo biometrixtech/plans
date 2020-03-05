@@ -6,12 +6,12 @@ from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
 from models.sport import SportName, SportType, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
 from models.post_session_survey import PostSurvey
-from models.load_stats import LoadStats
+# from models.load_stats import LoadStats
 from models.asymmetry import Asymmetry
 from models.movement_patterns import MovementPatterns
-from models.soreness_base import BodyPartSide
+from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.workout_program import WorkoutProgramModule
-from models.functional_movement import BodyPartFunctionalMovement
+from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
 
 
 class SessionType(Enum):
@@ -434,6 +434,25 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return True
 
+    def get_load_body_parts(self):
+        body_parts = {}
+
+        if self.session_load_dict is not None:
+            for body_part_side, body_part_functional_movement in self.session_load_dict.items():
+                muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
+                body_part_function = body_part_functional_movement.body_part_function
+                if isinstance(muscle_group, BodyPartLocation):
+                    body_part_location = muscle_group
+                else:
+                    body_part_location = body_part_side.body_part_location
+                if body_part_location in body_parts.keys():
+                    body_part_function = BodyPartFunction.merge(body_part_function, body_parts[body_part_location])
+                body_parts[body_part_location] = body_part_function
+
+        return body_parts
+
+    def is_cardio_plyometrics(self):
+        return False
 
 class SessionFactory(object):
 

@@ -79,6 +79,32 @@ class BodyPartFunction(Enum):
     stabilizer = 3
     fixator = 4
 
+    def get_ranking(self):
+        rankings = {
+            'prime_mover': 0,
+            'antagonist': 3,
+            'synergist': 2,
+            'stabilizer': 1,
+            'fixator': 4,
+        }
+        return rankings[self.name]
+
+    @classmethod
+    def merge(cls, function1, function2):
+        if function1 is not None and function2 is not None:
+            if function1 == function2:
+                return function1
+            elif function1.get_ranking() < function2.get_ranking():
+                return function1
+            else:
+                return function2
+        elif function1 is not None:
+            return function1
+        elif function2 is not None:
+            return function2
+        else:
+            return None
+
 
 class FunctionalMovement(object):
     def __init__(self, functional_movement_type, priority=0):
@@ -209,7 +235,7 @@ class BodyPartFunctionalMovement(Serialisable):
             self.is_compensating = max(self.is_compensating, target.is_compensating)
             self.compensation_source_volume = self.merge_with_none(self.compensation_source_volume, target.compensation_source_volume)
             self.compensation_source_intensity = self.merge_with_none(self.compensation_source_intensity, target.compensation_source_intensity)
-
+            self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
             # not sure these are even used
             # self.body_part_function = None
             # self.inhibited = 0
@@ -371,6 +397,7 @@ class FunctionalMovementActionMapping(object):
                 body_part_side_list = body_part_factory.get_body_part_side_list(p)
                 for body_part_side in body_part_side_list:
                     functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    functional_movement_body_part_side.body_part_function = BodyPartFunction.prime_mover
                     if body_part_side.side == 1 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
                                                                       BodyPartFunction.prime_mover, left_load, stability_rating)
@@ -383,6 +410,7 @@ class FunctionalMovementActionMapping(object):
                 body_part_side_list = body_part_factory.get_body_part_side_list(s)
                 for body_part_side in body_part_side_list:
                     functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
                     if body_part_side.side == 1 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
                                                                       BodyPartFunction.synergist, left_load, stability_rating)
@@ -395,6 +423,7 @@ class FunctionalMovementActionMapping(object):
                 body_part_side_list = body_part_factory.get_body_part_side_list(t)
                 for body_part_side in body_part_side_list:
                     functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    functional_movement_body_part_side.body_part_function = BodyPartFunction.stabilizer
                     if body_part_side.side == 1 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
                                                                       BodyPartFunction.stabilizer, left_load, stability_rating)
@@ -408,6 +437,7 @@ class FunctionalMovementActionMapping(object):
                 body_part_side_list = body_part_factory.get_body_part_side_list(f)
                 for body_part_side in body_part_side_list:
                     functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                    functional_movement_body_part_side.body_part_function = BodyPartFunction.fixator
                     if body_part_side.side == 1 or body_part_side.side == 0:
                         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
                                                                       BodyPartFunction.fixator, left_load, stability_rating)
@@ -418,17 +448,18 @@ class FunctionalMovementActionMapping(object):
                         self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
 
     def update_muscle_dictionary(self, muscle, attributed_muscle_load, muscle_action):
-        if muscle.body_part_side in self.muscle_load:
-            if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
-                self.muscle_load[muscle.body_part_side].concentric_volume += attributed_muscle_load
+        if attributed_muscle_load > 0:
+            if muscle.body_part_side in self.muscle_load:
+                if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
+                    self.muscle_load[muscle.body_part_side].concentric_volume += attributed_muscle_load
+                else:
+                    self.muscle_load[muscle.body_part_side].eccentric_volume += attributed_muscle_load
             else:
-                self.muscle_load[muscle.body_part_side].eccentric_volume += attributed_muscle_load
-        else:
-            self.muscle_load[muscle.body_part_side] = muscle
-            if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
-                self.muscle_load[muscle.body_part_side].concentric_volume = attributed_muscle_load
-            else:
-                self.muscle_load[muscle.body_part_side].eccentric_volume = attributed_muscle_load
+                self.muscle_load[muscle.body_part_side] = muscle
+                if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
+                    self.muscle_load[muscle.body_part_side].concentric_volume = attributed_muscle_load
+                else:
+                    self.muscle_load[muscle.body_part_side].eccentric_volume = attributed_muscle_load
 
     def get_muscle_load(self, functional_movement_priority, muscle_role, load, stability_rating):
 

@@ -2,6 +2,7 @@ from serialisable import Serialisable
 from models.load_stats import LoadStats
 from models.session import HighLoadSession
 from utils import format_date, parse_date, format_datetime, parse_datetime
+from fathomapi.utils.exceptions import InvalidSchemaException
 
 
 class UserStats(Serialisable):
@@ -21,13 +22,16 @@ class UserStats(Serialisable):
     def __setattr__(self, name, value):
         if name == 'event_date' and value is not None:
             if isinstance(value, str):
-                value = parse_date(value)
+                try:
+                    value = parse_datetime(value)
+                except InvalidSchemaException:
+                    value = parse_date(value)
         super().__setattr__(name, value)
 
     def json_serialise(self):
         ret = {
             'athlete_id': self.athlete_id,
-            'event_date': format_date(self.event_date),
+            'event_date': format_datetime(self.event_date),
             'load_stats': self.load_stats.json_serialise() if self.load_stats is not None else None,
             'high_relative_load_sessions': [high_load.json_serialise() for high_load in self.high_relative_load_sessions],
             'eligible_for_high_load_trigger': self.eligible_for_high_load_trigger,

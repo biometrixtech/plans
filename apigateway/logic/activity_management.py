@@ -47,6 +47,23 @@ class ActivityManager(object):
         for session in self.sessions_to_save_load:
             self.training_session_datastore.put(session)
 
+    def get_session_details(self):
+        self.exercise_assignment_calculator.sport_cardio = self.check_cardio_sport()
+        self.exercise_assignment_calculator.sport_body_parts = self.get_sport_body_parts()
+
+    def get_sport_body_parts(self):
+        sport_body_parts = {}
+        for session in self.training_sessions:
+            sport_body_parts.update(session.get_load_body_parts())
+        return sport_body_parts
+
+    def check_cardio_sport(self):
+        cardio_sport = False
+        for session in self.training_sessions:
+            if session.is_cardio_plyometrics():
+                cardio_sport = True
+        return cardio_sport
+
     @xray_recorder.capture('logic.ActivityManager.prepare_data')
     def prepare_data(self, default_rpe=None):
 
@@ -89,6 +106,7 @@ class ActivityManager(object):
         :return movement_prep: MovementPrep
         """
         self.prepare_data(8)  # we don't want to persist this RPE
+        self.get_session_details()
         movement_prep = self.exercise_assignment_calculator.get_movement_prep(self.athlete_id, force_on_demand=force_on_demand)
         self.movement_prep_datastore.put(movement_prep)
         self.save_session_load_dict()

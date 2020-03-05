@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from fathomapi.utils.xray import xray_recorder
 from logic.training_load_processing import TrainingLoadProcessing
-from logic.soreness_processing import SorenessCalculator
+# from logic.soreness_processing import SorenessCalculator
 from models.user_stats import UserStats
 # from models.asymmetry import HistoricAsymmetry, AsymmetryType
 from utils import parse_date, format_date

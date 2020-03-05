@@ -2,7 +2,7 @@ import statistics
 
 from models.body_parts import BodyPartFactory
 from models.compensation_source import CompensationSource
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, FunctionalMovementActionMapping
+from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, FunctionalMovementActionMapping, BodyPartFunction
 from models.movement_tags import AdaptationType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation, BodyPartSide
@@ -68,6 +68,7 @@ class SessionFunctionalMovement(object):
                 if body_part_side not in session_load_dict:
                     session_load_dict[body_part_side] = BodyPartFunctionalMovement(body_part_side)
 
+                session_load_dict[body_part_side].body_part_function = BodyPartFunction.merge(body_part_functional_movement.body_part_function, session_load_dict[body_part_side].body_part_function)
                 session_load_dict[body_part_side].concentric_volume += body_part_functional_movement.concentric_volume
                 session_load_dict[body_part_side].eccentric_volume += body_part_functional_movement.eccentric_volume
                 session_load_dict[body_part_side].compensated_concentric_volume += body_part_functional_movement.compensated_concentric_volume
@@ -119,20 +120,20 @@ class SessionFunctionalMovement(object):
                             section_load[adaptation_type] = muscle_load
                         else:
                             for muscle, load in muscle_load.items():
-                                if muscle not in section_load[adaptation_type].items():
+                                if muscle not in section_load[adaptation_type].keys():
                                     section_load[adaptation_type][muscle] = load
                                 else:
-                                    section_load[adaptation_type][muscle] += load
+                                    section_load[adaptation_type][muscle].merge(load)
 
                 for adaptation_type, muscle_load in section_load.items():
                     if adaptation_type not in workout_load:
                         workout_load[adaptation_type] = muscle_load
                     else:
                         for muscle, load in muscle_load.items():
-                            if muscle not in workout_load[adaptation_type].items():
+                            if muscle not in workout_load[adaptation_type].keys():
                                 workout_load[adaptation_type][muscle] = load
                             else:
-                                workout_load[adaptation_type][muscle] += load
+                                workout_load[adaptation_type][muscle].merge(load)
 
         return workout_load
 
@@ -166,13 +167,22 @@ class SessionFunctionalMovement(object):
             all_values.extend(concentric_values)
             all_values.extend(eccentric_values)
             if len(all_values) > 0:
-                average = statistics.mean(all_values)
-                std_dev = statistics.stdev(all_values)
+                # average = statistics.mean(all_values)
+                # std_dev = statistics.stdev(all_values)
+                minimum = min(all_values)
+                maximum = max(all_values)
+                value_range = maximum - minimum
                 for muscle in muscle_load_dict.keys():
-                    if muscle_load_dict[muscle].concentric_volume > 0:
-                        muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - average) / std_dev)
-                    if muscle_load_dict[muscle].eccentric_volume > 0:
-                        muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - average) / std_dev)
+                    if muscle_load_dict[muscle].concentric_volume > 0 and value_range > 0:
+                        # muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - average) / std_dev)
+                        muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - minimum) / value_range)
+                    else:
+                        muscle_load_dict[muscle].concentric_volume = 0
+                    if muscle_load_dict[muscle].eccentric_volume > 0 and value_range > 0:
+                        # muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - average) / std_dev)
+                        muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - minimum) / value_range)
+                    else:
+                        muscle_load_dict[muscle].eccentric_volume = 0
                     if muscle not in normalized_dict:
                         normalized_dict[muscle] = muscle_load_dict[muscle]
                     else:
