@@ -28,14 +28,14 @@ class WorkoutProcessor(object):
             exercise.initialize_from_movement(movement)
             self.add_action_details_to_exercise(exercise, movement)
 
-            if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-                exercise.convert_reps_to_duration(cardio_data)
+            # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            #     exercise.convert_reps_to_duration(cardio_data)
 
     def add_action_details_to_exercise(self, exercise, movement):
         for action_id in movement.primary_actions:
             action = action_library.get(action_id)
             if action is not None:
-                self.process_action(action, exercise)
+                self.initialize_action_from_exercise(action, exercise)
                 exercise.primary_actions.append(action)
         self.apply_explosiveness(exercise, exercise.primary_actions)
         for action in exercise.primary_actions:
@@ -44,13 +44,13 @@ class WorkoutProcessor(object):
         for action_id in movement.secondary_actions:
             action = action_library.get(action_id)
             if action is not None:
-                self.process_action(action, exercise)
+                self.initialize_action_from_exercise(action, exercise)
                 exercise.secondary_actions.append(action)
         self.apply_explosiveness(exercise, exercise.secondary_actions)
         for action in exercise.secondary_actions:
             action.set_training_load()
 
-    def process_action(self, action, exercise):
+    def initialize_action_from_exercise(self, action, exercise):
         # athlete_bodyweight = 100
         # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
