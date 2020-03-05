@@ -910,6 +910,7 @@ class MovementIntegrationPrep(ActiveRestBase):
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.active_stretch),
+                                ExercisePhase(ExercisePhaseType.dynamic_stretch),
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
                                 ExercisePhase(ExercisePhaseType.static_integrate),
                                 ExercisePhase(ExercisePhaseType.dynamic_integrate)]
