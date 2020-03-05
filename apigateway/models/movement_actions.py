@@ -313,7 +313,7 @@ class ExerciseAction(object):
         self.bodyweight_intensity_right = right
 
     def set_training_load(self):
-        self.set_training_intensity()
+        self.set_intensity()
         self.set_adaption_type()
         self.set_training_volume()
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
@@ -372,7 +372,7 @@ class ExerciseAction(object):
                 self.training_volume_left = self.reps
                 self.training_volume_right = self.reps
 
-    def set_training_intensity(self):
+    def set_intensity(self):
         if self.training_type == TrainingType.strength_cardiorespiratory:
             if self.rpe is None:
                 self.rpe = 4
