@@ -29,7 +29,7 @@ def get_action(action_id, name, exercise, training_type=TrainingType.strength_in
 
     WorkoutProcessor().process_action(action, exercise)
     action.explosiveness_rating = explosiveness
-    action.get_training_load()
+    action.set_training_load()
     return action
 
 
