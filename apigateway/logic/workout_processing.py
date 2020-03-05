@@ -37,7 +37,7 @@ class WorkoutProcessor(object):
             if action is not None:
                 self.initialize_action_from_exercise(action, exercise)
                 exercise.primary_actions.append(action)
-        self.apply_explosiveness(exercise, exercise.primary_actions)
+        self.set_action_explosiveness_from_exercise(exercise, exercise.primary_actions)
         for action in exercise.primary_actions:
             action.set_training_load()
 
@@ -46,7 +46,7 @@ class WorkoutProcessor(object):
             if action is not None:
                 self.initialize_action_from_exercise(action, exercise)
                 exercise.secondary_actions.append(action)
-        self.apply_explosiveness(exercise, exercise.secondary_actions)
+        self.set_action_explosiveness_from_exercise(exercise, exercise.secondary_actions)
         for action in exercise.secondary_actions:
             action.set_training_load()
 
@@ -338,7 +338,7 @@ class WorkoutProcessor(object):
             else:
                 return 0.0
 
-    def apply_explosiveness(self, exercise, action_list):
+    def set_action_explosiveness_from_exercise(self, exercise, action_list):
 
         if len(action_list) > 0:
             action_explosiveness = [a.explosiveness for a in action_list if a.explosiveness is not None]
