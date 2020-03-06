@@ -177,8 +177,7 @@ class SessionFunctionalMovement(object):
                     max_concentric_eccentic_volume = max(muscle_load_dict[muscle].concentric_volume,
                                                          muscle_load_dict[muscle].eccentric_volume)
                     if maximum < max_concentric_eccentic_volume:
-                        self.set_body_part_injury_risk_max(adaptation_type, muscle, maximum, event_date)
-                    else:
+                        self.set_body_part_injury_risk_max(adaptation_type, muscle, max_concentric_eccentic_volume, event_date)
                         maximum = max_concentric_eccentic_volume
 
                     value_range = maximum - minimum
@@ -217,7 +216,7 @@ class SessionFunctionalMovement(object):
 
         max = 0.0
 
-        if muscle in self.injury_risk_dict:
+        if muscle in self.injury_risk_dict.keys():
             if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
                 if self.is_max_date_valid(self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory_date, event_date):
                     max = self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory
@@ -253,7 +252,7 @@ class SessionFunctionalMovement(object):
 
     def set_body_part_injury_risk_max(self, adaptation_type, muscle, max, event_date):
 
-        if muscle not in self.injury_risk_dict:
+        if muscle not in self.injury_risk_dict.keys():
             self.injury_risk_dict[muscle] = BodyPartInjuryRisk()
 
         if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
