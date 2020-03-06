@@ -3,9 +3,11 @@ import statistics
 from models.body_parts import BodyPartFactory
 from models.compensation_source import CompensationSource
 from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, FunctionalMovementActionMapping, BodyPartFunction
+from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.movement_tags import AdaptationType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from datetime import timedelta
 
 
 class SessionFunctionalMovement(object):
@@ -23,7 +25,7 @@ class SessionFunctionalMovement(object):
         if self.session.session_type() == SessionType.mixed_activity:
             if self.session.workout_program_module is not None:
                 total_load_dict = self.process_workout_load(self.session.workout_program_module)
-                normalized_dict = self.normalize_and_consolidate_load(total_load_dict)
+                normalized_dict = self.normalize_and_consolidate_load(total_load_dict, event_date)
                 self.session_load_dict = normalized_dict
 
         else:
@@ -155,7 +157,7 @@ class SessionFunctionalMovement(object):
 
         return total_load
 
-    def normalize_and_consolidate_load(self, total_load_dict):
+    def normalize_and_consolidate_load(self, total_load_dict, event_date):
 
         normalized_dict = {}
 
@@ -167,19 +169,24 @@ class SessionFunctionalMovement(object):
             all_values.extend(concentric_values)
             all_values.extend(eccentric_values)
             if len(all_values) > 0:
-                # average = statistics.mean(all_values)
-                # std_dev = statistics.stdev(all_values)
                 minimum = min(all_values)
-                maximum = max(all_values)
-                value_range = maximum - minimum
+                # maximum = max(all_values)
+                # value_range = maximum - minimum
                 for muscle in muscle_load_dict.keys():
+                    maximum = self.get_body_part_injury_risk_max(adaptation_type, muscle, event_date)
+                    max_concentric_eccentic_volume = max(muscle_load_dict[muscle].concentric_volume,
+                                                         muscle_load_dict[muscle].eccentric_volume)
+                    if maximum < max_concentric_eccentic_volume:
+                        self.set_body_part_injury_risk_max(adaptation_type, muscle, maximum, event_date)
+                    else:
+                        maximum = max_concentric_eccentic_volume
+
+                    value_range = maximum - minimum
                     if muscle_load_dict[muscle].concentric_volume > 0 and value_range > 0:
-                        # muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - average) / std_dev)
                         muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - minimum) / value_range)
                     else:
                         muscle_load_dict[muscle].concentric_volume = 0
                     if muscle_load_dict[muscle].eccentric_volume > 0 and value_range > 0:
-                        # muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - average) / std_dev)
                         muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - minimum) / value_range)
                     else:
                         muscle_load_dict[muscle].eccentric_volume = 0
@@ -191,17 +198,80 @@ class SessionFunctionalMovement(object):
 
         return normalized_dict
 
-    def get_adaption_type_scalar(self, adaption_type):
+    def get_adaption_type_scalar(self, adaptation_type):
 
-        if adaption_type == AdaptationType.strength_endurance_cardiorespiratory.value:
+        if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
             return 0.20
-        elif adaption_type == AdaptationType.strength_endurance_strength.value:
+        elif adaptation_type == AdaptationType.strength_endurance_strength.value:
             return 0.40
-        elif adaption_type == AdaptationType.power_drill.value:
+        elif adaptation_type == AdaptationType.power_drill.value:
             return 0.60
-        elif adaption_type == AdaptationType.maximal_strength_hypertrophic.value:
+        elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
             return 0.80
-        elif adaption_type == AdaptationType.power_explosive_action.value:
+        elif adaptation_type == AdaptationType.power_explosive_action.value:
             return 1.00
         else:
             return 0.00
+
+    def get_body_part_injury_risk_max(self, adaptation_type, muscle, event_date):
+
+        max = 0.0
+
+        if muscle in self.injury_risk_dict:
+            if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
+                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory_date, event_date):
+                    max = self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory
+            elif adaptation_type == AdaptationType.strength_endurance_strength.value:
+                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_strength_endurance_strength_date, event_date):
+                    max = self.injury_risk_dict[muscle].max_strength_endurance_strength
+            elif adaptation_type == AdaptationType.power_drill.value:
+                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_power_drill_date, event_date):
+                    max = self.injury_risk_dict[muscle].max_power_drill
+            elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
+                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_maximal_strength_hypertrophic_date, event_date):
+                    max = self.injury_risk_dict[muscle].max_maximal_strength_hypertrophic
+            elif adaptation_type == AdaptationType.power_explosive_action.value:
+                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_power_explosive_action_date,
+                                          event_date):
+                    max = self.injury_risk_dict[muscle].max_power_explosive_action
+            else:
+                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_not_tracked_date,
+                                          event_date):
+                    max = self.injury_risk_dict[muscle].max_not_tracked
+
+        return max
+
+    def is_max_date_valid(self, date_attribute, test_date):
+
+        four_weeks_ago = test_date - timedelta(days=28)
+
+        if date_attribute is not None and date_attribute.date() >= four_weeks_ago:
+            return True
+        else:
+            return False
+
+
+    def set_body_part_injury_risk_max(self, adaptation_type, muscle, max, event_date):
+
+        if muscle not in self.injury_risk_dict:
+            self.injury_risk_dict[muscle] = BodyPartInjuryRisk()
+
+        if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
+            self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory = max
+            self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory_date = event_date
+        elif adaptation_type == AdaptationType.strength_endurance_strength.value:
+            self.injury_risk_dict[muscle].max_strength_endurance_strength = max
+            self.injury_risk_dict[muscle].max_strength_endurance_strength_date = event_date
+        elif adaptation_type == AdaptationType.power_drill.value:
+            self.injury_risk_dict[muscle].max_power_drill = max
+            self.injury_risk_dict[muscle].max_power_drill_date = event_date
+        elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
+            self.injury_risk_dict[muscle].max_maximal_strength_hypertrophic = max
+            self.injury_risk_dict[muscle].max_maximal_strength_hypertrophic_date = event_date
+        elif adaptation_type == AdaptationType.power_explosive_action.value:
+            self.injury_risk_dict[muscle].max_power_explosive_action = max
+            self.injury_risk_dict[muscle].max_power_explosive_action_date = event_date
+        else:
+            self.injury_risk_dict[muscle].max_not_tracked = max
+            self.injury_risk_dict[muscle].max_not_tracked_date = event_date
+
