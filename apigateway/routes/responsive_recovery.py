@@ -34,8 +34,8 @@ def handle_responsive_recovery_create(user_id):
     # set up processing
     user_stats = user_stats_datastore.get(athlete_id=user_id)
     if user_stats is None:
-        athlete_stats = UserStats(user_id)
-        athlete_stats.event_date = event_date_time
+        user_stats = UserStats(user_id)
+        user_stats.event_date = event_date_time
     user_stats.api_version = Config.get('API_VERSION')
     user_stats.timezone = timezone
     api_processor = APIProcessing(

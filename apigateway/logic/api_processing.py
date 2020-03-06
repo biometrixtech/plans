@@ -143,32 +143,3 @@ def force_datetime_iso(event_date):
     if len(event_date.split('.')) == 2:
         event_date = event_date.split(".")[0] + 'Z'
     return event_date
-
-
-# def create_activity(user_id, event_date_time, activity_type, user_stats=None, sessions=None, update_stats=True, user_stats_processor=None, datastore_collection=None):
-#     if datastore_collection is None:
-#         datastore_collection = DatastoreCollection()
-#     if update_stats:
-#         # update stats
-#         if user_stats_processor is None:
-#             user_stats_processor = UserStatsProcessing(
-#                     user_id,
-#                     event_date=event_date_time,
-#                     datastore_collection=datastore_collection
-#             )
-#         user_stats = user_stats_processor.process_athlete_stats(current_user_stats=user_stats)
-#
-#         user_stats_datastore = datastore_collection.user_stats_datastore
-#         user_stats_datastore.put(user_stats)
-#
-#     # create activity
-#     activity_manager = ActivityManager(user_id, datastore_collection, event_date_time, training_sessions=sessions, user_stats=user_stats)
-#     if activity_type == 'mobility_wod':
-#         activity = activity_manager.create_mobility_wod()
-#     elif activity_type == 'movement_prep':
-#         activity = activity_manager.create_movement_prep()
-#     elif activity_type == 'responsive_recovery':
-#         activity = activity_manager.create_responsive_recovery()
-#     else:
-#         raise ValueError("invalid activity type")
-#     return activity
