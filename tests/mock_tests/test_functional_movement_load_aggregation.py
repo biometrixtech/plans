@@ -5,7 +5,8 @@ from models.workout_program import WorkoutProgramModule, WorkoutSection, Workout
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
 from models.session_functional_movement import SessionFunctionalMovement
 from models.exercise import WeightMeasure
-
+from models.athlete_injury_risk import AthleteInjuryRisk
+from datetime import datetime
 
 def test_aggregate_load_concentric():
 
@@ -99,9 +100,10 @@ def test_normalize_load_concentric():
     program_module.workout_sections.append(section_1)
     program_module.workout_sections.append(section_2)
 
-    session_functional_movement = SessionFunctionalMovement(None, None)
+    athlete_injury_risk = AthleteInjuryRisk("tester")
+    session_functional_movement = SessionFunctionalMovement(None, athlete_injury_risk.items)
     load_dict = session_functional_movement.process_workout_load(program_module)
 
-    normalized_dict = session_functional_movement.normalize_and_consolidate_load(load_dict)
+    normalized_dict = session_functional_movement.normalize_and_consolidate_load(load_dict, datetime.now())
 
     assert len(normalized_dict) == 67
