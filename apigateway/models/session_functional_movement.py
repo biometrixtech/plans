@@ -26,6 +26,24 @@ class SessionFunctionalMovement(object):
             if self.session.workout_program_module is not None:
                 total_load_dict = self.process_workout_load(self.session.workout_program_module)
                 normalized_dict = self.normalize_and_consolidate_load(total_load_dict, event_date)
+
+                # saved normalized load to the session
+                for adaptation_type in total_load_dict.keys():
+                    load_values = [s.total_normalized_load for b, s in total_load_dict[adaptation_type].items()]
+                    total_load = sum(load_values)
+                    if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
+                        self.session.strength_endurance_cardiorespiratory_load = total_load
+                    elif adaptation_type == AdaptationType.strength_endurance_strength.value:
+                        self.session.strength_endurance_strength_load = total_load
+                    elif adaptation_type == AdaptationType.power_drill.value:
+                        self.session.power_drill_load = total_load
+                    elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
+                        self.session.maximal_strength_hypertrophic_load = total_load
+                    elif adaptation_type == AdaptationType.power_explosive_action.value:
+                        self.session.power_explosive_action_load = total_load
+                    else:
+                        self.session.not_tracked_load = total_load
+
                 self.session_load_dict = normalized_dict
 
         else:
@@ -52,7 +70,7 @@ class SessionFunctionalMovement(object):
                         functional_movement_body_part_side = BodyPartFunctionalMovement(b)
                         m.parts_receiving_compensation.append(functional_movement_body_part_side)
 
-                m.attribute_training_volume(self.session.training_load(load_stats), self.injury_risk_dict, event_date)
+                m.attribute_training_load(self.session.training_load(load_stats), self.injury_risk_dict, event_date)
                 # TODO - ensure we're using the correct (and all) intensity measures
                 # if self.session.session_RPE is not None:
                 #     m.attribute_intensity(self.session.session_RPE, self.injury_risk_dict, event_date)
@@ -71,18 +89,18 @@ class SessionFunctionalMovement(object):
                     session_load_dict[body_part_side] = BodyPartFunctionalMovement(body_part_side)
 
                 session_load_dict[body_part_side].body_part_function = BodyPartFunction.merge(body_part_functional_movement.body_part_function, session_load_dict[body_part_side].body_part_function)
-                session_load_dict[body_part_side].concentric_volume += body_part_functional_movement.concentric_volume
-                session_load_dict[body_part_side].eccentric_volume += body_part_functional_movement.eccentric_volume
-                session_load_dict[body_part_side].compensated_concentric_volume += body_part_functional_movement.compensated_concentric_volume
+                session_load_dict[body_part_side].concentric_load += body_part_functional_movement.concentric_load
+                session_load_dict[body_part_side].eccentric_load += body_part_functional_movement.eccentric_load
+                session_load_dict[body_part_side].compensated_concentric_load += body_part_functional_movement.compensated_concentric_load
                 session_load_dict[
-                    body_part_side].compensated_eccentric_volume += body_part_functional_movement.compensated_eccentric_volume
+                    body_part_side].compensated_eccentric_load += body_part_functional_movement.compensated_eccentric_load
 
-                session_load_dict[body_part_side].compensating_causes_volume.extend(body_part_functional_movement.compensating_causes_volume)
-                session_load_dict[body_part_side].compensating_causes_volume = list(set(session_load_dict[body_part_side].compensating_causes_volume))
-                session_load_dict[body_part_side].compensation_source_volume = CompensationSource.internal_processing
+                session_load_dict[body_part_side].compensating_causes_load.extend(body_part_functional_movement.compensating_causes_load)
+                session_load_dict[body_part_side].compensating_causes_load = list(set(session_load_dict[body_part_side].compensating_causes_load))
+                session_load_dict[body_part_side].compensation_source_load = CompensationSource.internal_processing
 
-                session_load_dict[body_part_side].concentric_intensity = max(body_part_functional_movement.concentric_intensity, session_load_dict[body_part_side].concentric_intensity)
-                session_load_dict[body_part_side].eccentric_intensity = max(body_part_functional_movement.eccentric_intensity, session_load_dict[body_part_side].eccentric_intensity)
+                # session_load_dict[body_part_side].concentric_intensity = max(body_part_functional_movement.concentric_intensity, session_load_dict[body_part_side].concentric_intensity)
+                # session_load_dict[body_part_side].eccentric_intensity = max(body_part_functional_movement.eccentric_intensity, session_load_dict[body_part_side].eccentric_intensity)
 
         return session_load_dict
 
@@ -163,37 +181,31 @@ class SessionFunctionalMovement(object):
 
         for adaptation_type, muscle_load_dict in total_load_dict.items():
             scalar = self.get_adaption_type_scalar(adaptation_type)
-            concentric_values = [c.concentric_volume for c in muscle_load_dict.values() if c.concentric_volume > 0]
-            eccentric_values = [c.eccentric_volume for c in muscle_load_dict.values() if c.eccentric_volume > 0]
-            all_values = []
-            all_values.extend(concentric_values)
-            all_values.extend(eccentric_values)
+            # concentric_values = [c.concentric_load for c in muscle_load_dict.values() if c.concentric_load > 0]
+            # eccentric_values = [c.eccentric_load for c in muscle_load_dict.values() if c.eccentric_load > 0]
+            all_values = [c.total_load() for c in muscle_load_dict.values() if c.total_load() > 0]
+            # all_values.extend(concentric_values)
+            # all_values.extend(eccentric_values)
             if len(all_values) > 0:
                 minimum = min(all_values)
                 # maximum = max(all_values)
                 # value_range = maximum - minimum
                 for muscle in muscle_load_dict.keys():
                     maximum = self.get_body_part_injury_risk_max(adaptation_type, muscle, event_date)
-                    max_concentric_eccentic_volume = max(muscle_load_dict[muscle].concentric_volume,
-                                                         muscle_load_dict[muscle].eccentric_volume)
-                    if maximum < max_concentric_eccentic_volume:
-                        self.set_body_part_injury_risk_max(adaptation_type, muscle, max_concentric_eccentic_volume, event_date)
-                        maximum = max_concentric_eccentic_volume
+                    max_current_load = muscle_load_dict[muscle].total_load()
+
+                    if maximum < max_current_load:
+                        self.set_body_part_injury_risk_max(adaptation_type, muscle, max_current_load, event_date)
+                        maximum = max_current_load
 
                     value_range = maximum - minimum
-                    if muscle_load_dict[muscle].concentric_volume > 0 and value_range > 0:
-                        muscle_load_dict[muscle].concentric_volume = scalar * ((muscle_load_dict[muscle].concentric_volume - minimum) / value_range)
-                    else:
-                        muscle_load_dict[muscle].concentric_volume = 0
-                    if muscle_load_dict[muscle].eccentric_volume > 0 and value_range > 0:
-                        muscle_load_dict[muscle].eccentric_volume = scalar * ((muscle_load_dict[muscle].eccentric_volume - minimum) / value_range)
-                    else:
-                        muscle_load_dict[muscle].eccentric_volume = 0
+                    if muscle_load_dict[muscle].total_load() > 0 and value_range > 0:
+                        muscle_load_dict[muscle].total_normalized_load = scalar * ((muscle_load_dict[muscle].total_load() - minimum) / value_range)
+
                     if muscle not in normalized_dict:
                         normalized_dict[muscle] = muscle_load_dict[muscle]
                     else:
-                        normalized_dict[muscle].concentric_volume += muscle_load_dict[muscle].concentric_volume
-                        normalized_dict[muscle].eccentric_volume += muscle_load_dict[muscle].eccentric_volume
+                        normalized_dict[muscle].total_normalized_load += muscle_load_dict[muscle].total_normalized_load
 
         return normalized_dict
 

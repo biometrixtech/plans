@@ -1,10 +1,11 @@
 from fathomapi.utils.xray import xray_recorder
 from models.training_volume import StandardErrorRange
-from models.session import HighLoadSession
+from models.session import HighLoadSession, HighDetailedLoadSession, SessionType
 from datetime import timedelta
 import statistics, math
 from utils import format_date, parse_date
 from models.stats import SportMaxLoad
+from models.movement_tags import AdaptationType
 
 
 class TrainingLoadProcessing(object):
@@ -31,6 +32,7 @@ class TrainingLoadProcessing(object):
         self.last_14_days_training_sessions = []
         self.load_stats = load_stats
         self.sport_max_load = {}
+        self.adaptation_type_load = {}
 
         self.training_sessions_exist_days_8_35 = False
 
@@ -55,9 +57,16 @@ class TrainingLoadProcessing(object):
         self.load_stats.set_min_max_values(previous_7_day_training_sessions)
         self.load_stats.set_min_max_values(last_7_day_training_sessions)
 
+        self.adaptation_type_load[AdaptationType.not_tracked.value] = self.load_stats.max_not_tracked if self.load_stats.max_not_tracked is not None else 0
+        self.adaptation_type_load[AdaptationType.strength_endurance_cardiorespiratory.value] = self.load_stats.max_strength_endurance_cardiorespiratory if self.load_stats.max_strength_endurance_cardiorespiratory is not None else 0
+        self.adaptation_type_load[AdaptationType.strength_endurance_strength.value] = self.load_stats.max_strength_endurance_strength if self.load_stats.max_strength_endurance_strength is not None else 0
+        self.adaptation_type_load[AdaptationType.power_drill.value] = self.load_stats.max_power_drill if self.load_stats.max_power_drill is not None else 0
+        self.adaptation_type_load[AdaptationType.maximal_strength_hypertrophic.value] = self.load_stats.max_maximal_strength_hypertrophic if self.load_stats.max_maximal_strength_hypertrophic is not None else 0
+        self.adaptation_type_load[AdaptationType.power_explosive_action.value] = self.load_stats.max_power_explosive_action if self.load_stats.max_power_explosive_action is not None else 0
+
         for p in previous_7_day_training_sessions:
 
-            if p.sport_name is not None:
+            if p.session_type() == SessionType.sport_training:
                 if p.sport_name not in self.previous_week_sport_training_loads:
                     self.last_week_sport_training_loads[p.sport_name] = []
                     self.previous_week_sport_training_loads[p.sport_name] = []
@@ -75,7 +84,7 @@ class TrainingLoadProcessing(object):
 
         for l in last_7_day_training_sessions:
 
-            if l.sport_name is not None:
+            if l.session_type() == SessionType.sport_training:
                 if l.sport_name not in self.last_week_sport_training_loads:
                     self.last_week_sport_training_loads[l.sport_name] = []
                     self.previous_week_sport_training_loads[l.sport_name] = []
@@ -128,21 +137,96 @@ class TrainingLoadProcessing(object):
 
         return user_stats
 
-    def set_high_relative_load_sessions(self, athlete_stats, training_sessions):
+    def set_high_relative_load_sessions(self, user_stats, training_sessions):
 
         for t in training_sessions:
-            if t.sport_name in athlete_stats.training_load_ramp:
-                if (athlete_stats.training_load_ramp[t.sport_name].observed_value is None or
-                        athlete_stats.training_load_ramp[t.sport_name].observed_value > 1.1):
+            if t.session_type() == SessionType.sport_training:
+                if t.sport_name in user_stats.training_load_ramp:
+                    if (user_stats.training_load_ramp[t.sport_name].observed_value is None or
+                            user_stats.training_load_ramp[t.sport_name].observed_value > 1.1):
+                        if t.session_RPE is not None and t.session_RPE > 4:
+                            high_load_session = HighLoadSession(t.event_date, t.sport_name)
+                            high_load_session.percent_of_max = self.get_max_training_percent(t)
+                            self.high_relative_load_sessions.append(high_load_session)
+                else:
                     if t.session_RPE is not None and t.session_RPE > 4:
                         high_load_session = HighLoadSession(t.event_date, t.sport_name)
                         high_load_session.percent_of_max = self.get_max_training_percent(t)
                         self.high_relative_load_sessions.append(high_load_session)
-            else:
-                if t.session_RPE is not None and t.session_RPE > 4:
-                    high_load_session = HighLoadSession(t.event_date, t.sport_name)
-                    high_load_session.percent_of_max = self.get_max_training_percent(t)
+            elif t.session_type() == SessionType.mixed_activity:
+
+                max_percent = 0
+                greater_than_50 = []
+
+                percent = self.get_percent(t.not_tracked_load, self.adaptation_type_load[AdaptationType.not_tracked.value])
+                if percent > 80:
+                    max_percent = percent
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.strength_endurance_cardiorespiratory_load,
+                                             self.adaptation_type_load[AdaptationType.strength_endurance_cardiorespiratory.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.strength_endurance_strength_load,
+                                               self.adaptation_type_load[
+                                                   AdaptationType.strength_endurance_strength.value])
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                percent = self.get_percent(t.power_drill_load, self.adaptation_type_load[AdaptationType.power_drill.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.maximal_strength_hypertrophic_load,
+                                                 self.adaptation_type_load[AdaptationType.maximal_strength_hypertrophic.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.power_explosive_action_load,self.adaptation_type_load[AdaptationType.power_explosive_action.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                if max_percent > 80:
+                    high_load_session = HighDetailedLoadSession(t.event_date)
+                    high_load_session.percent_of_max = max_percent
                     self.high_relative_load_sessions.append(high_load_session)
+
+                else:
+                    if len(greater_than_50) >= 2:
+                        high_load_session = HighDetailedLoadSession(t.event_date)
+                        high_load_session.percent_of_max = max(greater_than_50)
+                        self.high_relative_load_sessions.append(high_load_session)
+
+    def get_percent(self, test_value, base_value):
+
+            if test_value is not None:
+                if base_value is None:
+                    return 100
+                if test_value > base_value:
+                    return 100
+
+                if base_value > 0:
+                    ratio = test_value / base_value
+                    return ratio * 100
+
+            return 0
 
     def get_ramp(self, expected_weekly_workouts, last_week_values, previous_week_values, factor=1.1):
 

@@ -756,33 +756,33 @@ class BodyPartInjuryRisk(object):
 
     # def eccentric_volume_today(self):
     #
-    #     eccentric_volume = 0
+    #     eccentric_load = 0
     #
     #     if self.prime_mover_eccentric_volume_today is not None:
-    #         eccentric_volume += self.prime_mover_eccentric_volume_today
+    #         eccentric_load += self.prime_mover_eccentric_volume_today
     #
     #     if self.synergist_eccentric_volume_today is not None:
-    #         eccentric_volume += self.synergist_eccentric_volume_today
+    #         eccentric_load += self.synergist_eccentric_volume_today
     #
     #     if self.synergist_compensating_eccentric_volume_today is not None:
-    #         eccentric_volume += self.synergist_compensating_eccentric_volume_today
+    #         eccentric_load += self.synergist_compensating_eccentric_volume_today
     #
-    #     return eccentric_volume
+    #     return eccentric_load
     #
     # def concentric_volume_today(self):
     #
-    #     concentric_volume = 0
+    #     concentric_load = 0
     #
     #     if self.prime_mover_concentric_volume_today is not None:
-    #         concentric_volume += self.prime_mover_concentric_volume_today
+    #         concentric_load += self.prime_mover_concentric_volume_today
     #
     #     if self.synergist_concentric_volume_today is not None:
-    #         concentric_volume += self.synergist_concentric_volume_today
+    #         concentric_load += self.synergist_concentric_volume_today
     #
     #     if self.synergist_compensating_concentric_volume_today is not None:
-    #         concentric_volume += self.synergist_compensating_concentric_volume_today
+    #         concentric_load += self.synergist_compensating_concentric_volume_today
     #
-    #     return concentric_volume
+    #     return concentric_load
 
     def compensating_volume_today(self):
 
@@ -805,17 +805,17 @@ class BodyPartInjuryRisk(object):
 
     # def prime_mover_total_volume_today(self):
     #
-    #     concentric_volume = self.prime_mover_concentric_volume_today
-    #     eccentric_volume = self.prime_mover_eccentric_volume_today
+    #     concentric_load = self.prime_mover_concentric_volume_today
+    #     eccentric_load = self.prime_mover_eccentric_volume_today
     #
-    #     return concentric_volume + eccentric_volume
+    #     return concentric_load + eccentric_load
     #
     # def synergist_total_volume_today(self):
     #
-    #     concentric_volume = self.synergist_concentric_volume_today
-    #     eccentric_volume = self.synergist_eccentric_volume_today
+    #     concentric_load = self.synergist_concentric_volume_today
+    #     eccentric_load = self.synergist_eccentric_volume_today
     #
-    #     return concentric_volume + eccentric_volume + self.synergist_compensating_eccentric_volume_today + self.synergist_compensating_concentric_volume_today
+    #     return concentric_load + eccentric_load + self.synergist_compensating_eccentric_volume_today + self.synergist_compensating_concentric_volume_today
 
     # def prime_mover_eccentric_volume_ramp(self):
     #

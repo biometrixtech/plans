@@ -121,21 +121,21 @@ class FunctionalMovement(object):
 class BodyPartFunctionalMovement(Serialisable):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
-        self.concentric_volume = 0
-        self.eccentric_volume = 0
-        self.compensated_concentric_volume = 0
-        self.compensated_eccentric_volume = 0
-        self.compensating_causes_volume = []
-        self.concentric_intensity = 0
-        self.eccentric_intensity = 0
-        self.compensated_concentric_intensity = 0
-        self.compensated_eccentric_intensity = 0
-        self.compensating_causes_intensity = []
+        self.concentric_load = 0
+        self.eccentric_load = 0
+        self.compensated_concentric_load = 0
+        self.compensated_eccentric_load = 0
+        self.compensating_causes_load = []
+        # self.concentric_intensity = 0
+        # self.eccentric_intensity = 0
+        # self.compensated_concentric_intensity = 0
+        # self.compensated_eccentric_intensity = 0
+        # self.compensating_causes_intensity = []
         self.concentric_ramp = 0.0
         self.eccentric_ramp = 0.0
         self.is_compensating = False
-        self.compensation_source_volume = None
-        self.compensation_source_intensity = None
+        self.compensation_source_load = None
+        # self.compensation_source_intensity = None
         self.body_part_function = None
         self.inhibited = 0
         self.weak = 0
@@ -143,13 +143,23 @@ class BodyPartFunctionalMovement(Serialisable):
         self.inflamed = 0
         self.long = 0
 
-    def total_volume(self):
+        self.total_normalized_load = 0
 
-        return self.concentric_volume + self.eccentric_volume + self.compensated_concentric_volume + self.compensated_eccentric_volume
+    def total_load(self):
 
-    def total_intensity(self):
+        return self.concentric_load + self.eccentric_load + self.compensated_concentric_load + self.compensated_eccentric_load
 
-        return max(self.concentric_intensity, self.eccentric_intensity, self.compensated_concentric_intensity, self.compensated_eccentric_intensity)
+    def total_concentric_load(self):
+
+        return self.concentric_load + self.compensated_concentric_load
+
+    def total_eccentric_load(self):
+
+        return self.eccentric_load + self.compensated_eccentric_load
+
+    # def total_intensity(self):
+    #
+    #     return max(self.concentric_intensity, self.eccentric_intensity, self.compensated_concentric_intensity, self.compensated_eccentric_intensity)
 
     def __hash__(self):
         return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
@@ -165,76 +175,78 @@ class BodyPartFunctionalMovement(Serialisable):
     def json_serialise(self):
         return {
                 'body_part_side': self.body_part_side.json_serialise(),
-                'concentric_volume': self.concentric_volume,
-                'eccentric_volume': self.eccentric_volume,
-                'compensated_concentric_volume': self.compensated_concentric_volume,
-                'compensated_eccentric_volume': self.compensated_concentric_volume,
-                'compensating_causes_volume': [c.json_serialise() for c in self.compensating_causes_volume],
-                'concentric_intensity': self.concentric_intensity,
-                'eccentric_intensity': self.eccentric_intensity,
-                'compensated_concentric_intensity': self.compensated_concentric_intensity,
-                'compensated_eccentric_intensity': self.compensated_eccentric_intensity,
+                'concentric_load': self.concentric_load,
+                'eccentric_load': self.eccentric_load,
+                'compensated_concentric_load': self.compensated_concentric_load,
+                'compensated_eccentric_load': self.compensated_concentric_load,
+                'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
+                #'concentric_intensity': self.concentric_intensity,
+                #'eccentric_intensity': self.eccentric_intensity,
+                #'compensated_concentric_intensity': self.compensated_concentric_intensity,
+                #'compensated_eccentric_intensity': self.compensated_eccentric_intensity,
                 'compensating_causes_intensity': [c.json_serialise() for c in self.compensating_causes_intensity],
                 'concentric_ramp': self.concentric_ramp,
                 'eccentric_ramp': self.eccentric_ramp,
                 'is_compensating': self.is_compensating,
-                'compensation_source_volume': self.compensation_source_volume.value if self.compensation_source_volume is not None else None,
-                'compensation_source_intensity': self.compensation_source_intensity.value if self.compensation_source_intensity is not None else None,
+                'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
+                #'compensation_source_intensity': self.compensation_source_intensity.value if self.compensation_source_intensity is not None else None,
                 'body_part_function': self.body_part_function.value if self.body_part_function is not None else None,
                 'inhibited': self.inhibited if self.inhibited is not None else None,
                 'weak': self.weak,
                 'tight': self.tight,
                 'inflamed': self.inflamed,
-                'long': self.long
+                'long': self.long,
+                'total_normalized_load': self.total_normalized_load
             }
 
     @classmethod
     def json_deserialise(cls, input_dict):
         movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
-        movement.concentric_volume = input_dict.get('concentric_volume', 0)
-        movement.eccentric_volume = input_dict.get('eccentric_volume', 0)
-        movement.compensated_concentric_volume = input_dict.get('compensated_concentric_volume', 0)
-        movement.compensated_eccentric_volume = input_dict.get('compensated_eccentric_volume', 0)
-        movement.compensating_causes_volume = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_volume',[])]  # I don't know what gets saved here!
-        movement.concentric_intensity = input_dict.get('concentric_intensity', 0)
-        movement.eccentric_intensity = input_dict.get('eccentric_intensity', 0)
-        movement.compensated_concentric_intensity = input_dict.get('compensated_concentric_intensity', 0)
-        movement.compensated_eccentric_intensity = input_dict.get('compensated_eccentric_intensity', 0)
-        movement.compensating_causes_intensity = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_intensity',[])]  # I don't know what gets saved here!
+        movement.concentric_load = input_dict.get('concentric_load', 0)
+        movement.eccentric_load = input_dict.get('eccentric_load', 0)
+        movement.compensated_concentric_load = input_dict.get('compensated_concentric_load', 0)
+        movement.compensated_eccentric_load = input_dict.get('compensated_eccentric_load', 0)
+        movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
+        # movement.concentric_intensity = input_dict.get('concentric_intensity', 0)
+        # movement.eccentric_intensity = input_dict.get('eccentric_intensity', 0)
+        # movement.compensated_concentric_intensity = input_dict.get('compensated_concentric_intensity', 0)
+        # movement.compensated_eccentric_intensity = input_dict.get('compensated_eccentric_intensity', 0)
+        # movement.compensating_causes_intensity = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_intensity',[])]  # I don't know what gets saved here!
         movement.concentric_ramp = input_dict.get('concentric_ramp', 0.0)
         movement.eccentric_ramp = input_dict.get('eccentric_ramp', 0.0)
         movement.is_compensating = input_dict.get('is_compensating', False)
-        movement.compensation_source_volume = CompensationSource(input_dict['compensation_source_volume']) if input_dict.get('compensation_source_volume') is not None else None
-        movement.compensation_source_intensity = CompensationSource(input_dict['compensation_source_intensity']) if input_dict.get('compensation_source_intensity') is not None else None
+        movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
+        # movement.compensation_source_intensity = CompensationSource(input_dict['compensation_source_intensity']) if input_dict.get('compensation_source_intensity') is not None else None
         movement.body_part_function = BodyPartFunction(input_dict['body_part_function']) if input_dict.get('body_part_function') is not None else None
         movement.inhibited = input_dict.get('inhibited', 0)
         movement.weak = input_dict.get('weak', 0)
         movement.tight = input_dict.get('tight', 0)
         movement.inflamed = input_dict.get('inflamed', 0)
         movement.long = input_dict.get('long', 0)
+        movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
         return movement
 
     def merge(self, target):
 
         if self.body_part_side == target.body_part_side:
 
-            self.concentric_volume += target.concentric_volume
-            self.eccentric_volume += target.eccentric_volume
-            self.compensated_concentric_volume += target.compensated_concentric_volume
-            self.compensated_eccentric_volume += target.compensated_eccentric_volume
-            self.compensating_causes_volume.extend(target.compensating_causes_volume)
-            self.compensating_causes_volume = list(set(self.compensating_causes_volume))
-            self.concentric_intensity += target.concentric_intensity
-            self.eccentric_intensity += target.eccentric_intensity
-            self.compensated_concentric_intensity += target.compensated_concentric_intensity
-            self.compensated_eccentric_intensity += target.compensated_eccentric_intensity
-            self.compensating_causes_intensity.extend(target.compensating_causes_intensity)
-            self.compensating_causes_intensity = list(set(self.compensating_causes_intensity))
+            self.concentric_load += target.concentric_load
+            self.eccentric_load += target.eccentric_load
+            self.compensated_concentric_load += target.compensated_concentric_load
+            self.compensated_eccentric_load += target.compensated_eccentric_load
+            self.compensating_causes_load.extend(target.compensating_causes_load)
+            self.compensating_causes_load = list(set(self.compensating_causes_load))
+            # self.concentric_intensity += target.concentric_intensity
+            # self.eccentric_intensity += target.eccentric_intensity
+            # self.compensated_concentric_intensity += target.compensated_concentric_intensity
+            # self.compensated_eccentric_intensity += target.compensated_eccentric_intensity
+            #self.compensating_causes_intensity.extend(target.compensating_causes_intensity)
+            # self.compensating_causes_intensity = list(set(self.compensating_causes_intensity))
             self.concentric_ramp = max(self.concentric_ramp, target.concentric_ramp)
             self.eccentric_ramp = max(self.eccentric_ramp, target.eccentric_ramp)
             self.is_compensating = max(self.is_compensating, target.is_compensating)
-            self.compensation_source_volume = self.merge_with_none(self.compensation_source_volume, target.compensation_source_volume)
-            self.compensation_source_intensity = self.merge_with_none(self.compensation_source_intensity, target.compensation_source_intensity)
+            self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
+            # self.compensation_source_intensity = self.merge_with_none(self.compensation_source_intensity, target.compensation_source_intensity)
             self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
             # not sure these are even used
             # self.body_part_function = None
@@ -243,6 +255,7 @@ class BodyPartFunctionalMovement(Serialisable):
             # self.tight = 0
             # self.inflamed = 0
             # self.long = 0
+            self.total_normalized_load += target.total_normalized_load
 
     def merge_with_none(self, value_a, value_b):
 
@@ -451,15 +464,15 @@ class FunctionalMovementActionMapping(object):
         if attributed_muscle_load > 0:
             if muscle.body_part_side in self.muscle_load:
                 if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
-                    self.muscle_load[muscle.body_part_side].concentric_volume += attributed_muscle_load
+                    self.muscle_load[muscle.body_part_side].concentric_load += attributed_muscle_load
                 else:
-                    self.muscle_load[muscle.body_part_side].eccentric_volume += attributed_muscle_load
+                    self.muscle_load[muscle.body_part_side].eccentric_load += attributed_muscle_load
             else:
                 self.muscle_load[muscle.body_part_side] = muscle
                 if muscle_action == MuscleAction.concentric or muscle_action == MuscleAction.isometric:
-                    self.muscle_load[muscle.body_part_side].concentric_volume = attributed_muscle_load
+                    self.muscle_load[muscle.body_part_side].concentric_load = attributed_muscle_load
                 else:
-                    self.muscle_load[muscle.body_part_side].eccentric_volume = attributed_muscle_load
+                    self.muscle_load[muscle.body_part_side].eccentric_load = attributed_muscle_load
 
     def get_muscle_load(self, functional_movement_priority, muscle_role, load, stability_rating):
 
@@ -503,7 +516,7 @@ class FunctionalMovementActivityMapping(object):
         self.parts_receiving_compensation = []
         self.muscle_load = {}
 
-    def attribute_training_volume(self, training_volume, injury_risk_dict, event_date):
+    def attribute_training_load(self, training_load, injury_risk_dict, event_date):
 
         prime_mover_ratio = 0.8
         synergist_ratio = 0.6
@@ -520,93 +533,93 @@ class FunctionalMovementActivityMapping(object):
             else:
                 factor = .20
 
-            compensated_concentric_volume = training_volume * self.concentric_level * factor
-            compensated_eccentric_volume = training_volume * self.eccentric_level * factor
+            compensated_concentric_load = training_load * self.concentric_level * factor
+            compensated_eccentric_load = training_load * self.eccentric_level * factor
 
             for s in self.parts_receiving_compensation:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-                    synergist_compensated_concentric_volume = compensated_concentric_volume / float(len(self.parts_receiving_compensation))
-                    synergist_compensated_eccentric_volume = compensated_eccentric_volume / float(len(self.parts_receiving_compensation))
+                    synergist_compensated_concentric_load = compensated_concentric_load / float(len(self.parts_receiving_compensation))
+                    synergist_compensated_eccentric_load = compensated_eccentric_load / float(len(self.parts_receiving_compensation))
                     s.body_part_function = BodyPartFunction.synergist
-                    s.compensated_concentric_volume += synergist_compensated_concentric_volume
-                    s.compensated_eccentric_volume += synergist_compensated_eccentric_volume
-                    s.compensating_causes_volume.append(c)
-                    s.compensation_source_volume = CompensationSource.internal_processing
+                    s.compensated_concentric_load += synergist_compensated_concentric_load
+                    s.compensated_eccentric_load += synergist_compensated_eccentric_load
+                    s.compensating_causes_load.append(c)
+                    s.compensation_source_load = CompensationSource.internal_processing
                     if s.body_part_side not in self.muscle_load:
                         self.muscle_load[s.body_part_side] = s
                     else:
-                        self.muscle_load[s.body_part_side].compensated_concentric_volume += synergist_compensated_concentric_volume
-                        self.muscle_load[s.body_part_side].compensated_eccentric_volume += synergist_compensated_eccentric_volume
-                        self.muscle_load[s.body_part_side].compensating_causes_volume.append(c)
-                        self.muscle_load[s.body_part_side].compensation_source_volume = CompensationSource.internal_processing
+                        self.muscle_load[s.body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
+                        self.muscle_load[s.body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
+                        self.muscle_load[s.body_part_side].compensating_causes_load.append(c)
+                        self.muscle_load[s.body_part_side].compensation_source_load = CompensationSource.internal_processing
 
         for p in self.prime_movers:
-            attributed_concentric_volume = training_volume * self.concentric_level * prime_mover_ratio
-            attributed_eccentric_volume = training_volume * self.eccentric_level * prime_mover_ratio
+            attributed_concentric_load = training_load * self.concentric_level * prime_mover_ratio
+            attributed_eccentric_load = training_load * self.eccentric_level * prime_mover_ratio
             p.body_part_function = BodyPartFunction.prime_mover
-            p.concentric_volume = attributed_concentric_volume
-            p.eccentric_volume = attributed_eccentric_volume
+            p.concentric_load = attributed_concentric_load
+            p.eccentric_load = attributed_eccentric_load
             if p.body_part_side not in self.muscle_load:
                 self.muscle_load[p.body_part_side] = p
             else:
-                self.muscle_load[p.body_part_side].concentric_volume += p.concentric_volume
-                self.muscle_load[p.body_part_side].eccentric_volume += p.eccentric_volume
+                self.muscle_load[p.body_part_side].concentric_load += p.concentric_load
+                self.muscle_load[p.body_part_side].eccentric_load += p.eccentric_load
 
         for s in self.synergists:
-            attributed_concentric_volume = training_volume * self.concentric_level * synergist_ratio
-            attributed_eccentric_volume = training_volume * self.eccentric_level * synergist_ratio
+            attributed_concentric_load = training_load * self.concentric_level * synergist_ratio
+            attributed_eccentric_load = training_load * self.eccentric_level * synergist_ratio
             s.body_part_function = BodyPartFunction.synergist
-            s.concentric_volume = attributed_concentric_volume
-            s.eccentric_volume = attributed_eccentric_volume
+            s.concentric_load = attributed_concentric_load
+            s.eccentric_load = attributed_eccentric_load
             if s.body_part_side not in self.muscle_load:
                 self.muscle_load[s.body_part_side] = s
             else:
-                self.muscle_load[s.body_part_side].concentric_volume += s.concentric_volume
-                self.muscle_load[s.body_part_side].eccentric_volume += s.eccentric_volume
+                self.muscle_load[s.body_part_side].concentric_load += s.concentric_load
+                self.muscle_load[s.body_part_side].eccentric_load += s.eccentric_load
 
-    def attribute_intensity(self, intensity, injury_risk_dict, event_date):
-
-        prime_mover_ratio = 0.8
-        synergist_ratio = 0.6
-
-        compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
-
-        for c, severity in compensation_causing_prime_movers.items():
-            if severity <= 2:
-                factor = .04
-            elif 2 < severity <= 5:
-                factor = .08
-            elif 5 < severity <= 8:
-                factor = .16
-            else:
-                factor = .20
-
-            compensated_concentric_intensity = intensity * self.concentric_level * factor
-            compensated_eccentric_intensity = intensity * self.eccentric_level * factor
-
-            for s in self.parts_receiving_compensation:
-                if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-                    synergist_compensated_concentric_intensity = compensated_concentric_intensity / float(len(self.parts_receiving_compensation))
-                    synergist_compensated_eccentric_intensity = compensated_eccentric_intensity / float(len(self.parts_receiving_compensation))
-                    s.body_part_function = BodyPartFunction.synergist
-                    s.compensated_concentric_intensity = synergist_compensated_concentric_intensity  # note this isn't a max or additive; one time only
-                    s.compensated_eccentric_intensity = synergist_compensated_eccentric_intensity
-                    s.compensating_causes_intensity.append(c)
-                    s.compensation_source_intensity = CompensationSource.internal_processing
-
-        for p in self.prime_movers:
-            attributed_concentric_intensity = intensity * self.concentric_level * prime_mover_ratio
-            attributed_eccentric_intensity = intensity * self.eccentric_level * prime_mover_ratio
-            p.body_part_function = BodyPartFunction.prime_mover
-            p.concentric_intensity = attributed_concentric_intensity
-            p.eccentric_intensity = attributed_eccentric_intensity
-
-        for s in self.synergists:
-            attributed_concentric_intensity = intensity * self.concentric_level * synergist_ratio
-            attributed_eccentric_intensity = intensity * self.eccentric_level * synergist_ratio
-            s.body_part_function = BodyPartFunction.synergist
-            s.concentric_intensity = attributed_concentric_intensity
-            s.eccentric_intensity = attributed_eccentric_intensity
+    # def attribute_intensity(self, intensity, injury_risk_dict, event_date):
+    #
+    #     prime_mover_ratio = 0.8
+    #     synergist_ratio = 0.6
+    #
+    #     compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
+    #
+    #     for c, severity in compensation_causing_prime_movers.items():
+    #         if severity <= 2:
+    #             factor = .04
+    #         elif 2 < severity <= 5:
+    #             factor = .08
+    #         elif 5 < severity <= 8:
+    #             factor = .16
+    #         else:
+    #             factor = .20
+    #
+    #         compensated_concentric_intensity = intensity * self.concentric_level * factor
+    #         compensated_eccentric_intensity = intensity * self.eccentric_level * factor
+    #
+    #         for s in self.parts_receiving_compensation:
+    #             if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
+    #                 synergist_compensated_concentric_intensity = compensated_concentric_intensity / float(len(self.parts_receiving_compensation))
+    #                 synergist_compensated_eccentric_intensity = compensated_eccentric_intensity / float(len(self.parts_receiving_compensation))
+    #                 s.body_part_function = BodyPartFunction.synergist
+    #                 s.compensated_concentric_intensity = synergist_compensated_concentric_intensity  # note this isn't a max or additive; one time only
+    #                 s.compensated_eccentric_intensity = synergist_compensated_eccentric_intensity
+    #                 s.compensating_causes_intensity.append(c)
+    #                 s.compensation_source_intensity = CompensationSource.internal_processing
+    #
+    #     for p in self.prime_movers:
+    #         attributed_concentric_intensity = intensity * self.concentric_level * prime_mover_ratio
+    #         attributed_eccentric_intensity = intensity * self.eccentric_level * prime_mover_ratio
+    #         p.body_part_function = BodyPartFunction.prime_mover
+    #         p.concentric_intensity = attributed_concentric_intensity
+    #         p.eccentric_intensity = attributed_eccentric_intensity
+    #
+    #     for s in self.synergists:
+    #         attributed_concentric_intensity = intensity * self.concentric_level * synergist_ratio
+    #         attributed_eccentric_intensity = intensity * self.eccentric_level * synergist_ratio
+    #         s.body_part_function = BodyPartFunction.synergist
+    #         s.concentric_intensity = attributed_concentric_intensity
+    #         s.eccentric_intensity = attributed_eccentric_intensity
 
     def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date, prime_movers):
 
