@@ -48,7 +48,7 @@ class ActivityManager(object):
             self.training_session_datastore.put(session)
 
     def get_session_details(self):
-        self.exercise_assignment_calculator.sport_cardio = self.check_cardio_sport()
+        self.exercise_assignment_calculator.sport_cardio_plyometrics = self.check_cardio_sport()
         self.exercise_assignment_calculator.sport_body_parts = self.get_sport_body_parts()
 
     def get_sport_body_parts(self):
@@ -58,11 +58,11 @@ class ActivityManager(object):
         return sport_body_parts
 
     def check_cardio_sport(self):
-        cardio_sport = False
+        sport_cardio_plyometrics = False
         for session in self.training_sessions:
             if session.is_cardio_plyometrics():
-                cardio_sport = True
-        return cardio_sport
+                sport_cardio_plyometrics = True
+        return sport_cardio_plyometrics
 
     @xray_recorder.capture('logic.ActivityManager.prepare_data')
     def prepare_data(self, default_rpe=None):

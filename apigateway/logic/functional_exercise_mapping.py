@@ -14,7 +14,7 @@ class ExerciseAssignmentCalculator(object):
         self.aggregated_injury_risk_dict = aggregated_injury_risk_dict or {}
         self.event_date_time = event_date_time
         self.relative_load_level = relative_load_level
-        self.sport_cardio = False
+        self.sport_cardio_plyometrics = False
         self.sport_body_parts = None
 
     def get_pre_active_rest(self, force_data=False, force_on_demand=False):
@@ -65,7 +65,7 @@ class ExerciseAssignmentCalculator(object):
     def get_movement_prep(self, athlete_id, force_data=False, force_on_demand=True):
         # get activity
         movement_integration_prep = MovementIntegrationPrep(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
-        movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict, sport_cardio=self.sport_cardio, sport_body_parts=self.sport_body_parts)
+        movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict, sport_cardio_plyometrics=self.sport_cardio_plyometrics, sport_body_parts=self.sport_body_parts)
         movement_integration_prep.set_plan_dosage()
         movement_integration_prep.set_exercise_dosage_ranking()
         movement_integration_prep.aggregate_dosages()

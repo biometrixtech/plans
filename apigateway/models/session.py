@@ -12,6 +12,7 @@ from models.movement_patterns import MovementPatterns
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.workout_program import WorkoutProgramModule
 from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
+from models.movement_tags import TrainingType
 
 
 class SessionType(Enum):
@@ -551,6 +552,16 @@ class MixedActivitySession(Session):
         #return training_load
         return None
 
+    def is_cardio_plyometrics(self):
+        # TODO: Validate/Update this logic
+        if self.workout_program_module is not None:
+            for section in self.workout_program_module.workout_sections:
+                if section.assess_load:
+                    for exercise in section.exercises:
+                        if exercise.training_type in [TrainingType.strength_cardiorespiratory, TrainingType.power_drills_plyometrics]:
+                            return True
+        return False
+
 
 class SportTrainingSession(Session):
     def __init__(self):
@@ -597,6 +608,23 @@ class SportTrainingSession(Session):
             return True
         else:
             return False
+
+    def is_cardio_plyometrics(self):
+        # TODO: Validate list/approach
+        cardio_sports = [
+            SportName.cycling, SportName.rowing, SportName.distance_running,
+            SportName.dance, SportName.swimming, SportName.endurance,
+            SportName.elliptical, SportName.hiking, SportName.stair_climbing,
+            SportName.walking, SportName.water_fitness, SportName.yoga,
+            SportName.barre, SportName.high_intensity_interval_training, SportName.jump_rope,
+            SportName.pilates, SportName.stairs, SportName.step_training,
+            SportName.wheelchair_walk_pace, SportName.wheelchair_run_pace, SportName.mixed_cardio,
+            SportName.taichi, SportName.hand_cycling, SportName.climbing,
+        ]
+        if self.sport_name is not None:
+            if self.sport_name in cardio_sports:
+                return True
+        return False
 
 
 class StrengthConditioningSession(Session):

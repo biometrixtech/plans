@@ -237,7 +237,7 @@ class Activity(object):
         super().__setattr__(name, value)
 
     @abc.abstractmethod
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio, sport_body_parts):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio_plyometrics, sport_body_parts):
         pass
 
     def get_total_exercises(self):
@@ -733,7 +733,7 @@ class ActiveRestBase(Activity):
         self.force_on_demand = force_on_demand
 
     @abc.abstractmethod
-    def check_recovery(self, body_part_side, body_part_injury_risk, exercise_library, max_severity, sport_cardio, sport_body_parts):
+    def check_recovery(self, body_part_side, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts):
         pass
 
     @abc.abstractmethod
@@ -857,7 +857,7 @@ class ActiveRestBase(Activity):
         else:
             return False
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio=False, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio_plyometrics=False, sport_body_parts=None):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
@@ -873,7 +873,7 @@ class ActiveRestBase(Activity):
         else:
             if len(injury_risk_dict) > 0:
                 for body_part, body_part_injury_risk in injury_risk_dict.items():
-                    self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio, sport_body_parts)
+                    self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts)
                     self.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
                     self.check_prevention(body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts)
             else:
@@ -961,7 +961,7 @@ class MovementIntegrationPrep(ActiveRestBase):
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, 1, 0,
                                 exercise_library)
 
-    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio, sport_body_parts):
+    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts):
         compensating = False
         excessive_strain = False
 
@@ -1002,7 +1002,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal,
                                         tier, 0, exercise_library)
                     if max_severity < 7.0:
-                        if sport_cardio:
+                        if sport_cardio_plyometrics:
                             self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal,
                                                 tier, 0, exercise_library)
                         else:
@@ -1234,7 +1234,7 @@ class ActiveRest(ActiveRestBase):
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, 1, 0,
                                 exercise_library)
 
-    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio, sport_body_parts):
+    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts):
 
         goals = []
 
@@ -1435,7 +1435,7 @@ class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio=False, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio_plyometrics=False, sport_body_parts=None):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
