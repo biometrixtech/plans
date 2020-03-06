@@ -12,7 +12,7 @@ from models.movement_patterns import MovementPatterns
 from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.workout_program import WorkoutProgramModule
 from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
-from models.movement_tags import TrainingType
+from models.movement_tags import TrainingType, AdaptationType
 
 
 class SessionType(Enum):
@@ -133,6 +133,13 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.workout_program_module = None
 
         self.session_load_dict = None
+
+        self.not_tracked_load = None
+        self.strength_endurance_cardiorespiratory_load = None
+        self.strength_endurance_strength_load = None
+        self.power_drill_load = None
+        self.maximal_strength_hypertrophic_load = None
+        self.power_explosive_action_load = None
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
@@ -344,7 +351,14 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             # 'workout_program_module': self.workout_program_module.json_serialise() if self.workout_program_module is not None else None,
             'session_RPE': self.session_RPE,
             'session_load_dict': [{"body_part": key.json_serialise(),
-                                   "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None else None
+                                   "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None else None,
+
+            'not_tracked_load': self.not_tracked_load if self.not_tracked_load is not None else None,
+            'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load if self.strength_endurance_cardiorespiratory_load is not None else None,
+            'strength_endurance_strength_load': self.strength_endurance_strength_load if self.strength_endurance_strength_load is not None else None,
+            'power_drill_load': self.power_drill_load if self.power_drill_load is not None else None,
+            'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load if self.maximal_strength_hypertrophic_load is not None else None,
+            'power_explosive_action_load': self.power_explosive_action_load if self.power_explosive_action_load is not None else None
 
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
@@ -413,6 +427,13 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                 session.session_load_dict[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartFunctionalMovement.json_deserialise(item['injury_risk'])
         else:
             session.session_load_dict = None
+
+        session.not_tracked_load = input_dict.get('not_tracked_load')
+        session.strength_endurance_cardiorespiratory_load = input_dict.get('strength_endurance_cardiorespiratory_load')
+        session.strength_endurance_strength_load = input_dict.get('strength_endurance_strength_load')
+        session.power_drill_load = input_dict.get('power_drill_load')
+        session.maximal_strength_hypertrophic_load = input_dict.get('maximal_strength_hypertrophic_load')
+        session.power_explosive_action_load = input_dict.get('power_explosive_action_load')
 
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]
@@ -696,6 +717,27 @@ class CorrectiveSession(Session):
     #         return True
     #     else:
     #         return False
+
+
+class HighDetailedLoadSession(Serialisable):
+    def __init__(self, date):
+        self.date = date
+        self.percent_of_max = None
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        session = HighDetailedLoadSession(parse_datetime(input_dict["date"]))
+        session.percent_of_max = input_dict['percent_of_max'] if input_dict.get('percent_of_max') is not None else None
+        return session
+
+    def json_serialise(self):
+        ret = {
+            'date': format_datetime(self.date),
+            'percent_of_max': self.percent_of_max if self.percent_of_max is not None else None
+        }
+
+        return ret
 
 
 class HighLoadSession(Serialisable):
