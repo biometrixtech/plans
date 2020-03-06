@@ -965,7 +965,7 @@ class MovementIntegrationPrep(ActiveRestBase):
         compensating = False
         excessive_strain = False
 
-        if body_part is not None:
+        if body_part is not None and body_part.location in sport_body_parts.keys():
             if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
                 excessive_strain = True
 
@@ -1011,7 +1011,7 @@ class MovementIntegrationPrep(ActiveRestBase):
 
             if excessive_strain:
                 if max_severity < 5.0:
-                    if body_part.location in sport_body_parts.keys() and sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
+                    if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
                         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                             body_part_injury_risk.total_volume_percent_tier,
                                             0, exercise_library)
