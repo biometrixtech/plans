@@ -230,8 +230,8 @@ class SessionFunctionalMovement(object):
 
         if muscle in self.injury_risk_dict.keys():
             if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
-                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory_date, event_date):
-                    max = self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory
+                if self.is_max_date_valid(self.injury_risk_dict[muscle].max_strength_endurance_cardiorespiratory_date, event_date):
+                    max = self.injury_risk_dict[muscle].max_strength_endurance_cardiorespiratory
             elif adaptation_type == AdaptationType.strength_endurance_strength.value:
                 if self.is_max_date_valid(self.injury_risk_dict[muscle].max_strength_endurance_strength_date, event_date):
                     max = self.injury_risk_dict[muscle].max_strength_endurance_strength
@@ -268,8 +268,8 @@ class SessionFunctionalMovement(object):
             self.injury_risk_dict[muscle] = BodyPartInjuryRisk()
 
         if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
-            self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory = max
-            self.injury_risk_dict[muscle].max_max_strength_endurance_cardiorespiratory_date = event_date
+            self.injury_risk_dict[muscle].max_strength_endurance_cardiorespiratory = max
+            self.injury_risk_dict[muscle].max_strength_endurance_cardiorespiratory_date = event_date
         elif adaptation_type == AdaptationType.strength_endurance_strength.value:
             self.injury_risk_dict[muscle].max_strength_endurance_strength = max
             self.injury_risk_dict[muscle].max_strength_endurance_strength_date = event_date
