@@ -1077,7 +1077,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                     self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
                                         last_severity, exercise_library)
                 if max_severity < 5.0:  # TODO: this threshold needs to be updated
-                    self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
+                    self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
                                         last_severity, exercise_library)
 
         if muscle_spasm or knots:
