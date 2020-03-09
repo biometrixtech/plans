@@ -276,7 +276,7 @@ class FunctionalMovementLoad(object):
 
 
 class FunctionalMovementActionMapping(object):
-    def __init__(self, exercise_action):
+    def __init__(self, exercise_action, injury_risk_dict, event_date):
         self.exercise_action = exercise_action
         self.hip_joint_functional_movements = []
         self.knee_joint_functional_movements = []
@@ -285,9 +285,12 @@ class FunctionalMovementActionMapping(object):
         self.shoulder_scapula_joint_functional_movements = []
         self.elbow_joint_functional_movements = []
         self.muscle_load = {}
+        self.injury_risk_dict = injury_risk_dict
+        self.event_date = event_date
 
         self.set_functional_movements()
         self.set_muscle_load()
+        self.set_compensation_load()
 
     def set_functional_movements(self):
 
@@ -328,6 +331,7 @@ class FunctionalMovementActionMapping(object):
         self.apply_load_to_functional_movements(self.trunk_joint_functional_movements, self.exercise_action)
         self.apply_load_to_functional_movements(self.shoulder_scapula_joint_functional_movements, self.exercise_action)
         self.apply_load_to_functional_movements(self.elbow_joint_functional_movements, self.exercise_action)
+
 
     def get_matching_stability_rating(self, functional_movement_load, exercise_action):
 
@@ -389,6 +393,78 @@ class FunctionalMovementActionMapping(object):
                                           FunctionalMovementType.trunk_flexion_with_rotation,
                                           FunctionalMovementType.trunk_extension_with_rotation]:
             return (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+
+    def set_compensation_load(self):
+
+        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.hip_joint_functional_movements, self.exercise_action)
+        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.knee_joint_functional_movements, self.exercise_action)
+        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.ankle_joint_functional_movements, self.exercise_action)
+        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.trunk_joint_functional_movements, self.exercise_action)
+        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action)
+        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.elbow_joint_functional_movements, self.exercise_action)
+
+    def set_compensation_load_for_functional_movements(self, injury_risk_dict, event_date, functional_movement_list, exercise_action):
+
+        compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date, functional_movement_list)
+
+        left_load = exercise_action.total_load_left
+        right_load = exercise_action.total_load_right
+
+        body_part_factory = BodyPartFactory()
+
+        for functional_movement_load in functional_movement_list:
+            functional_movement = functional_movement_load.functional_movement
+
+            for c, severity in compensation_causing_prime_movers.items():
+                if severity <= 2:
+                    factor = .04
+                elif 2 < severity <= 5:
+                    factor = .08
+                elif 5 < severity <= 8:
+                    factor = .16
+                else:
+                    factor = .20
+
+                left_compensated_concentric_load = left_load * factor
+                left_compensated_eccentric_load = left_load * factor
+                right_compensated_concentric_load = right_load * factor
+                right_compensated_eccentric_load = right_load * factor
+
+                for s in functional_movement.parts_receiving_compensation:
+                    body_part_side_list = body_part_factory.get_body_part_side_list(s)
+                    for body_part_side in body_part_side_list:
+                        if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
+                            functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+                            functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
+                            if body_part_side.side == 1:
+                                compensated_concentric_load = left_compensated_concentric_load
+                                compensated_eccentric_load = left_compensated_eccentric_load
+                            elif body_part_side.side == 2:
+                                compensated_concentric_load = right_compensated_concentric_load
+                                compensated_eccentric_load = right_compensated_eccentric_load
+                            else:
+                                compensated_concentric_load = left_compensated_concentric_load + right_compensated_concentric_load
+                                compensated_eccentric_load = left_compensated_eccentric_load + right_compensated_eccentric_load
+
+                            synergist_compensated_concentric_load = compensated_concentric_load / float(
+                                len(functional_movement.parts_receiving_compensation))
+                            synergist_compensated_eccentric_load = compensated_eccentric_load / float(
+                                len(functional_movement.parts_receiving_compensation))
+                            functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
+                            functional_movement_body_part_side.compensated_concentric_load += synergist_compensated_concentric_load
+                            functional_movement_body_part_side.compensated_eccentric_load += synergist_compensated_eccentric_load
+                            functional_movement_body_part_side.compensating_causes_load.append(c)
+                            functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
+                            if body_part_side not in self.muscle_load:
+                                self.muscle_load[body_part_side] = functional_movement_body_part_side
+                            else:
+                                self.muscle_load[
+                                    body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
+                                self.muscle_load[
+                                    body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
+                                self.muscle_load[body_part_side].compensating_causes_load.append(c)
+                                self.muscle_load[
+                                    body_part_side].compensation_source_load = CompensationSource.internal_processing
 
     def apply_load_to_functional_movements(self, functional_movement_list, exercise_action):
 
@@ -502,6 +578,65 @@ class FunctionalMovementActionMapping(object):
 
         return scaled_load
 
+    def get_compensating_body_parts(self, injury_risk_dict, event_date, functional_movement_list):
+
+        affected_list = {}
+
+        two_days_ago = event_date - timedelta(days=1)
+
+        body_part_factory = BodyPartFactory()
+
+        for functional_movement_load in functional_movement_list:
+            functional_movement = functional_movement_load.functional_movement
+
+            for f in functional_movement.prime_movers:
+                body_part_side_list = body_part_factory.get_body_part_side_list(f)
+                for body_part_side in body_part_side_list:
+                # we are looking for recent statuses that we've determined, different than those reported in symptom intake
+                    if body_part_side in injury_risk_dict:
+                        if (injury_risk_dict[body_part_side].last_weak_date is not None and
+                                injury_risk_dict[body_part_side].last_weak_date == event_date):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+                        if (injury_risk_dict[body_part_side].last_muscle_spasm_date is not None and
+                                injury_risk_dict[body_part_side].last_muscle_spasm_date == event_date):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+                            affected_list[body_part_side] = max(affected_list[body_part_side],
+                                                                  injury_risk_dict[body_part_side].get_muscle_spasm_severity(event_date))
+                        if (injury_risk_dict[body_part_side].last_adhesions_date is not None and
+                                injury_risk_dict[body_part_side].last_adhesions_date == event_date):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+                            affected_list[body_part_side] = max(affected_list[body_part_side],
+                                                                  injury_risk_dict[body_part_side].get_adhesions_severity(event_date))
+                        if (injury_risk_dict[body_part_side].last_short_date is not None and
+                                injury_risk_dict[body_part_side].last_short_date == event_date):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+                        if (injury_risk_dict[body_part_side].last_long_date is not None and
+                                injury_risk_dict[body_part_side].last_long_date == event_date):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+                        if (injury_risk_dict[body_part_side].last_inhibited_date is not None and
+                                injury_risk_dict[body_part_side].last_inhibited_date == event_date):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+                        if (injury_risk_dict[body_part_side].last_inflammation_date is not None and
+                                injury_risk_dict[body_part_side].last_inflammation_date == event_date):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+                            affected_list[body_part_side] = max(affected_list[body_part_side],
+                                                                  injury_risk_dict[body_part_side].get_inflammation_severity(event_date))
+                        if (injury_risk_dict[body_part_side].last_excessive_strain_date is not None and
+                                injury_risk_dict[body_part_side].last_non_functional_overreaching_date is not None and
+                                injury_risk_dict[body_part_side].last_excessive_strain_date >= two_days_ago and
+                                injury_risk_dict[body_part_side].last_non_functional_overreaching_date >= two_days_ago):
+                            if body_part_side not in affected_list:
+                                affected_list[body_part_side] = 0
+
+        return affected_list
+
 
 class FunctionalMovementActivityMapping(object):
     def __init__(self, functional_movement_type, is_concentric, concentric_level, is_eccentric, eccentric_level):
@@ -576,50 +711,6 @@ class FunctionalMovementActivityMapping(object):
             else:
                 self.muscle_load[s.body_part_side].concentric_load += s.concentric_load
                 self.muscle_load[s.body_part_side].eccentric_load += s.eccentric_load
-
-    # def attribute_intensity(self, intensity, injury_risk_dict, event_date):
-    #
-    #     prime_mover_ratio = 0.8
-    #     synergist_ratio = 0.6
-    #
-    #     compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date)
-    #
-    #     for c, severity in compensation_causing_prime_movers.items():
-    #         if severity <= 2:
-    #             factor = .04
-    #         elif 2 < severity <= 5:
-    #             factor = .08
-    #         elif 5 < severity <= 8:
-    #             factor = .16
-    #         else:
-    #             factor = .20
-    #
-    #         compensated_concentric_intensity = intensity * self.concentric_level * factor
-    #         compensated_eccentric_intensity = intensity * self.eccentric_level * factor
-    #
-    #         for s in self.parts_receiving_compensation:
-    #             if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-    #                 synergist_compensated_concentric_intensity = compensated_concentric_intensity / float(len(self.parts_receiving_compensation))
-    #                 synergist_compensated_eccentric_intensity = compensated_eccentric_intensity / float(len(self.parts_receiving_compensation))
-    #                 s.body_part_function = BodyPartFunction.synergist
-    #                 s.compensated_concentric_intensity = synergist_compensated_concentric_intensity  # note this isn't a max or additive; one time only
-    #                 s.compensated_eccentric_intensity = synergist_compensated_eccentric_intensity
-    #                 s.compensating_causes_intensity.append(c)
-    #                 s.compensation_source_intensity = CompensationSource.internal_processing
-    #
-    #     for p in self.prime_movers:
-    #         attributed_concentric_intensity = intensity * self.concentric_level * prime_mover_ratio
-    #         attributed_eccentric_intensity = intensity * self.eccentric_level * prime_mover_ratio
-    #         p.body_part_function = BodyPartFunction.prime_mover
-    #         p.concentric_intensity = attributed_concentric_intensity
-    #         p.eccentric_intensity = attributed_eccentric_intensity
-    #
-    #     for s in self.synergists:
-    #         attributed_concentric_intensity = intensity * self.concentric_level * synergist_ratio
-    #         attributed_eccentric_intensity = intensity * self.eccentric_level * synergist_ratio
-    #         s.body_part_function = BodyPartFunction.synergist
-    #         s.concentric_intensity = attributed_concentric_intensity
-    #         s.eccentric_intensity = attributed_eccentric_intensity
 
     def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date, prime_movers):
 
@@ -718,8 +809,6 @@ class FunctionalMovementActivityMapping(object):
                         injury_risk_dict[f.body_part_side].last_non_functional_overreaching_date >= two_days_ago):
                     if f.body_part_side not in affected_list:
                         affected_list[f.body_part_side] = 0
-
-        #affected_list = list(set(affected_list))
 
         return affected_list
 

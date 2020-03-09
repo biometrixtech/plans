@@ -446,7 +446,6 @@ class Activity(object):
                 elif dosage.priority == "3" and dosage.severity() <= 4:
                     self.calc_dosage_durations(5, a, dosage)
 
-
     def set_winners(self):
 
         # key off efficient as the guide
@@ -455,13 +454,15 @@ class Activity(object):
         total_comprehensive = 0
         benchmarks = [1, 2, 3, 4, 5]
 
+        proposed_limit = 300
+
         for b in range(0, len(benchmarks) - 1):
             total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
             #proposed_efficient = total_efficient + self.dosage_durations[benchmarks[b + 1]].efficient_duration
             proposed_efficient = self.dosage_durations[benchmarks[b + 1]].efficient_duration
-            if 0 < proposed_efficient < 720:
+            if 0 < proposed_efficient < proposed_limit:
                 continue
-            elif abs(total_efficient - 720) < abs(proposed_efficient - 720):
+            elif abs(total_efficient - proposed_limit) < abs(proposed_efficient - proposed_limit):
                 self.efficient_winner = benchmarks[b]
                 break
             else:
