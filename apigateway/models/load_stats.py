@@ -70,12 +70,12 @@ class LoadStats(Serialisable):
             load_stats.max_trimp = input_dict["max_trimp"]
             load_stats.min_shrz = input_dict["min_shrz"]
             load_stats.max_shrz = input_dict["max_shrz"]
-            load_stats.max_not_tracked = input_dict['max_not_tracked']
-            load_stats.max_strength_endurance_cardiorespiratory = input_dict['max_strength_endurance_cardiorespiratory']
-            load_stats.max_strength_endurance_strength = input_dict['max_strength_endurance_strength']
-            load_stats.max_power_drill = input_dict['max_power_drill']
-            load_stats.max_maximal_strength_hypertrophic = input_dict['max_maximal_strength_hypertrophic']
-            load_stats.max_power_explosive_action = input_dict['max_power_explosive_action']
+            load_stats.max_not_tracked = input_dict.get('max_not_tracked', None)
+            load_stats.max_strength_endurance_cardiorespiratory = input_dict.get('max_strength_endurance_cardiorespiratory', None)
+            load_stats.max_strength_endurance_strength = input_dict.get('max_strength_endurance_strength', None)
+            load_stats.max_power_drill = input_dict.get('max_power_drill', None)
+            load_stats.max_maximal_strength_hypertrophic = input_dict.get('max_maximal_strength_hypertrophic', None)
+            load_stats.max_power_explosive_action = input_dict.get('max_power_explosive_action', None)
 
         return load_stats
 
