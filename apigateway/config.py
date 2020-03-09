@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from fathomapi.utils.xray import xray_recorder
 import os
 import boto3
 import json
@@ -7,7 +8,7 @@ from botocore.exceptions import ClientError
 from fathomapi.api.config import Config
 from fathomapi.utils.exceptions import ApplicationException
 
-
+@xray_recorder.capture('config.get_mongo_collection')
 def get_mongo_collection(collection):
     database = get_mongo_database()
     mongo_collection = os.environ['MONGO_COLLECTION_' + collection.upper()]

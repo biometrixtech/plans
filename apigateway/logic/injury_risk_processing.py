@@ -187,6 +187,7 @@ class InjuryRiskProcessor(object):
         else:
             return self.injury_risk_dict
 
+    @xray_recorder.capture('logic.InjuryRiskProcessor.aggregate_ird')
     def aggregate_ird(self):
         aggregated_injury_hist_dict = {}
         for body_part_side, body_part_injury_risk in self.injury_risk_dict.items():
