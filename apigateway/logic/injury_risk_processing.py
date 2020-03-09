@@ -134,12 +134,14 @@ class InjuryRiskProcessor(object):
             muscles = BodyPartLocation.get_muscles_for_group(s.body_part.location)
             if isinstance(muscles, list) and len(muscles) > 0:  # muscle groups that have constituent muscles defined
                 for m in muscles:
-                    symptom = deepcopy(s)
+                    symptom = pickle.loads(pickle.dumps(s, -1))
+                    # symptom = deepcopy(s)
                     symptom.body_part = BodyPart(m, None)
                     bilateral = body_part_factory.get_bilateral(symptom.body_part.location)
                     if bilateral and s.side == 0:
                         symptom.side = 1
-                        symptom_2 = deepcopy(s)
+                        symptom_2 = pickle.loads(pickle.dumps(s, -1))
+                        # symptom_2 = deepcopy(s)
                         symptom_2.body_part = BodyPart(m, None)
                         symptom_2.side = 2
                         detailed_symptoms.append(symptom_2)
@@ -173,14 +175,18 @@ class InjuryRiskProcessor(object):
                     if isinstance(muscle_group, BodyPartLocation):
                         new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
                         if new_body_part_side not in aggregated_injury_hist_dict:
-                            aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
+                            aggregated_injury_hist_dict[new_body_part_side] = pickle.loads(pickle.dumps(body_part_injury_risk, -1))
+                            # aggregated_injury_hist_dict[new_body_part_side] = deepcopy(body_part_injury_risk)
                         else:
-                            existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                            existing_body_part_injury_risk = pickle.loads(pickle.dumps(self.injury_risk_dict[body_part_side], -1))
+                            # existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
                             aggregated_injury_hist_dict[new_body_part_side].merge(existing_body_part_injury_risk)
                     else:
-                        aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
+                        aggregated_injury_hist_dict[body_part_side] = pickle.loads(pickle.dumps(self.injury_risk_dict[body_part_side], -1))
+                        # aggregated_injury_hist_dict[body_part_side] = deepcopy(self.injury_risk_dict[body_part_side])
                 else:
-                    existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
+                    existing_body_part_injury_risk = pickle.loads(pickle.dumps(self.injury_risk_dict[body_part_side], -1))
+                    # existing_body_part_injury_risk = deepcopy(self.injury_risk_dict[body_part_side])
                     aggregated_injury_hist_dict[body_part_side].merge(existing_body_part_injury_risk)
 
             self.viz_aggregated_injury_risk_dict = aggregated_injury_hist_dict
