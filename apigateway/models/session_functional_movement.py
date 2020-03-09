@@ -256,7 +256,7 @@ class SessionFunctionalMovement(object):
 
         four_weeks_ago = test_date - timedelta(days=28)
 
-        if date_attribute is not None and date_attribute.date() >= four_weeks_ago:
+        if date_attribute is not None and date_attribute >= four_weeks_ago:
             return True
         else:
             return False
