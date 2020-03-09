@@ -303,8 +303,8 @@ def test_get_responsive_recovery_with_simple_session_no_symptoms():
     print("\nresponsive_recovery, 100 mins run, no symptoms")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
 
-    assert responsive_recovery.active_rest is not None or responsive_recovery.active_recovery is not None
-    activity = responsive_recovery.active_rest or responsive_recovery.active_recovery
+    assert responsive_recovery.active_recovery is not None
+    activity = responsive_recovery.active_recovery
 
     assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
 
@@ -314,7 +314,37 @@ def test_get_responsive_recovery_with_simple_session_no_symptoms():
     assert duration_comprehensive > 0
 
 
-def test_get_responsive_recovery_with_simple_session_one_symptom():
+def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
+    session_types = [6]
+    dates = [datetime.now()]
+    rpes = [7]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+    workout_programs = [None]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = get_symptoms(body_parts=[
+        (7, 1, None, None, None, 2)  # left knee sharp=2
+    ])
+
+    print("\nresponsive_recovery, 100 mins run, knee sharp=2")
+    responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
+
+    assert responsive_recovery.active_recovery is not None
+    assert responsive_recovery.active_rest is None
+    assert responsive_recovery.ice is None
+    assert responsive_recovery.cold_water_immersion is not None
+    activity = responsive_recovery.active_recovery
+
+    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
+
+
+def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
     session_types = [6]
     dates = [datetime.now()]
     rpes = [5]
@@ -330,8 +360,63 @@ def test_get_responsive_recovery_with_simple_session_one_symptom():
     print("\nresponsive_recovery, 100 mins run, knee sharp=2")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
 
-    assert responsive_recovery.active_rest is not None or responsive_recovery.active_recovery is not None
-    activity = responsive_recovery.active_rest or responsive_recovery.active_recovery
+    assert responsive_recovery.active_recovery is not None
+    assert responsive_recovery.active_rest is None
+    assert responsive_recovery.ice is not None
+    assert responsive_recovery.cold_water_immersion is None
+    activity = responsive_recovery.active_recovery
+
+    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
+
+
+def test_get_mobility_wod_with_simple_session_no_symptoms():
+    session_types = [6]
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+    workout_programs = [None]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = []
+
+    print("\nmobility_wod, 100 mins run, no symptoms")
+    mobility_wod = get_activity(dates[0], symptoms, sessions, 'mobility_wod')
+
+    assert mobility_wod.active_rest is not None
+    activity = mobility_wod.active_rest
+
+    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
+
+
+def test_get_mobility_wod_with_simple_session_one_symptom():
+    session_types = [6]
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+    workout_programs = [None]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = get_symptoms(body_parts=[
+        (16, 1, None, None, None, 2)  # left glutes sharp=2
+    ])
+
+    print("\nmobility_wod, 100 mins run, knee sharp=2")
+    mobility_wod = get_activity(dates[0], symptoms, sessions, 'mobility_wod')
+
+    assert mobility_wod.active_rest is not None
+    activity = mobility_wod.active_rest
 
     assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
 

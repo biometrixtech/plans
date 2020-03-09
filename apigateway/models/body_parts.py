@@ -350,6 +350,8 @@ class BodyPartFactory(object):
                 dynamic_stretch = self.get_exercise_dictionary(part_json['dynamic_lengthen'])
                 isolated_activate = self.get_exercise_dictionary(part_json['isolated_activate'])
                 static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])
+                dynamic_integrate = self.get_exercise_dictionary(part_json['dynamic_integrate'])
+                dynamic_integrate_with_speed = self.get_exercise_dictionary(part_json['dynamic_integrate_with_speed'])
             else:
                 inhibit = self.get_full_exercise_dictionary(part_json['inhibit'], False)
                 static_stretch = self.get_full_exercise_dictionary(part_json['static_lengthen'], False)
@@ -357,8 +359,8 @@ class BodyPartFactory(object):
                 dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'], False)
                 isolated_activate = self.get_full_exercise_dictionary(part_json['isolated_activate'], False)
                 static_integrate = self.get_full_exercise_dictionary(part_json['static_integrate'], False)
-            dynamic_integrate = {}
-            dynamic_integrate_with_speed = {}
+                dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'], False)
+                dynamic_integrate_with_speed = self.get_full_exercise_dictionary(part_json['dynamic_integrate_with_speed'], False)
 
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activate, static_integrate)
         part.add_dynamic_exercise_phases({}, dynamic_integrate, dynamic_integrate_with_speed)  # dynamic_stretch is already added above
