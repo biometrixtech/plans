@@ -26,7 +26,7 @@ class MovementLibraryDatastore(object):
                     all_movements = json.load(f)
 
                 for mov_id, movement_dict in all_movements.items():
-                    movements[mov_id] = Movement.json_deserialise(movement_dict)
+                    movements[mov_id] = movement_dict  # Movement.json_deserialise(movement_dict)
             except FileNotFoundError:
                 print("Movement library does not exist for this provider")
 

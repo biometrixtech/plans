@@ -3,7 +3,7 @@ from datastores.action_library_datastore import ActionLibraryDatastore
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
-from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction
+from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 
@@ -24,7 +24,8 @@ class WorkoutProcessor(object):
 
     def add_movement_detail_to_exercise(self, exercise):
         if exercise.movement_id in movement_library.keys():
-            movement = movement_library[exercise.movement_id]
+            movement_json = movement_library[exercise.movement_id]
+            movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
             self.add_action_details_to_exercise(exercise, movement)
 
