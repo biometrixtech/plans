@@ -24,7 +24,7 @@ class SessionFunctionalMovement(object):
 
         if self.session.session_type() == SessionType.mixed_activity:
             if self.session.workout_program_module is not None:
-                total_load_dict = self.process_workout_load(self.session.workout_program_module, event_date)
+                total_load_dict = self.process_workout_load(self.session.workout_program_module)
                 normalized_dict = self.normalize_and_consolidate_load(total_load_dict, event_date)
 
                 # saved normalized load to the session
@@ -126,7 +126,7 @@ class SessionFunctionalMovement(object):
 
         return body_part_side_list
 
-    def process_workout_load(self, workout_program, event_date):
+    def process_workout_load(self, workout_program):
 
         workout_load = {}
 
@@ -134,7 +134,7 @@ class SessionFunctionalMovement(object):
             if workout_section.assess_load:
                 section_load = {}  # load by adaptation type
                 for workout_exercise in workout_section.exercises:
-                    exercise_load = self.apply_load(workout_exercise.primary_actions, event_date)
+                    exercise_load = self.apply_load(workout_exercise.primary_actions)
                     for adaptation_type, muscle_load in exercise_load.items():
                         if adaptation_type not in section_load:
                             section_load[adaptation_type] = muscle_load
@@ -157,12 +157,12 @@ class SessionFunctionalMovement(object):
 
         return workout_load
 
-    def apply_load(self, action_list, event_date):
+    def apply_load(self, action_list):
 
         total_load = {}  # load by adaptation type
 
         for action in action_list:
-            functional_movement_action_mapping = FunctionalMovementActionMapping(action, self.injury_risk_dict, event_date)
+            functional_movement_action_mapping = FunctionalMovementActionMapping(action)
             self.functional_movement_mappings.append(functional_movement_action_mapping)
             if action.adaptation_type.value not in total_load:
                 total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
