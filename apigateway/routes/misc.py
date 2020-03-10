@@ -322,3 +322,32 @@ def _get_offset(tz):
     else:
         minute_offset += hour_offset * 60
     return minute_offset
+
+
+@app.route('/test_performance', methods=['GET'])
+@require.authenticated.any
+@xray_recorder.capture('routes.misc.test_performance')
+def handle_test_performance():
+    import time
+    from datastores.exercise_datastore import ExerciseLibraryDatastore as mongo_datastore
+    from datastores.local_exercise_datastore import ExerciseLibraryDatastore as local_datastore
+    local_times = []
+    mongo_times = []
+    mongo_times_all = []
+    for i in range(11):
+        t1 = time.time()
+        exercises_local = local_datastore().get()
+        if i != 0:
+            local_times.append(time.time() - t1)
+        t2 = time.time()
+        exercises_mongo = mongo_datastore().get(exercise_id=['1', '2', '73', '81', '92', '117', '132', '142', '145', '165', '180', '192', '197', '221', '222'])
+        if i != 0:
+            mongo_times.append(time.time() - t2)
+        t3 = time.time()
+        exercises_mongo_all = mongo_datastore().get()
+        if i != 0:
+            mongo_times_all.append(time.time() - t3)
+    print(sum(mongo_times) / len(mongo_times), sum(local_times) / len(local_times))
+    return {'mongo': mongo_times, 'mongo_all': mongo_times_all, 'local': local_times}
+
+

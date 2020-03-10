@@ -8,8 +8,8 @@ import logic.exercise_generator as exercise
 
 class ExerciseLibraryDatastore(object):
     @xray_recorder.capture('datastores.ExerciseLibraryDatastore.get')
-    def get(self, collection='exerciselibrary'):
-        return self._query_mongodb(collection)
+    def get(self, collection='exerciselibrary', exercise_id=None):
+        return self._query_mongodb(collection, exercise_id)
 
     def put(self, items, collection):
         if not isinstance(items, list):
@@ -21,13 +21,19 @@ class ExerciseLibraryDatastore(object):
             raise e
 
     @xray_recorder.capture('datastores.ExerciseLibraryDatastore._query_mongodb')
-    def _query_mongodb(self, collection):
+    def _query_mongodb(self, collection, exercise_id):
 
         exercise_list = []
 
         mongo_collection = get_mongo_collection(collection)
 
-        exercise_cursor = mongo_collection.find()
+        if exercise_id is None:
+            exercise_cursor = mongo_collection.find()
+        else:
+            if isinstance(exercise_id, list):
+                exercise_cursor = mongo_collection.find({'library_id': {'$in': exercise_id}})
+            else:
+                exercise_cursor = mongo_collection.find({'library_id': exercise_id})
 
         for record in exercise_cursor:
             exercise_item = models.exercise.Exercise(record["library_id"])
