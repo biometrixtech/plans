@@ -1112,14 +1112,14 @@ class MovementIntegrationPrep(ActiveRestBase):
                 self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
                                     last_severity, exercise_library)
 
-            body_part_factory = BodyPartFactory()
-
-            for s in body_part.synergists:
-                synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
-
-                if max_severity < 7.0:
-                    self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                        last_severity, exercise_library)
+            # body_part_factory = BodyPartFactory()
+            #
+            # for s in body_part.synergists:
+            #     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
+            #
+            #     if max_severity < 7.0:
+            #         self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
+            #                             last_severity, exercise_library)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
         if body_part is not None and body_part.location in sport_body_parts.keys():
@@ -1160,7 +1160,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                 self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library)
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
-                    self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
+                    #self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
                     if self.sport_cardio_plyometrics:
                         self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library)
                     else:
@@ -1337,7 +1337,7 @@ class ActiveRest(ActiveRestBase):
             muscle_spasm = True
 
         if (body_part_injury_risk.last_knots_date is not None and
-                body_part_injury_risk.last_knots_date == self.event_date_time.date()):
+                body_part_injury_risk.last_knots_date == self.event_date_time.date() and body_part_injury_risk.knots_count_last_0_20_days <= 1):
             knots = True
 
         # if muscle_spasm or knots:
@@ -1424,33 +1424,33 @@ class ActiveRest(ActiveRestBase):
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         1, 0, exercise_library)
 
-            elif is_short:
+            # elif is_short:
+            #
+            #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+            #     tier_one = True
+            #     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+            #
+            #     if max_severity < 7.0:
+            #         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
+            #                             0, exercise_library)
 
-                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
-                tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
-
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                        0, exercise_library)
-
-            if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
-
-                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
-
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
-
-                if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                        0, exercise_library)
-
-            if not tier_one and body_part_injury_risk.underactive_weak_tier == 2:
-
-                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
-
-                if max_severity < 5.0:
-                    self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        2, 0, exercise_library)
+            # if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
+            #
+            #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+            #
+            #     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+            #
+            #     if max_severity < 7.0:
+            #         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
+            #                             0, exercise_library)
+            #
+            # if not tier_one and body_part_injury_risk.underactive_weak_tier == 2:
+            #
+            #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+            #
+            #     if max_severity < 5.0:
+            #         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
+            #                             2, 0, exercise_library)
 
 
 class ActiveRecovery(Activity):
