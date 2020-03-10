@@ -18,6 +18,7 @@ from routes.symptoms import app as symptoms_routes
 from routes.movement_prep import app as movement_prep_routes
 from routes.mobility_wod import app as mobility_wod_routes
 from routes.responsive_recovery import app as responsive_recovery_routes
+from routes.training_session import app as training_session_routes
 
 app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 app.register_blueprint(session_routes, url_prefix='/session')
@@ -35,6 +36,7 @@ app.register_blueprint(symptoms_routes, url_prefix='/symptoms')
 app.register_blueprint(movement_prep_routes, url_prefix='/movement_prep')
 app.register_blueprint(mobility_wod_routes, url_prefix='/mobility_wod')
 app.register_blueprint(responsive_recovery_routes, url_prefix='/responsive_recovery')
+app.register_blueprint(training_session_routes, url_prefix='/training_session')
 
 
 def handler(event, context):

@@ -32,7 +32,7 @@ class ActivityManager(object):
         self.symptoms = symptoms if symptoms is not None else []
         self.historical_injury_risk_dict = None
         self.exercise_assignment_calculator = None
-        self.sessions_to_save = [session for session in self.training_sessions]
+        self.current_training_sessions = [session for session in self.training_sessions]
         self.load_data()
 
     @xray_recorder.capture('logic.ActivityManager.load_data')
@@ -48,7 +48,7 @@ class ActivityManager(object):
 
     @xray_recorder.capture('logic.ActivityManager.save_session_dict')
     def save_session(self):
-        for session in self.sessions_to_save:
+        for session in self.current_training_sessions:
             self.training_session_datastore.put(session)
 
     def get_session_details(self):
@@ -57,13 +57,13 @@ class ActivityManager(object):
 
     def get_sport_body_parts(self):
         sport_body_parts = {}
-        for session in self.training_sessions:
+        for session in self.current_training_sessions:
             sport_body_parts.update(session.get_load_body_parts())
         return sport_body_parts
 
     def check_cardio_sport(self):
         sport_cardio_plyometrics = False
-        for session in self.training_sessions:
+        for session in self.current_training_sessions:
             if session.is_cardio_plyometrics():
                 sport_cardio_plyometrics = True
         return sport_cardio_plyometrics
@@ -131,13 +131,15 @@ class ActivityManager(object):
         return mobility_wod
 
     @xray_recorder.capture('logic.ActivityManager.create_responsive_recovery')
-    def create_responsive_recovery(self, force_on_demand=True):
+    def create_responsive_recovery(self, force_on_demand=True, responsive_recovery_id=None):
         """
         :param force_on_demand: boolean
         :return responsive_recovery: ResponsiveRecovery
         """
         self.prepare_data(None)
         responsive_recovery = self.exercise_assignment_calculator.get_responsive_recovery(self.athlete_id, force_on_demand=force_on_demand)
+        if responsive_recovery_id is not None:
+            responsive_recovery.responsive_recovery_id = responsive_recovery_id
         self.responsive_recovery_datastore.put(responsive_recovery)
         self.save_session()
 

@@ -87,7 +87,7 @@ class APIProcessing(object):
         symptom = Symptom.json_deserialise(symptom)
         self.symptoms.append(symptom)
 
-    def create_activity(self, activity_type, update_stats=True):
+    def create_activity(self, activity_type, update_stats=True, activity_id=None):
         if update_stats:
             # update stats
             if self.user_stats_processor is None:
@@ -108,16 +108,42 @@ class APIProcessing(object):
                 self.event_date_time,
                 training_sessions=self.sessions,
                 symptoms=self.symptoms,
-                user_stats=self.user_stats)
+                user_stats=self.user_stats
+        )
         if activity_type == 'mobility_wod':
             activity = activity_manager.create_mobility_wod()
         elif activity_type == 'movement_prep':
             activity = activity_manager.create_movement_prep()
         elif activity_type == 'responsive_recovery':
-            activity = activity_manager.create_responsive_recovery()
+            activity = activity_manager.create_responsive_recovery(responsive_recovery_id=activity_id)
         else:
             raise ValueError("invalid activity type")
         return activity
+
+    def update_stats_injury_risk(self):
+        # update stats
+        if self.user_stats_processor is None:
+            self.user_stats_processor = UserStatsProcessing(
+                    self.user_id,
+                    event_date=self.event_date_time,
+                    datastore_collection=self.datastore_collection
+            )
+        user_stats = self.user_stats_processor.process_user_stats(current_user_stats=self.user_stats)
+
+        user_stats_datastore = self.datastore_collection.user_stats_datastore
+        user_stats_datastore.put(user_stats)
+
+        # create activity
+        activity_manager = ActivityManager(
+                self.user_id,
+                self.datastore_collection,
+                self.event_date_time,
+                training_sessions=self.sessions,
+                symptoms=self.symptoms,
+                user_stats=self.user_stats
+        )
+        activity_manager.prepare_data(default_rpe=5)
+        activity_manager.save_session()
 
 
 def create_session(session_type, data):

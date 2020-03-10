@@ -63,8 +63,9 @@ def handle_responsive_recovery_create(user_id):
     if len(api_processor.symptoms) > 0:
         symptom_datastore.put(api_processor.symptoms)
 
-    if len(api_processor.sessions) > 0:
-        training_session_datastore.put(api_processor.sessions)
+    # Session will be saved during create_actiity
+    # if len(api_processor.sessions) > 0:
+    #     training_session_datastore.put(api_processor.sessions)
 
     if len(api_processor.workout_programs) > 0:
         workout_program_datastore.put(api_processor.workout_programs)
@@ -76,7 +77,72 @@ def handle_responsive_recovery_create(user_id):
             activity_type='responsive_recovery'
     )
 
-    return {'responsive_recovery': responsive_recovery.json_serialise()}, 201
+    return {
+               'responsive_recovery': responsive_recovery.json_serialise(),
+               'session_id': api_processor.sessions[0].id
+           }, 201
+
+
+@app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>', methods=['PATCH'])
+@require.authenticated.any
+@require.body({'event_date_time': str})
+@xray_recorder.capture('routes.responsive_recovery.create')
+def handle_responsive_recovery_update(user_id, responsive_recovery_id):
+    validate_data()
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    timezone = get_timezone(event_date_time)
+
+    # set up processing
+    user_stats = user_stats_datastore.get(athlete_id=user_id)
+    if user_stats is None:
+        user_stats = UserStats(user_id)
+        user_stats.event_date = event_date_time
+    user_stats.api_version = Config.get('API_VERSION')
+    user_stats.timezone = timezone
+    api_processor = APIProcessing(
+            user_id,
+            event_date_time,
+            user_stats=user_stats,
+            datastore_collection=datastore_collection
+    )
+    api_processor.user_age = request.json.get('user_age', 20)
+
+    # process completed session
+    if 'session' in request.json:
+        session = request.json['session']
+        if session is not None:
+            api_processor.create_session_from_survey(session)
+
+    # get symptoms
+    if 'symptoms' in request.json:
+        for symptom in request.json['symptoms']:
+            if symptom is None:
+                continue
+            api_processor.create_symptom_from_survey(symptom)
+
+    # store the symptoms, session, workout_program and heart rate, if any exist
+    if len(api_processor.symptoms) > 0:
+        symptom_datastore.put(api_processor.symptoms)
+
+    # Session will be saved during create_actiity
+    # if len(api_processor.sessions) > 0:
+    #     training_session_datastore.put(api_processor.sessions)
+
+    if len(api_processor.workout_programs) > 0:
+        workout_program_datastore.put(api_processor.workout_programs)
+
+    if len(api_processor.heart_rate_data) > 0:
+        heart_rate_datastore.put(api_processor.heart_rate_data)
+
+    responsive_recovery = api_processor.create_activity(
+            activity_type='responsive_recovery',
+            activity_id=responsive_recovery_id
+    )
+
+    return {
+               'responsive_recovery': responsive_recovery.json_serialise(),
+               'session_id': api_processor.sessions[0].id
+           }, 201
 
 
 @xray_recorder.capture('routes.responsive_recovery.validate')
