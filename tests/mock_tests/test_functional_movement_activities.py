@@ -139,16 +139,32 @@ def get_sessions(session_types, dates, rpes, durations, sport_names, workout_pro
 
 
 def get_total_durations(activity):
-    duration_efficient = 0
-    duration_complete = 0
-    duration_comprehensive = 0
+    total_duration_efficient = 0
+    total_duration_complete = 0
+    total_duration_comprehensive = 0
+    total_exercises = 0
     for ex_phase in activity.exercise_phases:
+        phase_name = ex_phase.name
+        duration_efficient_phase = 0
+        duration_complete_phase = 0
+        duration_comprehensive_phase = 0
+        ex_count_phase = 0
         for ex in ex_phase.exercises.values():
-            duration_efficient += ex.duration_efficient()
-            duration_complete += ex.duration_complete()
-            duration_comprehensive += ex.duration_comprehensive()
-    print(f"durations: efficient: {int(duration_efficient/60)}, complete: {int(duration_complete/60)}, comprehensive: {int(duration_comprehensive/60)}")
-    return duration_efficient, duration_complete, duration_comprehensive
+            ex_count_phase += 1
+            duration_efficient_phase += ex.duration_efficient()
+            duration_complete_phase += ex.duration_complete()
+            duration_comprehensive_phase += ex.duration_comprehensive()
+        if ex_count_phase > 0:
+            print(f"{phase_name}: exercises assigned: {ex_count_phase}, durations: efficient: {round(duration_efficient_phase / 60, 2)}, "
+                  f"complete: {round(duration_complete_phase / 60, 2)}, comprehensive: {round(duration_comprehensive_phase / 60, 2)}")
+            total_duration_efficient += duration_efficient_phase
+            total_duration_complete += duration_complete_phase
+            total_duration_comprehensive += duration_comprehensive_phase
+            total_exercises += ex_count_phase
+
+    print(f"{activity.title}, exercises assigned: {total_exercises}, durations: efficient: {round(total_duration_efficient / 60, 2)},"
+          f"complete: {round(total_duration_complete / 60, 2)}, comprehensive: {round(total_duration_comprehensive / 60, 2)}")
+    return total_duration_efficient, total_duration_complete, total_duration_comprehensive
 
 
 def get_activity(event_date_time, symptoms, sessions, activity_type='movement_prep'):
@@ -300,7 +316,7 @@ def test_get_responsive_recovery_with_simple_session_no_symptoms():
     sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
     symptoms = []
 
-    print("\nresponsive_recovery, 100 mins run, no symptoms")
+    print("\nactive_recovery, 100 mins run, no symptoms")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
 
     assert responsive_recovery.active_recovery is not None
@@ -327,8 +343,8 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
         (7, 1, None, None, None, 2)  # left knee sharp=2
     ])
 
-    print("\nresponsive_recovery, 100 mins run, knee sharp=2")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
+    print("\nactive_recovery, 100 mins run, high rpe (ice vs cwi), knee sharp=2")
 
     assert responsive_recovery.active_recovery is not None
     assert responsive_recovery.active_rest is None
@@ -357,8 +373,8 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
         (7, 1, None, None, None, 2)  # left knee sharp=2
     ])
 
-    print("\nresponsive_recovery, 100 mins run, knee sharp=2")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
+    print("\nactive_recovery, 100 mins run, low rpe (ice vs cwi), knee sharp=2")
 
     assert responsive_recovery.active_recovery is not None
     assert responsive_recovery.active_rest is None

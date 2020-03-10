@@ -3,7 +3,7 @@ from datastores.action_library_datastore import ActionLibraryDatastore
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
-from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance
+from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 
@@ -33,8 +33,9 @@ class WorkoutProcessor(object):
 
     def add_action_details_to_exercise(self, exercise, movement):
         for action_id in movement.primary_actions:
-            action = action_library.get(action_id)
-            if action is not None:
+            action_json = action_library.get(action_id)
+            if action_json is not None:
+                action = ExerciseAction.json_deserialise(action_json)
                 self.initialize_action_from_exercise(action, exercise)
                 exercise.primary_actions.append(action)
         self.set_action_explosiveness_from_exercise(exercise, exercise.primary_actions)
@@ -42,8 +43,9 @@ class WorkoutProcessor(object):
             action.set_training_load()
 
         for action_id in movement.secondary_actions:
-            action = action_library.get(action_id)
-            if action is not None:
+            action_json = action_library.get(action_id)
+            if action_json is not None:
+                action = ExerciseAction.json_deserialise(action_json)
                 self.initialize_action_from_exercise(action, exercise)
                 exercise.secondary_actions.append(action)
         self.set_action_explosiveness_from_exercise(exercise, exercise.secondary_actions)
