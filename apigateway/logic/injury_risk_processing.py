@@ -359,7 +359,7 @@ class InjuryRiskProcessor(object):
                         elif body_part_injury_risk.total_compensation_percent >= min_total_compensation:
                             body_part_injury_risk.total_compensation_percent_tier = 0
                         else:
-                            body_part_injury_risk.eccentric_compensation_percent_tier = 0
+                            body_part_injury_risk.total_compensation_percent_tier = 0
                     else:
                         body_part_injury_risk.total_compensation_percent_tier = 0
 
