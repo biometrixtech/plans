@@ -1,7 +1,7 @@
-# FathomAI - Recovery API (v 5.0.0)
+# FathomAI - Mobility API (v 5.0.0)
 
 ## Overview
-FathomAI provides this limited implementation of its Recovery API to demonstrate the core functionality to potential customers.
+FathomAI provides this limited implementation of its Mobility API to demonstrate the core functionality to potential customers.
 
 The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or all of the following elements.
 
@@ -32,7 +32,7 @@ VI. Appendix <br/>
 
 #### Terminology
 
-The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specifically __must__, __should__, __may__ and their negatives) applies.  The word __will__, when applied to the Recovery API ("the API"), has the same meaning as __must__.
+The terminology of [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt) (specifically __must__, __should__, __may__ and their negatives) applies.  The word __will__, when applied to the Mobility API ("the API"), has the same meaning as __must__.
 
 #### Protocol
 
@@ -818,7 +818,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 ## V. Improving Personalization
 
 ### Overview & Description
-FathomAI Recovery API can provide greater personalization, diversity, and granularity  of activities for an athlete when more information is supplied by a client. Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
+FathomAI Mobility API can provide greater personalization, diversity, and granularity  of activities for an athlete when more information is supplied by a client. Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
 
 ### Symptoms
 
