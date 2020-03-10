@@ -276,7 +276,7 @@ class FunctionalMovementLoad(object):
 
 
 class FunctionalMovementActionMapping(object):
-    def __init__(self, exercise_action, injury_risk_dict, event_date):
+    def __init__(self, exercise_action):
         self.exercise_action = exercise_action
         self.hip_joint_functional_movements = []
         self.knee_joint_functional_movements = []
@@ -285,12 +285,11 @@ class FunctionalMovementActionMapping(object):
         self.shoulder_scapula_joint_functional_movements = []
         self.elbow_joint_functional_movements = []
         self.muscle_load = {}
-        self.injury_risk_dict = injury_risk_dict
-        self.event_date = event_date
+        #self.injury_risk_dict = injury_risk_dict
+        #self.event_date = event_date
 
         self.set_functional_movements()
         self.set_muscle_load()
-        self.set_compensation_load()
 
     def set_functional_movements(self):
 
@@ -394,21 +393,18 @@ class FunctionalMovementActionMapping(object):
                                           FunctionalMovementType.trunk_extension_with_rotation]:
             return (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
 
-    def set_compensation_load(self):
+    def set_compensation_load(self, injury_risk_dict, event_date):
 
-        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.hip_joint_functional_movements, self.exercise_action)
-        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.knee_joint_functional_movements, self.exercise_action)
-        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.ankle_joint_functional_movements, self.exercise_action)
-        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.trunk_joint_functional_movements, self.exercise_action)
-        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action)
-        self.set_compensation_load_for_functional_movements(self.injury_risk_dict, self.event_date, self.elbow_joint_functional_movements, self.exercise_action)
+        self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.hip_joint_functional_movements)
+        self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.knee_joint_functional_movements)
+        self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.ankle_joint_functional_movements)
+        self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.trunk_joint_functional_movements)
+        self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements)
+        self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements)
 
-    def set_compensation_load_for_functional_movements(self, injury_risk_dict, event_date, functional_movement_list, exercise_action):
+    def set_compensation_load_for_functional_movements(self, injury_risk_dict, event_date, functional_movement_list):
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date, functional_movement_list)
-
-        left_load = exercise_action.total_load_left
-        right_load = exercise_action.total_load_right
 
         body_part_factory = BodyPartFactory()
 
@@ -425,26 +421,28 @@ class FunctionalMovementActionMapping(object):
                 else:
                     factor = .20
 
-                left_compensated_concentric_load = left_load * factor
-                left_compensated_eccentric_load = left_load * factor
-                right_compensated_concentric_load = right_load * factor
-                right_compensated_eccentric_load = right_load * factor
-
                 for s in functional_movement.parts_receiving_compensation:
                     body_part_side_list = body_part_factory.get_body_part_side_list(s)
                     for body_part_side in body_part_side_list:
                         if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
+                            if body_part_side in self.muscle_load.keys():
+                                concentric_load = self.muscle_load[body_part_side].concentric_load
+                                eccentric_load = self.muscle_load[body_part_side].eccentric_load
+                            else:
+                                concentric_load = 0
+                                eccentric_load = 0
+
+                            if functional_movement_load.muscle_action == MuscleAction.concentric or functional_movement_load.muscle_action == MuscleAction.isometric:
+
+                                compensated_concentric_load = concentric_load * factor
+                                compensated_eccentric_load = 0
+
+                            else:
+                                compensated_concentric_load = 0
+                                compensated_eccentric_load = eccentric_load * factor
+
                             functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
                             functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
-                            if body_part_side.side == 1:
-                                compensated_concentric_load = left_compensated_concentric_load
-                                compensated_eccentric_load = left_compensated_eccentric_load
-                            elif body_part_side.side == 2:
-                                compensated_concentric_load = right_compensated_concentric_load
-                                compensated_eccentric_load = right_compensated_eccentric_load
-                            else:
-                                compensated_concentric_load = left_compensated_concentric_load + right_compensated_concentric_load
-                                compensated_eccentric_load = left_compensated_eccentric_load + right_compensated_eccentric_load
 
                             synergist_compensated_concentric_load = compensated_concentric_load / float(
                                 len(functional_movement.parts_receiving_compensation))
