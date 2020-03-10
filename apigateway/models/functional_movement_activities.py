@@ -185,6 +185,7 @@ class Activity(object):
         self.exercise_phases = []
 
         self.relative_load_level = relative_load_level
+        self.sport_cardio_plyometrics = False
         self.efficient_winner = 1
         self.complete_winner = 1
         self.comprehensive_winner = 1
@@ -237,7 +238,7 @@ class Activity(object):
         super().__setattr__(name, value)
 
     @abc.abstractmethod
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio_plyometrics, sport_body_parts):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts):
         pass
 
     def get_total_exercises(self):
@@ -728,13 +729,14 @@ class Activity(object):
 
 
 class ActiveRestBase(Activity):
-    def __init__(self, event_date_time, modality_type, force_data=False, relative_load_level=3, force_on_demand=True):
+    def __init__(self, event_date_time, modality_type, force_data=False, relative_load_level=3, force_on_demand=True, sport_cardio_plyometrics=False):
         super().__init__(event_date_time, modality_type, relative_load_level)
         self.force_data = force_data
         self.force_on_demand = force_on_demand
+        self.sport_cardio_plyometrics = sport_cardio_plyometrics
 
     @abc.abstractmethod
-    def check_recovery(self, body_part_side, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts):
+    def check_recovery(self, body_part_side, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
         pass
 
     @abc.abstractmethod
@@ -858,7 +860,7 @@ class ActiveRestBase(Activity):
         else:
             return False
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio_plyometrics=False, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
@@ -874,7 +876,7 @@ class ActiveRestBase(Activity):
         else:
             if len(injury_risk_dict) > 0:
                 for body_part, body_part_injury_risk in injury_risk_dict.items():
-                    self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts)
+                    self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts)
                     self.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
                     self.check_prevention(body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts)
             else:
@@ -906,8 +908,8 @@ class ActiveRestBase(Activity):
 
 
 class MovementIntegrationPrep(ActiveRestBase):
-    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=True):
-        super().__init__(event_date_time, ActivityType.movement_integration_prep, force_data, relative_load_level, force_on_demand)
+    def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=True, sport_cardio_plyometrics=False):
+        super().__init__(event_date_time, ActivityType.movement_integration_prep, force_data, relative_load_level, force_on_demand, sport_cardio_plyometrics=sport_cardio_plyometrics)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.active_stretch),
@@ -962,7 +964,7 @@ class MovementIntegrationPrep(ActiveRestBase):
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, 1, 0,
                                 exercise_library)
 
-    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts):
+    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
         compensating = False
         excessive_strain = False
 
@@ -1003,7 +1005,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal,
                                         tier, 0, exercise_library)
                     if max_severity < 7.0:
-                        if sport_cardio_plyometrics:
+                        if self.sport_cardio_plyometrics:
                             self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal,
                                                 tier, 0, exercise_library)
                         else:
@@ -1060,11 +1062,18 @@ class MovementIntegrationPrep(ActiveRestBase):
                                 exercise_library)
 
             if max_severity < 7.0:
-                self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1,
-                                    last_severity, exercise_library)
-            if max_severity < 5.0:  # TODO: this threshold needs to be updated
-                self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
-                                    last_severity, exercise_library)
+                if self.sport_cardio_plyometrics:
+                    self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
+                                        last_severity, exercise_library)
+                else:
+                    self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1,
+                                        last_severity, exercise_library)
+
+            #     self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1,
+            #                         last_severity, exercise_library)
+            # if max_severity < 5.0:  # TODO: this threshold needs to be updated
+            #     self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
+            #                         last_severity, exercise_library)
 
             body_part_factory = BodyPartFactory()
 
@@ -1074,11 +1083,19 @@ class MovementIntegrationPrep(ActiveRestBase):
                                     exercise_library)
 
                 if max_severity < 7.0:
-                    self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
-                                        last_severity, exercise_library)
-                if max_severity < 5.0:  # TODO: this threshold needs to be updated
-                    self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
-                                        last_severity, exercise_library)
+                    if self.sport_cardio_plyometrics:
+                        self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
+                                            last_severity, exercise_library)
+                    else:
+                        self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
+                                            last_severity, exercise_library)
+
+                # if max_severity < 7.0:
+                #     self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
+                #                         last_severity, exercise_library)
+                # if max_severity < 5.0:  # TODO: this threshold needs to be updated
+                #     self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
+                #                         last_severity, exercise_library)
 
         if muscle_spasm or knots:
 
@@ -1144,10 +1161,14 @@ class MovementIntegrationPrep(ActiveRestBase):
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
                     self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
+                    if self.sport_cardio_plyometrics:
+                        self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library)
+                    else:
+                        self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal, 1, 0, exercise_library)
-                if max_severity < 5.0:  # TODO: this threshold might need to change
-                    self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library)
+                # if max_severity < 5.0:  # TODO: this threshold might need to change
+                #     self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library)
 
             # TODO: The logic below is not found in movement_prep spreadsheet.
             # elif is_short:
@@ -1235,7 +1256,7 @@ class ActiveRest(ActiveRestBase):
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, 1, 0,
                                 exercise_library)
 
-    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_cardio_plyometrics, sport_body_parts):
+    def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
 
         goals = []
 
@@ -1436,7 +1457,7 @@ class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_cardio_plyometrics=False, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():

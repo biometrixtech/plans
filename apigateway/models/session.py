@@ -579,7 +579,7 @@ class MixedActivitySession(Session):
             for section in self.workout_program_module.workout_sections:
                 if section.assess_load:
                     for exercise in section.exercises:
-                        if exercise.training_type in [TrainingType.strength_cardiorespiratory, TrainingType.power_drills_plyometrics]:
+                        if exercise.training_type in [TrainingType.strength_cardiorespiratory, TrainingType.power_drills_plyometrics, TrainingType.power_action_plyometrics]:
                             return True
         return False
 
