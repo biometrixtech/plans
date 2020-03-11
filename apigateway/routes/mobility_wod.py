@@ -77,7 +77,10 @@ def handle_rom_wod_create(user_id):
             activity_type='mobility_wod'
     )
 
-    return {'mobility_wod': mobility_wod.json_serialise()}, 201
+    return {
+               'mobility_wod': mobility_wod.json_serialise(),
+               'session_ids': [session.id for session in api_processor.sessions]
+           }, 201
 
 
 @xray_recorder.capture('routes.mobility_wod.validate')
