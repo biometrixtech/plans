@@ -133,11 +133,15 @@ class ActivityManager(object):
         return mobility_wod
 
     @xray_recorder.capture('logic.ActivityManager.create_responsive_recovery')
-    def create_responsive_recovery(self, force_on_demand=True, responsive_recovery_id=None):
+    def create_responsive_recovery(self, force_on_demand=True, responsive_recovery_id=None, training_session_id=None):
         """
         :param force_on_demand: boolean
+        :param responsive_recovery_id: uuid
+        :param training_session_id: uuid
         :return responsive_recovery: ResponsiveRecovery
         """
+        if training_session_id is not None:
+            self.activity_training_sessions = [session for session in self.training_sessions if session.id == training_session_id]
         self.prepare_data(None)
         responsive_recovery = self.exercise_assignment_calculator.get_responsive_recovery(self.athlete_id, force_on_demand=force_on_demand)
         if responsive_recovery_id is not None:

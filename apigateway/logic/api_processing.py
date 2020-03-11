@@ -87,7 +87,7 @@ class APIProcessing(object):
         symptom = Symptom.json_deserialise(symptom)
         self.symptoms.append(symptom)
 
-    def create_activity(self, activity_type, update_stats=True, activity_id=None):
+    def create_activity(self, activity_type, update_stats=True, activity_id=None, training_session_id=None):
         if update_stats:
             # update stats
             if self.user_stats_processor is None:
@@ -115,7 +115,7 @@ class APIProcessing(object):
         elif activity_type == 'movement_prep':
             activity = activity_manager.create_movement_prep()
         elif activity_type == 'responsive_recovery':
-            activity = activity_manager.create_responsive_recovery(responsive_recovery_id=activity_id)
+            activity = activity_manager.create_responsive_recovery(responsive_recovery_id=activity_id, training_session_id=training_session_id)
         else:
             raise ValueError("invalid activity type")
         return activity
