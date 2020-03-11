@@ -680,7 +680,6 @@ class InjuryRiskProcessor(object):
 
                 if session.session_load_dict is None:
                     current_session = session_functional_movement.process(d, load_stats)
-                    injury_risk_dict = session_functional_movement.injury_risk_dict
                     current_session.session_load_dict = session_functional_movement.session_load_dict
                     # session_data_store = TrainingSessionDatastore()
                     # session_data_store.put(current_session)
@@ -701,6 +700,8 @@ class InjuryRiskProcessor(object):
                 session_mapping_dict[current_session] = session_functional_movement.session_load_dict
 
             daily_injury_risk_dict = self.merge_daily_sessions(d, session_mapping_dict, injury_risk_dict)
+
+            daily_injury_risk_dict = self.update_injury_risk_dict_rankings(daily_injury_risk_dict, d)
 
             for body_part_side, body_part_injury_risk in daily_injury_risk_dict.items():
 
@@ -1199,7 +1200,6 @@ class InjuryRiskProcessor(object):
 
             if session.session_load_dict is None:
                 current_session = session_functional_movement.process(base_date, load_stats)
-                injury_risk_dict = session_functional_movement.injury_risk_dict
                 current_session.session_load_dict = session_functional_movement.session_load_dict
                 # session_data_store = TrainingSessionDatastore()
                 # session_data_store.put(current_session)
