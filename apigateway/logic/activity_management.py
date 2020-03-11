@@ -32,7 +32,7 @@ class ActivityManager(object):
         self.symptoms = symptoms if symptoms is not None else []
         self.historical_injury_risk_dict = None
         self.exercise_assignment_calculator = None
-        self.current_training_sessions = [session for session in self.training_sessions]
+        self.activity_training_sessions = [session for session in self.training_sessions]
         self.load_data()
 
     @xray_recorder.capture('logic.ActivityManager.load_data')
@@ -48,7 +48,7 @@ class ActivityManager(object):
 
     @xray_recorder.capture('logic.ActivityManager.save_session_dict')
     def save_session(self):
-        for session in self.current_training_sessions:
+        for session in self.activity_training_sessions:
             self.training_session_datastore.put(session)
 
     def get_session_details(self):
@@ -57,13 +57,13 @@ class ActivityManager(object):
 
     def get_sport_body_parts(self):
         sport_body_parts = {}
-        for session in self.current_training_sessions:
+        for session in self.activity_training_sessions:
             sport_body_parts.update(session.get_load_body_parts())
         return sport_body_parts
 
     def check_cardio_sport(self):
         sport_cardio_plyometrics = False
-        for session in self.current_training_sessions:
+        for session in self.activity_training_sessions:
             if session.is_cardio_plyometrics():
                 sport_cardio_plyometrics = True
         return sport_cardio_plyometrics
@@ -112,6 +112,7 @@ class ActivityManager(object):
         self.prepare_data(8)  # we don't want to persist this RPE
         self.get_session_details()
         movement_prep = self.exercise_assignment_calculator.get_movement_prep(self.athlete_id, force_on_demand=force_on_demand)
+        movement_prep.training_session_id = self.activity_training_sessions[0].id
         self.movement_prep_datastore.put(movement_prep)
         self.save_session()
 
@@ -125,6 +126,7 @@ class ActivityManager(object):
         """
         self.prepare_data(5)  # we don't want to persist this RPE
         mobility_wod = self.exercise_assignment_calculator.get_mobility_wod(self.athlete_id, force_on_demand=force_on_demand)
+        mobility_wod.training_session_ids = [session.id for session in self.activity_training_sessions]
         self.mobility_wod_datastore.put(mobility_wod)
         self.save_session()
 
@@ -140,6 +142,7 @@ class ActivityManager(object):
         responsive_recovery = self.exercise_assignment_calculator.get_responsive_recovery(self.athlete_id, force_on_demand=force_on_demand)
         if responsive_recovery_id is not None:
             responsive_recovery.responsive_recovery_id = responsive_recovery_id
+        responsive_recovery.training_session_id = self.activity_training_sessions[0].id
         self.responsive_recovery_datastore.put(responsive_recovery)
         self.save_session()
 

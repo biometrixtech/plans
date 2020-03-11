@@ -73,10 +73,7 @@ def handle_movement_prep_create(user_id):
             activity_type='movement_prep'
     )
 
-    return {
-               'movement_prep': movement_prep.json_serialise(),
-               'session_id': api_processor.sessions[0].id
-           }, 201
+    return {'movement_prep': movement_prep.json_serialise()}, 201
 
 
 @xray_recorder.capture('routes.movement_prep.validate')

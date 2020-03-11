@@ -19,6 +19,7 @@ class MovementPrep(object):
         self.movement_prep_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
+        self.training_session_id = None
         self.movement_integration_prep = None
 
     def json_serialise(self):
@@ -26,6 +27,7 @@ class MovementPrep(object):
             "movement_prep_id": self.movement_prep_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
+            "training_session": self.training_session_id,
             "movement_integration_prep": self.movement_integration_prep.json_serialise() if self.movement_integration_prep is not None else None
         }
 
@@ -33,6 +35,7 @@ class MovementPrep(object):
     def json_deserialise(cls, input_dict):
         movement_prep = cls(input_dict['user_id'], input_dict['created_date_time'])
         movement_prep.movement_prep_id = input_dict.get("movement_prep_id")
+        movement_prep.training_session_id = input_dict.get('training_session_id')
         movement_prep.movement_integration_prep = Activity.json_deserialise(input_dict['movement_integration_prep']) if input_dict.get('movement_integration_prep') is not None else None
         return movement_prep
 
@@ -50,6 +53,7 @@ class MobilityWOD(object):
         self.mobility_wod_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
+        self.training_session_ids = []
         self.active_rest = None
 
     def json_serialise(self):
@@ -57,6 +61,7 @@ class MobilityWOD(object):
             "mobility_wod_id": self.mobility_wod_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
+            "training_session_ids": self.training_session_ids,
             "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None
         }
 
@@ -64,6 +69,7 @@ class MobilityWOD(object):
     def json_deserialise(cls, input_dict):
         mobility_wod = cls(input_dict['user_id'], input_dict['created_date_time'])
         mobility_wod.mobility_wod_id = input_dict.get("mobility_wod_id")
+        mobility_wod.training_session_ids = input_dict.get('training_session_ids', [])
         mobility_wod.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
         return mobility_wod
 
@@ -81,6 +87,7 @@ class ResponsiveRecovery(object):
         self.responsive_recovery_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
+        self.training_session_id = None
         self.active_rest = None
         self.active_recovery = None
         self.ice = None
@@ -91,6 +98,7 @@ class ResponsiveRecovery(object):
             "responsive_recovery_id": self.responsive_recovery_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
+            "training_session_id": self.training_session_id,
             "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None,
             "active_recovery": self.active_recovery.json_serialise() if self.active_recovery is not None else None,
             "ice": self.ice.json_serialise() if self.ice is not None else None,
@@ -99,13 +107,14 @@ class ResponsiveRecovery(object):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        post_training_recovery = cls(input_dict['user_id'], input_dict['created_date_time'])
-        post_training_recovery.responsive_recovery_id = input_dict.get("responsive_recovery_id")
-        post_training_recovery.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
-        post_training_recovery.active_recovery = Activity.json_deserialise(input_dict['active_recovery']) if input_dict.get('active_recovery') is not None else None
-        post_training_recovery.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice') is not None else None
-        post_training_recovery.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion') is not None else None
-        return post_training_recovery
+        responsive_recovery = cls(input_dict['user_id'], input_dict['created_date_time'])
+        responsive_recovery.responsive_recovery_id = input_dict.get("responsive_recovery_id")
+        responsive_recovery.training_session_id = input_dict.get("training_session_id")
+        responsive_recovery.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
+        responsive_recovery.active_recovery = Activity.json_deserialise(input_dict['active_recovery']) if input_dict.get('active_recovery') is not None else None
+        responsive_recovery.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice') is not None else None
+        responsive_recovery.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion') is not None else None
+        return responsive_recovery
 
     def __setattr__(self, name, value):
         if name in ['created_date_time']:
