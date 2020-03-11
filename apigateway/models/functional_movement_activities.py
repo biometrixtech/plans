@@ -290,7 +290,7 @@ class Activity(object):
                 else:
                     return 3, DosageProgression.min_mod_max
 
-        elif goal.goal_type == AthleteGoalType.high_load:
+        elif goal.goal_type == AthleteGoalType.high_load or goal.goal_type == AthleteGoalType.expected_high_load:
             if tier == 1:
                 return 1, DosageProgression.min_mod_max
             elif tier == 2:
@@ -304,7 +304,7 @@ class Activity(object):
             else:
                 return 0, None
 
-        elif goal.goal_type == AthleteGoalType.asymmetric_session or goal.goal_type == AthleteGoalType.on_request:
+        elif goal.goal_type == AthleteGoalType.asymmetric_session or goal.goal_type == AthleteGoalType.on_request or goal.goal_type == AthleteGoalType.expected_asymmetric_session:
             if tier == 1:
                 return 1, DosageProgression.min_mod_max
             elif tier == 2:
@@ -929,10 +929,10 @@ class MovementIntegrationPrep(ActiveRestBase):
         for a in body_part.agonists:
             agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
             if agonist is not None:
-                self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0,
+                self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
                                     exercise_library)
                 if max_severity < 7:
-                    self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
+                    #self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
                     self.copy_exercises(agonist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
                 if max_severity < 5:
                     self.copy_exercises(agonist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
@@ -941,7 +941,7 @@ class MovementIntegrationPrep(ActiveRestBase):
         for y in body_part.synergists:
             synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
             if synergist is not None:
-                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
+                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, 0,
                                     exercise_library)
                 if max_severity < 7:
                     self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2, 0, exercise_library)
@@ -952,10 +952,10 @@ class MovementIntegrationPrep(ActiveRestBase):
         for t in body_part.stabilizers:
             stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
             if stabilizer is not None:
-                self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, 0,
+                self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 4, 0,
                                     exercise_library)
-                if max_severity < 7:
-                    self.copy_exercises(stabilizer.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 3, 0, exercise_library)
+                # if max_severity < 7:
+                #     self.copy_exercises(stabilizer.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 3, 0, exercise_library)
                 if max_severity < 5:
                     self.copy_exercises(stabilizer.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         3, 0, exercise_library)
@@ -981,9 +981,6 @@ class MovementIntegrationPrep(ActiveRestBase):
                   0 < body_part_injury_risk.total_compensation_percent_tier < 4):
                 compensating = True
 
-            # TODO: what should the goal name be?
-            goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
-
             if excessive_strain or compensating:
                 high_load_tier = 0
                 comp_tier = 0
@@ -1002,8 +999,14 @@ class MovementIntegrationPrep(ActiveRestBase):
                     tier = comp_tier
 
                 if tier > 0:
+
+                    if tier == high_load_tier:
+                        goal = AthleteGoal("Expected Load - Elevated Stress", 1, AthleteGoalType.expected_high_load)
+                    else:
+                        goal = AthleteGoal("Expected Load - Compensation", 1, AthleteGoalType.expected_asymmetric_session)
+
                     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal,
-                                        tier, 0, exercise_library)
+                                        tier + 1, 0, exercise_library)
                     if max_severity < 7.0:
                         if self.sport_cardio_plyometrics:
                             self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal,
@@ -1013,8 +1016,13 @@ class MovementIntegrationPrep(ActiveRestBase):
                                                 tier, 0, exercise_library)
 
             if excessive_strain:
+
+                goal = AthleteGoal("Expected Load - Compensation", 1, AthleteGoalType.expected_asymmetric_session)
+                
                 if max_severity < 5.0:
-                    if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
+                    #if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
+                    # removed stabilizers to reduce active time
+                    if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover]:
                         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                             body_part_injury_risk.total_volume_percent_tier,
                                             0, exercise_library)
@@ -1058,7 +1066,7 @@ class MovementIntegrationPrep(ActiveRestBase):
             if inflammation:
                 last_severity = max(last_severity, body_part_injury_risk.get_inflammation_severity(self.event_date_time.date()))
 
-            self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, last_severity,
+            self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
                                 exercise_library)
 
             if max_severity < 7.0:
@@ -1079,7 +1087,7 @@ class MovementIntegrationPrep(ActiveRestBase):
 
             for s in body_part.synergists:
                 synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
-                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
+                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, last_severity,
                                     exercise_library)
 
                 if max_severity < 7.0:
@@ -1135,7 +1143,7 @@ class MovementIntegrationPrep(ActiveRestBase):
             if is_overactive_short:
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 # tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
                                         0, exercise_library)
@@ -1151,13 +1159,13 @@ class MovementIntegrationPrep(ActiveRestBase):
             elif is_overactive_long:
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 # tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
 
             elif is_underactive_short:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 # tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
                     #self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
@@ -1284,7 +1292,6 @@ class ActiveRest(ActiveRestBase):
             #     goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
 
             # for goal in goals:
-            goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
             if high_load or compensating:
 
@@ -1305,6 +1312,12 @@ class ActiveRest(ActiveRestBase):
                     tier = comp_tier
 
                 if tier > 0:
+
+                    if tier == high_load_tier:
+                        goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
+                    else:
+                        goal = AthleteGoal("Recover from training", 1, AthleteGoalType.asymmetric_session)
+
                     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal,
                                         tier, 0, exercise_library)
 
@@ -1313,6 +1326,8 @@ class ActiveRest(ActiveRestBase):
                                             tier, 0, exercise_library)
 
             if high_load:
+
+                goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
