@@ -402,7 +402,7 @@ class ExerciseAction(object):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            if self.training_intensity >= 6:  # TODO: validate this number
+            if self.training_intensity >= 5:  # TODO: validate this number
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength

@@ -539,16 +539,14 @@ class MixedActivitySession(Session):
     #     return Session.missing_post_session_survey()
 
     def ultra_high_intensity_session(self):
-
-        ultra_high_intensity_sports = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
-                                       SportName.strength, SportName.functional_strength_training,
-                                       SportName.traditional_strength_training, SportName.core_training,
-                                       SportName.high_intensity_interval_training, SportName.pilates]
-
-        if self.sport_name in ultra_high_intensity_sports:
-            return True
-        else:
-            return False
+        if self.workout_program_module is not None:
+            for section in self.workout_program_module.workout_sections:
+                if section.assess_load:
+                    for exercise in section.exercises:
+                        for action in exercise.primary_actions:
+                            if action.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                                return True
+        return False
 
     def high_intensity_RPE(self):
 
@@ -646,7 +644,6 @@ class SportTrainingSession(Session):
             if self.sport_name in cardio_sports:
                 return True
         return False
-
 
 class StrengthConditioningSession(Session):
     def __init__(self):

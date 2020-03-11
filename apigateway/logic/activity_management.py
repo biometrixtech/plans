@@ -54,6 +54,13 @@ class ActivityManager(object):
     def get_session_details(self):
         self.exercise_assignment_calculator.sport_cardio_plyometrics = self.check_cardio_sport()
         self.exercise_assignment_calculator.sport_body_parts = self.get_sport_body_parts()
+        self.exercise_assignment_calculator.high_intensity_session = self.is_high_intensity_session()
+
+    def is_high_intensity_session(self):
+        for session in self.activity_training_sessions:
+            if session.ultra_high_intensity_session() and session.high_intensity_RPE():
+                return True
+        return False
 
     def get_sport_body_parts(self):
         sport_body_parts = {}
@@ -143,6 +150,7 @@ class ActivityManager(object):
         if training_session_id is not None:
             self.activity_training_sessions = [session for session in self.training_sessions if session.id == training_session_id]
         self.prepare_data(None)
+        self.get_session_details()
         responsive_recovery = self.exercise_assignment_calculator.get_responsive_recovery(self.athlete_id, force_on_demand=force_on_demand)
         if responsive_recovery_id is not None:
             responsive_recovery.responsive_recovery_id = responsive_recovery_id

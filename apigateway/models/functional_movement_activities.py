@@ -247,7 +247,7 @@ class Activity(object):
         super().__setattr__(name, value)
 
     @abc.abstractmethod
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts, high_intensity_session):
         pass
 
     def get_total_exercises(self):
@@ -869,7 +869,7 @@ class ActiveRestBase(Activity):
         else:
             return False
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
@@ -1481,7 +1481,7 @@ class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
@@ -1492,13 +1492,11 @@ class ActiveRecovery(Activity):
                     and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-        if len(injury_risk_dict) > 0:
+        if len(injury_risk_dict) > 0 and high_intensity_session:
             for body_part, body_part_injury_risk in injury_risk_dict.items():
                 self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity)
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-
-        goals = []
 
         compensating = False
         high_load = False
@@ -1506,7 +1504,6 @@ class ActiveRecovery(Activity):
         if body_part is not None:
 
             if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
-                # goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
                 high_load = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
@@ -1520,10 +1517,6 @@ class ActiveRecovery(Activity):
 
                 compensating = True
 
-            # if compensating:
-            #     goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
-
-            # for goal in goals:
             goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
             if high_load or compensating:
@@ -1547,7 +1540,7 @@ class ActiveRecovery(Activity):
                 if tier > 0:
 
                     if max_severity < 4.0:
-                        self.copy_exercises(body_part.dynamic_integrate_exercises, ExercisePhaseType.dynamic_integrate, goal,
+                        self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
                                             tier, 0, exercise_library)
 
 
