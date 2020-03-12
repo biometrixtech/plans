@@ -63,8 +63,9 @@ def handle_rom_wod_create(user_id):
     if len(api_processor.symptoms) > 0:
         symptom_datastore.put(api_processor.symptoms)
 
-    if len(api_processor.sessions) > 0:
-        training_session_datastore.put(api_processor.sessions)
+    # Session will be saved during create_actiity
+    # if len(api_processor.sessions) > 0:
+    #     training_session_datastore.put(api_processor.sessions)
 
     if len(api_processor.workout_programs) > 0:
         workout_program_datastore.put(api_processor.workout_programs)

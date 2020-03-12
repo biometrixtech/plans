@@ -115,6 +115,11 @@ def check_cardio_sport(training_sessions):
             sport_cardio_plyometrics = True
     return sport_cardio_plyometrics
 
+def is_high_intensity_session(training_sessions):
+    for session in training_sessions:
+        if session.ultra_high_intensity_session() and session.high_intensity_RPE():
+            return True
+    return False
 
 def get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs):
 
@@ -188,11 +193,12 @@ def get_activity(event_date_time, symptoms, sessions, activity_type='movement_pr
         mobility_wod = calc.get_mobility_wod('tester', force_on_demand=True)
         return mobility_wod
     elif activity_type == 'responsive_recovery':
+        calc.high_intensity_session = is_high_intensity_session(sessions)
         responsive_recovery = calc.get_responsive_recovery('tester', force_on_demand=True)
         return responsive_recovery
 
 
-def test_get_movement_prep_with_mixed_activitysession_no_symptoms():
+def test_get_movement_prep_with_mixed_activity_session_no_symptoms():
     session_types = [7]
     dates = [datetime.now()]
     rpes = [5]
@@ -221,7 +227,7 @@ def test_get_movement_prep_with_mixed_activitysession_no_symptoms():
     assert duration_comprehensive > 0
 
 
-def test_get_movement_prep_with_mixed_activitysession_one_symptom():
+def test_get_movement_prep_with_mixed_activity_session_one_symptom():
     session_types = [7]
     dates = [datetime.now()]
     rpes = [5]
@@ -250,7 +256,7 @@ def test_get_movement_prep_with_mixed_activitysession_one_symptom():
     assert duration_comprehensive > 0
 
 
-def test_get_movement_prep_with_mixed_activitysession_two_symptoms():
+def test_get_movement_prep_with_mixed_activity_session_two_symptoms():
     session_types = [7]
     dates = [datetime.now()]
     rpes = [5]
@@ -293,7 +299,7 @@ def test_get_movement_prep_with_simple_session_no_symptoms():
     sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
     symptoms = []
 
-    print("\nmovement prep, 100 mins run, no symptoms")
+    print("\nmovement prep, 100 mins weightlifting, no symptoms")
     movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')
 
     assert movement_prep.movement_integration_prep is not None
@@ -305,18 +311,49 @@ def test_get_movement_prep_with_simple_session_no_symptoms():
     assert duration_comprehensive > 0
 
 
+def test_get_responsive_recovery_with_mixed_activity_session_no_symptoms():
+    session_types = [7]
+    dates = [datetime.now()]
+    rpes = [6]
+    durations = [100]
+    sport_names = [None]
+    sections = {
+                   "Warmup / Movement Prep": ['rowing'],
+                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
+                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
+                   'Recovery Protocol': ['indoor_cycle']
+    }
+    workout_programs = [get_workout_program(sections=sections)]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = []
+
+    print("\nactive_recovery, 100 mins mixed activity, no symptoms")
+    responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
+
+    assert responsive_recovery.active_recovery is not None
+    activity = responsive_recovery.active_recovery
+
+    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
+
+
 def test_get_responsive_recovery_with_simple_session_no_symptoms():
     session_types = [6]
     dates = [datetime.now()]
-    rpes = [5]
+    rpes = [6]
     durations = [100]
-    sport_names = [SportName.distance_running]
+    sport_names = [SportName.weightlifting]
     workout_programs = [None]
 
     sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
     symptoms = []
 
-    print("\nactive_recovery, 100 mins run, no symptoms")
+    print("\nactive_recovery, 100 mins weightlifting, no symptoms")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
 
     assert responsive_recovery.active_recovery is not None
@@ -335,7 +372,7 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
     dates = [datetime.now()]
     rpes = [7]
     durations = [100]
-    sport_names = [SportName.distance_running]
+    sport_names = [SportName.weightlifting]
     workout_programs = [None]
 
     sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
@@ -344,7 +381,7 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
     ])
 
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
-    print("\nactive_recovery, 100 mins run, high rpe (ice vs cwi), knee sharp=2")
+    print("\nactive_recovery, 100 mins weightlifting, high rpe (ice vs cwi), knee sharp=2")
 
     assert responsive_recovery.active_recovery is not None
     assert responsive_recovery.active_rest is None
@@ -374,13 +411,13 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
     ])
 
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
-    print("\nactive_recovery, 100 mins run, low rpe (ice vs cwi), knee sharp=2")
+    print("\nactive_rest, 100 mins run, low rpe (ice vs cwi), knee sharp=2")
 
-    assert responsive_recovery.active_recovery is not None
-    assert responsive_recovery.active_rest is None
+    assert responsive_recovery.active_recovery is None
+    assert responsive_recovery.active_rest is not None
     assert responsive_recovery.ice is not None
     assert responsive_recovery.cold_water_immersion is None
-    activity = responsive_recovery.active_recovery
+    activity = responsive_recovery.active_rest
 
     assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
 

@@ -19,6 +19,7 @@ class MovementPrep(object):
         self.movement_prep_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
+        self.training_session_id = None
         self.movement_integration_prep = None
 
     def json_serialise(self):
@@ -26,6 +27,7 @@ class MovementPrep(object):
             "movement_prep_id": self.movement_prep_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
+            "training_session": self.training_session_id,
             "movement_integration_prep": self.movement_integration_prep.json_serialise() if self.movement_integration_prep is not None else None
         }
 
@@ -33,6 +35,7 @@ class MovementPrep(object):
     def json_deserialise(cls, input_dict):
         movement_prep = cls(input_dict['user_id'], input_dict['created_date_time'])
         movement_prep.movement_prep_id = input_dict.get("movement_prep_id")
+        movement_prep.training_session_id = input_dict.get('training_session_id')
         movement_prep.movement_integration_prep = Activity.json_deserialise(input_dict['movement_integration_prep']) if input_dict.get('movement_integration_prep') is not None else None
         return movement_prep
 
@@ -50,6 +53,7 @@ class MobilityWOD(object):
         self.mobility_wod_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
+        self.training_session_ids = []
         self.active_rest = None
 
     def json_serialise(self):
@@ -57,6 +61,7 @@ class MobilityWOD(object):
             "mobility_wod_id": self.mobility_wod_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
+            "training_session_ids": self.training_session_ids,
             "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None
         }
 
@@ -64,6 +69,7 @@ class MobilityWOD(object):
     def json_deserialise(cls, input_dict):
         mobility_wod = cls(input_dict['user_id'], input_dict['created_date_time'])
         mobility_wod.mobility_wod_id = input_dict.get("mobility_wod_id")
+        mobility_wod.training_session_ids = input_dict.get('training_session_ids', [])
         mobility_wod.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
         return mobility_wod
 
@@ -81,6 +87,7 @@ class ResponsiveRecovery(object):
         self.responsive_recovery_id = None
         self.user_id = user_id
         self.created_date_time = created_date_time
+        self.training_session_id = None
         self.active_rest = None
         self.active_recovery = None
         self.ice = None
@@ -91,6 +98,7 @@ class ResponsiveRecovery(object):
             "responsive_recovery_id": self.responsive_recovery_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
+            "training_session_id": self.training_session_id,
             "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None,
             "active_recovery": self.active_recovery.json_serialise() if self.active_recovery is not None else None,
             "ice": self.ice.json_serialise() if self.ice is not None else None,
@@ -99,13 +107,14 @@ class ResponsiveRecovery(object):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        post_training_recovery = cls(input_dict['user_id'], input_dict['created_date_time'])
-        post_training_recovery.responsive_recovery_id = input_dict.get("responsive_recovery_id")
-        post_training_recovery.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
-        post_training_recovery.active_recovery = Activity.json_deserialise(input_dict['active_recovery']) if input_dict.get('active_recovery') is not None else None
-        post_training_recovery.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice') is not None else None
-        post_training_recovery.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion') is not None else None
-        return post_training_recovery
+        responsive_recovery = cls(input_dict['user_id'], input_dict['created_date_time'])
+        responsive_recovery.responsive_recovery_id = input_dict.get("responsive_recovery_id")
+        responsive_recovery.training_session_id = input_dict.get("training_session_id")
+        responsive_recovery.active_rest = Activity.json_deserialise(input_dict['active_rest']) if input_dict.get('active_rest') is not None else None
+        responsive_recovery.active_recovery = Activity.json_deserialise(input_dict['active_recovery']) if input_dict.get('active_recovery') is not None else None
+        responsive_recovery.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice') is not None else None
+        responsive_recovery.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion') is not None else None
+        return responsive_recovery
 
     def __setattr__(self, name, value):
         if name in ['created_date_time']:
@@ -238,7 +247,7 @@ class Activity(object):
         super().__setattr__(name, value)
 
     @abc.abstractmethod
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts, high_intensity_session):
         pass
 
     def get_total_exercises(self):
@@ -860,7 +869,7 @@ class ActiveRestBase(Activity):
         else:
             return False
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
@@ -1472,7 +1481,7 @@ class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
 
-    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None):
+    def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
@@ -1483,13 +1492,11 @@ class ActiveRecovery(Activity):
                     and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-        if len(injury_risk_dict) > 0:
+        if len(injury_risk_dict) > 0 and high_intensity_session:
             for body_part, body_part_injury_risk in injury_risk_dict.items():
                 self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity)
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-
-        goals = []
 
         compensating = False
         high_load = False
@@ -1497,7 +1504,6 @@ class ActiveRecovery(Activity):
         if body_part is not None:
 
             if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
-                # goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
                 high_load = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
@@ -1511,10 +1517,6 @@ class ActiveRecovery(Activity):
 
                 compensating = True
 
-            # if compensating:
-            #     goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
-
-            # for goal in goals:
             goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
             if high_load or compensating:
@@ -1538,7 +1540,7 @@ class ActiveRecovery(Activity):
                 if tier > 0:
 
                     if max_severity < 4.0:
-                        self.copy_exercises(body_part.dynamic_integrate_exercises, ExercisePhaseType.dynamic_integrate, goal,
+                        self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
                                             tier, 0, exercise_library)
 
 

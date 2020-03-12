@@ -16,6 +16,7 @@ class ExerciseAssignmentCalculator(object):
         self.relative_load_level = relative_load_level
         self.sport_cardio_plyometrics = False
         self.sport_body_parts = None
+        self.high_intensity_session = False
 
     def get_pre_active_rest(self, force_data=False, force_on_demand=False):
 
@@ -65,7 +66,7 @@ class ExerciseAssignmentCalculator(object):
     def get_movement_prep(self, athlete_id, force_data=False, force_on_demand=True):
         # get activity
         movement_integration_prep = MovementIntegrationPrep(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand, sport_cardio_plyometrics=self.sport_cardio_plyometrics)
-        movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict,sport_body_parts=self.sport_body_parts)
+        movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict, sport_body_parts=self.sport_body_parts)
         movement_integration_prep.set_plan_dosage()
         movement_integration_prep.set_exercise_dosage_ranking()
         movement_integration_prep.aggregate_dosages()
@@ -101,7 +102,7 @@ class ExerciseAssignmentCalculator(object):
         responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
 
         active_recovery = ActiveRecovery(self.event_date_time)
-        active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict)
+        active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict, high_intensity_session=self.high_intensity_session)
         active_recovery.set_plan_dosage()
         active_recovery.set_exercise_dosage_ranking()
         active_recovery.aggregate_dosages()
