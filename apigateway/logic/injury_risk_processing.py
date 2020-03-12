@@ -1199,10 +1199,13 @@ class InjuryRiskProcessor(object):
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
 
             if session.session_load_dict is None:
+                print('processing session load dict')
+                import time; st = time.time()
                 current_session = session_functional_movement.process(base_date, load_stats)
                 current_session.session_load_dict = session_functional_movement.session_load_dict
                 # session_data_store = TrainingSessionDatastore()
                 # session_data_store.put(current_session)
+                print(f"session processing time: {time.time() - st}")
             else:
                 session_functional_movement.session_load_dict = session.session_load_dict
                 current_session = session
