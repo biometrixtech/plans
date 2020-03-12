@@ -1027,7 +1027,7 @@ class MovementIntegrationPrep(ActiveRestBase):
             if excessive_strain:
 
                 goal = AthleteGoal("Expected Load - Compensation", 1, AthleteGoalType.expected_asymmetric_session)
-                
+
                 if max_severity < 5.0:
                     #if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
                     # removed stabilizers to reduce active time

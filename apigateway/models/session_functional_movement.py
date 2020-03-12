@@ -27,23 +27,6 @@ class SessionFunctionalMovement(object):
                 total_load_dict = self.process_workout_load(self.session.workout_program_module, event_date)
                 normalized_dict = self.normalize_and_consolidate_load(total_load_dict, event_date)
 
-                # saved normalized load to the session
-                for adaptation_type in total_load_dict.keys():
-                    load_values = [s.total_normalized_load for b, s in total_load_dict[adaptation_type].items()]
-                    total_load = sum(load_values)
-                    if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
-                        self.session.strength_endurance_cardiorespiratory_load = total_load
-                    elif adaptation_type == AdaptationType.strength_endurance_strength.value:
-                        self.session.strength_endurance_strength_load = total_load
-                    elif adaptation_type == AdaptationType.power_drill.value:
-                        self.session.power_drill_load = total_load
-                    elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
-                        self.session.maximal_strength_hypertrophic_load = total_load
-                    elif adaptation_type == AdaptationType.power_explosive_action.value:
-                        self.session.power_explosive_action_load = total_load
-                    else:
-                        self.session.not_tracked_load = total_load
-
                 self.session_load_dict = normalized_dict
 
         else:
@@ -162,8 +145,8 @@ class SessionFunctionalMovement(object):
         total_load = {}  # load by adaptation type
 
         for action in action_list:
-            functional_movement_action_mapping = FunctionalMovementActionMapping(action)
-            functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+            functional_movement_action_mapping = FunctionalMovementActionMapping(action, self.injury_risk_dict, event_date)
+            #functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
             self.functional_movement_mappings.append(functional_movement_action_mapping)
             if action.adaptation_type.value not in total_load:
                 total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
@@ -179,6 +162,14 @@ class SessionFunctionalMovement(object):
     def normalize_and_consolidate_load(self, total_load_dict, event_date):
 
         normalized_dict = {}
+
+        # initialize session values
+        self.session.strength_endurance_cardiorespiratory_load = 0
+        self.session.strength_endurance_strength_load = 0
+        self.session.power_drill_load = 0
+        self.session.maximal_strength_hypertrophic_load = 0
+        self.session.power_explosive_action_load = 0
+        self.session.not_tracked_load = 0
 
         for adaptation_type, muscle_load_dict in total_load_dict.items():
             scalar = self.get_adaption_type_scalar(adaptation_type)
@@ -207,6 +198,20 @@ class SessionFunctionalMovement(object):
                         normalized_dict[muscle] = muscle_load_dict[muscle]
                     else:
                         normalized_dict[muscle].total_normalized_load += muscle_load_dict[muscle].total_normalized_load
+
+                    # saved normalized load to the session while we're looping through
+                    if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
+                        self.session.strength_endurance_cardiorespiratory_load += muscle_load_dict[muscle].total_normalized_load
+                    elif adaptation_type == AdaptationType.strength_endurance_strength.value:
+                        self.session.strength_endurance_strength_load += muscle_load_dict[muscle].total_normalized_load
+                    elif adaptation_type == AdaptationType.power_drill.value:
+                        self.session.power_drill_load += muscle_load_dict[muscle].total_normalized_load
+                    elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
+                        self.session.maximal_strength_hypertrophic_load += muscle_load_dict[muscle].total_normalized_load
+                    elif adaptation_type == AdaptationType.power_explosive_action.value:
+                        self.session.power_explosive_action_load += muscle_load_dict[muscle].total_normalized_load
+                    else:
+                        self.session.not_tracked_load += muscle_load_dict[muscle].total_normalized_load
 
         return normalized_dict
 

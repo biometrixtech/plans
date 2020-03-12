@@ -43,7 +43,7 @@ def test_apply_load_concentric():
     priority_2_ratio = 0.6
     priority_3_ratio = 0.3
 
-    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action)
+    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now())
     assert len(functional_movement_action_mapping.muscle_load) == 67
 
     # # Priority 1, prime movers
@@ -100,7 +100,7 @@ def test_apply_load_eccentric():
     priority_2_ratio = 0.6
     priority_3_ratio = 0.3
 
-    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action)
+    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now())
     assert len(functional_movement_action_mapping.muscle_load) == 67
 
     # # Priority 1, prime movers
