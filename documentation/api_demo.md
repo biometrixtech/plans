@@ -232,6 +232,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "movement_prep_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
+    "training_session_id: UUID,
     "movement_integration_prep": movement_integration_prep
 }
 ```
@@ -310,6 +311,7 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
     "movement_prep_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
+    "training_session_id": UUID,
     "movement_integration_prep": movement_integration_prep
 }
 ```
@@ -392,6 +394,7 @@ Authorization: eyJ0eX...xA8
     "mobility_wod_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
+    "training_session_ids": []
     "active_rest": active_rest
 }
 ```
@@ -512,6 +515,7 @@ Authorization: eyJraWQ...ajBc4VQ
     "mobility_wod_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
+    "training_session_ids": [UUID, UUID]
     "active_rest": active_rest
 }
 ```
@@ -580,6 +584,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
     "mobility_wod_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
+    "training_session_ids": [],
     "active_rest": active_rest
 }
 ```
@@ -723,6 +728,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
     "responsive_recovery_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
+    "training_session_id": UUID,
     "active_rest": active_rest,
     "active_recovery": active_recovery,
     "ice": ice,
@@ -801,9 +807,10 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 ```
 {
-    "mobility_wod_id": UUID,
+    "responsive_recovery_id": UUID,
     "user_id": UUID,
     "created_date_time": Datetime,
+    "training_session_id": UUID,
     "active_rest": active_rest,
     "active_recovery": active_recovery,
     "ice": ice,
@@ -812,6 +819,91 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 ```
 
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
+
+
+<!-- TODO: title and language -->
+### Update
+
+The Update Responsive Recovery endpoint can be called to update workout session information and/or report new symptom(s). Responsive Recovery Activities will be returned with consideration for the newly provided information.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/update`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "session: session,
+    "symptoms": [symptom, symptom]
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
+```
+POST /plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "session":{
+                    "event_date": "2019-01-12T10:41:57-05:00",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "session_RPE": 8,
+                    "end_date": "2019-01-12T10:54:57-05:00"
+                },
+    "symptoms":[{
+                    "body_part": 14,
+                    "side": 2
+                    "tight": null,
+                    "knots": null,
+                    "ache": 3,
+                    "sharp": 6,
+                }]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+ {
+    "responsive_recovery": responsive_recovery
+ }
+```
+
+* `responsive_recovery` will have the following schema:
+
+```
+{
+    "responsive_recovery_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id": UUID,
+    "active_rest": active_rest,
+    "active_recovery": active_recovery,
+    "ice": ice,
+    "cold_water_immersion": cold_water_immersion
+}
+```
+
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
+
+
 
 <div style="page-break-after: always;"></div>
 
@@ -859,6 +951,61 @@ Authorization: eyJraWQ...ajBc4VQ
             "ache": null
         }
     ]
+}
+```
+
+
+##### Response
+ 
+If the write was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+
+```
+{
+    {'message': 'success'}
+}
+```
+
+<!-- TODO -- title and language -->
+### Update Workout Detail
+
+Update training session endpoint can be called to update a planned or completed workout when new information becomes available.
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/training_session/{User UUID}/{Session UUID}`. The request method __must__ be `PATCH`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "session": session
+}
+```
+
+* `event_date_time` __should__  be a Datetime and reflect the local time the request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+
+```
+PATCH /plans/{version}/training_session/{User UUID}/{Session UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2019-10-29T17:45:24-05:00",
+    "session": {
+                    "event_date": "2019-01-12T10:41:57-05:00",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "session_RPE": 8,
+                    "end_date": "2019-01-12T10:54:57-05:00"
+                }
 }
 ```
 
