@@ -1400,7 +1400,7 @@ class InjuryRiskProcessor(object):
 
         return injury_risk_dict
 
-
+    @xray_recorder.capture('logic.InjuryRiskProcessor.process_todays_symptoms')
     def process_todays_symptoms(self, base_date, injury_risk_dict):
 
         todays_symptoms = [s for s in self.symptoms if s.reported_date_time.date() == base_date]
