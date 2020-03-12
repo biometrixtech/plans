@@ -4,6 +4,7 @@ from models.workout_program import WorkoutProgramModule, WorkoutSection, Workout
 # from logic.workout_processing import WorkoutProcessor
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
 from models.session_functional_movement import SessionFunctionalMovement
+from models.session import MixedActivitySession
 from models.exercise import WeightMeasure
 from models.athlete_injury_risk import AthleteInjuryRisk
 from datetime import datetime
@@ -101,7 +102,7 @@ def test_normalize_load_concentric():
     program_module.workout_sections.append(section_2)
 
     athlete_injury_risk = AthleteInjuryRisk("tester")
-    session_functional_movement = SessionFunctionalMovement(None, athlete_injury_risk.items)
+    session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now())
 
     normalized_dict = session_functional_movement.normalize_and_consolidate_load(load_dict, datetime.now())
