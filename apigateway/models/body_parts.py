@@ -345,6 +345,7 @@ class BodyPartFactory(object):
             isolated_activate = {}
             static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])  # sample 1
             dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'])  # sample 4
+            dynamic_integrate_2 = {}
             dynamic_integrate_with_speed = {}
 
         else:
