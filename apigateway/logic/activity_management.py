@@ -84,7 +84,6 @@ class ActivityManager(object):
                 if t.session_RPE is None:
                     t.session_RPE = default_rpe
 
-        import time; st = time.time()
         # process injury risk with new information
         injury_risk_processor = InjuryRiskProcessor(
                 self.event_date_time,
@@ -96,7 +95,7 @@ class ActivityManager(object):
         )
         injury_risk_processor.process()
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
-        print(f"injury risk processing: {time.time() - st}")
+
         # initialize exercise assignment calculator
         self.exercise_assignment_calculator = ExerciseAssignmentCalculator(
                 injury_risk_dict=consolidated_injury_risk_dict,
