@@ -8,6 +8,7 @@ from models.movement_tags import AdaptationType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation, BodyPartSide
 from datetime import timedelta
+from fathomapi.utils.xray import xray_recorder
 
 
 class SessionFunctionalMovement(object):
@@ -109,6 +110,7 @@ class SessionFunctionalMovement(object):
 
         return body_part_side_list
 
+    @xray_recorder.capture('logic.SessionFunctionalMovement.process_workout_load')
     def process_workout_load(self, workout_program, event_date):
 
         workout_load = {}
@@ -159,6 +161,7 @@ class SessionFunctionalMovement(object):
 
         return total_load
 
+    @xray_recorder.capture('logic.SessionFunctionalMovement.normalize_and_consolidate_load')
     def normalize_and_consolidate_load(self, total_load_dict, event_date):
 
         normalized_dict = {}
