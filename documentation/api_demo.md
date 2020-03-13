@@ -822,7 +822,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 
 <!-- TODO: title and language -->
-### Update
+### Update Responsive Recovery
 
 The Update Responsive Recovery endpoint can be called to update workout session information and/or report new symptom(s). Responsive Recovery Activities will be returned with consideration for the newly provided information.
 
@@ -855,6 +855,7 @@ Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date_time": "2018-12-10T17:45:24-05:00",
     "session":{
+                    "session_id": "5bbcc8da-181a-4a2b-bc72-a7210d5be757"
                     "event_date": "2019-01-12T10:41:57-05:00",
                     "session_type": 6,
                     "sport_name": 1,
@@ -966,9 +967,9 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 ```
 
 <!-- TODO -- title and language -->
-### Update Workout Detail
+### Update Workout
 
-Update training session endpoint can be called to update a planned or completed workout when new information becomes available.
+Update workout endpoint can be called to update details of a planned or completed workout when new information becomes available.
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/training_session/{User UUID}/{Session UUID}`. The request method __must__ be `PATCH`.
