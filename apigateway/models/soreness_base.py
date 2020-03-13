@@ -224,7 +224,7 @@ class BodyPartLocation(Enum):
     def get_muscle_group(cls, muscle):
         muscle_groups = cls.muscle_groups()
 
-        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+        if muscle in muscle_groups:  # is a muscle group, return itself
             return muscle
         else:
             for key, value in muscle_groups.items():
@@ -235,7 +235,7 @@ class BodyPartLocation(Enum):
     @classmethod
     def get_muscles_for_group(cls, muscle_group):
         muscle_groups = cls.muscle_groups()
-        if muscle_group in muscle_groups.keys():
+        if muscle_group in muscle_groups:
             return muscle_groups[muscle_group]
         return False
 
@@ -243,7 +243,7 @@ class BodyPartLocation(Enum):
     def get_viz_muscle_group(cls, muscle):
         muscle_groups = cls.muscle_groups_viz()
 
-        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+        if muscle in muscle_groups:  # is a muscle group, return itself
             return muscle
         else:
             for key, value in muscle_groups.items():
@@ -255,7 +255,7 @@ class BodyPartLocation(Enum):
     def get_muscle_group_for_viz_group(cls, muscle):
         muscle_groups = cls.viz_groups_to_muscle_groups()
 
-        if muscle in muscle_groups.keys():  # is a muscle group, return itself
+        if muscle in muscle_groups:  # is a muscle group, return itself
             return muscle
         else:
             for key, value in muscle_groups.items():
@@ -266,7 +266,7 @@ class BodyPartLocation(Enum):
     @classmethod
     def get_viz_muscles_for_group(cls, muscle_group):
         muscle_groups = cls.muscle_groups_viz()
-        if muscle_group in muscle_groups.keys():
+        if muscle_group in muscle_groups:
             return muscle_groups[muscle_group]
         return False
 

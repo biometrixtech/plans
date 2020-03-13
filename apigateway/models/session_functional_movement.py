@@ -125,7 +125,7 @@ class SessionFunctionalMovement(object):
                             section_load[adaptation_type] = muscle_load
                         else:
                             for muscle, load in muscle_load.items():
-                                if muscle not in section_load[adaptation_type].keys():
+                                if muscle not in section_load[adaptation_type]:
                                     section_load[adaptation_type][muscle] = load
                                 else:
                                     section_load[adaptation_type][muscle].merge(load)
@@ -135,7 +135,7 @@ class SessionFunctionalMovement(object):
                         workout_load[adaptation_type] = muscle_load
                     else:
                         for muscle, load in muscle_load.items():
-                            if muscle not in workout_load[adaptation_type].keys():
+                            if muscle not in workout_load[adaptation_type]:
                                 workout_load[adaptation_type][muscle] = load
                             else:
                                 workout_load[adaptation_type][muscle].merge(load)
@@ -185,7 +185,7 @@ class SessionFunctionalMovement(object):
                 minimum = min(all_values)
                 # maximum = max(all_values)
                 # value_range = maximum - minimum
-                for muscle in muscle_load_dict.keys():
+                for muscle in muscle_load_dict:
                     maximum = self.get_body_part_injury_risk_max(adaptation_type, muscle, event_date)
                     max_current_load = muscle_load_dict[muscle].total_load()
 
@@ -237,7 +237,7 @@ class SessionFunctionalMovement(object):
 
         max = 0.0
 
-        if muscle in self.injury_risk_dict.keys():
+        if muscle in self.injury_risk_dict:
             if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
                 if self.is_max_date_valid(self.injury_risk_dict[muscle].max_strength_endurance_cardiorespiratory_date, event_date):
                     max = self.injury_risk_dict[muscle].max_strength_endurance_cardiorespiratory
@@ -273,7 +273,7 @@ class SessionFunctionalMovement(object):
 
     def set_body_part_injury_risk_max(self, adaptation_type, muscle, max, event_date):
 
-        if muscle not in self.injury_risk_dict.keys():
+        if muscle not in self.injury_risk_dict:
             self.injury_risk_dict[muscle] = BodyPartInjuryRisk()
 
         if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:

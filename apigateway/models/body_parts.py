@@ -52,7 +52,7 @@ class BodyPartFactory(object):
 
         location = self.get_body_part_location(body_part)
         muscle_groups = BodyPartLocation.muscle_groups()
-        if location in muscle_groups.keys():  # is a muscle group
+        if location in muscle_groups:  # is a muscle group
             return True
         else:
             for key, value in muscle_groups.items():
@@ -1145,7 +1145,7 @@ class BodyPart(object):
 
         priority = 1
 
-        keys = list(exercise_dict.keys())
+        keys = list(exercise_dict)
 
         if randomize:
             shuffle(keys)
