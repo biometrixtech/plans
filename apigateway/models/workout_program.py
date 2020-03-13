@@ -157,8 +157,8 @@ class WorkoutExercise(Serialisable):
             'training_type': self.training_type.value if self.training_type is not None else None,
             'explosiveness_rating': self.explosiveness_rating,
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
-            'primary_actions': [action.json_serialise() for action in self.primary_actions],
-            'secondary_actions': [action.json_serialise() for action in self.secondary_actions]
+            # 'primary_actions': [action.json_serialise() for action in self.primary_actions],
+            # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions]
         }
         return ret
 
