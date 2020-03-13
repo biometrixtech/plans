@@ -615,26 +615,43 @@ class FunctionalMovementActionMapping(object):
                             self.muscle_load[
                                 body_part_side].compensation_source_load = CompensationSource.internal_processing
 
-    def apply_load_to_list(self, functional_movement_list, functional_movement_list_priority, target_body_part_function,
+    def apply_load_to_list(self, functional_movement_list, functional_movement_priority, target_body_part_function,
                            functional_movement_muscle_action, left_load, right_load, stability_rating):
 
         for body_part_side in functional_movement_list:
             functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
             functional_movement_body_part_side.body_part_function = target_body_part_function
             attributed_muscle_load = 0
-            left_load_to_attribute = 0
-            right_load_to_attribute = 0
+            load = 0
 
             if body_part_side.side == 1 or body_part_side.side == 0:
-                left_load_to_attribute += self.get_muscle_load(functional_movement_list_priority,
-                                                              target_body_part_function, left_load, stability_rating)
-
-                attributed_muscle_load += left_load_to_attribute
+                load += left_load
             elif body_part_side.side == 2 or body_part_side.side == 0:
-                right_load_to_attribute += self.get_muscle_load(functional_movement_list_priority,
-                                                               target_body_part_function, right_load, stability_rating)
+                load += right_load
 
-                attributed_muscle_load += right_load_to_attribute
+            if functional_movement_priority == 1:
+                priority_ratio = 1.00
+            elif functional_movement_priority == 2:
+                priority_ratio = 0.6
+            elif functional_movement_priority == 3:
+                priority_ratio = 0.3
+            elif functional_movement_priority == 4:
+                priority_ratio = 0.15
+            else:
+                priority_ratio = 0.00
+
+            if target_body_part_function == BodyPartFunction.prime_mover:
+                muscle_ratio = 1.00
+            elif target_body_part_function == BodyPartFunction.synergist:
+                muscle_ratio = 0.60
+            elif target_body_part_function == BodyPartFunction.stabilizer:
+                muscle_ratio = (0.15 * stability_rating) + 0.05
+            elif target_body_part_function == BodyPartFunction.fixator:
+                muscle_ratio = (0.10 * stability_rating) + 0.20
+            else:
+                muscle_ratio = 0.0
+
+            attributed_muscle_load = load * priority_ratio * muscle_ratio
 
                 # self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load,
                 #                               functional_movement_load.muscle_action)
