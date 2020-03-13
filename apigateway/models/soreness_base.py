@@ -399,6 +399,15 @@ class BodyPartSide(object):
     def json_deserialise(cls, input_dict):
         return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'])
 
+    def to_string(self):
+        return str(self.body_part_location.value) + "_" + str(self.side)
+
+    @staticmethod
+    def from_string(body_part_string):
+        data = body_part_string.split("_")
+        return BodyPartSide(BodyPartLocation(int(data[0])), int(data[1]))
+
+
 
 class BodyPartSideViz(object):
     def __init__(self, body_part_location, side, color):
