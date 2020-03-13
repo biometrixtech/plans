@@ -25,7 +25,9 @@ class SessionFunctionalMovement(object):
 
         if self.session.session_type() == SessionType.mixed_activity:
             if self.session.workout_program_module is not None:
-                total_load_dict = self.process_workout_load(self.session.workout_program_module, event_date)
+                functional_movement_factory = FunctionalMovementFactory()
+                functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+                total_load_dict = self.process_workout_load(self.session.workout_program_module, event_date, functional_movement_dict)
                 normalized_dict = self.normalize_and_consolidate_load(total_load_dict, event_date)
 
                 self.session_load_dict = normalized_dict
@@ -111,7 +113,7 @@ class SessionFunctionalMovement(object):
         return body_part_side_list
 
     @xray_recorder.capture('logic.SessionFunctionalMovement.process_workout_load')
-    def process_workout_load(self, workout_program, event_date):
+    def process_workout_load(self, workout_program, event_date, function_movement_dict):
 
         workout_load = {}
 
@@ -125,7 +127,7 @@ class SessionFunctionalMovement(object):
                     for action in workout_exercise.primary_actions:
                         functional_movement_action_mapping = FunctionalMovementActionMapping(action,
                                                                                              self.injury_risk_dict,
-                                                                                             event_date)
+                                                                                             event_date, function_movement_dict)
                         # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
                         self.functional_movement_mappings.append(functional_movement_action_mapping)
                         if action.adaptation_type.value not in exercise_load:

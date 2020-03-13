@@ -1,4 +1,5 @@
 from models.functional_movement_type import FunctionalMovementType
+from models.functional_movement import FunctionalMovementFactory
 from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
 # from logic.workout_processing import WorkoutProcessor
@@ -53,8 +54,11 @@ def test_aggregate_load_concentric():
     program_module.workout_sections.append(section_1)
     program_module.workout_sections.append(section_2)
 
+    factory = FunctionalMovementFactory()
+    dict = factory.get_functional_movement_dictinary()
+
     session_functional_movement = SessionFunctionalMovement(None, {})
-    load_dict = session_functional_movement.process_workout_load(program_module, datetime.now())
+    load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     assert len(load_dict) == 2
     assert len(load_dict[AdaptationType.strength_endurance_strength.value]) == 67
@@ -101,9 +105,12 @@ def test_normalize_load_concentric():
     program_module.workout_sections.append(section_1)
     program_module.workout_sections.append(section_2)
 
+    factory = FunctionalMovementFactory()
+    dict = factory.get_functional_movement_dictinary()
+
     athlete_injury_risk = AthleteInjuryRisk("tester")
     session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)
-    load_dict = session_functional_movement.process_workout_load(program_module, datetime.now())
+    load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     normalized_dict = session_functional_movement.normalize_and_consolidate_load(load_dict, datetime.now())
 
