@@ -276,7 +276,7 @@ class FunctionalMovementLoad(object):
 
 
 class FunctionalMovementActionMapping(object):
-    def __init__(self, exercise_action, injury_risk_dict, event_date):
+    def __init__(self, exercise_action, injury_risk_dict, event_date, functional_movement_dict=None):
         self.exercise_action = exercise_action
         self.hip_joint_functional_movements = []
         self.knee_joint_functional_movements = []
@@ -285,6 +285,7 @@ class FunctionalMovementActionMapping(object):
         self.shoulder_scapula_joint_functional_movements = []
         self.elbow_joint_functional_movements = []
         self.muscle_load = {}
+        self.functional_movement_dict = functional_movement_dict
         #self.injury_risk_dict = injury_risk_dict
         #self.event_date = event_date
 
@@ -303,7 +304,7 @@ class FunctionalMovementActionMapping(object):
 
     def get_functional_movements_for_joint_action(self, target_joint_action_list):
 
-        movement_factory = FunctionalMovementFactory()
+        #movement_factory = FunctionalMovementFactory()
         pairs = FunctionalMovementPairs()
 
         functional_movement_list = []
@@ -313,18 +314,20 @@ class FunctionalMovementActionMapping(object):
             functional_movement_type = pairs.get_functional_movement_for_muscle_action(
                 self.exercise_action.primary_muscle_action, target_joint_action.joint_action)
 
-            functional_movement = movement_factory.get_functional_movement(functional_movement_type)
+            #functional_movement = movement_factory.get_functional_movement(functional_movement_type)
 
-            functional_movement.prime_movers = self.convert_enums_to_body_part_side_list(
-                functional_movement.prime_movers)
-            functional_movement.stabilizers = self.convert_enums_to_body_part_side_list(
-                functional_movement.stabilizers)
-            functional_movement.synergists = self.convert_enums_to_body_part_side_list(
-                functional_movement.synergists)
-            functional_movement.fixators = self.convert_enums_to_body_part_side_list(
-                functional_movement.fixators)
-            functional_movement.parts_receiving_compensation = self.convert_enums_to_body_part_side_list(
-                functional_movement.parts_receiving_compensation)
+            # functional_movement.prime_movers = self.convert_enums_to_body_part_side_list(
+            #     functional_movement.prime_movers)
+            # functional_movement.stabilizers = self.convert_enums_to_body_part_side_list(
+            #     functional_movement.stabilizers)
+            # functional_movement.synergists = self.convert_enums_to_body_part_side_list(
+            #     functional_movement.synergists)
+            # functional_movement.fixators = self.convert_enums_to_body_part_side_list(
+            #     functional_movement.fixators)
+            # functional_movement.parts_receiving_compensation = self.convert_enums_to_body_part_side_list(
+            #     functional_movement.parts_receiving_compensation)
+
+            functional_movement = self.functional_movement_dict[functional_movement_type.value]
 
             functional_movement.priority = target_joint_action.priority
 
@@ -337,8 +340,11 @@ class FunctionalMovementActionMapping(object):
     def convert_enums_to_body_part_side_list(self, enum_list):
 
         body_part_factory = BodyPartFactory()
-
         body_part_list = []
+        # if len(enum_list) > 0:
+        #     body_part_list = [body_part_factory.get_body_part_side_list(e) for e in enum_list]
+        #     body_part_list = [b for body_list in body_part_list for b in body_list]
+
         for p in range(0, len(enum_list)):
             body_part_side_list = body_part_factory.get_body_part_side_list(enum_list[p])
             body_part_list.extend(body_part_side_list)
@@ -1014,6 +1020,78 @@ class ActivityFunctionalMovementFactory(object):
 
 
 class FunctionalMovementFactory(object):
+
+    def get_functional_movement_dictinary(self):
+
+        dict = {}
+
+        dict[FunctionalMovementType.ankle_dorsiflexion.value] = self.convert_ints_to_objects(self.get_ankle_dorsiflexion())
+        dict[FunctionalMovementType.ankle_dorsiflexion_and_inversion.value] = self.convert_ints_to_objects(self.get_ankle_dorsiflexion_and_inversion())
+        dict[FunctionalMovementType.ankle_plantar_flexion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion())
+        dict[FunctionalMovementType.ankle_plantar_flexion_and_eversion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion_and_eversion())
+        dict[FunctionalMovementType.inversion_of_the_foot.value] = self.convert_ints_to_objects(self.get_inversion_of_the_foot())
+        dict[FunctionalMovementType.eversion_of_the_foot.value] = self.convert_ints_to_objects(self.get_eversion_of_the_foot())
+        dict[FunctionalMovementType.knee_flexion.value] = self.convert_ints_to_objects(self.get_knee_flexion())
+        dict[FunctionalMovementType.knee_extension.value] = self.convert_ints_to_objects(self.get_knee_extension())
+        dict[FunctionalMovementType.hip_adduction.value] = self.convert_ints_to_objects(self.get_hip_adduction())
+        dict[FunctionalMovementType.hip_horizontal_adduction.value] = self.convert_ints_to_objects(self.get_hip_horizontal_adduction())
+        dict[FunctionalMovementType.hip_abduction.value] = self.convert_ints_to_objects(self.get_hip_abduction())
+        dict[FunctionalMovementType.hip_horizontal_abduction.value] =  self.convert_ints_to_objects(self.get_hip_horizontal_abduction())
+        dict[FunctionalMovementType.hip_internal_rotation.value] = self.convert_ints_to_objects(self.get_hip_internal_rotation())
+        dict[FunctionalMovementType.hip_external_rotation.value] = self.convert_ints_to_objects(self.get_hip_external_rotation())
+        dict[FunctionalMovementType.hip_extension.value] = self.convert_ints_to_objects(self.get_hip_extension())
+        dict[FunctionalMovementType.hip_flexion.value] = self.convert_ints_to_objects(self.get_hip_flexion())
+        dict[FunctionalMovementType.pelvic_anterior_tilt.value] = self.convert_ints_to_objects(self.get_pelvic_anterior_tilt())
+        dict[FunctionalMovementType.pelvic_posterior_tilt.value] = self.convert_ints_to_objects(self.get_pelvic_posterior_tilt())
+        dict[FunctionalMovementType.trunk_flexion.value] = self.convert_ints_to_objects(self.get_trunk_flexion())
+        dict[FunctionalMovementType.trunk_extension.value] = self.convert_ints_to_objects(self.get_trunk_extension())
+        dict[FunctionalMovementType.trunk_lateral_flexion.value] = self.convert_ints_to_objects(self.get_trunk_lateral_flexion())
+        dict[FunctionalMovementType.trunk_rotation.value] = self.convert_ints_to_objects(self.get_trunk_rotation())
+        dict[FunctionalMovementType.trunk_flexion_with_rotation.value] = self.convert_ints_to_objects(self.get_trunk_flexion_with_rotation())
+        dict[FunctionalMovementType.trunk_extension_with_rotation.value] = self.convert_ints_to_objects(self.get_trunk_extension_with_rotation())
+        dict[FunctionalMovementType.elbow_flexion.value] = self.convert_ints_to_objects(self.get_elbow_flexion())
+        dict[FunctionalMovementType.elbow_extension.value] = self.convert_ints_to_objects(self.get_elbow_extension())
+        dict[FunctionalMovementType.shoulder_horizontal_adduction.value] = self.convert_ints_to_objects(self.get_shoulder_horizontal_adduction_and_scapular_protraction())
+        dict[FunctionalMovementType.shoulder_horizontal_abduction.value] = self.convert_ints_to_objects(self.get_shoulder_horizontal_abduction_and_scapular_retraction())
+        dict[FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation.value] = self.convert_ints_to_objects(self.get_shoulder_flexion_and_scapular_upward_rotation())
+        dict[FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation.value] = self.convert_ints_to_objects(self.get_shoulder_extension_and_scapular_downward_rotation())
+        dict[FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation.value] = self.convert_ints_to_objects(self.get_shoulder_abduction_and_scapular_upward_rotation())
+        dict[FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation.value] = self.convert_ints_to_objects(self.get_shoulder_adduction_and_scapular_downward_rotation())
+        dict[FunctionalMovementType.internal_rotation.value] = self.convert_ints_to_objects(self.get_internal_rotation())
+        dict[FunctionalMovementType.external_rotation.value] = self.convert_ints_to_objects(self.get_external_rotation())
+        dict[FunctionalMovementType.scapular_elevation.value] = self.convert_ints_to_objects(self.get_scapular_elevation())
+        dict[FunctionalMovementType.scapular_depression.value] = self.convert_ints_to_objects(self.get_scapular_depression())
+
+        return dict
+
+    def convert_ints_to_objects(self, functional_movement):
+
+        functional_movement.prime_movers = self.convert_enum_list_to_body_part_list(
+            functional_movement.prime_movers)
+        functional_movement.stabilizers = self.convert_enum_list_to_body_part_list(
+            functional_movement.stabilizers)
+        functional_movement.synergists = self.convert_enum_list_to_body_part_list(
+            functional_movement.synergists)
+        functional_movement.fixators = self.convert_enum_list_to_body_part_list(
+            functional_movement.fixators)
+        functional_movement.parts_receiving_compensation = self.convert_enum_list_to_body_part_list(
+            functional_movement.parts_receiving_compensation)
+
+        return functional_movement
+
+    def convert_enum_list_to_body_part_list(self, enum_list):
+
+        body_part_factory = BodyPartFactory()
+        body_part_list = []
+        # if len(enum_list) > 0:
+        #     body_part_list = [body_part_factory.get_body_part_side_list(e) for e in enum_list]
+        #     body_part_list = [b for body_list in body_part_list for b in body_list]
+
+        for p in range(0, len(enum_list)):
+            body_part_side_list = body_part_factory.get_body_part_side_list(enum_list[p])
+            body_part_list.extend(body_part_side_list)
+
+        return body_part_list
 
     def get_functional_movement(self, movement_type):
 
