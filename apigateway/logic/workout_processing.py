@@ -1,3 +1,4 @@
+from fathomapi.utils.xray import xray_recorder
 from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
 from models.cardio_data import get_cardio_data
@@ -15,6 +16,7 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 
 class WorkoutProcessor(object):
 
+    @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, workout_program):
 
         for workout_section in workout_program.workout_sections:

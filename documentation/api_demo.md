@@ -821,11 +821,11 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
 
-<!-- TODO: title and language -->
+<!-- TODO - paul: title and language -->
 ### Update Responsive Recovery
 
 The Update Responsive Recovery endpoint can be called to update workout session information and/or report new symptom(s). Responsive Recovery Activities will be returned with consideration for the newly provided information.
-
+<!-- TODO - paul: should we mention something about SOFlete specific use case where this will be used to update planned session? -->
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/update`. The request method __must__ be `POST`.
@@ -913,7 +913,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 ### Overview & Description
 FathomAI Mobility API can provide greater personalization, diversity, and granularity  of activities for an athlete when more information is supplied by a client. Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
 
-### Symptoms
+### Symptom
 
 Consider severity ratings for tightness, knots, aches, and sharp as follows: 1-3 as Mild, 4-6 as Moderate, 7-9 as Severe, 10 as Max. When symptoms are reported with a severity greater than 4, Activity’s exercises will be restricted to avoid aggravation of symptoms. 
 ##### Query String
@@ -966,7 +966,7 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 }
 ```
 
-<!-- TODO -- title and language -->
+<!-- TODO - paul : title and language -->
 ### Update Workout
 
 Update workout endpoint can be called to update details of a planned or completed workout when new information becomes available.
