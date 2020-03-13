@@ -588,10 +588,11 @@ class FunctionalMovementActionMapping(object):
                     factor = .20
 
                 for body_part_side in functional_movement.parts_receiving_compensation:
+                    body_part_side_string = body_part_side.to_string()
                     if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
-                        if body_part_side in self.muscle_load:
-                            concentric_load = self.muscle_load[body_part_side].concentric_load
-                            eccentric_load = self.muscle_load[body_part_side].eccentric_load
+                        if body_part_side_string in self.muscle_load:
+                            concentric_load = self.muscle_load[body_part_side_string].concentric_load
+                            eccentric_load = self.muscle_load[body_part_side_string].eccentric_load
                         else:
                             concentric_load = 0
                             eccentric_load = 0
@@ -617,16 +618,16 @@ class FunctionalMovementActionMapping(object):
                         functional_movement_body_part_side.compensated_eccentric_load += synergist_compensated_eccentric_load
                         functional_movement_body_part_side.compensating_causes_load.append(c)
                         functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
-                        if body_part_side not in self.muscle_load:
-                            self.muscle_load[body_part_side] = functional_movement_body_part_side
+                        if body_part_side_string not in self.muscle_load:
+                            self.muscle_load[body_part_side_string] = functional_movement_body_part_side
                         else:
                             self.muscle_load[
-                                body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
+                                body_part_side_string].compensated_concentric_load += synergist_compensated_concentric_load
                             self.muscle_load[
-                                body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
-                            self.muscle_load[body_part_side].compensating_causes_load.append(c)
+                                body_part_side_string].compensated_eccentric_load += synergist_compensated_eccentric_load
+                            self.muscle_load[body_part_side_string].compensating_causes_load.append(c)
                             self.muscle_load[
-                                body_part_side].compensation_source_load = CompensationSource.internal_processing
+                                body_part_side_string].compensation_source_load = CompensationSource.internal_processing
 
     def apply_load_to_list(self, functional_movement_list, functional_movement_priority, target_body_part_function,
                            functional_movement_muscle_action, left_load, right_load, stability_rating):
@@ -669,17 +670,18 @@ class FunctionalMovementActionMapping(object):
                 # self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load,
                 #                               functional_movement_load.muscle_action)
             if attributed_muscle_load > 0:
-                if body_part_side in self.muscle_load:
+                body_part_side_string = body_part_side.to_string()
+                if body_part_side_string in self.muscle_load:
                     if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
-                        self.muscle_load[body_part_side].concentric_load += attributed_muscle_load
+                        self.muscle_load[body_part_side_string].concentric_load += attributed_muscle_load
                     else:
-                        self.muscle_load[body_part_side].eccentric_load += attributed_muscle_load
+                        self.muscle_load[body_part_side_string].eccentric_load += attributed_muscle_load
                 else:
-                    self.muscle_load[body_part_side] = functional_movement_body_part_side
+                    self.muscle_load[body_part_side_string] = functional_movement_body_part_side
                     if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
-                        self.muscle_load[body_part_side].concentric_load = attributed_muscle_load
+                        self.muscle_load[body_part_side_string].concentric_load = attributed_muscle_load
                     else:
-                        self.muscle_load[body_part_side].eccentric_load = attributed_muscle_load
+                        self.muscle_load[body_part_side_string].eccentric_load = attributed_muscle_load
             # if body_part_side.side == 2 or body_part_side.side == 0:
             #     attributed_muscle_load = self.get_muscle_load(functional_movement_list_priority,
             #                                                   target_body_part_function, right_load,

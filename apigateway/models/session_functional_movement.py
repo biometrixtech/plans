@@ -204,36 +204,37 @@ class SessionFunctionalMovement(object):
                 minimum = min(all_values)
                 # maximum = max(all_values)
                 # value_range = maximum - minimum
-                for muscle in muscle_load_dict:
+                for muscle_string in muscle_load_dict:
+                    muscle = BodyPartSide.from_string(muscle_string)
                     maximum = self.get_body_part_injury_risk_max(adaptation_type, muscle, event_date)
-                    max_current_load = muscle_load_dict[muscle].total_load()
+                    max_current_load = muscle_load_dict[muscle_string].total_load()
 
                     if maximum < max_current_load:
                         self.set_body_part_injury_risk_max(adaptation_type, muscle, max_current_load, event_date)
                         maximum = max_current_load
 
                     value_range = maximum - minimum
-                    if muscle_load_dict[muscle].total_load() > 0 and value_range > 0:
-                        muscle_load_dict[muscle].total_normalized_load = scalar * ((muscle_load_dict[muscle].total_load() - minimum) / value_range)
+                    if muscle_load_dict[muscle_string].total_load() > 0 and value_range > 0:
+                        muscle_load_dict[muscle_string].total_normalized_load = scalar * ((muscle_load_dict[muscle_string].total_load() - minimum) / value_range)
 
                     if muscle not in normalized_dict:
-                        normalized_dict[muscle] = muscle_load_dict[muscle]
+                        normalized_dict[muscle] = muscle_load_dict[muscle_string]
                     else:
-                        normalized_dict[muscle].total_normalized_load += muscle_load_dict[muscle].total_normalized_load
+                        normalized_dict[muscle].total_normalized_load += muscle_load_dict[muscle_string].total_normalized_load
 
                     # saved normalized load to the session while we're looping through
                     if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
-                        self.session.strength_endurance_cardiorespiratory_load += muscle_load_dict[muscle].total_normalized_load
+                        self.session.strength_endurance_cardiorespiratory_load += muscle_load_dict[muscle_string].total_normalized_load
                     elif adaptation_type == AdaptationType.strength_endurance_strength.value:
-                        self.session.strength_endurance_strength_load += muscle_load_dict[muscle].total_normalized_load
+                        self.session.strength_endurance_strength_load += muscle_load_dict[muscle_string].total_normalized_load
                     elif adaptation_type == AdaptationType.power_drill.value:
-                        self.session.power_drill_load += muscle_load_dict[muscle].total_normalized_load
+                        self.session.power_drill_load += muscle_load_dict[muscle_string].total_normalized_load
                     elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
-                        self.session.maximal_strength_hypertrophic_load += muscle_load_dict[muscle].total_normalized_load
+                        self.session.maximal_strength_hypertrophic_load += muscle_load_dict[muscle_string].total_normalized_load
                     elif adaptation_type == AdaptationType.power_explosive_action.value:
-                        self.session.power_explosive_action_load += muscle_load_dict[muscle].total_normalized_load
+                        self.session.power_explosive_action_load += muscle_load_dict[muscle_string].total_normalized_load
                     else:
-                        self.session.not_tracked_load += muscle_load_dict[muscle].total_normalized_load
+                        self.session.not_tracked_load += muscle_load_dict[muscle_string].total_normalized_load
 
         return normalized_dict
 
