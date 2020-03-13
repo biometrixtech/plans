@@ -574,7 +574,7 @@ class FunctionalMovementActionMapping(object):
                     # body_part_side_list = body_part_factory.get_body_part_side_list(s)
                     # for body_part_side in body_part_side_list:
                     if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
-                        if body_part_side in self.muscle_load.keys():
+                        if body_part_side in self.muscle_load:
                             concentric_load = self.muscle_load[body_part_side].concentric_load
                             eccentric_load = self.muscle_load[body_part_side].eccentric_load
                         else:

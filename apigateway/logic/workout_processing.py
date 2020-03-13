@@ -23,7 +23,7 @@ class WorkoutProcessor(object):
                 self.add_movement_detail_to_exercise(workout_exercise)
 
     def add_movement_detail_to_exercise(self, exercise):
-        if exercise.movement_id in movement_library.keys():
+        if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
@@ -177,11 +177,11 @@ class WorkoutProcessor(object):
 
         for prime_mover in prime_movers['first_prime_movers']:
             var = f'prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients.keys():
+            if var in bodyweight_coefficients:
                 bodyweight_ratio += bodyweight_coefficients[var]
         for prime_mover in prime_movers['second_prime_movers']:
             var = f'second_prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients.keys():
+            if var in bodyweight_coefficients:
                 bodyweight_ratio += bodyweight_coefficients[var]
         return bodyweight_ratio
 

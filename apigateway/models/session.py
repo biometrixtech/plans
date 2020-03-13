@@ -467,7 +467,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                     body_part_location = muscle_group
                 else:
                     body_part_location = body_part_side.body_part_location
-                if body_part_location in body_parts.keys():
+                if body_part_location in body_parts:
                     body_part_function = BodyPartFunction.merge(body_part_function, body_parts[body_part_location])
                 body_parts[body_part_location] = body_part_function
 

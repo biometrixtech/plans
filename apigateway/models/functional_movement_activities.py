@@ -977,7 +977,7 @@ class MovementIntegrationPrep(ActiveRestBase):
         compensating = False
         excessive_strain = False
 
-        if body_part is not None and body_part.location in sport_body_parts.keys():
+        if body_part is not None and body_part.location in sport_body_parts:
             if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
                 excessive_strain = True
 
@@ -1139,7 +1139,7 @@ class MovementIntegrationPrep(ActiveRestBase):
             #                             last_severity, exercise_library)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
-        if body_part is not None and body_part.location in sport_body_parts.keys():
+        if body_part is not None and body_part.location in sport_body_parts:
 
             # is_short = self.is_body_part_short(body_part_injury_risk)
             is_overactive_short = self.is_body_part_overactive_short(body_part_injury_risk)

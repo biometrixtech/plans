@@ -224,7 +224,7 @@ class InjuryRiskProcessor(object):
 
     def reset_reported_symptoms(self, injury_risk_dict):
 
-        for b in injury_risk_dict.keys():
+        for b in injury_risk_dict:
             injury_risk_dict[b].last_ache_date = None
             injury_risk_dict[b].last_tight_date = None
             injury_risk_dict[b].last_knots_date = None
@@ -826,7 +826,7 @@ class InjuryRiskProcessor(object):
             knee_valgus_apt_present = False
             knee_valgus_hip_drop_present = False
 
-            historic_body_part_list = [h.body_part_location.value for h in historic_symptom_body_part_enums.keys() if
+            historic_body_part_list = [h.body_part_location.value for h in historic_symptom_body_part_enums if
                                        h.side == side or h.side == 0]
 
             current_symptom_body_part_enums = [s.body_part.location.value for s in self.symptoms
@@ -1231,7 +1231,7 @@ class InjuryRiskProcessor(object):
         body_part_side_list = []
 
         for session in session_functional_movement_dict_list:
-            for body_part_side in session_functional_movement_dict_list[session].keys():
+            for body_part_side in session_functional_movement_dict_list[session]:
 
                 # prime_movers = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.prime_movers]
                 # synergists = [BodyPartSide(b.body_part_side.body_part_location, b.body_part_side.side) for b in functional_movement_mapping.synergists]
