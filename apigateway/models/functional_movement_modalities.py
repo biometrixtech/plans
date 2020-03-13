@@ -532,9 +532,9 @@ class Modality(object):
             self.dosage_durations[benchmark_value].comprehensive_duration += assigned_exercise.duration(
                 dosage.comprehensive_reps_assigned, dosage.comprehensive_sets_assigned)
 
-    @abc.abstractmethod
-    def fill_exercises(self, exercise_library, injury_hist_dict):
-        pass
+    # @abc.abstractmethod
+    # def fill_exercises(self, exercise_library, injury_hist_dict):
+    #     pass
 
     #@staticmethod
     def update_dosage(self, dosage, exercise):

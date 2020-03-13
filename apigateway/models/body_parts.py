@@ -410,7 +410,7 @@ class BodyPartFactory(object):
 
         upper_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         upper_body.add_muscle_groups([1, 18], [2], [], [21, 18])
         return upper_body
@@ -427,7 +427,7 @@ class BodyPartFactory(object):
 
         lower_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         lower_body.add_muscle_groups([16, 15], [5, 11], [], [14])
 
@@ -447,7 +447,7 @@ class BodyPartFactory(object):
 
         full_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         full_body.add_muscle_groups([12, 6, 4], [5, 15], [21, 11], [25, 14])
 

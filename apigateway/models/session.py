@@ -775,7 +775,7 @@ class GlobalLoadEstimationParameters(object):
 class SessionLoadEstimationParameter(GlobalLoadEstimationParameters):
 
     def __init__(self):
-        GlobalLoadEstimationParameters.__init__()
+        GlobalLoadEstimationParameters.__init__(self)
         self.session_type = SessionType.practice
 
 
