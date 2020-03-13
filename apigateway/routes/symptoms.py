@@ -5,12 +5,15 @@ from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.daily_plan import DailyPlan
+from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from routes.environments import is_fathom_environment
 from utils import parse_datetime, format_date, get_timezone, _check_plan_exists
 from logic.survey_processing import SurveyProcessing, create_plan
+
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -103,7 +106,7 @@ def validate_data():
         else:
             parse_datetime(request.json['event_date_time'])
     else:
-         InvalidSchemaException(f"event_date_time is a required field")
+        InvalidSchemaException(f"event_date_time is a required field")
 
     if 'soreness' in request.json:
         if not isinstance(request.json['soreness'], list):
@@ -124,4 +127,4 @@ def validate_data():
                 raise InvalidSchemaException('body_part not recognized')
             symptom['body_part'] = int(symptom['body_part'])
     else:
-         InvalidSchemaException(f"symptoms is a required field")
+        InvalidSchemaException(f"symptoms is a required field")
