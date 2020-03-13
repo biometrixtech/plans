@@ -492,8 +492,6 @@ class FunctionalMovementActionMapping(object):
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date,
                                                                              functional_movement_list)
 
-        body_part_factory = BodyPartFactory()
-
         left_load = exercise_action.total_load_left
         right_load = exercise_action.total_load_right
 
@@ -501,7 +499,65 @@ class FunctionalMovementActionMapping(object):
             functional_movement = functional_movement_load.functional_movement
 
             if exercise_action.apply_instability:
-                stability_rating = self.get_matching_stability_rating(functional_movement_load, exercise_action)
+
+                lower_stability_rating = exercise_action.lower_body_stability_rating / 2.0  # normalize
+                upper_stability_rating = exercise_action.upper_body_stability_rating / 2.0  # normalize
+
+                functional_movement_type = functional_movement.functional_movement_type
+
+                if functional_movement_type in [FunctionalMovementType.ankle_dorsiflexion,
+                                                FunctionalMovementType.ankle_plantar_flexion,
+                                                FunctionalMovementType.inversion_of_the_foot,
+                                                FunctionalMovementType.eversion_of_the_foot,
+                                                FunctionalMovementType.tibial_internal_rotation,
+                                                FunctionalMovementType.tibial_external_rotation,
+                                                FunctionalMovementType.ankle_dorsiflexion_and_inversion,
+                                                FunctionalMovementType.ankle_plantar_flexion_and_eversion]:
+                    stability_rating = (.8 * lower_stability_rating) + (.2 * upper_stability_rating)
+
+                elif functional_movement_type in [FunctionalMovementType.knee_flexion,
+                                                  FunctionalMovementType.knee_extension]:
+                    stability_rating = (.7 * lower_stability_rating) + (.3 * upper_stability_rating)
+
+                elif functional_movement_type in [FunctionalMovementType.elbow_extension,
+                                                  FunctionalMovementType.elbow_flexion]:
+                    stability_rating = (.2 * lower_stability_rating) + (.8 * upper_stability_rating)
+
+                elif functional_movement_type in [FunctionalMovementType.shoulder_horizontal_adduction,
+                                                  FunctionalMovementType.shoulder_horizontal_abduction,
+                                                  FunctionalMovementType.shoulder_flexion_and_scapular_upward_rotation,
+                                                  FunctionalMovementType.shoulder_extension_and_scapular_downward_rotation,
+                                                  FunctionalMovementType.shoulder_abduction_and_scapular_upward_rotation,
+                                                  FunctionalMovementType.shoulder_adduction_and_scapular_downward_rotation,
+                                                  FunctionalMovementType.internal_rotation,
+                                                  FunctionalMovementType.external_rotation,
+                                                  FunctionalMovementType.scapular_depression,
+                                                  FunctionalMovementType.scapular_elevation]:
+                    stability_rating = (.3 * lower_stability_rating) + (.7 * upper_stability_rating)
+
+                elif functional_movement_type in [FunctionalMovementType.hip_abduction,
+                                                  FunctionalMovementType.hip_adduction,
+                                                  FunctionalMovementType.hip_internal_rotation,
+                                                  FunctionalMovementType.hip_external_rotation,
+                                                  FunctionalMovementType.hip_extension,
+                                                  FunctionalMovementType.hip_flexion,
+                                                  FunctionalMovementType.hip_horizontal_abduction,
+                                                  FunctionalMovementType.hip_horizontal_adduction]:
+                    stability_rating = (.6 * lower_stability_rating) + (.4 * upper_stability_rating)
+
+                elif functional_movement_type in [FunctionalMovementType.pelvic_anterior_tilt,
+                                                  FunctionalMovementType.pelvic_posterior_tilt]:
+                    stability_rating = (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+
+                elif functional_movement_type in [FunctionalMovementType.trunk_flexion,
+                                                  FunctionalMovementType.trunk_extension,
+                                                  FunctionalMovementType.trunk_lateral_flexion,
+                                                  FunctionalMovementType.trunk_rotation,
+                                                  FunctionalMovementType.trunk_flexion_with_rotation,
+                                                  FunctionalMovementType.trunk_extension_with_rotation]:
+                    stability_rating = (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+                else:
+                    stability_rating = 0.0
             else:
                 stability_rating = 0.0
 
@@ -521,47 +577,6 @@ class FunctionalMovementActionMapping(object):
                                     BodyPartFunction.fixator, functional_movement_load.muscle_action,
                                     left_load, right_load, stability_rating)
 
-            # for body_part_side in functional_movement.synergists:
-            #     # body_part_side_list = body_part_factory.get_body_part_side_list(s)
-            #     # for body_part_side in body_part_side_list:
-            #     functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
-            #     functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
-            #     if body_part_side.side == 1 or body_part_side.side == 0:
-            #         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-            #                                                       BodyPartFunction.synergist, left_load, stability_rating)
-            #         self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
-            #     if body_part_side.side == 2 or body_part_side.side == 0:
-            #         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-            #                                                       BodyPartFunction.synergist, right_load, stability_rating)
-            #         self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
-            # for body_part_side in functional_movement.stabilizers:
-            #     # body_part_side_list = body_part_factory.get_body_part_side_list(t)
-            #     # for body_part_side in body_part_side_list:
-            #     functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
-            #     functional_movement_body_part_side.body_part_function = BodyPartFunction.stabilizer
-            #     if body_part_side.side == 1 or body_part_side.side == 0:
-            #         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-            #                                                       BodyPartFunction.stabilizer, left_load, stability_rating)
-            #         self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
-            #     if body_part_side.side == 2 or body_part_side.side == 0:
-            #         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-            #                                                       BodyPartFunction.stabilizer, right_load, stability_rating)
-            #         self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
-            #
-            # for body_part_side in functional_movement.fixators:
-            #     # body_part_side_list = body_part_factory.get_body_part_side_list(f)
-            #     # for body_part_side in body_part_side_list:
-            #     functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
-            #     functional_movement_body_part_side.body_part_function = BodyPartFunction.fixator
-            #     if body_part_side.side == 1 or body_part_side.side == 0:
-            #         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-            #                                                       BodyPartFunction.fixator, left_load, stability_rating)
-            #         self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
-            #     if body_part_side.side == 2 or body_part_side.side == 0:
-            #         attributed_muscle_load = self.get_muscle_load(functional_movement.priority,
-            #                                                       BodyPartFunction.fixator, right_load, stability_rating)
-            #         self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load, functional_movement_load.muscle_action)
-
             for c, severity in compensation_causing_prime_movers.items():
                 if severity <= 2:
                     factor = .04
@@ -573,8 +588,6 @@ class FunctionalMovementActionMapping(object):
                     factor = .20
 
                 for body_part_side in functional_movement.parts_receiving_compensation:
-                    # body_part_side_list = body_part_factory.get_body_part_side_list(s)
-                    # for body_part_side in body_part_side_list:
                     if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
                         if body_part_side in self.muscle_load:
                             concentric_load = self.muscle_load[body_part_side].concentric_load
@@ -703,33 +716,33 @@ class FunctionalMovementActionMapping(object):
     #             else:
     #                 self.muscle_load[muscle.body_part_side].compensated_eccentric_load = attributed_muscle_load
 
-    def get_muscle_load(self, functional_movement_priority, muscle_role, load, stability_rating):
-
-        if functional_movement_priority == 1:
-            priority_ratio = 1.00
-        elif functional_movement_priority == 2:
-            priority_ratio = 0.6
-        elif functional_movement_priority == 3:
-            priority_ratio = 0.3
-        elif functional_movement_priority == 4:
-            priority_ratio = 0.15
-        else:
-            priority_ratio = 0.00
-
-        if muscle_role == BodyPartFunction.prime_mover:
-            muscle_ratio = 1.00
-        elif muscle_role == BodyPartFunction.synergist:
-            muscle_ratio = 0.60
-        elif muscle_role == BodyPartFunction.stabilizer:
-            muscle_ratio = (0.15 * stability_rating) + 0.05
-        elif muscle_role == BodyPartFunction.fixator:
-            muscle_ratio = (0.10 * stability_rating) + 0.20
-        else:
-            muscle_ratio = 0.0
-
-        scaled_load = load * priority_ratio * muscle_ratio
-
-        return scaled_load
+    # def get_muscle_load(self, functional_movement_priority, muscle_role, load, stability_rating):
+    #
+    #     if functional_movement_priority == 1:
+    #         priority_ratio = 1.00
+    #     elif functional_movement_priority == 2:
+    #         priority_ratio = 0.6
+    #     elif functional_movement_priority == 3:
+    #         priority_ratio = 0.3
+    #     elif functional_movement_priority == 4:
+    #         priority_ratio = 0.15
+    #     else:
+    #         priority_ratio = 0.00
+    #
+    #     if muscle_role == BodyPartFunction.prime_mover:
+    #         muscle_ratio = 1.00
+    #     elif muscle_role == BodyPartFunction.synergist:
+    #         muscle_ratio = 0.60
+    #     elif muscle_role == BodyPartFunction.stabilizer:
+    #         muscle_ratio = (0.15 * stability_rating) + 0.05
+    #     elif muscle_role == BodyPartFunction.fixator:
+    #         muscle_ratio = (0.10 * stability_rating) + 0.20
+    #     else:
+    #         muscle_ratio = 0.0
+    #
+    #     scaled_load = load * priority_ratio * muscle_ratio
+    #
+    #     return scaled_load
 
     def get_compensating_body_parts(self, injury_risk_dict, event_date, functional_movement_list):
 
