@@ -117,7 +117,26 @@ class SessionFunctionalMovement(object):
             if workout_section.assess_load:
                 section_load = {}  # load by adaptation type
                 for workout_exercise in workout_section.exercises:
-                    exercise_load = self.apply_load(workout_exercise.primary_actions, event_date)
+                    #exercise_load = self.apply_load(workout_exercise.primary_actions, event_date)
+                    exercise_load = {}  # load by adaptation type
+
+                    for action in workout_exercise.primary_actions:
+                        functional_movement_action_mapping = FunctionalMovementActionMapping(action,
+                                                                                             self.injury_risk_dict,
+                                                                                             event_date)
+                        # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+                        self.functional_movement_mappings.append(functional_movement_action_mapping)
+                        if action.adaptation_type.value not in exercise_load:
+                            exercise_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
+                        else:
+                            for muscle, load in functional_movement_action_mapping.muscle_load.items():
+                                if muscle not in exercise_load[action.adaptation_type.value]:
+                                    exercise_load[action.adaptation_type.value][muscle] = load
+                                else:
+                                    exercise_load[action.adaptation_type.value][muscle].merge(load)
+
+                    #return total_load
+
                     for adaptation_type, muscle_load in exercise_load.items():
                         if adaptation_type not in section_load:
                             section_load[adaptation_type] = muscle_load
@@ -140,24 +159,24 @@ class SessionFunctionalMovement(object):
 
         return workout_load
 
-    def apply_load(self, action_list, event_date):
-
-        total_load = {}  # load by adaptation type
-
-        for action in action_list:
-            functional_movement_action_mapping = FunctionalMovementActionMapping(action, self.injury_risk_dict, event_date)
-            #functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
-            self.functional_movement_mappings.append(functional_movement_action_mapping)
-            if action.adaptation_type.value not in total_load:
-                total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
-            else:
-                for muscle, load in functional_movement_action_mapping.muscle_load.items():
-                    if muscle not in total_load[action.adaptation_type.value]:
-                        total_load[action.adaptation_type.value][muscle] = load
-                    else:
-                        total_load[action.adaptation_type.value][muscle].merge(load)
-
-        return total_load
+    # def apply_load(self, action_list, event_date):
+    #
+    #     total_load = {}  # load by adaptation type
+    #
+    #     for action in action_list:
+    #         functional_movement_action_mapping = FunctionalMovementActionMapping(action, self.injury_risk_dict, event_date)
+    #         #functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+    #         self.functional_movement_mappings.append(functional_movement_action_mapping)
+    #         if action.adaptation_type.value not in total_load:
+    #             total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
+    #         else:
+    #             for muscle, load in functional_movement_action_mapping.muscle_load.items():
+    #                 if muscle not in total_load[action.adaptation_type.value]:
+    #                     total_load[action.adaptation_type.value][muscle] = load
+    #                 else:
+    #                     total_load[action.adaptation_type.value][muscle].merge(load)
+    #
+    #     return total_load
 
     def normalize_and_consolidate_load(self, total_load_dict, event_date):
 
