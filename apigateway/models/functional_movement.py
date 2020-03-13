@@ -425,67 +425,67 @@ class FunctionalMovementActionMapping(object):
     #     self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements)
     #     self.set_compensation_load_for_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements)
 
-    def set_compensation_load_for_functional_movements(self, injury_risk_dict, event_date, functional_movement_list):
-
-        compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date, functional_movement_list)
-
-        body_part_factory = BodyPartFactory()
-
-        for functional_movement_load in functional_movement_list:
-            functional_movement = functional_movement_load.functional_movement
-
-            for c, severity in compensation_causing_prime_movers.items():
-                if severity <= 2:
-                    factor = .04
-                elif 2 < severity <= 5:
-                    factor = .08
-                elif 5 < severity <= 8:
-                    factor = .16
-                else:
-                    factor = .20
-
-                for s in functional_movement.parts_receiving_compensation:
-                    body_part_side_list = body_part_factory.get_body_part_side_list(s)
-                    for body_part_side in body_part_side_list:
-                        if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
-                            if body_part_side in self.muscle_load.keys():
-                                concentric_load = self.muscle_load[body_part_side].concentric_load
-                                eccentric_load = self.muscle_load[body_part_side].eccentric_load
-                            else:
-                                concentric_load = 0
-                                eccentric_load = 0
-
-                            if functional_movement_load.muscle_action == MuscleAction.concentric or functional_movement_load.muscle_action == MuscleAction.isometric:
-
-                                compensated_concentric_load = concentric_load * factor
-                                compensated_eccentric_load = 0
-
-                            else:
-                                compensated_concentric_load = 0
-                                compensated_eccentric_load = eccentric_load * factor
-
-                            functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
-                            functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
-
-                            synergist_compensated_concentric_load = compensated_concentric_load / float(
-                                len(functional_movement.parts_receiving_compensation))
-                            synergist_compensated_eccentric_load = compensated_eccentric_load / float(
-                                len(functional_movement.parts_receiving_compensation))
-                            functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
-                            functional_movement_body_part_side.compensated_concentric_load += synergist_compensated_concentric_load
-                            functional_movement_body_part_side.compensated_eccentric_load += synergist_compensated_eccentric_load
-                            functional_movement_body_part_side.compensating_causes_load.append(c)
-                            functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
-                            if body_part_side not in self.muscle_load:
-                                self.muscle_load[body_part_side] = functional_movement_body_part_side
-                            else:
-                                self.muscle_load[
-                                    body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
-                                self.muscle_load[
-                                    body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
-                                self.muscle_load[body_part_side].compensating_causes_load.append(c)
-                                self.muscle_load[
-                                    body_part_side].compensation_source_load = CompensationSource.internal_processing
+    # def set_compensation_load_for_functional_movements(self, injury_risk_dict, event_date, functional_movement_list):
+    #
+    #     compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date, functional_movement_list)
+    #
+    #     body_part_factory = BodyPartFactory()
+    #
+    #     for functional_movement_load in functional_movement_list:
+    #         functional_movement = functional_movement_load.functional_movement
+    #
+    #         for c, severity in compensation_causing_prime_movers.items():
+    #             if severity <= 2:
+    #                 factor = .04
+    #             elif 2 < severity <= 5:
+    #                 factor = .08
+    #             elif 5 < severity <= 8:
+    #                 factor = .16
+    #             else:
+    #                 factor = .20
+    #
+    #             for s in functional_movement.parts_receiving_compensation:
+    #                 body_part_side_list = body_part_factory.get_body_part_side_list(s)
+    #                 for body_part_side in body_part_side_list:
+    #                     if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
+    #                         if body_part_side in self.muscle_load.keys():
+    #                             concentric_load = self.muscle_load[body_part_side].concentric_load
+    #                             eccentric_load = self.muscle_load[body_part_side].eccentric_load
+    #                         else:
+    #                             concentric_load = 0
+    #                             eccentric_load = 0
+    #
+    #                         if functional_movement_load.muscle_action == MuscleAction.concentric or functional_movement_load.muscle_action == MuscleAction.isometric:
+    #
+    #                             compensated_concentric_load = concentric_load * factor
+    #                             compensated_eccentric_load = 0
+    #
+    #                         else:
+    #                             compensated_concentric_load = 0
+    #                             compensated_eccentric_load = eccentric_load * factor
+    #
+    #                         functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
+    #                         functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
+    #
+    #                         synergist_compensated_concentric_load = compensated_concentric_load / float(
+    #                             len(functional_movement.parts_receiving_compensation))
+    #                         synergist_compensated_eccentric_load = compensated_eccentric_load / float(
+    #                             len(functional_movement.parts_receiving_compensation))
+    #                         functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
+    #                         functional_movement_body_part_side.compensated_concentric_load += synergist_compensated_concentric_load
+    #                         functional_movement_body_part_side.compensated_eccentric_load += synergist_compensated_eccentric_load
+    #                         functional_movement_body_part_side.compensating_causes_load.append(c)
+    #                         functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
+    #                         if body_part_side not in self.muscle_load:
+    #                             self.muscle_load[body_part_side] = functional_movement_body_part_side
+    #                         else:
+    #                             self.muscle_load[
+    #                                 body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
+    #                             self.muscle_load[
+    #                                 body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
+    #                             self.muscle_load[body_part_side].compensating_causes_load.append(c)
+    #                             self.muscle_load[
+    #                                 body_part_side].compensation_source_load = CompensationSource.internal_processing
 
     def apply_load_to_functional_movements(self, injury_risk_dict, event_date, functional_movement_list, exercise_action):
 
