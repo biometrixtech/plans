@@ -15,13 +15,13 @@ user_stats_datastore = datastore_collection.user_stats_datastore
 symptom_datastore = datastore_collection.symptom_datastore
 
 
-app = Blueprint('symptom', __name__)
+app = Blueprint('report_symptoms', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
 @require.body({'event_date_time': str})
-@xray_recorder.capture('routes.symptom.post')
+@xray_recorder.capture('routes.report_symptoms.post')
 def handle_add_symptom(user_id):
     validate_data()
     event_date_time = parse_datetime(request.json['event_date_time'])
@@ -58,7 +58,7 @@ def handle_add_symptom(user_id):
     return {'message': 'success'}, 200
 
 
-@xray_recorder.capture('routes.symptom.validate')
+@xray_recorder.capture('routes.report_symptoms.validate')
 def validate_data():
     if not isinstance(request.json['event_date_time'], str):
         raise InvalidSchemaException(f"Property event_date_time must be of type string")

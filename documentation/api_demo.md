@@ -918,7 +918,7 @@ FathomAI Mobility API can provide greater personalization, diversity, and granul
 Consider severity ratings for tightness, knots, aches, and sharp as follows: 1-3 as Mild, 4-6 as Moderate, 7-9 as Severe, 10 as Max. When symptoms are reported with a severity greater than 4, Activity’s exercises will be restricted to avoid aggravation of symptoms. 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/symptom/{User UUID}`. The request method __must__ be `POST`.
+The client __must__ submit a request to the endpoint `/plans/{version}/report_symptoms/{User UUID}`. The request method __must__ be `POST`.
 
 ##### Request
 
@@ -935,7 +935,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `symptoms` __should__ reflect a list of symptoms(`symptom`) as defined in the Appendix
 
 ```
-POST /plans/{version}/symptom/{User UUID} HTTPS/1.1
+POST /plans/{version}/report_symptoms/{User UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -1605,5 +1605,5 @@ The following reportable body parts are considered muscles
     rotator_cuff = 119
     serratus_anterior = 125
 ```
-###### Last Modified: March 13, 2020
+###### Last Modified: March 16, 2020
 
