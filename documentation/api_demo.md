@@ -969,7 +969,7 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 <!-- TODO - paul : title and language -->
 ### Update Workout
 
-Update workout endpoint can be called to update details of a planned or completed workout when new information becomes available.
+The Update Workout endpoint can be called to update details of a planned or completed workout when new information becomes available.  This updated information will improve future personalization.
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/training_session/{User UUID}/{Session UUID}`. The request method __must__ be `PATCH`.
