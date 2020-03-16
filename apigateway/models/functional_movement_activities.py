@@ -27,7 +27,7 @@ class MovementPrep(object):
             "movement_prep_id": self.movement_prep_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
-            "training_session": self.training_session_id,
+            "training_session_id": self.training_session_id,
             "movement_integration_prep": self.movement_integration_prep.json_serialise() if self.movement_integration_prep is not None else None
         }
 
