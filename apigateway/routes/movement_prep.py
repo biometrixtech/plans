@@ -14,7 +14,7 @@ from utils import parse_datetime, get_timezone
 datastore_collection = DatastoreCollection()
 user_stats_datastore = datastore_collection.user_stats_datastore
 symptom_datastore = datastore_collection.symptom_datastore
-training_session_datastore = datastore_collection.training_session_datastore
+# training_session_datastore = datastore_collection.training_session_datastore
 workout_program_datastore = datastore_collection.workout_program_datastore
 
 app = Blueprint('movement_prep', __name__)

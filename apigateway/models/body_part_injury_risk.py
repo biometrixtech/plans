@@ -23,18 +23,18 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_ramp_today = 0
 
         # intensity
-        self.concentric_intensity_last_week = 0
-        self.concentric_intensity_this_week = 0
-
-        self.eccentric_intensity_last_week = 0
-        self.eccentric_intensity_this_week = 0
-        self.concentric_intensity_today = 0
-        self.eccentric_intensity_today = 0
-        self.total_intensity_today = 0
-
-        self.compensating_concentric_intensity_today = 0
-        self.compensating_eccentric_intensity_today = 0
-        self.compensating_total_intensity_today = 0
+        # self.concentric_intensity_last_week = 0
+        # self.concentric_intensity_this_week = 0
+        #
+        # self.eccentric_intensity_last_week = 0
+        # self.eccentric_intensity_this_week = 0
+        # self.concentric_intensity_today = 0
+        # self.eccentric_intensity_today = 0
+        # self.total_intensity_today = 0
+        #
+        # self.compensating_concentric_intensity_today = 0
+        # self.compensating_eccentric_intensity_today = 0
+        # self.compensating_total_intensity_today = 0
         self.total_compensation_percent = 0
         self.eccentric_compensation_percent = 0
         self.total_compensation_percent_tier = 0
@@ -43,9 +43,9 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_percent_tier = 0
 
         self.compensating_causes_volume_today = []
-        self.compensating_causes_intensity_today = []
+        # self.compensating_causes_intensity_today = []
         self.compensating_source_volume = None
-        self.compensating_source_intensity = None
+        # self.compensating_source_intensity = None
 
         self.last_compensation_date = None
         self.compensation_count_last_0_20_days = 0
@@ -169,16 +169,16 @@ class BodyPartInjuryRisk(object):
                 "total_volume_ramp_today": self.total_volume_ramp_today,
                 "eccentric_volume_ramp_today": self.eccentric_volume_ramp_today,
 
-                "concentric_intensity_today": self.concentric_intensity_today,
-                "eccentric_intensity_today": self.eccentric_intensity_today,
-                "compensating_concentric_intensity_today": self.compensating_concentric_intensity_today,
-                "compensating_eccentric_intensity_today": self.compensating_eccentric_intensity_today,
+                # "concentric_intensity_today": self.concentric_intensity_today,
+                # "eccentric_intensity_today": self.eccentric_intensity_today,
+                # "compensating_concentric_intensity_today": self.compensating_concentric_intensity_today,
+                # "compensating_eccentric_intensity_today": self.compensating_eccentric_intensity_today,
 
                 "compensating_causes_volume_today": [c.json_serialise() for c in self.compensating_causes_volume_today],
-                "compensating_causes_intensity_today": [c.json_serialise() for c in self.compensating_causes_intensity_today],
+                # "compensating_causes_intensity_today": [c.json_serialise() for c in self.compensating_causes_intensity_today],
 
                 "compensating_source_volume": self.compensating_source_volume.value if self.compensating_source_volume is not None else None,
-                "compensating_source_intensity": self.compensating_source_intensity.value if self.compensating_source_intensity is not None else None,
+                # "compensating_source_intensity": self.compensating_source_intensity.value if self.compensating_source_intensity is not None else None,
                 "last_compensation_date": format_date(self.last_compensation_date),
                 "compensation_count_last_0_20_days": self.compensation_count_last_0_20_days,
 
@@ -319,41 +319,41 @@ class BodyPartInjuryRisk(object):
         injury_risk.total_volume_ramp_today = input_dict.get('total_volume_ramp_today')
         injury_risk.eccentric_volume_ramp_today = input_dict.get('eccentric_volume_ramp_today')
 
-        concentric_intensity_today = 0
-        concentric_intensity_today += input_dict.get('prime_mover_concentric_intensity_today', 0)
-        concentric_intensity_today += input_dict.get('synergist_concentric_intensity_today', 0)
-        concentric_intensity_today += input_dict.get('concentric_intensity_today', 0)
-        injury_risk.concentric_intensity_today = concentric_intensity_today
+        # concentric_intensity_today = 0
+        # concentric_intensity_today += input_dict.get('prime_mover_concentric_intensity_today', 0)
+        # concentric_intensity_today += input_dict.get('synergist_concentric_intensity_today', 0)
+        # concentric_intensity_today += input_dict.get('concentric_intensity_today', 0)
+        # injury_risk.concentric_intensity_today = concentric_intensity_today
 
-        eccentric_intensity_today = 0
-        eccentric_intensity_today += input_dict.get('prime_mover_eccentric_intensity_today', 0)
-        eccentric_intensity_today += input_dict.get('synergist_eccentric_intensity_today', 0)
-        eccentric_intensity_today += input_dict.get('eccentric_intensity_today', 0)
-        injury_risk.eccentric_intensity_today = eccentric_intensity_today
+        # eccentric_intensity_today = 0
+        # eccentric_intensity_today += input_dict.get('prime_mover_eccentric_intensity_today', 0)
+        # eccentric_intensity_today += input_dict.get('synergist_eccentric_intensity_today', 0)
+        # eccentric_intensity_today += input_dict.get('eccentric_intensity_today', 0)
+        # injury_risk.eccentric_intensity_today = eccentric_intensity_today
+        #
+        # compensating_concentric_intensity_today = 0
+        # compensating_concentric_intensity_today += input_dict.get('synergist_compensating_concentric_intensity_today', 0)
+        # compensating_concentric_intensity_today += input_dict.get('compensating_concentric_intensity_today', 0)
+        # injury_risk.compensating_concentric_intensity_today = compensating_concentric_intensity_today
 
-        compensating_concentric_intensity_today = 0
-        compensating_concentric_intensity_today += input_dict.get('synergist_compensating_concentric_intensity_today', 0)
-        compensating_concentric_intensity_today += input_dict.get('compensating_concentric_intensity_today', 0)
-        injury_risk.compensating_concentric_intensity_today = compensating_concentric_intensity_today
-
-        compensating_eccentric_intensity_today = 0
-        compensating_eccentric_intensity_today += input_dict.get('synergist_compensating_eccentric_intensity_today', 0)
-        compensating_eccentric_intensity_today += input_dict.get('compensating_eccentric_intensity_today', 0)
-        injury_risk.compensating_eccentric_intensity_today = compensating_eccentric_intensity_today
+        # compensating_eccentric_intensity_today = 0
+        # compensating_eccentric_intensity_today += input_dict.get('synergist_compensating_eccentric_intensity_today', 0)
+        # compensating_eccentric_intensity_today += input_dict.get('compensating_eccentric_intensity_today', 0)
+        # injury_risk.compensating_eccentric_intensity_today = compensating_eccentric_intensity_today
 
         injury_risk.compensating_causes_volume_today = [BodyPartSide.json_deserialise(c) for c in
                                                   input_dict.get('compensating_causes_volume_today', [])]
-        injury_risk.compensating_causes_intensity_today = [BodyPartSide.json_deserialise(c) for c in
-                                                  input_dict.get('compensating_causes_intensity_today', [])]
+        # injury_risk.compensating_causes_intensity_today = [BodyPartSide.json_deserialise(c) for c in
+        #                                           input_dict.get('compensating_causes_intensity_today', [])]
 
         injury_risk.last_compensation_date = input_dict.get('last_compensation_date')
 
         injury_risk.compensating_source_volume = CompensationSource(
             input_dict['compensating_source_volume']) if input_dict.get(
             "compensating_source_volume") is not None else None
-        injury_risk.compensating_source_intensity = CompensationSource(
-            input_dict['compensating_source_intensity']) if input_dict.get(
-            "compensating_source_intensity") is not None else None
+        # injury_risk.compensating_source_intensity = CompensationSource(
+        #     input_dict['compensating_source_intensity']) if input_dict.get(
+        #     "compensating_source_intensity") is not None else None
 
         injury_risk.compensation_count_last_0_20_days = input_dict.get('compensation_count_last_0_20_days', 0)
 
