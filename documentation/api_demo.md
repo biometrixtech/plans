@@ -470,28 +470,28 @@ Authorization: eyJraWQ...ajBc4VQ
                              },
                         ],
                 "workout_program_module": {
-                                        "workout_sections": [{
-                                            "name": "Upper Body Work",
-                                            "duration_seconds": 360,
-                                            "start_date_time": "2019-01-12T10:43:08-05:00",
-                                            "end_date_time": "2019-01-12T12:17:12-05:00"
-                                            "exercises": [
-                                                {
-                                                    "id": "1",
-                                                    "name": "Bent over Row",
-                                                    "weight_measure": 2,
-                                                    "weight": 150,
-                                                    "sets": 2,
-                                                    "reps_per_set": 10,
-                                                    "unit_of_measure": 1,
-                                                    "movement_id": "2356",
-                                                    "bilateral": true,
-                                                    "side": 0,
-                                                    "rpe": 5.0
-                                                }
-                                                ]
-                                        }]
-                                    }
+                                "workout_sections": [{
+                                    "name": "Upper Body Work",
+                                    "duration_seconds": 360,
+                                    "start_date_time": "2019-01-12T10:43:08-05:00",
+                                    "end_date_time": "2019-01-12T12:17:12-05:00"
+                                    "exercises": [
+                                        {
+                                            "id": "1",
+                                            "name": "Bent over Row",
+                                            "weight_measure": 2,
+                                            "weight": 150,
+                                            "sets": 2,
+                                            "reps_per_set": 10,
+                                            "unit_of_measure": 1,
+                                            "movement_id": "2356",
+                                            "bilateral": true,
+                                            "side": 0,
+                                            "rpe": 5.0
+                                        }
+                                        ]
+                                }]
+                            }
                 }
                 
             ]
@@ -685,28 +685,28 @@ Authorization: eyJraWQ...ajBc4VQ
                              },
                         ],
                 "workout_program_module": {
-                                        "workout_sections": [{
-                                            "name": "Upper Body Work",
-                                            "duration_seconds": 360,
-                                            "start_date_time": "2019-01-12T10:43:08-05:00",
-                                            "end_date_time": "2019-01-12T12:17:12-05:00"
-                                            "exercises": [
-                                                {
-                                                    "id": "1",
-                                                    "name": "Bent over Row",
-                                                    "weight_measure": 2,
-                                                    "weight": 150,
-                                                    "sets": 2,
-                                                    "reps_per_set": 10,
-                                                    "unit_of_measure": 1,
-                                                    "movement_id": "2356",
-                                                    "bilateral": true,
-                                                    "side": 0,
-                                                    "rpe": 5.0
-                                                }
-                                                ]
-                                        }]
-                                    }
+                                "workout_sections": [{
+                                    "name": "Upper Body Work",
+                                    "duration_seconds": 360,
+                                    "start_date_time": "2019-01-12T10:43:08-05:00",
+                                    "end_date_time": "2019-01-12T12:17:12-05:00"
+                                    "exercises": [
+                                        {
+                                            "id": "1",
+                                            "name": "Bent over Row",
+                                            "weight_measure": 2,
+                                            "weight": 150,
+                                            "sets": 2,
+                                            "reps_per_set": 10,
+                                            "unit_of_measure": 1,
+                                            "movement_id": "2356",
+                                            "bilateral": true,
+                                            "side": 0,
+                                            "rpe": 5.0
+                                        }
+                                        ]
+                                }]
+                            }
                 }
 }
 ```
@@ -847,7 +847,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
 ```
-POST /plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID} HTTPS/1.1
+POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID} HTTPS/1.1
 Host: apis.demo.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -1605,5 +1605,5 @@ The following reportable body parts are considered muscles
     rotator_cuff = 119
     serratus_anterior = 125
 ```
-###### Last Modified: February 28, 2020
+###### Last Modified: March 13, 2020
 
