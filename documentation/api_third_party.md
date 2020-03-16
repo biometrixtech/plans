@@ -951,7 +951,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "post_active_rest_completed": Boolean,
     "pre_active_rest_completed": Boolean,
     "sessions_planned": Boolean,
-    "train_later": Bolean
+    "train_later": Boolean
 }
 ``` -->
 ```

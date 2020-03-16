@@ -19,6 +19,14 @@ class LoadStats(Serialisable):
         self.min_shrz = None
         self.max_shrz = None
 
+        # mixed session
+        self.max_not_tracked = None
+        self.max_strength_endurance_cardiorespiratory = None
+        self.max_strength_endurance_strength = None
+        self.max_power_drill = None
+        self.max_maximal_strength_hypertrophic = None
+        self.max_power_explosive_action = None
+
     def json_serialise(self):
         ret = {
             'min_duration_health': self.min_duration_health,
@@ -34,7 +42,13 @@ class LoadStats(Serialisable):
             'min_trimp': self.min_trimp,
             'max_trimp': self.max_trimp,
             'min_shrz': self.min_shrz,
-            'max_shrz': self.max_shrz
+            'max_shrz': self.max_shrz,
+            'max_not_tracked': self.max_not_tracked,
+            'max_strength_endurance_cardiorespiratory': self.max_strength_endurance_cardiorespiratory,
+            'max_strength_endurance_strength': self.max_strength_endurance_strength,
+            'max_power_drill': self.max_power_drill,
+            'max_maximal_strength_hypertrophic': self.max_maximal_strength_hypertrophic,
+            'max_power_explosive_action': self.max_power_explosive_action
         }
         return ret
 
@@ -56,6 +70,12 @@ class LoadStats(Serialisable):
             load_stats.max_trimp = input_dict["max_trimp"]
             load_stats.min_shrz = input_dict["min_shrz"]
             load_stats.max_shrz = input_dict["max_shrz"]
+            load_stats.max_not_tracked = input_dict.get('max_not_tracked', None)
+            load_stats.max_strength_endurance_cardiorespiratory = input_dict.get('max_strength_endurance_cardiorespiratory', None)
+            load_stats.max_strength_endurance_strength = input_dict.get('max_strength_endurance_strength', None)
+            load_stats.max_power_drill = input_dict.get('max_power_drill', None)
+            load_stats.max_maximal_strength_hypertrophic = input_dict.get('max_maximal_strength_hypertrophic', None)
+            load_stats.max_power_explosive_action = input_dict.get('max_power_explosive_action', None)
 
         return load_stats
 
@@ -81,6 +101,18 @@ class LoadStats(Serialisable):
                 if t.get_distance_training_volume(SportName.cycling) is not None and t.get_distance_training_volume(SportName.cycling) > 0:
                     self.min_cycling_distance = min(self.min_cycling_distance if self.min_cycling_distance is not None else 0, t.get_distance_training_volume(SportName.cycling))
                     self.max_cycling_distance = max(self.max_cycling_distance if self.max_cycling_distance is not None else 0, t.get_distance_training_volume(SportName.cycling))
+                if t.not_tracked_load is not None and t.not_tracked_load > 0:
+                    self.max_not_tracked = max(self.max_not_tracked if self.max_not_tracked is not None else 0, t.not_tracked_load)
+                if t.strength_endurance_cardiorespiratory_load is not None and t.strength_endurance_cardiorespiratory_load > 0:
+                    self.max_strength_endurance_cardiorespiratory = max(self.max_strength_endurance_cardiorespiratory if self.max_strength_endurance_cardiorespiratory is not None else 0, t.strength_endurance_cardiorespiratory_load)
+                if t.strength_endurance_strength_load is not None and t.strength_endurance_strength_load > 0:
+                    self.max_strength_endurance_strength = max(self.max_strength_endurance_strength if self.max_strength_endurance_strength is not None else 0, t.strength_endurance_strength_load)
+                if t.power_drill_load is not None and t.power_drill_load > 0:
+                    self.max_power_drill = max(self.max_power_drill if self.max_power_drill is not None else 0, t.power_drill_load)
+                if t.maximal_strength_hypertrophic_load is not None and t.maximal_strength_hypertrophic_load > 0:
+                    self.max_maximal_strength_hypertrophic = max(self.max_maximal_strength_hypertrophic if self.max_maximal_strength_hypertrophic is not None else 0, t.maximal_strength_hypertrophic_load)
+                if t.power_explosive_action_load is not None and t.power_explosive_action_load > 0:
+                    self.max_power_explosive_action = max(self.max_power_explosive_action if self.max_power_explosive_action is not None else 0, t.power_explosive_action_load)
 
     def get_attribute_load(self, attribute_name, value):
 

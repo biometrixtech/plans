@@ -15,6 +15,8 @@ class AthleteGoalType(Enum):
     on_request = 10
     asymmetric_session = 20
     asymmetric_pattern = 21
+    expected_high_load = 22
+    expected_asymmetric_session = 23
 
 
 class AthleteGoal(object):

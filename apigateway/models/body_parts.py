@@ -52,7 +52,7 @@ class BodyPartFactory(object):
 
         location = self.get_body_part_location(body_part)
         muscle_groups = BodyPartLocation.muscle_groups()
-        if location in muscle_groups.keys():  # is a muscle group
+        if location in muscle_groups:  # is a muscle group
             return True
         else:
             for key, value in muscle_groups.items():
@@ -126,19 +126,24 @@ class BodyPartFactory(object):
         else:
             return []
 
-    def get_exercise_dictionary(self, exercise_list):
+    def get_exercise_dictionary(self, exercise_list, sample=1):
 
         exercise_dict = {}
 
         # pick on exercise from the list:
         if len(exercise_list) > 0:
-            position = random.randint(0, len(exercise_list) - 1)
+            if sample < len(exercise_list):
+                sampled_list = random.sample(exercise_list, sample)
+            else:
+                sampled_list = exercise_list
+            for e in sampled_list:
+                exercise_dict[e] = []
+            # position = random.randint(0, len(exercise_list) - 1)
+            # # ignoring progressions for now
+            # #for e in exercise_list:
+            # #    exercise_dict[e] = self.get_progression_list(e)
 
-            # ignoring progressions for now
-            #for e in exercise_list:
-            #    exercise_dict[e] = self.get_progression_list(e)
-
-            exercise_dict[exercise_list[position]] = []
+            # exercise_dict[exercise_list[position]] = []
 
         return exercise_dict
 
@@ -340,6 +345,7 @@ class BodyPartFactory(object):
             isolated_activate = {}
             static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])  # sample 1
             dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'])  # sample 4
+            dynamic_integrate_2 = {}
             dynamic_integrate_with_speed = {}
 
         else:
@@ -350,6 +356,9 @@ class BodyPartFactory(object):
                 dynamic_stretch = self.get_exercise_dictionary(part_json['dynamic_lengthen'])
                 isolated_activate = self.get_exercise_dictionary(part_json['isolated_activate'])
                 static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])
+                dynamic_integrate = self.get_exercise_dictionary(part_json['dynamic_integrate'])
+                dynamic_integrate_2 = self.get_exercise_dictionary(part_json['dynamic_integrate'], sample=2)
+                dynamic_integrate_with_speed = self.get_exercise_dictionary(part_json['dynamic_integrate_with_speed'])
             else:
                 inhibit = self.get_full_exercise_dictionary(part_json['inhibit'], False)
                 static_stretch = self.get_full_exercise_dictionary(part_json['static_lengthen'], False)
@@ -357,11 +366,12 @@ class BodyPartFactory(object):
                 dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'], False)
                 isolated_activate = self.get_full_exercise_dictionary(part_json['isolated_activate'], False)
                 static_integrate = self.get_full_exercise_dictionary(part_json['static_integrate'], False)
-            dynamic_integrate = {}
-            dynamic_integrate_with_speed = {}
+                dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'], False)
+                dynamic_integrate_2 = self.get_exercise_dictionary(part_json['dynamic_integrate'], False)
+                dynamic_integrate_with_speed = self.get_full_exercise_dictionary(part_json['dynamic_integrate_with_speed'], False)
 
         part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activate, static_integrate)
-        part.add_dynamic_exercise_phases({}, dynamic_integrate, dynamic_integrate_with_speed)  # dynamic_stretch is already added above
+        part.add_dynamic_exercise_phases({}, dynamic_integrate, dynamic_integrate_with_speed, dynamic_integrate_2)  # dynamic_stretch is already added above
 
         part.add_muscle_groups(part_json['agonists'], part_json['synergists'], part_json['stabilizers'], part_json['antagonists'])
         return part
@@ -400,7 +410,7 @@ class BodyPartFactory(object):
 
         upper_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         upper_body.add_muscle_groups([1, 18], [2], [], [21, 18])
         return upper_body
@@ -417,7 +427,7 @@ class BodyPartFactory(object):
 
         lower_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         lower_body.add_muscle_groups([16, 15], [5, 11], [], [14])
 
@@ -437,7 +447,7 @@ class BodyPartFactory(object):
 
         full_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         full_body.add_muscle_groups([12, 6, 4], [5, 15], [21, 11], [25, 14])
 
@@ -1109,6 +1119,7 @@ class BodyPart(object):
         self.isolated_activate_exercises = []
         self.static_integrate_exercises = []
         self.dynamic_integrate_exercises = []
+        self.dynamic_integrate_2_exercises = []
         self.dynamic_stretch_integrate_exercises = []
         self.dynamic_integrate_with_speed_exercises = []
 
@@ -1134,7 +1145,7 @@ class BodyPart(object):
 
         priority = 1
 
-        keys = list(exercise_dict.keys())
+        keys = list(exercise_dict)
 
         if randomize:
             shuffle(keys)
@@ -1165,10 +1176,11 @@ class BodyPart(object):
         self.activate_exercises = self.add_exercises(self.activate_exercises, activate,
                                                      self.treatment_priority, randomize)
 
-    def add_dynamic_exercise_phases(self, dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed):
+    def add_dynamic_exercise_phases(self, dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, dynamic_integrate_2):
 
         self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch, self.treatment_priority, False)
         self.dynamic_integrate_exercises = self.add_exercises(self.dynamic_integrate_exercises, dynamic_integrate, self.treatment_priority, False)
+        self.dynamic_integrate_2_exercises = self.add_exercises(self.dynamic_integrate_2_exercises, dynamic_integrate_2, self.treatment_priority, False)
         self.dynamic_integrate_with_speed_exercises = self.add_exercises(self.dynamic_integrate_with_speed_exercises, dynamic_integrate_with_speed, self.treatment_priority, False)
 
     def add_extended_exercise_phases(self, inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, static_integrate, randomize=False):

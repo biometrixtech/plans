@@ -12,7 +12,7 @@ The plans service generates a  __Daily Plan__ for an athlete based on one or all
 
 * __Daily Readiness__ - information about the athlete's training plan and symptoms for a given day
 * __Post-Workout__ - information about an athlete's workout session along with their Rating of Perceived Exertion (RPE) and symptoms following the workout
-* __Symptom-Reporting__ - information about the athlete's symptoms indpendent of workout and/or training plan
+* __Symptom-Reporting__ - information about the athlete's symptoms independent of workout and/or training plan
 
 A __Daily Plan__ can be created with as little as one of the above data elements. As this information is gathered over time, Fathom's analytics also use historical patterns in pain/soreness and workouts to identify underlying imbalances unique to the athlete which influence the creation of their __Daily Plan__.
 
@@ -233,7 +233,7 @@ The following data elements are required when following the  __Post-Workout__ pa
 
 ### Symptom-Reporting
 #### Required Data Elements
-The following data elements are required when following the  __Symptom-Reporing__ pathway to __Daily Plan__ generation.
+The following data elements are required when following the  __Symptom-Reporting__ pathway to __Daily Plan__ generation.
 
 * `event_date` __should__ be a Datetime and reflect the local time that survey was taken
 * `soreness` __should__ follow the same definition as in _Daily Readiness_

@@ -1,6 +1,6 @@
 from datetime import datetime, date
 
-from models.functional_movement import CompensationSource
+from models.compensation_source import CompensationSource
 from models.soreness_base import BodyPartSide
 from utils import format_date, format_datetime, parse_datetime, parse_date
 
@@ -12,29 +12,10 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_today = 0
         self.concentric_volume_last_week = 0
         self.concentric_volume_this_week = 0
-        # self.prime_mover_concentric_volume_last_week = 0
-        # self.prime_mover_concentric_volume_this_week = 0
-        # self.synergist_concentric_volume_last_week = 0
-        # self.synergist_concentric_volume_this_week = 0
-        # self.synergist_compensating_concentric_volume_last_week = 0
-        # self.synergist_compensating_concentric_volume_this_week = 0
 
         self.eccentric_volume_last_week = 0
         self.eccentric_volume_this_week = 0
-        # self.prime_mover_eccentric_volume_last_week = 0
-        # self.prime_mover_eccentric_volume_this_week = 0
-        # self.synergist_eccentric_volume_last_week = 0
-        # self.synergist_eccentric_volume_this_week = 0
-        # self.synergist_compensating_eccentric_volume_last_week = 0
-        # self.synergist_compensating_eccentric_volume_this_week = 0
 
-        # self.prime_mover_concentric_volume_today = 0
-        # self.prime_mover_eccentric_volume_today = 0
-        #
-        # self.synergist_concentric_volume_today = 0
-        # self.synergist_eccentric_volume_today = 0
-        # self.synergist_compensating_concentric_volume_today = 0
-        # self.synergist_compensating_eccentric_volume_today = 0
         self.compensating_concentric_volume_today = 0
         self.compensating_eccentric_volume_today = 0
 
@@ -42,43 +23,18 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_ramp_today = 0
 
         # intensity
-        self.concentric_intensity_last_week = 0
-        self.concentric_intensity_this_week = 0
-        # self.prime_mover_concentric_intensity_last_week = 0
-        # self.prime_mover_concentric_intensity_this_week = 0
-        # self.synergist_concentric_intensity_last_week = 0
-        # self.synergist_concentric_intensity_this_week = 0
-        # self.synergist_compensating_concentric_intensity_last_week = 0
-        # self.synergist_compensating_concentric_intensity_this_week = 0
-
-        self.eccentric_intensity_last_week = 0
-        self.eccentric_intensity_this_week = 0
-        # self.prime_mover_eccentric_intensity_last_week = 0
-        # self.prime_mover_eccentric_intensity_this_week = 0
-        # self.synergist_eccentric_intensity_last_week = 0
-        # self.synergist_eccentric_intensity_this_week = 0
-        # self.synergist_compensating_eccentric_intensity_last_week = 0
-        # self.synergist_compensating_eccentric_intensity_this_week = 0
-
-        #self.concentric_intensity_today = 0
-        #self.eccentric_intensity_today = 0
-
-        # self.prime_mover_concentric_intensity_today = 0
-        # self.prime_mover_eccentric_intensity_today = 0
-        # self.prime_mover_total_intensity_today = 0
-        self.concentric_intensity_today = 0
-        self.eccentric_intensity_today = 0
-        self.total_intensity_today = 0
+        # self.concentric_intensity_last_week = 0
+        # self.concentric_intensity_this_week = 0
         #
-        # self.synergist_concentric_intensity_today = 0
-        # self.synergist_eccentric_intensity_today = 0
-        # self.synergist_total_intensity_today = 0
-        # self.synergist_compensating_concentric_intensity_today = 0
-        # self.synergist_compensating_eccentric_intensity_today = 0
-        # self.synergist_compensating_total_intensity_today = 0
-        self.compensating_concentric_intensity_today = 0
-        self.compensating_eccentric_intensity_today = 0
-        self.compensating_total_intensity_today = 0
+        # self.eccentric_intensity_last_week = 0
+        # self.eccentric_intensity_this_week = 0
+        # self.concentric_intensity_today = 0
+        # self.eccentric_intensity_today = 0
+        # self.total_intensity_today = 0
+        #
+        # self.compensating_concentric_intensity_today = 0
+        # self.compensating_eccentric_intensity_today = 0
+        # self.compensating_total_intensity_today = 0
         self.total_compensation_percent = 0
         self.eccentric_compensation_percent = 0
         self.total_compensation_percent_tier = 0
@@ -87,9 +43,9 @@ class BodyPartInjuryRisk(object):
         self.eccentric_volume_percent_tier = 0
 
         self.compensating_causes_volume_today = []
-        self.compensating_causes_intensity_today = []
+        # self.compensating_causes_intensity_today = []
         self.compensating_source_volume = None
-        self.compensating_source_intensity = None
+        # self.compensating_source_intensity = None
 
         self.last_compensation_date = None
         self.compensation_count_last_0_20_days = 0
@@ -170,7 +126,7 @@ class BodyPartInjuryRisk(object):
         self.last_movement_dysfunction_stress_date = None
         self.last_dysfunction_cause_date = None
 
-        #votes
+        # votes
         self.overactive_short_vote_count = 0
         self.overactive_long_vote_count = 0
         self.underactive_short_vote_count = 0
@@ -180,18 +136,27 @@ class BodyPartInjuryRisk(object):
         self.limited_mobility_tier = 0
         self.underactive_weak_tier = 0
 
+        # max values
+        self.max_not_tracked = 0.0
+        self.max_strength_endurance_cardiorespiratory = 0.0
+        self.max_strength_endurance_strength = 0.0
+        self.max_power_drill = 0.0
+        self.max_maximal_strength_hypertrophic = 0.0
+        self.max_power_explosive_action = 0.0
+
+        self.max_not_tracked_date = None
+        self.max_strength_endurance_cardiorespiratory_date = None
+        self.max_strength_endurance_strength_date = None
+        self.max_power_drill_date = None
+        self.max_maximal_strength_hypertrophic_date = None
+        self.max_power_explosive_action_date = None
+
     def json_serialise(self):
         return {
                 "concentric_volume_today": self.concentric_volume_today,
 
                 "eccentric_volume_today": self.eccentric_volume_today,
 
-                # "prime_mover_concentric_volume_today": self.prime_mover_concentric_volume_today,
-                #
-                # "prime_mover_eccentric_volume_today": self.prime_mover_eccentric_volume_today,
-                #
-                # "synergist_concentric_volume_today": self.synergist_concentric_volume_today,
-                # "synergist_eccentric_volume_today": self.synergist_eccentric_volume_today,
                 "compensating_concentric_volume_today": self.compensating_concentric_volume_today,
                 "compensating_eccentric_volume_today": self.compensating_eccentric_volume_today,
                 "total_compensation_percent": self.total_compensation_percent,
@@ -204,22 +169,16 @@ class BodyPartInjuryRisk(object):
                 "total_volume_ramp_today": self.total_volume_ramp_today,
                 "eccentric_volume_ramp_today": self.eccentric_volume_ramp_today,
 
-                #"prime_mover_concentric_intensity_today": self.prime_mover_concentric_intensity_today,
-                #"prime_mover_eccentric_intensity_today": self.prime_mover_eccentric_intensity_today,
-                "concentric_intensity_today": self.concentric_intensity_today,
-                "eccentric_intensity_today": self.eccentric_intensity_today,
-                # "synergist_concentric_intensity_today": self.synergist_concentric_intensity_today,
-                # "synergist_eccentric_intensity_today": self.synergist_eccentric_intensity_today,
-                #"synergist_compensating_concentric_intensity_today": self.synergist_compensating_concentric_intensity_today,
-                #"synergist_compensating_eccentric_intensity_today": self.synergist_compensating_eccentric_intensity_today,
-                "compensating_concentric_intensity_today": self.compensating_concentric_intensity_today,
-                "compensating_eccentric_intensity_today": self.compensating_eccentric_intensity_today,
+                # "concentric_intensity_today": self.concentric_intensity_today,
+                # "eccentric_intensity_today": self.eccentric_intensity_today,
+                # "compensating_concentric_intensity_today": self.compensating_concentric_intensity_today,
+                # "compensating_eccentric_intensity_today": self.compensating_eccentric_intensity_today,
 
                 "compensating_causes_volume_today": [c.json_serialise() for c in self.compensating_causes_volume_today],
-                "compensating_causes_intensity_today": [c.json_serialise() for c in self.compensating_causes_intensity_today],
+                # "compensating_causes_intensity_today": [c.json_serialise() for c in self.compensating_causes_intensity_today],
 
                 "compensating_source_volume": self.compensating_source_volume.value if self.compensating_source_volume is not None else None,
-                "compensating_source_intensity": self.compensating_source_intensity.value if self.compensating_source_intensity is not None else None,
+                # "compensating_source_intensity": self.compensating_source_intensity.value if self.compensating_source_intensity is not None else None,
                 "last_compensation_date": format_date(self.last_compensation_date),
                 "compensation_count_last_0_20_days": self.compensation_count_last_0_20_days,
 
@@ -309,6 +268,20 @@ class BodyPartInjuryRisk(object):
                 "limited_mobility_tier": self.limited_mobility_tier,
                 "underactive_weak_tier": self.underactive_weak_tier,
 
+                "max_not_tracked": self.max_not_tracked,
+                "max_strength_endurance_cardiorespiratory": self.max_strength_endurance_cardiorespiratory,
+                "max_strength_endurance_strength": self.max_strength_endurance_strength,
+                "max_power_drill": self.max_power_drill,
+                "max_maximal_strength_hypertrophic": self.max_maximal_strength_hypertrophic,
+                "max_power_explosive_action": self.max_power_explosive_action,
+
+                "max_not_tracked_date": format_date(self.max_not_tracked_date) if self.max_not_tracked_date is not None else None,
+                "max_strength_endurance_cardiorespiratory_date": format_date(self.max_strength_endurance_cardiorespiratory_date) if self.max_strength_endurance_cardiorespiratory_date is not None else None,
+                "max_strength_endurance_strength_date": format_date(self.max_strength_endurance_strength_date) if self.max_strength_endurance_strength_date is not None else None,
+                "max_power_drill_date": format_date(self.max_power_drill_date) if self.max_power_drill_date is not None else None,
+                "max_maximal_strength_hypertrophic_date": format_date(self.max_maximal_strength_hypertrophic_date) if self.max_maximal_strength_hypertrophic_date is not None else None,
+                "max_power_explosive_action_date": format_date(self.max_power_explosive_action_date) if self.max_power_explosive_action_date is not None else None
+
         }
 
     @classmethod
@@ -326,11 +299,6 @@ class BodyPartInjuryRisk(object):
         eccentric_volume_today += input_dict.get('eccentric_volume_today', 0)
         injury_risk.eccentric_volume_today = eccentric_volume_today
 
-        # injury_risk.prime_mover_concentric_volume_today = input_dict.get('prime_mover_concentric_volume_today', 0)
-        # injury_risk.prime_mover_eccentric_volume_today = input_dict.get('prime_mover_eccentric_volume_today', 0)
-        #
-        # injury_risk.synergist_concentric_volume_today = input_dict.get('synergist_concentric_volume_today', 0)
-        # injury_risk.synergist_eccentric_volume_today = input_dict.get('synergist_eccentric_volume_today', 0)
         compensating_concentric_volume_today = 0
         compensating_concentric_volume_today += input_dict.get('synergist_compensating_concentric_volume_today', 0)
         compensating_concentric_volume_today += input_dict.get('compensating_concentric_volume_today', 0)
@@ -351,48 +319,41 @@ class BodyPartInjuryRisk(object):
         injury_risk.total_volume_ramp_today = input_dict.get('total_volume_ramp_today')
         injury_risk.eccentric_volume_ramp_today = input_dict.get('eccentric_volume_ramp_today')
 
-        concentric_intensity_today = 0
-        concentric_intensity_today += input_dict.get('prime_mover_concentric_intensity_today', 0)
-        concentric_intensity_today += input_dict.get('synergist_concentric_intensity_today', 0)
-        concentric_intensity_today += input_dict.get('concentric_intensity_today', 0)
-        injury_risk.concentric_intensity_today = concentric_intensity_today
+        # concentric_intensity_today = 0
+        # concentric_intensity_today += input_dict.get('prime_mover_concentric_intensity_today', 0)
+        # concentric_intensity_today += input_dict.get('synergist_concentric_intensity_today', 0)
+        # concentric_intensity_today += input_dict.get('concentric_intensity_today', 0)
+        # injury_risk.concentric_intensity_today = concentric_intensity_today
 
-        eccentric_intensity_today = 0
-        eccentric_intensity_today += input_dict.get('prime_mover_eccentric_intensity_today', 0)
-        eccentric_intensity_today += input_dict.get('synergist_eccentric_intensity_today', 0)
-        eccentric_intensity_today += input_dict.get('eccentric_intensity_today', 0)
-        injury_risk.eccentric_intensity_today = eccentric_intensity_today
-
-        # injury_risk.prime_mover_concentric_intensity_today = input_dict.get('prime_mover_concentric_intensity_today', 0)
-        # injury_risk.prime_mover_eccentric_intensity_today = input_dict.get('prime_mover_eccentric_intensity_today', 0)
+        # eccentric_intensity_today = 0
+        # eccentric_intensity_today += input_dict.get('prime_mover_eccentric_intensity_today', 0)
+        # eccentric_intensity_today += input_dict.get('synergist_eccentric_intensity_today', 0)
+        # eccentric_intensity_today += input_dict.get('eccentric_intensity_today', 0)
+        # injury_risk.eccentric_intensity_today = eccentric_intensity_today
         #
-        # injury_risk.synergist_concentric_intensity_today = input_dict.get('synergist_concentric_intensity_today', 0)
-        # injury_risk.synergist_eccentric_intensity_today = input_dict.get('synergist_eccentric_intensity_today', 0)
-        # injury_risk.synergist_compensating_concentric_intensity_today = input_dict.get('synergist_compensating_concentric_intensity_today', 0)
-        # injury_risk.synergist_compensating_eccentric_intensity_today = input_dict.get('synergist_compensating_eccentric_intensity_today', 0)
-        compensating_concentric_intensity_today = 0
-        compensating_concentric_intensity_today += input_dict.get('synergist_compensating_concentric_intensity_today', 0)
-        compensating_concentric_intensity_today += input_dict.get('compensating_concentric_intensity_today', 0)
-        injury_risk.compensating_concentric_intensity_today = compensating_concentric_intensity_today
+        # compensating_concentric_intensity_today = 0
+        # compensating_concentric_intensity_today += input_dict.get('synergist_compensating_concentric_intensity_today', 0)
+        # compensating_concentric_intensity_today += input_dict.get('compensating_concentric_intensity_today', 0)
+        # injury_risk.compensating_concentric_intensity_today = compensating_concentric_intensity_today
 
-        compensating_eccentric_intensity_today = 0
-        compensating_eccentric_intensity_today += input_dict.get('synergist_compensating_eccentric_intensity_today', 0)
-        compensating_eccentric_intensity_today += input_dict.get('compensating_eccentric_intensity_today', 0)
-        injury_risk.compensating_eccentric_intensity_today = compensating_eccentric_intensity_today
+        # compensating_eccentric_intensity_today = 0
+        # compensating_eccentric_intensity_today += input_dict.get('synergist_compensating_eccentric_intensity_today', 0)
+        # compensating_eccentric_intensity_today += input_dict.get('compensating_eccentric_intensity_today', 0)
+        # injury_risk.compensating_eccentric_intensity_today = compensating_eccentric_intensity_today
 
         injury_risk.compensating_causes_volume_today = [BodyPartSide.json_deserialise(c) for c in
                                                   input_dict.get('compensating_causes_volume_today', [])]
-        injury_risk.compensating_causes_intensity_today = [BodyPartSide.json_deserialise(c) for c in
-                                                  input_dict.get('compensating_causes_intensity_today', [])]
+        # injury_risk.compensating_causes_intensity_today = [BodyPartSide.json_deserialise(c) for c in
+        #                                           input_dict.get('compensating_causes_intensity_today', [])]
 
         injury_risk.last_compensation_date = input_dict.get('last_compensation_date')
 
         injury_risk.compensating_source_volume = CompensationSource(
             input_dict['compensating_source_volume']) if input_dict.get(
             "compensating_source_volume") is not None else None
-        injury_risk.compensating_source_intensity = CompensationSource(
-            input_dict['compensating_source_intensity']) if input_dict.get(
-            "compensating_source_intensity") is not None else None
+        # injury_risk.compensating_source_intensity = CompensationSource(
+        #     input_dict['compensating_source_intensity']) if input_dict.get(
+        #     "compensating_source_intensity") is not None else None
 
         injury_risk.compensation_count_last_0_20_days = input_dict.get('compensation_count_last_0_20_days', 0)
 
@@ -479,6 +440,20 @@ class BodyPartInjuryRisk(object):
         injury_risk.last_vote_updated_date_time = input_dict.get('last_vote_updated_date_time')
         injury_risk.limited_mobility_tier = input_dict.get('limited_mobility_tier', 0)
         injury_risk.underactive_weak_tier = input_dict.get('underactive_weak_tier', 0)
+
+        injury_risk.max_not_tracked = input_dict.get("max_not_tracked", 0)
+        injury_risk.max_strength_endurance_cardiorespiratory = input_dict.get("max_strength_endurance_cardiorespiratory", 0)
+        injury_risk.max_strength_endurance_strength = input_dict.get("max_strength_endurance_strength", 0)
+        injury_risk.max_power_drill = input_dict.get("max_power_drill", 0)
+        injury_risk.max_maximal_strength_hypertrophic = input_dict.get("max_maximal_strength_hypertrophic", 0)
+        injury_risk.max_power_explosive_action = input_dict.get("max_power_explosive_action", 0)
+
+        injury_risk.max_not_tracked_date = input_dict.get("max_not_tracked_date")
+        injury_risk.max_strength_endurance_cardiorespiratory_date = input_dict.get("max_strength_endurance_cardiorespiratory_date")
+        injury_risk.max_strength_endurance_strength_date = input_dict.get("max_strength_endurance_strength_date")
+        injury_risk.max_power_drill_date = input_dict.get("max_power_drill_date")
+        injury_risk.max_maximal_strength_hypertrophic_date = input_dict.get("max_maximal_strength_hypertrophic_date")
+        injury_risk.max_power_explosive_action_date = input_dict.get("max_power_explosive_action_date")
 
         return injury_risk
 
@@ -781,33 +756,33 @@ class BodyPartInjuryRisk(object):
 
     # def eccentric_volume_today(self):
     #
-    #     eccentric_volume = 0
+    #     eccentric_load = 0
     #
     #     if self.prime_mover_eccentric_volume_today is not None:
-    #         eccentric_volume += self.prime_mover_eccentric_volume_today
+    #         eccentric_load += self.prime_mover_eccentric_volume_today
     #
     #     if self.synergist_eccentric_volume_today is not None:
-    #         eccentric_volume += self.synergist_eccentric_volume_today
+    #         eccentric_load += self.synergist_eccentric_volume_today
     #
     #     if self.synergist_compensating_eccentric_volume_today is not None:
-    #         eccentric_volume += self.synergist_compensating_eccentric_volume_today
+    #         eccentric_load += self.synergist_compensating_eccentric_volume_today
     #
-    #     return eccentric_volume
+    #     return eccentric_load
     #
     # def concentric_volume_today(self):
     #
-    #     concentric_volume = 0
+    #     concentric_load = 0
     #
     #     if self.prime_mover_concentric_volume_today is not None:
-    #         concentric_volume += self.prime_mover_concentric_volume_today
+    #         concentric_load += self.prime_mover_concentric_volume_today
     #
     #     if self.synergist_concentric_volume_today is not None:
-    #         concentric_volume += self.synergist_concentric_volume_today
+    #         concentric_load += self.synergist_concentric_volume_today
     #
     #     if self.synergist_compensating_concentric_volume_today is not None:
-    #         concentric_volume += self.synergist_compensating_concentric_volume_today
+    #         concentric_load += self.synergist_compensating_concentric_volume_today
     #
-    #     return concentric_volume
+    #     return concentric_load
 
     def compensating_volume_today(self):
 
@@ -830,17 +805,17 @@ class BodyPartInjuryRisk(object):
 
     # def prime_mover_total_volume_today(self):
     #
-    #     concentric_volume = self.prime_mover_concentric_volume_today
-    #     eccentric_volume = self.prime_mover_eccentric_volume_today
+    #     concentric_load = self.prime_mover_concentric_volume_today
+    #     eccentric_load = self.prime_mover_eccentric_volume_today
     #
-    #     return concentric_volume + eccentric_volume
+    #     return concentric_load + eccentric_load
     #
     # def synergist_total_volume_today(self):
     #
-    #     concentric_volume = self.synergist_concentric_volume_today
-    #     eccentric_volume = self.synergist_eccentric_volume_today
+    #     concentric_load = self.synergist_concentric_volume_today
+    #     eccentric_load = self.synergist_eccentric_volume_today
     #
-    #     return concentric_volume + eccentric_volume + self.synergist_compensating_eccentric_volume_today + self.synergist_compensating_concentric_volume_today
+    #     return concentric_load + eccentric_load + self.synergist_compensating_eccentric_volume_today + self.synergist_compensating_concentric_volume_today
 
     # def prime_mover_eccentric_volume_ramp(self):
     #

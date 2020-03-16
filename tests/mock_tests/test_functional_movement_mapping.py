@@ -1,7 +1,8 @@
-from models.functional_movement import FunctionalMovementPairs, FunctionalMovementActionMapping
+from models.functional_movement import FunctionalMovementPairs, FunctionalMovementActionMapping, FunctionalMovementFactory
 from models.functional_movement_type import FunctionalMovementType
 from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from datetime import datetime
 
 
 def test_get_eccentric_pair():
@@ -42,7 +43,10 @@ def test_apply_load_concentric():
     priority_2_ratio = 0.6
     priority_3_ratio = 0.3
 
-    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action)
+    factory = FunctionalMovementFactory()
+    dict = factory.get_functional_movement_dictinary()
+
+    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now(), dict)
     assert len(functional_movement_action_mapping.muscle_load) == 67
 
     # # Priority 1, prime movers
@@ -99,7 +103,10 @@ def test_apply_load_eccentric():
     priority_2_ratio = 0.6
     priority_3_ratio = 0.3
 
-    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action)
+    factory = FunctionalMovementFactory()
+    dict = factory.get_functional_movement_dictinary()
+
+    functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now(), dict)
     assert len(functional_movement_action_mapping.muscle_load) == 67
 
     # # Priority 1, prime movers

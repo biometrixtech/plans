@@ -1059,7 +1059,7 @@
         "library_id": "102",
         "name": "Foam Roller - Erector Spinae",
         "display_name": "Foam Roll - Upper Back",
-        "description": "Place a foam roller behind your low back. Cross your arms in front of you and protract your shoulders. Raise your hips off of the floor and lean back, keeping your weight on your lower back. Roll over your back, holding points of tension for 30 seconds. Repeat on the other side. Don\u2019t have a foam roller? You can use a tennis ball or water bottle.",
+        "description": "Place a foam roller behind your mid back. Cross your arms in front of you and protract your shoulders. Raise your hips off of the floor and lean back, keeping your weight on your back. Roll over your back, holding points of tension for 30 seconds.  Don\u2019t have a foam roller? You can use a tennis ball or water bottle.",
         "youtube_id": "",
         "min_sets": 1,
         "max_sets": 2,
@@ -1632,30 +1632,6 @@
         ]
     },
     {
-        "library_id": "141",
-        "name": "Walking Superman",
-        "display_name": "Walking Superman",
-        "description": "Take a step then lean forward, bring the back leg off the ground. Extend your arms out in front of you, making a straight line from your hands down to the foot off the ground. Stand back up and take a step forward with the leg that was raised, and repeat.",
-        "youtube_id": "",
-        "min_sets": 1,
-        "max_sets": 1,
-        "min_reps": 10,
-        "max_reps": 15,
-        "bilateral": false,
-        "progression_interval": 0,
-        "exposure_target": 0,
-        "exposure_minimum": 0,
-        "unit_of_measure": "yards",
-        "seconds_rest_between_sets": 0,
-        "time_per_set": 36,
-        "time_per_rep": null,
-        "progresses_to": "",
-        "technical_difficulty": "Beginner",
-        "equipment_required": [
-            "None"
-        ]
-    },
-    {
         "library_id": "142",
         "name": "Hurdle Walks (In)",
         "display_name": "Hurdle Walks (In)",
@@ -1921,8 +1897,8 @@
     },
     {
         "library_id": "162",
-        "name": "Running Arm Circles",
-        "display_name": "Running Arm Circles",
+        "name": "Skipping Arm Circles",
+        "display_name": "Skipping Arm Circles",
         "description": "Skip forward and swing your arms around in circles forward, then backward.",
         "youtube_id": "",
         "min_sets": 1,
@@ -1945,8 +1921,8 @@
     },
     {
         "library_id": "163",
-        "name": "Low Lateral Squat",
-        "display_name": "Low Lateral Squat",
+        "name": "Side Lunge",
+        "display_name": "Side Lunge",
         "description": "Begin in a wide-legged stance. Shift your weight to one side, bending that knee to descend into a deep squat. Stand back up into the starting position, then shift your weight to the other side. Complete for the set number of reps.",
         "youtube_id": "",
         "min_sets": 1,
@@ -1970,8 +1946,8 @@
     {
         "library_id": "164",
         "name": "Lunge with Rotation",
-        "display_name": "Lunge with Rotation",
-        "description": "Step forward into a lunge, then rotate your torso to face the left, then rotate to face the right. Push up off your back leg to stand again. Step forward into a lunge with the other leg, and repeat.",
+        "display_name": "Knee Hug to Lunge with Rotation",
+        "description": "In a standing position, bring your knee to your chest and wrap your hands around your shin to pull your knee farther up. Release that leg and step it forward, dropping into a lunge. Then rotate your torso to face the left, then rotate to face the right. Push up off your back leg to stand again, and repeat.",
         "youtube_id": "",
         "min_sets": 1,
         "max_sets": 1,
@@ -2227,30 +2203,6 @@
         "time_per_rep": 3,
         "progresses_to": "",
         "technical_difficulty": "Beginner",
-        "equipment_required": [
-            "None"
-        ]
-    },
-    {
-        "library_id": "193",
-        "name": "Side to Side Squat",
-        "display_name": "Side to Side Squat",
-        "description": "Stand with your feet shoulder-width apart. Perform a squat but shift your weight onto one side so your body is off-center. Come back to the starting position, then perform the squat on the other side. Repeat for the designated reps.",
-        "youtube_id": "",
-        "min_sets": 1,
-        "max_sets": 1,
-        "min_reps": 10,
-        "max_reps": 15,
-        "bilateral": false,
-        "progression_interval": 0,
-        "exposure_target": 0,
-        "exposure_minimum": 0,
-        "unit_of_measure": "count",
-        "seconds_rest_between_sets": 0,
-        "time_per_set": null,
-        "time_per_rep": 3,
-        "progresses_to": "",
-        "technical_difficulty": "Beginner - Tier 2",
         "equipment_required": [
             "None"
         ]

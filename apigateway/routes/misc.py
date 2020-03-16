@@ -236,7 +236,7 @@ def update_dates(daily_plans, athlete_stats, event_date):
 @xray_recorder.capture('routes.misc.dailycron')
 def handle_dailycron():
     # This route will be called daily via a CloudWatch Scheduled Event.
-    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', 'misc/activeusers', body={})
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', 'misc/activeusers', body={})
 
     return {'status': 'Success'}, 200
 

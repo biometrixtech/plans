@@ -27,9 +27,9 @@ def get_action(action_id, name, exercise, training_type=TrainingType.strength_in
     action.eligible_external_resistance = [Equipment.barbells, Equipment.dumbbells]
     action.lateral_distribution_pattern = weight_dist
 
-    WorkoutProcessor().process_action(action, exercise)
+    WorkoutProcessor().initialize_action_from_exercise(action, exercise)
     action.explosiveness_rating = explosiveness
-    action.get_training_load()
+    action.set_training_load()
     return action
 
 

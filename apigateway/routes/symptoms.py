@@ -5,12 +5,15 @@ from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.comms.service import Service
 from fathomapi.utils.decorators import require
+from fathomapi.utils.exceptions import InvalidSchemaException
 from fathomapi.utils.xray import xray_recorder
 from models.daily_plan import DailyPlan
+from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from routes.environments import is_fathom_environment
 from utils import parse_datetime, format_date, get_timezone, _check_plan_exists
 from logic.survey_processing import SurveyProcessing, create_plan
+
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -24,10 +27,12 @@ app = Blueprint('symptoms', __name__)
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
 @require.authenticated.any
-@require.body({'event_date': str})
+# @require.body({'event_date': str})
 @xray_recorder.capture('routes.symptoms.post')
 def handle_add_symptoms(user_id=None):
-    event_date = parse_datetime(request.json['event_date'])
+    validate_data()
+    event_date_string = request.json.get('event_date') or request.json.get('event_date_time')
+    event_date = parse_datetime(event_date_string)
     timezone = get_timezone(event_date)
     hist_update = False
     athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
@@ -44,15 +49,13 @@ def handle_add_symptoms(user_id=None):
                                         athlete_stats=athlete_stats,
                                         datastore_collection=datastore_collection)
     survey_processor.user_age = request.json.get('user_age', 20)
-    for soreness in request.json['soreness']:
-        if soreness is None:
+    symptoms = request.json.get('soreness') or request.json.get('symptoms') or []
+    for symptom in symptoms:
+        if symptom is None:
             continue
-        survey_processor.create_soreness_from_survey(soreness)
+        survey_processor.create_soreness_from_survey(symptom)
 
     visualizations = is_fathom_environment()
-
-    # # update daily pain and soreness in athlete_stats
-    # survey_processor.patch_daily_and_historic_soreness(survey='post_session')
 
     # check if plan exists, if not create a new one and save it to database, also check if existing one needs updating flags
     if not _check_plan_exists(user_id, plan_event_date):
@@ -65,24 +68,63 @@ def handle_add_symptoms(user_id=None):
 
     daily_plan_datastore.put(plan)
 
-    # update plan
-    if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
-        plan_copy = copy.deepcopy(plan)
-        if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
-            survey_processor.stats_processor.all_plans.remove([p for p in survey_processor.stats_processor.all_plans if p.event_date == plan_event_date][0])
-        survey_processor.stats_processor.all_plans.append(plan_copy)
-    plan = create_plan(user_id,
-                       event_date,
-                       athlete_stats=survey_processor.athlete_stats,
-                       stats_processor=survey_processor.stats_processor,
-                       datastore_collection=datastore_collection,
-                       visualizations=visualizations,
-                       hist_update=hist_update)
-
-    # update users database if health data received
     if is_fathom_environment():
+        # update plan
+        if survey_processor.stats_processor is not None and survey_processor.stats_processor.historic_data_loaded:
+            plan_copy = copy.deepcopy(plan)
+            if plan_event_date in [p.event_date for p in survey_processor.stats_processor.all_plans]:
+                survey_processor.stats_processor.all_plans.remove([p for p in survey_processor.stats_processor.all_plans if p.event_date == plan_event_date][0])
+            survey_processor.stats_processor.all_plans.append(plan_copy)
+        plan = create_plan(user_id,
+                           event_date,
+                           athlete_stats=survey_processor.athlete_stats,
+                           stats_processor=survey_processor.stats_processor,
+                           datastore_collection=datastore_collection,
+                           visualizations=visualizations,
+                           hist_update=hist_update)
+
+        # update users database if health data received
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                 endpoint=f"user/{user_id}",
                                                                                 body={"timezone": timezone,
                                                                                       "plans_api_version": Config.get('API_VERSION')})
-    return {'daily_plans': [plan]}, 201
+        return {'daily_plans': [plan]}, 201
+    else:
+        return {'message': 'success'}, 200
+
+
+@xray_recorder.capture('routes.symptoms.validate')
+def validate_data():
+    if 'event_date' in request.json:
+        if not isinstance(request.json['event_date'], str):
+            raise InvalidSchemaException(f"Property event_date must be of type string")
+        else:
+            parse_datetime(request.json['event_date'])
+    elif 'event_date_time' in request.json:
+        if not isinstance(request.json['event_date_time'], str):
+            raise InvalidSchemaException(f"Property event_date_time must be of type string")
+        else:
+            parse_datetime(request.json['event_date_time'])
+    else:
+        InvalidSchemaException(f"event_date_time is a required field")
+
+    if 'soreness' in request.json:
+        if not isinstance(request.json['soreness'], list):
+            raise InvalidSchemaException(f"Property soreness must be of type list")
+        for symptom in request.json['soreness']:
+            try:
+                BodyPartLocation(symptom['body_part'])
+            except ValueError:
+                raise InvalidSchemaException('body_part not recognized')
+            symptom['body_part'] = int(symptom['body_part'])
+    elif 'symptoms' in request.json:
+        if not isinstance(request.json['symptoms'], list):
+            raise InvalidSchemaException(f"Property symptoms must be of type list")
+        for symptom in request.json['symptoms']:
+            try:
+                BodyPartLocation(symptom['body_part'])
+            except ValueError:
+                raise InvalidSchemaException('body_part not recognized')
+            symptom['body_part'] = int(symptom['body_part'])
+    else:
+        InvalidSchemaException(f"symptoms is a required field")

@@ -1060,7 +1060,7 @@ class TrendProcessor(object):
                     if len(body_part_text_2) == 0:
                         body_part_text_2 = "PRIME MOVER"
                     if body_part_text_2 not in recovery_body_parts:
-                        recovery_body_parts.add(body_part_text_1)
+                        recovery_body_parts.add(body_part_text_2)
                         tile_2.text = "Strengthen your " + body_part_text_2
                         tile_2.description = mobilize_suffix
                         bold_2 = BoldText()

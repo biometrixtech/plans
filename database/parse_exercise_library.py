@@ -99,7 +99,7 @@ class ExerciseLibraryParser(object):
         # TODO: Update this once added to exercise library
         # body_parts = self.__getattribute__(f"body_parts_{self.source}")
         try:
-            mapped_body_parts = row['muscle_group_joint']
+            # mapped_body_parts = row['muscle_group_joint']
             mapped_body_parts = json.loads(row['muscle_group_joint'])
             for key, value in mapped_body_parts.items():
                 if value not in self.body_parts.keys():
@@ -122,6 +122,8 @@ class ExerciseLibraryParser(object):
                     body_part['static_integrate'].append(row['id'])
                 elif row['dynamic_integrate'] == 'x':
                     body_part['dynamic_integrate'].append(row['id'])
+                elif row['dynamic_integrate_with_speed'] == 'x':
+                    body_part['dynamic_integrate_with_speed'].append(row['id'])
         except Exception as e:
             print(e)
             pass
@@ -179,6 +181,7 @@ class ExerciseLibraryParser(object):
         body_part['isolated_activate'] = []
         body_part['static_integrate'] = []
         body_part['dynamic_integrate'] = []
+        body_part['dynamic_integrate_with_speed'] = []
         body_part['agonists'] = []
         body_part['synergists'] = []
         body_part['stabilizers'] = []

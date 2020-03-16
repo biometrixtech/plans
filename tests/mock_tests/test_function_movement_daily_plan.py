@@ -7,8 +7,9 @@ import pytest
 from models.session import SportTrainingSession, MixedActivitySession
 from datetime import datetime, timedelta
 from models.sport import SportName
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, SessionFunctionalMovement
-from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
+# from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement
+# from models.session_functional_movement import SessionFunctionalMovement
+# from logic.functional_anatomy_processing import FunctionalAnatomyProcessor
 from models.soreness import Soreness
 from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation, BodyPartSide

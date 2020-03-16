@@ -1,9 +1,10 @@
+from fathomapi.utils.xray import xray_recorder
 from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
-from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance
+from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 
@@ -15,6 +16,7 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 
 class WorkoutProcessor(object):
 
+    @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, workout_program):
 
         for workout_section in workout_program.workout_sections:
@@ -23,34 +25,37 @@ class WorkoutProcessor(object):
                 self.add_movement_detail_to_exercise(workout_exercise)
 
     def add_movement_detail_to_exercise(self, exercise):
-        if exercise.movement_id in movement_library.keys():
-            movement = movement_library[exercise.movement_id]
-            exercise.process_movement(movement)
+        if exercise.movement_id in movement_library:
+            movement_json = movement_library[exercise.movement_id]
+            movement = Movement.json_deserialise(movement_json)
+            exercise.initialize_from_movement(movement)
             self.add_action_details_to_exercise(exercise, movement)
 
-            if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-                exercise.convert_reps_to_duration(cardio_data)
+            # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            #     exercise.convert_reps_to_duration(cardio_data)
 
     def add_action_details_to_exercise(self, exercise, movement):
         for action_id in movement.primary_actions:
-            action = action_library.get(action_id)
-            if action is not None:
-                self.process_action(action, exercise)
+            action_json = action_library.get(action_id)
+            if action_json is not None:
+                action = ExerciseAction.json_deserialise(action_json)
+                self.initialize_action_from_exercise(action, exercise)
                 exercise.primary_actions.append(action)
-        self.apply_explosiveness(exercise, exercise.primary_actions)
+        self.set_action_explosiveness_from_exercise(exercise, exercise.primary_actions)
         for action in exercise.primary_actions:
-            action.get_training_load()
+            action.set_training_load()
 
         for action_id in movement.secondary_actions:
-            action = action_library.get(action_id)
-            if action is not None:
-                self.process_action(action, exercise)
+            action_json = action_library.get(action_id)
+            if action_json is not None:
+                action = ExerciseAction.json_deserialise(action_json)
+                self.initialize_action_from_exercise(action, exercise)
                 exercise.secondary_actions.append(action)
-        self.apply_explosiveness(exercise, exercise.secondary_actions)
+        self.set_action_explosiveness_from_exercise(exercise, exercise.secondary_actions)
         for action in exercise.secondary_actions:
-            action.get_training_load()
+            action.set_training_load()
 
-    def process_action(self, action, exercise):
+    def initialize_action_from_exercise(self, action, exercise):
         # athlete_bodyweight = 100
         # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
@@ -174,11 +179,11 @@ class WorkoutProcessor(object):
 
         for prime_mover in prime_movers['first_prime_movers']:
             var = f'prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients.keys():
+            if var in bodyweight_coefficients:
                 bodyweight_ratio += bodyweight_coefficients[var]
         for prime_mover in prime_movers['second_prime_movers']:
             var = f'second_prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients.keys():
+            if var in bodyweight_coefficients:
                 bodyweight_ratio += bodyweight_coefficients[var]
         return bodyweight_ratio
 
@@ -338,7 +343,7 @@ class WorkoutProcessor(object):
             else:
                 return 0.0
 
-    def apply_explosiveness(self, exercise, action_list):
+    def set_action_explosiveness_from_exercise(self, exercise, action_list):
 
         if len(action_list) > 0:
             action_explosiveness = [a.explosiveness for a in action_list if a.explosiveness is not None]

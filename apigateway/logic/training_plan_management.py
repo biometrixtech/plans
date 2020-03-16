@@ -79,7 +79,7 @@ class TrainingPlanManager(object):
         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
-    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True):
+    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True, force_on_demand=False):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
@@ -126,7 +126,7 @@ class TrainingPlanManager(object):
                 # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
 
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
-                post_active_rests = calc.get_post_active_rest(force_data)
+                post_active_rests = calc.get_post_active_rest(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(post_active_rests)
             else:
                 # if any completed post-training modalities exist, preserve them
@@ -153,7 +153,7 @@ class TrainingPlanManager(object):
                 # remove existing post active rest
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
                 # create new post active rest
-                post_active_rests = calc.get_post_active_rest(force_data)
+                post_active_rests = calc.get_post_active_rest(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(post_active_rests)
 
                 # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
@@ -170,7 +170,7 @@ class TrainingPlanManager(object):
                 # create new pre active rest
                 # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
-                pre_active_rests = calc.get_pre_active_rest(force_data)
+                pre_active_rests = calc.get_pre_active_rest(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(pre_active_rests)
 
             else:
@@ -191,7 +191,7 @@ class TrainingPlanManager(object):
                 # remove existing pre_active rest
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
                 # get new pre active rest
-                pre_active_rests = calc.get_pre_active_rest(force_data)
+                pre_active_rests = calc.get_pre_active_rest(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(pre_active_rests)
 
                 # remove existing warm_up

@@ -209,13 +209,13 @@ class ExerciseAction(object):
 
         return action
 
-    def get_power_training_intensity(self):
+    def set_power_training_intensity(self):
         self.training_intensity = self.explosiveness_rating
 
-    def get_strength_training_intensity(self):
+    def set_strength_training_intensity(self):
         self.training_intensity = 8
 
-    def get_external_intensity(self):
+    def set_external_intensity(self):
         external_weight_left = 0
         external_weight_right = 0
         if self.apply_resistance:
@@ -282,7 +282,7 @@ class ExerciseAction(object):
         self.external_intensity_left = external_weight_left
         self.external_intensity_right = external_weight_right
 
-    def get_body_weight_intensity(self):
+    def set_body_weight_intensity(self):
         left = 0
         right = 0
         if self.lateral_distribution_pattern == WeightDistribution.bilateral:  # each side gets half the load for each rep (50, 50)
@@ -312,10 +312,10 @@ class ExerciseAction(object):
         self.bodyweight_intensity_left = left
         self.bodyweight_intensity_right = right
 
-    def get_training_load(self):
-        self.get_training_intensity()
+    def set_training_load(self):
+        self.set_intensity()
         self.set_adaption_type()
-        self.get_training_volume()
+        self.set_training_volume()
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             # both sides have same volume (duration) and intensity (rpe)
             self.total_load_left = self.training_volume_left * self.training_intensity
@@ -340,7 +340,7 @@ class ExerciseAction(object):
             self.total_load_left = self.training_volume_left * self.training_intensity * left_dist
             self.total_load_right = self.training_volume_right * self.training_intensity * right_dist
 
-    def get_training_volume(self):
+    def set_training_volume(self):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             # both sides are assigned all the reps (already in duration)
             self.training_volume_left = self.reps
@@ -372,17 +372,17 @@ class ExerciseAction(object):
                 self.training_volume_left = self.reps
                 self.training_volume_right = self.reps
 
-    def get_training_intensity(self):
+    def set_intensity(self):
         if self.training_type == TrainingType.strength_cardiorespiratory:
             if self.rpe is None:
                 self.rpe = 4
             self.training_intensity = self.rpe
         elif self.training_type in [TrainingType.strength_endurance, TrainingType.strength_integrated_resistance]:
-            self.get_strength_training_intensity()
+            self.set_strength_training_intensity()
         else:
-            self.get_power_training_intensity()
-        self.get_external_intensity()
-        self.get_body_weight_intensity()
+            self.set_power_training_intensity()
+        self.set_external_intensity()
+        self.set_body_weight_intensity()
 
     def set_adaption_type(self):
         if self.training_type == TrainingType.flexibility:
@@ -402,7 +402,7 @@ class ExerciseAction(object):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            if self.training_intensity >= 6:  # TODO: validate this number
+            if self.training_intensity >= 5:  # TODO: validate this number
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength

@@ -78,6 +78,7 @@ class SurveyProcessing(object):
         apple_health_kit_ids = session.get("merged_apple_health_kit_ids", [])
         apple_health_kit_source_names = session.get("merged_apple_health_kit_source_names", [])
         workout_program_module = session.get("workout_program_module", None)
+        session_RPE = session.get('session_RPE', None)
 
         duration_health = None
         if source == 1:
@@ -100,7 +101,8 @@ class SurveyProcessing(object):
                         "merged_apple_health_kit_source_names": apple_health_kit_source_names,
                         "apple_health_kit_id": apple_health_kit_id,
                         "apple_health_kit_source_name": apple_health_kit_source_name,
-                        "workout_program_module": workout_program_module}
+                        "workout_program_module": workout_program_module,
+                        "session_RPE": session_RPE}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -381,7 +383,7 @@ def match_sessions(user_sessions, health_session):
 
 
 def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None,
-                force_data=False, mobilize_only=False, visualizations=True, hist_update=False):
+                force_data=False, mobilize_only=False, visualizations=True, hist_update=False, force_on_demand=False):
     if datastore_collection is None:
         datastore_collection = DatastoreCollection()
     if update_stats:
@@ -407,7 +409,8 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
                                           athlete_stats=athlete_stats,
                                           force_data=force_data,
                                           mobilize_only=mobilize_only,
-                                          visualizations=visualizations)
+                                          visualizations=visualizations,
+                                          force_on_demand=force_on_demand)
     plan = cleanup_plan(plan, visualizations)
 
     return plan

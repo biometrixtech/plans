@@ -9,6 +9,7 @@ class ExercisePhaseType(Enum):
     dynamic_stretch = 3
     isolated_activate = 4
     static_integrate = 5
+    dynamic_integrate = 6
 
     def get_display_name(self):
         display_names = {
@@ -17,7 +18,8 @@ class ExercisePhaseType(Enum):
             2: 'ACTIVE STRETCH',
             3: 'DYNAMIC STRETCH',
             4: 'ACTIVATE',
-            5: 'STATIC INTEGRATE'
+            5: 'STATIC INTEGRATE',
+            6: 'DYNAMIC INTEGRATE'
             }
         return display_names[self.value]
 

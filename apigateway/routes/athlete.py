@@ -7,10 +7,12 @@ from datastores.datastore_collection import DatastoreCollection
 from logic.training_plan_management import TrainingPlanManager
 from logic.stats_processing import StatsProcessing
 from logic.metrics_processing import MetricsProcessing
+from logic.user_stats_processing import UserStatsProcessing
 from models.stats import AthleteStats
 from utils import parse_date, parse_datetime, format_date
 from routes.environments import is_fathom_environment
 import datetime
+import pytz
 import random
 import os
 
@@ -49,13 +51,18 @@ def create_daily_plan(athlete_id):
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
     event_date = request.json.get('event_date', None)
-    athlete_stats = StatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_athlete_stats()
+    if is_fathom_environment():
+        athlete_stats = StatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_athlete_stats()
 
-    if event_date is not None:
-        metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
-        athlete_stats.metrics = metrics
+        if event_date is not None:
+            metrics = MetricsProcessing().get_athlete_metrics_from_stats(athlete_stats, event_date)
+            athlete_stats.metrics = metrics
 
-    DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+        DatastoreCollection().athlete_stats_datastore.put(athlete_stats)
+    else:
+        user_stats = UserStatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_user_stats(force_historical_process=False)
+        DatastoreCollection().user_stats_datastore.put(user_stats)
+
     return {'message': 'Update requested'}, 202
 
 
@@ -81,7 +88,6 @@ def manage_athlete_push_notification(athlete_id):
         event_date = format_date(datetime.datetime.now())
         stats_update_time = event_date + 'T03:30:00Z'
         trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
-
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
                                                                           endpoint=f"athlete/{athlete_id}/stats",
                                                                           body={"event_date": event_date},
@@ -89,10 +95,11 @@ def manage_athlete_push_notification(athlete_id):
     except Exception as e:
         print(e)
         pass
-    if not _is_athlete_active(athlete_id):
-        return {'message': 'Athlete is not active'}, 200
 
-    _schedule_notifications(athlete_id)
+    if is_fathom_environment():
+        if not _is_athlete_active(athlete_id):
+            return {'message': 'Athlete is not active'}, 200
+        _schedule_notifications(athlete_id)
 
     return {'message': 'Processed'}, 202
 
@@ -104,7 +111,7 @@ def process_athlete_survey(athlete_id):
     athlete_stats = DatastoreCollection().athlete_stats_datastore.get(athlete_id=athlete_id)
     if athlete_stats is None:
         athlete_stats = AthleteStats(athlete_id)
-        athlete_stats.event_date = datetime.datetime.now()
+        athlete_stats.event_date = datetime.datetime.now().replace(tzinfo=pytz.utc)
 
     if 'typical_weekly_sessions' in request.json:
         athlete_stats.typical_weekly_sessions = request.json['typical_weekly_sessions']
@@ -300,7 +307,7 @@ def _randomize_trigger_time(start_time, window, tz_offset):
     offset_from_start = random.randint(0, window)
     local_date = parse_datetime(start_time) + datetime.timedelta(seconds=offset_from_start)
     utc_date = local_date - datetime.timedelta(minutes=tz_offset)
-    return utc_date
+    return utc_date.replace(tzinfo=None)
 
 
 def _are_exercises_assigned(rec, rec_type):
