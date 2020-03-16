@@ -216,27 +216,27 @@ class Activity(object):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        modality_type = ActivityType(input_dict["type"])
-        if modality_type == ActivityType.movement_integration_prep:
-            modality = MovementIntegrationPrep(event_date_time=input_dict.get('event_date_time'),
+        activity_type = ActivityType(input_dict["type"])
+        if activity_type == ActivityType.movement_integration_prep:
+            activity = MovementIntegrationPrep(event_date_time=input_dict.get('event_date_time'),
                                                force_data=input_dict.get('force_data', False))
-        elif modality_type == ActivityType.active_rest:
-            modality = ActiveRest(event_date_time=input_dict.get('event_date_time'),
+        elif activity_type == ActivityType.active_rest:
+            activity = ActiveRest(event_date_time=input_dict.get('event_date_time'),
                                   force_data=input_dict.get('force_data', False))
-        elif modality_type == ActivityType.active_recovery:
-            modality = ActiveRecovery(event_date_time=input_dict.get('event_date_time'))
+        elif activity_type == ActivityType.active_recovery:
+            activity = ActiveRecovery(event_date_time=input_dict.get('event_date_time'))
         else:
             raise ValueError("Unknown activity type")
-        modality.id = input_dict.get("id")
-        modality.start_date_time = input_dict.get('start_date_time', None)
-        modality.completed_date_time = input_dict.get('completed_date_time', None)
-        modality.event_date_time = input_dict.get('event_date_time', None)
-        modality.completed = input_dict.get('completed', False)
-        modality.default_plan = input_dict.get('default_plan', 'Complete')
-        modality.goals = {goal_type: ActivityGoal.json_deserialise(goal) for
+        activity.id = input_dict.get("id")
+        activity.start_date_time = input_dict.get('start_date_time', None)
+        activity.completed_date_time = input_dict.get('completed_date_time', None)
+        activity.event_date_time = input_dict.get('event_date_time', None)
+        activity.completed = input_dict.get('completed', False)
+        activity.default_plan = input_dict.get('default_plan', 'Complete')
+        activity.goals = {goal_type: ActivityGoal.json_deserialise(goal) for
                           (goal_type, goal) in input_dict.get('goals', {}).items()}
-        modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
-        return modality
+        activity.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
+        return activity
 
     def __setattr__(self, name, value):
         if name in ['event_date_time', 'start_date_time', 'completed_date_time']:
