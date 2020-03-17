@@ -21,7 +21,7 @@ app = Blueprint('daily_plan', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'start_date': str})
 @xray_recorder.capture('routes.daily_plan.get')
 def handle_daily_plan_get(user_id=None):
@@ -101,7 +101,7 @@ def handle_daily_plan_get(user_id=None):
 
 
 @app.route('/<uuid:user_id>/update', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.daily_plan.update_get')
 def handle_daily_plan_update_get(user_id=None):
@@ -118,7 +118,7 @@ def handle_daily_plan_update_get(user_id=None):
 
 
 @app.route('/<uuid:user_id>/get_plan', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.daily_plan.get_plan')
 def handle_get_daily_plan(user_id):
