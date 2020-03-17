@@ -19,7 +19,7 @@ app = Blueprint('report_symptoms', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.self
+@require.authenticated.any
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.report_symptoms.post')
 def handle_add_symptom(user_id):

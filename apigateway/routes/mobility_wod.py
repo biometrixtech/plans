@@ -22,7 +22,7 @@ app = Blueprint('mobility_wod', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.self
+@require.authenticated.any
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.mobility_wod.create')
 def handle_rom_wod_create(user_id):
