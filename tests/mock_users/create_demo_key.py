@@ -16,7 +16,7 @@ def get_jwt():
 
     # Generate the JWT
     payload = {
-        'iss': 'soflete',
+        'iss': 'demo',
         'aud': 'fathom',
         'exp': datetime.datetime.utcnow() + delta,
         'iat': datetime.datetime.utcnow(),
