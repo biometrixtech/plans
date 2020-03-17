@@ -17,7 +17,7 @@ class MovementLibraryDatastore(object):
         try:
             file_name = Config.get('PROVIDER_INFO')['movement_library_filename']
         except KeyError:
-            print('Movement library not defined or does not exist for this provider')
+            print('Movement library not defined or does nto exist for this provider')
         else:
             try:
                 script_dir = os.path.dirname(__file__)
