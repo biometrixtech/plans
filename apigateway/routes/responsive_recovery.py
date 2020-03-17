@@ -23,7 +23,7 @@ app = Blueprint('responsive_recovery', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.responsive_recovery.create')
 def handle_responsive_recovery_create(user_id):
@@ -85,7 +85,7 @@ def handle_responsive_recovery_create(user_id):
 
 
 @app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>/update', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.responsive_recovery.update')
 def handle_responsive_recovery_update(user_id, responsive_recovery_id):

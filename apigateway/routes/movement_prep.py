@@ -21,7 +21,7 @@ app = Blueprint('movement_prep', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.movement_prep.create')
 def handle_movement_prep_create(user_id):

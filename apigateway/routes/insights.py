@@ -13,9 +13,9 @@ app = Blueprint('insights', __name__)
 
 
 @app.route('/<uuid:user_id>/read', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
-@xray_recorder.capture('routes.active_recovery.exercise_modalities.complete')
+@xray_recorder.capture('routes.insights.read')
 def handle_insights_read(user_id):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])

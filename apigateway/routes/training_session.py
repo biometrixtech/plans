@@ -20,7 +20,7 @@ app = Blueprint('training_session', __name__)
 
 
 @app.route('/<uuid:user_id>/<uuid:session_id>', methods=['PATCH'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.training_session.update')
 def handle_session_update(session_id, user_id):
