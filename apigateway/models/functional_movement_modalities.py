@@ -32,7 +32,7 @@ class ModalityType(Enum):
     def get_display_name(self):
         display_names = {
             0: 'Mobilize',
-            1: 'Mobilize',
+            1: 'Active Rest',
             2: 'Warm Up',
             3: 'Cool Down',
             4: 'Functional Strength',
