@@ -23,7 +23,7 @@ USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 @app.route('/<uuid:user_id>/clear_user_data', methods=['POST'])
 @require.body({'event_date': str})
-@require.authenticated.any
+@require.authenticated.self
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data(user_id=None):
     # users_service = Service('users', '2_0')
@@ -134,7 +134,7 @@ def handle_data_migration():
 
 
 @app.route('/<uuid:user_id>/app_logs', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @xray_recorder.capture('routes.misc.app_logs')
 def handle_app_open_tracking(user_id=None):
     event_date = request.json['event_date']

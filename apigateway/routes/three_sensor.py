@@ -13,7 +13,7 @@ app = Blueprint('three_sensor', __name__)
 
 
 @app.route('/<uuid:user_id>/biomechanics_detail', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.three_sensor.get')
 def handle_biomechanics_detail_get(user_id=None):
@@ -30,7 +30,7 @@ def handle_biomechanics_detail_get(user_id=None):
 
 
 @app.route('/<uuid:user_id>/biomechanics_detail/<uuid:session_id>', methods=['GET'])
-@require.authenticated.any
+@require.authenticated.self
 @xray_recorder.capture('routes.three_sensor.get_session')
 def handle_biomechanics_detail_get_session(user_id=None, session_id=None):
 

@@ -31,7 +31,7 @@ app = Blueprint('session', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str, 'sessions': list})
 @xray_recorder.capture('routes.session.create')
 def handle_session_create(user_id=None):
@@ -172,7 +172,7 @@ def handle_session_create(user_id=None):
 
 
 @app.route('/<uuid:user_id>/<uuid:session_id>', methods=['DELETE'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str, 'session_type': int})
 @xray_recorder.capture('routes.session.delete')
 def handle_session_delete(session_id, user_id=None):
@@ -197,7 +197,7 @@ def handle_session_delete(session_id, user_id=None):
 
 
 @app.route('/<uuid:user_id>/<uuid:session_id>', methods=['PATCH'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.session.update')
 def handle_session_update(session_id, user_id=None):
@@ -313,7 +313,7 @@ def handle_session_update(session_id, user_id=None):
 
 
 @app.route('/<uuid:user_id>/sensor_data', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'last_sensor_sync': str, 'sessions': list})
 @xray_recorder.capture('routes.session.add_sensor_data')
 def handle_session_sensor_data(user_id=None):
@@ -462,7 +462,7 @@ def handle_session_three_sensor_data(user_id):
 
 
 @app.route('/<uuid:user_id>/typical', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.typical_sessions')
 def handle_get_typical_sessions(user_id=None):
@@ -475,7 +475,7 @@ def handle_get_typical_sessions(user_id=None):
 
 
 @app.route('/<uuid:user_id>/no_sessions', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.no_sessions_planned')
 def handle_no_sessions_planned(user_id=None):
