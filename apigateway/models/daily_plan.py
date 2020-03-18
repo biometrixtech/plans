@@ -144,10 +144,10 @@ class DailyPlan(Serialisable):
                 active_rest_available_on_demand = False
             if m.type.value == 5 and not m.completed:
                 movement_prep_available = False
-            if active_rest_available_on_demand:
-                self.modalities_available_on_demand.append(ModalityTypeDisplay(ModalityType(1)))
-            if movement_prep_available:
-                self.modalities_available_on_demand.append(ModalityTypeDisplay(ModalityType(5)))
+        if active_rest_available_on_demand:
+            self.modalities_available_on_demand.append(ModalityTypeDisplay(ModalityType(1)))
+        if movement_prep_available:
+            self.modalities_available_on_demand.append(ModalityTypeDisplay(ModalityType(5)))
 
     def get_past_sessions(self, trigger_date_time):
 
