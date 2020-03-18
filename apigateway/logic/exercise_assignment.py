@@ -14,7 +14,7 @@ class ExerciseAssignment(object):
         self.event_date_time = event_date_time
         self.relative_load_level = relative_load_level
         self.sport_cardio_plyometrics = False
-        self.sport_body_parts = []
+        self.sport_body_parts = {}
         self.high_intensity_session = False
 
     def get_movement_integration_prep(self, force_data=False, force_on_demand=True):
