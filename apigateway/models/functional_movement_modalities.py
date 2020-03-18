@@ -2446,11 +2446,11 @@ class FunctionalStrength(Modality):
 
 
 class IceSession(Serialisable):
-    def __init__(self, minutes=0):
+    def __init__(self, event_date_time, minutes=0):
         self.minutes = minutes
         self.start_date_time = None
         self.completed_date_time = None
-        self.event_date_time = None
+        self.event_date_time = event_date_time
         self.completed = False
         self.active = True
         self.body_parts = []
