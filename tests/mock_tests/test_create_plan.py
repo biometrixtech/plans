@@ -232,11 +232,11 @@ def test_active_rest_before_training_quad_hist_soreness_knee():
     daily_plan = create_plan(body_part_list=[7, 6], severity_list=[2, 1], side_list=[1, 1], pain_list=[True, False], historic_soreness_list=historic_soreness_list)
     #daily_plan_json = daily_plan.json_serialise()
 
-    pre_active_rest = [m for m in daily_plan.modalities if m.type.value == 0][0]
-    assert len(pre_active_rest.exercise_phases[0].exercises) > 0
-    assert len(pre_active_rest.exercise_phases[1].exercises) > 0
-    assert len(pre_active_rest.exercise_phases[3].exercises) == 0
-    assert len(pre_active_rest.exercise_phases[4].exercises) == 0
+    movement_prep = [m for m in daily_plan.modalities if m.type.value == 5][0]
+    assert len(movement_prep.exercise_phases[0].exercises) > 0
+    assert len(movement_prep.exercise_phases[1].exercises) > 0
+    assert len(movement_prep.exercise_phases[3].exercises) == 0
+    assert len(movement_prep.exercise_phases[4].exercises) == 0
 
     # assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
     # assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) > 0
@@ -264,11 +264,11 @@ def test_active_rest_before_training_spectrum_soreness():
     daily_plan = create_plan(body_part_list=[7, 6, 5, 4, 3], severity_list=[5, 4, 3, 2, 1], side_list=[1, 1, 1, 1, 1],
                              pain_list=[False, False, True, False, False], historic_soreness_list=historic_soreness_list)
     #daily_plan_json = daily_plan.json_serialise()
-    pre_active_rest = [m for m in daily_plan.modalities if m.type.value == 0][0]
-    assert len(pre_active_rest.exercise_phases[0].exercises) > 0
-    assert len(pre_active_rest.exercise_phases[1].exercises) == 0
-    assert len(pre_active_rest.exercise_phases[3].exercises) == 0
-    assert len(pre_active_rest.exercise_phases[4].exercises) == 0
+    movement_prep = [m for m in daily_plan.modalities if m.type.value == 5][0]
+    assert len(movement_prep.exercise_phases[0].exercises) > 0
+    assert len(movement_prep.exercise_phases[1].exercises) == 0
+    assert len(movement_prep.exercise_phases[3].exercises) == 0
+    assert len(movement_prep.exercise_phases[4].exercises) == 0
 
     # assert len(daily_plan.pre_active_rest[0].inhibit_exercises) > 0
     # assert len(daily_plan.pre_active_rest[0].static_stretch_exercises) == 0
