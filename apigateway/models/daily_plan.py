@@ -74,7 +74,8 @@ class DailyPlan(Serialisable):
                # 'ice': self.ice.json_serialise() if self.ice is not None else None,
                'ice': self.fake_ice(),
                'completed_ice': [ice.json_serialise() for ice in self.completed_ice],
-               'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
+               # 'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
+               'cold_water_immersion': self.fake_cwi(),
                'completed_cold_water_immersion': [cwi.json_serialise() for cwi in self.completed_cold_water_immersion],
                'last_updated': self.last_updated,
                'daily_readiness_survey': readiness,
@@ -231,5 +232,25 @@ class DailyPlan(Serialisable):
                     'active': True
                 }
             ],
+            'alerts': []
+        }
+
+    @staticmethod
+    def fake_cwi():
+        return {
+            'minutes': 10,
+            'after_training': True,
+            'goals': [
+                {
+                    'text': 'Recovery',
+                    'priority': 1,
+                    'goal_type': 2
+                }
+            ],
+            'start_date_time': None,
+            'completed_date_time': None,
+            'event_date_time': '2020-03-18T15:11:19.395515',
+            'completed': False,
+            'active': True,
             'alerts': []
         }

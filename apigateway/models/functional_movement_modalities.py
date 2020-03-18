@@ -2537,12 +2537,12 @@ class Ice(Serialisable):
 
 
 class ColdWaterImmersion(Serialisable):
-    def __init__(self, minutes=10):
+    def __init__(self, event_date_time, minutes=10):
         self.minutes = minutes
         self.after_training = True
         self.start_date_time = None
         self.completed_date_time = None
-        self.event_date_time = None
+        self.event_date_time = event_date_time
         self.completed = False
         self.active = True
         self.goals = set()
