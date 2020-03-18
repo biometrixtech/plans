@@ -35,10 +35,12 @@ class TrainingPlanManager(object):
         self.longitudinal_alerts = []
         self.soreness_list = []
         self.symptoms = []
+        self.activity_training_sessions = []
 
     def load_data(self, event_date):
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, event_date, event_date)
         plan_today = [plan for plan in daily_plans if plan.event_date == event_date]
+
         if len(plan_today) == 0:
             self.daily_plan = DailyPlan(event_date)
             self.daily_plan.user_id = self.athlete_id
@@ -54,6 +56,8 @@ class TrainingPlanManager(object):
         for c in plan_today:
             self.training_sessions.extend(c.training_sessions)
             self.symptoms.extend(c.symptoms)
+
+        self.activity_training_sessions = [session for session in self.training_sessions]
 
     @staticmethod
     def preserve_completed_modality(modalities):
@@ -78,11 +82,37 @@ class TrainingPlanManager(object):
         # only retain not-completed
         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
 
+    def set_exercise_assignment_session_info(self, exercise_assignment):
+
+        exercise_assignment.sport_cardio_plyometrics = self.check_cardio_sport()
+        exercise_assignment.sport_body_parts = self.get_sport_body_parts()
+        exercise_assignment.high_intensity_session = self.is_high_intensity_session()
+
+    def is_high_intensity_session(self):
+        for session in self.activity_training_sessions:
+            if session.ultra_high_intensity_session() and session.high_intensity_RPE():
+                return True
+        return False
+
+    def get_sport_body_parts(self):
+        sport_body_parts = {}
+        for session in self.activity_training_sessions:
+            sport_body_parts.update(session.get_load_body_parts())
+        return sport_body_parts
+
+    def check_cardio_sport(self):
+        sport_cardio_plyometrics = False
+        for session in self.activity_training_sessions:
+            if session.is_cardio_plyometrics():
+                sport_cardio_plyometrics = True
+        return sport_cardio_plyometrics
+
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
     def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True, force_on_demand=False):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
+
         date = parse_date(event_date)
 
         historic_soreness = []
@@ -111,15 +141,17 @@ class TrainingPlanManager(object):
             self.athlete_stats.insight_categories = trend_processor.athlete_insight_categories
 
         modality_date_time = self.trigger_date_time or date
-        calc = ExerciseAssignment(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
+        exercise_assignment = ExerciseAssignment(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
                                   modality_date_time, injury_risk_processor.relative_load_level)
+
+        self.set_exercise_assignment_session_info(exercise_assignment)
 
         # new modalities
         self.move_completed_modalities()
 
         if not self.daily_plan.train_later:
             if len(self.daily_plan.training_sessions) > 0:
-                responsive_recovery, ice, cold_water_immersion = calc.get_responsive_recovery(force_data, force_on_demand)
+                responsive_recovery, ice, cold_water_immersion = exercise_assignment.get_responsive_recovery(force_data, force_on_demand)
 
                 if len(responsive_recovery) > 0:
                     modality_type_value = responsive_recovery[0].modality_type.value
@@ -136,12 +168,12 @@ class TrainingPlanManager(object):
 
             else:
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
-                active_rests = calc.get_active_rest(force_data, force_on_demand)
+                active_rests = exercise_assignment.get_active_rest(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(active_rests)
         else:
 
             if len(self.daily_plan.training_sessions) > 0:
-                responsive_recovery, ice, cold_water_immersion = calc.get_responsive_recovery(force_data, force_on_demand)
+                responsive_recovery, ice, cold_water_immersion = exercise_assignment.get_responsive_recovery(force_data, force_on_demand)
 
                 if len(responsive_recovery) > 0:
                     modality_type_value = responsive_recovery[0].modality_type.value
@@ -156,17 +188,8 @@ class TrainingPlanManager(object):
 
                 # remove existing post-training modalities rest
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.movement_integration_prep.value]
-                movement_preps = calc.get_movement_integration_prep(force_data, force_on_demand)
+                movement_preps = exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(movement_preps)
-
-            # remove existing warm_up
-            # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.warm_up.value]
-            # get new warm_up
-            # warm_up = calc.get_warm_up()
-            # self.daily_plan.modalities.extend(warm_up)
-
-            # self.daily_plan.heat = calc.get_heat()
-            # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
 
         self.daily_plan.last_updated = last_updated
         self.daily_plan.define_available_modalities()
@@ -195,24 +218,26 @@ class TrainingPlanManager(object):
                                                     self.athlete_id)
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
         injury_risk_processor.set_relative_load_level(event_date.date())
-        calc = ExerciseAssignment(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
-                                  event_date, injury_risk_processor.relative_load_level)
+        exercise_assignment = ExerciseAssignment(consolidated_injury_risk_dict, self.exercise_library_datastore,
+                                                 self.completed_exercise_datastore,
+                                                 event_date, injury_risk_processor.relative_load_level)
 
+        self.set_exercise_assignment_session_info(exercise_assignment)
         self.move_completed_modalities()
 
         modality_type = ModalityType(modality_type)
         if modality_type == ModalityType.pre_active_rest:
-            new_modality = calc.get_active_rest(force_data)
+            new_modality = exercise_assignment.get_active_rest(force_data)
         elif modality_type == ModalityType.post_active_rest:
-            new_modality = calc.get_active_rest(force_data)
+            new_modality = exercise_assignment.get_active_rest(force_data)
         # elif modality_type == ModalityType.warm_up:
         #     new_modality = calc.get_warm_up()
         elif modality_type == ModalityType.cool_down or modality_type == ModalityType.active_recovery:
-            new_modality, ice, cold_water_immersion = calc.get_responsive_recovery(force_data)
+            new_modality, ice, cold_water_immersion = exercise_assignment.get_responsive_recovery(force_data)
         # elif modality_type == ModalityType.functional_strength:
         #     new_modality = calc.get_functional_strength()
         elif modality_type == ModalityType.movement_integration_prep:
-            new_modality = calc.get_movement_integration_prep(force_data)
+            new_modality = exercise_assignment.get_movement_integration_prep(force_data)
         else:
             new_modality = None
 
