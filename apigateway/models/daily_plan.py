@@ -71,7 +71,8 @@ class DailyPlan(Serialisable):
                'completed_cool_down': [cool_down.json_serialise() for cool_down in self.completed_cool_down],
                'post_active_rest': [ar.json_serialise() for ar in self.post_active_rest],
                'completed_post_active_rest': [ar.json_serialise() for ar in self.completed_post_active_rest],
-               'ice': self.ice.json_serialise() if self.ice is not None else None,
+               # 'ice': self.ice.json_serialise() if self.ice is not None else None,
+               'ice': self.fake_ice(),
                'completed_ice': [ice.json_serialise() for ice in self.completed_ice],
                'cold_water_immersion': self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None,
                'completed_cold_water_immersion': [cwi.json_serialise() for cwi in self.completed_cold_water_immersion],
@@ -202,3 +203,33 @@ class DailyPlan(Serialisable):
 
     def sort_insights(self):
         self.insights = sorted(self.insights, key=lambda x: (int(x.read), x.priority, int(x.cleared)))
+
+    @staticmethod
+    def fake_ice():
+        return {
+            'minutes': 10,
+            'start_date_time': None,
+            'completed_date_time': None,
+            'event_date_time': '2020-03-18T14:24:37.565031',
+            'completed': False,
+            'active': True,
+            'body_parts': [
+                {
+                    'body_part_location': 7,
+                    'goals': [
+                        {
+                            'text': 'Care',
+                            'priority': 1,
+                            'goal_type': 0
+                        }
+                    ],
+                    'after_training': True,
+                    'immediately_after_training': False,
+                    'repeat_every_3hrs_for_24hrs': False,
+                    'side': 1,
+                    'completed': False,
+                    'active': True
+                }
+            ],
+            'alerts': []
+        }
