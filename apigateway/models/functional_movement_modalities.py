@@ -135,6 +135,8 @@ class Modality(object):
         self.comprehensive_winner = 1
         self.rankings = set()
 
+        self.source_training_session_id = None
+
     def json_serialise(self):
          return {
              "id": self.id,
@@ -154,7 +156,8 @@ class Modality(object):
              "locked_text": self.locked_text,
              # "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
              "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
-             "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases]
+             "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases],
+             "source_training_session_id": self.source_training_session_id if self.source_training_session_id is not None else None
              }
 
     @classmethod
@@ -194,6 +197,7 @@ class Modality(object):
         modality.goals = {goal_type: ModalityGoal.json_deserialise(goal) for
                                  (goal_type, goal) in input_dict.get('goals', {}).items()}
         modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
+        modality.source_training_session_id = input_dict.get('source_training_session_id')
         return modality
 
     def __setattr__(self, name, value):
