@@ -166,6 +166,11 @@ class Modality(object):
         elif modality_type == ModalityType.post_active_rest:
             modality = ActiveRestAfterTraining(event_date_time=input_dict.get('event_date_time'),
                                                force_data=input_dict.get('force_data', False))
+        elif modality_type == ModalityType.movement_integration_prep:
+            modality = MovementIntegrationPrep(event_date_time=input_dict.get('event_date_time'),
+                                               force_data=input_dict.get('force_data', False))
+        elif modality_type == ModalityType.active_recovery:
+            modality = ActiveRecovery(event_date_time=input_dict.get('event_date_time'))
         elif modality_type == ModalityType.warm_up:
             modality = WarmUp(event_date_time=input_dict.get('event_date_time'))
         elif modality_type == ModalityType.cool_down:
