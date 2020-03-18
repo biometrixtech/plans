@@ -2474,10 +2474,10 @@ class IceSession(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        ice_session = cls(input_dict.get('minutes', 0))
+        ice_session = cls(input_dict.get('event_date_time'), input_dict.get('minutes', 0))
         ice_session.start_date_time = input_dict.get('start_date_time', None)
         ice_session.completed_date_time = input_dict.get('completed_date_time', None)
-        ice_session.event_date_time = input_dict.get('event_date_time', None)
+        # ice_session.event_date_time = input_dict.get('event_date_time', None)
         ice_session.completed = input_dict.get('completed', False)
         ice_session.active = input_dict.get('active', True)
         ice_session.body_parts = [Ice.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
@@ -2566,11 +2566,11 @@ class ColdWaterImmersion(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        cold_water_immersion = cls(minutes=input_dict['minutes'])
+        cold_water_immersion = cls(input_dict.get('event_date_time'), minutes=input_dict['minutes'])
         cold_water_immersion.after_training = input_dict.get('after_training', True)
         cold_water_immersion.start_date_time = input_dict.get('start_date_time', None)
         cold_water_immersion.completed_date_time = input_dict.get('completed_date_time', None)
-        cold_water_immersion.event_date_time = input_dict.get('event_date_time', None)
+        # cold_water_immersion.event_date_time = input_dict.get('event_date_time', None)
         cold_water_immersion.completed = input_dict.get('completed', False)
         cold_water_immersion.active = input_dict.get('active', True)
         cold_water_immersion.goals = set([AthleteGoal.json_deserialise(goal) for goal in input_dict.get('goals', [])])
