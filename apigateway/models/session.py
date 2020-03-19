@@ -287,7 +287,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def get_sport_type(self, sport_name):
 
-        ultra_high = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting, SportName.strength,
+        ultra_high = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
+                      SportName.power, SportName.speed_agility, SportName.strength,
                       SportName.functional_strength_training, SportName.traditional_strength_training,
                       SportName.core_training, SportName.high_intensity_interval_training, SportName.pilates]
 
@@ -601,11 +602,21 @@ class SportTrainingSession(Session):
     #     return Session.missing_post_session_survey()
 
     def ultra_high_intensity_session(self):
+        """
+        Determining if a session is Type 1.5 sports to determine recovery needs
+        :return:
+        """
 
-        ultra_high_intensity_sports = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
-                                       SportName.strength, SportName.functional_strength_training,
-                                       SportName.traditional_strength_training, SportName.core_training,
-                                       SportName.high_intensity_interval_training, SportName.pilates]
+        ultra_high_intensity_sports = [
+            SportName.cycling, SportName.football, SportName.gymnastics, SportName.skate_sports,
+            SportName.lacrosse, SportName.rowing, SportName.rugby, SportName.diving,
+            SportName.soccer, SportName.sprints, SportName.jumps, SportName.throws,
+            SportName.wrestling, SportName.weightlifting, SportName.track_field, SportName.australian_football,
+            SportName.hockey, SportName.martial_arts, SportName.downhill_skiing, SportName.snowboarding,
+            SportName.power, SportName.speed_agility, SportName.strength, SportName.functional_strength_training,
+            SportName.stair_climbing, SportName.traditional_strength_training, SportName.barre, SportName.core_training,
+            SportName.high_intensity_interval_training, SportName.pilates
+        ]
 
         if self.sport_name in ultra_high_intensity_sports:
             return True
@@ -614,7 +625,7 @@ class SportTrainingSession(Session):
 
     def high_intensity_RPE(self):
 
-        if self.session_RPE is not None and self.session_RPE > 5:
+        if self.session_RPE is not None and self.session_RPE >= 5:
             return True
         else:
             return False
