@@ -51,7 +51,7 @@ class ModalityType(Enum):
                 3: 'cool_down',
                 4: 'functional_strength',
                 5: 'warm_up',
-                6: 'cool_down',
+                6: 'dynamic_integrate',
                 7: 'cool_down',
                 8: 'cool_down'
                 }
@@ -2080,6 +2080,10 @@ class MovementIntegrationPrep(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
                                 ExercisePhase(ExercisePhaseType.static_integrate),
                                 ExercisePhase(ExercisePhaseType.dynamic_integrate)]
+        self.when = "before training"
+        self.when_card = "before training"
+        self.display_image = "inhibit"   # do not include .png or _activity or _tab
+        self.locked_text = "Sorry, you missed the optimal window for Movement Prep today."
 
     def get_general_exercises(self, exercise_library, max_severity):
 
@@ -2345,6 +2349,10 @@ class MovementIntegrationPrep(ActiveRest):
 class ActiveRecovery(Modality):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ModalityType.active_recovery)
+        self.when = "after training"
+        self.when_card = "after training"
+        self.display_image = "dynamic_integrate"   # do not include .png or _activity or _tab
+        self.locked_text = "Sorry, you missed the optimal window for Active Recovery today."
 
     def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
