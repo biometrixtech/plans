@@ -262,7 +262,7 @@ class Modality(object):
                 else:
                     return 3, DosageProgression.min_mod_max
 
-        elif goal.goal_type == AthleteGoalType.high_load:
+        elif goal.goal_type == AthleteGoalType.high_load or goal.goal_type == AthleteGoalType.expected_high_load:
             if tier == 1:
                 return 1, DosageProgression.min_mod_max
             elif tier == 2:
@@ -276,7 +276,7 @@ class Modality(object):
             else:
                 return 0, None
 
-        elif goal.goal_type == AthleteGoalType.asymmetric_session or goal.goal_type == AthleteGoalType.on_request:
+        elif goal.goal_type == AthleteGoalType.asymmetric_session or goal.goal_type == AthleteGoalType.on_request or goal.goal_type == AthleteGoalType.expected_asymmetric_session:
             if tier == 1:
                 return 1, DosageProgression.min_mod_max
             elif tier == 2:
@@ -426,6 +426,7 @@ class Modality(object):
     def aggregate_dosage_by_severity_exercise_collection(self, assigned_exercises):
 
         for ex, a in assigned_exercises.items():
+            a.dosages = [dosage for dosage in a.dosages if isinstance(dosage.priority, str)]
             if len(a.dosages) > 0:
                 # a.dosages = sorted(a.dosages, key=lambda x: (3 - int(x.priority), x.severity(),
                 #                                              x.default_comprehensive_sets_assigned,
