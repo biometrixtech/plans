@@ -32,7 +32,7 @@ class ModalityType(Enum):
     def get_display_name(self):
         display_names = {
             0: 'Mobilize',
-            1: 'Active Rest',
+            1: 'Mobility',
             2: 'Warm Up',
             3: 'Cool Down',
             4: 'Functional Strength',
@@ -46,12 +46,12 @@ class ModalityType(Enum):
     def get_image(self):
             images = {
                 0: 'pre_active_rest',
-                1: 'post_active_rest',
+                1: 'static_stretch',
                 2: 'warm_up',
                 3: 'cool_down',
                 4: 'functional_strength',
-                5: 'warm_up',
-                6: 'dynamic_flexibility',
+                5: 'dynamic_flexibility',
+                6: 'dynamic_stretch',
                 7: 'cool_down',
                 8: 'cool_down'
                 }
@@ -1791,10 +1791,10 @@ class ActiveRestAfterTraining(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
                                 ExercisePhase(ExercisePhaseType.static_integrate)]
-        self.when = "after training"
-        self.when_card = "after training"
-        self.display_image = "inhibit"   # do not include .png or _activity or _tab
-        self.locked_text = "Sorry, you missed the optimal window for Mobilize today."
+        self.when = "anytime, up to 3 per day"
+        self.when_card = "anytime"
+        self.display_image = "static_stretch"   # do not include .png or _activity or _tab
+        self.locked_text = "You skipped this Mobility Workout. Tap + to create another."
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
@@ -2082,8 +2082,8 @@ class MovementIntegrationPrep(ActiveRest):
                                 ExercisePhase(ExercisePhaseType.dynamic_integrate)]
         self.when = "before training"
         self.when_card = "before training"
-        self.display_image = "inhibit"   # do not include .png or _activity or _tab
-        self.locked_text = "Sorry, you missed the optimal window for Movement Prep today."
+        self.display_image = "dynamic_flexibility"   # do not include .png or _activity or _tab
+        self.locked_text = "You skipped this Movement Prep before your Workout today."
 
     def get_general_exercises(self, exercise_library, max_severity):
 
@@ -2351,8 +2351,8 @@ class ActiveRecovery(Modality):
         super().__init__(event_date_time, ModalityType.active_recovery)
         self.when = "after training"
         self.when_card = "after training"
-        self.display_image = "dynamic_flexibility"   # do not include .png or _activity or _tab
-        self.locked_text = "Sorry, you missed the optimal window for Active Recovery today."
+        self.display_image = "dynamic_stretch"   # do not include .png or _activity or _tab
+        self.locked_text = "You missed the optimal window for Active Recovery."
 
     def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
