@@ -58,7 +58,7 @@ class TrainingPlanManager(object):
             self.training_sessions.extend(c.training_sessions)
             self.symptoms.extend(c.symptoms)
 
-        self.training_sessions = self.training_sessions.sort(key=lambda x: x.completed_date_time, reverse=True)  #now we can always grab the 0 element
+        self.training_sessions.sort(key=lambda x: x.completed_date_time, reverse=True)  #now we can always grab the 0 element
 
         #self.active_training_sessions = [session for session in self.training_sessions]
 
