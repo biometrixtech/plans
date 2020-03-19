@@ -46,12 +46,12 @@ class ModalityType(Enum):
     def get_image(self):
             images = {
                 0: 'pre_active_rest',
-                1: 'static_stretch',
+                1: 'post_active_rest',
                 2: 'warm_up',
                 3: 'cool_down',
                 4: 'functional_strength',
-                5: 'dynamic_flexibility',
-                6: 'dynamic_stretch',
+                5: 'warm_up',
+                6: 'cool_down',
                 7: 'cool_down',
                 8: 'cool_down'
                 }
