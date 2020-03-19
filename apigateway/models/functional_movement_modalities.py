@@ -51,7 +51,7 @@ class ModalityType(Enum):
                 3: 'cool_down',
                 4: 'functional_strength',
                 5: 'warm_up',
-                6: 'dynamic_integrate',
+                6: 'dynamic_flexibility',
                 7: 'cool_down',
                 8: 'cool_down'
                 }
@@ -2351,7 +2351,7 @@ class ActiveRecovery(Modality):
         super().__init__(event_date_time, ModalityType.active_recovery)
         self.when = "after training"
         self.when_card = "after training"
-        self.display_image = "dynamic_integrate"   # do not include .png or _activity or _tab
+        self.display_image = "dynamic_flexibility"   # do not include .png or _activity or _tab
         self.locked_text = "Sorry, you missed the optimal window for Active Recovery today."
 
     def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
