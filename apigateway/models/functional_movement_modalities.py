@@ -36,7 +36,7 @@ class ModalityType(Enum):
             2: 'Warm Up',
             3: 'Cool Down',
             4: 'Functional Strength',
-            5: 'Movement Integration Prep',
+            5: 'Movement Prep',
             6: 'Active Recovery',
             7: 'Cold Water Immersion',
             8: 'Ice'
