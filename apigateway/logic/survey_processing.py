@@ -383,7 +383,8 @@ def match_sessions(user_sessions, health_session):
 
 
 def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None,
-                force_data=False, mobilize_only=False, visualizations=True, hist_update=False, force_on_demand=False):
+                force_data=False, mobilize_only=False, visualizations=True, hist_update=False, force_on_demand=False,
+                log_symptoms=False):
     if datastore_collection is None:
         datastore_collection = DatastoreCollection()
     if update_stats:
@@ -410,7 +411,8 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
                                           force_data=force_data,
                                           mobilize_only=mobilize_only,
                                           visualizations=visualizations,
-                                          force_on_demand=force_on_demand)
+                                          force_on_demand=force_on_demand,
+                                          log_symptoms=log_symptoms)
     plan = cleanup_plan(plan, visualizations)
 
     return plan
