@@ -236,7 +236,7 @@ class TrainingPlanManager(object):
         # elif modality_type == ModalityType.warm_up:
         #     new_modality = calc.get_warm_up()
         elif modality_type == ModalityType.cool_down or modality_type == ModalityType.active_recovery:
-            new_modality  = exercise_assignment.get_responsive_recovery(force_data, ice_cwi=False)[0]
+            new_modality = exercise_assignment.get_responsive_recovery(force_data, ice_cwi=False)[0]
         # elif modality_type == ModalityType.functional_strength:
         #     new_modality = calc.get_functional_strength()
         elif modality_type == ModalityType.movement_integration_prep:
