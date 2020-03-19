@@ -116,7 +116,7 @@ class TrainingPlanManager(object):
         return sport_cardio_plyometrics
 
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
-    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True, force_on_demand=False):
+    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True, force_on_demand=False, log_symptoms=False):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
@@ -156,52 +156,93 @@ class TrainingPlanManager(object):
         # new modalities
         self.move_completed_modalities()
 
-        if not self.daily_plan.train_later:
-            if len(self.daily_plan.training_sessions) > 0:
-                self.set_active_sessions([self.training_sessions[0]])
+        if not log_symptoms:
+            if not self.daily_plan.train_later:
+                if len(self.daily_plan.training_sessions) > 0:
+                    self.set_active_sessions([self.training_sessions[0]])
 
-                responsive_recovery, ice, cold_water_immersion = self.exercise_assignment.get_responsive_recovery(force_data, force_on_demand)
+                    responsive_recovery, ice, cold_water_immersion = self.exercise_assignment.get_responsive_recovery(self.training_sessions[0].id, force_data, force_on_demand)
 
-                if len(responsive_recovery) > 0:
-                    # get rid of both possible active recovery and active rest modalities
-                    # and go with whatever is responsive to last session
-                    self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
-                                                  m.type.value in [ModalityType.active_recovery.value,
-                                                                   ModalityType.post_active_rest.value]]
+                    if len(responsive_recovery) > 0:
+                        # get rid of both possible active recovery and active rest modalities
+                        # and go with whatever is responsive to last session
+                        self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                                      m.type.value not in [ModalityType.active_recovery.value,
+                                                                           ModalityType.post_active_rest.value]]
 
-                self.daily_plan.ice = ice
-                self.daily_plan.cold_water_immersion = cold_water_immersion
-                self.daily_plan.modalities.extend(responsive_recovery)
+                    self.daily_plan.ice = ice
+                    self.daily_plan.cold_water_immersion = cold_water_immersion
+                    self.daily_plan.modalities.extend(responsive_recovery)
 
+                else:
+                    self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+                    active_rests = self.exercise_assignment.get_active_rest(force_data, force_on_demand)
+                    self.daily_plan.modalities.extend(active_rests)
             else:
-                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
-                active_rests = self.exercise_assignment.get_active_rest(force_data, force_on_demand)
-                self.daily_plan.modalities.extend(active_rests)
+
+                if len(self.daily_plan.training_sessions) > 0:
+                    self.set_active_sessions([self.training_sessions[0]])
+
+                    responsive_recovery = self.exercise_assignment.get_responsive_recovery(self.training_sessions[0].id, force_data, force_on_demand, ice_cwi=False)[0]
+
+                    if len(responsive_recovery) > 0:
+                        # get rid of both possible active recovery and active rest modalities
+                        # and go with whatever is responsive to last session
+                        self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                                      m.type.value not in [ModalityType.active_recovery.value,
+                                                                           ModalityType.post_active_rest.value]]
+
+                    # don't assign ice or cwi if they are training later
+                    self.daily_plan.ice = None
+                    self.daily_plan.cold_water_immersion = None
+                    self.daily_plan.modalities.extend(responsive_recovery)
+
+                else:
+
+                    # remove existing movement preps
+                    self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.movement_integration_prep.value]
+                    movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
+                    self.daily_plan.modalities.extend(movement_preps)
         else:
 
-            if len(self.daily_plan.training_sessions) > 0:
-                self.set_active_sessions([self.training_sessions[0]])
+            # replace any existing uncompleted active rests so we can add a new, updated one
+            self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                          m.type.value != ModalityType.post_active_rest.value]
+            active_rests = self.exercise_assignment.get_active_rest(force_data, force_on_demand)
+            self.daily_plan.modalities.extend(active_rests)
 
-                responsive_recovery = self.exercise_assignment.get_responsive_recovery(force_data, force_on_demand, ice_cwi=False)[0]
+            # update any existing movement preps
+            movement_preps = [m for m in self.daily_plan.modalities if
+                                          m.type.value == ModalityType.movement_integration_prep.value]
 
-                if len(responsive_recovery) > 0:
-                    # get rid of both possible active recovery and active rest modalities
-                    # and go with whatever is responsive to last session
-                    self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
-                                                  m.type.value in [ModalityType.active_recovery.value,
-                                                                   ModalityType.post_active_rest.value]]
-
-                # don't assign ice or cwi if they are training later
-                self.daily_plan.ice = None
-                self.daily_plan.cold_water_immersion = None
-                self.daily_plan.modalities.extend(responsive_recovery)
-
-            else:
-
-                # remove existing post-training modalities rest
-                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.movement_integration_prep.value]
+            if len(movement_preps) > 0:
+                # remove existing movement preps
+                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                              m.type.value != ModalityType.movement_integration_prep.value]
                 movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(movement_preps)
+
+            # update any active recovery in place:
+            active_recoveries = [m for m in self.daily_plan.modalities if
+                                 m.type.value == ModalityType.active_recovery.value]
+
+            if len(active_recoveries) > 0:
+                source_session_id = active_recoveries[0].source_training_session_id
+
+                source_sessions = [t for t in self.training_sessions if t.id == source_session_id]
+
+                if len(source_sessions) > 0:
+                    self.set_active_sessions(source_sessions[0])
+
+                    responsive_recovery = self.exercise_assignment.get_responsive_recovery(source_session_id, force_data, force_on_demand,
+                                                                                           ice_cwi=False)[0]
+
+                    if len(responsive_recovery) > 0:
+                        if responsive_recovery[0].modality_type == ModalityType.active_recovery.value:
+                            self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                                          m.type.value != ModalityType.active_recovery.value]
+
+                    self.daily_plan.modalities.append(responsive_recovery[0])
 
         self.daily_plan.last_updated = last_updated
         self.daily_plan.define_available_modalities()
@@ -243,7 +284,7 @@ class TrainingPlanManager(object):
         #     new_modality = calc.get_warm_up()
         elif modality_type == ModalityType.cool_down or modality_type == ModalityType.active_recovery:
             self.set_active_sessions([self.training_sessions[0]])
-            new_modality = exercise_assignment.get_responsive_recovery(force_data, ice_cwi=False)[0]
+            new_modality = exercise_assignment.get_responsive_recovery(self.training_sessions[0].id, force_data, ice_cwi=False)[0]
         # elif modality_type == ModalityType.functional_strength:
         #     new_modality = calc.get_functional_strength()
         elif modality_type == ModalityType.movement_integration_prep:
