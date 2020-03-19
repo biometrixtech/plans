@@ -196,7 +196,7 @@ def get_activity(event_date_time, symptoms, sessions, activity_type='movement_pr
         return mobility_wod
     elif activity_type == 'responsive_recovery':
         calc.high_intensity_session = is_high_intensity_session(sessions)
-        modality, ice, cwi = calc.get_responsive_recovery(force_on_demand=True)
+        modality, ice, cwi = calc.get_responsive_recovery(sessions[0].id, force_on_demand=True)
         return modality, ice, cwi
 
 

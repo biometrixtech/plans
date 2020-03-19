@@ -2357,7 +2357,7 @@ class ActiveRecovery(Modality):
                     and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-        if len(injury_risk_dict) > 0 and high_intensity_session:
+        if max_severity < 4.0 and len(injury_risk_dict) > 0 and high_intensity_session:
             for body_part, body_part_injury_risk in injury_risk_dict.items():
                 self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity)
 
@@ -2407,9 +2407,8 @@ class ActiveRecovery(Modality):
 
                 if tier > 0:
 
-                    if max_severity < 4.0:
-                        self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
-                                            tier, 0, exercise_library)
+                    self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
+                                        tier, 0, exercise_library)
 
 
 class WarmUp(Modality):

@@ -49,7 +49,7 @@ class ExerciseAssignment(object):
     
         return [active_rest]
 
-    def get_responsive_recovery(self, force_data=False, force_on_demand=True, ice_cwi=True):
+    def get_responsive_recovery(self, source_session_id, force_data=False, force_on_demand=True, ice_cwi=True):
         active_recovery = ActiveRecovery(self.event_date_time)
         active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict, high_intensity_session=self.high_intensity_session)
         active_recovery.set_plan_dosage()
@@ -58,10 +58,12 @@ class ExerciseAssignment(object):
         active_recovery.set_winners()
         active_recovery.scale_all_active_time()
         active_recovery.reconcile_default_plan_with_active_time()
+        active_recovery.source_training_session_id = source_session_id
         if active_recovery.get_total_exercises() > 0:
             exercise_activity = [active_recovery]
         else:
             active_rest = self.get_active_rest(force_data=force_data, force_on_demand=force_on_demand)[0]
+            active_rest.source_training_session_id = source_session_id
             if active_rest.get_total_exercises() == 0:
                 exercise_activity = []
             else:
