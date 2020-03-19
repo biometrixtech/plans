@@ -8,6 +8,7 @@ from models.body_parts import BodyPart, BodyPartFactory
 from copy import deepcopy
 from utils import format_date
 from models.functional_movement_stats import InjuryCycleSummary, InjuryCycleSummaryProcessor
+from models.session import SessionType
 from math import floor
 import pickle
 
@@ -678,7 +679,7 @@ class InjuryRiskProcessor(object):
 
                 session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
 
-                if session.session_load_dict is None:
+                if session.session_type() == SessionType.sport_training or session.session_load_dict is None:
                     current_session = session_functional_movement.process(d, load_stats)
                     current_session.session_load_dict = session_functional_movement.session_load_dict
                     # session_data_store = TrainingSessionDatastore()
@@ -1198,7 +1199,7 @@ class InjuryRiskProcessor(object):
         for session in daily_sessions:
             session_functional_movement = SessionFunctionalMovement(session, injury_risk_dict)
 
-            if session.session_load_dict is None:
+            if session.session_type() == SessionType.sport_training or session.session_load_dict is None:
                 current_session = session_functional_movement.process(base_date, load_stats)
                 current_session.session_load_dict = session_functional_movement.session_load_dict
                 # session_data_store = TrainingSessionDatastore()

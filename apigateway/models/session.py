@@ -352,7 +352,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             # 'workout_program_module': self.workout_program_module.json_serialise() if self.workout_program_module is not None else None,
             'session_RPE': self.session_RPE,
             'session_load_dict': [{"body_part": key.json_serialise(),
-                                   "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None else None,
+                                   "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None and session_type == SessionType.mixed_activity else None,
 
             'not_tracked_load': self.not_tracked_load if self.not_tracked_load is not None else None,
             'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load if self.strength_endurance_cardiorespiratory_load is not None else None,
@@ -422,7 +422,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
             'movement_patterns') is not None else None
         # session.workout_program_module = WorkoutProgramModule.json_deserialise(input_dict['workout_program_module']) if input_dict.get('workout_program_module') is not None else None
-        if input_dict.get('session_load_dict') is not None:
+        if input_dict.get('session_load_dict') is not None and session.session_type() == SessionType.mixed_activity:
             session.session_load_dict = {}
             for item in input_dict.get('session_load_dict', []):
                 session.session_load_dict[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartFunctionalMovement.json_deserialise(item['injury_risk'])
