@@ -49,7 +49,7 @@ class ExerciseAssignment(object):
     
         return [active_rest]
 
-    def get_responsive_recovery(self, force_data=False, force_on_demand=True):
+    def get_responsive_recovery(self, force_data=False, force_on_demand=True, ice_cwi=True):
         active_recovery = ActiveRecovery(self.event_date_time)
         active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict, high_intensity_session=self.high_intensity_session)
         active_recovery.set_plan_dosage()
@@ -66,12 +66,14 @@ class ExerciseAssignment(object):
                 exercise_activity = []
             else:
                 exercise_activity = [active_rest]
+        if ice_cwi:
+            cold_water_immersion = self.get_cold_water_immersion()
 
-        cold_water_immersion = self.get_cold_water_immersion()
-
-        ice_session = self.get_ice_session()
-        ice = self.adjust_ice_session(ice_session, cold_water_immersion)
-        return exercise_activity, ice, cold_water_immersion
+            ice_session = self.get_ice_session()
+            ice = self.adjust_ice_session(ice_session, cold_water_immersion)
+            return exercise_activity, ice, cold_water_immersion
+        else:
+            return  exercise_activity, None, None
 
     def get_cold_water_immersion(self):
 

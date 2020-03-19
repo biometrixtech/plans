@@ -166,6 +166,8 @@ class TrainingPlanManager(object):
                 if cold_water_immersion is not None:
                     self.daily_plan.cold_water_immersion = cold_water_immersion
 
+                self.daily_plan.modalities.extend(responsive_recovery)
+
             else:
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
                 active_rests = exercise_assignment.get_active_rest(force_data, force_on_demand)
@@ -183,6 +185,7 @@ class TrainingPlanManager(object):
 
                 self.daily_plan.ice = None
                 self.daily_plan.cold_water_immersion = None
+                self.daily_plan.modalities.extend(responsive_recovery)
 
             else:
 
@@ -233,7 +236,7 @@ class TrainingPlanManager(object):
         # elif modality_type == ModalityType.warm_up:
         #     new_modality = calc.get_warm_up()
         elif modality_type == ModalityType.cool_down or modality_type == ModalityType.active_recovery:
-            new_modality, ice, cold_water_immersion = exercise_assignment.get_responsive_recovery(force_data)
+            new_modality  = exercise_assignment.get_responsive_recovery(force_data, ice_cwi=False)[0]
         # elif modality_type == ModalityType.functional_strength:
         #     new_modality = calc.get_functional_strength()
         elif modality_type == ModalityType.movement_integration_prep:
