@@ -4,15 +4,13 @@ import datetime
 from enum import Enum
 from serialisable import Serialisable
 
-from models.soreness import Soreness, Alert
-from models.soreness_base import HistoricSorenessStatus, BodyPartLocation, BodyPartSide
+from models.soreness import Alert
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.exercise import AssignedExercise
-from models.goal import AthleteGoalType, AthleteGoal, AthleteGoalDef
+from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType
 from models.dosage import ExerciseDosage, DosageProgression
 from models.body_parts import BodyPartFactory, BodyPart
-from models.sport import SportName
-from models.movement_errors import MovementErrorType, MovementError, MovementErrorFactory
 from models.exercise_phase import ExercisePhase, ExercisePhaseType
 from models.functional_movement import BodyPartFunction
 from utils import parse_datetime, format_datetime
@@ -317,10 +315,6 @@ class Modality(object):
                     (dosage.comprehensive_reps_assigned > 0 and dosage.comprehensive_sets_assigned > 0)):
                 self.goals[dosage.goal.text] = ModalityGoal()
 
-        # self.goals[dosage.goal.text].efficient_active = False
-        # self.goals[dosage.goal.text].complete_active = False
-        # self.goals[dosage.goal.text].comprehensive_active = False
-
         if dosage.efficient_reps_assigned > 0 and dosage.efficient_sets_assigned > 0:
             self.goals[dosage.goal.text].efficient_active = True
         if dosage.complete_reps_assigned > 0 and dosage.complete_sets_assigned > 0:
@@ -329,40 +323,6 @@ class Modality(object):
             self.goals[dosage.goal.text].comprehensive_active = True
 
     def set_plan_dosage(self):
-
-        # care_for_pain_present = False
-        # pain_reported_today = False
-        # soreness_historic_status_present = False
-        # soreness_reported_today = False
-        # severity_greater_than_2 = False
-        #
-        # for s in soreness_list:
-        #     if s.pain and (s.historic_soreness_status is None or s.is_dormant_cleared()) and s.severity > 1:
-        #         care_for_pain_present = True
-        #     if s.pain:
-        #         pain_reported_today = True
-        #     if not s.pain and s.daily:
-        #         soreness_reported_today = True
-        #     if (not s.pain and s.historic_soreness_status is not None and not s.is_dormant_cleared() and
-        #             s.historic_soreness_status is not HistoricSorenessStatus.doms):
-        #         soreness_historic_status_present = True
-        #     if s.severity >= 2:
-        #         severity_greater_than_2 = True
-        #
-        # increased_sensitivity = self.conditions_for_increased_sensitivity_met(soreness_list, muscular_strain_high)
-        #
-        # if care_for_pain_present:
-        #     self.default_plan = "Comprehensive"
-        # elif not severity_greater_than_2 and not pain_reported_today and not soreness_historic_status_present and soreness_reported_today:
-        #     if not increased_sensitivity:
-        #         self.default_plan = "Efficient"
-        #     else:
-        #         self.default_plan = "Complete"
-        # else:
-        #     if not increased_sensitivity:
-        #         self.default_plan = "Complete"
-        #     else:
-        #         self.default_plan = "Comprehensive"
         if 1 not in self.rankings and 2 not in self.rankings:
             self.default_plan = "Efficient"
         else:
@@ -428,14 +388,6 @@ class Modality(object):
         for ex, a in assigned_exercises.items():
             a.dosages = [dosage for dosage in a.dosages if isinstance(dosage.priority, str)]
             if len(a.dosages) > 0:
-                # a.dosages = sorted(a.dosages, key=lambda x: (3 - int(x.priority), x.severity(),
-                #                                              x.default_comprehensive_sets_assigned,
-                #                                              x.default_comprehensive_reps_assigned,
-                #                                              x.default_complete_sets_assigned,
-                #                                              x.default_complete_reps_assigned,
-                #                                              x.default_efficient_sets_assigned,
-                #                                              x.default_efficient_reps_assigned), reverse=True)
-
                 a.dosages = sorted(a.dosages, key=lambda x: (3 - int(x.priority),
                                                              x.default_efficient_sets_assigned,
                                                              x.default_efficient_reps_assigned,
@@ -555,28 +507,7 @@ class Modality(object):
             self.dosage_durations[benchmark_value].comprehensive_duration += assigned_exercise.duration(
                 dosage.comprehensive_reps_assigned, dosage.comprehensive_sets_assigned)
 
-    # @abc.abstractmethod
-    # def fill_exercises(self, exercise_library, injury_hist_dict):
-    #     pass
-
-    #@staticmethod
     def update_dosage(self, dosage, exercise):
-
-        # if dosage.goal.goal_type == AthleteGoalType.high_load or dosage.goal.goal_type == AthleteGoalType.preempt_sport:
-        #     if dosage.priority == "1" or dosage.priority == "2":
-        #         dosage.efficient_reps_assigned = exercise.min_reps
-        #         dosage.efficient_sets_assigned = 1
-        #         dosage.complete_reps_assigned = exercise.max_reps
-        #         dosage.complete_sets_assigned = 1
-        #         dosage.comprehensive_reps_assigned = exercise.max_reps
-        #         dosage.comprehensive_sets_assigned = 2
-        #         dosage.default_efficient_reps_assigned = exercise.min_reps
-        #         dosage.default_efficient_sets_assigned = 1
-        #         dosage.default_complete_reps_assigned = exercise.max_reps
-        #         dosage.default_complete_sets_assigned = 1
-        #         dosage.default_comprehensive_reps_assigned = exercise.max_reps
-        #         dosage.default_comprehensive_sets_assigned = 2
-
         if dosage.goal.goal_type == AthleteGoalType.high_load or dosage.goal.goal_type == AthleteGoalType.asymmetric_session:
             if self.relative_load_level == 3:
                 if dosage.priority == "1":
@@ -651,33 +582,6 @@ class Modality(object):
             dosage.default_comprehensive_sets_assigned = 2
 
         if dosage.goal.goal_type == AthleteGoalType.pain or dosage.goal.goal_type == AthleteGoalType.sore:
-            # if dosage.last_severity <= 5:
-            #     dosage.efficient_reps_assigned = exercise.min_reps
-            #     dosage.efficient_sets_assigned = 1
-            #     dosage.complete_reps_assigned = exercise.max_reps
-            #     dosage.complete_sets_assigned = 1
-            #     dosage.comprehensive_reps_assigned = exercise.max_reps
-            #     dosage.comprehensive_sets_assigned = 2
-            #     dosage.default_efficient_reps_assigned = exercise.min_reps
-            #     dosage.default_efficient_sets_assigned = 1
-            #     dosage.default_complete_reps_assigned = exercise.max_reps
-            #     dosage.default_complete_sets_assigned = 1
-            #     dosage.default_comprehensive_reps_assigned = exercise.max_reps
-            #     dosage.default_comprehensive_sets_assigned = 2
-            # else:
-            #     dosage.efficient_reps_assigned = exercise.max_reps
-            #     dosage.efficient_sets_assigned = 1
-            #     dosage.complete_reps_assigned = exercise.max_reps
-            #     dosage.complete_sets_assigned = 2
-            #     dosage.comprehensive_reps_assigned = exercise.max_reps
-            #     dosage.comprehensive_sets_assigned = 3
-            #     dosage.default_efficient_reps_assigned = exercise.max_reps
-            #     dosage.default_efficient_sets_assigned = 1
-            #     dosage.default_complete_reps_assigned = exercise.max_reps
-            #     dosage.default_complete_sets_assigned = 2
-            #     dosage.default_comprehensive_reps_assigned = exercise.max_reps
-            #     dosage.default_comprehensive_sets_assigned = 3
-
             if dosage.last_severity < 1.0:
                 if dosage.priority == "1":
                     dosage.efficient_reps_assigned = exercise.min_reps
@@ -772,26 +676,6 @@ class Modality(object):
                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
                 dosage.default_comprehensive_sets_assigned = 3
 
-        #elif dosage.goal.goal_type == AthleteGoalType.asymmetric_session or dosage.goal.goal_type == AthleteGoalType.asymmetric_pattern:
-        # elif dosage.goal.goal_type == AthleteGoalType.asymmetric_session:
-        #     if dosage.priority == "1":
-        #         dosage.efficient_reps_assigned = exercise.min_reps
-        #         dosage.efficient_sets_assigned = 1
-        #         dosage.default_efficient_reps_assigned = exercise.min_reps
-        #         dosage.default_efficient_sets_assigned = 1
-        #
-        #     if dosage.priority == "1":
-        #         dosage.complete_reps_assigned = exercise.min_reps
-        #         dosage.complete_sets_assigned = 1
-        #         dosage.default_complete_reps_assigned = exercise.min_reps
-        #         dosage.default_complete_sets_assigned = 1
-        #
-        #     if dosage.priority == "1" or dosage.priority == "2":
-        #         dosage.comprehensive_reps_assigned = exercise.min_reps
-        #         dosage.comprehensive_sets_assigned = 1
-        #         dosage.default_comprehensive_reps_assigned = exercise.min_reps
-        #         dosage.default_comprehensive_sets_assigned = 1
-
         elif dosage.goal.goal_type == AthleteGoalType.on_request:
             if dosage.priority == "1":
                 dosage.efficient_reps_assigned = exercise.min_reps
@@ -810,292 +694,6 @@ class Modality(object):
                 dosage.comprehensive_sets_assigned = 1
                 dosage.default_comprehensive_reps_assigned = exercise.min_reps
                 dosage.default_comprehensive_sets_assigned = 1
-
-#         elif dosage.goal.goal_type == AthleteGoalType.corrective:  # table 2 corrective
-#
-#             if dosage.last_severity < 1:
-#
-#                 if dosage.priority == "1":
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#
-#                     dosage.comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.comprehensive_sets_assigned = 1
-#                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.default_comprehensive_sets_assigned = 1
-#
-#             elif 1 <= dosage.last_severity < 3:
-#
-#                 if dosage.priority == "1":
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#
-#                     dosage.comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.comprehensive_sets_assigned = 1
-#                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.default_comprehensive_sets_assigned = 1
-#
-#             elif 3 <= dosage.last_severity < 5:
-#
-#                 if dosage.priority == "1":
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#                     dosage.comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.comprehensive_sets_assigned = 1
-#                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.default_comprehensive_sets_assigned = 1
-#
-#             # trial
-#             elif 5 <= dosage.last_severity <= 10:
-#                 dosage.default_efficient_reps_assigned = 0
-#                 dosage.default_efficient_sets_assigned = 0
-#                 dosage.default_complete_reps_assigned = 0
-#                 dosage.default_complete_sets_assigned = 0
-#                 dosage.comprehensive_reps_assigned = 0
-#                 dosage.comprehensive_sets_assigned = 0
-#                 dosage.default_comprehensive_reps_assigned = 0
-#                 dosage.default_comprehensive_sets_assigned = 0
-#
-#             '''trial
-#             elif 5 <= dosage.soreness_source.severity < 7:
-#
-#                 dosage.default_efficient_reps_assigned = exercise.min_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 1
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 2
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 2
-#
-#             elif 7 <= dosage.soreness_source.severity < 9:
-#
-#                 dosage.default_efficient_reps_assigned = exercise.max_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 2
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 3
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 3
-#
-#             elif dosage.soreness_source.severity >= 9:
-#
-#                 dosage.default_efficient_reps_assigned = exercise.max_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 2
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 3
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 3
-#             '''
-#
-#         elif (dosage.goal.goal_type == AthleteGoalType.sore or
-# #              (dosage.soreness_source.historic_soreness_status is None or
-#  #              dosage.soreness_source.is_dormant_cleared() or
-#   #             dosage.soreness_source.historic_soreness_status is HistoricSorenessStatus.doms) or
-#               # dosage.goal.goal_type == AthleteGoalType.preempt_personalized_sport or
-#               dosage.goal.goal_type == AthleteGoalType.preempt_corrective):  # table 1
-#             if dosage.last_severity < 1:
-#                 if dosage.priority == "1":
-#                     dosage.efficient_reps_assigned = exercise.min_reps
-#                     dosage.efficient_sets_assigned = 1
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.complete_reps_assigned = exercise.min_reps
-#                     dosage.complete_sets_assigned = 1
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#
-#                     # trial to reduce active time
-#                     dosage.comprehensive_reps_assigned = exercise.min_reps
-#                     dosage.comprehensive_sets_assigned = 1
-#                     dosage.default_comprehensive_reps_assigned = exercise.min_reps
-#                     dosage.default_comprehensive_sets_assigned = 1
-#             elif 1 <= dosage.last_severity < 3:
-#                 if dosage.priority == "1":
-#                     dosage.efficient_reps_assigned = exercise.min_reps
-#                     dosage.efficient_sets_assigned = 1
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.complete_reps_assigned = exercise.min_reps
-#                     dosage.complete_sets_assigned = 1
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#
-#                     # trial to reduce active time
-#                     dosage.comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.comprehensive_sets_assigned = 1
-#                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.default_comprehensive_sets_assigned = 1
-#             elif 3 <= dosage.last_severity < 5:
-#                 if dosage.priority == "1":
-#                     dosage.efficient_reps_assigned = exercise.min_reps
-#                     dosage.efficient_sets_assigned = 1
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.complete_reps_assigned = exercise.min_reps
-#                     dosage.complete_sets_assigned = 1
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#                 # trial
-#                 dosage.comprehensive_reps_assigned = exercise.min_reps
-#                 dosage.comprehensive_sets_assigned = 1
-#                 dosage.default_comprehensive_reps_assigned = exercise.min_reps
-#                 dosage.default_comprehensive_sets_assigned = 1
-#             elif 5 <= dosage.last_severity < 7:
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.efficient_reps_assigned = exercise.min_reps
-#                     dosage.efficient_sets_assigned = 1
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#                 # trial
-#                 dosage.complete_reps_assigned = exercise.min_reps
-#                 dosage.complete_sets_assigned = 1
-#                 dosage.default_complete_reps_assigned = exercise.min_reps
-#                 dosage.default_complete_sets_assigned = 1
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 1
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 1
-#             elif 7 <= dosage.last_severity < 9:
-#                 dosage.efficient_reps_assigned = exercise.min_reps
-#                 dosage.efficient_sets_assigned = 1
-#                 dosage.complete_reps_assigned = exercise.max_reps
-#                 dosage.complete_sets_assigned = 1
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 2
-#                 dosage.default_efficient_reps_assigned = exercise.min_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 1
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 2
-#             elif dosage.last_severity >= 9:
-#                 dosage.efficient_reps_assigned = exercise.max_reps
-#                 dosage.efficient_sets_assigned = 1
-#
-#                 dosage.complete_reps_assigned = exercise.max_reps
-#                 dosage.complete_sets_assigned = 2
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 3
-#                 dosage.default_efficient_reps_assigned = exercise.max_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 2
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 3
-#
-#         else:  # table 2
-#             if dosage.last_severity < 1:
-#                 if dosage.priority == "1":
-#                     dosage.efficient_reps_assigned = exercise.min_reps
-#                     dosage.efficient_sets_assigned = 1
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.complete_reps_assigned = exercise.min_reps
-#                     dosage.complete_sets_assigned = 1
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#
-#                     # trial
-#                     dosage.comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.comprehensive_sets_assigned = 1
-#                     dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                     dosage.default_comprehensive_sets_assigned = 1
-#             elif 1 <= dosage.last_severity < 3:
-#                 if dosage.priority == "1":
-#                     dosage.efficient_reps_assigned = exercise.min_reps
-#                     dosage.efficient_sets_assigned = 1
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.complete_reps_assigned = exercise.min_reps
-#                     dosage.complete_sets_assigned = 1
-#                     dosage.default_complete_reps_assigned = exercise.min_reps
-#                     dosage.default_complete_sets_assigned = 1
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 1
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 1
-#             elif 3 <= dosage.last_severity < 5:
-#                 if dosage.priority == "1" or dosage.priority == "2":
-#                     dosage.efficient_reps_assigned = exercise.min_reps
-#                     dosage.efficient_sets_assigned = 1
-#                     dosage.default_efficient_reps_assigned = exercise.min_reps
-#                     dosage.default_efficient_sets_assigned = 1
-#                 dosage.complete_reps_assigned = exercise.min_reps
-#                 dosage.complete_sets_assigned = 1
-#                 dosage.default_complete_reps_assigned = exercise.min_reps
-#                 dosage.default_complete_sets_assigned = 1
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 1
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 1
-#
-#             elif 5 <= dosage.last_severity < 7:
-#
-#                 dosage.efficient_reps_assigned = exercise.min_reps
-#                 dosage.efficient_sets_assigned = 1
-#                 dosage.complete_reps_assigned = exercise.max_reps
-#                 dosage.complete_sets_assigned = 1
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 2
-#                 dosage.default_efficient_reps_assigned = exercise.min_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 1
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 2
-#             elif 7 <= dosage.last_severity < 9:
-#                 dosage.efficient_reps_assigned = exercise.max_reps
-#                 dosage.efficient_sets_assigned = 1
-#
-#                 dosage.complete_reps_assigned = exercise.max_reps
-#                 dosage.complete_sets_assigned = 2
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 3
-#                 dosage.default_efficient_reps_assigned = exercise.max_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 2
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 3
-#             elif dosage.last_severity >= 9:
-#                 dosage.efficient_reps_assigned = exercise.max_reps
-#                 dosage.efficient_sets_assigned = 1
-#
-#                 dosage.complete_reps_assigned = exercise.max_reps
-#                 dosage.complete_sets_assigned = 2
-#                 dosage.comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.comprehensive_sets_assigned = 3
-#                 dosage.default_efficient_reps_assigned = exercise.max_reps
-#                 dosage.default_efficient_sets_assigned = 1
-#
-#                 dosage.default_complete_reps_assigned = exercise.max_reps
-#                 dosage.default_complete_sets_assigned = 2
-#                 dosage.default_comprehensive_reps_assigned = exercise.max_reps
-#                 dosage.default_comprehensive_sets_assigned = 3
 
         return dosage
 
@@ -1168,9 +766,6 @@ class ActiveRest(Modality):
         return is_overactive_short
 
     def is_body_part_overactive_long(self, body_part_injury_risk):
-
-        #is_short = self.is_body_part_short(body_part_injury_risk)
-
         is_overactive_long = False
 
         if body_part_injury_risk.overactive_long_count_last_0_20_days >= 3:
@@ -1179,9 +774,6 @@ class ActiveRest(Modality):
         return is_overactive_long
 
     def is_body_part_underactive_long(self, body_part_injury_risk):
-
-        #is_long = self.is_body_part_long(body_part_injury_risk)
-
         is_underactive_long = False
 
         if body_part_injury_risk.underactive_long_count_last_0_20_days >= 3:
@@ -1190,23 +782,12 @@ class ActiveRest(Modality):
         return is_underactive_long
 
     def is_body_part_underactive_short(self, body_part_injury_risk):
-
-        #is_short = self.is_body_part_short(body_part_injury_risk)
-
         is_underactive_short = False
 
         if body_part_injury_risk.underactive_short_count_last_0_20_days >= 3:
             is_underactive_short = True
 
         return is_underactive_short
-
-    # def is_body_part_underactive_weak_short(self, body_part_injury_risk):
-    #
-    #     is_short = self.is_body_part_short(body_part_injury_risk)
-    #
-    #     is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
-    #
-    #     return is_short and is_underactive_weak
 
     def is_body_part_long(self, body_part_injury_risk):
 
@@ -1231,14 +812,6 @@ class ActiveRest(Modality):
         if body_part_injury_risk.short_count_last_0_20_days >= 3:
             is_short = True
         return is_short
-
-    # def is_body_part_overactive(self, body_part_injury_risk):
-    #
-    #     is_overactive = False
-    #
-    #     if body_part_injury_risk.overactive_count_last_0_20_days >= 3:
-    #         is_overactive = True
-    #     return is_overactive
 
     def is_body_part_weak(self, body_part_injury_risk):
 
@@ -1296,14 +869,8 @@ class ActiveRest(Modality):
         else:
             if len(injury_risk_dict) > 0:
                 for body_part, body_part_injury_risk in injury_risk_dict.items():
-                    #self.check_recovery_excessive_strain(body_part, body_part_injury_risk, exercise_library, max_severity)
-                    #self.check_recovery_compensation(body_part, body_part_injury_risk, exercise_library, max_severity)
                     self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts)
-                    #self.check_care_inflammation(body_part, body_part_injury_risk, exercise_library, max_severity)
-                    #self.check_care_muscle_spasm(body_part, body_part_injury_risk, exercise_library, max_severity)
                     self.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
-                    #self.check_care_knots(body_part, body_part_injury_risk, exercise_library, max_severity)
-                    #self.check_care_movement_pattern(body_part, body_part_injury_risk, exercise_library, max_severity)
                     self.check_prevention(body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts)
             else:
                 if self.force_on_demand:
@@ -1375,25 +942,6 @@ class ActiveRestBeforeTraining(ActiveRest):
         self.when_card = "before training"
         self.display_image = "inhibit"  # do not include .png or _activity or _tab
         self.locked_text = "Sorry, you missed the optimal window for Mobilize today."
-
-    # def get_total_exercises(self):
-    #     total_exercises = 0
-    #     for phase in self.exercise_phases:
-    #         total_exercises += len(phase.exercises)
-    #     return total_exercises
-
-
-    # def scale_all_active_time(self):
-    #     for phase in self.exercise_phases:
-    #         self.scale_active_time(phase.exercises)
-
-    # def aggregate_dosages(self):
-    #     for phase in self.exercise_phases:
-    #         self.aggregate_dosage_by_severity_exercise_collection(phase.exercises)
-
-    # def reactivate_complete_goals(self):
-    #     for phase in self.exercise_phases:
-    #         self.reactivate_complete_corrective_goals_by_collection(phase.exercises)
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
@@ -1483,16 +1031,12 @@ class ActiveRestBeforeTraining(ActiveRest):
                                 exercise_library)
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
-
-        goals = []
-
         compensating = False
         high_load = False
 
         if body_part is not None:
 
             if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
-                #goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
                 high_load = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
@@ -1505,11 +1049,6 @@ class ActiveRestBeforeTraining(ActiveRest):
                   0 < body_part_injury_risk.total_compensation_percent_tier < 6):
 
                 compensating = True
-
-            #if compensating:
-                #goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
-
-            #for goal in goals:
 
             goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
@@ -1547,61 +1086,13 @@ class ActiveRestBeforeTraining(ActiveRest):
                                         body_part_injury_risk.total_volume_percent_tier,
                                         0, exercise_library)
 
-
-    # def check_recovery_excessive_strain(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-    #
-    #     if body_part is not None:
-    #
-    #         goal = AthleteGoal("Elevated Stress", 1, AthleteGoalType.high_load)
-    #
-    #         if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
-    #
-    #             self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, body_part_injury_risk.total_volume_percent_tier, 0, exercise_library)
-    #
-    #             if max_severity < 7.0:
-    #                 self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, body_part_injury_risk.total_volume_percent_tier,
-    #                                     0, exercise_library)
-    #             if max_severity < 5.0:
-    #                 self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal, body_part_injury_risk.total_volume_percent_tier,
-    #                                     0, exercise_library)
-    #
-    # def check_recovery_compensation(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-    #
-    #     compensating = False
-    #
-    #     if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
-    #         body_part_injury_risk.last_movement_dysfunction_stress_date == self.event_date_time.date()):
-    #
-    #         compensating = True
-    #     elif (body_part_injury_risk.last_compensation_date is not None
-    #             and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-    #             body_part_injury_risk.total_compensation_percent_tier <= 3):
-    #
-    #         compensating = True
-    #
-    #     if compensating:
-    #
-    #         goal = AthleteGoal("Compensations", 1, AthleteGoalType.asymmetric_session)
-    #
-    #         self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, body_part_injury_risk.total_compensation_percent_tier, 0,
-    #                             exercise_library)
-    #
-    #         if max_severity < 7.0:
-    #             self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch,
-    #                                 goal, body_part_injury_risk.total_compensation_percent_tier, 0,
-    #                                 exercise_library)
-
     def check_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-
-        goals = []
-
         muscle_spasm = False
         knots = False
         inflammation = False
 
         if (body_part_injury_risk.last_inflammation_date is not None and
                 body_part_injury_risk.last_inflammation_date == self.event_date_time.date()):
-            #goals.append(AthleteGoal("Care for symptoms", 1, AthleteGoalType.pain))
             inflammation = True
 
         if (body_part_injury_risk.last_muscle_spasm_date is not None and
@@ -1612,10 +1103,6 @@ class ActiveRestBeforeTraining(ActiveRest):
                 body_part_injury_risk.last_knots_date == self.event_date_time.date()):
             knots = True
 
-        # if muscle_spasm or knots:
-        #     goals.append(AthleteGoal("Care for symptoms", 1, AthleteGoalType.sore))
-
-        #for goal in goals:
         goal = AthleteGoal("Care for symptoms", 1, AthleteGoalType.sore)
 
         if muscle_spasm or knots or inflammation:
@@ -1673,31 +1160,14 @@ class ActiveRestBeforeTraining(ActiveRest):
 
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
-
-        #body_part_factory = BodyPartFactory()
-
-        #body_part = body_part_factory.get_body_part(body_part_side)
-
         if body_part is not None:
 
             is_short = self.is_body_part_short(body_part_injury_risk)
-            #is_overactive = self.is_body_part_overactive(body_part_injury_risk)
-            #is_underactive_weak = self.is_body_part_underactive_weak(body_part_injury_risk)
-            #is_underactive_inhibited = self.is_body_part_underactive_inhibited(body_part_injury_risk)
             is_overactive_short = self.is_body_part_overactive_short(body_part_injury_risk)
             is_overactive_long = self.is_body_part_overactive_long(body_part_injury_risk)
             is_underactive_long = self.is_body_part_underactive_long(body_part_injury_risk)
             is_underactive_short = self.is_body_part_underactive_short(body_part_injury_risk)
             is_weak = self.is_body_part_weak(body_part_injury_risk)
-            #is_underactive_weak_short = self.is_body_part_underactive_weak_short(body_part_injury_risk)
-
-            #last_severity = self.get_last_severity(body_part_injury_risk)
-            non_isolated_severity = 2.5
-            if is_weak:
-                isolated_severity = 7.5
-            else:
-                isolated_severity = 2.5
-
             tier_one = False
 
             if is_overactive_short:
@@ -1708,9 +1178,6 @@ class ActiveRestBeforeTraining(ActiveRest):
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
                                         0, exercise_library)
-                    # self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, "1",
-                    #                     last_severity, exercise_library)
-
             elif is_underactive_long or is_weak:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
@@ -1754,9 +1221,6 @@ class ActiveRestBeforeTraining(ActiveRest):
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2, 0, exercise_library)
-                    # self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, "1",
-                    #                     last_severity, exercise_library)
-
             if not tier_one and body_part_injury_risk.underactive_weak_tier == 2:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
@@ -1772,17 +1236,6 @@ class ActiveRestBeforeTraining(ActiveRest):
             current_ranking = ordered_ranks[r]
             for phase in self.exercise_phases:
                 self.prioritize_dosages(phase.exercises, current_ranking, r + 1)
-
-            # self.prioritize_dosages(self.inhibit_exercises, current_ranking, r + 1)
-            # self.prioritize_dosages(self.static_stretch_exercises, current_ranking, r + 1)
-            # self.prioritize_dosages(self.active_stretch_exercises, current_ranking, r + 1)
-            # self.prioritize_dosages(self.isolated_activate_exercises, current_ranking, r + 1)
-            # self.prioritize_dosages(self.static_integrate_exercises, current_ranking, r + 1)
-        # self.rank_dosages([self.inhibit_exercises,
-        #                    self.static_stretch_exercises,
-        #                    self.active_stretch_exercises,
-        #                    self.isolated_activate_exercises,
-        #                    self.static_integrate_exercises])
 
 
 class ActiveRestAfterTraining(ActiveRest):
@@ -1875,16 +1328,12 @@ class ActiveRestAfterTraining(ActiveRest):
                                 exercise_library)
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
-
-        goals = []
-
         compensating = False
         high_load = False
 
         if body_part is not None:
 
             if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
-                # goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
                 high_load = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
@@ -1898,10 +1347,6 @@ class ActiveRestAfterTraining(ActiveRest):
 
                 compensating = True
 
-            # if compensating:
-            #     goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
-
-            # for goal in goals:
             goal = AthleteGoal("Recover from training", 1, AthleteGoalType.high_load)
 
             if high_load or compensating:
@@ -1938,16 +1383,12 @@ class ActiveRestAfterTraining(ActiveRest):
                                         0, exercise_library)
 
     def check_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-
-        goals = []
-
         muscle_spasm = False
         knots = False
         inflammation = False
 
         if (body_part_injury_risk.last_inflammation_date is not None and
                 body_part_injury_risk.last_inflammation_date == self.event_date_time.date()):
-            # goals.append(AthleteGoal("Care for symptoms", 1, AthleteGoalType.pain))
             inflammation = True
 
         if (body_part_injury_risk.last_muscle_spasm_date is not None and
@@ -1958,10 +1399,6 @@ class ActiveRestAfterTraining(ActiveRest):
                 body_part_injury_risk.last_knots_date == self.event_date_time.date()):
             knots = True
 
-        # if muscle_spasm or knots:
-        #     goals.append(AthleteGoal("Care for symptoms", 1, AthleteGoalType.sore))
-
-        # for goal in goals:
         goal = AthleteGoal("Care for symptoms", 1, AthleteGoalType.sore)
 
         if muscle_spasm or knots or inflammation:
@@ -2122,8 +1559,6 @@ class MovementIntegrationPrep(ActiveRest):
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 4, 0,
                                     exercise_library)
-                # if max_severity < 7:
-                #     self.copy_exercises(stabilizer.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 3, 0, exercise_library)
                 if max_severity < 5:
                     self.copy_exercises(stabilizer.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         3, 0, exercise_library)
@@ -2188,8 +1623,6 @@ class MovementIntegrationPrep(ActiveRest):
                 goal = AthleteGoal("Expected Load - Compensation", 1, AthleteGoalType.expected_asymmetric_session)
 
                 if max_severity < 5.0:
-                    #if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
-                    # removed stabilizers to reduce active time
                     if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover]:
                         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                             body_part_injury_risk.total_volume_percent_tier,

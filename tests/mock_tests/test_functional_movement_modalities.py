@@ -1,5 +1,7 @@
 import pytest
+from models.exercise_phase import ExercisePhaseType
 from models.session import SportTrainingSession, MixedActivitySession
+from models.functional_movement_modalities import ModalityType
 from datetime import datetime
 from models.sport import SportName
 from models.symptom import Symptom
@@ -215,6 +217,22 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
 
     activity, ice, cwi = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
     print("\nactive_recovery, 100 mins weightlifting, high rpe (ice vs cwi), knee sharp=2")
+    assert len(activity) == 1
+    activity = activity[0]
+    assert activity.type == ModalityType.active_recovery
+    assert activity.display_image == "dynamic_stretch"
+    assert activity.when == "after training"
+    assert activity.locked_text == "You missed the optimal window for Active Recovery."
+    assert activity.title == "Active Recovery".upper()
+
+    exercise_phases = activity.exercise_phases
+    assert len(exercise_phases) == 1
+    assert exercise_phases[0].type == ExercisePhaseType.dynamic_integrate
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
 
     assert ice is None
     assert cwi is not None
@@ -237,9 +255,82 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
 
     activity, ice, cwi = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
     print("\nactive_rest, 100 mins run, low rpe (ice vs cwi), knee sharp=2")
+    assert len(activity) == 1
+    activity = activity[0]
+    assert activity.type == ModalityType.post_active_rest
+    assert activity.display_image == "static_stretch"
+    assert activity.when == "anytime, up to 3 per day"
+    assert activity.locked_text == "You skipped this Mobility Workout. Tap + to create another."
+    assert activity.title == "Mobility".upper()
+
+    exercise_phases = activity.exercise_phases
+    assert len(exercise_phases) == 4
+    assert exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert exercise_phases[3].type == ExercisePhaseType.static_integrate
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
 
     assert ice is not None
     assert cwi is None
 
     ice_json = ice.json_serialise()
     assert len(ice_json['body_parts']) == 1
+
+
+def test_get_movement_prep_with_simple_session_no_symptoms():
+    session_types = [6]
+    dates = [datetime.now()]
+    rpes = [7]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+    workout_programs = [None]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = []
+
+    print("\nmovement prep, 100 mins weightlifting, no symptoms")
+    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')[0]
+    assert movement_prep.type == ModalityType.movement_integration_prep
+    assert len(movement_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
+
+
+def test_get_movement_prep_with_mixed_activity_session_one_symptom():
+    session_types = [7]
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [None]
+    sections = {
+                   "Warmup / Movement Prep": ['rowing'],
+                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
+                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
+                   'Recovery Protocol': ['indoor_cycle']
+    }
+    workout_programs = [get_workout_program(sections=sections)]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = get_symptoms(body_parts=[(7, 1, None, None, None, 2)])  # left knee sharp=2
+
+    print("\nmovement prep, mixed activity session, knee sharp")
+    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')[0]
+    assert movement_prep.display_image == "dynamic_flexibility"
+    assert movement_prep.when == "before training"
+    assert movement_prep.locked_text == "You skipped this Movement Prep before your Workout today."
+    assert movement_prep.title == "Movement Prep".upper()
+
+    assert len(movement_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
