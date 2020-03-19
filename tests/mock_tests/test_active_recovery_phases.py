@@ -1,18 +1,14 @@
 import pytest
 from datetime import datetime, timedelta
-from utils import format_datetime, parse_datetime
-from logic.trigger_processing import TriggerFactory
 from models.soreness import Soreness
-from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.soreness_base import BodyPartLocation
 from models.body_parts import BodyPart
-from models.historic_soreness import HistoricSoreness
-from models.functional_movement_modalities import ActiveRecovery
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.exercise_assignment import ExerciseAssignment
 from models.sport import SportName
 from models.stats import AthleteStats
 from models.session import SportTrainingSession
-from models.exercise_phase import ExercisePhase, ExercisePhaseType
+from models.exercise_phase import ExercisePhaseType
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 
@@ -73,6 +69,7 @@ def test_active_recovery_check_soreness_severity_3():
         #         print('priority=' + val.dosages[d].priority)
         #         print('ranking=' + str(val.dosages[d].ranking))
 
+
 def test_active_recovery_check_no_soreness():
 
     now_date = datetime.now()
@@ -112,3 +109,29 @@ def test_active_rest_check_no_high_intensity():
     assert ExercisePhaseType.inhibit == responsive_recovery.exercise_phases[0].type
     assert len(responsive_recovery.exercise_phases[0].exercises) > 0
 
+
+def test_active_rest_check_no_high_intensity_severity_3():
+
+    now_date = datetime.now()
+
+    for b in body_parts_1:
+        soreness = Soreness()
+        soreness.body_part = BodyPart(BodyPartLocation(b), None)
+        soreness.side = 1
+        soreness.sharp = 3
+        soreness.reported_date_time = now_date
+
+        session = get_session(datetime.today(), 8, 120, SportName.rowing)
+
+        proc = InjuryRiskProcessor(now_date, [soreness], [session], {}, AthleteStats("tester"), "tester")
+        injury_risk_dict = proc.process(aggregate_results=True)
+        consolidated_injury_risk_dict = proc.get_consolidated_dict()
+
+        calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore,
+                                  completed_exercise_datastore, now_date)
+        #calc.high_intensity_session = is_high_intensity_session([session])
+
+        responsive_recovery = calc.get_responsive_recovery("", ice_cwi=False)[0][0]
+
+        assert ExercisePhaseType.inhibit == responsive_recovery.exercise_phases[0].type
+        assert len(responsive_recovery.exercise_phases[0].exercises) > 0
