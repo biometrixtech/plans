@@ -154,7 +154,7 @@ class TrainingPlanManager(object):
                 responsive_recovery, ice, cold_water_immersion = exercise_assignment.get_responsive_recovery(force_data, force_on_demand)
 
                 if len(responsive_recovery) > 0:
-                    modality_type_value = responsive_recovery[0].modality_type.value
+                    modality_type_value = responsive_recovery[0].type.value
                     # TODO - should we get rid of both Active Recovery and Active Rest here?
                     self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                   m.type.value != modality_type_value]
@@ -178,7 +178,7 @@ class TrainingPlanManager(object):
                 responsive_recovery, ice, cold_water_immersion = exercise_assignment.get_responsive_recovery(force_data, force_on_demand)
 
                 if len(responsive_recovery) > 0:
-                    modality_type_value = responsive_recovery[0].modality_type.value
+                    modality_type_value = responsive_recovery[0].type.value
                     # TODO - should we get rid of both Active Recovery and Active Rest here?
                     self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                   m.type.value != modality_type_value]
