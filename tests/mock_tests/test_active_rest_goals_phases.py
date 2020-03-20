@@ -93,7 +93,7 @@ def test_active_rest_check_care_severity_7():
             assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_short():
+def test_active_rest_check_prevention_short():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 3
@@ -136,7 +136,7 @@ def test_active_rest_after_training_check_prevention_short():
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_overactive_short():
+def test_active_rest_check_prevention_overactive_short():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 3
@@ -166,7 +166,7 @@ def test_active_rest_after_training_check_prevention_overactive_short():
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_overactive_short_severity_7():
+def test_active_rest_check_prevention_overactive_short_severity_7():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 7
@@ -196,7 +196,7 @@ def test_active_rest_after_training_check_prevention_overactive_short_severity_7
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_overactive_long():
+def test_active_rest_check_prevention_overactive_long():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 3
@@ -226,7 +226,7 @@ def test_active_rest_after_training_check_prevention_overactive_long():
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_underactive_short_severity_3():
+def test_active_rest_check_prevention_underactive_short_severity_3():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 3
@@ -256,7 +256,7 @@ def test_active_rest_after_training_check_prevention_underactive_short_severity_
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_underactive_short_severity_5():
+def test_active_rest_check_prevention_underactive_short_severity_5():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 5
@@ -286,7 +286,7 @@ def test_active_rest_after_training_check_prevention_underactive_short_severity_
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_underactive_short_severity_7():
+def test_active_rest_check_prevention_underactive_short_severity_7():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 7
@@ -316,7 +316,7 @@ def test_active_rest_after_training_check_prevention_underactive_short_severity_
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_underactive_long_severity_3():
+def test_active_rest_check_prevention_underactive_long_severity_3():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 3
@@ -346,7 +346,7 @@ def test_active_rest_after_training_check_prevention_underactive_long_severity_3
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_underactive_long_severity_7():
+def test_active_rest_check_prevention_underactive_long_severity_7():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 7
@@ -376,7 +376,7 @@ def test_active_rest_after_training_check_prevention_underactive_long_severity_7
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_weak():
+def test_active_rest_check_prevention_weak():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 3
@@ -406,7 +406,7 @@ def test_active_rest_after_training_check_prevention_weak():
         assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
-def test_active_rest_after_training_check_prevention_weak_severity_5():
+def test_active_rest_check_prevention_weak_severity_5():
 
     exercise_library = exercise_library_datastore.get()
     max_severity = 5
@@ -535,6 +535,93 @@ def test_active_rest_check_recovery_volume_tier_1_5_severity_7():
 
         active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
+        active_rest.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity, [])
+
+        assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+        assert len(active_rest.exercise_phases[0].exercises) > 0
+        assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+        assert len(active_rest.exercise_phases[1].exercises) == 0
+        assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+        assert len(active_rest.exercise_phases[2].exercises) == 0
+        assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+        assert len(active_rest.exercise_phases[3].exercises) == 0
+
+
+def test_active_rest_check_recovery_compensation_tier_1_5_severity_3():
+
+    exercise_library = exercise_library_datastore.get()
+    max_severity = 3
+    body_part_factory = BodyPartFactory()
+
+    comp_tiers = [1, 2, 3, 4, 5]
+
+    body_part_injury_risk_1 = BodyPartInjuryRisk()
+
+    body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
+
+    for v in comp_tiers:
+
+        active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+        body_part_injury_risk_1.total_compensation_percent_tier = v
+        body_part_injury_risk_1.last_compensation_date = datetime.today().date()
+        active_rest.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity, [])
+
+        assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+        assert len(active_rest.exercise_phases[0].exercises) > 0
+        assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+        assert len(active_rest.exercise_phases[1].exercises) > 0
+        assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+        assert len(active_rest.exercise_phases[2].exercises) == 0
+        assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+        assert len(active_rest.exercise_phases[3].exercises) == 0
+
+
+def test_active_rest_check_recovery_compensation_tiers_0_6_severity_3():
+
+    exercise_library = exercise_library_datastore.get()
+    max_severity = 3
+    body_part_factory = BodyPartFactory()
+
+    comp_tiers = [0, 6]
+
+    body_part_injury_risk_1 = BodyPartInjuryRisk()
+
+    body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
+
+    for v in comp_tiers:
+        active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+        body_part_injury_risk_1.total_compensation_percent_tier = v
+        body_part_injury_risk_1.total_compensation_percent_tier = v
+        body_part_injury_risk_1.last_compensation_date = datetime.today().date()
+        active_rest.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity, [])
+
+        assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+        assert len(active_rest.exercise_phases[0].exercises) == 0
+        assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+        assert len(active_rest.exercise_phases[1].exercises) == 0
+        assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+        assert len(active_rest.exercise_phases[2].exercises) == 0
+        assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+        assert len(active_rest.exercise_phases[3].exercises) == 0
+
+
+def test_active_rest_check_recovery_compensation_tier_1_5_severity_7():
+
+    exercise_library = exercise_library_datastore.get()
+    max_severity = 7
+    body_part_factory = BodyPartFactory()
+
+    comp_tiers = [1, 2, 3, 4, 5]
+
+    body_part_injury_risk_1 = BodyPartInjuryRisk()
+
+    body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
+
+    for v in comp_tiers:
+
+        active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+        body_part_injury_risk_1.total_compensation_percent_tier = v
+        body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         active_rest.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity, [])
 
         assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
