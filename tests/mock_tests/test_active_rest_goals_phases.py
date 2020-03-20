@@ -591,7 +591,6 @@ def test_active_rest_check_recovery_compensation_tiers_0_6_severity_3():
     for v in comp_tiers:
         active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
-        body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         active_rest.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity, [])
 
