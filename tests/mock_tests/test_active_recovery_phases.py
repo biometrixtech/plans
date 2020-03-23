@@ -59,7 +59,7 @@ def test_active_recovery_check_soreness_severity_3():
         calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, now_date)
         calc.high_intensity_session = is_high_intensity_session([session])
 
-        responsive_recovery = calc.get_responsive_recovery("", ice_cwi=False)[0][0]
+        responsive_recovery = calc.get_responsive_recovery_modality("", ice_cwi=False)[0][0]
 
         assert ExercisePhaseType.dynamic_integrate == responsive_recovery.exercise_phases[0].type
         assert len(responsive_recovery.exercise_phases[0].exercises) > 0
@@ -84,7 +84,7 @@ def test_active_recovery_check_no_soreness():
                               completed_exercise_datastore, now_date)
     calc.high_intensity_session = is_high_intensity_session([session])
 
-    responsive_recovery = calc.get_responsive_recovery("", ice_cwi=False)[0][0]
+    responsive_recovery = calc.get_responsive_recovery_modality("", ice_cwi=False)[0][0]
 
     assert ExercisePhaseType.dynamic_integrate == responsive_recovery.exercise_phases[0].type
     assert len(responsive_recovery.exercise_phases[0].exercises) > 0
@@ -104,7 +104,7 @@ def test_active_rest_check_no_high_intensity():
                               completed_exercise_datastore, now_date)
     #calc.high_intensity_session = is_high_intensity_session([session])
 
-    responsive_recovery = calc.get_responsive_recovery("", ice_cwi=False)[0][0]
+    responsive_recovery = calc.get_responsive_recovery_modality("", ice_cwi=False)[0][0]
 
     assert ExercisePhaseType.inhibit == responsive_recovery.exercise_phases[0].type
     assert len(responsive_recovery.exercise_phases[0].exercises) > 0
@@ -131,7 +131,7 @@ def test_active_rest_check_no_high_intensity_severity_3():
                                   completed_exercise_datastore, now_date)
         #calc.high_intensity_session = is_high_intensity_session([session])
 
-        responsive_recovery = calc.get_responsive_recovery("", ice_cwi=False)[0][0]
+        responsive_recovery = calc.get_responsive_recovery_modality("", ice_cwi=False)[0][0]
 
         assert ExercisePhaseType.inhibit == responsive_recovery.exercise_phases[0].type
         assert len(responsive_recovery.exercise_phases[0].exercises) > 0

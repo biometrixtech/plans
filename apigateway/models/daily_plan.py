@@ -4,7 +4,7 @@ from models.session import Session
 from models.daily_readiness import DailyReadiness
 from models.athlete_trend import AthleteTrends
 from models.soreness import Soreness
-from models.functional_movement_modalities import Modality, ModalityTypeDisplay, ModalityType, IceSession, HeatSession, ColdWaterImmersion
+from models.functional_movement_modalities import Modality, ModalityTypeDisplay, ModalityType, IceSessionModalities, HeatSession, ColdWaterImmersionModality
 
 
 class DailyPlan(Serialisable):
@@ -100,10 +100,10 @@ class DailyPlan(Serialisable):
         if not stats_processing:
             daily_plan.heat = HeatSession.json_deserialise(input_dict['heat']) if input_dict.get('heat', None) is not None else None
             daily_plan.completed_heat = [HeatSession.json_deserialise(heat) for heat in input_dict.get('completed_heat', [])]
-            daily_plan.ice = IceSession.json_deserialise(input_dict['ice']) if input_dict.get('ice', None) is not None else None
-            daily_plan.completed_ice = [IceSession.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
-            daily_plan.cold_water_immersion = ColdWaterImmersion.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion', None) is not None else None
-            daily_plan.completed_cold_water_immersion = [ColdWaterImmersion.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
+            daily_plan.ice = IceSessionModalities.json_deserialise(input_dict['ice']) if input_dict.get('ice', None) is not None else None
+            daily_plan.completed_ice = [IceSessionModalities.json_deserialise(ice) for ice in input_dict.get('completed_ice', [])]
+            daily_plan.cold_water_immersion = ColdWaterImmersionModality.json_deserialise(input_dict['cold_water_immersion']) if input_dict.get('cold_water_immersion', None) is not None else None
+            daily_plan.completed_cold_water_immersion = [ColdWaterImmersionModality.json_deserialise(cwi) for cwi in input_dict.get('completed_cold_water_immersion', [])]
             daily_plan.trends = AthleteTrends.json_deserialise(input_dict['trends']) if input_dict.get('trends', None) is not None else None
             daily_plan.modalities = [Modality.json_deserialise(m) for m in input_dict.get('modalities', [])]
             daily_plan.completed_modalities = [Modality.json_deserialise(m) for m in input_dict.get('completed_modalities', [])]
