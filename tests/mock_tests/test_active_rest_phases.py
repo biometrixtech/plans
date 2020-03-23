@@ -1,566 +1,249 @@
+
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False)
+xray_recorder.begin_segment(name="test")
+
 import pytest
+from models.session import SportTrainingSession, MixedActivitySession
 from datetime import datetime, timedelta
-from utils import format_datetime, parse_datetime
+from models.sport import SportName
 from models.soreness import Soreness
-from models.soreness_base import HistoricSorenessStatus
-from models.body_parts import BodyPart, BodyPartLocation
-#from models.historic_soreness import HistoricSoreness
-from models.modalities import ActiveRestAfterTraining, ActiveRestBeforeTraining
-from models.trigger import Trigger, TriggerType
-from logic.trigger_processing import TriggerFactory
+from models.body_parts import BodyPart
+from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.stats import AthleteStats
+from logic.injury_risk_processing import InjuryRiskProcessor
+from logic.exercise_assignment import ExerciseAssignment
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
+from models.movement_tags import AdaptationType
+from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
+from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
+from models.functional_movement_type import FunctionalMovementType
+from models.exercise_phase import ExercisePhaseType
+
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
 
-body_parts_1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
 
 @pytest.fixture(scope="session", autouse=True)
 def load_exercises():
     exercise_library_datastore.side_load_exericse_list_from_csv()
 
-# post active rest
 
+def get_sessions(dates, rpes, durations, sport_names):
 
-def test_active_rest_after_training_check_soreness_severity_3():
+    if len(dates) != len(rpes) != len(durations) != len(sport_names):
+        raise Exception("dates, rpes, durations must match in length")
 
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+    sessions = []
 
-    for b in body_parts_1:
+    for d in range(0, len(dates)):
+        session = SportTrainingSession()
+        session.event_date = dates[d]
+        session.session_RPE = rpes[d]
+        session.duration_minutes = durations[d]
+        session.sport_name = sport_names[d]
+        sessions.append(session)
 
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        exercise_library = exercise_library_datastore.get()
+    return sessions
 
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
 
-        for t in factory.triggers:
-            active_rest.check_reactive_care_soreness(t, exercise_library, 3)
+def test_check_active_rest_phases_soreness_no_session():
 
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
+    now_date = datetime.now()
 
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation(6), None)
+    soreness.side = 1
+    soreness.sharp = 3
+    soreness.reported_date_time = now_date
 
-def test_active_rest_after_training_check_soreness_severity_4():
+    proc = InjuryRiskProcessor(now_date, [soreness], [], {}, AthleteStats("tester"), "tester")
+    injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
 
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore, now_date)
 
-    for b in body_parts_1:
+    active_rest = calc.get_active_rest()[0]
+    assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert len(active_rest.exercise_phases[2].exercises) == 0
+    assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+    assert len(active_rest.exercise_phases[3].exercises) == 0
 
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 4
-        soreness.side = 1
-        exercise_library = exercise_library_datastore.get()
 
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
+def test_check_active_rest_phases_soreness_with_simple_session():
 
-        for t in factory.triggers:
-            active_rest.check_reactive_care_soreness(t, exercise_library, 4)
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [SportName.distance_running]
 
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) == 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
+    sessions = get_sessions(dates, rpes, durations, sport_names)
 
+    soreness = Soreness()
+    soreness.body_part = BodyPart(BodyPartLocation(6), None)
+    soreness.side = 1
+    soreness.tight = 1
+    soreness.reported_date_time = dates[0]
 
-def test_active_rest_after_training_check_prevention_soreness_severity_2():
+    soreness_2 = Soreness()
+    soreness_2.body_part = BodyPart(BodyPartLocation(7), None)
+    soreness_2.side = 1
+    soreness_2.sharp = 2
+    soreness_2.reported_date_time = dates[0]
 
-    current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
+    proc = InjuryRiskProcessor(dates[0], [soreness, soreness_2], sessions, {}, AthleteStats("tester"), "tester")
+    injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
 
-    for b in body_parts_1:
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+                                        dates[0])
 
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 2
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
+    active_rest = calc.get_active_rest()[0]
+    assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert len(active_rest.exercise_phases[2].exercises) > 0
+    assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+    assert len(active_rest.exercise_phases[3].exercises) == 0
 
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
 
-        for t in factory.triggers:
-            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
+def test_check_active_rest_phases_no_soreness_with_simple_session():
 
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) > 0
-        assert len(active_rest.static_integrate_exercises) > 0
+    dates = [datetime.now()]
+    rpes = [5]
+    durations = [100]
+    sport_names = [SportName.distance_running]
 
+    sessions = get_sessions(dates, rpes, durations, sport_names)
 
-def test_active_rest_after_training_check_prevention_soreness_severity_3():
+    proc = InjuryRiskProcessor(dates[0], [], sessions, {}, AthleteStats("tester"), "tester")
+    injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
 
-    current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+                                        dates[0])
 
-    for b in body_parts_1:
-
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) > 0
-        assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_after_training_check_prevention_pain_severity_2():
-
-    current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 2
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) > 0
-        assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_after_training_check_prevention_pain_severity_3():
-
-    current_date_time = datetime.today()
-    active_rest = ActiveRestAfterTraining(event_date_time=current_date_time)
-
-    for b in body_parts_1:
-
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) > 0
-        assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_after_training_check_pain_severity_3():
-
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.pain = True
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_reactive_care_pain(t, exercise_library, 3)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_after_training_check_pain_severity_4():
-
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 4
-        soreness.side = 1
-        soreness.pain = True
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_reactive_care_pain(t, exercise_library, 4)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) == 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_after_training_three_sensor_asymmetry():
-
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
-
-    exercise_library = exercise_library_datastore.get()
-
-    trigger = Trigger(TriggerType.movement_error_apt_asymmetry)
-
-    active_rest.check_reactive_three_sensor([trigger], exercise_library)
-
-    assert len(active_rest.inhibit_exercises) > 0
-    assert len(active_rest.static_stretch_exercises) > 0
-    assert len(active_rest.isolated_activate_exercises) == 0
-    assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_after_training_empty_soreness_blank():
-
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises([], exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) == 0
-    assert len(active_rest.static_stretch_exercises) == 0
-    assert len(active_rest.isolated_activate_exercises) == 0
-    assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_after_training_none_soreness_blank():
-
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today())
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) == 0
-    assert len(active_rest.static_stretch_exercises) == 0
-    assert len(active_rest.isolated_activate_exercises) == 0
-    assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_after_training_empty_soreness_force_data():
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today(), force_data=True)
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises([], exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) > 0
-    assert len(active_rest.static_stretch_exercises) > 0
-    assert len(active_rest.isolated_activate_exercises) > 0
-    assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_after_training_none_soreness_force_data():
-    active_rest = ActiveRestAfterTraining(event_date_time=datetime.today(), force_data=True)
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) > 0
-    assert len(active_rest.static_stretch_exercises) > 0
-    assert len(active_rest.isolated_activate_exercises) > 0
-    assert len(active_rest.static_integrate_exercises) > 0
-
-# pre active rest
-
-
-def test_active_rest_before_training_check_soreness_severity_3():
-
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_reactive_care_soreness(t, exercise_library, 3)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.active_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_before_training_check_soreness_severity_4():
-
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 4
-        soreness.side = 1
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_reactive_care_soreness(t, exercise_library, 4)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) == 0
-        assert len(active_rest.active_stretch_exercises) == 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_before_training_check_prevention_soreness_severity_2():
-
-    current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 2
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.active_stretch_exercises) == 0
-        assert len(active_rest.isolated_activate_exercises) > 0
-        assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_before_training_check_prevention_soreness_severity_3():
-
-    current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_soreness
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_corrective_soreness(t, current_date_time, exercise_library, 2)
-
-        assert len(active_rest.inhibit_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
-        assert len(active_rest.static_stretch_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
-        assert len(active_rest.active_stretch_exercises) == 0, 'Error with ' + str(BodyPartLocation(b))
-        assert len(active_rest.isolated_activate_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
-        assert len(active_rest.static_integrate_exercises) > 0, 'Error with ' + str(BodyPartLocation(b))
-
-
-def test_active_rest_before_training_check_prevention_pain_severity_2():
-
-    current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 2
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.active_stretch_exercises) == 0
-        assert len(active_rest.isolated_activate_exercises) > 0
-        assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_before_training_check_prevention_pain_severity_3():
-
-    current_date_time = datetime.today()
-    active_rest = ActiveRestBeforeTraining(event_date_time=current_date_time)
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.historic_soreness_status = HistoricSorenessStatus.persistent_pain
-        historic_date_time = current_date_time - timedelta(days=31)
-        soreness.first_reported_date_time = historic_date_time
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_corrective_pain(t, current_date_time, exercise_library, 2)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.active_stretch_exercises) == 0
-        assert len(active_rest.isolated_activate_exercises) > 0
-        assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_before_training_check_pain_severity_3():
-
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 3
-        soreness.side = 1
-        soreness.pain = True
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_reactive_care_pain(t, exercise_library, 3)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) > 0
-        assert len(active_rest.active_stretch_exercises) > 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_before_training_check_pain_severity_4():
-
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
-
-    for b in body_parts_1:
-        soreness = Soreness()
-        soreness.body_part = BodyPart(BodyPartLocation(b), None)
-        soreness.severity = 4
-        soreness.side = 1
-        soreness.pain = True
-        exercise_library = exercise_library_datastore.get()
-
-        factory = TriggerFactory(datetime.now(), None, [soreness], [])
-        factory.load_triggers()
-
-        for t in factory.triggers:
-            active_rest.check_reactive_care_pain(t, exercise_library, 4)
-
-        assert len(active_rest.inhibit_exercises) > 0
-        assert len(active_rest.static_stretch_exercises) == 0
-        assert len(active_rest.active_stretch_exercises) == 0
-        assert len(active_rest.isolated_activate_exercises) == 0
-        assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_before_training_empty_soreness_blank():
-
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises([], exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) == 0
-    assert len(active_rest.static_stretch_exercises) == 0
-    assert len(active_rest.active_stretch_exercises) == 0
-    assert len(active_rest.isolated_activate_exercises) == 0
-    assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_before_training_none_soreness_blank():
-
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today())
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) == 0
-    assert len(active_rest.static_stretch_exercises) == 0
-    assert len(active_rest.active_stretch_exercises) == 0
-    assert len(active_rest.isolated_activate_exercises) == 0
-    assert len(active_rest.static_integrate_exercises) == 0
-
-
-def test_active_rest_before_training_empty_soreness_force_data():
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today(), force_data=True)
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises([], exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) > 0
-    assert len(active_rest.static_stretch_exercises) > 0
-    assert len(active_rest.active_stretch_exercises) > 0
-    assert len(active_rest.isolated_activate_exercises) > 0
-    assert len(active_rest.static_integrate_exercises) > 0
-
-
-def test_active_rest_before_training_none_soreness_force_data():
-    active_rest = ActiveRestBeforeTraining(event_date_time=datetime.today(), force_data=True)
-
-    exercise_library = exercise_library_datastore.get()
-    active_rest.fill_exercises(None, exercise_library, False, False, False, [])
-
-    assert len(active_rest.inhibit_exercises) > 0
-    assert len(active_rest.static_stretch_exercises) > 0
-    assert len(active_rest.active_stretch_exercises) > 0
-    assert len(active_rest.isolated_activate_exercises) > 0
-    assert len(active_rest.static_integrate_exercises) > 0
-
-
-
-
+    active_rest = calc.get_active_rest()[0]
+    assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert len(active_rest.exercise_phases[2].exercises) > 0
+    assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+    assert len(active_rest.exercise_phases[3].exercises) == 0
+
+
+def test_check_active_rest_phases_no_inputs_default_force_on_demand():
+
+    dates = [datetime.now()]
+
+    proc = InjuryRiskProcessor(dates[0], [], [], {}, AthleteStats("tester"), "tester")
+    injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
+
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+                                        dates[0])
+
+    active_rest = calc.get_active_rest()[0]
+    assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert len(active_rest.exercise_phases[2].exercises) > 0
+    assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+    assert len(active_rest.exercise_phases[3].exercises) > 0
+
+
+def test_check_active_rest_phases_no_inputs_force_on_demand_false():
+
+    dates = [datetime.now()]
+
+    proc = InjuryRiskProcessor(dates[0], [], [], {}, AthleteStats("tester"), "tester")
+    injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
+
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+                                        dates[0])
+
+    active_rest = calc.get_active_rest(force_on_demand=False)[0]
+    assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert len(active_rest.exercise_phases[0].exercises) == 0
+    assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert len(active_rest.exercise_phases[1].exercises) == 0
+    assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert len(active_rest.exercise_phases[2].exercises) == 0
+    assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+    assert len(active_rest.exercise_phases[3].exercises) == 0
+
+
+def test_check_active_rest_phases_no_soreness_with_mixed_session():
+
+    session = MixedActivitySession()
+    session.event_date = datetime.now()
+
+    exercise_action_1 = ExerciseAction("1", "flail")
+    exercise_action_1.primary_muscle_action = MuscleAction.concentric
+    exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
+    exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
+    exercise_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
+    exercise_action_1.total_load_left = 100
+    exercise_action_1.total_load_right = 200
+    exercise_action_1.lower_body_stability_rating = 1.1
+    exercise_action_1.upper_body_stability_rating = 0.6
+    exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
+
+    exercise_action_2 = ExerciseAction("1", "flail")
+    exercise_action_2.primary_muscle_action = MuscleAction.concentric
+    exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
+    exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
+    exercise_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
+    exercise_action_2.total_load_left = 200
+    exercise_action_2.total_load_right = 100
+    exercise_action_2.lower_body_stability_rating = 1.1
+    exercise_action_2.upper_body_stability_rating = 0.6
+    exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
+
+    exercise_1 = WorkoutExercise()
+    exercise_1.primary_actions.append(exercise_action_1)
+
+    exercise_2 = WorkoutExercise()
+    exercise_2.primary_actions.append(exercise_action_2)
+
+    section_1 = WorkoutSection()
+    section_1.exercises.append(exercise_1)
+
+    section_2 = WorkoutSection()
+    section_2.exercises.append(exercise_2)
+
+    program_module = WorkoutProgramModule()
+    program_module.workout_sections.append(section_1)
+    program_module.workout_sections.append(section_2)
+
+    session.workout_program_module = program_module
+
+    proc = InjuryRiskProcessor(session.event_date, [], [session], {}, AthleteStats("tester"), "tester")
+    injury_risk_dict = proc.process(aggregate_results=True)
+    consolidated_injury_risk_dict = proc.get_consolidated_dict()
+
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+                                        session.event_date)
+
+    active_rest = calc.get_active_rest()[0]
+    assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert len(active_rest.exercise_phases[1].exercises) > 0
+    assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert len(active_rest.exercise_phases[2].exercises) > 0
+    assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+    assert len(active_rest.exercise_phases[3].exercises) == 0
