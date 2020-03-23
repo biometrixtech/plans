@@ -464,6 +464,7 @@ class Activity(object):
         total_comprehensive = 0
         benchmarks = [1, 2, 3, 4, 5]
 
+        # TODO verify this change from modality logic is correct
         proposed_limit = 300
 
         for b in range(0, len(benchmarks) - 1):
@@ -477,6 +478,8 @@ class Activity(object):
                 break
             else:
                 self.efficient_winner = benchmarks[b + 1]
+                # TODO - see if a `break` is needed here. Modality logic had it
+                # break
 
     def scale_all_active_time(self):
         for phase in self.exercise_phases:
@@ -915,6 +918,37 @@ class ActiveRestBase(Activity):
 
         pass
 
+    def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
+
+        pass
+
+    # TODO - Make sure this method ported over from Modality logic is no longer needed
+    # def check_reactive_recover_from_sport(self, trigger_list, exercise_library, sports, max_severity):
+    #
+    #
+    #     for t in range(0, len(trigger_list)):
+    #         if trigger_list[t].trigger_type == TriggerType.high_volume_intensity:  # 0
+    #             goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
+    #             body_part_factory = BodyPartFactory()
+    #
+    #             body_part = body_part_factory.get_body_part_for_sports(sports)
+    #
+    #             # Note: this is just returning the primary mover related exercises for sport
+    #             if body_part is not None:  # and not prohibiting_soreness:
+    #                 self.copy_exercises(body_part.inhibit_exercises,
+    #                                     ExercisePhaseType.inhibit, goal, "1", trigger_list[t], exercise_library)
+    #                 # if not prohibiting_soreness:
+    #                 if max_severity < 7:
+    #                     self.copy_exercises(body_part.static_stretch_exercises,
+    #                                         ExercisePhaseType.static_stretch, goal, "1", trigger_list[t], exercise_library,
+    #                                         sports)
+    #                 if max_severity < 5:
+    #                     self.copy_exercises(body_part.isolated_activate_exercises,
+    #                                         ExercisePhaseType.isolated_activate, goal, "1", trigger_list[t],
+    #                                         exercise_library, sports)
+    #
+    #             self.check_reactive_recover_from_sport_general(sports, exercise_library, goal, max_severity)
+
 
 class MovementIntegrationPrep(ActiveRestBase):
     def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=True, sport_cardio_plyometrics=False):
@@ -1225,6 +1259,35 @@ class ActiveRest(ActiveRestBase):
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
                                 ExercisePhase(ExercisePhaseType.static_integrate)]
 
+    def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
+
+        goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
+
+        body_part_factory = BodyPartFactory()
+
+        body_part = body_part_factory.get_body_part_for_sports(sports)
+
+        for a in body_part.agonists:
+            agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+            if agonist is not None:
+                if max_severity < 7.0:
+                    self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, "1", None,
+                                        exercise_library)
+                    self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, "1",
+                                        None, exercise_library)
+
+        for t in body_part.antagonists:
+            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+            if antagonist is not None:
+                if max_severity < 5.0:
+                    self.copy_exercises(antagonist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
+                                        "1",
+                                        None, exercise_library)
+
+        if max_severity < 5.0:
+            self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, "1", None,
+                                exercise_library)
+
     def get_general_exercises(self, exercise_library, max_severity):
 
         body_part_factory = BodyPartFactory()
@@ -1448,33 +1511,33 @@ class ActiveRest(ActiveRestBase):
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         1, 0, exercise_library)
 
-            # elif is_short:
-            #
-            #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
-            #     tier_one = True
-            #     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
-            #
-            #     if max_severity < 7.0:
-            #         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-            #                             0, exercise_library)
+            elif is_short:
 
-            # if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
-            #
-            #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
-            #
-            #     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
-            #
-            #     if max_severity < 7.0:
-            #         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-            #                             0, exercise_library)
-            #
-            # if not tier_one and body_part_injury_risk.underactive_weak_tier == 2:
-            #
-            #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
-            #
-            #     if max_severity < 5.0:
-            #         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-            #                             2, 0, exercise_library)
+                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+                tier_one = True
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
+                                        0, exercise_library)
+
+            if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
+
+                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
+                                        0, exercise_library)
+
+            if not tier_one and body_part_injury_risk.underactive_weak_tier == 2:
+
+                goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
+
+                if max_severity < 5.0:
+                    self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
+                                        2, 0, exercise_library)
 
 
 class ActiveRecovery(Activity):
@@ -1492,9 +1555,12 @@ class ActiveRecovery(Activity):
                     and body_part_injury_risk.last_ache_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_ache_level)
 
-        if len(injury_risk_dict) > 0 and high_intensity_session:
+        if max_severity < 4.0 and len(injury_risk_dict) > 0 and high_intensity_session:
             for body_part, body_part_injury_risk in injury_risk_dict.items():
                 self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity)
+
+    def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
+        return False
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 
@@ -1539,9 +1605,9 @@ class ActiveRecovery(Activity):
 
                 if tier > 0:
 
-                    if max_severity < 4.0:
-                        self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
-                                            tier, 0, exercise_library)
+                    #if max_severity < 4.0:
+                    self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
+                                        tier, 0, exercise_library)
 
 
 class IceSession(object):

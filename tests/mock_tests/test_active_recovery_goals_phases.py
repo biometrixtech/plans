@@ -5,7 +5,7 @@ from models.soreness import Soreness
 from models.soreness_base import HistoricSorenessStatus
 from models.body_parts import BodyPart, BodyPartLocation, BodyPartFactory
 #from models.historic_soreness import HistoricSoreness
-from models.functional_movement_modalities import ActiveRecovery
+from models.functional_movement_modalities import ActiveRecoveryModality
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.stats import AthleteStats
 from models.exercise_phase import ExercisePhaseType
@@ -39,7 +39,7 @@ def test_active_recovery_check_recovery_volume_tier_1_3_severity_3():
 
     for v in volume_tiers:
 
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         body_part_injury_risk_1.last_sharp_level = max_severity
         body_part_injury_risk_1.last_sharp_date = datetime.today().date()
@@ -66,7 +66,7 @@ def test_active_recovery_check_recovery_volume_tier_1_3_severity_3_no_high_inten
 
     for v in volume_tiers:
 
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         body_part_injury_risk_1.last_sharp_level = max_severity
         body_part_injury_risk_1.last_sharp_date = datetime.today().date()
@@ -92,7 +92,7 @@ def test_active_recovery_check_recovery_volume_tiers_0_4_severity_3():
 
     for v in volume_tiers:
 
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         body_part_injury_risk_1.last_sharp_level = max_severity
         body_part_injury_risk_1.last_sharp_date = datetime.today().date()
@@ -118,7 +118,7 @@ def test_active_recovery_check_recovery_volume_tier_1_3_severity_4():
 
     for v in volume_tiers:
 
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         body_part_injury_risk_1.last_sharp_level = max_severity
         body_part_injury_risk_1.last_sharp_date = datetime.today().date()
@@ -144,7 +144,7 @@ def test_active_recovery_check_recovery_compensation_tier_1_3_severity_3():
 
     for v in comp_tiers:
 
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         body_part_injury_risk_1.last_sharp_level = max_severity
@@ -172,7 +172,7 @@ def test_active_recovery_check_recovery_compensation_tier_1_3_severity_4():
 
     for v in comp_tiers:
 
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         body_part_injury_risk_1.last_sharp_level = max_severity
@@ -199,7 +199,7 @@ def test_active_recovery_check_recovery_compensation_tier_1_3_severity_3_no_high
 
     for v in comp_tiers:
 
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         body_part_injury_risk_1.last_sharp_level = max_severity
@@ -225,7 +225,7 @@ def test_active_recovery_check_recovery_compensation_tiers_0_4_severity_3():
     body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation.quads, None))
 
     for v in comp_tiers:
-        active_recovery = ActiveRecovery(event_date_time=datetime.today())
+        active_recovery = ActiveRecoveryModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         body_part_injury_risk_1.last_sharp_level = max_severity
