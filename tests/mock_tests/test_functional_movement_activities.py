@@ -5,7 +5,8 @@ from models.sport import SportName
 from models.symptom import Symptom
 from models.user_stats import UserStats
 from logic.injury_risk_processing import InjuryRiskProcessor
-from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+#from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+from logic.exercise_assignment import ExerciseAssignment
 from logic.workout_processing import WorkoutProcessor
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
@@ -176,7 +177,7 @@ def get_activity(event_date_time, symptoms, sessions, activity_type='movement_pr
     proc = InjuryRiskProcessor(event_date_time, symptoms, sessions, {}, UserStats("tester"), "tester")
     proc.process(aggregate_results=True)
     consolidated_injury_risk_dict = proc.get_consolidated_dict()
-    calc = ExerciseAssignmentCalculator(
+    calc = ExerciseAssignment(
             injury_risk_dict=consolidated_injury_risk_dict,
             exercise_library_datastore=exercise_library_datastore,
             completed_exercise_datastore=completed_exercise_datastore,

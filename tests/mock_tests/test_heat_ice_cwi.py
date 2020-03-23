@@ -11,7 +11,7 @@
 # from models.body_parts import BodyPart
 # from models.goal import AthleteGoalType
 # from models.historic_soreness import HistoricSoreness
-# from models.modalities import ColdWaterImmersion, Ice, IceSession
+# from models.modalities import ColdWaterImmersion, Ice, IceSessionModalities
 # from models.stats import AthleteStats
 # from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 # from logic.exercise_mapping import ExerciseAssignmentCalculator
@@ -281,7 +281,7 @@
 # def test_remove_lower_body_parts():
 #
 #     cwi = ColdWaterImmersion()
-#     ice_session = IceSession()
+#     ice_session = IceSessionModalities()
 #     ice = Ice(BodyPartLocation.ankle, 1)
 #     ice_session.body_parts.append(ice)
 #     athlete_stats = AthleteStats("tester")

@@ -2,7 +2,8 @@ from fathomapi.utils.xray import xray_recorder
 
 # from logic.soreness_processing import SorenessCalculator
 from logic.injury_risk_processing import InjuryRiskProcessor
-from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+#from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+from logic.exercise_assignment import ExerciseAssignment
 from models.athlete_injury_risk import AthleteInjuryRisk
 
 
@@ -97,7 +98,7 @@ class ActivityManager(object):
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
 
         # initialize exercise assignment calculator
-        self.exercise_assignment_calculator = ExerciseAssignmentCalculator(
+        self.exercise_assignment_calculator = ExerciseAssignment(
                 injury_risk_dict=consolidated_injury_risk_dict,
                 exercise_library_datastore=self.exercise_library_datastore,
                 completed_exercise_datastore=self.completed_exercise_datastore,

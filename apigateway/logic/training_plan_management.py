@@ -161,7 +161,7 @@ class TrainingPlanManager(object):
                 if len(self.daily_plan.training_sessions) > 0:
                     self.set_active_sessions([self.training_sessions[0]])
 
-                    responsive_recovery, ice, cold_water_immersion = self.exercise_assignment.get_responsive_recovery(self.training_sessions[0].id, force_data, force_on_demand)
+                    responsive_recovery, ice, cold_water_immersion = self.exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, force_data, force_on_demand)
 
                     if len(responsive_recovery) > 0:
                         # get rid of both possible active recovery and active rest modalities
@@ -183,7 +183,7 @@ class TrainingPlanManager(object):
                 if len(self.daily_plan.training_sessions) > 0:
                     self.set_active_sessions([self.training_sessions[0]])
 
-                    responsive_recovery = self.exercise_assignment.get_responsive_recovery(self.training_sessions[0].id, force_data, force_on_demand, ice_cwi=False)[0]
+                    responsive_recovery = self.exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, force_data, force_on_demand, ice_cwi=False)[0]
 
                     if len(responsive_recovery) > 0:
                         # get rid of both possible active recovery and active rest modalities
@@ -234,8 +234,8 @@ class TrainingPlanManager(object):
                 if len(source_sessions) > 0:
                     self.set_active_sessions(source_sessions[0])
 
-                    responsive_recovery = self.exercise_assignment.get_responsive_recovery(source_session_id, force_data, force_on_demand,
-                                                                                           ice_cwi=False)[0]
+                    responsive_recovery = self.exercise_assignment.get_responsive_recovery_modality(source_session_id, force_data, force_on_demand,
+                                                                                                    ice_cwi=False)[0]
 
                     if len(responsive_recovery) > 0:
                         if responsive_recovery[0].modality_type == ModalityType.active_recovery.value:
@@ -284,7 +284,7 @@ class TrainingPlanManager(object):
         #     new_modality = calc.get_warm_up()
         elif modality_type == ModalityType.cool_down or modality_type == ModalityType.active_recovery:
             self.set_active_sessions([self.training_sessions[0]])
-            new_modality = exercise_assignment.get_responsive_recovery(self.training_sessions[0].id, force_data, ice_cwi=False)[0]
+            new_modality = exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, force_data, ice_cwi=False)[0]
         # elif modality_type == ModalityType.functional_strength:
         #     new_modality = calc.get_functional_strength()
         elif modality_type == ModalityType.movement_integration_prep:

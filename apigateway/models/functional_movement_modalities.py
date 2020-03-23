@@ -13,7 +13,7 @@ from models.dosage import ExerciseDosage, DosageProgression
 from models.body_parts import BodyPartFactory, BodyPart
 from models.exercise_phase import ExercisePhase, ExercisePhaseType
 from models.functional_movement import BodyPartFunction
-from models.functional_movement_activities import Activity, ActivityType, ActiveRecovery, DosageDuration, ActiveRestBase, ActiveRest, MovementIntegrationPrep
+from models.functional_movement_activities import Activity, ActivityType, ActivityGoal, ActiveRecovery, DosageDuration, ActiveRestBase, ActiveRest, MovementIntegrationPrep
 from utils import parse_datetime, format_datetime
 
 
@@ -75,27 +75,27 @@ class ModalityTypeDisplay(object):
         return cls(ModalityType(input_dict['type']))
 
 
-class ModalityGoal(Serialisable):
-    def __init__(self):
-        self.efficient_active = False
-        self.complete_active = False
-        self.comprehensive_active = False
-
-    def json_serialise(self):
-        ret = {
-            'efficient_active': self.efficient_active,
-            'complete_active': self.complete_active,
-            'comprehensive_active': self.comprehensive_active
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        goal = cls()
-        goal.efficient_active = input_dict.get('efficient_active', False)
-        goal.complete_active = input_dict.get('complete_active', False)
-        goal.comprehensive_active = input_dict.get('comprehensive_active', False)
-        return goal
+# class ModalityGoal(Serialisable):
+#     def __init__(self):
+#         self.efficient_active = False
+#         self.complete_active = False
+#         self.comprehensive_active = False
+#
+#     def json_serialise(self):
+#         ret = {
+#             'efficient_active': self.efficient_active,
+#             'complete_active': self.complete_active,
+#             'comprehensive_active': self.comprehensive_active
+#         }
+#         return ret
+#
+#     @classmethod
+#     def json_deserialise(cls, input_dict):
+#         goal = cls()
+#         goal.efficient_active = input_dict.get('efficient_active', False)
+#         goal.complete_active = input_dict.get('complete_active', False)
+#         goal.comprehensive_active = input_dict.get('comprehensive_active', False)
+#         return goal
 
 
 # class DosageDuration(object):
@@ -211,7 +211,7 @@ class Modality(Activity):
         # modality.display_image = input_dict.get('display_image', '')
         # modality.locked_text = input_dict.get('locked_text', '')
         # modality.goal_defs = [AthleteGoalDef.json_deserialise(agd) for agd in input_dict.get('goal_defs', [])]
-        modality.goals = {goal_type: ModalityGoal.json_deserialise(goal) for
+        modality.goals = {goal_type: AthleteGoal.json_deserialise(goal) for
                                  (goal_type, goal) in input_dict.get('goals', {}).items()}
         modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
         modality.source_training_session_id = input_dict.get('source_training_session_id')
@@ -1940,7 +1940,7 @@ class FunctionalStrength(Modality):
         pass
 
 
-class IceSession(Serialisable):
+class IceSessionModalities(Serialisable):
     def __init__(self, event_date_time, minutes=0):
         self.minutes = minutes
         self.start_date_time = None
@@ -1975,7 +1975,7 @@ class IceSession(Serialisable):
         # ice_session.event_date_time = input_dict.get('event_date_time', None)
         ice_session.completed = input_dict.get('completed', False)
         ice_session.active = input_dict.get('active', True)
-        ice_session.body_parts = [Ice.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
+        ice_session.body_parts = [IceModality.json_deserialise(body_part) for body_part in input_dict.get('body_parts', [])]
         ice_session.alerts = [Alert.json_deserialise(alert) for alert in input_dict.get('alerts', [])]
         if len(ice_session.body_parts) > 0:
             return ice_session
@@ -1989,7 +1989,7 @@ class IceSession(Serialisable):
         super().__setattr__(name, value)
 
 
-class Ice(Serialisable):
+class IceModality(Serialisable):
     def __init__(self, body_part_location=None, side=0):
         self.body_part_location = body_part_location
         self.side = side
@@ -2031,7 +2031,7 @@ class Ice(Serialisable):
         return ice
 
 
-class ColdWaterImmersion(Serialisable):
+class ColdWaterImmersionModality(Serialisable):
     def __init__(self, event_date_time, minutes=10):
         self.minutes = minutes
         self.after_training = True
