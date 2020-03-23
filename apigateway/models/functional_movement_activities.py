@@ -456,6 +456,8 @@ class Activity(object):
                 elif dosage.priority == "3" and dosage.severity() <= 4:
                     self.calc_dosage_durations(5, a, dosage)
 
+        assigned_exercises = {ex: a for ex, a in assigned_exercises.items() if len(a.dosages) > 0 and a.duration_comprehensive() > 0}
+
     def set_winners(self):
 
         # key off efficient as the guide
@@ -1543,6 +1545,7 @@ class ActiveRest(ActiveRestBase):
 class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
+        self.exercise_phases = [ExercisePhase(ExercisePhaseType.dynamic_integrate)]
 
     def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
