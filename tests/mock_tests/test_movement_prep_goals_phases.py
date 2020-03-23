@@ -5,7 +5,7 @@ from models.soreness import Soreness
 from models.soreness_base import HistoricSorenessStatus
 from models.body_parts import BodyPart, BodyPartLocation, BodyPartFactory
 #from models.historic_soreness import HistoricSoreness
-from models.functional_movement_modalities import MovementIntegrationPrep
+from models.functional_movement_modalities import MovementIntegrationPrepModality
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.stats import AthleteStats
 from models.exercise_phase import ExercisePhaseType
@@ -60,7 +60,7 @@ def test_movement_prep_check_care_severity_3():
             else:
                 knots = False
 
-            movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+            movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
             movement_prep.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
 
             assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -119,7 +119,7 @@ def test_movement_prep_check_care_severity_7():
             else:
                 knots = False
 
-            movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+            movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
             movement_prep.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
 
             assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -167,7 +167,7 @@ def test_movement_prep_check_prevention_overactive_short():
 
     for b in body_part_injury_risk_list:
 
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -211,7 +211,7 @@ def test_movement_prep_check_prevention_overactive_short_severity_7():
 
     for b in body_part_injury_risk_list:
 
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -255,7 +255,7 @@ def test_movement_prep_check_prevention_overactive_long():
 
     for b in body_part_injury_risk_list:
 
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -298,7 +298,7 @@ def test_movement_prep_check_prevention_underactive_short_severity_3():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for b in body_part_injury_risk_list:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -341,7 +341,7 @@ def test_movement_prep_check_prevention_underactive_short_severity_5():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for b in body_part_injury_risk_list:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -384,7 +384,7 @@ def test_movement_prep_check_prevention_underactive_short_severity_7():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for b in body_part_injury_risk_list:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -427,7 +427,7 @@ def test_movement_prep_check_prevention_underactive_long_severity_3():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for b in body_part_injury_risk_list:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -470,7 +470,7 @@ def test_movement_prep_check_prevention_underactive_long_severity_7():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for b in body_part_injury_risk_list:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -513,7 +513,7 @@ def test_movement_prep_check_prevention_weak():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for b in body_part_injury_risk_list:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -556,7 +556,7 @@ def test_movement_prep_check_prevention_weak_severity_5():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for b in body_part_injury_risk_list:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         movement_prep.check_prevention(body_part, b, exercise_library, max_severity, sport_body_parts)
 
         assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
@@ -597,7 +597,7 @@ def test_movement_prep_check_recovery_volume_tier_1_3_severity_3():
 
     for v in volume_tiers:
 
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         movement_prep.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity, sport_body_parts)
 
@@ -638,7 +638,7 @@ def test_movement_prep_check_recovery_volume_tiers_0_4_severity_3():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for v in volume_tiers:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         movement_prep.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity,
                                      sport_body_parts)
@@ -680,7 +680,7 @@ def test_active_rest_check_recovery_volume_tier_1_3_severity_5():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for v in volume_tiers:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         movement_prep.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity,
                                      sport_body_parts)
@@ -722,7 +722,7 @@ def test_active_rest_check_recovery_volume_tier_1_3_severity_7():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for v in volume_tiers:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_volume_percent_tier = v
         movement_prep.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity,
                                      sport_body_parts)
@@ -764,7 +764,7 @@ def test_active_rest_check_recovery_compensation_tier_1_3_severity_3():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for v in comp_tiers:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         movement_prep.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity,
@@ -807,7 +807,7 @@ def test_active_rest_check_recovery_compensation_tiers_0_4_severity_3():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for v in comp_tiers:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         movement_prep.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity,
@@ -850,7 +850,7 @@ def test_active_rest_check_recovery_compensation_tier_1_3_severity_7():
     sport_body_parts[BodyPartLocation.quads] = BodyPartFunction.prime_mover
 
     for v in comp_tiers:
-        movement_prep = MovementIntegrationPrep(event_date_time=datetime.today())
+        movement_prep = MovementIntegrationPrepModality(event_date_time=datetime.today())
         body_part_injury_risk_1.total_compensation_percent_tier = v
         body_part_injury_risk_1.last_compensation_date = datetime.today().date()
         movement_prep.check_recovery(body_part, body_part_injury_risk_1, exercise_library, max_severity,

@@ -1,5 +1,5 @@
 from models.daily_plan import DailyPlan
-from models.functional_movement_modalities import ModalityType, ActiveRestAfterTraining, MovementIntegrationPrep
+from models.functional_movement_modalities import ModalityType, ActiveRestAfterTraining, MovementIntegrationPrepModality
 from utils import format_date
 import datetime
 
@@ -20,7 +20,7 @@ def test_on_demand_movement_prep_assigned_active_rest_completed():
     plan = DailyPlan(event_date)
     active_rest = ActiveRestAfterTraining(event_date_time)
     active_rest.completed = True
-    movement_prep = MovementIntegrationPrep(event_date_time)
+    movement_prep = MovementIntegrationPrepModality(event_date_time)
     plan.modalities = [active_rest, movement_prep]
     plan.define_available_modalities()
 
@@ -33,7 +33,7 @@ def test_on_demand_movement_prep_post_active_rest_assigned():
     event_date = format_date(event_date_time)
     plan = DailyPlan(event_date)
     active_rest = ActiveRestAfterTraining(event_date_time)
-    movement_prep = MovementIntegrationPrep(event_date_time)
+    movement_prep = MovementIntegrationPrepModality(event_date_time)
     plan.modalities = [active_rest, movement_prep]
     plan.define_available_modalities()
 
@@ -45,7 +45,7 @@ def test_on_demand_movement_prep_completed_post_active_rest_assigned():
     event_date = format_date(event_date_time)
     plan = DailyPlan(event_date)
     active_rest = ActiveRestAfterTraining(event_date_time)
-    movement_prep = MovementIntegrationPrep(event_date_time)
+    movement_prep = MovementIntegrationPrepModality(event_date_time)
     movement_prep.completed = True
     plan.modalities = [active_rest, movement_prep]
     plan.define_available_modalities()

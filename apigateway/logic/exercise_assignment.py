@@ -1,4 +1,4 @@
-from models.functional_movement_modalities import MovementIntegrationPrep, ActiveRestAfterTraining, ActiveRecovery, ColdWaterImmersion, Ice, IceSession
+from models.functional_movement_modalities import MovementIntegrationPrepModality, ActiveRestAfterTraining, ActiveRecoveryModality, ColdWaterImmersion, Ice, IceSession
 from models.body_parts import BodyPartLocation, BodyPartFactory
 from models.goal import AthleteGoalType, AthleteGoal
 
@@ -19,7 +19,7 @@ class ExerciseAssignment(object):
 
     def get_movement_integration_prep(self, force_data=False, force_on_demand=True):
         # get activity
-        movement_integration_prep = MovementIntegrationPrep(
+        movement_integration_prep = MovementIntegrationPrepModality(
                 self.event_date_time,
                 force_data=force_data,
                 relative_load_level=self.relative_load_level,
@@ -50,7 +50,7 @@ class ExerciseAssignment(object):
         return [active_rest]
 
     def get_responsive_recovery(self, source_session_id, force_data=False, force_on_demand=True, ice_cwi=True):
-        active_recovery = ActiveRecovery(self.event_date_time)
+        active_recovery = ActiveRecoveryModality(self.event_date_time)
         active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict, high_intensity_session=self.high_intensity_session)
         active_recovery.set_plan_dosage()
         active_recovery.set_exercise_dosage_ranking()
