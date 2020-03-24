@@ -275,16 +275,16 @@ class TrainingPlanManager(object):
 
         modality_type = ModalityType(modality_type)
         if modality_type == ModalityType.pre_active_rest or modality_type == ModalityType.post_active_rest:
-            new_modality = exercise_assignment.get_active_rest(force_data)
+            new_modality = exercise_assignment.get_active_rest()
         # elif modality_type == ModalityType.warm_up:
         #     new_modality = calc.get_warm_up()
         elif modality_type == ModalityType.cool_down or modality_type == ModalityType.active_recovery:
             self.set_active_sessions([self.training_sessions[0]])
-            new_modality = exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, force_data, ice_cwi=False)[0]
+            new_modality = exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, ice_cwi=False)[0]
         # elif modality_type == ModalityType.functional_strength:
         #     new_modality = calc.get_functional_strength()
         elif modality_type == ModalityType.movement_integration_prep:
-            new_modality = exercise_assignment.get_movement_integration_prep(force_data)
+            new_modality = exercise_assignment.get_movement_integration_prep()
         else:
             new_modality = None
 

@@ -249,23 +249,23 @@ def handle_request_modality(user_id=None):
 
     visualizations = is_fathom_environment()
 
-    force_data = False
-    if modality_type == 0:
-        pre_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
-        if len(pre_active_rests) == 0:
-            force_data = True
-        elif pre_active_rests[0].force_data:
-            force_data = True
-        else:
-            force_data = False
-    elif modality_type == 1:
-        post_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
-        if len(post_active_rests) == 0:
-            force_data = True
-        elif post_active_rests[0].force_data:
-            force_data = True
-        else:
-            force_data = False
+    # force_data = False
+    # if modality_type == 0:
+    #     pre_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+    #     if len(pre_active_rests) == 0:
+    #         force_data = True
+    #     elif pre_active_rests[0].force_data:
+    #         force_data = True
+    #     else:
+    #         force_data = False
+    # elif modality_type == 1:
+    #     post_active_rests = [m for m in plan.modalities if m.type.value == modality_type]
+    #     if len(post_active_rests) == 0:
+    #         force_data = True
+    #     elif post_active_rests[0].force_data:
+    #         force_data = True
+    #     else:
+    #         force_data = False
 
     athlete_stats = athlete_stats_datastore.get(user_id)
 
@@ -277,7 +277,7 @@ def handle_request_modality(user_id=None):
         athlete_stats_datastore.put(athlete_stats)
 
     plan = add_modality_on_demand(user_id, event_date, modality_type=modality_type, athlete_stats=athlete_stats,
-                                  visualizations=visualizations, force_data=force_data)
+                                  visualizations=visualizations)
 
     return {'daily_plans': [plan]}, 200
 

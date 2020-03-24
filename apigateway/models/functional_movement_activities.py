@@ -893,9 +893,9 @@ class ActiveRestBase(Activity):
                     self.check_recovery(body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts)
                     self.check_care(body_part, body_part_injury_risk, exercise_library, max_severity)
                     self.check_prevention(body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts)
-            else:
-                if self.force_on_demand:
-                    self.get_general_exercises(exercise_library, max_severity)
+
+        if self.get_total_exercises() == 0 and self.force_on_demand:
+            self.get_general_exercises(exercise_library, max_severity)
 
     def get_last_severity(self, body_part_injury_risk):
 
