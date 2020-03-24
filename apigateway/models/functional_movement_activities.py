@@ -1545,7 +1545,7 @@ class ActiveRest(ActiveRestBase):
 class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery)
-        self.exercise_phases = [ExercisePhase(ExercisePhaseType.dynamic_integrate)]
+        # self.exercise_phases = [ExercisePhase(ExercisePhaseType.dynamic_integrate)]
 
     def fill_exercises(self, exercise_library, injury_risk_dict, sport_body_parts=None, high_intensity_session=False):
 
