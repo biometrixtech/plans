@@ -403,7 +403,7 @@ Authorization: eyJ0eX...xA8
 
 ### Including Completed Workout Session(s)
 
-If the client includes the optional __sessions__ element, an Active Rest Activity will be returned with consideration for the workout session(s) the athlete completed and their history
+If the client includes the optional __sessions__ element, an Active Rest Activity will be returned with consideration for the workout session(s) the athlete completed and their history.
 
 Completed workout session may be reported using one of two formats:
 
@@ -431,7 +431,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 * `event_date_time` __should__ reflect the local time that the request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
-* `user_age` __should__ be provided if heart rate data is included for any sessions
+* `user_age` __should__ be provided if heart rate data is included for any session
 
 ```
 POST /plans/{version}/mobility_wod/{User UUID} HTTPS/1.1
@@ -1559,51 +1559,51 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 ```
 
 #### Joints
-The following reportable body parts are considered joints
+The following reportable body parts are considered joints.  Allowable Sides (0, 1, 2) are provided in brackets following the body part.
 ```
-    shoulder = 1
-    hip = 4
-    elbow = 19
-    wrist = 20
-    knee = 7
-    ankle = 9
-    foot = 10
+    shoulder = 1 {1, 2}
+    hip = 4 {1, 2}
+    elbow = 19 {1, 2}
+    wrist = 20 {1, 2}
+    knee = 7 {1, 2}
+    ankle = 9 {1, 2}
+    foot = 10 {1, 2}
 ```
 
 #### Ligaments
-The following reportable body parts are considered ligaments
+The following reportable body parts are considered ligaments. Allowable Sides (0, 1, 2) are provided in brackets following the body part.
 ```
-    it_band = 11
-    it_band_lateral_knee = 27
-    achilles = 17
+    it_band = 11 {1, 2}
+    it_band_lateral_knee = 27 {1, 2}
+    achilles = 17 {1, 2}
 ```
 
 <div style="page-break-after: always;"></div>
 
 #### Muscles
-The following reportable body parts are considered muscles
+The following reportable body parts are considered muscles. Allowable Sides (0, 1, 2) are provided in brackets following the body part.
 ```
-    chest = 2
-    abdominals = 3
-    groin = 5
-    quads = 6
-    shin = 8
-    lower_back = 12
-    glutes = 14
-    hamstrings = 15
-    calves = 16
-    upper_back_neck = 18
-    lats = 21
-    biceps = 22
-    triceps = 23
-    forearm = 24
-    core_stabilizers = 25
-    hip_flexor = 28
-    deltoid = 29
-    deep_rotators_hip = 30
-    obliques = 31
-    rotator_cuff = 119
-    serratus_anterior = 125
+    chest = 2 {1, 2}
+    abdominals = 3 {0}
+    groin = 5 {1, 2}
+    quads = 6 {1, 2}
+    shin = 8 {1, 2}
+    lower_back = 12 {0}
+    glutes = 14 {1, 2}
+    hamstrings = 15 {1, 2}
+    calves = 16 {1, 2}
+    upper_back_neck = 18 {1, 2}
+    lats = 21 {1, 2}
+    biceps = 22 {1, 2}
+    triceps = 23 {1, 2}
+    forearm = 24 {1, 2}
+    core_stabilizers = 25 {1, 2}
+    hip_flexor = 28 {1, 2}
+    deltoid = 29 {1, 2}
+    deep_rotators_hip = 30 {1, 2}
+    obliques = 31 {1, 2}
+    rotator_cuff = 119 {1, 2}
+    serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: March 16, 2020
+###### Last Modified: March 24, 2020
 
