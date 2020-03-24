@@ -232,13 +232,13 @@ class TrainingPlanManager(object):
                 source_sessions = [t for t in self.training_sessions if t.id == source_session_id]
 
                 if len(source_sessions) > 0:
-                    self.set_active_sessions(source_sessions[0])
+                    self.set_active_sessions([source_sessions[0]])
 
                     responsive_recovery = self.exercise_assignment.get_responsive_recovery_modality(source_session_id, force_data, force_on_demand,
                                                                                                     ice_cwi=False)[0]
 
                     if len(responsive_recovery) > 0:
-                        if responsive_recovery[0].modality_type == ModalityType.active_recovery.value:
+                        if responsive_recovery[0].type == ModalityType.active_recovery.value:
                             self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                           m.type.value != ModalityType.active_recovery.value]
 
