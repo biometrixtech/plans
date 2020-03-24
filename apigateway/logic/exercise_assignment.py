@@ -112,8 +112,11 @@ class ExerciseAssignment(object):
         active_rest.set_winners()
         active_rest.scale_all_active_time()
         active_rest.reconcile_default_plan_with_active_time()
-    
-        return [active_rest]
+        # return [active_rest]
+        if active_rest.get_total_exercises() > 0:
+            return [active_rest]
+
+        return []
 
     def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=True):
         responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
@@ -155,6 +158,7 @@ class ExerciseAssignment(object):
         return responsive_recovery
 
     def get_responsive_recovery_modality(self, source_session_id, force_data=False, force_on_demand=True, ice_cwi=True):
+        exercise_activity = []
         active_recovery = ActiveRecoveryModality(self.event_date_time)
         active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict, high_intensity_session=self.high_intensity_session)
         active_recovery.set_plan_dosage()
@@ -167,12 +171,12 @@ class ExerciseAssignment(object):
         if active_recovery.get_total_exercises() > 0:
             exercise_activity = [active_recovery]
         else:
-            active_rest = self.get_active_rest(force_data=force_data, force_on_demand=force_on_demand)[0]
-            active_rest.source_training_session_id = source_session_id
-            if active_rest.get_total_exercises() == 0:
-                exercise_activity = []
-            else:
-                exercise_activity = [active_rest]
+            active_rest = self.get_active_rest(force_data=force_data, force_on_demand=force_on_demand)
+            if len(active_rest) > 0:
+                active_rest = active_rest[0]
+                active_rest.source_training_session_id = source_session_id
+                if active_rest.get_total_exercises() > 0:
+                    exercise_activity = [active_rest]
         if ice_cwi:
             cold_water_immersion = self.get_cold_water_immersion_modality()
 

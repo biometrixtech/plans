@@ -175,15 +175,17 @@ def test_check_active_rest_phases_no_inputs_force_on_demand_false():
     calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[0])
 
-    active_rest = calc.get_active_rest(force_on_demand=False)[0]
-    assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
-    assert len(active_rest.exercise_phases[0].exercises) == 0
-    assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
-    assert len(active_rest.exercise_phases[1].exercises) == 0
-    assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
-    assert len(active_rest.exercise_phases[2].exercises) == 0
-    assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
-    assert len(active_rest.exercise_phases[3].exercises) == 0
+    active_rest = calc.get_active_rest(force_on_demand=False)
+    assert len(active_rest) == 0
+    # active_rest = calc.get_active_rest(force_on_demand=False)[0]
+    # assert active_rest.exercise_phases[0].type == ExercisePhaseType.inhibit
+    # assert len(active_rest.exercise_phases[0].exercises) == 0
+    # assert active_rest.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    # assert len(active_rest.exercise_phases[1].exercises) == 0
+    # assert active_rest.exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    # assert len(active_rest.exercise_phases[2].exercises) == 0
+    # assert active_rest.exercise_phases[3].type == ExercisePhaseType.static_integrate
+    # assert len(active_rest.exercise_phases[3].exercises) == 0
 
 
 def test_check_active_rest_phases_no_soreness_with_mixed_session():
