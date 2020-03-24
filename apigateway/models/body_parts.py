@@ -137,6 +137,8 @@ class BodyPartFactory(object):
             else:
                 sampled_list = exercise_list
             for e in sampled_list:
+                if isinstance(e, int):
+                    e = str(e)
                 exercise_dict[e] = []
             # position = random.randint(0, len(exercise_list) - 1)
             # # ignoring progressions for now
