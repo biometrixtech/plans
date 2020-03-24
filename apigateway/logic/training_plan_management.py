@@ -1,19 +1,14 @@
-# import datetime
-
 from fathomapi.utils.xray import xray_recorder
 from logic.functional_trend_processing import TrendProcessor
 from logic.soreness_processing import SorenessCalculator
-# from logic.trigger_processing import TriggerFactory
 
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.exercise_assignment import ExerciseAssignment
 from models.daily_plan import DailyPlan
 from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
-# from models.functional_movement_stats import FunctionalMovementSummary
-from models.functional_movement_modalities import ModalityType, CoolDown, FunctionalStrength
+from models.functional_movement_modalities import ModalityType
 from utils import format_date, parse_datetime, parse_date, format_datetime
-# from models.body_parts import BodyPartFactory
 import copy
 
 
@@ -58,9 +53,9 @@ class TrainingPlanManager(object):
             self.training_sessions.extend(c.training_sessions)
             self.symptoms.extend(c.symptoms)
 
-        self.training_sessions.sort(key=lambda x: x.completed_date_time, reverse=True)  #now we can always grab the 0 element
+        self.training_sessions.sort(key=lambda x: x.completed_date_time, reverse=True)  # now we can always grab the 0 element
 
-        #self.active_training_sessions = [session for session in self.training_sessions]
+        # self.active_training_sessions = [session for session in self.training_sessions]
 
     @staticmethod
     def preserve_completed_modality(modalities):
@@ -238,11 +233,12 @@ class TrainingPlanManager(object):
                                                                                                     ice_cwi=False)[0]
 
                     if len(responsive_recovery) > 0:
-                        if responsive_recovery[0].type == ModalityType.active_recovery.value:
+                        # if we get any responsive recovery and if it's active_recovery, replace it
+                        # If it's active rest, ignore it as it's already added earlier
+                        if responsive_recovery[0].type.value == ModalityType.active_recovery.value:
                             self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                           m.type.value != ModalityType.active_recovery.value]
-
-                    self.daily_plan.modalities.append(responsive_recovery[0])
+                            self.daily_plan.modalities.append(responsive_recovery[0])
 
         self.daily_plan.last_updated = last_updated
         self.daily_plan.define_available_modalities()
