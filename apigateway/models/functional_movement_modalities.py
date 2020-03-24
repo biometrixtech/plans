@@ -211,7 +211,7 @@ class Modality(Activity):
         # modality.display_image = input_dict.get('display_image', '')
         # modality.locked_text = input_dict.get('locked_text', '')
         # modality.goal_defs = [AthleteGoalDef.json_deserialise(agd) for agd in input_dict.get('goal_defs', [])]
-        modality.goals = {goal_type: AthleteGoal.json_deserialise(goal) for
+        modality.goals = {goal_type: ActivityGoal.json_deserialise(goal) for
                                  (goal_type, goal) in input_dict.get('goals', {}).items()}
         modality.exercise_phases = [ExercisePhase.json_deserialise(ex_phase) for ex_phase in input_dict.get('exercise_phases', [])]
         modality.source_training_session_id = input_dict.get('source_training_session_id')
