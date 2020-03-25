@@ -142,7 +142,7 @@ class ExerciseDosage(object):
     def json_serialise(self):
         ret = {'goal': self.goal.json_serialise() if self.goal is not None else None,
                'priority': self.priority,
-               'tier': self.tier,
+               # 'tier': self.tier,
                'efficient_reps_assigned': self.efficient_reps_assigned,
                'efficient_sets_assigned': self.efficient_sets_assigned,
                'complete_reps_assigned': self.complete_reps_assigned,
