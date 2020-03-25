@@ -31,12 +31,12 @@ class ExercisePhase(object):
         self.title = self.type.get_display_name()
         self.exercises = {}
 
-    def json_serialise(self):
+    def json_serialise(self, mobility_api=False):
         return {
             "type": self.type.value,
             "name": self.name,
             "title": self.title,
-            "exercises": [e.json_serialise() for e in self.exercises.values()]
+            "exercises": [e.json_serialise(mobility_api) for e in self.exercises.values()]
         }
 
     @classmethod

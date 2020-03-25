@@ -28,7 +28,7 @@ class MovementPrep(object):
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_id": self.training_session_id,
-            "movement_integration_prep": self.movement_integration_prep.json_serialise() if self.movement_integration_prep is not None else None
+            "movement_integration_prep": self.movement_integration_prep.json_serialise(mobility_api=True) if self.movement_integration_prep is not None else None
         }
 
     @classmethod
@@ -62,7 +62,7 @@ class MobilityWOD(object):
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_ids": self.training_session_ids,
-            "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None
+            "active_rest": self.active_rest.json_serialise(mobility_api=True) if self.active_rest is not None else None
         }
 
     @classmethod
@@ -99,8 +99,8 @@ class ResponsiveRecovery(object):
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_id": self.training_session_id,
-            "active_rest": self.active_rest.json_serialise() if self.active_rest is not None else None,
-            "active_recovery": self.active_recovery.json_serialise() if self.active_recovery is not None else None,
+            "active_rest": self.active_rest.json_serialise(mobility_api=True) if self.active_rest is not None else None,
+            "active_recovery": self.active_recovery.json_serialise(mobility_api=True) if self.active_recovery is not None else None,
             "ice": self.ice.json_serialise() if self.ice is not None else None,
             "cold_water_immersion": self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None
         }
@@ -200,7 +200,7 @@ class Activity(object):
         self.comprehensive_winner = 1
         self.rankings = set()
 
-    def json_serialise(self):
+    def json_serialise(self, mobility_api=False):
         return {
             "id": self.id,
             "type": self.type.value,
@@ -211,7 +211,7 @@ class Activity(object):
             "completed": self.completed,
             "default_plan": self.default_plan,
             "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
-            "exercise_phases": [ex_phase.json_serialise() for ex_phase in self.exercise_phases]
+            "exercise_phases": [ex_phase.json_serialise(mobility_api) for ex_phase in self.exercise_phases]
          }
 
     @classmethod
@@ -411,7 +411,7 @@ class Activity(object):
 
     def aggregate_dosages(self):
         for phase in self.exercise_phases:
-            self.aggregate_dosage_by_severity_exercise_collection(phase.exercises)
+            phase.exercises = self.aggregate_dosage_by_severity_exercise_collection(phase.exercises)
 
     def reactivate_complete_goals(self):
         for phase in self.exercise_phases:
@@ -456,7 +456,7 @@ class Activity(object):
                 elif dosage.priority == "3" and dosage.severity() <= 4:
                     self.calc_dosage_durations(5, a, dosage)
 
-        assigned_exercises = {ex: a for ex, a in assigned_exercises.items() if len(a.dosages) > 0 and a.duration_comprehensive() > 0}
+        return {ex: a for ex, a in assigned_exercises.items() if len(a.dosages) > 0 and a.duration_comprehensive() > 0}
 
     def set_winners(self):
 

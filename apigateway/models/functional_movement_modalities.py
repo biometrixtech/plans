@@ -154,7 +154,7 @@ class Modality(Activity):
                     value = ModalityType.post_active_rest
         super().__setattr__(name, value)
 
-    def json_serialise(self):
+    def json_serialise(self, mobility_api=False):
          return {
              "id": self.id,
              "type": self.type.value,
@@ -173,7 +173,7 @@ class Modality(Activity):
              "locked_text": self.locked_text,
              # "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
              "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
-             "exercise_phases":[ex_phase.json_serialise() for ex_phase in self.exercise_phases],
+             "exercise_phases":[ex_phase.json_serialise(mobility_api) for ex_phase in self.exercise_phases],
              "source_training_session_id": self.source_training_session_id if self.source_training_session_id is not None else None
              }
 

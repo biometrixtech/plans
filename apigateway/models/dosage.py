@@ -139,24 +139,29 @@ class ExerciseDosage(object):
          self.complete_reps_assigned * self.complete_sets_assigned + \
          self.comprehensive_reps_assigned * self.comprehensive_sets_assigned
 
-    def json_serialise(self):
-        ret = {'goal': self.goal.json_serialise() if self.goal is not None else None,
-               'priority': self.priority,
-               # 'tier': self.tier,
-               'efficient_reps_assigned': self.efficient_reps_assigned,
-               'efficient_sets_assigned': self.efficient_sets_assigned,
-               'complete_reps_assigned': self.complete_reps_assigned,
-               'complete_sets_assigned': self.complete_sets_assigned,
-               'comprehensive_reps_assigned': self.comprehensive_reps_assigned,
-               'comprehensive_sets_assigned': self.comprehensive_sets_assigned,
-               'default_efficient_reps_assigned': self.default_efficient_reps_assigned,
-               'default_efficient_sets_assigned': self.default_efficient_sets_assigned,
-               'default_complete_reps_assigned': self.default_complete_reps_assigned,
-               'default_complete_sets_assigned': self.default_complete_sets_assigned,
-               'default_comprehensive_reps_assigned': self.default_comprehensive_reps_assigned,
-               'default_comprehensive_sets_assigned': self.default_comprehensive_sets_assigned,
-               'ranking': self.ranking
-               }
+    def json_serialise(self, mobility_api=False):
+        ret = {
+            'goal': self.goal.json_serialise(mobility_api) if self.goal is not None else None,
+            'efficient_reps_assigned': self.efficient_reps_assigned,
+            'efficient_sets_assigned': self.efficient_sets_assigned,
+            'complete_reps_assigned': self.complete_reps_assigned,
+            'complete_sets_assigned': self.complete_sets_assigned,
+            'comprehensive_reps_assigned': self.comprehensive_reps_assigned,
+            'comprehensive_sets_assigned': self.comprehensive_sets_assigned,
+            'priority': self.priority,
+        }
+        if not mobility_api:
+            other_attributes = {
+                'ranking': self.ranking,
+                'tier': self.tier,
+                'default_efficient_reps_assigned': self.default_efficient_reps_assigned,
+                'default_efficient_sets_assigned': self.default_efficient_sets_assigned,
+                'default_complete_reps_assigned': self.default_complete_reps_assigned,
+                'default_complete_sets_assigned': self.default_complete_sets_assigned,
+                'default_comprehensive_reps_assigned': self.default_comprehensive_reps_assigned,
+                'default_comprehensive_sets_assigned': self.default_comprehensive_sets_assigned
+                }
+            ret.update(other_attributes)
         return ret
 
     @classmethod
