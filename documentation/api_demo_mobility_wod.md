@@ -708,8 +708,6 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
 
-<div style="page-break-after: always;"></div>
-
 ### Activity Goal
 
 Activity Goals are returned with activities to summarize what dosages are available for the given goal based on the exercises assigned.  This enables clients to quickly identify what goals should be active for each dosage option.
@@ -764,7 +762,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 
 Exercises are assigned to each phase based on the needs of the athlete.  Each assigned exercise contains instructions that can be provided to end users.
 
-Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
+Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
 
 * `assigned_exercise` will be of the following schema:
 
@@ -804,7 +802,7 @@ Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on
 * `duration_comprehensive` provides the estimated duration of the exercise given the comprehensive dosage of the highest ranked goal
 * `goal_text` will typically be empty and is reserved for future use.
 * `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
-* `dosages` will be a list of __Exercise Dosage__ objects of the schema defined in this Appendix.
+* `dosages` will be a list of  __Exercise Dosage__ objects of the schema defined in this Appendix.
 
 <div style="page-break-after: always;"></div>
 
@@ -827,14 +825,14 @@ Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on
 ```
 
 * `goal` will be a Goal as defined in this Appendix
-* `priority` is the normalized ranking of this __Exercise Dosage__ across all __Exercise Phase__ objects returned
-* `efficient_reps_assigned` reflects the number of reps assigned of this exercise for the __efficient__ dosage
-* `efficient_sets_assigned` reflects the number of sets assigned of this exercise for the __efficient__ dosage
-* `complete_reps_assigned` reflects the number of reps assigned of this exercise for the __complete__ dosage
-* `complete_sets_assigned` reflects the number of sets assigned of this exercise for the __complete__ dosage
-* `comprehensive_reps_assigned` reflects the number of reps assigned of this exercise for the __comprehensive__ dosage
-* `comprehensive_sets_assigned` reflects the number sets reps assigned of this exercise for the __comprehensive__ dosage
-* `ranking` reflects the relative importance for this exercise to be completed by the athlete within the __Exercise Phase__
+* `priority` is the normalized ranking of this  __Exercise Dosage__ across all  __Exercise Phase__ objects returned
+* `efficient_reps_assigned` reflects the number of reps assigned of this exercise for the  __efficient__ dosage
+* `efficient_sets_assigned` reflects the number of sets assigned of this exercise for the  __efficient__ dosage
+* `complete_reps_assigned` reflects the number of reps assigned of this exercise for the  __complete__ dosage
+* `complete_sets_assigned` reflects the number of sets assigned of this exercise for the  __complete__ dosage
+* `comprehensive_reps_assigned` reflects the number of reps assigned of this exercise for the  __comprehensive__ dosage
+* `comprehensive_sets_assigned` reflects the number sets reps assigned of this exercise for the  __comprehensive__ dosage
+* `ranking` reflects the relative importance for this exercise to be completed by the athlete within the  __Exercise Phase__
 
 ### Goal
 
@@ -851,8 +849,6 @@ Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on
 
 * `text` will be the name of the goal that can be displayed to an end-user
 * `goal_type` will be an integer reflecting the Athlete Goal Type enumeration as defined in Appendix
-
-<div style="page-break-after: always;"></div>
 
 ### Enumerations
 
@@ -896,6 +892,7 @@ Sports science research places importance on the order in which phases are compl
     asymmetric_session = 20
     asymmetric_pattern = 21
 ```
+<div style="page-break-after: always;"></div>
 
 #### Unit of Measure
 ```
@@ -944,6 +941,9 @@ Sports science research places importance on the order in which phases are compl
     cricket = 30
     curling = 31
     dance = 32
+```
+
+```
     equestrian_sports = 33
     fencing = 34
     fishing = 35
@@ -956,8 +956,6 @@ Sports science research places importance on the order in which phases are compl
     snow_sports = 42
     squash = 43
     surfing_sports = 44
-```
-```
     swimming = 45
     table_tennis = 46
     water_polo = 47
@@ -999,9 +997,6 @@ Sports science research places importance on the order in which phases are compl
     other = 83
 ```
 
-<div style="page-break-after: always;"></div>
-
-
 ### Body Parts
 
 #### Side
@@ -1031,8 +1026,6 @@ The following reportable body parts are considered ligaments. Allowable Sides (0
     it_band_lateral_knee = 27 {1, 2}
     achilles = 17 {1, 2}
 ```
-
-<div style="page-break-after: always;"></div>
 
 #### Muscles
 The following reportable body parts are considered muscles. Allowable Sides (0, 1, 2) are provided in brackets following the body part.
