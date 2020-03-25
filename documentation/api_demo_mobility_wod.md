@@ -819,8 +819,7 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
     "complete_reps_assigned" : integer,
     "complete_sets_assigned" : integer,
     "comprehensive_reps_assigned" : integer,
-    "comprehensive_sets_assigned" : integer,
-    "ranking" : integer
+    "comprehensive_sets_assigned" : integer
 }
 ```
 
@@ -832,7 +831,6 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 * `complete_sets_assigned` reflects the number of sets assigned of this exercise for the  __complete__ dosage
 * `comprehensive_reps_assigned` reflects the number of reps assigned of this exercise for the  __comprehensive__ dosage
 * `comprehensive_sets_assigned` reflects the number sets reps assigned of this exercise for the  __comprehensive__ dosage
-* `ranking` reflects the relative importance for this exercise to be completed by the athlete within the  __Exercise Phase__
 
 ### Goal
 
@@ -841,7 +839,6 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 ```
 {
      "text" : string,
-     "priority" : integer,
      "goal_type" : integer
            
 }
@@ -849,6 +846,8 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 
 * `text` will be the name of the goal that can be displayed to an end-user
 * `goal_type` will be an integer reflecting the Athlete Goal Type enumeration as defined in Appendix
+
+<div style="page-break-after: always;"></div>
 
 ### Enumerations
 
@@ -942,6 +941,7 @@ Sports science research places importance on the order in which phases are compl
     curling = 31
     dance = 32
 ```
+<div style="page-break-after: always;"></div>
 
 ```
     equestrian_sports = 33
@@ -1026,6 +1026,8 @@ The following reportable body parts are considered ligaments. Allowable Sides (0
     it_band_lateral_knee = 27 {1, 2}
     achilles = 17 {1, 2}
 ```
+
+<div style="page-break-after: always;"></div>
 
 #### Muscles
 The following reportable body parts are considered muscles. Allowable Sides (0, 1, 2) are provided in brackets following the body part.
