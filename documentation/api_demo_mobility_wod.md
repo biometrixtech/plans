@@ -795,7 +795,7 @@ Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on
 * `description` provides instructions to the end user on how to complete the exercise
 * `youtube_id` generally will be null but is reserved for URLs to instructional videos for the exercise
 * `bilateral` if true, indicates the exercise should be completed on both the left and right sides
-* `seconds_per_rep` used for estimating exercise dosage duration and indicates the number of seconds to complete one rep
+* `seconds_per_rep` used for estimating exercise dosage duration and indicates the number of seconds to complete one rep; will be null if unit_of_measure is "seconds"
 * `seconds_per_set` used for estimating exercise dosage duration and indicates the number of seconds to complete one set
 * `unit_of_measure` will be the string representation of the Unit of Measure enumeration as defined in this Appendix (e.g. "seconds", "count", etc.). 
 * `position_order` can be used by the client to order exercises to the end user
@@ -822,17 +822,19 @@ Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on
     "complete_sets_assigned" : integer,
     "comprehensive_reps_assigned" : integer,
     "comprehensive_sets_assigned" : integer,
-    "default_efficient_reps_assigned" : integer,
-    "default_efficient_sets_assigned" : integer,
-    "default_complete_reps_assigned" : integer,
-    "default_complete_sets_assigned" : integer,
-    "default_comprehensive_reps_assigned" : integer,
-    "default_comprehensive_sets_assigned" : integer,
     "ranking" : integer
 }
 ```
 
 * `goal` will be a Goal as defined in this Appendix
+* `priority` is the normalized ranking of this __Exercise Dosage__ across all __Exercise Phase__ objects returned
+* `efficient_reps_assigned` reflects the number of reps assigned of this exercise for the __efficient__ dosage
+* `efficient_sets_assigned` reflects the number of sets assigned of this exercise for the __efficient__ dosage
+* `complete_reps_assigned` reflects the number of reps assigned of this exercise for the __complete__ dosage
+* `complete_sets_assigned` reflects the number of sets assigned of this exercise for the __complete__ dosage
+* `comprehensive_reps_assigned` reflects the number of reps assigned of this exercise for the __comprehensive__ dosage
+* `comprehensive_sets_assigned` reflects the number sets reps assigned of this exercise for the __comprehensive__ dosage
+* `ranking` reflects the relative importance for this exercise to be completed by the athlete within the __Exercise Phase__
 
 ### Goal
 
@@ -847,6 +849,7 @@ Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on
 }
 ```
 
+* `text` will be the name of the goal that can be displayed to an end-user
 * `goal_type` will be an integer reflecting the Athlete Goal Type enumeration as defined in Appendix
 
 <div style="page-break-after: always;"></div>
@@ -863,6 +866,11 @@ Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on
 ```
 
 #### ExercisePhaseType
+
+There are seven different types of exercises phases returned, identified by the enumeration below.  Each phase plays a critical role in the athlete's recovery, but only some of these phases will be returned for an athlete's specific recovery.  
+
+Sports science research places importance on the order in which phases are completed by the athlete in order to maximize recovery.  We recommend presenting phases to the athlete using the enumeration order.
+
 ```
     inhibit = 0
     static_stretch = 1
