@@ -681,18 +681,6 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 
 
-### Activity Goal
-
-`activity_goal` will be of the following schema:
-
-```
-    "efficient_active": boolean
-    "complete_active": boolean
-    "comprehensive_active": boolean
-```
-
-<div style="page-break-after: always;"></div>
-
 ### Active Rest
 
 * `active_rest` will be of the following schema:
@@ -715,12 +703,44 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 }
 ```
 
-* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
 * `activity_goal` __will__ be an Activity Goal as defined in this Appendix
 * `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
 
 <div style="page-break-after: always;"></div>
+
+### Activity Goal
+
+Activity Goals are returned with activities to summarize what dosages are available for the given goal based on the exercises assigned.  This enables clients to quickly identify what goals should be active for each dosage option.
+
+`activity_goal` will be of the following schema:
+
+```
+    "efficient_active": boolean
+    "complete_active": boolean
+    "comprehensive_active": boolean
+```
+
+__Example:__
+
+In the following response, exercises associated with the `Reduce Injury Risks` goal only are assigned for Complete and Comprehensive dosages while exercises associated with the `Recover from Training` goal are assigned for all three dosages. 
+```
+"goals" : {
+        "Reduce injury risks : {
+            "efficient_active": false
+            "complete_active": true
+            "comprehensive_active": true
+            },
+        "Recover from training" : {
+            "efficient_active": true
+            "complete_active": true
+            "comprehensive_active": true
+            }
+    },
+
+```
+
 
 ### Exercise Phase
 
@@ -736,9 +756,15 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 ```
 
 * `type` will be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
+* `name` will reflect the corresponding name value of the Exercise Phase Type enumeration
+* `title` will provide a label for the Exercise Phase that could be displayed to end users.
 * `assigned_exercise` will be an Assigned Exercise as defined in Appendix
 
 ### Assigned Exercise
+
+Exercises are assigned to each phase based on the needs of the athlete.  Each assigned exercise contains instructions that can be provided to end users.
+
+Each __Assigned Exercise__ also includes 1 or more __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
 
 * `assigned_exercise` will be of the following schema:
 
@@ -763,9 +789,22 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 }
 ```
 
-* `library_id` is a string indicating the ID of the assigned exercise
-* `exercise_dosage` will be an Exercise Dosage as defined in this Appendix.
+* `name` represents the Fathom internal name of the assigned exercise
+* `display_name` is a label for this exercise that can be presented to the end user
+* `library_id` is the Fathom internal ID of the assigned exercise
+* `description` provides instructions to the end user on how to complete the exercise
+* `youtube_id` generally will be null but is reserved for URLs to instructional videos for the exercise
+* `bilateral` if true, indicates the exercise should be completed on both the left and right sides
+* `seconds_per_rep` used for estimating exercise dosage duration and indicates the number of seconds to complete one rep
+* `seconds_per_set` used for estimating exercise dosage duration and indicates the number of seconds to complete one set
 * `unit_of_measure` will be the string representation of the Unit of Measure enumeration as defined in this Appendix (e.g. "seconds", "count", etc.). 
+* `position_order` can be used by the client to order exercises to the end user
+* `duration_efficient` provides the estimated duration of the exercise given the efficient dosage of the highest ranked goal
+* `duration_complete` provides the estimated duration of the exercise given the complete dosage of the highest ranked goal
+* `duration_comprehensive` provides the estimated duration of the exercise given the comprehensive dosage of the highest ranked goal
+* `goal_text` will typically be empty and is reserved for future use.
+* `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
+* `dosages` will be a list of __Exercise Dosage__ objects of the schema defined in this Appendix.
 
 <div style="page-break-after: always;"></div>
 
