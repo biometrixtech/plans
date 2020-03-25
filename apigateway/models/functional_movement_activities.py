@@ -1085,6 +1085,7 @@ class MovementIntegrationPrep(ActiveRestBase):
         muscle_spasm = False
         knots = False
         inflammation = False
+        sharp_tight_ache = False
 
         if (body_part_injury_risk.last_inflammation_date is not None and
                 body_part_injury_risk.last_inflammation_date == self.event_date_time.date()):
@@ -1093,6 +1094,18 @@ class MovementIntegrationPrep(ActiveRestBase):
         if (body_part_injury_risk.last_muscle_spasm_date is not None and
                 body_part_injury_risk.last_muscle_spasm_date == self.event_date_time.date()):
             muscle_spasm = True
+
+        if (body_part_injury_risk.last_sharp_date is not None and
+                body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+            sharp_tight_ache = True
+
+        if (body_part_injury_risk.last_tight_date is not None and
+                body_part_injury_risk.last_tight_date == self.event_date_time.date()):
+            sharp_tight_ache = True
+
+        if (body_part_injury_risk.last_ache_date is not None and
+                body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+            sharp_tight_ache = True
 
         if (body_part_injury_risk.last_knots_date is not None and
                 body_part_injury_risk.last_knots_date == self.event_date_time.date()):
@@ -1130,25 +1143,26 @@ class MovementIntegrationPrep(ActiveRestBase):
 
             body_part_factory = BodyPartFactory()
 
-            for s in body_part.synergists:
-                synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
-                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, last_severity,
-                                    exercise_library)
+            if sharp_tight_ache:  # muscles tagged with muscle spasm only due to being related will be excluded
+                for s in body_part.synergists:
+                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
+                    self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, last_severity,
+                                        exercise_library)
 
-                if max_severity < 7.0:
-                    if self.sport_cardio_plyometrics:
-                        self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
-                                            last_severity, exercise_library)
-                    else:
-                        self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
-                                            last_severity, exercise_library)
+                    if max_severity < 7.0:
+                        if self.sport_cardio_plyometrics:
+                            self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
+                                                last_severity, exercise_library)
+                        else:
+                            self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
+                                                last_severity, exercise_library)
 
-                # if max_severity < 7.0:
-                #     self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
-                #                         last_severity, exercise_library)
-                # if max_severity < 5.0:  # TODO: this threshold needs to be updated
-                #     self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
-                #                         last_severity, exercise_library)
+                    # if max_severity < 7.0:
+                    #     self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
+                    #                         last_severity, exercise_library)
+                    # if max_severity < 5.0:  # TODO: this threshold needs to be updated
+                    #     self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
+                    #                         last_severity, exercise_library)
 
         if muscle_spasm or knots:
 
