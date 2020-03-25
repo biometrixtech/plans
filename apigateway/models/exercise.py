@@ -251,7 +251,7 @@ class AssignedExercise(Serialisable):
 
         return assigned_exercise
 
-    def json_serialise(self):
+    def json_serialise(self, mobility_api=False):
         ret = {'name': self.exercise.name,
                'display_name': self.exercise.display_name,
                'library_id': self.exercise.id,
@@ -270,7 +270,7 @@ class AssignedExercise(Serialisable):
                # 'goals': [goal.json_serialise() for goal in self.goals],
                # 'priorities': list(self.priorities),
                # 'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources],
-               'dosages': [dosage.json_serialise() for dosage in self.dosages]
+               'dosages': [dosage.json_serialise(mobility_api) for dosage in self.dosages]
                }
         return ret
 
