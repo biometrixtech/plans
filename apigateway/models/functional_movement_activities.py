@@ -282,22 +282,45 @@ class Activity(object):
 
     def get_dosage_rank_and_progression(self, goal, severity, tier):
 
+        # if goal.goal_type == AthleteGoalType.pain or goal.goal_type == AthleteGoalType.sore:
+        #     if 7 <= severity:
+        #         if tier == 1:
+        #             return 1, DosageProgression.mod_max_super_max
+        #         else:
+        #             return 2, DosageProgression.mod_max_super_max
+        #     elif 4 <= severity < 7:
+        #         if tier == 1:
+        #             return 1, DosageProgression.mod_max_super_max
+        #         else:
+        #             return 2, DosageProgression.mod_max_super_max
+        #     else:
+        #         if tier == 1:
+        #             return 2, DosageProgression.min_mod_max
+        #         else:
+        #             return 3, DosageProgression.min_mod_max
+
         if goal.goal_type == AthleteGoalType.pain or goal.goal_type == AthleteGoalType.sore:
-            if 7 <= severity:
-                if tier == 1:
-                    return 1, DosageProgression.mod_max_super_max
-                else:
-                    return 2, DosageProgression.mod_max_super_max
-            elif 4 <= severity < 7:
-                if tier == 1:
-                    return 1, DosageProgression.mod_max_super_max
-                else:
-                    return 2, DosageProgression.mod_max_super_max
-            else:
+            if severity < 3:
                 if tier == 1:
                     return 2, DosageProgression.min_mod_max
                 else:
                     return 3, DosageProgression.min_mod_max
+            elif 3 <= severity < 5:
+                if tier >= 3:
+                    return 3, DosageProgression.min_mod_max
+                elif tier == 2:
+                    return 2, DosageProgression.min_mod_max
+                else:
+                    return 1, DosageProgression.min_mod_max
+            elif 5 <= severity < 7:
+                if tier >= 3:
+                    return 2, DosageProgression.min_mod_max
+                else:
+                    return 1, DosageProgression.min_mod_max
+            elif 7 <= severity < 9:
+                return 1, DosageProgression.min_mod_max
+            elif severity >= 9:
+                return 1, DosageProgression.mod_max_super_max
 
         elif goal.goal_type == AthleteGoalType.high_load or goal.goal_type == AthleteGoalType.expected_high_load:
             if tier == 1:
