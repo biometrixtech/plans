@@ -1429,6 +1429,7 @@ class ActiveRest(ActiveRestBase):
         muscle_spasm = False
         knots = False
         inflammation = False
+        sharp_tight_ache = False
 
         if (body_part_injury_risk.last_inflammation_date is not None and
                 body_part_injury_risk.last_inflammation_date == self.event_date_time.date()):
@@ -1442,6 +1443,18 @@ class ActiveRest(ActiveRestBase):
         if (body_part_injury_risk.last_knots_date is not None and
                 body_part_injury_risk.last_knots_date == self.event_date_time.date() and body_part_injury_risk.knots_count_last_0_20_days <= 1):
             knots = True
+
+        if (body_part_injury_risk.last_sharp_date is not None and
+                body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
+            sharp_tight_ache = True
+
+        if (body_part_injury_risk.last_tight_date is not None and
+                body_part_injury_risk.last_tight_date == self.event_date_time.date()):
+            sharp_tight_ache = True
+
+        if (body_part_injury_risk.last_ache_date is not None and
+                body_part_injury_risk.last_ache_date == self.event_date_time.date()):
+            sharp_tight_ache = True
 
         # if muscle_spasm or knots:
         #     goals.append(AthleteGoal("Care for symptoms", 1, AthleteGoalType.sore))
@@ -1469,14 +1482,15 @@ class ActiveRest(ActiveRestBase):
 
             body_part_factory = BodyPartFactory()
 
-            for s in body_part.synergists:
-                synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
-                self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
-                                    exercise_library)
+            if sharp_tight_ache:
+                for s in body_part.synergists:
+                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
+                    self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
+                                        exercise_library)
 
-                if max_severity < 7.0:
-                    self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                        last_severity, exercise_library)
+                    if max_severity < 7.0:
+                        self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
+                                            last_severity, exercise_library)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
 
