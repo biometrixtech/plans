@@ -3,8 +3,9 @@ from flask import request, Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
+from models.functional_movement_activities import ActivityType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation
 from models.user_stats import UserStats
@@ -167,7 +168,12 @@ def handle_responsive_recovery_start(user_id, responsive_recovery_id):
 
     # update responsive recovery and write to db
     activity_proc = ActivitiesProcessing(datastore_collection)
-    activity_proc.mark_activity_started(responsive_recovery, event_date_time, activity_type)
+    try:
+        activity_proc.mark_activity_started(responsive_recovery, event_date_time, activity_type)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Movement Prep")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Movement Prep does not contain a valid {ActivityType(activity_type).name}")
 
     responsive_recovery_datastore.put(responsive_recovery)
 
@@ -191,7 +197,12 @@ def handle_responsive_recovery_complete(user_id, responsive_recovery_id):
 
     # update responsive recovery and write to db
     activity_proc = ActivitiesProcessing(datastore_collection)
-    activity_proc.mark_activity_completed(responsive_recovery, event_date_time, activity_type, user_id, completed_exercises)
+    try:
+        activity_proc.mark_activity_completed(responsive_recovery, event_date_time, activity_type, user_id, completed_exercises)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Movement Prep")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Movement Prep does not contain a valid {ActivityType(activity_type).name}")
 
     responsive_recovery_datastore.put(responsive_recovery)
 

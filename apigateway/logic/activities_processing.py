@@ -1,3 +1,4 @@
+from fathomapi.utils.exceptions import NoSuchEntityException
 from models.soreness import CompletedExercise
 from models.functional_movement_activities import ActivityType
 
@@ -18,8 +19,12 @@ class ActivitiesProcessing(object):
             completed_activity.completed_date_time = completed_date_time
             if ActivityType(activity_type) in [ActivityType.movement_integration_prep, ActivityType.active_rest, ActivityType.active_recovery]:
                 self.save_completed_exercises(completed_exercises, user_id, completed_date_time)
+        else:
+            raise NoSuchEntityException()
 
     def mark_activity_started(self, activity, start_date_time, activity_type):
         started_activity = activity.__getattribute__(ActivityType(activity_type).name)
         if started_activity is not None:
             started_activity.start_date_time = start_date_time
+        else:
+            raise NoSuchEntityException()

@@ -3,8 +3,9 @@ from flask import request, Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
+from models.functional_movement_activities import ActivityType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation
 from models.user_stats import UserStats
@@ -118,7 +119,12 @@ def handle_movement_prep_complete(user_id, movement_prep_id):
 
     # update movement prep and write to db
     activity_proc = ActivitiesProcessing(datastore_collection)
-    activity_proc.mark_activity_completed(movement_prep, event_date_time, activity_type, user_id, completed_exercises)
+    try:
+        activity_proc.mark_activity_completed(movement_prep, event_date_time, activity_type, user_id, completed_exercises)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Movement Prep")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Movement Prep does not contain a valid {ActivityType(activity_type).name}")
 
     movement_prep_datastore.put(movement_prep)
 

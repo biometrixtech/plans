@@ -1,7 +1,10 @@
+import pytest
 import datetime
+from fathomapi.utils.exceptions import NoSuchEntityException
 from logic.activities_processing import ActivitiesProcessing
 from models.functional_movement_activities import MobilityWOD, MovementPrep, ResponsiveRecovery, MovementIntegrationPrep, ActiveRest, ActiveRecovery, IceSession, ColdWaterImmersion, ActivityType
 from tests.mocks.mock_datastore_collection import DatastoreCollection
+
 
 def test_mobility_wod_complete_active_rest():
     event_date_time = datetime.datetime.now()
@@ -127,3 +130,19 @@ def test_responsive_recovery_start_cwi():
     ActivitiesProcessing(DatastoreCollection()).mark_activity_started(responsive_recovery, start_date_time, ActivityType.cold_water_immersion.value)
 
     assert responsive_recovery.cold_water_immersion.start_date_time == start_date_time
+
+
+def test_activity_not_valid():
+    event_date_time = datetime.datetime.now()
+    mobility_wod = MobilityWOD('tester', event_date_time)
+    start_date_time = event_date_time + datetime.timedelta(hours=1)
+    with pytest.raises(AttributeError):
+        ActivitiesProcessing(DatastoreCollection()).mark_activity_started(mobility_wod, start_date_time, ActivityType.cold_water_immersion.value)
+
+
+def test_activity_does_not_exist():
+    event_date_time = datetime.datetime.now()
+    responsive_recovery = ResponsiveRecovery('tester', event_date_time)
+    start_date_time = event_date_time + datetime.timedelta(hours=1)
+    with pytest.raises(NoSuchEntityException):
+        ActivitiesProcessing(DatastoreCollection()).mark_activity_started(responsive_recovery, start_date_time, ActivityType.cold_water_immersion.value)
