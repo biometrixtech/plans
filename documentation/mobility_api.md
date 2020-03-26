@@ -20,9 +20,11 @@ __Exercise Types__: The __Activities__ include exercises such as foam rolling, s
 This documentation is divided into the following sections:<br/>
 
 I. Common Provisions<br/>
-II. Mobility WOD (Workout of the Day)<br/>
-III. Improving Personalization<br/>
-IV. Appendix <br/>
+II. Movement Prep<br/>
+III. Mobility WOD (Workout of the Day)<br/>
+IV. Responsive Recovery<br/>
+V. Improving Personalization<br/>
+VI. Appendix <br/>
 
 <div style="page-break-after: always;"></div>
 
@@ -134,8 +136,190 @@ The following simple types __may__ be used in requests and responses:
 
 <div style="page-break-after: always;"></div>
 
+## II. Movement Prep
 
-## II. Mobility WOD (Workout of the Day)
+### Overview & Description
+
+The Movement Prep endpoint can be called to request a Movement Integration Preparation Activity which is assembled to restore proper muscle length-tension relationships and improve neuromuscular control to encourage proper muscle activation and proper movement.
+
+_Movement Integration Preparation Activity_:
+
+__Expected Duration__: durations will vary based on the athlete need’s severity and diversity.
+
+* Efficient - typically 2 to 8 minutes, 
+* Complete - typically 5 to 13 minutes
+* Comprehensive - typically 10 minutes or more.
+
+__Exercise Types__: foam rolling, static stretching, active stretching or dynamic flexibility, and isolated activation based on the athlete’s needs.
+
+Generating a _Movement Integration Preparation Activity_ requires the following data elements: 
+
+* Local date time 
+* Planned workout
+
+Additional optional elements that when included, provides enhanced personalization to the athlete's needs: 
+
+* Today's Symptoms
+
+The _Movement Integration Preparation Activity_ will also consider prior completed workouts and prior logged symptoms.
+
+### Basic Case
+
+Requesting a _Movement Integration Preparation Activity_ requires the local date time of the athlete and one planned session. 
+
+The planned workout session may be reported using one of two formats:
+
+* Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the athlete should use this format.
+
+* Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+
+This will generate a _Movement Prep Integration Activity_ that takes into consideration the planned workout and athlete's history. 
+
+_For more information about  __session__ formats, please see the Appendix._
+ 
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "session": session
+}
+```
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+
+```
+POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "session":{
+                "event_date": "2019-01-12T10:41:57-05:00",
+                "session_type": 6,
+                "sport_name": 1,
+                "duration": 14,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "end_date": "2019-01-12T10:54:57-05:00"
+            }
+}
+```
+
+##### Response
+ 
+ If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+
+```
+ {
+    "movement_prep": movement_prep
+ }
+```
+
+* `movement_prep` will have the following schema:
+
+```
+{
+    "movement_prep_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id: UUID,
+    "movement_integration_prep": movement_integration_prep
+}
+```
+
+* `movement_integration_prep` will have the schema as defined in the Appendix.
+
+### Including Today's Symptoms
+
+If the client includes the optional __symptoms__ element, a _Movement Integration Preparation Activity_ will be returned with consideration for the symptoms the athlete is experiencing today and the projected, resulting response to the upcoming workout.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "session": session,
+    "symptoms": [symptom, symptom]
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+* `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
+* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
+```
+POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "session": {
+                "event_date": "2019-01-12T10:41:57-05:00",
+                "session_type": 6,
+                "sport_name": 1,
+                "duration": 14,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "end_date": "2019-01-12T10:54:57-05:00"
+            },
+    "symptoms":[
+            {
+                "body_part": 14,
+                "side": 2
+                "tight": null,
+                "knots": null,
+                "ache": 3,
+                "sharp": 6,
+            }]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+
+```
+ {
+    "movement_prep": movement_prep
+ }
+```
+
+* `movement_prep` will have the following schema:
+
+```
+{
+    "movement_prep_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id": UUID,
+    "movement_integration_prep": movement_integration_prep
+}
+```
+
+* `movement_integration_prep` will have the schema as defined in the Appendix.
+
+
+## III. Mobility WOD (Workout of the Day)
 
 ### Overview & Description
 
@@ -409,7 +593,322 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 <div style="page-break-after: always;"></div>
 
-## III. Improving Personalization
+## IV. Responsive Recovery
+
+### Overview & Description
+
+The Responsive Recovery endpoint can be called to request Activities assembled to facilitate and expedite the removal of waste and recruitment of nutrients to rebuild muscle tissue.  It will include either the Active Rest Activity or Active Recovery Activity dependent on the athlete’s severity of need for proactive recovery. Cold Water Immersion Activity recommendations are also included to further reduce the severity of delayed onset soreness in cases of elevated need. Ice Activity recommendations are also included to decrease inflammation in cases of elevated need.
+
+* __Active Rest__ Activity (see Mobility WOD section above )
+* __Active Recovery__ Activity
+
+    * __Expected Duration__: durations will vary based on the athlete need’s severity and diversity.
+        * Efficient - typically 2 to 5 minutes, 
+        * Complete - typically 4 to 8 minutes
+        * Comprehensive - typically 8 minutes or more.
+    * __Exercise Types__: dynamic flexibility and dynamic integrate exercises based on the athlete’s needs
+
+* Additional Optional Content: 
+
+    * __Cold Water Immersion Activity, Ice Activity__
+    
+Generating Activities using the Responsive Recovery endpoint requires the following data elements: 
+
+* Local date time 
+* Completed Workout
+
+Additional optional elements that when included, provides enhanced personalization to the athlete's needs: 
+
+* Today's Symptoms
+
+The Activities returned will also consider prior completed workouts and prior logged symptoms.
+
+### Basic Case
+
+Requesting Activities using the Responsive Recovery endpoint  requires the local date time of the athlete and one completed workout session.
+
+The completed workout session may be reported using one of two formats:
+
+* Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
+
+* Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+
+The Activities returned will also consider prior completed workouts and prior logged symptoms.
+
+_For more information about  __session__ formats, please see the Appendix._
+ 
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "session": session,
+    "user_age": integer
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+* `user_age` __should__ be provided if heart rate data is included for any sessions
+
+```
+POST /plans/{version}/responsive_recovery/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "user_age": 28,
+    "session":
+            {
+                "event_date": "2019-01-12T10:41:57-05:00",
+                "session_type": 7,
+                "duration": 840,
+                "description": "Evening Practice",
+                "calories": 100,
+                "distance": 200,
+                "session_RPE": 7,
+                "end_date": "2019-02-12T10:54:57-05:00",
+``` 
+```
+                "hr_data":  [
+                            {"value": 153,
+                             "startDate": "2019-01-12T10:43:08.490-0500",
+                             "endDate": "2019-01-12T10:43:08.490-0500"
+                             },
+                        ],
+                "workout_program_module": {
+                                "workout_sections": [{
+                                    "name": "Upper Body Work",
+                                    "duration_seconds": 360,
+                                    "start_date_time": "2019-01-12T10:43:08-05:00",
+                                    "end_date_time": "2019-01-12T12:17:12-05:00"
+                                    "exercises": [
+                                        {
+                                            "id": "1",
+                                            "name": "Bent over Row",
+                                            "weight_measure": 2,
+                                            "weight": 150,
+                                            "sets": 2,
+                                            "reps_per_set": 10,
+                                            "unit_of_measure": 1,
+                                            "movement_id": "2356",
+                                            "bilateral": true,
+                                            "side": 0,
+                                            "rpe": 5.0
+                                        }
+                                        ]
+                                }]
+                            }
+                }
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+
+```
+ {
+    "responsive_recovery": responsive_recovery
+ }
+```
+
+* `responsive_recovery` will have the following schema:
+
+```
+{
+    "responsive_recovery_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id": UUID,
+    "active_rest": active_rest,
+    "active_recovery": active_recovery,
+    "ice": ice,
+    "cold_water_immersion": cold_water_immersion
+}
+```
+
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
+
+
+### Including Today's Symptoms
+
+If the client includes the optional __symptoms__ element, Responsive Recovery Activities will be returned with consideration for the symptoms the athlete is experiencing today.
+
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "session: session,
+    "symptoms": [symptom, symptom]
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
+```
+POST /plans/{version}/responsive_recovery/{User UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "session":{
+                    "event_date": "2019-01-12T10:41:57-05:00",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "session_RPE": 8,
+                    "end_date": "2019-01-12T10:54:57-05:00"
+                },
+    "symptoms":[{
+                    "body_part": 14,
+                    "side": 2
+                    "tight": null,
+                    "knots": null,
+                    "ache": 3,
+                    "sharp": 6,
+                }]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+ {
+    "responsive_recovery": responsive_recovery
+ }
+```
+
+* `responsive_recovery` will have the following schema:
+
+```
+{
+    "responsive_recovery_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id": UUID,
+    "active_rest": active_rest,
+    "active_recovery": active_recovery,
+    "ice": ice,
+    "cold_water_immersion": cold_water_immersion
+}
+```
+
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
+
+
+<!-- TODO - paul: title and language -->
+### Update Responsive Recovery
+
+The Update Responsive Recovery endpoint can be called to update workout session information and/or report new symptom(s). Responsive Recovery Activities will be returned with consideration for the newly provided information.
+<!-- TODO - paul: should we mention something about SOFlete specific use case where this will be used to update planned session? -->
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/update`. The request method __must__ be `POST`.
+
+##### Request
+
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "session: session,
+    "symptoms": [symptom, symptom]
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+
+```
+POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID} HTTPS/1.1
+Host: apis.demo.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "session":{
+                    "session_id": "5bbcc8da-181a-4a2b-bc72-a7210d5be757"
+                    "event_date": "2019-01-12T10:41:57-05:00",
+                    "session_type": 6,
+                    "sport_name": 1,
+                    "duration": 14,
+                    "description": "Evening Practice",
+                    "calories": 100,
+                    "distance": 200,
+                    "session_RPE": 8,
+                    "end_date": "2019-01-12T10:54:57-05:00"
+                },
+    "symptoms":[{
+                    "body_part": 14,
+                    "side": 2
+                    "tight": null,
+                    "knots": null,
+                    "ache": 3,
+                    "sharp": 6,
+                }]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ 
+```
+ {
+    "responsive_recovery": responsive_recovery
+ }
+```
+
+* `responsive_recovery` will have the following schema:
+
+```
+{
+    "responsive_recovery_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id": UUID,
+    "active_rest": active_rest,
+    "active_recovery": active_recovery,
+    "ice": ice,
+    "cold_water_immersion": cold_water_immersion
+}
+```
+
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
+
+
+
+<div style="page-break-after: always;"></div>
+
+## V. Improving Personalization
 
 ### Overview & Description
 FathomAI Mobility API can provide greater personalization, diversity, and granularity  of activities for an athlete when more information is supplied by a client. Some APIs allow for clients to provide more information about an athlete as it becomes available but does not lead to a new recovery plan.
@@ -524,7 +1023,7 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 
 <div style="page-break-after: always;"></div>
 
-## IV. Appendix
+## VI. Appendix
 
 ### Symptoms
 
@@ -681,6 +1180,44 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 
 
+### Movement Integration Prep
+
+`movement_integration_prep` will be of following schema:
+
+```
+{
+    "id" : UUID,
+    "type" : integer,
+    "title" : string,
+    "start_date_time" : Datetime,
+    "completed_date_time" : Datetime,
+    "event_date_time" : Datetime,
+    "completed" : boolean,
+    "default_plan" : string,
+    "goals" : {
+        string : activity_goal,
+        string : activity_goal
+    },
+    "exercise_phases" : [exercise_phase, exercise_phase]
+}
+```
+
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
+* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
+* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
+
+### Activity Goal
+
+`activity_goal` will be of the following schema:
+
+```
+    "efficient_active": boolean
+    "complete_active": boolean
+    "comprehensive_active": boolean
+```
+
+<div style="page-break-after: always;"></div>
+
 ### Active Rest
 
 * `active_rest` will be of the following schema:
@@ -703,42 +1240,80 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 }
 ```
 
-* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
 * `activity_goal` __will__ be an Activity Goal as defined in this Appendix
 * `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
 
+### Active Recovery
 
-### Activity Goal
-
-Activity Goals are returned with activities to summarize what dosages are available for the given goal based on the exercises assigned.  This enables clients to quickly identify what goals should be active for each dosage option.
-
-`activity_goal` will be of the following schema:
+* `active_recovery` will be of the following schema:
 
 ```
-    "efficient_active": boolean
-    "complete_active": boolean
-    "comprehensive_active": boolean
-```
-
-__Example:__
-
-In the following response, exercises associated with the `Reduce Injury Risks` goal only are assigned for Complete and Comprehensive dosages while exercises associated with the `Recover from Training` goal are assigned for all three dosages. 
-```
-"goals" : {
-        "Reduce injury risks : {
-            "efficient_active": false
-            "complete_active": true
-            "comprehensive_active": true
-            },
-        "Recover from training" : {
-            "efficient_active": true
-            "complete_active": true
-            "comprehensive_active": true
-            }
+{
+    "id" : UUID,
+    "type" : integer,
+    "title" : string,
+    "start_date_time" : Datetime,
+    "completed_date_time" : Datetime,
+    "event_date_time" : Datetime,
+    "completed" : boolean,
+    "default_plan" : string,
+    "goals" : {
+        string : activity_goal,
+        string : activity_goal
     },
+    "exercise_phases" : [exercise_phase, exercise_phase]
+}
+```
+
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
+* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
+* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
+
+### Ice
+
+* `ice` will be of the following schema
+
+```
+{
+    "body_parts": [
+        {
+            "body_part_location": integer,
+            "side": side,
+            "completed": boolean
+        }
+    ],
+    "completed": boolean,
+    "completed_date_time": Datetime,
+    "event_date_time": Datetime,
+    "minutes": integer,
+    "start_date_time": Datetime,
+    "goal": goal,
+}
+```
+
+* `body_part_location` will be an integer reflecting the Body Part enumeration as defined in this Appendix.
+* `goal` will be a goal as defined in this Appendix.
+
+### Cold Water Immersion
+
+* `cold_water_immersion` will be of the following schema
+
+```
+{
+    "minutes": integer,
+    "goals": [goal, goal],
+    "start_date_time": Datetime,
+    "completed_date_time": Datetime,
+    "event_date_time": Datetime,
+    "completed": boolean
+}
 
 ```
 
+* `goal` will be a goal as defined in this Appendix.
+
+<div style="page-break-after: always;"></div>
 
 ### Exercise Phase
 
@@ -754,15 +1329,9 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 ```
 
 * `type` will be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
-* `name` will reflect the corresponding name value of the Exercise Phase Type enumeration
-* `title` will provide a label for the Exercise Phase that could be displayed to end users.
 * `assigned_exercise` will be an Assigned Exercise as defined in Appendix
 
 ### Assigned Exercise
-
-Exercises are assigned to each phase based on the needs of the athlete.  Each assigned exercise contains instructions that can be provided to end users.
-
-Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
 
 * `assigned_exercise` will be of the following schema:
 
@@ -787,22 +1356,9 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 }
 ```
 
-* `name` represents the Fathom internal name of the assigned exercise
-* `display_name` is a label for this exercise that can be presented to the end user
-* `library_id` is the Fathom internal ID of the assigned exercise
-* `description` provides instructions to the end user on how to complete the exercise
-* `youtube_id` generally will be null but is reserved for URLs to instructional videos for the exercise
-* `bilateral` if true, indicates the exercise should be completed on both the left and right sides
-* `seconds_per_rep` used for estimating exercise dosage duration and indicates the number of seconds to complete one rep; will be null if unit_of_measure is "seconds"
-* `seconds_per_set` used for estimating exercise dosage duration and indicates the number of seconds to complete one set
+* `library_id` is a string indicating the ID of the assigned exercise
+* `exercise_dosage` will be an Exercise Dosage as defined in this Appendix.
 * `unit_of_measure` will be the string representation of the Unit of Measure enumeration as defined in this Appendix (e.g. "seconds", "count", etc.). 
-* `position_order` can be used by the client to order exercises to the end user
-* `duration_efficient` provides the estimated duration of the exercise given the efficient dosage of the highest ranked goal
-* `duration_complete` provides the estimated duration of the exercise given the complete dosage of the highest ranked goal
-* `duration_comprehensive` provides the estimated duration of the exercise given the comprehensive dosage of the highest ranked goal
-* `goal_text` will typically be empty and is reserved for future use.
-* `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
-* `dosages` will be a list of  __Exercise Dosage__ objects of the schema defined in this Appendix.
 
 <div style="page-break-after: always;"></div>
 
@@ -819,18 +1375,18 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
     "complete_reps_assigned" : integer,
     "complete_sets_assigned" : integer,
     "comprehensive_reps_assigned" : integer,
-    "comprehensive_sets_assigned" : integer
+    "comprehensive_sets_assigned" : integer,
+    "default_efficient_reps_assigned" : integer,
+    "default_efficient_sets_assigned" : integer,
+    "default_complete_reps_assigned" : integer,
+    "default_complete_sets_assigned" : integer,
+    "default_comprehensive_reps_assigned" : integer,
+    "default_comprehensive_sets_assigned" : integer,
+    "ranking" : integer
 }
 ```
 
 * `goal` will be a Goal as defined in this Appendix
-* `priority` is the normalized ranking of this  __Exercise Dosage__ across all  __Exercise Phase__ objects returned
-* `efficient_reps_assigned` reflects the number of reps assigned of this exercise for the  __efficient__ dosage
-* `efficient_sets_assigned` reflects the number of sets assigned of this exercise for the  __efficient__ dosage
-* `complete_reps_assigned` reflects the number of reps assigned of this exercise for the  __complete__ dosage
-* `complete_sets_assigned` reflects the number of sets assigned of this exercise for the  __complete__ dosage
-* `comprehensive_reps_assigned` reflects the number of reps assigned of this exercise for the  __comprehensive__ dosage
-* `comprehensive_sets_assigned` reflects the number sets reps assigned of this exercise for the  __comprehensive__ dosage
 
 ### Goal
 
@@ -839,12 +1395,12 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 ```
 {
      "text" : string,
+     "priority" : integer,
      "goal_type" : integer
            
 }
 ```
 
-* `text` will be the name of the goal that can be displayed to an end-user
 * `goal_type` will be an integer reflecting the Athlete Goal Type enumeration as defined in Appendix
 
 <div style="page-break-after: always;"></div>
@@ -861,11 +1417,6 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 ```
 
 #### ExercisePhaseType
-
-There are seven different types of exercises phases returned, identified by the enumeration below.  Each phase plays a critical role in the athlete's recovery, but only some of these phases will be returned for an athlete's specific recovery.  
-
-Sports science research places importance on the order in which phases are completed by the athlete in order to maximize recovery.  We recommend presenting phases to the athlete using the enumeration order.
-
 ```
     inhibit = 0
     static_stretch = 1
@@ -891,7 +1442,6 @@ Sports science research places importance on the order in which phases are compl
     asymmetric_session = 20
     asymmetric_pattern = 21
 ```
-<div style="page-break-after: always;"></div>
 
 #### Unit of Measure
 ```
@@ -940,10 +1490,6 @@ Sports science research places importance on the order in which phases are compl
     cricket = 30
     curling = 31
     dance = 32
-```
-<div style="page-break-after: always;"></div>
-
-```
     equestrian_sports = 33
     fencing = 34
     fishing = 35
@@ -956,6 +1502,8 @@ Sports science research places importance on the order in which phases are compl
     snow_sports = 42
     squash = 43
     surfing_sports = 44
+```
+```
     swimming = 45
     table_tennis = 46
     water_polo = 47
@@ -996,6 +1544,9 @@ Sports science research places importance on the order in which phases are compl
     climbing = 82
     other = 83
 ```
+
+<div style="page-break-after: always;"></div>
+
 
 ### Body Parts
 
