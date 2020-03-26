@@ -1,4 +1,4 @@
-# FathomAI - Mobility API (v 5.0.1)
+# FathomAI - Mobility API (v 5.0.1 - Demo)
 
 ## Overview
 FathomAI provides this limited implementation of its Mobility API to demonstrate the core functionality to potential customers.
@@ -703,9 +703,16 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 }
 ```
 
+* `id` __will__ be a unique identifier for this activity
 * `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
-* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
-* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
+* `title` __will__ be the name of the activity that can be displayed to an end user
+* `start_date_time` __will__ be the date/time the end user starts this activity
+* `completed_date_time` __will__ be the date/time the end user completed this activity
+* `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
+* `completed` __will__ indicate whether or not this activity has been mark completed
+* `default_plan` __will__ indicate the recommended dosage plan based on the athlete's current needs.  Will be "efficient", "complete" or "comprehensive".
+* `goals` __will__ be a name/value collection of Activity Goals as defined in this Appendix
+* `exercise_phases` __will__ be list of Exercise Phase objects as defined in this Appendix
 
 
 ### Activity Goal
@@ -762,7 +769,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 
 Exercises are assigned to each phase based on the needs of the athlete.  Each assigned exercise contains instructions that can be provided to end users.
 
-Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
+Each  __Assigned Exercise__ also includes one or more  __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
 
 * `assigned_exercise` will be of the following schema:
 
@@ -804,7 +811,6 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 * `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
 * `dosages` will be a list of  __Exercise Dosage__ objects of the schema defined in this Appendix.
 
-<div style="page-break-after: always;"></div>
 
 ### Exercise Dosage
 
@@ -825,12 +831,12 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 
 * `goal` will be a Goal as defined in this Appendix
 * `priority` is the normalized ranking of this  __Exercise Dosage__ across all  __Exercise Phase__ objects returned
-* `efficient_reps_assigned` reflects the number of reps assigned of this exercise for the  __efficient__ dosage
-* `efficient_sets_assigned` reflects the number of sets assigned of this exercise for the  __efficient__ dosage
-* `complete_reps_assigned` reflects the number of reps assigned of this exercise for the  __complete__ dosage
-* `complete_sets_assigned` reflects the number of sets assigned of this exercise for the  __complete__ dosage
-* `comprehensive_reps_assigned` reflects the number of reps assigned of this exercise for the  __comprehensive__ dosage
-* `comprehensive_sets_assigned` reflects the number sets reps assigned of this exercise for the  __comprehensive__ dosage
+* `efficient_reps_assigned` the number of reps assigned of this exercise for the  __efficient__ dosage
+* `efficient_sets_assigned` the number of sets assigned of this exercise for the  __efficient__ dosage
+* `complete_reps_assigned` the number of reps assigned of this exercise for the  __complete__ dosage
+* `complete_sets_assigned` the number of sets assigned of this exercise for the  __complete__ dosage
+* `comprehensive_reps_assigned` the number of reps assigned of this exercise for the  __comprehensive__ dosage
+* `comprehensive_sets_assigned` the number sets reps assigned of this exercise for the  __comprehensive__ dosage
 
 ### Goal
 
@@ -1054,5 +1060,5 @@ The following reportable body parts are considered muscles. Allowable Sides (0, 
     rotator_cuff = 119 {1, 2}
     serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: March 24, 2020
+###### Last Modified: March 26, 2020
 
