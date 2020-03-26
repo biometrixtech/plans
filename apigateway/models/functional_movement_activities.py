@@ -199,6 +199,7 @@ class Activity(object):
         self.complete_winner = 1
         self.comprehensive_winner = 1
         self.rankings = set()
+        self.body_part_factory = BodyPartFactory()
 
     def json_serialise(self, mobility_api=False):
         return {
@@ -878,6 +879,7 @@ class ActiveRestBase(Activity):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
+            self.body_part_factory.mapped_body_parts[body_part.location] = body_part
             if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
                     and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
@@ -931,9 +933,8 @@ class ActiveRestBase(Activity):
     #     for t in range(0, len(trigger_list)):
     #         if trigger_list[t].trigger_type == TriggerType.high_volume_intensity:  # 0
     #             goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
-    #             body_part_factory = BodyPartFactory()
     #
-    #             body_part = body_part_factory.get_body_part_for_sports(sports)
+    #             body_part = self.body_part_factory.get_body_part_for_sports(sports)
     #
     #             # Note: this is just returning the primary mover related exercises for sport
     #             if body_part is not None:  # and not prohibiting_soreness:
@@ -965,14 +966,12 @@ class MovementIntegrationPrep(ActiveRestBase):
 
     def get_general_exercises(self, exercise_library, max_severity):
 
-        body_part_factory = BodyPartFactory()
-
-        body_part = body_part_factory.get_general()
+        body_part = self.body_part_factory.get_general()
 
         goal = AthleteGoal("Improve mobility", 1, AthleteGoalType.on_request)
 
         for a in body_part.agonists:
-            agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+            agonist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None), use_cache=True)
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
                                     exercise_library)
@@ -984,7 +983,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                                         1, 0, exercise_library)
 
         for y in body_part.synergists:
-            synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+            synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None), use_cache=True)
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, 0,
                                     exercise_library)
@@ -995,7 +994,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                                         2, 0, exercise_library)
 
         for t in body_part.stabilizers:
-            stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+            stabilizer = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None), use_cache=True)
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 4, 0,
                                     exercise_library)
@@ -1141,11 +1140,9 @@ class MovementIntegrationPrep(ActiveRestBase):
             #     self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
             #                         last_severity, exercise_library)
 
-            body_part_factory = BodyPartFactory()
-
             if sharp_tight_ache:  # muscles tagged with muscle spasm only due to being related will be excluded
                 for s in body_part.synergists:
-                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
+                    synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None), use_cache=True)
                     self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, last_severity,
                                         exercise_library)
 
@@ -1179,10 +1176,8 @@ class MovementIntegrationPrep(ActiveRestBase):
                 self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
                                     last_severity, exercise_library)
 
-            # body_part_factory = BodyPartFactory()
-            #
             # for s in body_part.synergists:
-            #     synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
+            #     synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None), use_cache=True)
             #
             #     if max_severity < 7.0:
             #         self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
@@ -1279,12 +1274,10 @@ class ActiveRest(ActiveRestBase):
 
         goal = AthleteGoal("High Load", 1, AthleteGoalType.high_load)
 
-        body_part_factory = BodyPartFactory()
-
-        body_part = body_part_factory.get_body_part_for_sports(sports)
+        body_part = self.body_part_factory.get_body_part_for_sports(sports)
 
         for a in body_part.agonists:
-            agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+            agonist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None), use_cache=True)
             if agonist is not None:
                 if max_severity < 7.0:
                     self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, "1", None,
@@ -1293,7 +1286,7 @@ class ActiveRest(ActiveRestBase):
                                         None, exercise_library)
 
         for t in body_part.antagonists:
-            antagonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+            antagonist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None), use_cache=True)
             if antagonist is not None:
                 if max_severity < 5.0:
                     self.copy_exercises(antagonist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
@@ -1306,14 +1299,12 @@ class ActiveRest(ActiveRestBase):
 
     def get_general_exercises(self, exercise_library, max_severity):
 
-        body_part_factory = BodyPartFactory()
-
-        body_part = body_part_factory.get_general()
+        body_part = self.body_part_factory.get_general()
 
         goal = AthleteGoal("Improve mobility", 1, AthleteGoalType.on_request)
 
         for a in body_part.agonists:
-            agonist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None))
+            agonist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None), use_cache=True)
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0,
                                     exercise_library)
@@ -1325,7 +1316,7 @@ class ActiveRest(ActiveRestBase):
                                         1, 0, exercise_library)
 
         for y in body_part.synergists:
-            synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None))
+            synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None), use_cache=True)
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
                                     exercise_library)
@@ -1337,7 +1328,7 @@ class ActiveRest(ActiveRestBase):
                                         2, 0, exercise_library)
 
         for t in body_part.stabilizers:
-            stabilizer = body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None))
+            stabilizer = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None), use_cache=True)
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, 0,
                                     exercise_library)
@@ -1480,11 +1471,9 @@ class ActiveRest(ActiveRestBase):
                 self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
                                     last_severity, exercise_library)
 
-            body_part_factory = BodyPartFactory()
-
             if sharp_tight_ache:
                 for s in body_part.synergists:
-                    synergist = body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None))
+                    synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None), use_cache=True)
                     self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
                                         exercise_library)
 
@@ -1579,6 +1568,7 @@ class ActiveRecovery(Activity):
 
         max_severity = 0
         for body_part, body_part_injury_risk in injury_risk_dict.items():
+            self.body_part_factory.mapped_body_parts[body_part.location] = body_part
             if (body_part_injury_risk.last_sharp_level > 0 and body_part_injury_risk.last_sharp_date is not None
                     and body_part_injury_risk.last_sharp_date == self.event_date_time.date()):
                 max_severity = max(max_severity, body_part_injury_risk.last_sharp_level)
