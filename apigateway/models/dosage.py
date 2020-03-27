@@ -128,7 +128,8 @@ class ExerciseDosage(object):
                 self.default_comprehensive_sets_assigned = 1
 
     def severity(self):
-        if self.soreness_source is not None:
+        if self.last_severity is not None and self.last_severity:
+        #if self.soreness_source is not None:
             #return self.soreness_source.severity
             return self.last_severity
         else:
