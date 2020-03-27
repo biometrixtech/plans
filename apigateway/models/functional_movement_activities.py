@@ -1166,6 +1166,12 @@ class MovementIntegrationPrep(ActiveRestBase):
             self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
                                 exercise_library)
 
+            if muscle_spasm or knots:
+
+                if max_severity < 7.0:
+                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
+                                        last_severity, exercise_library)
+
             if max_severity < 7.0:
                 if self.sport_cardio_plyometrics:
                     self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
@@ -1173,12 +1179,6 @@ class MovementIntegrationPrep(ActiveRestBase):
                 else:
                     self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1,
                                         last_severity, exercise_library)
-
-            #     self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1,
-            #                         last_severity, exercise_library)
-            # if max_severity < 5.0:  # TODO: this threshold needs to be updated
-            #     self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
-            #                         last_severity, exercise_library)
 
             if sharp_tight_ache:  # muscles tagged with muscle spasm only due to being related will be excluded
                 for s in body_part.synergists:
@@ -1193,35 +1193,6 @@ class MovementIntegrationPrep(ActiveRestBase):
                         else:
                             self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
                                                 last_severity, exercise_library)
-
-                    # if max_severity < 7.0:
-                    #     self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
-                    #                         last_severity, exercise_library)
-                    # if max_severity < 5.0:  # TODO: this threshold needs to be updated
-                    #     self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
-                    #                         last_severity, exercise_library)
-
-        if muscle_spasm or knots:
-
-            last_severity = 0
-
-            if muscle_spasm:
-                last_severity = max(last_severity,
-                                    body_part_injury_risk.get_muscle_spasm_severity(self.event_date_time.date()))
-            if knots:
-                last_severity = max(last_severity,
-                                    body_part_injury_risk.get_knots_severity(self.event_date_time.date()))
-
-            if max_severity < 7.0:
-                self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
-                                    last_severity, exercise_library)
-
-            # for s in body_part.synergists:
-            #     synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None), use_cache=True)
-            #
-            #     if max_severity < 7.0:
-            #         self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-            #                             last_severity, exercise_library)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
         if body_part is not None and body_part.location in sport_body_parts:
@@ -1262,15 +1233,12 @@ class MovementIntegrationPrep(ActiveRestBase):
                 self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
-                    #self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
                     if self.sport_cardio_plyometrics:
                         self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library)
                     else:
                         self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal, 1, 0, exercise_library)
-                # if max_severity < 5.0:  # TODO: this threshold might need to change
-                #     self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library)
 
             # TODO: The logic below is not found in movement_prep spreadsheet.
             # elif is_short:
@@ -1406,11 +1374,6 @@ class ActiveRest(ActiveRestBase):
                   0 < body_part_injury_risk.total_compensation_percent_tier < 4):
 
                 compensating = True
-
-            # if compensating:
-            #     goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.asymmetric_session))
-
-            # for goal in goals:
 
             if high_load or compensating:
 
