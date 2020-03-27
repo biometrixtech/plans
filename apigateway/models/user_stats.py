@@ -1,6 +1,6 @@
 from serialisable import Serialisable
 from models.load_stats import LoadStats
-from models.session import HighLoadSession
+from models.session import HighLoadSession, HighDetailedLoadSession
 from utils import format_date, parse_date, format_datetime, parse_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
@@ -48,7 +48,7 @@ class UserStats(Serialisable):
         user_stats.api_version = input_dict.get('api_version', '4_8')
         user_stats.timezone = input_dict.get('timezone', '-04:00')
         user_stats.load_stats = LoadStats.json_deserialise(input_dict.get('load_stats', None))
-        user_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])]
+        user_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) if 'sport_name' in session else HighDetailedLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])]
         user_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
         user_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
 

@@ -65,7 +65,7 @@ class AthleteGoal(object):
     def json_deserialise(cls, input_dict):
         goal_type = input_dict.get('goal_type', None)
         athlete_goal_type = AthleteGoalType(goal_type) if goal_type is not None else None
-        goal = cls(text=input_dict['text'], priority=input_dict['priority'], athlete_goal_type=athlete_goal_type)
+        goal = cls(text=input_dict['text'], priority=input_dict.get('priority', 1), athlete_goal_type=athlete_goal_type)
         #trigger_type = input_dict.get('trigger_type', None)
         #goal.trigger_type = TriggerType(trigger_type) if trigger_type is not None else None
         return goal
