@@ -99,8 +99,10 @@ class ExerciseAssignment(object):
         movement_integration_prep.set_winners()
         movement_integration_prep.scale_all_active_time()
         movement_integration_prep.reconcile_default_plan_with_active_time()
-    
-        return [movement_integration_prep]
+        if movement_integration_prep.get_total_exercises() > 0:
+            return [movement_integration_prep]
+
+        return []
 
     def get_active_rest(self, force_data=False, force_on_demand=True):
         # get activity

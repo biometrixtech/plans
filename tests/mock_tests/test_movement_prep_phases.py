@@ -228,21 +228,22 @@ def test_check_movement_prep_phases_no_inputs_force_on_demand_false():
     calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[0])
 
-    movement_prep = calc.get_movement_integration_prep(force_on_demand=False)[0]
-    assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
-    assert len(movement_prep.exercise_phases[0].exercises) == 0
-    assert movement_prep.exercise_phases[1].type == ExercisePhaseType.static_stretch
-    assert len(movement_prep.exercise_phases[1].exercises) == 0
-    assert movement_prep.exercise_phases[2].type == ExercisePhaseType.active_stretch
-    assert len(movement_prep.exercise_phases[2].exercises) == 0
-    assert movement_prep.exercise_phases[3].type == ExercisePhaseType.dynamic_stretch
-    assert len(movement_prep.exercise_phases[3].exercises) == 0
-    assert movement_prep.exercise_phases[4].type == ExercisePhaseType.isolated_activate
-    assert len(movement_prep.exercise_phases[4].exercises) == 0
-    assert movement_prep.exercise_phases[5].type == ExercisePhaseType.static_integrate
-    assert len(movement_prep.exercise_phases[5].exercises) == 0
-    assert movement_prep.exercise_phases[6].type == ExercisePhaseType.dynamic_integrate
-    assert len(movement_prep.exercise_phases[6].exercises) == 0
+    assert len(calc.get_movement_integration_prep(force_on_demand=False)) == 0
+    # movement_prep = calc.get_movement_integration_prep(force_on_demand=False)[0]
+    # assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
+    # assert len(movement_prep.exercise_phases[0].exercises) == 0
+    # assert movement_prep.exercise_phases[1].type == ExercisePhaseType.static_stretch
+    # assert len(movement_prep.exercise_phases[1].exercises) == 0
+    # assert movement_prep.exercise_phases[2].type == ExercisePhaseType.active_stretch
+    # assert len(movement_prep.exercise_phases[2].exercises) == 0
+    # assert movement_prep.exercise_phases[3].type == ExercisePhaseType.dynamic_stretch
+    # assert len(movement_prep.exercise_phases[3].exercises) == 0
+    # assert movement_prep.exercise_phases[4].type == ExercisePhaseType.isolated_activate
+    # assert len(movement_prep.exercise_phases[4].exercises) == 0
+    # assert movement_prep.exercise_phases[5].type == ExercisePhaseType.static_integrate
+    # assert len(movement_prep.exercise_phases[5].exercises) == 0
+    # assert movement_prep.exercise_phases[6].type == ExercisePhaseType.dynamic_integrate
+    # assert len(movement_prep.exercise_phases[6].exercises) == 0
 
 
 def test_check_movement_prep_phases_no_soreness_with_mixed_session():
