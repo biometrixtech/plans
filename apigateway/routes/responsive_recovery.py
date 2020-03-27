@@ -81,8 +81,7 @@ def handle_responsive_recovery_create(user_id):
     )
 
     return {
-               'responsive_recovery': responsive_recovery.json_serialise(),
-               'session_id': api_processor.sessions[0].id
+               'responsive_recovery': responsive_recovery.json_serialise()
            }, 201
 
 
