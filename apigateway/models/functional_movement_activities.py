@@ -534,8 +534,13 @@ class Activity(object):
                 continue
             elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
                 continue
-            elif abs(total_efficient - self.proposed_efficient_limit) < abs(proposed_efficient - self.proposed_efficient_limit):
+            #elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
+            elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
                 self.efficient_winner = benchmarks[last_efficient_value]
+                efficient_found = True
+                break
+            elif total_efficient + proposed_efficient == self.proposed_efficient_limit:
+                self.efficient_winner = benchmarks[b + 1]
                 efficient_found = True
                 break
             else:
@@ -558,8 +563,13 @@ class Activity(object):
                 continue
             elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
                 continue
-            elif abs(total_complete - self.proposed_complete_limit) < abs(proposed_complete - self.proposed_complete_limit):
+            #elif abs(total_complete - self.proposed_complete_limit) < abs(proposed_complete - self.proposed_complete_limit):
+            elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
                 self.complete_winner = benchmarks[last_complete_value]
+                complete_found = True
+                break
+            elif total_complete + proposed_complete == self.proposed_complete_limit:
+                self.complete_winner = benchmarks[b + 1]
                 complete_found = True
                 break
             else:
@@ -582,8 +592,13 @@ class Activity(object):
                 continue
             elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
                 continue
-            elif abs(total_comprehensive - self.proposed_comprehensive_limit) < abs(proposed_comprehensive - self.proposed_comprehensive_limit):
+            #elif abs(total_comprehensive - self.proposed_comprehensive_limit) < abs(proposed_comprehensive - self.proposed_comprehensive_limit):
+            elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_complete_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
+                comprehensive_found = True
+                break
+            elif total_comprehensive + proposed_comprehensive == self.proposed_comprehensive_limit:
+                self.comprehensive_winner = benchmarks[b + 1]
                 comprehensive_found = True
                 break
             else:
@@ -605,25 +620,38 @@ class Activity(object):
                 if len(a.dosages) > 0:
 
                     if self.efficient_winner == 1:
+                        if self.dosage_durations[1].efficient_duration > self.proposed_efficient_limit:
+                            for d in a.dosages:
+                                if d.priority == '1' and d.efficient_sets_assigned > 1:
+                                    d.efficient_sets_assigned = 1
+                                    d.default_efficient_sets_assigned = 1
                         for d in a.dosages:
                             if d.priority != '1':
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
+                                d.default_efficient_reps_assigned = 0
+                                d.default_efficient_sets_assigned = 0
                     elif self.efficient_winner == 2:
                         for d in a.dosages:
                             if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
+                                d.default_efficient_reps_assigned = 0
+                                d.default_efficient_sets_assigned = 0
                     elif self.efficient_winner == 3:
                         for d in a.dosages:
                             if d.priority == '3' and d.severity() <= 4:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
+                                d.default_efficient_reps_assigned = 0
+                                d.default_efficient_sets_assigned = 0
                     elif self.efficient_winner == 4:
                         for d in a.dosages:
                             if d.priority == '3':
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
+                                d.default_efficient_reps_assigned = 0
+                                d.default_efficient_sets_assigned = 0
                     elif self.efficient_winner == 5:
                         pass
                     elif self.efficient_winner == 0:
@@ -634,25 +662,38 @@ class Activity(object):
                 if len(a.dosages) > 0:
 
                     if self.complete_winner == 1:
+                        if self.dosage_durations[1].complete_duration > self.proposed_complete_limit:
+                            for d in a.dosages:
+                                if d.priority == '1' and d.complete_sets_assigned > 1:
+                                    d.complete_sets_assigned = d.complete_sets_assigned - 1
+                                    d.default_complete_sets_assigned = d.complete_sets_assigned - 1
                         for d in a.dosages:
                             if d.priority != '1':
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
+                                d.default_complete_reps_assigned = 0
+                                d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 2:
                         for d in a.dosages:
                             if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
+                                d.default_complete_reps_assigned = 0
+                                d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 3:
                         for d in a.dosages:
                             if d.priority == '3' and d.severity() <= 4:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
+                                d.default_complete_reps_assigned = 0
+                                d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 4:
                         for d in a.dosages:
                             if d.priority == '3':
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
+                                d.default_complete_reps_assigned = 0
+                                d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 5:
                         pass
                     elif self.complete_winner == 0:
@@ -662,26 +703,39 @@ class Activity(object):
             for ex, a in assigned_exercises.items():
                 if len(a.dosages) > 0:
 
-                    if self.complete_winner == 1:
+                    if self.comprehensive_winner == 1:
+                        if self.dosage_durations[1].comprehensive_duration > self.proposed_comprehensive_limit:
+                            for d in a.dosages:
+                                if d.priority == '1' and d.comprehensive_sets_assigned > 1:
+                                    d.comprehensive_sets_assigned = d.comprehensive_sets_assigned - 1
+                                    d.default_comprehensive_sets_assigned = d.comprehensive_sets_assigned - 1
                         for d in a.dosages:
                             if d.priority != '1':
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
+                                d.default_comprehensive_reps_assigned = 0
+                                d.default_comprehensive_sets_assigned = 0
                     elif self.comprehensive_winner == 2:
                         for d in a.dosages:
                             if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
+                                d.default_comprehensive_reps_assigned = 0
+                                d.default_comprehensive_sets_assigned = 0
                     elif self.comprehensive_winner == 3:
                         for d in a.dosages:
                             if d.priority == '3' and d.severity() <= 4:
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
+                                d.default_comprehensive_reps_assigned = 0
+                                d.default_comprehensive_sets_assigned = 0
                     elif self.comprehensive_winner == 4:
                         for d in a.dosages:
                             if d.priority == '3':
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
+                                d.default_comprehensive_reps_assigned = 0
+                                d.default_comprehensive_sets_assigned = 0
                     elif self.comprehensive_winner == 5:
                         pass
                     elif self.comprehensive_winner == 0:
