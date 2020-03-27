@@ -522,6 +522,7 @@ class Activity(object):
         comprehensive_found = False
 
         for b in range(0, len(benchmarks) - 1):
+            # only way this could be too high is if it's Priorty 1 (and nothing we can do)
             total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
             if self.dosage_durations[benchmarks[b]].efficient_duration > 0:
                 last_efficient_value = b
@@ -550,6 +551,7 @@ class Activity(object):
                 # break
         if not efficient_found:
             self.efficient_winner = benchmarks[last_efficient_value]
+
         for b in range(0, len(benchmarks) - 1):
             total_complete += self.dosage_durations[benchmarks[b]].complete_duration
             if self.dosage_durations[benchmarks[b]].complete_duration > 0:
@@ -640,14 +642,14 @@ class Activity(object):
                                 d.default_efficient_sets_assigned = 0
                     elif self.efficient_winner == 3:
                         for d in a.dosages:
-                            if d.priority == '3' and d.severity() <= 4:
+                            if d.priority == '3':
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                                 d.default_efficient_reps_assigned = 0
                                 d.default_efficient_sets_assigned = 0
                     elif self.efficient_winner == 4:
                         for d in a.dosages:
-                            if d.priority == '3':
+                            if d.priority == '3' and d.severity() <= 4:
                                 d.efficient_reps_assigned = 0
                                 d.efficient_sets_assigned = 0
                                 d.default_efficient_reps_assigned = 0
@@ -682,14 +684,14 @@ class Activity(object):
                                 d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 3:
                         for d in a.dosages:
-                            if d.priority == '3' and d.severity() <= 4:
+                            if d.priority == '3':
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
                                 d.default_complete_reps_assigned = 0
                                 d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 4:
                         for d in a.dosages:
-                            if d.priority == '3':
+                            if d.priority == '3' and d.severity() <= 4:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
                                 d.default_complete_reps_assigned = 0
@@ -724,14 +726,14 @@ class Activity(object):
                                 d.default_comprehensive_sets_assigned = 0
                     elif self.comprehensive_winner == 3:
                         for d in a.dosages:
-                            if d.priority == '3' and d.severity() <= 4:
+                            if d.priority == '3':
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
                                 d.default_comprehensive_reps_assigned = 0
                                 d.default_comprehensive_sets_assigned = 0
                     elif self.comprehensive_winner == 4:
                         for d in a.dosages:
-                            if d.priority == '3':
+                            if d.priority == '3' and d.severity() <= 4:
                                 d.comprehensive_reps_assigned = 0
                                 d.comprehensive_sets_assigned = 0
                                 d.default_comprehensive_reps_assigned = 0
