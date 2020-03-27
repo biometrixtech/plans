@@ -593,7 +593,7 @@ class Activity(object):
             elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
                 continue
             #elif abs(total_comprehensive - self.proposed_comprehensive_limit) < abs(proposed_comprehensive - self.proposed_comprehensive_limit):
-            elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_complete_limit:
+            elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
                 comprehensive_found = True
                 break
