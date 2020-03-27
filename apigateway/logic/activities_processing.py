@@ -9,7 +9,7 @@ class ActivitiesProcessing(object):
 
     def save_completed_exercises(self, exercise_list, user_id, event_date):
         for exercise in exercise_list:
-            self.completed_exercise_datastore.put(CompletedExercise(athlete_id=user_id, exercise_id=exercise,
+            self.completed_exercise_datastore.put(CompletedExercise(athlete_id=user_id, exercise_id=str(exercise),
                                                                     event_date=event_date))
 
     def mark_activity_completed(self, activity, completed_date_time, activity_type, user_id, completed_exercises):
