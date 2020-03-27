@@ -1155,11 +1155,16 @@ class MovementIntegrationPrep(ActiveRestBase):
         if muscle_spasm or knots or inflammation:
 
             last_severity = 0
+            last_muscle_spasm_knots_severity = 0
 
             if muscle_spasm:
                 last_severity = max(last_severity, body_part_injury_risk.get_muscle_spasm_severity(self.event_date_time.date()))
+                last_muscle_spasm_knots_severity = last_severity
+
             if knots:
                 last_severity = max(last_severity, body_part_injury_risk.get_knots_severity(self.event_date_time.date()))
+                last_muscle_spasm_knots_severity = last_severity
+
             if inflammation:
                 last_severity = max(last_severity, body_part_injury_risk.get_inflammation_severity(self.event_date_time.date()))
 
@@ -1170,7 +1175,7 @@ class MovementIntegrationPrep(ActiveRestBase):
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
-                                        last_severity, exercise_library)
+                                        last_muscle_spasm_knots_severity, exercise_library)
 
             if max_severity < 7.0:
                 if self.sport_cardio_plyometrics:
