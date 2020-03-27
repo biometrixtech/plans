@@ -108,7 +108,7 @@ def handle_mobility_wod_start(user_id, mobility_wod_id):
 
     mobility_wod_datastore.put(mobility_wod)
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}
 
 
 @app.route('/<uuid:user_id>/<uuid:mobility_wod_id>/complete_activity', methods=['POST'])
@@ -137,7 +137,7 @@ def handle_mobility_wod_complete(user_id, mobility_wod_id):
 
     mobility_wod_datastore.put(mobility_wod)
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}
 
 
 @app.route('/<uuid:user_id>/<uuid:mobility_wod_id>', methods=['GET'])
@@ -149,7 +149,7 @@ def handle_mobility_wod_get(user_id, mobility_wod_id):
     if mobility_wod.user_id != user_id:
         return {'message': 'user_id and mobility_wod_id do not match'}, 404
 
-    return {'mobility_wod': mobility_wod.json_serialise()}, 200
+    return {'mobility_wod': mobility_wod.json_serialise()}
 
 
 @xray_recorder.capture('routes.mobility_wod.validate')

@@ -148,7 +148,7 @@ def handle_responsive_recovery_update(user_id, responsive_recovery_id):
             training_session_id=existing_responsive_recovery.training_session_id
     )
 
-    return {'responsive_recovery': responsive_recovery.json_serialise()}, 201
+    return {'responsive_recovery': responsive_recovery.json_serialise()}
 
 
 @app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>/start_activity', methods=['POST'])
@@ -176,7 +176,7 @@ def handle_responsive_recovery_start(user_id, responsive_recovery_id):
 
     responsive_recovery_datastore.put(responsive_recovery)
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}
 
 
 @app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>/complete_activity', methods=['POST'])
@@ -205,7 +205,7 @@ def handle_responsive_recovery_complete(user_id, responsive_recovery_id):
 
     responsive_recovery_datastore.put(responsive_recovery)
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}
 
 
 @app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>', methods=['GET'])
@@ -217,7 +217,7 @@ def handle_responsive_recovery_get(user_id, responsive_recovery_id):
     if responsive_recovery.user_id != user_id:
         return {'message': 'user_id and responsive_recovery_id do not match'}, 404
 
-    return {'responsive_recovery': responsive_recovery.json_serialise()}, 200
+    return {'responsive_recovery': responsive_recovery.json_serialise()}
 
 
 @xray_recorder.capture('routes.responsive_recovery.validate')

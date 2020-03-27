@@ -99,7 +99,7 @@ def handle_movement_prep_start(user_id, movement_prep_id):
 
     movement_prep_datastore.put(movement_prep)
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}
 
 
 @app.route('/<uuid:user_id>/<uuid:movement_prep_id>/complete_activity', methods=['POST'])
@@ -128,7 +128,7 @@ def handle_movement_prep_complete(user_id, movement_prep_id):
 
     movement_prep_datastore.put(movement_prep)
 
-    return {'message': 'success'}, 202
+    return {'message': 'success'}
 
 
 @app.route('/<uuid:user_id>/<uuid:movement_prep_id>', methods=['GET'])
@@ -140,7 +140,7 @@ def handle_movement_prep_get(user_id, movement_prep_id):
     if movement_prep.user_id != user_id:
         return {'message': 'user_id and movement_prep_id do not match'}, 404
 
-    return {'movement_prep': movement_prep.json_serialise()}, 200
+    return {'movement_prep': movement_prep.json_serialise()}
 
 
 @xray_recorder.capture('routes.movement_prep.validate')
