@@ -361,7 +361,7 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
 <!-- TODO - paul: title and language -->
 ### Start Movement Prep Activity
 
-The Start Movement Prep endpoint can be called to mark that the athlete has started a specific activity recommended as part of Movement Prep.
+The Start Movement Prep endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Movement Prep.
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/start_activity`. The request method __must__ be `POST`.
@@ -394,7 +394,7 @@ Authorization: eyJraWQ...ajBc4VQ
 <!-- TODO - paul: title and language -->
 ### Complete Movement Prep Activity
 
-The Complete Movement Prep endpoint can be called to mark that the athlete has completed a specific activity recommended as part of Movement Prep.
+The Complete Movement Prep endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Movement Prep.
 
 ##### Query String
 
@@ -755,7 +755,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 <!-- TODO - paul: title and language -->
 ### Start Mobility WOD Activity
 
-The Start Mobility WOD endpoint can be called to mark that the athlete has started a specific activity recommended as part of Mobility WOD.
+The Start Mobility WOD endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Mobility WOD.
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/start_activity`. The request method __must__ be `POST`.
@@ -788,7 +788,7 @@ Authorization: eyJraWQ...ajBc4VQ
 <!-- TODO - paul: title and language -->
 ### Complete Mobility WOD Activity
 
-The Complete Mobility WOD endpoint can be called to mark that the athlete has completed a specific activity recommended as part of Mobility WOD.
+The Complete Mobility WOD endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Mobility WOD.
 
 ##### Query String
 
@@ -865,7 +865,7 @@ The Activities returned will also consider prior completed workouts and prior lo
 
 ### Basic Case
 
-Requesting Activities using the Responsive Recovery endpoint  requires the local date time of the athlete and one completed workout session.
+Requesting Activities using the Responsive Recovery endpoint requires the local date time of the athlete and one completed workout session.
 
 The completed workout session may be reported using one of two formats:
 
@@ -1063,7 +1063,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 <!-- TODO - paul: title and language -->
 ### Get Responsive Recovery
 
-The Get Responsive Recovery endpoint can be called to retrieve a previously assigned responsive recovery.
+The Get Responsive Recovery endpoint can be called to retrieve a previously assigned Responsive Recovery Activities.
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}`. The request method __must__ be `GET`.
@@ -1192,7 +1192,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 <!-- TODO - paul: title and language -->
 ### Start Responsive Recovery Activity
 
-The Start Responsive Recovery endpoint can be called to mark that the athlete has started a specific activity recommended as part of Responsive Recovery.
+The Start Responsive Recovery endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Responsive Recovery.
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/start_activity`. The request method __must__ be `POST`.
@@ -1225,7 +1225,7 @@ Authorization: eyJraWQ...ajBc4VQ
 <!-- TODO - paul: title and language -->
 ### Complete Responsive Recovery Activity
 
-The Complete Responsive Recovery endpoint can be called to mark that the athlete has completed a specific activity recommended as part of Responsive Recovery.
+The Complete Responsive Recovery endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Responsive Recovery.
 
 ##### Query String
 
@@ -1631,7 +1631,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 * `start_date_time` __will__ be the date/time the end user starts this activity
 * `completed_date_time` __will__ be the date/time the end user completed this activity
 * `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
-* `completed` __will__ indicate whether or not this activity has been mark completed
+* `completed` __will__ indicate whether or not this activity has been marked completed
 * `default_plan` __will__ indicate the recommended dosage plan based on the athlete's current needs.  Will be "efficient", "complete" or "comprehensive".
 * `goals` __will__ be a name/value collection of Activity Goals as defined in this Appendix
 * `exercise_phases` __will__ be list of Exercise Phase objects as defined in this Appendix
