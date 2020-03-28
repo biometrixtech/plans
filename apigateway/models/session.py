@@ -4,9 +4,8 @@ import uuid
 import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
-from models.sport import SportName, SportType, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
+from models.sport import SportName, SportType
 from models.post_session_survey import PostSurvey
-# from models.load_stats import LoadStats
 from models.asymmetry import Asymmetry
 from models.movement_patterns import MovementPatterns
 from models.soreness_base import BodyPartSide, BodyPartLocation
@@ -31,7 +30,7 @@ class SessionType(Enum):
 
 
 class StrengthConditioningType(Enum):
-    "sub-type for session_type=1"
+    """sub-type for session_type=1"""
     endurance = 0
     power = 1
     speed_agility = 2
@@ -84,10 +83,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.mod_intensity_minutes = None
         self.low_intensity_minutes = None
         self.inactive_minutes = None
-        #self.high_intensity_RPE = None
-        #self.mod_intensity_RPE = None
-        #self.low_intensity_RPE = None
-        self.post_session_soreness = []     # post_session_soreness object array
+        self.post_session_soreness = []  # post_session_soreness object array
         self.duration_minutes = None
         self.created_date = None
         self.completed_date_time = None
@@ -140,6 +136,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.power_drill_load = None
         self.maximal_strength_hypertrophic_load = None
         self.power_explosive_action_load = None
+        self.cardio_plyometrics = None
+        self.ultra_high_intensity = None
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
@@ -277,7 +275,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         if len(loads) > 0:
             load = max(loads)
 
-        return  load
+        return load
 
     def get_distance_training_volume(self, sport_name):
         if self.sport_name == sport_name is not None and self.distance is not None:
@@ -359,8 +357,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'strength_endurance_strength_load': self.strength_endurance_strength_load if self.strength_endurance_strength_load is not None else None,
             'power_drill_load': self.power_drill_load if self.power_drill_load is not None else None,
             'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load if self.maximal_strength_hypertrophic_load is not None else None,
-            'power_explosive_action_load': self.power_explosive_action_load if self.power_explosive_action_load is not None else None
-
+            'power_explosive_action_load': self.power_explosive_action_load if self.power_explosive_action_load is not None else None,
+            'cardio_plyometrics': self.cardio_plyometrics,
+            'ultra_high_intensity': self.ultra_high_intensity
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
             # 'underactive_weak_body_parts': [u.json_serialise() for u in self.underactive_weak_body_parts],
@@ -435,6 +434,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.power_drill_load = input_dict.get('power_drill_load')
         session.maximal_strength_hypertrophic_load = input_dict.get('maximal_strength_hypertrophic_load')
         session.power_explosive_action_load = input_dict.get('power_explosive_action_load')
+        session.cardio_plyometrics = input_dict.get('cardio_plyometrics')
+        session.ultra_high_intensity = input_dict.get('ultra_high_intensity')
 
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]
@@ -477,12 +478,13 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def is_cardio_plyometrics(self):
         return False
 
+
 class SessionFactory(object):
 
     def create(self, session_type: SessionType):
 
-        #if session_type == SessionType.practice:
-        #    session_object = PracticeSession()
+        # if session_type == SessionType.practice:
+        #     session_object = PracticeSession()
         if session_type == SessionType.game:
             session_object = Game()
         elif session_type == SessionType.bump_up:
@@ -540,13 +542,17 @@ class MixedActivitySession(Session):
     #     return Session.missing_post_session_survey()
 
     def ultra_high_intensity_session(self):
+        if self.ultra_high_intensity is not None:
+            return self.ultra_high_intensity
         if self.workout_program_module is not None:
             for section in self.workout_program_module.workout_sections:
                 if section.assess_load:
                     for exercise in section.exercises:
                         for action in exercise.primary_actions:
                             if action.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                                self.ultra_high_intensity = True
                                 return True
+        self.ultra_high_intensity = False
         return False
 
     def high_intensity_RPE(self):
@@ -567,19 +573,23 @@ class MixedActivitySession(Session):
 
     def training_load(self, load_stats):
 
-        #training_load = self.workout_program_module.get_training_load()
+        # training_load = self.workout_program_module.get_training_load()
 
-        #return training_load
+        # return training_load
         return None
 
     def is_cardio_plyometrics(self):
         # TODO: Validate/Update this logic
+        if self.cardio_plyometrics is not None:
+            return self.cardio_plyometrics
         if self.workout_program_module is not None:
             for section in self.workout_program_module.workout_sections:
                 if section.assess_load:
                     for exercise in section.exercises:
                         if exercise.training_type in [TrainingType.strength_cardiorespiratory, TrainingType.power_drills_plyometrics, TrainingType.power_action_plyometrics]:
+                            self.cardio_plyometrics = True
                             return True
+        self.cardio_plyometrics = False
         return False
 
 
@@ -655,6 +665,7 @@ class SportTrainingSession(Session):
             if self.sport_name in cardio_sports:
                 return True
         return False
+
 
 class StrengthConditioningSession(Session):
     def __init__(self):

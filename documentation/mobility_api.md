@@ -315,6 +315,129 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
 * `movement_integration_prep` will have the schema as defined in the Appendix.
 
 
+<!-- TODO - paul: title and language -->
+### Get Movement Prep
+
+The Get Movement Prep endpoint can be called to retrieve a previously assigned Movement Prep.
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}`. The request method __must__ be `GET`.
+
+##### Request
+
+Body is not required for this request.
+```
+GET /plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+```
+
+##### Response
+ 
+If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+
+```
+ {
+    "movement_prep": movement_prep
+ }
+```
+
+* `movement_prep` will have the following schema:
+
+```
+{
+    "movement_prep_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id": UUID,
+    "movement_integration_prep": movement_integration_prep
+}
+```
+
+* `movement_integration_prep` will have the schema as defined in the Appendix.
+
+
+<!-- TODO - paul: title and language -->
+### Start Movement Prep Activity
+
+The Start Movement Prep endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Movement Prep.
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/start_activity`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "activity_type": integer
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
+
+```
+POST /plans/{version}/movement_prep/{User UUID}/{Mov Prep UUID}/start_activity HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "activity_type": 0
+}
+```
+
+<!-- TODO - paul: title and language -->
+### Complete Movement Prep Activity
+
+The Complete Movement Prep endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Movement Prep.
+
+##### Query String
+
+The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/complete_activity`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "activity_type": integer,
+    "completed_exercises": [string, string]
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
+* `completed_exercises` __should__ be a list of `library_id` for each exercise completed by the athlete.
+
+```
+POST /plans/{version}/movement_prep/{User UUID}/{Mov Prep UUID}/complete_activity HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:55:24-05:00",
+    "activity_type": 0,
+    "completed_exercises": ["1", "50", "70"]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+ 
+```
+ {
+    "message": "success"
+ }
+```
+
 ## III. Mobility WOD (Workout of the Day)
 
 ### Overview & Description
@@ -589,6 +712,127 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 <div style="page-break-after: always;"></div>
 
+<!-- TODO - paul: title and language -->
+### Get Mobility WOD
+
+The Get Mobility WOD endpoint can be called to retrieve a previously assigned Mobility WOD.
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}`. The request method __must__ be `GET`.
+
+##### Request
+
+Body is not required for this request.
+```
+GET /plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+ 
+```
+ {
+    "mobility_wod": mobility_wod
+ }
+```
+
+* `mobility_wod` will have the following schema:
+
+```
+{
+    "mobility_wod_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_ids": [],
+    "active_rest": active_rest
+}
+```
+
+<!-- TODO - paul: title and language -->
+### Start Mobility WOD Activity
+
+The Start Mobility WOD endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Mobility WOD.
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/start_activity`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "activity_type": integer
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
+
+```
+POST /plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/start_activity HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "activity_type": 0
+}
+```
+
+<!-- TODO - paul: title and language -->
+### Complete Mobility WOD Activity
+
+The Complete Mobility WOD endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Mobility WOD.
+
+##### Query String
+
+The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/complete_activity`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "activity_type": integer,
+    "completed_exercises": [string, string]
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
+* `completed_exercises` __should__ be a list of `library_id` for each exercise completed by the athlete.
+
+```
+POST /plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/complete_activity HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:55:24-05:00",
+    "activity_type": 0,
+    "completed_exercises": ["1", "50", "70"]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+ 
+```
+ {
+    "message": "success"
+ }
+```
+
+
 ## IV. Responsive Recovery
 
 ### Overview & Description
@@ -621,7 +865,7 @@ The Activities returned will also consider prior completed workouts and prior lo
 
 ### Basic Case
 
-Requesting Activities using the Responsive Recovery endpoint  requires the local date time of the athlete and one completed workout session.
+Requesting Activities using the Responsive Recovery endpoint requires the local date time of the athlete and one completed workout session.
 
 The completed workout session may be reported using one of two formats:
 
@@ -816,6 +1060,51 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
+<!-- TODO - paul: title and language -->
+### Get Responsive Recovery
+
+The Get Responsive Recovery endpoint can be called to retrieve a previously assigned Responsive Recovery Activities.
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}`. The request method __must__ be `GET`.
+
+##### Request
+
+Body is not required for this request.
+```
+GET /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID} HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+ 
+```
+ {
+    "responsive_recovery": responsive_recovery
+ }
+```
+
+* `responsive_recovery` will have the following schema:
+
+```
+{
+    "responsive_recovery_id": UUID,
+    "user_id": UUID,
+    "created_date_time": Datetime,
+    "training_session_id": UUID,
+    "active_rest": active_rest,
+    "active_recovery": active_recovery,
+    "ice": ice,
+    "cold_water_immersion": cold_water_immersion
+}
+```
+
+* `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
+
 
 <!-- TODO - paul: title and language -->
 ### Update Responsive Recovery
@@ -843,7 +1132,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
 
 ```
-POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID} HTTPS/1.1
+POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID}/update HTTPS/1.1
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -875,7 +1164,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
-If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+If the request was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
  
 ```
  {
@@ -900,7 +1189,86 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
+<!-- TODO - paul: title and language -->
+### Start Responsive Recovery Activity
 
+The Start Responsive Recovery endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Responsive Recovery.
+##### Query String
+ 
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/start_activity`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "activity_type": integer
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
+
+```
+POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID}/start_activity HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:45:24-05:00",
+    "activity_type": 2
+}
+```
+
+<!-- TODO - paul: title and language -->
+### Complete Responsive Recovery Activity
+
+The Complete Responsive Recovery endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Responsive Recovery.
+
+##### Query String
+
+The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/complete_activity`. The request method __must__ be `POST`.
+
+##### Request
+The client __must__ submit a request body containing a JSON object having the following schema:
+
+```
+{
+    "event_date_time": Datetime,
+    "activity_type": integer,
+    "completed_exercises": [string, string]
+}
+```
+
+* `event_date_time` __should__ reflect the local time that request was submitted
+* `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
+* `completed_exercises` __should__ be a list of `library_id` for each exercise completed by the athlete. This is an __optional__ parameter that's not required for `Ice` or `Cold Water Immersion`
+
+
+```
+POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID}/complete_activity HTTPS/1.1
+Host: apis.{env}.fathomai.com
+Content-Type: application/json
+Authorization: eyJraWQ...ajBc4VQ
+
+{
+    "event_date_time": "2018-12-10T17:55:24-05:00",
+    "activity_type": 2,
+    "completed_exercises": ["1", "50", "70"]
+}
+```
+
+##### Response
+ 
+If the request was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+ 
+```
+ {
+    "message": "success"
+ }
+```
 
 <div style="page-break-after: always;"></div>
 
@@ -1263,7 +1631,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 * `start_date_time` __will__ be the date/time the end user starts this activity
 * `completed_date_time` __will__ be the date/time the end user completed this activity
 * `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
-* `completed` __will__ indicate whether or not this activity has been mark completed
+* `completed` __will__ indicate whether or not this activity has been marked completed
 * `default_plan` __will__ indicate the recommended dosage plan based on the athlete's current needs.  Will be "efficient", "complete" or "comprehensive".
 * `goals` __will__ be a name/value collection of Activity Goals as defined in this Appendix
 * `exercise_phases` __will__ be list of Exercise Phase objects as defined in this Appendix
