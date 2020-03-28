@@ -614,6 +614,7 @@ class Activity(object):
     def scale_all_active_time(self):
         for phase in self.exercise_phases:
             self.scale_active_time(phase.exercises)
+            phase.exercises = {ex: a for ex, a in phase.exercises.items() if len(a.dosages) > 0 and a.duration_comprehensive() > 0}
 
     def scale_active_time(self, assigned_exercises):
 
@@ -742,6 +743,7 @@ class Activity(object):
                         pass
                     elif self.comprehensive_winner == 0:
                         pass
+
 
     def calc_dosage_durations(self, benchmark_value, assigned_exercise, dosage):
         if dosage.efficient_reps_assigned is not None and dosage.efficient_sets_assigned is not None:
