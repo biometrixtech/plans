@@ -22,7 +22,8 @@ class ActivitiesProcessing(object):
         else:
             raise NoSuchEntityException()
 
-    def mark_activity_started(self, activity, start_date_time, activity_type):
+    @staticmethod
+    def mark_activity_started(activity, start_date_time, activity_type):
         started_activity = activity.__getattribute__(ActivityType(activity_type).name)
         if started_activity is not None:
             started_activity.start_date_time = start_date_time

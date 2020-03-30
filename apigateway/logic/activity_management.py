@@ -1,8 +1,6 @@
 from fathomapi.utils.xray import xray_recorder
 
-# from logic.soreness_processing import SorenessCalculator
 from logic.injury_risk_processing import InjuryRiskProcessor
-#from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from logic.exercise_assignment import ExerciseAssignment
 from models.athlete_injury_risk import AthleteInjuryRisk
 

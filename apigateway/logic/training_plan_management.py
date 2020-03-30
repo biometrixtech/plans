@@ -207,8 +207,7 @@ class TrainingPlanManager(object):
             self.daily_plan.modalities.extend(active_rests)
 
             # update any existing movement preps
-            movement_preps = [m for m in self.daily_plan.modalities if
-                                          m.type.value == ModalityType.movement_integration_prep.value]
+            movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value]
 
             if len(movement_preps) > 0:
                 # remove existing movement preps
