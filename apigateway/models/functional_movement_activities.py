@@ -486,9 +486,10 @@ class Activity(object):
 
                 max_priority = a.dosages[0].priority
 
-                #a.dosages = [d for d in a.dosages if d.priority == max_priority]
+                a.dosages = [d for d in a.dosages if d.priority == max_priority]
 
                 consolidated_dosage = ExerciseDosage()
+                consolidated_dosage.priority = max_priority
 
                 # this is unnecessary since we already sorted on this
                 dosages = sorted(a.dosages, key=lambda x: (x.default_efficient_sets_assigned,
@@ -569,19 +570,20 @@ class Activity(object):
             elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
                 continue
             elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
-            #elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
+            # elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
                 self.efficient_winner = benchmarks[last_efficient_value]
                 efficient_found = True
                 break
-            elif total_efficient + proposed_efficient == self.proposed_efficient_limit:
+            elif total_efficient + proposed_efficient <= self.proposed_efficient_limit + 120:
                 self.efficient_winner = benchmarks[b + 1]
                 efficient_found = True
                 break
             else:
-                self.efficient_winner = benchmarks[b + 1]
+                self.efficient_winner = benchmarks[last_efficient_value]
+                # self.efficient_winner = benchmarks[b + 1]
                 efficient_found = True
                 # TODO - see if a `break` is needed here. Modality logic had it
-                # break
+                break
         if not efficient_found:
             self.efficient_winner = benchmarks[last_efficient_value]
 
@@ -598,20 +600,21 @@ class Activity(object):
                 continue
             elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
                 continue
-            elif abs(total_complete - self.proposed_complete_limit) < abs(proposed_complete - self.proposed_complete_limit):
-            #elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
+            elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
+            # elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
                 self.complete_winner = benchmarks[last_complete_value]
                 complete_found = True
                 break
-            elif total_complete + proposed_complete == self.proposed_complete_limit:
+            elif total_complete + proposed_complete <= self.proposed_complete_limit + 180:
                 self.complete_winner = benchmarks[b + 1]
                 complete_found = True
                 break
             else:
-                self.complete_winner = benchmarks[b + 1]
+                self.complete_winner = benchmarks[last_complete_value]
+                # self.complete_winner = benchmarks[b + 1]
                 complete_found = True
                 # TODO - see if a `break` is needed here. Modality logic had it
-                # break
+                break
         if not complete_found:
             self.complete_winner = benchmarks[last_complete_value]
         for b in range(0, len(benchmarks) - 1):
@@ -627,20 +630,21 @@ class Activity(object):
                 continue
             elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
                 continue
-            elif abs(total_comprehensive - self.proposed_comprehensive_limit) < abs(proposed_comprehensive - self.proposed_comprehensive_limit):
-            #elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
+            elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
+            # elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
                 comprehensive_found = True
                 break
-            elif total_comprehensive + proposed_comprehensive == self.proposed_comprehensive_limit:
+            elif total_comprehensive + proposed_comprehensive <= self.proposed_comprehensive_limit + 180:
                 self.comprehensive_winner = benchmarks[b + 1]
                 comprehensive_found = True
                 break
             else:
-                self.comprehensive_winner = benchmarks[b + 1]
+                self.comprehensive_winner = benchmarks[last_comprehensive_value]
+                # self.comprehensive_winner = benchmarks[b + 1]
                 comprehensive_found = True
                 # TODO - see if a `break` is needed here. Modality logic had it
-                # break
+                break
         if not comprehensive_found:
             self.comprehensive_winner = benchmarks[last_comprehensive_value]
 
