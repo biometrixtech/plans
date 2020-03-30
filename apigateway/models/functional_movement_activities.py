@@ -484,10 +484,43 @@ class Activity(object):
                                                              x.default_comprehensive_sets_assigned,
                                                              x.default_comprehensive_reps_assigned), reverse=True)
 
+                max_priority = a.dosages[0].priority
+
+                #a.dosages = [d for d in a.dosages if d.priority == max_priority]
+
+                consolidated_dosage = ExerciseDosage()
+
+                # this is unnecessary since we already sorted on this
+                dosages = sorted(a.dosages, key=lambda x: (x.default_efficient_sets_assigned,
+                                                             x.default_efficient_reps_assigned), reverse=True)
+
+                consolidated_dosage.efficient_sets_assigned = dosages[0].efficient_sets_assigned
+                consolidated_dosage.efficient_reps_assigned = dosages[0].efficient_reps_assigned
+                consolidated_dosage.default_efficient_sets_assigned = dosages[0].default_efficient_sets_assigned
+                consolidated_dosage.default_efficient_reps_assigned = dosages[0].default_efficient_reps_assigned
+
+                dosages = sorted(a.dosages, key=lambda x: (x.default_complete_sets_assigned,
+                                                           x.default_complete_reps_assigned), reverse=True)
+
+                consolidated_dosage.complete_sets_assigned = dosages[0].complete_sets_assigned
+                consolidated_dosage.complete_reps_assigned = dosages[0].complete_reps_assigned
+                consolidated_dosage.default_complete_sets_assigned = dosages[0].default_complete_sets_assigned
+                consolidated_dosage.default_complete_reps_assigned = dosages[0].default_complete_reps_assigned
+
+                dosages = sorted(a.dosages, key=lambda x: (x.default_comprehensive_sets_assigned,
+                                                           x.default_comprehensive_reps_assigned), reverse=True)
+
+                consolidated_dosage.comprehensive_sets_assigned = dosages[0].comprehensive_sets_assigned
+                consolidated_dosage.comprehensive_reps_assigned = dosages[0].comprehensive_reps_assigned
+                consolidated_dosage.default_comprehensive_sets_assigned = dosages[0].default_comprehensive_sets_assigned
+                consolidated_dosage.default_comprehensive_reps_assigned = dosages[0].default_comprehensive_reps_assigned
+
                 self.add_goals(a.dosages)
-                dosage = a.dosages[0]
                 for goal_dosage in a.dosages:
                     self.update_goals(goal_dosage)
+
+                #dosage = a.dosages[0]
+                dosage = consolidated_dosage
 
                 if dosage.priority == "1":
                     self.calc_dosage_durations(1, a, dosage)
@@ -535,8 +568,8 @@ class Activity(object):
                 continue
             elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
                 continue
-            #elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
-            elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
+            elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
+            #elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
                 self.efficient_winner = benchmarks[last_efficient_value]
                 efficient_found = True
                 break
@@ -565,8 +598,8 @@ class Activity(object):
                 continue
             elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
                 continue
-            #elif abs(total_complete - self.proposed_complete_limit) < abs(proposed_complete - self.proposed_complete_limit):
-            elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
+            elif abs(total_complete - self.proposed_complete_limit) < abs(proposed_complete - self.proposed_complete_limit):
+            #elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
                 self.complete_winner = benchmarks[last_complete_value]
                 complete_found = True
                 break
@@ -594,8 +627,8 @@ class Activity(object):
                 continue
             elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
                 continue
-            #elif abs(total_comprehensive - self.proposed_comprehensive_limit) < abs(proposed_comprehensive - self.proposed_comprehensive_limit):
-            elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
+            elif abs(total_comprehensive - self.proposed_comprehensive_limit) < abs(proposed_comprehensive - self.proposed_comprehensive_limit):
+            #elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
                 comprehensive_found = True
                 break
