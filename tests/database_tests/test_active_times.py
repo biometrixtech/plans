@@ -240,12 +240,8 @@ def get_activity(event_date_time, symptoms, sessions, activity_type='movement_pr
         movement_prep = calc.get_movement_integration_prep(force_on_demand=True)
         return movement_prep
     elif activity_type == 'mobility_wod':
-        mobility_wod = calc.get_active_rest('tester', force_on_demand=True)
+        mobility_wod = calc.get_active_rest(force_on_demand=True)
         return mobility_wod
-    elif activity_type == 'responsive_recovery':
-        calc.high_intensity_session = is_high_intensity_session(sessions)
-        modality, ice, cwi = calc.get_responsive_recovery(sessions[0].id, force_on_demand=True)
-        return modality, ice, cwi
 
 
 def get_body_part_string(symptoms):
@@ -280,10 +276,10 @@ def test_generate_spreadsheets():
             'dynamic_integrate_exercises,dynamic_integrate_minutes_efficient,dynamic_integrate_minutes_complete,dynamic_integrate_minutes_comprehensive'
             )
 
-    active_rest_file = open("../../output/active_rest.csv", 'w')
+    active_rest_file = open("../../output/active_rest_10.csv", 'w')
     active_rest_file.write(line + '\n')
 
-    movement_integration_prep_file = open("../../output/movement_integration_prep.csv", 'w')
+    movement_integration_prep_file = open("../../output/movement_integration_prep_10.csv", 'w')
     movement_integration_prep_file.write(line + '\n')
 
     possible_symptoms = [('sharp',), ('knots', 'sharp'), ('tight', 'ache')]
