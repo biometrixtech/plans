@@ -561,7 +561,7 @@ class Activity(object):
             if self.dosage_durations[benchmarks[b]].efficient_duration > 0:
                 last_efficient_value = b
             proposed_efficient = self.dosage_durations[benchmarks[b + 1]].efficient_duration
-            if total_efficient > self.proposed_efficient_limit:
+            if total_efficient >= self.proposed_efficient_limit:
                 self.efficient_winner = benchmarks[last_efficient_value]
                 efficient_found = True
                 break
@@ -592,7 +592,7 @@ class Activity(object):
             if self.dosage_durations[benchmarks[b]].complete_duration > 0:
                 last_complete_value = b
             proposed_complete = self.dosage_durations[benchmarks[b + 1]].complete_duration
-            if total_complete > self.proposed_complete_limit:
+            if total_complete >= self.proposed_complete_limit:
                 self.complete_winner = benchmarks[last_complete_value]
                 complete_found = True
                 break
@@ -622,7 +622,7 @@ class Activity(object):
             if self.dosage_durations[benchmarks[b]].comprehensive_duration > 0:
                 last_comprehensive_value = b
             proposed_comprehensive = self.dosage_durations[benchmarks[b + 1]].comprehensive_duration
-            if total_comprehensive > self.proposed_comprehensive_limit:
+            if total_comprehensive >= self.proposed_comprehensive_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
                 comprehensive_found = True
                 break
