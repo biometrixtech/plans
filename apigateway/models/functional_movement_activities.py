@@ -1280,7 +1280,7 @@ class MovementIntegrationPrep(ActiveRestBase):
         excessive_strain = False
 
         if body_part is not None and body_part.location in sport_body_parts:
-            if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
                 excessive_strain = True
 
             if (body_part_injury_risk.last_movement_dysfunction_stress_date is not None and
@@ -1289,7 +1289,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                 body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-                  0 < body_part_injury_risk.total_compensation_percent_tier < 4):
+                  0 < body_part_injury_risk.total_compensation_percent_tier < 6):
                 compensating = True
 
             if excessive_strain or compensating:
@@ -1592,7 +1592,7 @@ class ActiveRest(ActiveRestBase):
 
         if body_part is not None:
 
-            if 0 < body_part_injury_risk.total_volume_percent_tier < 4:
+            if 0 < body_part_injury_risk.total_volume_percent_tier < 6:
                 # goals.append(AthleteGoal("Recover from Training", 1, AthleteGoalType.high_load))
                 high_load = True
 
@@ -1603,7 +1603,7 @@ class ActiveRest(ActiveRestBase):
                 body_part_injury_risk.total_compensation_percent_tier = 1
             elif (body_part_injury_risk.last_compensation_date is not None
                   and body_part_injury_risk.last_compensation_date == self.event_date_time.date() and
-                  0 < body_part_injury_risk.total_compensation_percent_tier < 4):
+                  0 < body_part_injury_risk.total_compensation_percent_tier < 6):
 
                 compensating = True
 
