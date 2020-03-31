@@ -199,7 +199,7 @@ def test_check_movement_prep_phases_no_inputs_default_force_on_demand():
 
     movement_prep = calc.get_movement_integration_prep()[0]
     assert movement_prep.exercise_phases[0].type == ExercisePhaseType.inhibit
-    assert len(movement_prep.exercise_phases[0].exercises) > 0
+    # assert len(movement_prep.exercise_phases[0].exercises) > 0  # inhibit is the first one to get removed so, possibly not always included
     assert movement_prep.exercise_phases[1].type == ExercisePhaseType.static_stretch
     assert len(movement_prep.exercise_phases[1].exercises) == 0
 
