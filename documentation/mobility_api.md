@@ -113,7 +113,7 @@ Partners __may__ interact with the API on a business-to-business basis instead o
 
 #### General responses
 
-In addition to the AWS API Gateway responses and the specific responses for each endpoint, the server __may__ respond with one of the following HTTP responses:
+In addition to the AWS API Gateway responses and the specific responses for each endpoint, the server  __may__ respond with one of the following HTTP responses:
 
 * `400 Bad Request` with `Status` header equal to `InvalidSchema`, if the JSON body of the request does not match the requirements of the endpoint.
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
@@ -123,7 +123,7 @@ In addition to the AWS API Gateway responses and the specific responses for each
 
 #### Schema
 
-The following simple types __may__ be used in requests and responses:
+The following simple types  __may__ be used in requests and responses:
 
 * `string`, `number`, `integer`, `boolean`: as defined in the [JSON Schema](http://json-schema.org) standard.
 * `UUID`: a `string` matching the regular expression `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`, that is, the string representation of an [RFC 4122](https://tools.ietf.org/html/rfc4122) UUID.
@@ -165,9 +165,9 @@ Requesting a _Movement Integration Preparation Activity_ requires the local date
 
 The planned workout session may be reported using one of two formats:
 
-* Use the __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the athlete should use this format.
+* Use the  __Detailed Session__ (`session_type: 7`) format for workouts for which you have detailed content. Most workouts completed in your service to the athlete should use this format.
 
-* Use the __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+* Use the  __Simple Session__  (`session_type: 6`) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
 This will generate a _Movement Prep Integration Activity_ that takes into consideration the planned workout and athlete's history. 
 
@@ -175,11 +175,11 @@ _For more information about  __session__ formats, please see the Appendix._
  
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -187,8 +187,8 @@ The client __must__ submit a request body containing a JSON object having the fo
     "session": session
 }
 ```
-* `event_date_time` __should__ reflect the local time that request was submitted
-* `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
+* `event_date_time`  __should__ reflect the local time that request was submitted
+* `session`  __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
 
 ```
 POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
@@ -213,7 +213,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
- If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+ If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
 
 ```
  {
@@ -237,15 +237,15 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ### Including Today's Symptoms
 
-If the client includes the optional __symptoms__ element, a _Movement Integration Preparation Activity_ will be returned with consideration for the symptoms the athlete is experiencing today and the projected, resulting response to the upcoming workout.
+If the client includes the optional  __symptoms__ element, a _Movement Integration Preparation Activity_ will be returned with consideration for the symptoms the athlete is experiencing today and the projected, resulting response to the upcoming workout.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -257,7 +257,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
-* `symptoms` __should__ reflect a list of `symptom` objects as defined in the Appendix. Length __could__ be 0.
+* `symptoms` __should__ reflect a list of `symptom` objects as defined in the Appendix. Length  __could__ be 0.
 
 ```
 POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
@@ -291,7 +291,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
-If the request was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
+If the request was successful, the Service  __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
 
 ```
  {
@@ -319,7 +319,7 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
 The Get Movement Prep endpoint can be called to retrieve a previously assigned Movement Prep.
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}`. The request method __must__ be `GET`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}`. The request method  __must__ be `GET`.
 
 ##### Request
 
@@ -333,7 +333,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 ##### Response
  
-If the request was successful, the Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
+If the request was successful, the Service  __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
 
 ```
  {
@@ -364,10 +364,10 @@ The Start Movement Prep endpoint can be called to indicate that the athlete has 
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/start_activity`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/start_activity`. The request method  __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -399,10 +399,10 @@ The Complete Movement Prep endpoint can be called to indicate that the athlete h
 
 ##### Query String
 
-The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/complete_activity`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/complete_activity`. The request method  __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -474,7 +474,7 @@ An Active Rest Activity can be requested by only submitting the local date time 
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
@@ -525,23 +525,23 @@ Authorization: eyJ0eX...xA8
 
 ### Including Completed Workout Session(s)
 
-If the client includes the optional __sessions__ element, an Active Rest Activity will be returned with consideration for the workout session(s) the athlete completed and their history.
+If the client includes the optional  __sessions__ element, an Active Rest Activity will be returned with consideration for the workout session(s) the athlete completed and their history.
 
 Completed workout session may be reported using one of two formats:
 
-* Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
+* Use the  __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
 
-* Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information) 
+* Use the  __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information) 
 
 _For more information about  __session__ formats, please see the Appendix._
  
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -647,15 +647,15 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 ### Including Today's Symptoms
-If the client includes the optional __symptoms__ element, an Active Rest Activity will be returned with consideration for the symptoms the athlete is experiencing today.
+If the client includes the optional  __symptoms__ element, an Active Rest Activity will be returned with consideration for the symptoms the athlete is experiencing today.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -665,7 +665,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `symptoms` __should__ reflect a list of `symptom` objects as defined in the Appendix. Length __could__ be 0.
+* `symptoms` __should__ reflect a list of  `symptom` objects as defined in the Appendix. Length  __could__ be 0.
 
 
 ```
@@ -719,7 +719,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 The Get Mobility WOD endpoint can be called to retrieve a previously assigned Mobility WOD.
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}`. The request method __must__ be `GET`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}`. The request method  __must__ be `GET`.
 
 ##### Request
 
@@ -758,10 +758,10 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 The Start Mobility WOD endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Mobility WOD.
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/start_activity`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/start_activity`. The request method  __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -793,10 +793,10 @@ The Complete Mobility WOD endpoint can be called to indicate that the athlete ha
 
 ##### Query String
 
-The client __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/complete_activity`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/complete_activity`. The request method  __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -873,9 +873,9 @@ Requesting Activities using the Responsive Recovery endpoint requires the local 
 
 The completed workout session may be reported using one of two formats:
 
-* Use the __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
+* Use the  __Detailed Session__ ( `session_type: 7` ) format for workouts for which you have detailed content including exercise duration, pace, sets, reps, resistance. Most workouts completed in your service to the athlete should use this format.
 
-* Use the __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
+* Use the  __Simple Session__ ( `session_type: 6` ) format for workouts for which you do not have detailed workout content but that is useful to consider as training loads that should affect the recovery plan (i.e. workouts you access through HealthKit, Google Fit, Samsung Fit or that are completed in your service with a low resolution of information)
 
 The Activities returned will also consider prior completed workouts and prior logged symptoms.
 
@@ -883,11 +883,11 @@ _For more information about  __session__ formats, please see the Appendix._
  
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -985,15 +985,15 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 ### Including Today's Symptoms
 
-If the client includes the optional __symptoms__ element, Responsive Recovery Activities will be returned with consideration for the symptoms the athlete is experiencing today.
+If the client includes the optional  __symptoms__ element, Responsive Recovery Activities will be returned with consideration for the symptoms the athlete is experiencing today.
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -1069,7 +1069,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 The Get Responsive Recovery endpoint can be called to retrieve a previously assigned Responsive Recovery Activities.
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}`. The request method __must__ be `GET`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}`. The request method  __must__ be `GET`.
 
 ##### Request
 
@@ -1116,11 +1116,11 @@ The Update Responsive Recovery endpoint can be called to update workout session 
 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/update`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/update`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -1197,10 +1197,10 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 The Start Responsive Recovery endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Responsive Recovery.
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/start_activity`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/start_activity`. The request method  __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -1233,10 +1233,10 @@ The Complete Responsive Recovery endpoint can be called to indicate that the ath
 
 ##### Query String
 
-The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/complete_activity`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/complete_activity`. The request method  __must__ be `POST`.
 
 ##### Request
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -1248,7 +1248,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
-* `completed_exercises` __should__ be a list of `library_id` for each exercise completed by the athlete. This is an __optional__ parameter that's not required for `Ice` or `Cold Water Immersion`
+* `completed_exercises` __should__ be a list of `library_id` for each exercise completed by the athlete. This is an  __optional__ parameter that's not required for  `Ice` or  `Cold Water Immersion`
 
 
 ```
@@ -1289,11 +1289,11 @@ FathomAI Mobility API can provide greater personalization, diversity, and granul
 Consider severity ratings for tightness, knots, aches, and sharp as follows: 1-3 as Mild, 4-6 as Moderate, 7-9 as Severe, 10 as Max. When symptoms are reported with a severity greater than 4, Activity’s exercises will be restricted to avoid aggravation of symptoms. 
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/report_symptoms/{User UUID}`. The request method __must__ be `POST`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/report_symptoms/{User UUID}`. The request method  __must__ be `POST`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -1342,11 +1342,11 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 The Update Workout endpoint can be called to update details of a planned or completed workout when new information becomes available.  This updated information will improve future personalization.
 ##### Query String
  
-The client __must__ submit a request to the endpoint `/plans/{version}/training_session/{User UUID}/{Session UUID}`. The request method __must__ be `PATCH`.
+The client  __must__ submit a request to the endpoint `/plans/{version}/training_session/{User UUID}/{Session UUID}`. The request method  __must__ be `PATCH`.
 
 ##### Request
 
-The client __must__ submit a request body containing a JSON object having the following schema:
+The client  __must__ submit a request body containing a JSON object having the following schema:
 
 ```
 {
@@ -1412,7 +1412,7 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `body_part` __should__ be an integer reflecting Body Part enumeration as defined in this Appendix
 * `side` __should__ be an integer reflecting Side enumeration as defined in this Appendix
 * `tight` __should__ be an integer (1-10) indicating the severity of tightness felt. If not reported, it should be `null`
-* `knots` __should__ be reported for muscles (see _Enumerations_ later in this Appendix) only and __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, trigger points, and muscular adhesions felt. If not reported, it should be `null`
+* `knots` __should__ be reported for muscles (see _Enumerations_ later in this Appendix) only and  __should__ be an integer (1-10) indicating the severity of discomfort caused by knots, trigger points, and muscular adhesions felt. If not reported, it should be `null`
 * `ache` __should__ be an integer (1-10) indicating the severity of discomfort felt described as an ache, dull, or sore, indicating inflammation and muscle spasms are likely present. If not reported, it should be `null`
 * `sharp` __should__ be an integer (1-10) indicating the severity of discomfort felt described as sharp, acute, shooting, indicating that inflammation and muscle spasms are likely present. If not reported, it should be `null`
 
@@ -1452,7 +1452,7 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 * `hr_data` __if present__, __should__ be the heart rate data associated with the workout. Each hr will have `startDate`, `endDate` and `value`
 * `description` is an __optional__ parameter to provide short description of the session
 
-Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the specific endpoint documentation for further details.
+Note: `user_age` __should__ be provided if  `hr_data` is supplied.  See the specific endpoint documentation for further details.
 
 <div style="page-break-after: always;"></div>
 
@@ -1518,7 +1518,7 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `duration_seconds` __should__ be total time assigned or taken to complete the section
 * `start_date_time` __should__ reflect the start time of the workout section
 * `end_date_time` __should__ reflect the end time of the workout section
-* `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
+* `exercises` __should__ be a list of of all  _exercise_ elements assigned within the section
 
 `exercise` __should__ be of the following schema:
 ```
@@ -1540,9 +1540,9 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `id` __should__ be provider's unique identifier for the exercise
 * `name` __should__ be the exercise name
 * `weight_measure` __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
-* `weight` __should__ represent the numeric value of the weight used according to the `weight_measure` attribute
+* `weight` __should__ represent the numeric value of the weight used according to the  `weight_measure` attribute
 * `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
-* `side` __should__ represent the side (left or right) on which the exercise is performed if `bilateral` is false
+* `side` __should__ represent the side (left or right) on which the exercise is performed if  `bilateral` is false
 * `sets` __should__ be an integer representation of total sets of the exercise to be performed
 * `reps_per_set` __should__ be an integer representing of total reps of exercise to be performed per set
 * `unit_of_measure` __should__ be an integer reflecting the Unit of Measure enumeration and should indicate the unit in which the reps are measured
@@ -1573,7 +1573,7 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 ```
 
 * `id` __will__ be a unique identifier for this activity
-* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Movement Integration Prep__ this will be  __0__ which corresponds to _movement_integration_prep = 0_ in the enumerations.)
 * `title` __will__ be the name of the activity that can be displayed to an end user
 * `start_date_time` __will__ be the date/time the end user starts this activity
 * `completed_date_time` __will__ be the date/time the end user completed this activity
@@ -1590,9 +1590,11 @@ Activity Goals are returned with activities to summarize what dosages are availa
 `activity_goal` will be of the following schema:
 
 ```
+{
     "efficient_active": boolean
     "complete_active": boolean
     "comprehensive_active": boolean
+}
 ```
 
 __Example:__
@@ -1637,7 +1639,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 ```
 
 * `id` __will__ be a unique identifier for this activity
-* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be  __1__ which corresponds to _active_rest = 1_ in the enumerations.)
 * `title` __will__ be the name of the activity that can be displayed to an end user
 * `start_date_time` __will__ be the date/time the end user starts this activity
 * `completed_date_time` __will__ be the date/time the end user completed this activity
@@ -1671,7 +1673,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 ```
 
 * `id` __will__ be a unique identifier for this activity
-* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Recovery__ this will be  __2__ which corresponds to _active_recovery = 2_ in the enumerations.)
 * `title` __will__ be the name of the activity that can be displayed to an end user
 * `start_date_time` __will__ be the date/time the end user starts this activity
 * `completed_date_time` __will__ be the date/time the end user completed this activity
