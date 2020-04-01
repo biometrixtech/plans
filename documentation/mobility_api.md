@@ -1,7 +1,7 @@
 # FathomAI - Mobility API (v 5.0.1)
 
 ## Overview
-The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or all of the following elements.
+The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or both of the following elements.
 
 * __Symptoms__ - information about the athlete's muscular stress that may be in response to training, posture or other habitual movements 
 * __Workout Sessions__ - information about an athlete's training volume, intensity, and movements
@@ -257,8 +257,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 * `event_date_time` __should__ reflect the local time that request was submitted
 * `session` __should__ reflect the schema of the Simple or Detailed Session format as outlined in the Appendix.
-* `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
-* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+* `symptoms` __should__ reflect a list of `symptom` objects as defined in the Appendix. Length __could__ be 0.
 
 ```
 POST /plans/{version}/movement_prep/{User UUID} HTTPS/1.1
@@ -662,8 +661,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
-* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+* `symptoms` __should__ reflect a list of `symptom` objects as defined in the Appendix. Length __could__ be 0.
 
 
 ```
@@ -1566,9 +1564,17 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 }
 ```
 
-* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
-* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
-* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
+* `id` __will__ be a unique identifier for this activity
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
+* `title` __will__ be the name of the activity that can be displayed to an end user
+* `start_date_time` __will__ be the date/time the end user starts this activity
+* `completed_date_time` __will__ be the date/time the end user completed this activity
+* `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
+* `completed` __will__ indicate whether or not this activity has been mark completed
+* `default_plan` __will__ indicate the recommended dosage plan based on the athlete's current needs.  Will be "efficient", "complete" or "comprehensive".
+* `goals` __will__ be a name/value collection of Activity Goals as defined in this Appendix
+* `exercise_phases` __will__ be list of Exercise Phase objects as defined in this Appendix
+
 
 ### Activity Goal
 Activity Goals are returned with activities to summarize what dosages are available for the given goal based on the exercises assigned.  This enables clients to quickly identify what goals should be active for each dosage option.
@@ -1686,7 +1692,13 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 ```
 
 * `body_part_location` will be an integer reflecting the Body Part enumeration as defined in this Appendix.
+* `completed` __will__ indicate whether or not this activity has been mark completed
+* `completed_date_time` __will__ be the date/time the end user completed this activity
+* `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
+* `minutes` __will__ be the duration of minutes the body part should receive treatment
+* `start_date_time` __will__ be the date/time the end user starts this activity
 * `goal` will be a goal as defined in this Appendix.
+
 
 ### Cold Water Immersion
 
@@ -1703,8 +1715,12 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 }
 
 ```
-
-* `goal` will be a goal as defined in this Appendix.
+* `minutes` __will__ be the duration of minutes the body part should receive treatment
+* `goals` will be a list of `goal` objects as defined in this Appendix.
+* `start_date_time` __will__ be the date/time the end user starts this activity
+* `completed_date_time` __will__ be the date/time the end user completed this activity
+* `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
+* `completed` __will__ indicate whether or not this activity has been mark completed
 
 <div style="page-break-after: always;"></div>
 

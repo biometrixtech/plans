@@ -3,7 +3,7 @@
 ## Overview
 FathomAI provides this limited implementation of its Mobility API to demonstrate the core functionality to potential customers.
 
-The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or all of the following elements.
+The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or both of the following elements.
 
 * __Symptoms__ - information about the athlete's muscular stress that may be in response to training, posture or other habitual movements 
 * __Workout Sessions__ - information about an athlete's training volume, intensity, and movements
@@ -359,8 +359,7 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 
 * `event_date_time` __should__ reflect the local time that request was submitted
-* `symptoms` __should__ reflect a list of symptoms(`symptom`). Length __could__ be 0.
-* `symptom` __should__ follow the schema for Symptom as defined in the Appendix.
+* `symptoms` __should__ reflect a list of `symptom` objects as defined in the Appendix. Length __could__ be 0.
 
 
 ```
