@@ -314,7 +314,6 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
 * `movement_integration_prep` will have the schema as defined in the Appendix.
 
 
-<!-- TODO - paul: title and language -->
 ### Get Movement Prep
 
 The Get Movement Prep endpoint can be called to retrieve a previously assigned Movement Prep.
@@ -357,10 +356,12 @@ If the request was successful, the Service __will__ respond with HTTP Status `20
 * `movement_integration_prep` will have the schema as defined in the Appendix.
 
 
-<!-- TODO - paul: title and language -->
 ### Start Movement Prep Activity
 
 The Start Movement Prep endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Movement Prep.
+
+<div style="page-break-after: always;"></div>
+
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}/start_activity`. The request method __must__ be `POST`.
@@ -379,7 +380,9 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
 
 ```
-POST /plans/{version}/movement_prep/{User UUID}/{Mov Prep UUID}/start_activity HTTPS/1.1
+POST 
+/plans/{version}/movement_prep/{User UUID}/{Mov Prep UUID}/start_activity HTTPS/1.1
+
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -390,7 +393,6 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-<!-- TODO - paul: title and language -->
 ### Complete Movement Prep Activity
 
 The Complete Movement Prep endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Movement Prep.
@@ -415,7 +417,8 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `completed_exercises` __should__ be a list of `library_id` for each exercise completed by the athlete.
 
 ```
-POST /plans/{version}/movement_prep/{User UUID}/{Mov Prep UUID}/complete_activity HTTPS/1.1
+POST 
+/plans/{version}/movement_prep/{User UUID}/{Mov Prep UUID}/complete_activity HTTPS/1.1
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -436,6 +439,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
     "message": "success"
  }
 ```
+<div style="page-break-after: always;"></div>
 
 ## III. Mobility WOD (Workout of the Day)
 
@@ -710,7 +714,6 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 <div style="page-break-after: always;"></div>
 
-<!-- TODO - paul: title and language -->
 ### Get Mobility WOD
 
 The Get Mobility WOD endpoint can be called to retrieve a previously assigned Mobility WOD.
@@ -750,7 +753,6 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 }
 ```
 
-<!-- TODO - paul: title and language -->
 ### Start Mobility WOD Activity
 
 The Start Mobility WOD endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Mobility WOD.
@@ -772,7 +774,9 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
 
 ```
-POST /plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/start_activity HTTPS/1.1
+POST 
+/plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/start_activity HTTPS/1.1
+
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -783,7 +787,6 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-<!-- TODO - paul: title and language -->
 ### Complete Mobility WOD Activity
 
 The Complete Mobility WOD endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Mobility WOD.
@@ -808,7 +811,9 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `completed_exercises` __should__ be a list of `library_id` for each exercise completed by the athlete.
 
 ```
-POST /plans/{version}/mobility_wod/{User UUID}/{Mobility WOD UUID}/complete_activity HTTPS/1.1
+POST 
+/plans/{version}/mobility_wod/{User UUID}/{Mob WOD UUID}/complete_activity HTTPS/1.1
+
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -830,6 +835,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
  }
 ```
 
+<div style="page-break-after: always;"></div>
 
 ## IV. Responsive Recovery
 
@@ -1058,7 +1064,6 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
-<!-- TODO - paul: title and language -->
 ### Get Responsive Recovery
 
 The Get Responsive Recovery endpoint can be called to retrieve a previously assigned Responsive Recovery Activities.
@@ -1104,11 +1109,11 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
 
-<!-- TODO - paul: title and language -->
+
 ### Update Responsive Recovery
 
 The Update Responsive Recovery endpoint can be called to update workout session information and/or report new symptom(s). Responsive Recovery Activities will be returned with consideration for the newly provided information.
-<!-- TODO - paul: should we mention something about SOFlete specific use case where this will be used to update planned session? -->
+
 ##### Query String
  
 The client __must__ submit a request to the endpoint `/plans/{version}/responsive_recovery/{User UUID}/{Responsive Recovery UUID}/update`. The request method __must__ be `POST`.
@@ -1187,7 +1192,6 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 
 * `active_rest`, `active_recovery`,`ice`, and `cold_water_immersion` could be null or will have the schema as defined in the Appendix.
 
-<!-- TODO - paul: title and language -->
 ### Start Responsive Recovery Activity
 
 The Start Responsive Recovery endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Responsive Recovery.
@@ -1209,7 +1213,10 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `activity_type` __should__ be an integer reflecting Activity Type enumeration as defined in Appendix. 
 
 ```
-POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID}/start_activity HTTPS/1.1
+POST 
+/plans/{version}/responsive_recovery/{User UUID}/
+    {Responsive Recovery UUID}/start_activity HTTPS/1.1
+
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -1220,7 +1227,6 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 
-<!-- TODO - paul: title and language -->
 ### Complete Responsive Recovery Activity
 
 The Complete Responsive Recovery endpoint can be called to indicate that the athlete has completed a specific activity recommended as part of Responsive Recovery.
@@ -1246,7 +1252,10 @@ The client __must__ submit a request body containing a JSON object having the fo
 
 
 ```
-POST /plans/{version}/responsive_recovery/{User UUID}/{Resp Rec UUID}/complete_activity HTTPS/1.1
+POST 
+/plans/{version}/responsive_recovery/{User UUID}/
+    {Responsive Recovery UUID}/complete_activity HTTPS/1.1
+
 Host: apis.{env}.fathomai.com
 Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
@@ -1328,7 +1337,6 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 }
 ```
 
-<!-- TODO - paul : title and language -->
 ### Update Workout
 
 The Update Workout endpoint can be called to update details of a planned or completed workout when new information becomes available.  This updated information will improve future personalization.
@@ -1606,9 +1614,6 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 
 ```
 
-
-<div style="page-break-after: always;"></div>
-
 ### Active Rest
 
 * `active_rest` will be of the following schema:
@@ -1665,9 +1670,18 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 }
 ```
 
-* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix
-* `activity_goal` __will__ be an Activity Goal as defined in this Appendix
-* `exercise_phase` __will__ be an Exercise Phase as defined in this Appendix
+* `id` __will__ be a unique identifier for this activity
+* `type` __will__ be an integer reflecting Activity Type enumeration as defined in this Appendix.  (For __Active Rest__ this will be __1__ which corresponds to _active_rest = 1_ in the enumerations.)
+* `title` __will__ be the name of the activity that can be displayed to an end user
+* `start_date_time` __will__ be the date/time the end user starts this activity
+* `completed_date_time` __will__ be the date/time the end user completed this activity
+* `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
+* `completed` __will__ indicate whether or not this activity has been marked completed
+* `default_plan` __will__ indicate the recommended dosage plan based on the athlete's current needs.  Will be "efficient", "complete" or "comprehensive".
+* `goals` __will__ be a name/value collection of Activity Goals as defined in this Appendix
+* `exercise_phases` __will__ be list of Exercise Phase objects as defined in this Appendix
+
+<div style="page-break-after: always;"></div>
 
 ### Ice
 
@@ -1721,8 +1735,6 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 * `completed_date_time` __will__ be the date/time the end user completed this activity
 * `event_date_time` __will__ be the date/time the activity was created/assigned to the end user
 * `completed` __will__ indicate whether or not this activity has been mark completed
-
-<div style="page-break-after: always;"></div>
 
 ### Exercise Phase
 
@@ -1874,6 +1886,7 @@ Sports science research places importance on the order in which phases are compl
     asymmetric_session = 20
     asymmetric_pattern = 21
 ```
+<div style="page-break-after: always;"></div>
 
 #### Unit of Measure
 ```
@@ -1923,6 +1936,9 @@ Sports science research places importance on the order in which phases are compl
     curling = 31
     dance = 32
     equestrian_sports = 33
+```
+
+```
     fencing = 34
     fishing = 35
     handball = 36
@@ -1934,8 +1950,6 @@ Sports science research places importance on the order in which phases are compl
     snow_sports = 42
     squash = 43
     surfing_sports = 44
-```
-```
     swimming = 45
     table_tennis = 46
     water_polo = 47
@@ -1976,8 +1990,6 @@ Sports science research places importance on the order in which phases are compl
     climbing = 82
     other = 83
 ```
-
-<div style="page-break-after: always;"></div>
 
 
 ### Body Parts
