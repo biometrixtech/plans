@@ -711,29 +711,29 @@ class Activity(object):
                             if d.priority != '1':
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
-                                d.default_complete_reps_assigned = 0
-                                d.default_complete_sets_assigned = 0
+                                # d.default_complete_reps_assigned = 0
+                                # d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 2:
                         for d in a.dosages:
                             if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
-                                d.default_complete_reps_assigned = 0
-                                d.default_complete_sets_assigned = 0
+                                # d.default_complete_reps_assigned = 0
+                                # d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 3:
                         for d in a.dosages:
                             if d.priority == '3':
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
-                                d.default_complete_reps_assigned = 0
-                                d.default_complete_sets_assigned = 0
+                                # d.default_complete_reps_assigned = 0
+                                # d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 4:
                         for d in a.dosages:
                             if d.priority == '3' and d.severity() <= 4:
                                 d.complete_reps_assigned = 0
                                 d.complete_sets_assigned = 0
-                                d.default_complete_reps_assigned = 0
-                                d.default_complete_sets_assigned = 0
+                                # d.default_complete_reps_assigned = 0
+                                # d.default_complete_sets_assigned = 0
                     elif self.complete_winner == 5:
                         pass
                     elif self.complete_winner == 0:
