@@ -3,12 +3,14 @@ from flask import request, Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
+from models.functional_movement_activities import ActivityType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation
 from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
+from logic.activities_processing import ActivitiesProcessing
 from utils import parse_datetime, get_timezone
 
 datastore_collection = DatastoreCollection()
@@ -17,6 +19,7 @@ symptom_datastore = datastore_collection.symptom_datastore
 training_session_datastore = datastore_collection.training_session_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
 workout_program_datastore = datastore_collection.workout_program_datastore
+mobility_wod_datastore = datastore_collection.mobility_wod_datastore
 
 app = Blueprint('mobility_wod', __name__)
 
@@ -25,7 +28,7 @@ app = Blueprint('mobility_wod', __name__)
 @require.authenticated.any
 @require.body({'event_date_time': str})
 @xray_recorder.capture('routes.mobility_wod.create')
-def handle_rom_wod_create(user_id):
+def handle_mobility_wod_create(user_id):
     validate_data()
     event_date_time = parse_datetime(request.json['event_date_time'])
     # event_date = fix_early_survey_event_date(event_date)
@@ -78,6 +81,75 @@ def handle_rom_wod_create(user_id):
     )
 
     return {'mobility_wod': mobility_wod.json_serialise()}, 201
+
+
+@app.route('/<uuid:user_id>/<uuid:mobility_wod_id>/start_activity', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date_time': str})
+@xray_recorder.capture('routes.mobility_wod.start')
+def handle_mobility_wod_start(user_id, mobility_wod_id):
+    # validate_data()
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    activity_type = request.json['activity_type']
+
+    # read in mobility wod and validate that it belongs the the correct user
+    mobility_wod = mobility_wod_datastore.get(mobility_wod_id=mobility_wod_id)
+    if mobility_wod.user_id != user_id:
+        return {'message': 'user_id and mobility_wod_id do not match'}, 404
+
+    # update mobility wod and write it to db
+    activity_proc = ActivitiesProcessing(datastore_collection)
+    try:
+        activity_proc.mark_activity_started(mobility_wod, event_date_time, activity_type)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Mobility WOD")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Mobility WOD does not contain a valid {ActivityType(activity_type).name}")
+
+    mobility_wod_datastore.put(mobility_wod)
+
+    return {'message': 'success'}
+
+
+@app.route('/<uuid:user_id>/<uuid:mobility_wod_id>/complete_activity', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date_time': str})
+@xray_recorder.capture('routes.mobility_wod.complete')
+def handle_mobility_wod_complete(user_id, mobility_wod_id):
+    # validate_data()
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    activity_type = request.json['activity_type']
+    completed_exercises = request.json.get('completed_exercises', [])
+
+    # read in mobility wod and validate that it belongs the the correct user
+    mobility_wod = mobility_wod_datastore.get(mobility_wod_id=mobility_wod_id)
+    if mobility_wod.user_id != user_id:
+        return {'message': 'user_id and mobility_wod_id do not match'}, 404
+
+    # update mobility wod and write it to db
+    activity_proc = ActivitiesProcessing(datastore_collection)
+    try:
+        activity_proc.mark_activity_completed(mobility_wod, event_date_time, activity_type, user_id, completed_exercises)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Mobility WOD")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Mobility WOD does not contain a valid {ActivityType(activity_type).name}")
+
+    mobility_wod_datastore.put(mobility_wod)
+
+    return {'message': 'success'}
+
+
+@app.route('/<uuid:user_id>/<uuid:mobility_wod_id>', methods=['GET'])
+@require.authenticated.any
+@xray_recorder.capture('routes.mobility_wod.get')
+def handle_mobility_wod_get(user_id, mobility_wod_id):
+    # get mobility wod from db and validate that it belongs to the user
+    mobility_wod = mobility_wod_datastore.get(mobility_wod_id=mobility_wod_id)
+    if mobility_wod.user_id != user_id:
+        return {'message': 'user_id and mobility_wod_id do not match'}, 404
+
+    return {'mobility_wod': mobility_wod.json_serialise()}
 
 
 @xray_recorder.capture('routes.mobility_wod.validate')

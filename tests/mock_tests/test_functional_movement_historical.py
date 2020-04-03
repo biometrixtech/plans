@@ -12,7 +12,8 @@ from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from logic.injury_risk_processing import InjuryRiskProcessor
-from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+#from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+from logic.exercise_assignment import ExerciseAssignment
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 
@@ -122,7 +123,7 @@ def test_historical_update_multiple_day_data():
             consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
 
 
-    calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[2])
 
     active_rest = calc.get_pre_active_rest()[0]

@@ -1,11 +1,12 @@
 import pytest
+from models.exercise_phase import ExercisePhaseType
 from models.session import SportTrainingSession, MixedActivitySession
+from models.functional_movement_modalities import ModalityType
 from datetime import datetime
 from models.sport import SportName
 from models.symptom import Symptom
 from models.user_stats import UserStats
 from logic.injury_risk_processing import InjuryRiskProcessor
-#from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
 from logic.exercise_assignment import ExerciseAssignment
 from logic.workout_processing import WorkoutProcessor
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
@@ -116,11 +117,13 @@ def check_cardio_sport(training_sessions):
             sport_cardio_plyometrics = True
     return sport_cardio_plyometrics
 
+
 def is_high_intensity_session(training_sessions):
     for session in training_sessions:
         if session.ultra_high_intensity_session() and session.high_intensity_RPE():
             return True
     return False
+
 
 def get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs):
 
@@ -188,41 +191,114 @@ def get_activity(event_date_time, symptoms, sessions, activity_type='movement_pr
     if activity_type == 'movement_prep':
         calc.sport_cardio_plyometrics = check_cardio_sport(sessions)
         calc.sport_body_parts = get_sport_body_parts(sessions)
-        movement_prep = calc.get_movement_prep('tester', force_on_demand=True)
+        movement_prep = calc.get_movement_integration_prep(force_on_demand=True)
         return movement_prep
     elif activity_type == 'mobility_wod':
-        mobility_wod = calc.get_mobility_wod('tester', force_on_demand=True)
+        mobility_wod = calc.get_active_rest('tester', force_on_demand=True)
         return mobility_wod
     elif activity_type == 'responsive_recovery':
         calc.high_intensity_session = is_high_intensity_session(sessions)
-        responsive_recovery = calc.get_responsive_recovery('tester', force_on_demand=True)
-        return responsive_recovery
+        modality, ice, cwi = calc.get_responsive_recovery_modality(sessions[0].id, force_on_demand=True)
+        return modality, ice, cwi
 
 
-def test_get_movement_prep_with_mixed_activity_session_no_symptoms():
-    session_types = [7]
+def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
+    session_types = [6]
+    dates = [datetime.now()]
+    rpes = [7]
+    durations = [100]
+    sport_names = [SportName.weightlifting]
+    workout_programs = [None]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = get_symptoms(body_parts=[
+        (7, 1, None, None, None, 2)  # left knee sharp=2
+    ])
+
+    activity, ice, cwi = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
+    print("\nactive_recovery, 100 mins weightlifting, high rpe (ice vs cwi), knee sharp=2")
+    assert len(activity) == 1
+    activity = activity[0]
+    assert activity.type == ModalityType.active_recovery
+    assert activity.display_image == "dynamic_stretch"
+    assert activity.when == "after training"
+    assert activity.locked_text == "You missed the optimal window for Active Recovery."
+    assert activity.title == "Active Recovery".upper()
+
+    exercise_phases = activity.exercise_phases
+    assert len(exercise_phases) == 1
+    assert exercise_phases[0].type == ExercisePhaseType.dynamic_integrate
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
+
+    assert ice is None
+    assert cwi is not None
+    cwi_json = cwi.json_serialise()
+    assert cwi_json['minutes'] == 10
+
+
+def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
+    session_types = [6]
     dates = [datetime.now()]
     rpes = [5]
     durations = [100]
-    sport_names = [None]
-    sections = {
-                   "Warmup / Movement Prep": ['rowing'],
-                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-                   'Recovery Protocol': ['indoor_cycle']
-    }
-    workout_programs = [get_workout_program(sections=sections)]
+    sport_names = [SportName.distance_running]
+    workout_programs = [None]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    symptoms = get_symptoms(body_parts=[
+        (7, 1, None, None, None, 2)  # left knee sharp=2
+    ])
+
+    activity, ice, cwi = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
+    print("\nactive_rest, 100 mins run, low rpe (ice vs cwi), knee sharp=2")
+    assert len(activity) == 1
+    activity = activity[0]
+    assert activity.type == ModalityType.post_active_rest
+    assert activity.display_image == "static_stretch"
+    assert activity.when == "anytime, up to 3 per day"
+    assert activity.locked_text == "You skipped this Mobility Workout. Tap + to create another."
+    assert activity.title == "Mobility".upper()
+
+    exercise_phases = activity.exercise_phases
+    assert len(exercise_phases) == 4
+    assert exercise_phases[0].type == ExercisePhaseType.inhibit
+    assert exercise_phases[1].type == ExercisePhaseType.static_stretch
+    assert exercise_phases[2].type == ExercisePhaseType.isolated_activate
+    assert exercise_phases[3].type == ExercisePhaseType.static_integrate
+
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    assert duration_efficient > 0
+    assert duration_complete > 0
+    assert duration_comprehensive > 0
+
+    assert ice is not None
+    assert cwi is None
+
+    ice_json = ice.json_serialise()
+    assert len(ice_json['body_parts']) == 1
+
+
+def test_get_movement_prep_with_simple_session_no_symptoms():
+    session_types = [6]
+    dates = [datetime.now()]
+    rpes = [7]
+    durations = [100]
+    sport_names = [SportName.distance_running]
+    workout_programs = [None]
 
     sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
     symptoms = []
 
-    print("\nmovement prep, mixed activity session, no symptoms")
-    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')
+    print("\nmovement prep, 100 mins weightlifting, no symptoms")
+    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')[0]
+    assert movement_prep.type == ModalityType.movement_integration_prep
+    assert len(movement_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
 
-    assert movement_prep.movement_integration_prep is not None
-    assert len(movement_prep.movement_integration_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep.movement_integration_prep)
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep)
     assert duration_efficient > 0
     assert duration_complete > 0
     assert duration_comprehensive > 0
@@ -246,235 +322,15 @@ def test_get_movement_prep_with_mixed_activity_session_one_symptom():
     symptoms = get_symptoms(body_parts=[(7, 1, None, None, None, 2)])  # left knee sharp=2
 
     print("\nmovement prep, mixed activity session, knee sharp")
-    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')
+    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')[0]
+    assert movement_prep.display_image == "dynamic_flexibility"
+    assert movement_prep.when == "before training"
+    assert movement_prep.locked_text == "You skipped this Movement Prep before your Workout today."
+    assert movement_prep.title == "Movement Prep".upper()
 
-    assert movement_prep.movement_integration_prep is not None
-    assert len(movement_prep.movement_integration_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
+    assert len(movement_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
 
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep.movement_integration_prep)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_movement_prep_with_mixed_activity_session_two_symptoms():
-    session_types = [7]
-    dates = [datetime.now()]
-    rpes = [5]
-    durations = [100]
-    sport_names = [None]
-    sections = {
-                   "Warmup / Movement Prep": ['rowing'],
-                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-                   'Recovery Protocol': ['indoor_cycle']
-    }
-    workout_programs = [get_workout_program(sections=sections)]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = get_symptoms(body_parts=[
-        (7, 1, None, None, None, 2),  # left knee sharp=2
-        (14, 2, 3, None, 3, None)  # right glutes tight, ache=3
-    ])
-
-    print("\nmovement prep, mixed activity session, knee sharp and glutes tight/ache")
-    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')
-
-    assert movement_prep.movement_integration_prep is not None
-    assert len(movement_prep.movement_integration_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep.movement_integration_prep)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_movement_prep_with_simple_session_no_symptoms():
-    session_types = [6]
-    dates = [datetime.now()]
-    rpes = [5]
-    durations = [100]
-    sport_names = [SportName.distance_running]
-    workout_programs = [None]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = []
-
-    print("\nmovement prep, 100 mins weightlifting, no symptoms")
-    movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')
-
-    assert movement_prep.movement_integration_prep is not None
-    assert len(movement_prep.movement_integration_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep.movement_integration_prep)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_responsive_recovery_with_mixed_activity_session_no_symptoms():
-    session_types = [7]
-    dates = [datetime.now()]
-    rpes = [6]
-    durations = [100]
-    sport_names = [None]
-    sections = {
-                   "Warmup / Movement Prep": ['rowing'],
-                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-                   'Recovery Protocol': ['indoor_cycle']
-    }
-    workout_programs = [get_workout_program(sections=sections)]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = []
-
-    print("\nactive_recovery, 100 mins mixed activity, no symptoms")
-    responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
-
-    assert responsive_recovery.active_recovery is not None
-    activity = responsive_recovery.active_recovery
-
-    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_responsive_recovery_with_simple_session_no_symptoms():
-    session_types = [6]
-    dates = [datetime.now()]
-    rpes = [6]
-    durations = [100]
-    sport_names = [SportName.weightlifting]
-    workout_programs = [None]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = []
-
-    print("\nactive_recovery, 100 mins weightlifting, no symptoms")
-    responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
-
-    assert responsive_recovery.active_recovery is not None
-    activity = responsive_recovery.active_recovery
-
-    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
-    session_types = [6]
-    dates = [datetime.now()]
-    rpes = [7]
-    durations = [100]
-    sport_names = [SportName.weightlifting]
-    workout_programs = [None]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = get_symptoms(body_parts=[
-        (7, 1, None, None, None, 2)  # left knee sharp=2
-    ])
-
-    responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
-    print("\nactive_recovery, 100 mins weightlifting, high rpe (ice vs cwi), knee sharp=2")
-
-    assert responsive_recovery.active_recovery is not None
-    assert responsive_recovery.active_rest is None
-    assert responsive_recovery.ice is None
-    assert responsive_recovery.cold_water_immersion is not None
-    activity = responsive_recovery.active_recovery
-
-    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
-    session_types = [6]
-    dates = [datetime.now()]
-    rpes = [5]
-    durations = [100]
-    sport_names = [SportName.distance_running]
-    workout_programs = [None]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = get_symptoms(body_parts=[
-        (7, 1, None, None, None, 2)  # left knee sharp=2
-    ])
-
-    responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
-    print("\nactive_rest, 100 mins run, low rpe (ice vs cwi), knee sharp=2")
-
-    assert responsive_recovery.active_recovery is None
-    assert responsive_recovery.active_rest is not None
-    assert responsive_recovery.ice is not None
-    assert responsive_recovery.cold_water_immersion is None
-    activity = responsive_recovery.active_rest
-
-    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_mobility_wod_with_simple_session_no_symptoms():
-    session_types = [6]
-    dates = [datetime.now()]
-    rpes = [5]
-    durations = [100]
-    sport_names = [SportName.distance_running]
-    workout_programs = [None]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = []
-
-    print("\nmobility_wod, 100 mins run, no symptoms")
-    mobility_wod = get_activity(dates[0], symptoms, sessions, 'mobility_wod')
-
-    assert mobility_wod.active_rest is not None
-    activity = mobility_wod.active_rest
-
-    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
-    assert duration_efficient > 0
-    assert duration_complete > 0
-    assert duration_comprehensive > 0
-
-
-def test_get_mobility_wod_with_simple_session_one_symptom():
-    session_types = [6]
-    dates = [datetime.now()]
-    rpes = [5]
-    durations = [100]
-    sport_names = [SportName.distance_running]
-    workout_programs = [None]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
-    symptoms = get_symptoms(body_parts=[
-        (16, 1, None, None, None, 2)  # left glutes sharp=2
-    ])
-
-    print("\nmobility_wod, 100 mins run, knee sharp=2")
-    mobility_wod = get_activity(dates[0], symptoms, sessions, 'mobility_wod')
-
-    assert mobility_wod.active_rest is not None
-    activity = mobility_wod.active_rest
-
-    assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
-
-    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(activity)
+    duration_efficient, duration_complete, duration_comprehensive = get_total_durations(movement_prep)
     assert duration_efficient > 0
     assert duration_complete > 0
     assert duration_comprehensive > 0

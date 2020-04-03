@@ -68,7 +68,7 @@ def handle_session_update(session_id, user_id):
 
     api_processor.update_stats_injury_risk()
 
-    return {'message': 'success'}, 200
+    return {'message': 'success'}
 
 
 @xray_recorder.capture('routes.responsive_recovery.validate')

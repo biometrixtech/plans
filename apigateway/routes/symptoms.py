@@ -81,7 +81,8 @@ def handle_add_symptoms(user_id=None):
                            stats_processor=survey_processor.stats_processor,
                            datastore_collection=datastore_collection,
                            visualizations=visualizations,
-                           hist_update=hist_update)
+                           hist_update=hist_update,
+                           log_symptoms=True)
 
         # update users database if health data received
         Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',

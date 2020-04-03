@@ -3,12 +3,14 @@ from flask import request, Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
+from models.functional_movement_activities import ActivityType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation
 from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
+from logic.activities_processing import ActivitiesProcessing
 from utils import parse_datetime, get_timezone
 
 datastore_collection = DatastoreCollection()
@@ -79,8 +81,7 @@ def handle_responsive_recovery_create(user_id):
     )
 
     return {
-               'responsive_recovery': responsive_recovery.json_serialise(),
-               'session_id': api_processor.sessions[0].id
+               'responsive_recovery': responsive_recovery.json_serialise()
            }, 201
 
 
@@ -147,7 +148,76 @@ def handle_responsive_recovery_update(user_id, responsive_recovery_id):
             training_session_id=existing_responsive_recovery.training_session_id
     )
 
-    return {'responsive_recovery': responsive_recovery.json_serialise()}, 201
+    return {'responsive_recovery': responsive_recovery.json_serialise()}
+
+
+@app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>/start_activity', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date_time': str})
+@xray_recorder.capture('routes.responsive_recovery.start')
+def handle_responsive_recovery_start(user_id, responsive_recovery_id):
+    # validate_data()
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    activity_type = request.json['activity_type']
+
+    # get responsive recovery from db and validate that it belongs to the user
+    responsive_recovery = responsive_recovery_datastore.get(responsive_recovery_id=responsive_recovery_id)
+    if responsive_recovery.user_id != user_id:
+        return {'message': 'user_id and responsive_recovery_id do not match'}, 404
+
+    # update responsive recovery and write to db
+    activity_proc = ActivitiesProcessing(datastore_collection)
+    try:
+        activity_proc.mark_activity_started(responsive_recovery, event_date_time, activity_type)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Movement Prep")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Movement Prep does not contain a valid {ActivityType(activity_type).name}")
+
+    responsive_recovery_datastore.put(responsive_recovery)
+
+    return {'message': 'success'}
+
+
+@app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>/complete_activity', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date_time': str})
+@xray_recorder.capture('routes.responsive_recovery.complete')
+def handle_responsive_recovery_complete(user_id, responsive_recovery_id):
+    # validate_data()
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    activity_type = request.json['activity_type']
+    completed_exercises = request.json.get('completed_exercises', [])
+
+    # get responsive recovery from db and validate that it belongs to the user
+    responsive_recovery = responsive_recovery_datastore.get(responsive_recovery_id=responsive_recovery_id)
+    if responsive_recovery.user_id != user_id:
+        return {'message': 'user_id and responsive_recovery_id do not match'}, 404
+
+    # update responsive recovery and write to db
+    activity_proc = ActivitiesProcessing(datastore_collection)
+    try:
+        activity_proc.mark_activity_completed(responsive_recovery, event_date_time, activity_type, user_id, completed_exercises)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Movement Prep")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Movement Prep does not contain a valid {ActivityType(activity_type).name}")
+
+    responsive_recovery_datastore.put(responsive_recovery)
+
+    return {'message': 'success'}
+
+
+@app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>', methods=['GET'])
+@require.authenticated.any
+@xray_recorder.capture('routes.responsive_recovery.get')
+def handle_responsive_recovery_get(user_id, responsive_recovery_id):
+    # get responsive recovery from db and validate that it belongs to the user
+    responsive_recovery = responsive_recovery_datastore.get(responsive_recovery_id=responsive_recovery_id)
+    if responsive_recovery.user_id != user_id:
+        return {'message': 'user_id and responsive_recovery_id do not match'}, 404
+
+    return {'responsive_recovery': responsive_recovery.json_serialise()}
 
 
 @xray_recorder.capture('routes.responsive_recovery.validate')

@@ -49,20 +49,23 @@ class AthleteGoal(object):
         elif self.goal_type == AthleteGoalType.injury_history:
             return 10
 
-    def json_serialise(self):
+    def json_serialise(self, mobility_api=False):
         ret = {
             'text': self.text,
-            'priority': self.priority,
             #'trigger_type': self.trigger_type.value if self.trigger_type is not None else None,
             'goal_type': self.goal_type.value if self.goal_type is not None else None
         }
+        if not mobility_api:
+            ret.update({
+                'priority': self.priority
+            })
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         goal_type = input_dict.get('goal_type', None)
         athlete_goal_type = AthleteGoalType(goal_type) if goal_type is not None else None
-        goal = cls(text=input_dict['text'], priority=input_dict['priority'], athlete_goal_type=athlete_goal_type)
+        goal = cls(text=input_dict['text'], priority=input_dict.get('priority', 1), athlete_goal_type=athlete_goal_type)
         #trigger_type = input_dict.get('trigger_type', None)
         #goal.trigger_type = TriggerType(trigger_type) if trigger_type is not None else None
         return goal

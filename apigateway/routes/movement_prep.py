@@ -3,12 +3,14 @@ from flask import request, Blueprint
 from datastores.datastore_collection import DatastoreCollection
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
-from fathomapi.utils.exceptions import InvalidSchemaException
+from fathomapi.utils.exceptions import InvalidSchemaException, NoSuchEntityException
 from fathomapi.utils.xray import xray_recorder
+from models.functional_movement_activities import ActivityType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation
 from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
+from logic.activities_processing import ActivitiesProcessing
 from utils import parse_datetime, get_timezone
 
 datastore_collection = DatastoreCollection()
@@ -16,6 +18,7 @@ user_stats_datastore = datastore_collection.user_stats_datastore
 symptom_datastore = datastore_collection.symptom_datastore
 # training_session_datastore = datastore_collection.training_session_datastore
 workout_program_datastore = datastore_collection.workout_program_datastore
+movement_prep_datastore = datastore_collection.movement_prep_datastore
 
 app = Blueprint('movement_prep', __name__)
 
@@ -74,6 +77,70 @@ def handle_movement_prep_create(user_id):
     )
 
     return {'movement_prep': movement_prep.json_serialise()}, 201
+
+
+@app.route('/<uuid:user_id>/<uuid:movement_prep_id>/start_activity', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date_time': str})
+@xray_recorder.capture('routes.movement_prep.start')
+def handle_movement_prep_start(user_id, movement_prep_id):
+    # validate_data()
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    activity_type = request.json['activity_type']
+
+    # read in movement prep and validate that it belongs the the correct user
+    movement_prep = movement_prep_datastore.get(movement_prep_id=movement_prep_id)
+    if movement_prep.user_id != user_id:
+        return {'message': 'user_id and movement_prep_id do not match'}, 404
+
+    # update movement prep and write to db
+    activity_proc = ActivitiesProcessing(datastore_collection)
+    activity_proc.mark_activity_started(movement_prep, event_date_time, activity_type)
+
+    movement_prep_datastore.put(movement_prep)
+
+    return {'message': 'success'}
+
+
+@app.route('/<uuid:user_id>/<uuid:movement_prep_id>/complete_activity', methods=['POST'])
+@require.authenticated.any
+@require.body({'event_date_time': str})
+@xray_recorder.capture('routes.movement_prep.complete')
+def handle_movement_prep_complete(user_id, movement_prep_id):
+    # validate_data()
+    event_date_time = parse_datetime(request.json['event_date_time'])
+    activity_type = request.json['activity_type']
+    completed_exercises = request.json.get('completed_exercises', [])
+
+    # read in movement prep and validate that it belongs the the correct user
+    movement_prep = movement_prep_datastore.get(movement_prep_id=movement_prep_id)
+    if movement_prep.user_id != user_id:
+        return {'message': 'user_id and movement_prep_id do not match'}, 404
+
+    # update movement prep and write to db
+    activity_proc = ActivitiesProcessing(datastore_collection)
+    try:
+        activity_proc.mark_activity_completed(movement_prep, event_date_time, activity_type, user_id, completed_exercises)
+    except AttributeError:
+        raise InvalidSchemaException(f"{ActivityType(activity_type).name} does not exist for Movement Prep")
+    except NoSuchEntityException:
+        raise NoSuchEntityException(f"Provided Movement Prep does not contain a valid {ActivityType(activity_type).name}")
+
+    movement_prep_datastore.put(movement_prep)
+
+    return {'message': 'success'}
+
+
+@app.route('/<uuid:user_id>/<uuid:movement_prep_id>', methods=['GET'])
+@require.authenticated.any
+@xray_recorder.capture('routes.movement_prep.get')
+def handle_movement_prep_get(user_id, movement_prep_id):
+    # get movement prep from db and validate that it belongs to the user
+    movement_prep = movement_prep_datastore.get(movement_prep_id=movement_prep_id)
+    if movement_prep.user_id != user_id:
+        return {'message': 'user_id and movement_prep_id do not match'}, 404
+
+    return {'movement_prep': movement_prep.json_serialise()}
 
 
 @xray_recorder.capture('routes.movement_prep.validate')
