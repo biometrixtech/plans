@@ -37,7 +37,7 @@ class MovementError(object):
 
         priority = 1
 
-        keys = list(exercise_dict.keys())
+        keys = list(exercise_dict)
 
         if randomize:
             shuffle(keys)

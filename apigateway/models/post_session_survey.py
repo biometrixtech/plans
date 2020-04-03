@@ -17,7 +17,7 @@ class PostSessionSurvey(Serialisable):
                  session_type,
                  survey=None
                  ):
-        self.event_date_time = datetime.datetime.strptime(event_date_time, "%Y-%m-%dT%H:%M:%SZ")
+        self.event_date_time = parse_datetime(event_date_time)  # datetime.datetime.strptime(event_date_time, "%Y-%m-%dT%H:%M:%SZ")
         self.event_date = self.event_date_time.strftime("%Y-%m-%d")
         self.user_id = user_id
         self.session_id = session_id

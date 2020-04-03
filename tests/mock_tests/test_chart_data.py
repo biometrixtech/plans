@@ -1,7 +1,3 @@
-from fathomapi.api.config import Config
-Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
-                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
-
 from models.chart_data import WorkoutChart, TrainingVolumeChart, BodyPartChartCollection, MuscularStrainChart, HighRelativeLoadChart, DOMSChart, BodyResponseChart
 from utils import parse_date
 from math import floor
@@ -406,7 +402,7 @@ def test_workload_new_user():
     for s in sessions:
         growing_sessions.append(s)
         load_stats.set_min_max_values(growing_sessions)
-        training_load = s.training_volume(load_stats)
+        training_load = s.training_load(load_stats)
 
         if s.sport_name.value in sport_max_load:
             if training_load > sport_max_load[s.sport_name.value].load:
@@ -443,7 +439,7 @@ def test_workload_new_sport():
             s.sport_name = SportName.cycling
         growing_sessions.append(s)
         load_stats.set_min_max_values(growing_sessions)
-        training_load = s.training_volume(load_stats)
+        training_load = s.training_load(load_stats)
 
         if s.sport_name.value in sport_max_load:
             if training_load > sport_max_load[s.sport_name.value].load:
@@ -488,7 +484,7 @@ def test_workload_new_max():
         session_count += 1
 
     for s in sessions:
-        training_load = s.training_volume(load_stats)
+        training_load = s.training_load(load_stats)
 
         if s.sport_name.value in sport_max_load:
             if training_load > sport_max_load[s.sport_name.value].load:

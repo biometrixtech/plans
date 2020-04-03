@@ -293,7 +293,7 @@ class Soreness(BaseSoreness, Serialisable):
                 self.body_part.location == BodyPartLocation.calves or
                 self.body_part.location == BodyPartLocation.achilles or
                 self.body_part.location == BodyPartLocation.upper_back_neck or
-                self.body_part.location == BodyPartLocation.lats or
+                self.body_part.location == BodyPartLocation.latissmus_dorsi or
                 self.body_part.location == BodyPartLocation.biceps or
                 self.body_part.location == BodyPartLocation.triceps):
             return True

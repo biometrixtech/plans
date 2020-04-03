@@ -1,12 +1,8 @@
-import os
-os.environ['ENVIRONMENT'] = 'dev'
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-from fathomapi.api.config import Config
-Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
-                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
-
+# import os
+# os.environ['ENVIRONMENT'] = 'dev'
+# from aws_xray_sdk.core import xray_recorder
+# xray_recorder.configure(sampling=False)
+# xray_recorder.begin_segment(name="test")
 import pytest
 from models.session import SportTrainingSession
 from datetime import datetime, timedelta
@@ -16,7 +12,8 @@ from models.body_parts import BodyPart
 from models.soreness_base import BodyPartLocation
 from models.stats import AthleteStats
 from logic.injury_risk_processing import InjuryRiskProcessor
-from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+#from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+from logic.exercise_assignment import ExerciseAssignment
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 
@@ -126,7 +123,7 @@ def test_historical_update_multiple_day_data():
             consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
 
 
-    calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
+    calc = ExerciseAssignment(consolidated_injury_risk_dict, exercise_library_datastore, completed_exercise_datastore,
                                         dates[2])
 
     active_rest = calc.get_pre_active_rest()[0]

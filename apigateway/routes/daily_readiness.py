@@ -32,7 +32,7 @@ app = Blueprint('daily_readiness', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'date_time': str, "soreness": list})
 @xray_recorder.capture('routes.daily_readiness.create')
 def handle_daily_readiness_create(user_id):
@@ -73,9 +73,9 @@ def handle_daily_readiness_create(user_id):
     if 'sessions' in request.json and len(request.json['sessions']) > 0:
         sessions_planned = True
         # enable the forcing of a post_active_rest modality prior to the workout
-        if 'sessions_planned' in request.json and not request.json['sessions_planned']:
-            sessions_planned = False
-            train_later = False
+        # if 'sessions_planned' in request.json and not request.json['sessions_planned']:
+        #     sessions_planned = False
+        #     train_later = False
         for session in request.json['sessions']:
             if session is None:
                 continue
@@ -170,7 +170,7 @@ def handle_daily_readiness_create(user_id):
 
 
 @app.route('/<uuid:user_id>/previous', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.daily_readiness.previous')
 def handle_daily_readiness_get(user_id=None):

@@ -1,7 +1,3 @@
-from fathomapi.api.config import Config
-Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
-                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
-
 from models.metrics import AthleteSorenessMetricGenerator, AthleteTrainingVolumeMetricGenerator, MetricColor, DailyHighLevelInsight, MetricType, TextGenerator, ThresholdRecommendation
 from models.stats import AthleteStats
 from models.soreness import Soreness
@@ -129,7 +125,7 @@ def test_populate_thresholds_athlete_daily_soreness_thresh_mod_diff():
     soreness1.pain = True
     soreness1.streak = 2
     soreness1.side = 1
-    soreness1.body_part = BodyPart(BodyPartLocation.lats, None)
+    soreness1.body_part = BodyPart(BodyPartLocation.latissmus_dorsi, None)
 
     soreness2 = Soreness()
     soreness2.severity = 4

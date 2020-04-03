@@ -32,6 +32,11 @@ class UnitOfMeasure(Enum):
     seconds = 0
     count = 1
     yards = 2
+    feet = 3
+    meters = 4
+    miles = 5
+    kilometers = 6
+    calories = 7
 
 
 class Tempo(Enum):
@@ -174,6 +179,11 @@ class AssignedExercise(Serialisable):
             dosages = sorted(self.dosages, key=lambda x: (x.efficient_sets_assigned, x.efficient_reps_assigned), reverse=True)
 
             return self.duration(dosages[0].efficient_reps_assigned, dosages[0].efficient_sets_assigned)
+            # duration = 0
+            # for d in self.dosages:
+            #     duration += self.duration(d.efficient_reps_assigned, d.efficient_sets_assigned)
+            #
+            # return duration
         else:
             return 0
 
@@ -183,6 +193,11 @@ class AssignedExercise(Serialisable):
             dosages = sorted(self.dosages, key=lambda x: (x.complete_sets_assigned, x.complete_reps_assigned), reverse=True)
 
             return self.duration(dosages[0].complete_reps_assigned, dosages[0].complete_sets_assigned)
+            # duration = 0
+            # for d in self.dosages:
+            #     duration += self.duration(d.complete_reps_assigned, d.complete_sets_assigned)
+            #
+            # return duration
         else:
             return 0
 
@@ -192,6 +207,11 @@ class AssignedExercise(Serialisable):
             dosages = sorted(self.dosages, key=lambda x: (x.comprehensive_sets_assigned, x.comprehensive_reps_assigned), reverse=True)
 
             return self.duration(dosages[0].comprehensive_reps_assigned, dosages[0].comprehensive_sets_assigned)
+            # duration = 0
+            # for d in self.dosages:
+            #     duration += self.duration(d.comprehensive_reps_assigned, d.comprehensive_sets_assigned)
+            #
+            # return duration
         else:
             return 0
 
@@ -246,7 +266,7 @@ class AssignedExercise(Serialisable):
 
         return assigned_exercise
 
-    def json_serialise(self):
+    def json_serialise(self, mobility_api=False):
         ret = {'name': self.exercise.name,
                'display_name': self.exercise.display_name,
                'library_id': self.exercise.id,
@@ -265,6 +285,12 @@ class AssignedExercise(Serialisable):
                # 'goals': [goal.json_serialise() for goal in self.goals],
                # 'priorities': list(self.priorities),
                # 'soreness_sources': [soreness.json_serialise(trigger=True) for soreness in self.soreness_sources],
-               'dosages': [dosage.json_serialise() for dosage in self.dosages]
+               'dosages': [dosage.json_serialise(mobility_api) for dosage in self.dosages]
                }
         return ret
+
+
+class WeightMeasure(Enum):
+    rep_max = 0
+    percent_bodyweight = 1
+    actual_weight = 2

@@ -1,11 +1,3 @@
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-from fathomapi.api.config import Config
-Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
-                             'body_part_mapping_filename': 'body_part_mapping_fathom.json'})
-
-
 from models.soreness import Soreness
 from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
 from models.body_parts import BodyPart
@@ -20,6 +12,7 @@ from tests.testing_utilities import TestUtilities
 from datetime import datetime, timedelta
 from models.stats import AthleteStats
 from utils import parse_date, format_date
+import pytz
 
 def get_dates(start_date, end_date):
 
@@ -151,7 +144,7 @@ def test_consecutive_last_updated_2_days_with_break():
 
     consecutive_pain_list = stats_processing.get_historic_soreness_list(soreness_list_25)
 
-    assert (datetime(2018, 7, 19, 11, 0) == consecutive_pain_list[0].last_reported_date_time)
+    assert (datetime(2018, 7, 19, 11, 0).replace(tzinfo=pytz.utc) == consecutive_pain_list[0].last_reported_date_time)
 
 def test_historical_soreness_trigger_update_almost_persistent_to_persistent():
     athlete_stats = AthleteStats("tester")

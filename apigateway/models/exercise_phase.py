@@ -9,6 +9,7 @@ class ExercisePhaseType(Enum):
     dynamic_stretch = 3
     isolated_activate = 4
     static_integrate = 5
+    dynamic_integrate = 6
 
     def get_display_name(self):
         display_names = {
@@ -17,7 +18,8 @@ class ExercisePhaseType(Enum):
             2: 'ACTIVE STRETCH',
             3: 'DYNAMIC STRETCH',
             4: 'ACTIVATE',
-            5: 'STATIC INTEGRATE'
+            5: 'STATIC INTEGRATE',
+            6: 'DYNAMIC INTEGRATE'
             }
         return display_names[self.value]
 
@@ -29,12 +31,12 @@ class ExercisePhase(object):
         self.title = self.type.get_display_name()
         self.exercises = {}
 
-    def json_serialise(self):
+    def json_serialise(self, mobility_api=False):
         return {
             "type": self.type.value,
             "name": self.name,
             "title": self.title,
-            "exercises": [e.json_serialise() for e in self.exercises.values()]
+            "exercises": [e.json_serialise(mobility_api) for e in self.exercises.values()]
         }
 
     @classmethod

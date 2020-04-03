@@ -145,11 +145,11 @@ class TrainingVolumeProcessing(object):
         self.load_stats.set_min_max_values(training_sessions)
 
         for t in training_sessions:
-            swimming_sessions.append((t.event_date, t.swimming_load(), t.sport_name))
-            cycling_sessions.append((t.event_date, t.cycling_load(), t.sport_name))
-            running_sessions.append((t.event_date, t.running_load(), t.sport_name))
-            walking_sessions.append((t.event_date, t.walking_load(), t.sport_name))
-            training_volume = t.training_volume(self.load_stats)
+            swimming_sessions.append((t.event_date, t.swimming_training_volume(), t.sport_name))
+            cycling_sessions.append((t.event_date, t.cycling_training_volume(), t.sport_name))
+            running_sessions.append((t.event_date, t.running_training_volume(), t.sport_name))
+            walking_sessions.append((t.event_date, t.walking_training_volume(), t.sport_name))
+            training_volume = t.training_load(self.load_stats)
             if training_volume is not None:
                 duration_sessions.append((t.event_date, training_volume, t.sport_name))
 
@@ -174,7 +174,7 @@ class TrainingVolumeProcessing(object):
     def is_last_session_high_relative_load(self, event_date, last_training_session, benchmarks, load_stats):
         if (event_date - last_training_session.event_date).days <= 2:
             if last_training_session.sport_name in benchmarks:
-                if last_training_session.training_volume(load_stats) >= benchmarks[last_training_session.sport_name]:
+                if last_training_session.training_load(load_stats) >= benchmarks[last_training_session.sport_name]:
                     return True
         else:
             return False
@@ -249,7 +249,7 @@ class TrainingVolumeProcessing(object):
             if p.sport_name not in self.previous_week_sport_training_loads:
                 self.last_week_sport_training_loads[p.sport_name] = []
                 self.previous_week_sport_training_loads[p.sport_name] = []
-            training_load = p.training_volume(self.load_stats)
+            training_load = p.training_load(self.load_stats)
             if training_load is not None:
                 self.previous_week_sport_training_loads[p.sport_name].append(training_load)
                 if p.sport_name.value in self.sport_max_load:
@@ -270,7 +270,7 @@ class TrainingVolumeProcessing(object):
             if l.sport_name not in self.last_week_sport_training_loads:
                 self.last_week_sport_training_loads[l.sport_name] = []
                 self.previous_week_sport_training_loads[l.sport_name] = []
-            training_load = l.training_volume(self.load_stats)
+            training_load = l.training_load(self.load_stats)
             if training_load is not None:
                 self.last_week_sport_training_loads[l.sport_name].append(training_load)
                 if l.sport_name.value in self.sport_max_load:
@@ -376,7 +376,7 @@ class TrainingVolumeProcessing(object):
         percent = None
 
         if self.load_stats is not None and self.sport_max_load is not None:
-            training_volume = training_session.training_volume(self.load_stats)
+            training_volume = training_session.training_load(self.load_stats)
             if training_volume is not None and training_volume > 0:
                 training_volume = round(training_volume, 2)
 

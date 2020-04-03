@@ -17,7 +17,7 @@ app = Blueprint('functional_strength', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['PATCH'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.functional_strength')
 def handle_functional_strength_update(user_id=None):
@@ -66,7 +66,7 @@ def handle_functional_strength_update(user_id=None):
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.functional_strength')
 def handle_functional_strength_start(user_id=None):
@@ -98,7 +98,7 @@ def handle_functional_strength_start(user_id=None):
 
 
 @app.route('/<uuid:user_id>/activate', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str, "current_sport_name": (int, None), "current_position": (int, None)})
 @xray_recorder.capture('routes.functional_strength.activate')
 def handle_functional_strength_activate(user_id=None):

@@ -436,13 +436,13 @@ class StatsProcessing(object):
 
         for t in training_sessions:
             if t.session_RPE == 1:  # maintenance load, do not consider
-                total_load += t.training_volume(athlete_stats.load_stats)
+                total_load += t.training_load(athlete_stats.load_stats)
             else:
                 sore_body_parts = list(a for a in all_soreness
                                        if a.first_reported_date_time <= t.event_date <= a.last_reported_date_time)
                 if len(sore_body_parts) > 0:
-                    sore_load += t.training_volume(athlete_stats.load_stats)
-                total_load += t.training_volume(athlete_stats.load_stats)
+                    sore_load += t.training_load(athlete_stats.load_stats)
+                total_load += t.training_load(athlete_stats.load_stats)
 
         if total_load > 0:
             muscular_strain = DataSeries(self.event_date, 100 - ((sore_load / float(total_load)) * 100))

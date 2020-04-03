@@ -14,7 +14,7 @@ app = Blueprint('trends', __name__)
 
 
 @app.route('/<uuid:user_id>/plan_alerts/clear', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.trends.plan_alerts.clear')
 def handle_alerts_cleared(user_id):
@@ -50,7 +50,7 @@ def handle_alerts_cleared(user_id):
 
 
 @app.route('/<uuid:user_id>/first_time_experience/category', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.trends.first_time_experience.category')
 def handle_fte_category(user_id):
@@ -76,7 +76,7 @@ def handle_fte_category(user_id):
 
 
 @app.route('/<uuid:user_id>/first_time_experience/view', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.trends.first_time_experience.view')
 def handle_fte_view(user_id):

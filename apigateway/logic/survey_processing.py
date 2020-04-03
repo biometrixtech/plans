@@ -14,6 +14,7 @@ from logic.training_plan_management import TrainingPlanManager
 from logic.training_volume_processing import TrainingVolumeProcessing
 from logic.heart_rate_processing import HeartRateProcessing
 from logic.metrics_processing import MetricsProcessing
+from logic.workout_processing import WorkoutProcessor
 from datastores.datastore_collection import DatastoreCollection
 from utils import parse_datetime, format_datetime, fix_early_survey_event_date, format_date
 from copy import deepcopy
@@ -77,6 +78,7 @@ class SurveyProcessing(object):
         apple_health_kit_ids = session.get("merged_apple_health_kit_ids", [])
         apple_health_kit_source_names = session.get("merged_apple_health_kit_source_names", [])
         workout_program_module = session.get("workout_program_module", None)
+        session_RPE = session.get('session_RPE', None)
 
         duration_health = None
         if source == 1:
@@ -99,7 +101,8 @@ class SurveyProcessing(object):
                         "merged_apple_health_kit_source_names": apple_health_kit_source_names,
                         "apple_health_kit_id": apple_health_kit_id,
                         "apple_health_kit_source_name": apple_health_kit_source_name,
-                        "workout_program_module": workout_program_module}
+                        "workout_program_module": workout_program_module,
+                        "session_RPE": session_RPE}
         if 'post_session_survey' in session:
             survey = PostSurvey(event_date=session['post_session_survey']['event_date'],
                                 survey=session['post_session_survey'])
@@ -125,6 +128,8 @@ class SurveyProcessing(object):
                         self.athlete_stats.session_RPE = survey.RPE
                         self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
+        if session_obj.workout_program_module is not None:
+            WorkoutProcessor().process_workout(session_obj.workout_program_module)
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:
@@ -315,7 +320,7 @@ class SurveyProcessing(object):
                                                                              self.athlete_stats.load_stats):
                 high_relative_load_session_present = True
                 # session_load = session.duration_minutes * session.session_RPE
-                session_load = session.training_volume(self.athlete_stats.load_stats)
+                session_load = session.training_load(self.athlete_stats.load_stats)
                 if session_load > load:
                     sport_name = session.sport_name
         self.athlete_stats.high_relative_load_session = high_relative_load_session_present
@@ -378,7 +383,8 @@ def match_sessions(user_sessions, health_session):
 
 
 def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stats_processor=None, datastore_collection=None,
-                force_data=False, mobilize_only=False, visualizations=True, hist_update=False):
+                force_data=False, mobilize_only=False, visualizations=True, hist_update=False, force_on_demand=False,
+                log_symptoms=False):
     if datastore_collection is None:
         datastore_collection = DatastoreCollection()
     if update_stats:
@@ -404,7 +410,9 @@ def create_plan(user_id, event_date, update_stats=True, athlete_stats=None, stat
                                           athlete_stats=athlete_stats,
                                           force_data=force_data,
                                           mobilize_only=mobilize_only,
-                                          visualizations=visualizations)
+                                          visualizations=visualizations,
+                                          force_on_demand=force_on_demand,
+                                          log_symptoms=log_symptoms)
     plan = cleanup_plan(plan, visualizations)
 
     return plan
