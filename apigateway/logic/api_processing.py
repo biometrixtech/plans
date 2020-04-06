@@ -75,7 +75,7 @@ class APIProcessing(object):
             self.workout_programs.append(session_obj.workout_program_module)
         if len(self.heart_rate_data) > 0:
             if session_obj.workout_program_module is not None:
-                session_obj.shrz = workout_program_module.aggregate_shrz()
+                session_obj.shrz = session_obj.workout_program_module.aggregate_shrz()
             else:
                 session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         return session_obj
