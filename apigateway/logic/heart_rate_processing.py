@@ -57,7 +57,7 @@ class HeartRateProcessing(object):
             new_heart_rate_data.append(heart_rate_data[h].value)
             if seconds_diff > 0:
                 for s in range(1, seconds_diff):
-                    new_heart_rate = ((heart_rate_data[h + 1].value - heart_rate_data[h].value) / s) + heart_rate_data[h].value
+                    new_heart_rate = ((heart_rate_data[h + 1].value - heart_rate_data[h].value) / seconds_diff * s) + heart_rate_data[h].value
                     new_heart_rate_data.append(new_heart_rate)
 
         new_heart_rate_data.append(heart_rate_data[len(heart_rate_data) - 1].value)
