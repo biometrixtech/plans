@@ -159,13 +159,13 @@ def update_session(session, data):
 
 def cleanup_hr_data_from_api(hr_data):
     return {
-            'start_date': force_datetime_iso(hr_data['startDate']),
-            'end_date': force_datetime_iso(hr_data['endDate']),
+            'start_date': hr_data['startDate'],
+            'end_date': hr_data['endDate'],
             'value': hr_data['value']
             }
 
 
-def force_datetime_iso(event_date):
-    if len(event_date.split('.')) == 2:
-        event_date = event_date.split(".")[0] + 'Z'
-    return event_date
+# def force_datetime_iso(event_date):
+#     if len(event_date.split('.')) == 2:
+#         event_date = event_date.split(".")[0] + 'Z'
+#     return event_date
