@@ -47,6 +47,20 @@ class WorkoutProgramModule(Serialisable):
 
         super().__setattr__(key, value)
 
+    def aggregate_shrz(self):
+        weighted_sum = 0
+        duration = 0
+        shrz = 1
+        for section in self.workout_sections:
+            if section.shrz is not None:
+                weighted_sum += section.shrz * section.duration_seconds
+                duration += section.duration_seconds
+        if duration > 0:
+            shrz = round(weighted_sum / duration, 2)
+        return max(1, shrz)
+
+
+
     # def get_training_load(self):
     #     total_load = 0
     #
@@ -63,6 +77,8 @@ class WorkoutSection(Serialisable):
         self.end_date_time = None
         self.duration_seconds = None
         self.assess_load = True
+        self.assess_shrz = True
+        self.shrz = None
         self.exercises = []
 
     def json_serialise(self):
@@ -72,6 +88,8 @@ class WorkoutSection(Serialisable):
             'end_date_time': format_datetime(self.end_date_time) if self.end_date_time is not None else None,
             'duration_seconds': self.duration_seconds,
             'assess_load': self.assess_load,
+            'assess_shrz': self.assess_shrz,
+            'shrz': self.shrz,
             'exercises': [e.json_serialise() for e in self.exercises]
         }
         return ret
@@ -83,10 +101,19 @@ class WorkoutSection(Serialisable):
         workout_section.start_date_time = parse_datetime(input_dict['start_date_time']) if input_dict.get('start_date_time') is not None else None
         workout_section.end_date_time = parse_datetime(input_dict['end_date_time']) if input_dict.get('end_date_time') is not None else None
         workout_section.duration_seconds = input_dict.get('duration_seconds')
+        workout_section.shrz = input_dict.get('shrz')
         workout_section.assess_load = input_dict.get('assess_load', True)
+        workout_section.assess_shrz = input_dict.get('assess_shrz', True)
         workout_section.exercises = [WorkoutExercise.json_deserialise(workout_exercise) for workout_exercise in input_dict.get('exercises', [])]
 
         return workout_section
+
+    def __setattr__(self, key, value):
+        if key in ['start_date_time', 'end_date_time']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_datetime(value)
+
+        super().__setattr__(key, value)
 
     def should_assess_load(self, no_load_sections):
         section = self.name.lower().replace("-", "_")
@@ -94,6 +121,26 @@ class WorkoutSection(Serialisable):
             pat = r'\b' + keyword + r'\b'
             if re.search(pat, section) is not None:
                 self.assess_load = False
+
+    def should_assess_shrz(self):
+        if not self.assess_load:
+            self.assess_shrz = False
+        else:
+            for exercise in self.exercises:
+                # TODO: validate the filtering here
+                if exercise.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics,
+                                              TrainingType.integrated_resistance_olympic_lift, TrainingType.strength_integrated_resistance
+                                              ]:
+                    self.assess_shrz = False
+                    break
+        if not self.assess_shrz:
+            self.shrz = None
+            for exercise in self.exercises:
+                exercise.shrz = None
+                for action in exercise.primary_actions:
+                    action.shrz = None
+                for action in exercise.secondary_actions:
+                    action.shrz = None
 
     # def get_training_load(self):
     #
@@ -133,6 +180,7 @@ class WorkoutExercise(Serialisable):
         self.surface_stability = None
         self.primary_actions = []
         self.secondary_actions = []
+        self.shrz = None
 
     def json_serialise(self):
         ret = {
@@ -158,7 +206,8 @@ class WorkoutExercise(Serialisable):
             'explosiveness_rating': self.explosiveness_rating,
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             # 'primary_actions': [action.json_serialise() for action in self.primary_actions],
-            # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions]
+            # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions],
+            'shrz': self.shrz
         }
         return ret
 
@@ -192,6 +241,7 @@ class WorkoutExercise(Serialisable):
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
         exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
+        exercise.shrz = input_dict.get('shrz')
 
         return exercise
 

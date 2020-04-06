@@ -1,6 +1,7 @@
-from models.heart_rate import HeartRateData, SessionHeartRate
-from datetime import timedelta
+# from models.heart_rate import HeartRateData, SessionHeartRate
+# from datetime import timedelta
 from utils import parse_datetime
+
 
 class HeartRateProcessing(object):
     def __init__(self, user_age):
@@ -40,7 +41,7 @@ class HeartRateProcessing(object):
 
         total_possible_duration = len(full_heart_data) * 5
 
-        shrz = (total_duration / total_possible_duration) * 10
+        shrz = round((total_duration / total_possible_duration) * 10, 2)
 
         shrz = max(1, shrz)
 
@@ -63,5 +64,3 @@ class HeartRateProcessing(object):
         new_heart_rate_data.append(heart_rate_data[len(heart_rate_data) - 1].value)
 
         return new_heart_rate_data
-
-

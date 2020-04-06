@@ -1,5 +1,6 @@
 from serialisable import Serialisable
-from utils import format_datetime
+from utils import format_datetime, parse_datetime
+import datetime
 
 
 class SessionHeartRate(Serialisable):
@@ -31,7 +32,14 @@ class HeartRateData(Serialisable):
         self.value = hr_data['value']
 
     def json_serialise(self):
-        ret = {'start_date': self.start_date,
-               'end_date': self.end_date,
+        ret = {'start_date': format_datetime(self.start_date),
+               'end_date': format_datetime(self.end_date),
                'value': self.value}
         return ret
+
+    def __setattr__(self, key, value):
+        if key in ['start_date', 'end_date']:
+            if value is not None and not isinstance(value, datetime.datetime):
+                value = parse_datetime(value)
+
+        super().__setattr__(key, value)
