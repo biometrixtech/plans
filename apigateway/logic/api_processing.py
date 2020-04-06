@@ -85,6 +85,7 @@ class APIProcessing(object):
                                               session_id=session.id,
                                               event_date=session.event_date)
         session_heart_rate.hr_workout = [HeartRateData(cleanup_hr_data_from_api(hr)) for hr in hr_data]
+        session_heart_rate.hr_workout = [hr for hr in session_heart_rate.hr_workout if hr.start_date is not None]
         self.heart_rate_data.append(session_heart_rate)
 
     def create_symptom_from_survey(self, symptom):
@@ -165,10 +166,11 @@ def update_session(session, data):
 
 def cleanup_hr_data_from_api(hr_data):
     return {
-            'start_date': hr_data['startDate'],
-            'end_date': hr_data['endDate'],
+            'start_date': hr_data.get('startDate') or hr_data.get('event_date_time'),
+            'end_date': hr_data.get('endDate') or hr_data.get('end_date_time'),
             'value': hr_data['value']
             }
+
 
 
 # def force_datetime_iso(event_date):
