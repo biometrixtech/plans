@@ -62,16 +62,22 @@ class APIProcessing(object):
         session_obj = create_session(session_type, session_data)
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
+        if 'hr_data' in session and len(session['hr_data']) > 0:
+            heart_rate_processing = HeartRateProcessing(self.user_age)
+            self.create_session_hr_data(session_obj, session['hr_data'])
+            # session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         if session_obj.workout_program_module is not None:
             session_obj.workout_program_module.session_id = session_obj.id
             session_obj.workout_program_module.user_id = session_obj.user_id
             session_obj.workout_program_module.event_date_time = session_obj.event_date
-            WorkoutProcessor().process_workout(session_obj.workout_program_module)
+            hr_workout = self.heart_rate_data[0].hr_workout if len(self.heart_rate_data) > 0 else None
+            WorkoutProcessor().process_workout(session_obj.workout_program_module, hr_workout, self.user_age)
             self.workout_programs.append(session_obj.workout_program_module)
-        if 'hr_data' in session and len(session['hr_data']) > 0:
-            heart_rate_processing = HeartRateProcessing(self.user_age)
-            self.create_session_hr_data(session_obj, session['hr_data'])
-            session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
+        if len(self.heart_rate_data) > 0:
+            if session_obj.workout_program_module is not None:
+                session_obj.shrz = workout_program_module.aggregate_shrz()
+            else:
+                session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         return session_obj
 
     def create_session_hr_data(self, session, hr_data):
