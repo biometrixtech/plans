@@ -23,7 +23,7 @@ class WorkoutProcessor(object):
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
             heart_rate_processing = HeartRateProcessing(user_age)
-            if hr_data is not None:
+            if hr_data is not None workout_section.start_date_time is not None and workout_section.end_date_time is not None:
                 # assumption here is that all exercises in the section are of similar training/adaptation types
                 # such that a single shrz can be calculated for each section
                 section_hr = [hr for hr in hr_data if workout_section.start_date_time <= hr.start_date <= workout_section.end_date_time]
