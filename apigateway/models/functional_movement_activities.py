@@ -205,7 +205,7 @@ class Activity(object):
         self.proposed_comprehensive_limit = 1500
         self.exercise_phases_pre_scaling = []
 
-    def json_serialise(self, mobility_api=False):
+    def json_serialise(self, mobility_api=False, api=False, consolidated=False):
         return {
             "id": self.id,
             "type": self.type.value,
@@ -216,7 +216,7 @@ class Activity(object):
             "completed": self.completed,
             "default_plan": self.default_plan,
             "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
-            "exercise_phases": [ex_phase.json_serialise(mobility_api) for ex_phase in self.exercise_phases]
+            "exercise_phases": [ex_phase.json_serialise(mobility_api=mobility_api, api=api, consolidated=consolidated) for ex_phase in self.exercise_phases]
          }
 
     @classmethod
