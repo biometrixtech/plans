@@ -80,7 +80,7 @@ def handle_mobility_wod_create(user_id):
             activity_type='mobility_wod'
     )
 
-    return {'mobility_wod': mobility_wod.json_serialise()}, 201
+    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=True)}, 201
 
 
 @app.route('/<uuid:user_id>/<uuid:mobility_wod_id>/start_activity', methods=['POST'])
