@@ -203,6 +203,7 @@ class Activity(object):
         self.proposed_efficient_limit = 480
         self.proposed_complete_limit = 900
         self.proposed_comprehensive_limit = 1500
+        self.exercise_phases_pre_scaling = []
 
     def json_serialise(self, mobility_api=False):
         return {
@@ -568,7 +569,12 @@ class Activity(object):
             elif proposed_efficient == 0:
                 continue
             elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
-                continue
+                if b == len(benchmarks) - 2:
+                    self.efficient_winner = benchmarks[b + 1]
+                    efficient_found = True
+                    break
+                else:
+                    continue
             elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
             # elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
                 self.efficient_winner = benchmarks[last_efficient_value]
@@ -599,7 +605,12 @@ class Activity(object):
             elif proposed_complete == 0:
                 continue
             elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
-                continue
+                if b == len(benchmarks) - 2:
+                    self.complete_winner = benchmarks[b + 1]
+                    complete_found = True
+                    break
+                else:
+                    continue
             elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
             # elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
                 self.complete_winner = benchmarks[last_complete_value]
@@ -629,7 +640,12 @@ class Activity(object):
             elif proposed_comprehensive == 0:
                 continue
             elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
-                continue
+                if b == len(benchmarks) - 2:
+                    self.comprehensive_winner = benchmarks[b + 1]
+                    comprehensive_found = True
+                    break
+                else:
+                    continue
             elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
             # elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
