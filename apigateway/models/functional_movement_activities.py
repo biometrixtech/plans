@@ -22,13 +22,13 @@ class MovementPrep(object):
         self.training_session_id = None
         self.movement_integration_prep = None
 
-    def json_serialise(self):
+    def json_serialise(self, api=False, consolidated=False):
         return {
             "movement_prep_id": self.movement_prep_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_id": self.training_session_id,
-            "movement_integration_prep": self.movement_integration_prep.json_serialise(mobility_api=True) if self.movement_integration_prep is not None else None
+            "movement_integration_prep": self.movement_integration_prep.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.movement_integration_prep is not None else None
         }
 
     @classmethod
@@ -56,13 +56,13 @@ class MobilityWOD(object):
         self.training_session_ids = []
         self.active_rest = None
 
-    def json_serialise(self):
+    def json_serialise(self, api=False, consolidated=False):
         return {
             "mobility_wod_id": self.mobility_wod_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_ids": self.training_session_ids,
-            "active_rest": self.active_rest.json_serialise(mobility_api=True) if self.active_rest is not None else None
+            "active_rest": self.active_rest.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.active_rest is not None else None
         }
 
     @classmethod
@@ -93,14 +93,14 @@ class ResponsiveRecovery(object):
         self.ice = None
         self.cold_water_immersion = None
 
-    def json_serialise(self):
+    def json_serialise(self, api=False, consolidated=False):
         return {
             "responsive_recovery_id": self.responsive_recovery_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_id": self.training_session_id,
-            "active_rest": self.active_rest.json_serialise(mobility_api=True) if self.active_rest is not None else None,
-            "active_recovery": self.active_recovery.json_serialise(mobility_api=True) if self.active_recovery is not None else None,
+            "active_rest": self.active_rest.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.active_rest is not None else None,
+            "active_recovery": self.active_recovery.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.active_recovery is not None else None,
             "ice": self.ice.json_serialise() if self.ice is not None else None,
             "cold_water_immersion": self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None
         }
