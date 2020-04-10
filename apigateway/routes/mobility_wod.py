@@ -149,7 +149,7 @@ def handle_mobility_wod_get(user_id, mobility_wod_id):
     if mobility_wod.user_id != user_id:
         return {'message': 'user_id and mobility_wod_id do not match'}, 404
 
-    return {'mobility_wod': mobility_wod.json_serialise()}
+    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=True)}
 
 
 @xray_recorder.capture('routes.mobility_wod.validate')
