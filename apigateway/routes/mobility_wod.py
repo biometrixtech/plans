@@ -21,6 +21,9 @@ heart_rate_datastore = datastore_collection.heart_rate_datastore
 workout_program_datastore = datastore_collection.workout_program_datastore
 mobility_wod_datastore = datastore_collection.mobility_wod_datastore
 
+consolidate_dosage = Config.get('PROVIDER_INFO').get('consolidate_dosage') or 'false'
+consolidated = True if consolidate_dosage.lower() == 'true' else False
+
 app = Blueprint('mobility_wod', __name__)
 
 
@@ -80,7 +83,7 @@ def handle_mobility_wod_create(user_id):
             activity_type='mobility_wod'
     )
 
-    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=True)}, 201
+    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=consolidated)}, 201
 
 
 @app.route('/<uuid:user_id>/<uuid:mobility_wod_id>/start_activity', methods=['POST'])
@@ -149,7 +152,7 @@ def handle_mobility_wod_get(user_id, mobility_wod_id):
     if mobility_wod.user_id != user_id:
         return {'message': 'user_id and mobility_wod_id do not match'}, 404
 
-    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=True)}
+    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=consolidated)}
 
 
 @xray_recorder.capture('routes.mobility_wod.validate')
