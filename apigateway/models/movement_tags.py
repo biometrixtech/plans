@@ -6,7 +6,6 @@ class TrainingType(Enum):
     strength_cardiorespiratory = 1
     strength_endurance = 2
     strength_integrated_resistance = 3
-    integrated_resistance_olympic_lift = 3
     power_action_olympic_lift = 4
     power_action_plyometrics = 5
     power_drills_plyometrics = 6

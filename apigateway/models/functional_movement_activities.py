@@ -22,13 +22,13 @@ class MovementPrep(object):
         self.training_session_id = None
         self.movement_integration_prep = None
 
-    def json_serialise(self):
+    def json_serialise(self, api=False, consolidated=False):
         return {
             "movement_prep_id": self.movement_prep_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_id": self.training_session_id,
-            "movement_integration_prep": self.movement_integration_prep.json_serialise(mobility_api=True) if self.movement_integration_prep is not None else None
+            "movement_integration_prep": self.movement_integration_prep.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.movement_integration_prep is not None else None
         }
 
     @classmethod
@@ -56,13 +56,13 @@ class MobilityWOD(object):
         self.training_session_ids = []
         self.active_rest = None
 
-    def json_serialise(self):
+    def json_serialise(self, api=False, consolidated=False):
         return {
             "mobility_wod_id": self.mobility_wod_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_ids": self.training_session_ids,
-            "active_rest": self.active_rest.json_serialise(mobility_api=True) if self.active_rest is not None else None
+            "active_rest": self.active_rest.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.active_rest is not None else None
         }
 
     @classmethod
@@ -93,14 +93,14 @@ class ResponsiveRecovery(object):
         self.ice = None
         self.cold_water_immersion = None
 
-    def json_serialise(self):
+    def json_serialise(self, api=False, consolidated=False):
         return {
             "responsive_recovery_id": self.responsive_recovery_id,
             "user_id": self.user_id,
             "created_date_time": format_datetime(self.created_date_time) if self.created_date_time is not None else None,
             "training_session_id": self.training_session_id,
-            "active_rest": self.active_rest.json_serialise(mobility_api=True) if self.active_rest is not None else None,
-            "active_recovery": self.active_recovery.json_serialise(mobility_api=True) if self.active_recovery is not None else None,
+            "active_rest": self.active_rest.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.active_rest is not None else None,
+            "active_recovery": self.active_recovery.json_serialise(mobility_api=True, api=api, consolidated=consolidated) if self.active_recovery is not None else None,
             "ice": self.ice.json_serialise() if self.ice is not None else None,
             "cold_water_immersion": self.cold_water_immersion.json_serialise() if self.cold_water_immersion is not None else None
         }
@@ -203,8 +203,9 @@ class Activity(object):
         self.proposed_efficient_limit = 480
         self.proposed_complete_limit = 900
         self.proposed_comprehensive_limit = 1500
+        self.exercise_phases_pre_scaling = []
 
-    def json_serialise(self, mobility_api=False):
+    def json_serialise(self, mobility_api=False, api=False, consolidated=False):
         return {
             "id": self.id,
             "type": self.type.value,
@@ -215,7 +216,7 @@ class Activity(object):
             "completed": self.completed,
             "default_plan": self.default_plan,
             "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
-            "exercise_phases": [ex_phase.json_serialise(mobility_api) for ex_phase in self.exercise_phases]
+            "exercise_phases": [ex_phase.json_serialise(mobility_api=mobility_api, api=api, consolidated=consolidated) for ex_phase in self.exercise_phases]
          }
 
     @classmethod
@@ -568,7 +569,12 @@ class Activity(object):
             elif proposed_efficient == 0:
                 continue
             elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
-                continue
+                if b == len(benchmarks) - 2:
+                    self.efficient_winner = benchmarks[b + 1]
+                    efficient_found = True
+                    break
+                else:
+                    continue
             elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
             # elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
                 self.efficient_winner = benchmarks[last_efficient_value]
@@ -599,7 +605,12 @@ class Activity(object):
             elif proposed_complete == 0:
                 continue
             elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
-                continue
+                if b == len(benchmarks) - 2:
+                    self.complete_winner = benchmarks[b + 1]
+                    complete_found = True
+                    break
+                else:
+                    continue
             elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
             # elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
                 self.complete_winner = benchmarks[last_complete_value]
@@ -629,7 +640,12 @@ class Activity(object):
             elif proposed_comprehensive == 0:
                 continue
             elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
-                continue
+                if b == len(benchmarks) - 2:
+                    self.comprehensive_winner = benchmarks[b + 1]
+                    comprehensive_found = True
+                    break
+                else:
+                    continue
             elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
             # elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
