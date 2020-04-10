@@ -12,6 +12,9 @@ from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
 from logic.activities_processing import ActivitiesProcessing
 from utils import parse_datetime, get_timezone
+from routes.environments import consolidated_dosage
+
+consolidated = consolidated_dosage()
 
 datastore_collection = DatastoreCollection()
 user_stats_datastore = datastore_collection.user_stats_datastore
@@ -81,7 +84,7 @@ def handle_responsive_recovery_create(user_id):
     )
 
     return {
-               'responsive_recovery': responsive_recovery.json_serialise()
+               'responsive_recovery': responsive_recovery.json_serialise(api=True, consolidated=consolidated)
            }, 201
 
 
@@ -148,7 +151,7 @@ def handle_responsive_recovery_update(user_id, responsive_recovery_id):
             training_session_id=existing_responsive_recovery.training_session_id
     )
 
-    return {'responsive_recovery': responsive_recovery.json_serialise()}
+    return {'responsive_recovery': responsive_recovery.json_serialise(api=True, consolidated=consolidated)}
 
 
 @app.route('/<uuid:user_id>/<uuid:responsive_recovery_id>/start_activity', methods=['POST'])
@@ -217,7 +220,7 @@ def handle_responsive_recovery_get(user_id, responsive_recovery_id):
     if responsive_recovery.user_id != user_id:
         return {'message': 'user_id and responsive_recovery_id do not match'}, 404
 
-    return {'responsive_recovery': responsive_recovery.json_serialise()}
+    return {'responsive_recovery': responsive_recovery.json_serialise(api=True, consolidated=consolidated)}
 
 
 @xray_recorder.capture('routes.responsive_recovery.validate')

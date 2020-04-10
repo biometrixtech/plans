@@ -12,6 +12,9 @@ from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
 from logic.activities_processing import ActivitiesProcessing
 from utils import parse_datetime, get_timezone
+from routes.environments import consolidated_dosage
+
+consolidated = consolidated_dosage()
 
 datastore_collection = DatastoreCollection()
 user_stats_datastore = datastore_collection.user_stats_datastore
@@ -21,8 +24,6 @@ heart_rate_datastore = datastore_collection.heart_rate_datastore
 workout_program_datastore = datastore_collection.workout_program_datastore
 mobility_wod_datastore = datastore_collection.mobility_wod_datastore
 
-consolidate_dosage = Config.get('PROVIDER_INFO').get('consolidate_dosage') or 'false'
-consolidated = True if consolidate_dosage.lower() == 'true' else False
 
 app = Blueprint('mobility_wod', __name__)
 
