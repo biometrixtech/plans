@@ -28,7 +28,7 @@ class ExerciseAssignment(object):
         if self.log_intermediary_data:
             activity.exercise_phases_pre_scaling = pickle.loads(pickle.dumps(activity.exercise_phases))
         activity.aggregate_dosages()
-        activity.set_winners()
+        activity.set_winners_2()
         activity.scale_all_active_time()
         activity.reconcile_default_plan_with_active_time()
 
@@ -40,7 +40,8 @@ class ExerciseAssignment(object):
             active_rest.set_plan_dosage()
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
-            active_rest.set_winners()
+            # active_rest.set_winners()
+            active_rest.set_winners_2()
             active_rest.scale_all_active_time()
             active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
@@ -55,7 +56,8 @@ class ExerciseAssignment(object):
             active_rest.set_plan_dosage()
             active_rest.set_exercise_dosage_ranking()
             active_rest.aggregate_dosages()
-            active_rest.set_winners()
+            # active_rest.set_winners()
+            active_rest.set_winners_2()
             active_rest.scale_all_active_time()
             active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
