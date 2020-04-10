@@ -1598,5 +1598,3 @@ class FunctionalMovementFactory(object):
         functional_movement.fixators = self.get_shoulder_fixators_2()
         functional_movement.parts_receiving_compensation = [81]
         return functional_movement
-
-    # def get_tibial
