@@ -52,7 +52,6 @@ class BodyPartInjuryRisk(object):
 
         # ache
         self.ache_count_last_0_10_days = 0
-        # self.ache_count_last_0_10_days = 0 # 0 to 10
         self.ache_count_last_0_20_days = 0 # 0 to 20
         self.last_ache_level = 0
         self.last_ache_date = None

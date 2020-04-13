@@ -1,4 +1,4 @@
-# FathomAI - Mobility API (v 5.0.1)
+# FathomAI - Mobility API (v 5.0.2)
 
 ## Overview
 The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or both of the following elements.
@@ -1516,8 +1516,8 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 
 * `name` __should__ be an identifying section name
 * `duration_seconds` __should__ be total time assigned or taken to complete the section
-* `start_date_time` __should__ reflect the start time of the workout section
-* `end_date_time` __should__ reflect the end time of the workout section
+* `start_date_time` is an __optional__ parameter and should reflect the start time of the workout section
+* `end_date_time` is an __optional__ parameter and should reflect the end time of the workout section
 * `exercises` __should__ be a list of of all  _exercise_ elements assigned within the section
 
 `exercise` __should__ be of the following schema:
@@ -1758,11 +1758,81 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 
 ### Assigned Exercise
 
-Exercises are assigned to each phase based on the needs of the athlete.  Each assigned exercise contains instructions that can be provided to end users.
+Exercises are assigned to each phase based on the needs of the athlete. Each assigned exercise contains instructions that can be provided to end users.
 
-Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
+`assigned_exercise` can either follow the schema of the Consolidated Assigned Exercise or Detailed Assigned Exercise format:
 
-* `assigned_exercise` will be of the following schema:
+#### Consolidated Assigned Exercise Format
+
+* Consolidated `assigned_exercise` will be of the following schema:
+
+```
+{
+    "name" : string,
+    "display_name" : string,
+    "library_id" : string,
+    "description" : string,
+    "youtube_id" : null,
+    "bilateral" : boolean,
+    "seconds_per_rep" : integer,
+    "seconds_per_set" : integer,
+    "unit_of_measure" : string,
+    "position_order" : integer,
+    "duration_efficient" : integer,
+    "duration_complete" : integer,
+    "duration_comprehensive" : integer,
+    "efficient_reps_assigned": integer,
+    "efficient_sets_assigned": integer,
+    "complete_reps_assigned": integer,
+    "complete_sets_assigned": integer,
+    "comprehensive_reps_assigned": integer,
+    "comprehensive_sets_assigned": integer,
+    "goals": [exercise_goal, exercise_goal],
+    "goal_text" : string,
+    "equipment_required" : [string, string],
+}
+```
+
+* `name` represents the Fathom internal name of the assigned exercise
+* `display_name` is a label for this exercise that can be presented to the end user
+* `library_id` is the Fathom internal ID of the assigned exercise
+* `description` provides instructions to the end user on how to complete the exercise
+* `youtube_id` generally will be null but is reserved for URLs to instructional videos for the exercise
+* `bilateral` if true, indicates the exercise should be completed on both the left and right sides
+* `seconds_per_rep` used for estimating exercise dosage duration and indicates the number of seconds to complete one rep; will be null if unit_of_measure is "seconds"
+* `seconds_per_set` used for estimating exercise dosage duration and indicates the number of seconds to complete one set
+* `unit_of_measure` will be the string representation of the Unit of Measure enumeration as defined in this Appendix (e.g. "seconds", "count", etc.). 
+* `position_order` can be used by the client to order exercises to the end user
+* `duration_efficient` provides the estimated duration of the exercise given the  __efficient__ dosage
+* `duration_complete` provides the estimated duration of the exercise given the  __complete__ dosage
+* `duration_comprehensive` provides the estimated duration of the exercise given the  __comprehensive__ dosage
+* `efficient_reps_assigned` the number of reps assigned of this exercise for the  __efficient__ dosage
+* `efficient_sets_assigned` the number of sets assigned of this exercise for the  __efficient__ dosage
+* `complete_reps_assigned` the number of reps assigned of this exercise for the  __complete__ dosage
+* `complete_sets_assigned` the number of sets assigned of this exercise for the  __complete__ dosage
+* `comprehensive_reps_assigned` the number of reps assigned of this exercise for the  __comprehensive__ dosage
+* `comprehensive_sets_assigned` the number sets reps assigned of this exercise for the  __comprehensive__ dosage
+* `goals` will be a list of `exercise_goal` items as defined in this Appendix
+* `goal_text` will typically be empty and is reserved for future use.
+* `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
+
+### Exercise Goal
+* `exercise_goal` will have the following schema:
+```
+    {
+        goal_text : priority
+    }
+```
+
+* `goal_text` will be name of the ActivityGoal that can be displayed to an end-user
+* `priority` is the normalized ranking of this Exercise Goal across all  __Exercise Phase__ objects returned
+
+
+#### Detailed Assigned Exercise Format
+
+Each  __Detailed Assigned Exercise__ also includes one or more  __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
+
+* Detailed `assigned_exercise` will be of the following schema:
 
 ```
 {
@@ -1821,7 +1891,7 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 }
 ```
 
-* `goal` will be a Goal as defined in this Appendix
+* `goal` will be a Dosage Goal as defined in this Appendix
 * `priority` is the normalized ranking of this  __Exercise Dosage__ across all  __Exercise Phase__ objects returned
 * `efficient_reps_assigned` reflects the number of reps assigned of this exercise for the  __efficient__ dosage
 * `efficient_sets_assigned` reflects the number of sets assigned of this exercise for the  __efficient__ dosage
@@ -1830,9 +1900,9 @@ Each  __Assigned Exercise__ also includes 1 or more  __Exercise Dosage__, based 
 * `comprehensive_reps_assigned` reflects the number of reps assigned of this exercise for the  __comprehensive__ dosage
 * `comprehensive_sets_assigned` reflects the number sets reps assigned of this exercise for the  __comprehensive__ dosage
 
-### Goal
+### Dosage Goal
 
-* `goal` will have the following schema 
+* `dosage_goal` will have the following schema 
 
 ```
 {
@@ -2051,5 +2121,5 @@ The following reportable body parts are considered muscles. Allowable Sides (0, 
     rotator_cuff = 119 {1, 2}
     serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: March 26, 2020
+###### Last Modified: April 13, 2020
 
