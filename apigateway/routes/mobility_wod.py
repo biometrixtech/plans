@@ -12,6 +12,9 @@ from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
 from logic.activities_processing import ActivitiesProcessing
 from utils import parse_datetime, get_timezone
+from routes.environments import consolidated_dosage
+
+consolidated = consolidated_dosage()
 
 datastore_collection = DatastoreCollection()
 user_stats_datastore = datastore_collection.user_stats_datastore
@@ -20,6 +23,7 @@ training_session_datastore = datastore_collection.training_session_datastore
 heart_rate_datastore = datastore_collection.heart_rate_datastore
 workout_program_datastore = datastore_collection.workout_program_datastore
 mobility_wod_datastore = datastore_collection.mobility_wod_datastore
+
 
 app = Blueprint('mobility_wod', __name__)
 
@@ -80,7 +84,7 @@ def handle_mobility_wod_create(user_id):
             activity_type='mobility_wod'
     )
 
-    return {'mobility_wod': mobility_wod.json_serialise()}, 201
+    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=consolidated)}, 201
 
 
 @app.route('/<uuid:user_id>/<uuid:mobility_wod_id>/start_activity', methods=['POST'])
@@ -149,7 +153,7 @@ def handle_mobility_wod_get(user_id, mobility_wod_id):
     if mobility_wod.user_id != user_id:
         return {'message': 'user_id and mobility_wod_id do not match'}, 404
 
-    return {'mobility_wod': mobility_wod.json_serialise()}
+    return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=consolidated)}
 
 
 @xray_recorder.capture('routes.mobility_wod.validate')

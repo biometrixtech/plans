@@ -26,7 +26,7 @@ class TestParameters(object):
 
 def get_test_parameters_list():
 
-    parm_list = []
+    parm_list = list()
 
     parm_list.append(TestParameters("active_rest",  no_symptom=False, high_load=True))
     parm_list.append(TestParameters("active_rest",  no_symptom=False, high_load=True, symptoms=2))
@@ -173,6 +173,11 @@ def get_ex_assigned_details(activity):
     total_duration_complete = 0
     total_duration_comprehensive = 0
     total_exercises = 0
+
+    total_duration_efficient_pre = 0
+    total_duration_complete_pre = 0
+    total_duration_comprehensive_pre = 0
+    total_exercises_pre = 0
     phase_lines = {
         'inhibit': ",,,",
         'static_stretch': ",,,",
@@ -182,33 +187,77 @@ def get_ex_assigned_details(activity):
         'static_integrate': ",,,",
         'dynamic_integrate': ",,,"
     }
-    for ex_phase in activity.exercise_phases:
+    # if pre_scaling:
+    #     exercise_phases = activity.exercise_phases_pre_scaling
+    # else:
+    #     exercise_phases = activity.exercise_phases
+    for i in range(len(activity.exercise_phases)):
+        ex_phase = activity.exercise_phases[i]
+        ex_phase_pre = activity.exercise_phases_pre_scaling[i]
         phase_name = ex_phase.name
         duration_efficient_phase = 0
         duration_complete_phase = 0
         duration_comprehensive_phase = 0
+        duration_efficient_phase_pre = 0
+        duration_complete_phase_pre = 0
+        duration_comprehensive_phase_pre = 0
         ex_count_phase = 0
+        ex_count_phase_pre = 0
         for ex in ex_phase.exercises.values():
             ex_count_phase += 1
             duration_efficient_phase += ex.duration_efficient()
             duration_complete_phase += ex.duration_complete()
             duration_comprehensive_phase += ex.duration_comprehensive()
-        if ex_count_phase > 0:
+        for ex in ex_phase_pre.exercises.values():
+            ex.dosages = [dosage for dosage in ex.dosages if isinstance(dosage.priority, str)]
+            if len(ex.dosages) > 0:
+
+                ex.dosages = sorted(ex.dosages, key=lambda x: (3 - int(x.priority),
+                                                               x.default_efficient_sets_assigned,
+                                                               x.default_efficient_reps_assigned,
+                                                               x.default_complete_sets_assigned,
+                                                               x.default_complete_reps_assigned,
+                                                               x.default_comprehensive_sets_assigned,
+                                                               x.default_comprehensive_reps_assigned),
+                                    reverse=True)
+
+                ex_count_phase_pre += 1
+                duration_efficient_phase_pre += ex.duration_efficient()
+                duration_complete_phase_pre += ex.duration_complete()
+                duration_comprehensive_phase_pre += ex.duration_comprehensive()
+        ex_phase_pre.exercises = {ex: a for ex, a in ex_phase_pre.exercises.items() if len(a.dosages) > 0}
+        if ex_count_phase_pre > 0:
             phase_exercises = ";".join(list(ex_phase.exercises.keys()))
+            phase_exercises_pre = ";".join(list(ex_phase_pre.exercises.keys()))
             # print(f"{phase_name}: exercises assigned: {ex_count_phase}, durations: efficient: {round(duration_efficient_phase / 60, 2)}, "
             #       f"complete: {round(duration_complete_phase / 60, 2)}, comprehensive: {round(duration_comprehensive_phase / 60, 2)}")
-            phase_lines[phase_name] = f"{phase_exercises},{round(duration_efficient_phase / 60, 2)},{round(duration_complete_phase / 60, 2)},{round(duration_comprehensive_phase / 60, 2)}"
+            phase_lines[phase_name] = f"{phase_exercises},{phase_exercises_pre}," \
+                f"{round(duration_efficient_phase / 60, 2)},{round(duration_efficient_phase_pre / 60, 2)}," \
+                f"{round(duration_complete_phase / 60, 2)},{round(duration_complete_phase_pre / 60, 2)}," \
+                f"{round(duration_comprehensive_phase / 60, 2)}, {round(duration_comprehensive_phase_pre / 60, 2)}"
             total_duration_efficient += duration_efficient_phase
             total_duration_complete += duration_complete_phase
             total_duration_comprehensive += duration_comprehensive_phase
             total_exercises += ex_count_phase
+
+            total_duration_efficient_pre += duration_efficient_phase_pre
+            total_duration_complete_pre += duration_complete_phase_pre
+            total_duration_comprehensive_pre += duration_comprehensive_phase_pre
+            total_exercises_pre += ex_count_phase_pre
         else:
-            phase_lines[phase_name] = "None,0,0,0"
+            phase_lines[phase_name] = "None,None,0,0,0,0,0,0"
 
     total_duration_efficient = round(total_duration_efficient / 60, 2)
     total_duration_complete = round(total_duration_complete / 60, 2)
     total_duration_comprehensive = round(total_duration_comprehensive / 60, 2)
-    total_line = f"{total_exercises}, {total_duration_efficient}, {total_duration_complete}, {total_duration_comprehensive}"
+
+    total_duration_efficient_pre = round(total_duration_efficient_pre / 60, 2)
+    total_duration_complete_pre = round(total_duration_complete_pre / 60, 2)
+    total_duration_comprehensive_pre = round(total_duration_comprehensive_pre / 60, 2)
+    total_line = f"{total_exercises},{total_exercises_pre}," \
+        f"{total_duration_efficient},{total_duration_efficient_pre}," \
+        f"{total_duration_complete},{total_duration_complete_pre}," \
+        f"{total_duration_comprehensive},{total_duration_comprehensive_pre}"
     ex_assignment_line = ",".join([total_line,
                                    phase_lines['inhibit'],
                                    phase_lines['static_stretch'],
@@ -232,7 +281,8 @@ def get_activity(event_date_time, symptoms, sessions, activity_type='movement_pr
             completed_exercise_datastore=completed_exercise_datastore,
             event_date_time=event_date_time,
             relative_load_level=proc.relative_load_level,
-            aggregated_injury_risk_dict=proc.aggregated_injury_risk_dict
+            aggregated_injury_risk_dict=proc.aggregated_injury_risk_dict,
+            log_intermediary_data=True
     )
     if activity_type == 'movement_prep':
         calc.sport_cardio_plyometrics = check_cardio_sport(sessions)
@@ -258,6 +308,7 @@ def get_session_line(session):
         session_type = 'mixed'
     return f"{session_type},{session.sport_name.name},{session.is_cardio_plyometrics()},{session.ultra_high_intensity_session() and session.high_intensity_RPE()}"
 
+
 def test_generate_spreadsheets():
 
     current_date = date.today()
@@ -265,21 +316,45 @@ def test_generate_spreadsheets():
 
     parm_list = get_test_parameters_list()
 
-    line = ('(BodyPart;tight;knots;ache;sharp),session_type,sport_name,cardio_plyometric,ultra_high_intensity,'+
-            'total_exercises,duration_efficient,duration_complete,duration_comprehensive,' +
-            'inhibit_exercises,inhibit_minutes_efficient,inhibit_minutes_complete,inhibit_minutes_comprehensive,'+
-            'static_stretch_exercises,static_stretch_minutes_efficient,static_stretch_minutes_complete,static_stretch_minutes_comprehensive,'+
-            'active_stretch_exercises,active_stretch_minutes_efficient,active_stretch_minutes_complete,active_stretch_minutes_comprehensive,'+
-            'dynamic_stretch_exercises,dynamic_stretch_minutes_efficient,dynamic_stretch_minutes_complete,dynamic_stretch_minutes_comprehensive,'+
-            'isolated_activate_exercises,isolated_activate_minutes_efficient,isolated_activate_minutes_complete,isolated_activate_minutes_comprehensive,'+
-            'static_integrate_exercises,static_integrate_minutes_efficient,static_integrate_minutes_complete,static_integrate_minutes_comprehensive,'+
-            'dynamic_integrate_exercises,dynamic_integrate_minutes_efficient,dynamic_integrate_minutes_complete,dynamic_integrate_minutes_comprehensive'
+    line = ('(BodyPart;tight;knots;ache;sharp),session_type,sport_name,cardio_plyometric,ultra_high_intensity,'
+            'total_exercises,total_exercises_pre,'
+            'duration_efficient,duration_efficient_pre,'
+            'duration_complete,duration_complete_pre,'
+            'duration_comprehensive,duration_comprehensive_pre,'
+            'inhibit_exercises,inhibit_exercises_pre,'
+            'inhibit_minutes_efficient,inhibit_minutes_efficient_pre,'
+            'inhibit_minutes_complete,inhibit_minutes_complete_pre,'
+            'inhibit_minutes_comprehensive,inhibit_minutes_comprehensive_pre,'
+            'static_stretch_exercises,static_stretch_exercises_pre,'
+            'static_stretch_minutes_efficient,static_stretch_minutes_efficient_pre,'
+            'static_stretch_minutes_complete,static_stretch_minutes_complete_pre,'
+            'static_stretch_minutes_comprehensive,static_stretch_minutes_comprehensive_pre,'
+            'active_stretch_exercises,active_stretch_exercises_pre,'
+            'active_stretch_minutes_efficient,active_stretch_minutes_efficient_pre,'
+            'active_stretch_minutes_complete,active_stretch_minutes_complete_pre,'
+            'active_stretch_minutes_comprehensive,active_stretch_minutes_comprehensive_pre,'
+            'dynamic_stretch_exercises,dynamic_stretch_exercises_pre,'
+            'dynamic_stretch_minutes_efficient,dynamic_stretch_minutes_efficient_pre,'
+            'dynamic_stretch_minutes_complete,dynamic_stretch_minutes_complete_pre,'
+            'dynamic_stretch_minutes_comprehensive,dynamic_stretch_minutes_comprehensive_pre,'
+            'isolated_activate_exercises,isolated_activate_exercises_pre,'
+            'isolated_activate_minutes_efficient,isolated_activate_minutes_efficient_pre,'
+            'isolated_activate_minutes_complete,isolated_activate_minutes_complete_pre,'
+            'isolated_activate_minutes_comprehensive,isolated_activate_minutes_comprehensive_pre,'
+            'static_integrate_exercises,static_integrate_exercises_pre,'
+            'static_integrate_minutes_efficient,static_integrate_minutes_efficient_pre,'
+            'static_integrate_minutes_complete,static_integrate_minutes_complete_pre,'
+            'static_integrate_minutes_comprehensive,static_integrate_minutes_comprehensive_pre,'
+            'dynamic_integrate_exercises,dynamic_integrate_exercises_pre,'
+            'dynamic_integrate_minutes_efficient,dynamic_integrate_minutes_efficient_pre,'
+            'dynamic_integrate_minutes_complete,dynamic_integrate_minutes_complete_pre,'
+            'dynamic_integrate_minutes_comprehensive,dynamic_integrate_minutes_comprehensive_pre'
             )
 
-    active_rest_file = open("../../output/active_rest_10.csv", 'w')
+    active_rest_file = open("../../output/active_rest_11.csv", 'w')
     active_rest_file.write(line + '\n')
 
-    movement_integration_prep_file = open("../../output/movement_integration_prep_10.csv", 'w')
+    movement_integration_prep_file = open("../../output/movement_integration_prep_11.csv", 'w')
     movement_integration_prep_file.write(line + '\n')
 
     possible_symptoms = [('sharp',), ('knots', 'sharp'), ('tight', 'ache')]
@@ -320,11 +395,13 @@ def test_generate_spreadsheets():
                                 if test_param.file_name == 'active_rest':
                                     active_rest = get_activity(current_date_time, symptoms, sessions, 'mobility_wod')[0]
                                     ar_line = get_ex_assigned_details(active_rest)
+                                    # ar_line_pre = get_ex_assigned_details(active_rest, pre_scaling=True)
                                     line = f"{get_body_part_string(symptoms)},{session_line},{ar_line}\n"
                                     active_rest_file.write(line)
                                 elif test_param.file_name == 'movement_integration_prep':
                                     movement_integration_prep = get_activity(current_date_time, symptoms, sessions, 'movement_prep')[0]
                                     mi_prep_line = get_ex_assigned_details(movement_integration_prep)
+                                    # mi_prep_line_pre = get_ex_assigned_details(movement_integration_prep, pre_scaling=True)
                                     line = f"{get_body_part_string(symptoms)},{session_line},{mi_prep_line}\n"
                                     movement_integration_prep_file.write(line)
                 elif test_param.symptoms == 2:
@@ -340,11 +417,13 @@ def test_generate_spreadsheets():
                                 if test_param.file_name == 'active_rest':
                                     active_rest = get_activity(current_date_time, symptoms, sessions, 'mobility_wod')[0]
                                     ar_line = get_ex_assigned_details(active_rest)
+                                    # ar_line_pre = get_ex_assigned_details(active_rest, pre_scaling=True)
                                     line = f"{get_body_part_string(symptoms)},{session_line},{ar_line}\n"
                                     active_rest_file.write(line)
                                 elif test_param.file_name == 'movement_integration_prep':
                                     movement_integration_prep = get_activity(current_date_time, symptoms, sessions, 'movement_prep')[0]
                                     mi_prep_line = get_ex_assigned_details(movement_integration_prep)
+                                    # mi_prep_line_pre = get_ex_assigned_details(movement_integration_prep, pre_scaling=True)
                                     line = f"{get_body_part_string(symptoms)},{session_line},{mi_prep_line}\n"
                                     movement_integration_prep_file.write(line)
     active_rest_file.close()
