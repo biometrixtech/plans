@@ -1,4 +1,4 @@
-# FathomAI - Mobility API (v 5.0.1)
+# FathomAI - Mobility API (v 5.0.2)
 
 ## Overview
 The API requests described in this document enable clients to generate targeted injury prevention and recovery __Activities__ for an athlete based on one or both of the following elements.
@@ -1516,8 +1516,8 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 
 * `name` __should__ be an identifying section name
 * `duration_seconds` __should__ be total time assigned or taken to complete the section
-* `start_date_time` __should__ reflect the start time of the workout section
-* `end_date_time` __should__ reflect the end time of the workout section
+* `start_date_time` is an __optional__ parameter and should reflect the start time of the workout section
+* `end_date_time` is an __optional__ parameter and should reflect the end time of the workout section
 * `exercises` __should__ be a list of of all  _exercise_ elements assigned within the section
 
 `exercise` __should__ be of the following schema:
@@ -2121,5 +2121,5 @@ The following reportable body parts are considered muscles. Allowable Sides (0, 
     rotator_cuff = 119 {1, 2}
     serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: March 26, 2020
+###### Last Modified: April 13, 2020
 

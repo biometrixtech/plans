@@ -1,4 +1,4 @@
-# FathomAI - Mobility API (v 5.0.1 - Demo)
+# FathomAI - Mobility API (v 5.0.2 - Demo)
 
 ## Overview
 FathomAI provides this limited implementation of its Mobility API to demonstrate the core functionality to potential customers.
@@ -649,8 +649,8 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 
 * `name` __should__ be an identifying section name
 * `duration_seconds` __should__ be total time assigned or taken to complete the section
-* `start_date_time` __should__ reflect the start time of the workout section
-* `end_date_time` __should__ reflect the end time of the workout section
+* `start_date_time` is an __optional__ parameter and should reflect the start time of the workout section
+* `end_date_time` is an __optional__ parameter and should reflect the end time of the workout section
 * `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
 
 `exercise` __should__ be of the following schema:
@@ -826,7 +826,7 @@ Exercises are assigned to each phase based on the needs of the athlete.  Each as
 * `goal_text` will typically be empty and is reserved for future use.
 * `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
 
-_Note: There is an option for a more detailed version of `assigned_exercise` object. Please refer to our expanded API documentation._
+_Note: There is an option for a more detailed version of the  `assigned_exercise` object. Please refer to our expanded API documentation._
 
 ### Exercise Goal
 * `exercise_goal` will have the following schema:
@@ -1046,5 +1046,5 @@ The following reportable body parts are considered muscles. Allowable Sides (0, 
     rotator_cuff = 119 {1, 2}
     serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: March 26, 2020
+###### Last Modified: April 13, 2020
 
