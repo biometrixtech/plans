@@ -217,6 +217,8 @@ class Activity(object):
         self.relative_load_level = relative_load_level
         self.sport_cardio_plyometrics = False
         self.efficient_winner = 1
+        self.efficient_winer_column = 0
+        self.comprehensive_max_treatment_priority = 33
         self.complete_winner = 1
         self.complete_winner_column = 0
         self.complete_max_treatment_priority = 33
@@ -604,55 +606,64 @@ class Activity(object):
     def set_winners_2(self):
 
         # key off efficient as the guide
-        total_efficient = 0
-        total_complete = 0
-        total_comprehensive = 0
-        benchmarks = sorted(self.dosage_durations.keys())
+        # total_efficient = 0
+        # total_complete = 0
+        # total_comprehensive = 0
+        # benchmarks = sorted(self.dosage_durations.keys())
 
-        last_efficient_value = 0
-        last_complete_value = 0
-        last_complete_value_2 = 0
-        last_comprehensive_value = 0
-        last_comprehensive_value_2 = 0
-        efficient_found = False
-        complete_found = False
-        comprehensive_found = False
+        # last_efficient_value = 0
+        # last_complete_value = 0
+        # last_complete_value_2 = 0
+        # last_comprehensive_value = 0
+        # last_comprehensive_value_2 = 0
+        # efficient_found = False
+        # complete_found = False
+        # comprehensive_found = False
 
-        for b in benchmarks:
-            if b == benchmarks[-1]:
-                continue
-            # only way this could be too high is if it's Priorty 1 (and nothing we can do)
-            total_efficient += self.dosage_durations[b].efficient_duration_min_rep_one_set_total
-            if self.dosage_durations[b].efficient_duration_min_rep_one_set_total > 0:
-                last_efficient_value = b
-            proposed_efficient = self.dosage_durations[b + 1].efficient_duration_min_rep_one_set_total
-            if total_efficient >= self.proposed_efficient_limit:
-                self.efficient_winner = last_efficient_value
-                efficient_found = True
-                break
-            elif proposed_efficient == 0:
-                continue
-            elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
-                if b == len(benchmarks) - 2:
-                    self.efficient_winner = benchmarks[b + 1]
-                    efficient_found = True
-                    break
-                else:
-                    continue
-            elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
-                self.efficient_winner = last_efficient_value
-                efficient_found = True
-                break
-            elif total_efficient + proposed_efficient <= self.proposed_efficient_limit + 120:
-                self.efficient_winner = b + 1
-                efficient_found = True
-                break
-            else:
-                self.efficient_winner = last_efficient_value
-                efficient_found = True
-                break
-        if not efficient_found:
-            self.efficient_winner = max([last_efficient_value, 1])
+        efficient_cost_params = {
+            0: 'efficient_duration_min_rep_one_set_total'
+        }
+
+        efficient_winner, efficient_winner_column, efficient_max_treatment_priority = self.find_winner(efficient_cost_params, 1, self.proposed_efficient_limit)
+        self.efficient_winner = efficient_winner
+        self.efficient_winner_column = efficient_winner_column
+        self.efficient_max_treatment_priority = efficient_max_treatment_priority
+
+        # for b in benchmarks:
+        #     if b == benchmarks[-1]:
+        #         continue
+        #     # only way this could be too high is if it's Priorty 1 (and nothing we can do)
+        #     total_efficient += self.dosage_durations[b].efficient_duration_min_rep_one_set_total
+        #     if self.dosage_durations[b].efficient_duration_min_rep_one_set_total > 0:
+        #         last_efficient_value = b
+        #     proposed_efficient = self.dosage_durations[b + 1].efficient_duration_min_rep_one_set_total
+        #     if total_efficient >= self.proposed_efficient_limit:
+        #         self.efficient_winner = last_efficient_value
+        #         efficient_found = True
+        #         break
+        #     elif proposed_efficient == 0:
+        #         continue
+        #     elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
+        #         if b == len(benchmarks) - 2:
+        #             self.efficient_winner = benchmarks[b + 1]
+        #             efficient_found = True
+        #             break
+        #         else:
+        #             continue
+        #     elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
+        #         self.efficient_winner = last_efficient_value
+        #         efficient_found = True
+        #         break
+        #     elif total_efficient + proposed_efficient <= self.proposed_efficient_limit + 120:
+        #         self.efficient_winner = b + 1
+        #         efficient_found = True
+        #         break
+        #     else:
+        #         self.efficient_winner = last_efficient_value
+        #         efficient_found = True
+        #         break
+        # if not efficient_found:
+        #     self.efficient_winner = max([last_efficient_value, 1])
 
         complete_cost_params = {
             0: 'complete_duration_min_rep_one_set_total',
@@ -829,7 +840,7 @@ class Activity(object):
                     last_used_benchmark = b
                     last_used_benchmark_column = i
                 if b == benchmarks[-1]:
-                    if i == 0:
+                    if i != (max_column - 1):
                         next_benchmark = (1, i + 1)
                         next_cost_param = cost_params[i + 1]
                         next_benchmark_duration = getattr(self.dosage_durations[1], next_cost_param)
@@ -1017,10 +1028,16 @@ class Activity(object):
         for ex, a in assigned_exercises.items():
             for d in a.dosages:
                 if d.benchmark <= self.efficient_winner:
-                    d.efficient_reps_assigned = a.exercise.min_reps
-                    d.efficient_sets_assigned = 1
-                    d.default_efficient_reps_assigned = a.exercise.min_reps
-                    d.default_efficient_sets_assigned = 1
+                    if d.treatment_priority <= self.efficient_max_treatment_priority or d.benchmark < self.efficient_winner:
+                        d.efficient_reps_assigned = a.exercise.min_reps
+                        d.efficient_sets_assigned = 1
+                        d.default_efficient_reps_assigned = a.exercise.min_reps
+                        d.default_efficient_sets_assigned = 1
+                    else:
+                        d.efficient_reps_assigned = 0
+                        d.efficient_sets_assigned = 0
+                        d.default_efficient_reps_assigned = 0
+                        d.default_efficient_sets_assigned = 0
                 else:
                     d.efficient_reps_assigned = 0
                     d.efficient_sets_assigned = 0
