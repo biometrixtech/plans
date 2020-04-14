@@ -168,29 +168,28 @@ class ActivityGoal(Serialisable):
 
 class DosageDuration(object):
     def __init__(self):
-        self.efficient_duration_min_rep_one_set = {}
-        self.complete_duration_min_rep_one_set = {}
-        self.complete_duration_max_rep_one_set = {}
-        self.comprehensive_duration_min_rep_one_set = {}
-        self.comprehensive_duration_max_rep_one_set = {}
-        self.comprehensive_duration_min_rep_two_set = {}
-        self.comprehensive_duration_max_rep_two_set = {}
-        self.efficient_duration_min_rep_one_set_total = 0
-        self.complete_duration_min_rep_one_set_total = 0
-        self.complete_duration_max_rep_one_set_total = 0
-        self.comprehensive_duration_min_rep_one_set_total = 0
-        self.comprehensive_duration_max_rep_one_set_total = 0
-        self.comprehensive_duration_min_rep_two_set_total = 0
-        self.comprehensive_duration_max_rep_two_set_total = 0
+        self.efficient_duration_min_rep_one_set_priority = {}
+        self.complete_duration_min_rep_one_set_priority = {}
+        self.complete_duration_max_rep_one_set_priority = {}
+        self.comprehensive_duration_min_rep_one_set_priority = {}
+        self.comprehensive_duration_max_rep_one_set_priority = {}
+        self.comprehensive_duration_min_rep_two_set_priority = {}
+        self.comprehensive_duration_max_rep_two_set_priority = {}
 
-    # def aggregate_durations(self):
-    #     self.efficient_duration_min_rep_one_set_duration = sum(self.efficient_duration_min_rep_one_set.values())
-    #     self.complete_duration_min_rep_one_set_duration = sum(self.complete_duration_min_rep_one_set.values())
-    #     self.complete_duration_max_rep_one_set_duration = sum(self.complete_duration_max_rep_one_set.values())
-    #     self.comprehensive_duration_min_rep_one_set_duration = sum(self.comprehensive_duration_min_rep_one_set.values())
-    #     self.comprehensive_duration_max_rep_one_set_duration = sum(self.comprehensive_duration_max_rep_one_set.values())
-    #     self.comprehensive_duration_min_rep_two_set_duration = sum(self.comprehensive_duration_min_rep_two_set.values())
-    #     self.comprehensive_duration_max_rep_two_set_duration = sum(self.comprehensive_duration_max_rep_two_set.values())
+        self.efficient_duration_min_rep_one_set = 0
+        self.complete_duration_min_rep_one_set = 0
+        self.complete_duration_max_rep_one_set = 0
+        self.comprehensive_duration_min_rep_one_set = 0
+        self.comprehensive_duration_max_rep_one_set = 0
+        self.comprehensive_duration_min_rep_two_set = 0
+        self.comprehensive_duration_max_rep_two_set = 0
+
+
+class RepsAndSetsRanking(Enum):
+    min_rep_one_set = 0
+    max_rep_one_set = 1
+    min_rep_two_set = 2
+    max_rep_two_set = 3
 
 
 class Activity(object):
@@ -217,13 +216,13 @@ class Activity(object):
         self.relative_load_level = relative_load_level
         self.sport_cardio_plyometrics = False
         self.efficient_winner = 1
-        self.efficient_winer_column = 0
-        self.comprehensive_max_treatment_priority = 33
+        self.efficient_winner_reps_sets_ranking = 0
+        self.efficient_max_treatment_priority = 33
         self.complete_winner = 1
-        self.complete_winner_column = 0
+        self.complete_winner_reps_sets_ranking = 0
         self.complete_max_treatment_priority = 33
         self.comprehensive_winner = 1
-        self.comprehensive_winner_column = 0
+        self.comprehensive_winner_reps_sets_ranking = 0
         self.comprehensive_max_treatment_priority = 33
         self.rankings = set()
         self.body_part_factory = BodyPartFactory()
@@ -447,8 +446,7 @@ class Activity(object):
         else:
             self.default_plan = "Complete"
 
-    def copy_exercises(self, source_collection, target_phase, goal, tier, severity, exercise_library,
-                       treatment_priority=33):
+    def copy_exercises(self, source_collection, target_phase, goal, tier, severity, exercise_library, treatment_priority=33):
 
         position_order = 0
 
@@ -508,76 +506,33 @@ class Activity(object):
         for ex, a in assigned_exercises.items():
             a.dosages = [dosage for dosage in a.dosages if isinstance(dosage.priority, str)]
             if len(a.dosages) > 0:
-
-                a.dosages = sorted(a.dosages, key=lambda x: (3 - int(x.priority),
-                                                             x.default_efficient_sets_assigned,
-                                                             x.default_efficient_reps_assigned,
-                                                             x.default_complete_sets_assigned,
-                                                             x.default_complete_reps_assigned,
-                                                             x.default_comprehensive_sets_assigned,
-                                                             x.default_comprehensive_reps_assigned), reverse=True)
-
+                # a.dosages = sorted(a.dosages, key=lambda x: (3 - int(x.priority),
+                #                                              x.default_efficient_sets_assigned,
+                #                                              x.default_efficient_reps_assigned,
+                #                                              x.default_complete_sets_assigned,
+                #                                              x.default_complete_reps_assigned,
+                #                                              x.default_comprehensive_sets_assigned,
+                #                                              x.default_comprehensive_reps_assigned), reverse=True)
+                a.dosages = sorted(a.dosages, key=lambda x: int(x.priority))
                 max_priority = a.dosages[0].priority
-
                 a.dosages = [d for d in a.dosages if d.priority == max_priority]
-
-                # consolidated_dosage = ExerciseDosage()
-                # consolidated_dosage.priority = max_priority
-
-                # # this is unnecessary since we already sorted on this
-                # dosages = sorted(a.dosages, key=lambda x: (x.default_efficient_sets_assigned,
-                #                                              x.default_efficient_reps_assigned), reverse=True)
-
-                # consolidated_dosage.efficient_sets_assigned = dosages[0].efficient_sets_assigned
-                # consolidated_dosage.efficient_reps_assigned = dosages[0].efficient_reps_assigned
-                # consolidated_dosage.default_efficient_sets_assigned = dosages[0].default_efficient_sets_assigned
-                # consolidated_dosage.default_efficient_reps_assigned = dosages[0].default_efficient_reps_assigned
-
-                # dosages = sorted(a.dosages, key=lambda x: (x.default_complete_sets_assigned,
-                #                                            x.default_complete_reps_assigned), reverse=True)
-
-                # consolidated_dosage.complete_sets_assigned = dosages[0].complete_sets_assigned
-                # consolidated_dosage.complete_reps_assigned = dosages[0].complete_reps_assigned
-                # consolidated_dosage.default_complete_sets_assigned = dosages[0].default_complete_sets_assigned
-                # consolidated_dosage.default_complete_reps_assigned = dosages[0].default_complete_reps_assigned
-
-                # dosages = sorted(a.dosages, key=lambda x: (x.default_comprehensive_sets_assigned,
-                #                                            x.default_comprehensive_reps_assigned), reverse=True)
-
-                # consolidated_dosage.comprehensive_sets_assigned = dosages[0].comprehensive_sets_assigned
-                # consolidated_dosage.comprehensive_reps_assigned = dosages[0].comprehensive_reps_assigned
-                # consolidated_dosage.default_comprehensive_sets_assigned = dosages[0].default_comprehensive_sets_assigned
-                # consolidated_dosage.default_comprehensive_reps_assigned = dosages[0].default_comprehensive_reps_assigned
 
                 self.add_goals(a.dosages)
                 for goal_dosage in a.dosages:
                     self.update_goals(goal_dosage)
-
-                #dosage = a.dosages[0]
-                # dosage = consolidated_dosage
                 benchmark = self.get_benchmark(a.dosages, ex_phase_type)
+
                 treatment_priority = min([d.treatment_priority for d in a.dosages])
                 self.calc_dosage_durations_2(benchmark, a, max_priority, treatment_priority)
+
                 for dosage in a.dosages:
                     dosage.benchmark = benchmark
 
-                # if dosage.priority == "1":
-                #     self.calc_dosage_durations(1, a, dosage)
-                # elif dosage.priority == "2" and dosage.severity() > 4:
-                #     self.calc_dosage_durations(2, a, dosage)
-                # elif dosage.priority == "2" and dosage.severity() <= 4:
-                #     self.calc_dosage_durations(3, a, dosage)
-                # elif dosage.priority == "3" and dosage.severity() > 4:
-                #     self.calc_dosage_durations(4, a, dosage)
-                # elif dosage.priority == "3" and dosage.severity() <= 4:
-                #     self.calc_dosage_durations(5, a, dosage)
-
-        return {ex: a for ex, a in assigned_exercises.items() if len(a.dosages) > 0 and a.duration_comprehensive() > 0}
+        return {ex: a for ex, a in assigned_exercises.items() if len(a.dosages) > 0}
 
     def get_benchmark(self, dosages, ex_phase_type):
         priority = int(dosages[0].priority)
-        benchmarks_per_priority = int(len(self.dosage_durations) / 3)
-        # treatment_priority = min([d.treatment_priority for d in dosages])
+        benchmarks_per_priority = len(self.ranked_goals) * len(self.ranked_exercise_phases)  #  int(len(self.dosage_durations) / 3)
 
         phase_benchmark = self.ranked_exercise_phases.get(ex_phase_type.name, len(self.ranked_exercise_phases) - 1)
         goal_benchmarks = []
@@ -604,234 +559,47 @@ class Activity(object):
         return benchmark
 
     def set_winners_2(self):
-
-        # key off efficient as the guide
-        # total_efficient = 0
-        # total_complete = 0
-        # total_comprehensive = 0
-        # benchmarks = sorted(self.dosage_durations.keys())
-
-        # last_efficient_value = 0
-        # last_complete_value = 0
-        # last_complete_value_2 = 0
-        # last_comprehensive_value = 0
-        # last_comprehensive_value_2 = 0
-        # efficient_found = False
-        # complete_found = False
-        # comprehensive_found = False
-
         efficient_cost_params = {
-            0: 'efficient_duration_min_rep_one_set_total'
+            0: 'efficient_duration_min_rep_one_set'
         }
-
-        efficient_winner, efficient_winner_column, efficient_max_treatment_priority = self.find_winner(efficient_cost_params, 1, self.proposed_efficient_limit)
-        self.efficient_winner = efficient_winner
-        self.efficient_winner_column = efficient_winner_column
-        self.efficient_max_treatment_priority = efficient_max_treatment_priority
-
-        # for b in benchmarks:
-        #     if b == benchmarks[-1]:
-        #         continue
-        #     # only way this could be too high is if it's Priorty 1 (and nothing we can do)
-        #     total_efficient += self.dosage_durations[b].efficient_duration_min_rep_one_set_total
-        #     if self.dosage_durations[b].efficient_duration_min_rep_one_set_total > 0:
-        #         last_efficient_value = b
-        #     proposed_efficient = self.dosage_durations[b + 1].efficient_duration_min_rep_one_set_total
-        #     if total_efficient >= self.proposed_efficient_limit:
-        #         self.efficient_winner = last_efficient_value
-        #         efficient_found = True
-        #         break
-        #     elif proposed_efficient == 0:
-        #         continue
-        #     elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
-        #         if b == len(benchmarks) - 2:
-        #             self.efficient_winner = benchmarks[b + 1]
-        #             efficient_found = True
-        #             break
-        #         else:
-        #             continue
-        #     elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
-        #         self.efficient_winner = last_efficient_value
-        #         efficient_found = True
-        #         break
-        #     elif total_efficient + proposed_efficient <= self.proposed_efficient_limit + 120:
-        #         self.efficient_winner = b + 1
-        #         efficient_found = True
-        #         break
-        #     else:
-        #         self.efficient_winner = last_efficient_value
-        #         efficient_found = True
-        #         break
-        # if not efficient_found:
-        #     self.efficient_winner = max([last_efficient_value, 1])
+        (
+            self.efficient_winner,
+            self.efficient_winner_reps_sets_ranking,
+            self.efficient_max_treatment_priority
+        ) = self.find_winner(cost_params=efficient_cost_params, max_duration=self.proposed_efficient_limit)
 
         complete_cost_params = {
-            0: 'complete_duration_min_rep_one_set_total',
-            1: 'complete_duration_max_rep_one_set_total'
+            0: 'complete_duration_min_rep_one_set',
+            1: 'complete_duration_max_rep_one_set'
         }
-
-        complete_winner, complete_winner_column, complete_max_treatment_priority = self.find_winner(complete_cost_params, 2, self.proposed_complete_limit)
-        self.complete_winner = complete_winner
-        self.complete_winner_column = complete_winner_column
-        self.complete_max_treatment_priority = complete_max_treatment_priority
-        # for i in range(2):
-
-        #     cost_param = complete_cost_params[i]
-        #     for b in benchmarks:
-        #         total_complete += getattr(self.dosage_durations[b], cost_param) #.complete_duration_min_rep_one_set
-        #         if getattr(self.dosage_durations[b], cost_param) > 0: #self.dosage_durations[benchmarks[b]].complete_duration_min_rep_one_set > 0:
-        #             last_complete_value = b
-        #             last_complete_value_2 = i
-        #         if b == benchmarks[-1]:
-        #             if i == 0:
-        #                 next_benchmark = (1, i + 1)
-        #                 next_cost_param = 'complete_duration_max_rep_one_set_total'
-        #                 proposed_complete = getattr(self.dosage_durations[1], next_cost_param)
-        #             else:
-        #                 break
-        #                 # next_benchmark = (None, None)
-        #                 # proposed_complete = 0
-        #         else:
-        #             next_cost_param = complete_cost_params[i]
-        #             next_benchmark = (b + 1, i)
-        #             proposed_complete = getattr(self.dosage_durations[b + 1], next_cost_param) #self.dosage_durations[benchmarks[b + 1]].complete_duration_min_rep_one_set
-        #         if total_complete >= self.proposed_complete_limit:
-        #             self.complete_winner = last_complete_value
-        #             complete_found = True
-        #             break
-        #         elif proposed_complete == 0:
-        #             continue
-        #         elif 0 < total_complete + proposed_complete <= self.proposed_complete_limit:
-        #             continue
-        #         # elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
-        #         #     self.complete_winner = last_complete_value
-        #         #     complete_found = True
-        #         #     break
-        #         # elif total_complete + proposed_complete <= self.proposed_complete_limit + 120:
-        #         #     self.complete_winner = b + 1
-        #         #     if b == benchmarks[-1]:
-        #         #         last_complete_value_2 = i + 1
-        #         #     else:
-        #         #         last_complete_value_2 = i
-        #         #     complete_found = True
-        #         #     break
-        #         elif total_complete + proposed_complete > self.proposed_complete_limit:
-        #             treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
-        #             sorted_keys = sorted(treatment_priorities)
-        #             remaining_time = self.proposed_complete_limit - total_complete
-        #             used_time = 0
-        #             last_treatment_priority = 0
-        #             for treatment_priority in sorted_keys:
-        #                 proposed_duration = treatment_priorities[treatment_priority]
-        #                 if used_time + proposed_duration <= remaining_time:
-        #                     used_time += proposed_duration
-        #                     last_treatment_priority = treatment_priority
-        #                 else:
-        #                     # if used_time > 0
-        #                     break
-        #             if used_time > 0:
-        #                 self.complete_winner = next_benchmark[0]
-        #                 last_complete_value_2 = next_benchmark[1]
-        #                 self.complete_max_treatment_priority = last_treatment_priority
-        #             else:
-        #                 self.complete_winner = last_complete_value
-        #             complete_found = True
-        #             break
-        #         else:
-        #             self.complete_winner = last_complete_value
-        #             complete_found = True
-        #             break
-        #     if complete_found:
-        #         break
-        # if not complete_found:
-        #     self.complete_winner = max([last_complete_value, 1])
-        # self.complete_winner_column = last_complete_value_2
+        (
+            self.complete_winner,
+            self.complete_winner_reps_sets_ranking,
+            self.complete_max_treatment_priority
+        ) = self.find_winner(cost_params=complete_cost_params, max_duration=self.proposed_complete_limit)
 
         comprehensive_cost_params  = {
-            0: 'comprehensive_duration_min_rep_one_set_total',
-            1: 'comprehensive_duration_max_rep_one_set_total',
-            2: 'comprehensive_duration_min_rep_two_set_total',
-            3: 'comprehensive_duration_max_rep_two_set_total'
+            0: 'comprehensive_duration_min_rep_one_set',
+            1: 'comprehensive_duration_max_rep_one_set',
+            2: 'comprehensive_duration_min_rep_two_set',
+            3: 'comprehensive_duration_max_rep_two_set'
         }
-        comprehensive_winner, comprehensive_winner_column, comprehensive_max_treatment_priority = self.find_winner(comprehensive_cost_params, 4, self.proposed_comprehensive_limit)
-        self.comprehensive_winner = comprehensive_winner
-        self.comprehensive_winner_column = comprehensive_winner_column
-        self.comprehensive_max_treatment_priority = comprehensive_max_treatment_priority
-        # for i in range(4):
-        #     cost_param = comprehensive_cost_params[i]
-        #     for b in benchmarks:
-        #         total_comprehensive += getattr(self.dosage_durations[b], cost_param)  # self.dosage_durations[benchmarks[b]].comprehensive_duration_min_rep_one_set
-        #         if getattr(self.dosage_durations[b], cost_param) > 0:  #self.dosage_durations[benchmarks[b]].comprehensive_duration_min_rep_one_set > 0:
-        #             last_comprehensive_value = b
-        #             last_comprehensive_value_2 = i
-        #         if b == benchmarks[-1]:
-        #             if i != 3:
-        #                 next_benchmark = (1, i + 1)
-        #                 next_cost_param = comprehensive_cost_params[i + 1]
-        #                 proposed_comprehensive = getattr(self.dosage_durations[1], next_cost_param)
-        #             else:
-        #                 break
-        #                 # next_benchmark = (None, None)
-        #                 # proposed_comprehensive = 0
-        #                 # next_cost_param = next_cost_param
-        #         else:
-        #             next_benchmark = (b + 1, i)
-        #             next_cost_param = comprehensive_cost_params[i]
-        #             proposed_comprehensive = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param)  #self.dosage_durations[benchmarks[b + 1]].comprehensive_duration_min_rep_one_set
-        #         if total_comprehensive >= self.proposed_comprehensive_limit:
-        #             self.comprehensive_winner = last_comprehensive_value
-        #             comprehensive_found = True
-        #             break
-        #         elif proposed_comprehensive == 0:
-        #             continue
-        #         elif 0 < total_comprehensive + proposed_comprehensive <= self.proposed_comprehensive_limit:
-        #             continue
-        #         # elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
-        #         #     self.comprehensive_winner = last_comprehensive_value
-        #         #     comprehensive_found = True
-        #         #     break
-        #         elif total_comprehensive + proposed_comprehensive > self.proposed_comprehensive_limit:
-        #             treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
-        #             sorted_keys = sorted(treatment_priorities)
-        #             remaining_time = self.proposed_comprehensive_limit - total_comprehensive
-        #             used_time = 0
-        #             last_treatment_priority = 0
-        #             for treatment_priority in sorted_keys:
-        #                 proposed_duration = treatment_priorities[treatment_priority]
-        #                 if used_time + proposed_duration <= remaining_time:
-        #                     used_time += proposed_duration
-        #                     last_treatment_priority = treatment_priority
-        #                 else:
-        #                     # if used_time > 0:
-        #                     break
-        #             if used_time > 0:
-        #                 self.comprehensive_winner = next_benchmark[0]
-        #                 last_comprehensive_value_2 = next_benchmark[1]
-        #                 self.comprehensive_max_treatment_priority = last_treatment_priority
-        #             else:
-        #                 self.comprehensive_winner = last_comprehensive_value
-        #             comprehensive_found = True
-        #             break
-        #         else:
-        #             self.comprehensive_winner = last_comprehensive_value
-        #             comprehensive_found = True
-        #             break
-        #     if comprehensive_found:
-        #         break
-        # if not comprehensive_found:
-        #     self.comprehensive_winner = max([last_comprehensive_value, 1])
-        # self.comprehensive_winner_column = last_comprehensive_value_2
+        (
+            self.comprehensive_winner,
+            self.comprehensive_winner_reps_sets_ranking,
+            self.comprehensive_max_treatment_priority
+        ) = self.find_winner(cost_params=comprehensive_cost_params, max_duration=self.proposed_comprehensive_limit)
 
-
-
-    def find_winner(self, cost_params, max_column, max_duration):
+    def find_winner(self, cost_params, max_duration):
         benchmarks = sorted(self.dosage_durations.keys())
         total_duration = 0
         winner_found = False
         last_used_benchmark = 0
         last_used_benchmark_column = 0
-        last_treatment_priority = 33
+        last_treatment_priority = 33  # max treatment_priority in among all body parts
         winner = 0
+        max_column = len(cost_params)
+
         for i in range(max_column):
             cost_param = cost_params[i]
             for b in benchmarks:
@@ -859,19 +627,19 @@ class Activity(object):
                 elif 0 < total_duration + next_benchmark_duration <= max_duration:
                     continue
                 elif total_duration + next_benchmark_duration > max_duration:
-                    treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
+                    treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], f"{next_cost_param}_priority")
                     treatment_priorities = {treatment_priority: duration for treatment_priority, duration in treatment_priorities.items() if duration > 0}
                     sorted_keys = sorted(treatment_priorities)
                     remaining_time = max_duration - total_duration
-                    used_time = 0
+                    duration_used = 0
                     for treatment_priority in sorted_keys:
                         proposed_duration = treatment_priorities[treatment_priority]
-                        if used_time + proposed_duration <= remaining_time:
-                            used_time += proposed_duration
+                        if duration_used + proposed_duration <= remaining_time:
+                            duration_used += proposed_duration
                             last_treatment_priority = treatment_priority
                         else:
                             break
-                    if used_time > 0:
+                    if duration_used > 0:
                         winner = next_benchmark[0]
                         last_used_benchmark_column = next_benchmark[1]
                     else:
@@ -887,7 +655,6 @@ class Activity(object):
         if not winner_found:
             winner = max([last_used_benchmark, 1])
         return winner, last_used_benchmark_column, last_treatment_priority
-
 
     def set_winners(self):
 
@@ -1024,124 +791,85 @@ class Activity(object):
 
     def scale_active_time_2(self, assigned_exercises):
 
-        # if self.efficient_winner is not None:  # if None, don't reduce
         for ex, a in assigned_exercises.items():
             for d in a.dosages:
-                if d.benchmark <= self.efficient_winner:
-                    if d.treatment_priority <= self.efficient_max_treatment_priority or d.benchmark < self.efficient_winner:
-                        d.efficient_reps_assigned = a.exercise.min_reps
-                        d.efficient_sets_assigned = 1
-                        d.default_efficient_reps_assigned = a.exercise.min_reps
-                        d.default_efficient_sets_assigned = 1
-                    else:
-                        d.efficient_reps_assigned = 0
-                        d.efficient_sets_assigned = 0
-                        d.default_efficient_reps_assigned = 0
-                        d.default_efficient_sets_assigned = 0
+                if (d.benchmark < self.efficient_winner) or (d.benchmark == self.efficient_winner and d.treatment_priority <= self.efficient_max_treatment_priority):
+                    d.efficient_reps_assigned = a.exercise.min_reps
+                    d.efficient_sets_assigned = 1
+                    d.default_efficient_reps_assigned = a.exercise.min_reps
+                    d.default_efficient_sets_assigned = 1
                 else:
                     d.efficient_reps_assigned = 0
                     d.efficient_sets_assigned = 0
                     d.default_efficient_reps_assigned = 0
                     d.default_efficient_sets_assigned = 0
 
-        # if self.complete_winner is not None:  # if None, don't reduce
         for ex, a in assigned_exercises.items():
             for d in a.dosages:
-                assigned = False
-                if self.complete_winner_column == 0:
-                    if d.benchmark <= self.complete_winner:
-                        if d.treatment_priority <= self.complete_max_treatment_priority or d.benchmark < self.complete_winner:
-                            d.complete_reps_assigned = a.exercise.min_reps
-                            d.complete_sets_assigned = 1
-                            d.default_complete_reps_assigned = a.exercise.min_reps
-                            d.default_complete_sets_assigned = 1
-                            assigned = True
-                else:
-                    if d.benchmark <= self.complete_winner:
-                        if d.treatment_priority <= self.complete_max_treatment_priority or d.benchmark < self.complete_winner:
-                            d.complete_reps_assigned = a.exercise.max_reps
-                            d.complete_sets_assigned = 1
-                            d.default_complete_reps_assigned = a.exercise.max_reps
-                            d.default_complete_sets_assigned = 1
-                            assigned = True
-                        else:
-                            if d.priority == "1" or d.priority == "2":
-                                d.complete_reps_assigned = a.exercise.min_reps
-                                d.complete_sets_assigned = 1
-                                d.default_complete_reps_assigned = a.exercise.min_reps
-                                d.default_complete_sets_assigned = 1
-                                assigned = True
-
+                if self.complete_winner_reps_sets_ranking == 0:
+                    if (d.benchmark < self.complete_winner) or (d.benchmark == self.complete_winner and
+                                                                d.treatment_priority <= self.complete_max_treatment_priority):
+                        d.complete_reps_assigned = a.exercise.min_reps
+                        d.complete_sets_assigned = 1
+                        d.default_complete_reps_assigned = a.exercise.min_reps
+                        d.default_complete_sets_assigned = 1
+                    else:
+                        d.complete_reps_assigned = 0
+                        d.complete_sets_assigned = 0
+                        d.default_complete_reps_assigned = 0
+                        d.default_complete_sets_assigned = 0
+                else:  # winning reps_sets_ranking is 1
+                    if (d.benchmark < self.complete_winner) or (d.benchmark == self.complete_winner and
+                                                                d.treatment_priority <= self.complete_max_treatment_priority):
+                        d.complete_reps_assigned = a.exercise.max_reps
+                        d.complete_sets_assigned = 1
+                        d.default_complete_reps_assigned = a.exercise.max_reps
+                        d.default_complete_sets_assigned = 1
                     else:
                         if d.priority == "1" or d.priority == "2":
                             d.complete_reps_assigned = a.exercise.min_reps
                             d.complete_sets_assigned = 1
                             d.default_complete_reps_assigned = a.exercise.min_reps
                             d.default_complete_sets_assigned = 1
-                            assigned = True
+                        else:
+                            d.complete_reps_assigned = 0
+                            d.complete_sets_assigned = 0
+                            d.default_complete_reps_assigned = 0
+                            d.default_complete_sets_assigned = 0
 
-                if not assigned:
-                    d.complete_reps_assigned = 0
-                    d.complete_sets_assigned = 0
-                    d.default_complete_reps_assigned = 0
-                    d.default_complete_sets_assigned = 0
-
-        # if self.comprehensive_winner is not None:  # if None, don't reduce
         for ex, a in assigned_exercises.items():
             for d in a.dosages:
-                if self.comprehensive_winner_column == 0:
-                    if d.benchmark <= self.comprehensive_winner:
-                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
-                            d.comprehensive_reps_assigned = a.exercise.min_reps
-                            d.comprehensive_sets_assigned = 1
-                            d.default_comprehensive_reps_assigned = a.exercise.min_reps
-                            d.default_comprehensive_sets_assigned = 1
-                        else:
-                            d.comprehensive_reps_assigned = 0
-                            d.comprehensive_sets_assigned = 0
-                            d.default_comprehensive_reps_assigned = 0
-                            d.default_comprehensive_sets_assigned = 0
+                if self.comprehensive_winner_reps_sets_ranking == 0:
+                    if (d.benchmark < self.comprehensive_winner) or (d.benchmark == self.comprehensive_winner and
+                                                                     d.treatment_priority <= self.comprehensive_max_treatment_priority):
+                        d.comprehensive_reps_assigned = a.exercise.min_reps
+                        d.comprehensive_sets_assigned = 1
+                        d.default_comprehensive_reps_assigned = a.exercise.min_reps
+                        d.default_comprehensive_sets_assigned = 1
                     else:
                         d.comprehensive_reps_assigned = 0
                         d.comprehensive_sets_assigned = 0
                         d.default_comprehensive_reps_assigned = 0
                         d.default_comprehensive_sets_assigned = 0
-                elif self.comprehensive_winner_column == 1:
-                    if d.benchmark <= self.comprehensive_winner:
-                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
-                            d.comprehensive_reps_assigned = a.exercise.max_reps
-                            d.comprehensive_sets_assigned = 1
-                            d.default_comprehensive_reps_assigned = a.exercise.max_reps
-                            d.default_comprehensive_sets_assigned = 1
-                        else:
-                            d.comprehensive_reps_assigned = a.exercise.min_reps
-                            d.comprehensive_sets_assigned = 1
-                            d.default_comprehensive_reps_assigned = a.exercise.min_reps
-                            d.default_comprehensive_sets_assigned = 1
+                elif self.comprehensive_winner_reps_sets_ranking == 1:
+                    if (d.benchmark < self.comprehensive_winner) or (d.benchmark == self.comprehensive_winner and
+                                                                     d.treatment_priority <= self.comprehensive_max_treatment_priority):
+                        d.comprehensive_reps_assigned = a.exercise.max_reps
+                        d.comprehensive_sets_assigned = 1
+                        d.default_comprehensive_reps_assigned = a.exercise.max_reps
+                        d.default_comprehensive_sets_assigned = 1
                     else:
                         d.comprehensive_reps_assigned = a.exercise.min_reps
                         d.comprehensive_sets_assigned = 1
                         d.default_comprehensive_reps_assigned = a.exercise.min_reps
                         d.default_comprehensive_sets_assigned = 1
-                elif self.comprehensive_winner_column == 2:
-                    if d.benchmark <= self.comprehensive_winner:
-                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
-                            d.comprehensive_reps_assigned = a.exercise.min_reps
-                            d.comprehensive_sets_assigned = 2
-                            d.default_comprehensive_reps_assigned = a.exercise.min_reps
-                            d.default_comprehensive_sets_assigned = 2
-                        else:
-                            if d.priority == "1" or d.priority == "2":
-                                d.comprehensive_reps_assigned = a.exercise.max_reps
-                                d.comprehensive_sets_assigned = 1
-                                d.default_comprehensive_reps_assigned = a.exercise.max_reps
-                                d.default_comprehensive_sets_assigned = 1
-                            else:
-                                d.comprehensive_reps_assigned = a.exercise.min_reps
-                                d.comprehensive_sets_assigned = 1
-                                d.default_comprehensive_reps_assigned = a.exercise.min_reps
-                                d.default_comprehensive_sets_assigned = 1
-
+                elif self.comprehensive_winner_reps_sets_ranking == 2:
+                    if (d.benchmark < self.comprehensive_winner) or (d.benchmark == self.comprehensive_winner and
+                                                                     d.treatment_priority <= self.comprehensive_max_treatment_priority):
+                        d.comprehensive_reps_assigned = a.exercise.min_reps
+                        d.comprehensive_sets_assigned = 2
+                        d.default_comprehensive_reps_assigned = a.exercise.min_reps
+                        d.default_comprehensive_sets_assigned = 2
                     else:
                         if d.priority == "1" or d.priority == "2":
                             d.comprehensive_reps_assigned = a.exercise.max_reps
@@ -1153,29 +881,13 @@ class Activity(object):
                             d.comprehensive_sets_assigned = 1
                             d.default_comprehensive_reps_assigned = a.exercise.min_reps
                             d.default_comprehensive_sets_assigned = 1
-                else:  # winning column is 3
-                    if d.benchmark <= self.comprehensive_winner:
-                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
-                            d.comprehensive_reps_assigned = a.exercise.max_reps
-                            d.comprehensive_sets_assigned = 2
-                            d.default_comprehensive_reps_assigned = a.exercise.max_reps
-                            d.default_comprehensive_sets_assigned = 2
-                        else:
-                            if d.priority == "1":
-                                d.comprehensive_reps_assigned = a.exercise.min_reps
-                                d.comprehensive_sets_assigned = 2
-                                d.default_comprehensive_reps_assigned = a.exercise.min_reps
-                                d.default_comprehensive_sets_assigned = 2
-                            elif d.priority == "2":
-                                d.comprehensive_reps_assigned = a.exercise.max_reps
-                                d.comprehensive_sets_assigned = 1
-                                d.default_comprehensive_reps_assigned = a.exercise.max_reps
-                                d.default_comprehensive_sets_assigned = 1
-                            else:
-                                d.comprehensive_reps_assigned = a.exercise.min_reps
-                                d.comprehensive_sets_assigned = 1
-                                d.default_comprehensive_reps_assigned = a.exercise.min_reps
-                                d.default_comprehensive_sets_assigned = 1
+                else:  # winning reps_sets_ranking is 3
+                    if (d.benchmark < self.comprehensive_winner) or (d.benchmark == self.comprehensive_winner and
+                                                                     d.treatment_priority <= self.comprehensive_max_treatment_priority):
+                        d.comprehensive_reps_assigned = a.exercise.max_reps
+                        d.comprehensive_sets_assigned = 2
+                        d.default_comprehensive_reps_assigned = a.exercise.max_reps
+                        d.default_comprehensive_sets_assigned = 2
                     else:
                         if d.priority == "1":
                             d.comprehensive_reps_assigned = a.exercise.min_reps
@@ -1321,7 +1033,6 @@ class Activity(object):
                     elif self.comprehensive_winner == 0:
                         pass
 
-
     def calc_dosage_durations(self, benchmark_value, assigned_exercise, dosage):
         if dosage.efficient_reps_assigned is not None and dosage.efficient_sets_assigned is not None:
             self.dosage_durations[benchmark_value].efficient_duration += assigned_exercise.duration(
@@ -1348,8 +1059,9 @@ class Activity(object):
             'min_rep_two_set': min_rep_two_set_cost,
             'max_rep_two_set': max_rep_two_set_cost
         }
-        if priority == '1':
-            attributes_to_update = [
+
+        attributes_to_update_by_priority = {
+            "1": [
                 'efficient_duration_min_rep_one_set',
                 'complete_duration_min_rep_one_set',
                 'complete_duration_max_rep_one_set',
@@ -1357,54 +1069,28 @@ class Activity(object):
                 'comprehensive_duration_max_rep_one_set',
                 'comprehensive_duration_min_rep_two_set',
                 'comprehensive_duration_max_rep_two_set'
-            ]
-            for attribute in attributes_to_update:
-                duration_dict = getattr(self.dosage_durations[benchmark_value], attribute)
-                cost = cost_dict.get(attribute.split('duration_')[1])
-                if treatment_priority in duration_dict:
-                    duration_dict[treatment_priority] += cost
-                else:
-                    duration_dict[treatment_priority] = cost
-                current_total = getattr(self.dosage_durations[benchmark_value], f"{attribute}_total")
-                current_total += cost
-                setattr(self.dosage_durations[benchmark_value], f"{attribute}_total", current_total)
-            # self.dosage_durations[benchmark_value].efficient_duration_min_rep_one_set += min_rep_one_set
-            # self.dosage_durations[benchmark_value].complete_duration_min_rep_one_set += min_rep_one_set
-            # self.dosage_durations[benchmark_value].complete_duration_max_rep_one_set += max_rep_one_set_cost
-            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
-            # self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_one_set += max_rep_one_set_cost
-            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_two_set += min_rep_two_set_cost
-            # self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_two_set += max_rep_two_set_cost
-        elif priority == '2':
-            attributes_to_update = [
+            ],
+            "2": [
                 'complete_duration_min_rep_one_set',
                 'comprehensive_duration_min_rep_one_set',
                 'comprehensive_duration_max_rep_one_set'
-            ]
-            for attribute in attributes_to_update:
-                duration_dict = getattr(self.dosage_durations[benchmark_value], attribute)
-                cost = cost_dict.get(attribute.split('duration_')[1])
-                if treatment_priority in duration_dict:
-                    duration_dict[treatment_priority] += cost
-                else:
-                    duration_dict[treatment_priority] = cost
-                setattr(self.dosage_durations[benchmark_value], f"{attribute}_total", getattr(self.dosage_durations[benchmark_value], f"{attribute}_total") + cost)
-            # self.dosage_durations[benchmark_value].complete_duration_min_rep_one_set += min_rep_one_set
-            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
-            # self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_one_set += max_rep_one_set_cost
-        elif priority == '3':
-            attributes_to_update = [
+            ],
+            "3": [
                 'comprehensive_duration_min_rep_one_set'
             ]
-            for attribute in attributes_to_update:
-                duration_dict = getattr(self.dosage_durations[benchmark_value], attribute)
-                cost = cost_dict.get(attribute.split('duration_')[1])
-                if treatment_priority in duration_dict:
-                    duration_dict[treatment_priority] += cost
-                else:
-                    duration_dict[treatment_priority] = cost
-                setattr(self.dosage_durations[benchmark_value], f"{attribute}_total", getattr(self.dosage_durations[benchmark_value], f"{attribute}_total") + cost)
-            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
+        }
+
+        attributes_to_update = attributes_to_update_by_priority.get(priority, {})
+        for attribute in attributes_to_update:
+            duration_dict = getattr(self.dosage_durations[benchmark_value], f"{attribute}_priority")
+            cost = cost_dict.get(attribute.split('duration_')[1])
+            if treatment_priority in duration_dict:
+                duration_dict[treatment_priority] += cost
+            else:
+                duration_dict[treatment_priority] = cost
+            current_total = getattr(self.dosage_durations[benchmark_value], attribute)
+            current_total += cost
+            setattr(self.dosage_durations[benchmark_value], attribute, current_total)
 
     #@staticmethod
     def update_dosage(self, dosage, exercise):
@@ -1607,7 +1293,7 @@ class Activity(object):
             for dosage in assigned_exercise.dosages:
                 if dosage.ranking == target_ranking:
                     dosage.priority = str(priority)
-                    dosage.set_reps_and_sets(assigned_exercise.exercise)
+                    # dosage.set_reps_and_sets(assigned_exercise.exercise)
 
     def set_exercise_dosage_ranking(self):
         ordered_ranks = sorted(self.rankings)
@@ -2451,7 +2137,7 @@ class ActiveRest(ActiveRestBase):
 class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery, possible_benchmarks=3)
-        # self.exercise_phases = [ExercisePhase(ExercisePhaseType.dynamic_integrate)]
+        self.exercise_phases = [ExercisePhase(ExercisePhaseType.dynamic_integrate)]
         self.ranked_exercise_phases = {
                 'dynamic_integrate': 0
             }
