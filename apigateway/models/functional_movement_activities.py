@@ -524,11 +524,14 @@ class Activity(object):
         return {ex: a for ex, a in assigned_exercises.items() if len(a.dosages) > 0}
 
     def get_benchmark(self, dosages, ex_phase_type):
-        priority = int(dosages[0].priority)
-        benchmarks_per_priority = len(self.ranked_goals) * len(self.ranked_exercise_phases)  #  int(len(self.dosage_durations) / 3)
+        benchmarks_per_priority = len(self.ranked_goals) * len(self.ranked_exercise_phases)
+        benchmarks_per_goal = len(self.ranked_exercise_phases)
 
-        phase_benchmark = self.ranked_exercise_phases.get(ex_phase_type.name, len(self.ranked_exercise_phases) - 1)
-        goal_benchmarks = []
+        priority_rank = int(dosages[0].priority) - 1
+
+        phase_rank = self.ranked_exercise_phases.get(ex_phase_type.name, len(self.ranked_exercise_phases) - 1)
+
+        goal_ranks = []
         for dosage in dosages:
             goal = dosage.goal
             if goal.goal_type == AthleteGoalType.pain or goal.goal_type == AthleteGoalType.sore:
@@ -540,28 +543,29 @@ class Activity(object):
                 goal_type = 'prevention'
             else:
                 goal_type = 'other'
-            new_goal_benchmark = self.ranked_goals.get(goal_type)
-            if new_goal_benchmark is not None:
-                goal_benchmarks.append(new_goal_benchmark)
-        if len(goal_benchmarks) == 0:
-            goal_benchmark = max([len(self.ranked_goals) - 1, 0])
+            goal_rank = self.ranked_goals.get(goal_type)
+            if goal_rank is not None:
+                goal_ranks.append(goal_rank)
+        if len(goal_ranks) == 0:
+            final_goal_rank = max([len(self.ranked_goals) - 1, 0])
         else:
-            goal_benchmark = min(goal_benchmarks)
+            final_goal_rank = min(goal_ranks)
 
-        benchmark = (priority - 1) * benchmarks_per_priority + goal_benchmark * len(self.ranked_exercise_phases) + phase_benchmark + 1
+        benchmark = priority_rank * benchmarks_per_priority + final_goal_rank * benchmarks_per_goal + phase_rank + 1
+
         return benchmark
 
     def set_winners_2(self):
-        efficient_cost_params = {
+        efficient_reps_sets_ranking_parameters = {
             0: 'efficient_duration_min_rep_one_set'
         }
         (
             self.efficient_winner,
             self.efficient_winner_reps_sets_ranking,
             self.efficient_max_treatment_priority
-        ) = self.find_winner(cost_params=efficient_cost_params, max_duration=self.proposed_efficient_limit)
+        ) = self.find_winner(reps_sets_ranking_parameters=efficient_reps_sets_ranking_parameters, max_duration=self.proposed_efficient_limit)
 
-        complete_cost_params = {
+        complete_reps_sets_ranking_parameters = {
             0: 'complete_duration_min_rep_one_set',
             1: 'complete_duration_max_rep_one_set'
         }
@@ -569,9 +573,9 @@ class Activity(object):
             self.complete_winner,
             self.complete_winner_reps_sets_ranking,
             self.complete_max_treatment_priority
-        ) = self.find_winner(cost_params=complete_cost_params, max_duration=self.proposed_complete_limit)
+        ) = self.find_winner(reps_sets_ranking_parameters=complete_reps_sets_ranking_parameters, max_duration=self.proposed_complete_limit)
 
-        comprehensive_cost_params  = {
+        comprehensive_reps_sets_ranking_parameters  = {
             0: 'comprehensive_duration_min_rep_one_set',
             1: 'comprehensive_duration_max_rep_one_set',
             2: 'comprehensive_duration_min_rep_two_set',
@@ -581,36 +585,36 @@ class Activity(object):
             self.comprehensive_winner,
             self.comprehensive_winner_reps_sets_ranking,
             self.comprehensive_max_treatment_priority
-        ) = self.find_winner(cost_params=comprehensive_cost_params, max_duration=self.proposed_comprehensive_limit)
+        ) = self.find_winner(reps_sets_ranking_parameters=comprehensive_reps_sets_ranking_parameters, max_duration=self.proposed_comprehensive_limit)
 
-    def find_winner(self, cost_params, max_duration):
+    def find_winner(self, reps_sets_ranking_parameters, max_duration):
         benchmarks = sorted(self.dosage_durations.keys())
+        max_reps_sets_ranking = max(reps_sets_ranking_parameters)
         total_duration = 0
         winner_found = False
         last_used_benchmark = 0
-        last_used_benchmark_column = 0
+        last_used_reps_sets_ranking = 0
         last_treatment_priority = 33  # max treatment_priority in among all body parts
         winner = 0
-        max_column = len(cost_params)
-
-        for i in range(max_column):
-            cost_param = cost_params[i]
+        reps_sets_rankings = sorted(reps_sets_ranking_parameters)
+        for i in reps_sets_rankings:
+            reps_sets_parameter = reps_sets_ranking_parameters[i]
             for b in benchmarks:
-                total_duration += getattr(self.dosage_durations[b], cost_param)
-                if getattr(self.dosage_durations[b], cost_param) > 0:
+                total_duration += getattr(self.dosage_durations[b], reps_sets_parameter)
+                if getattr(self.dosage_durations[b], reps_sets_parameter) > 0:
                     last_used_benchmark = b
-                    last_used_benchmark_column = i
+                    last_used_reps_sets_ranking = i
                 if b == benchmarks[-1]:
-                    if i != (max_column - 1):
+                    if i != max_reps_sets_ranking:
                         next_benchmark = (1, i + 1)
-                        next_cost_param = cost_params[i + 1]
-                        next_benchmark_duration = getattr(self.dosage_durations[1], next_cost_param)
+                        next_reps_sets_parameter = reps_sets_ranking_parameters[i + 1]
+                        next_benchmark_duration = getattr(self.dosage_durations[1], next_reps_sets_parameter)
                     else:
                         break
                 else:
-                    next_cost_param = cost_params[i]
+                    next_reps_sets_parameter = reps_sets_ranking_parameters[i]
                     next_benchmark = (b + 1, i)
-                    next_benchmark_duration = getattr(self.dosage_durations[b + 1], next_cost_param)
+                    next_benchmark_duration = getattr(self.dosage_durations[b + 1], next_reps_sets_parameter)
                 if total_duration >= max_duration:
                     winner = last_used_benchmark
                     winner_found = True
@@ -620,7 +624,7 @@ class Activity(object):
                 elif 0 < total_duration + next_benchmark_duration <= max_duration:
                     continue
                 elif total_duration + next_benchmark_duration > max_duration:
-                    treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], f"{next_cost_param}_priority")
+                    treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], f"{next_reps_sets_parameter}_priority")
                     treatment_priorities = {treatment_priority: duration for treatment_priority, duration in treatment_priorities.items() if duration > 0}
                     sorted_keys = sorted(treatment_priorities)
                     remaining_time = max_duration - total_duration
@@ -634,7 +638,7 @@ class Activity(object):
                             break
                     if duration_used > 0:
                         winner = next_benchmark[0]
-                        last_used_benchmark_column = next_benchmark[1]
+                        last_used_reps_sets_ranking = next_benchmark[1]
                     else:
                         winner = last_used_benchmark
                     winner_found = True
@@ -647,7 +651,7 @@ class Activity(object):
                 break
         if not winner_found:
             winner = max([last_used_benchmark, 1])
-        return winner, last_used_benchmark_column, last_treatment_priority
+        return winner, last_used_reps_sets_ranking, last_treatment_priority
 
     def set_winners(self):
 
