@@ -451,7 +451,7 @@ class Activity(object):
         position_order = 0
 
         try:
-            target_collection = [phase.exercises for phase in self.exercise_phases if phase.type==target_phase][0]
+            target_collection = [phase.exercises for phase in self.exercise_phases if phase.type == target_phase][0]
         except IndexError:
             print("phase not initialized")
             phase = ExercisePhase(target_phase)
@@ -479,8 +479,8 @@ class Activity(object):
             dosage.sports = []
             dosage.goal = goal
             dosage.treatment_priority = treatment_priority
-            #dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
-            #if dosage.get_total_dosage() > 0:
+            # dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
+            # if dosage.get_total_dosage() > 0:
             target_collection[s.exercise.id].dosages.append(dosage)
             position_order += 1
 
@@ -575,7 +575,7 @@ class Activity(object):
             self.complete_max_treatment_priority
         ) = self.find_winner(reps_sets_ranking_parameters=complete_reps_sets_ranking_parameters, max_duration=self.proposed_complete_limit)
 
-        comprehensive_reps_sets_ranking_parameters  = {
+        comprehensive_reps_sets_ranking_parameters = {
             0: 'comprehensive_duration_min_rep_one_set',
             1: 'comprehensive_duration_max_rep_one_set',
             2: 'comprehensive_duration_min_rep_two_set',
@@ -692,7 +692,6 @@ class Activity(object):
                 else:
                     continue
             elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
-            # elif 0 < (total_efficient + proposed_efficient) > self.proposed_efficient_limit:
                 self.efficient_winner = benchmarks[last_efficient_value]
                 efficient_found = True
                 break
@@ -728,7 +727,6 @@ class Activity(object):
                 else:
                     continue
             elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
-            # elif 0 < (total_complete + proposed_complete) > self.proposed_complete_limit:
                 self.complete_winner = benchmarks[last_complete_value]
                 complete_found = True
                 break
@@ -763,7 +761,6 @@ class Activity(object):
                 else:
                     continue
             elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
-            # elif 0 < (total_comprehensive + proposed_comprehensive) > self.proposed_comprehensive_limit:
                 self.comprehensive_winner = benchmarks[last_comprehensive_value]
                 comprehensive_found = True
                 break
@@ -1089,7 +1086,6 @@ class Activity(object):
             current_total += cost
             setattr(self.dosage_durations[benchmark_value], attribute, current_total)
 
-    #@staticmethod
     def update_dosage(self, dosage, exercise):
         if dosage.goal.goal_type == AthleteGoalType.high_load or dosage.goal.goal_type == AthleteGoalType.asymmetric_session:
             if self.relative_load_level == 3:
@@ -1411,7 +1407,7 @@ class ActiveRestBase(Activity):
 
     def is_functional_overreaching(self, body_part_injury_risk):
         if (body_part_injury_risk.last_functional_overreaching_date is not None and
-              body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date()):
+                body_part_injury_risk.last_functional_overreaching_date == self.event_date_time.date()):
             return True
         else:
             return False
@@ -1421,7 +1417,7 @@ class ActiveRestBase(Activity):
         two_days_ago = self.event_date_time.date() - datetime.timedelta(days=1)
 
         if (body_part_injury_risk.last_non_functional_overreaching_date is not None and
-              body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
+                body_part_injury_risk.last_non_functional_overreaching_date >= two_days_ago):
             return True
         else:
             return False
@@ -1564,7 +1560,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                 self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
                                     exercise_library, treatment_priority=agonist.treatment_priority)
                 if max_severity < 7:
-                    #self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library, treatment_priority=agonist.treatment_priority)
+                    # self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library, treatment_priority=agonist.treatment_priority)
                     self.copy_exercises(agonist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library, treatment_priority=agonist.treatment_priority)
                 if max_severity < 5:
                     self.copy_exercises(agonist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
@@ -1652,7 +1648,7 @@ class MovementIntegrationPrep(ActiveRestBase):
                 goal = AthleteGoal("Expected Load - Compensation", 1, AthleteGoalType.expected_asymmetric_session)
 
                 if max_severity < 5.0:
-                    #if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
+                    # if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
                     # removed stabilizers to reduce active time
                     if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover]:
                         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
@@ -1922,8 +1918,6 @@ class ActiveRest(ActiveRestBase):
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
 
-        goals = []
-
         compensating = False
         high_load = False
 
@@ -1986,8 +1980,6 @@ class ActiveRest(ActiveRestBase):
                                         0, exercise_library, treatment_priority=body_part.treatment_priority)
 
     def check_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
-
-        goals = []
 
         muscle_spasm = False
         knots = False
@@ -2204,7 +2196,7 @@ class ActiveRecovery(Activity):
 
                 if tier > 0:
 
-                    #if max_severity < 4.0:
+                    # if max_severity < 4.0:
                     self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
                                         tier, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
