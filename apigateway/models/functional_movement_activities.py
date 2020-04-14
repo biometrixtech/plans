@@ -658,77 +658,83 @@ class Activity(object):
             0: 'complete_duration_min_rep_one_set_total',
             1: 'complete_duration_max_rep_one_set_total'
         }
-        for i in range(2):
 
-            cost_param = complete_cost_params[i]
-            for b in benchmarks:
-                total_complete += getattr(self.dosage_durations[b], cost_param) #.complete_duration_min_rep_one_set
-                if getattr(self.dosage_durations[b], cost_param) > 0: #self.dosage_durations[benchmarks[b]].complete_duration_min_rep_one_set > 0:
-                    last_complete_value = b
-                    last_complete_value_2 = i
-                if b == benchmarks[-1]:
-                    if i == 0:
-                        next_benchmark = (1, i + 1)
-                        next_cost_param = 'complete_duration_max_rep_one_set_total'
-                        proposed_complete = getattr(self.dosage_durations[1], next_cost_param)
-                    else:
-                        break
-                        # next_benchmark = (None, None)
-                        # proposed_complete = 0
-                else:
-                    next_cost_param = complete_cost_params[i]
-                    next_benchmark = (b + 1, i)
-                    proposed_complete = getattr(self.dosage_durations[b + 1], next_cost_param) #self.dosage_durations[benchmarks[b + 1]].complete_duration_min_rep_one_set
-                if total_complete >= self.proposed_complete_limit:
-                    self.complete_winner = last_complete_value
-                    complete_found = True
-                    break
-                elif proposed_complete == 0:
-                    continue
-                elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
-                    continue
-                # elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
-                #     self.complete_winner = last_complete_value
-                #     complete_found = True
-                #     break
-                # elif total_complete + proposed_complete <= self.proposed_complete_limit + 120:
-                #     self.complete_winner = b + 1
-                #     if b == benchmarks[-1]:
-                #         last_complete_value_2 = i + 1
-                #     else:
-                #         last_complete_value_2 = i
-                #     complete_found = True
-                #     break
-                elif total_complete + proposed_complete > self.proposed_complete_limit:
-                    treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
-                    sorted_keys = sorted(treatment_priorities)
-                    remaining_time = self.proposed_complete_limit - total_complete
-                    used_time = 0
-                    last_treatment_priority = 0
-                    for treatment_priority in sorted_keys:
-                        proposed_duration = treatment_priorities[treatment_priority]
-                        if used_time + proposed_duration <= remaining_time:
-                            used_time += proposed_duration
-                            last_treatment_priority = treatment_priority
-                        else:
-                            self.complete_max_treatment_priority = last_treatment_priority
-                            break
-                    if used_time > 0:
-                        self.complete_winner = next_benchmark[0]
-                        last_complete_value_2 = next_benchmark[1]
-                    else:
-                        self.complete_winner = last_complete_value
-                    complete_found = True
-                    break
-                else:
-                    self.complete_winner = last_complete_value
-                    complete_found = True
-                    break
-            if complete_found:
-                break
-        if not complete_found:
-            self.complete_winner = max([last_complete_value, 1])
-        self.complete_winner_column = last_complete_value_2
+        complete_winner, complete_winner_column, complete_max_treatment_priority = self.find_winner(complete_cost_params, 2, self.proposed_complete_limit)
+        self.complete_winner = complete_winner
+        self.complete_winner_column = complete_winner_column
+        self.complete_max_treatment_priority = complete_max_treatment_priority
+        # for i in range(2):
+
+        #     cost_param = complete_cost_params[i]
+        #     for b in benchmarks:
+        #         total_complete += getattr(self.dosage_durations[b], cost_param) #.complete_duration_min_rep_one_set
+        #         if getattr(self.dosage_durations[b], cost_param) > 0: #self.dosage_durations[benchmarks[b]].complete_duration_min_rep_one_set > 0:
+        #             last_complete_value = b
+        #             last_complete_value_2 = i
+        #         if b == benchmarks[-1]:
+        #             if i == 0:
+        #                 next_benchmark = (1, i + 1)
+        #                 next_cost_param = 'complete_duration_max_rep_one_set_total'
+        #                 proposed_complete = getattr(self.dosage_durations[1], next_cost_param)
+        #             else:
+        #                 break
+        #                 # next_benchmark = (None, None)
+        #                 # proposed_complete = 0
+        #         else:
+        #             next_cost_param = complete_cost_params[i]
+        #             next_benchmark = (b + 1, i)
+        #             proposed_complete = getattr(self.dosage_durations[b + 1], next_cost_param) #self.dosage_durations[benchmarks[b + 1]].complete_duration_min_rep_one_set
+        #         if total_complete >= self.proposed_complete_limit:
+        #             self.complete_winner = last_complete_value
+        #             complete_found = True
+        #             break
+        #         elif proposed_complete == 0:
+        #             continue
+        #         elif 0 < total_complete + proposed_complete <= self.proposed_complete_limit:
+        #             continue
+        #         # elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
+        #         #     self.complete_winner = last_complete_value
+        #         #     complete_found = True
+        #         #     break
+        #         # elif total_complete + proposed_complete <= self.proposed_complete_limit + 120:
+        #         #     self.complete_winner = b + 1
+        #         #     if b == benchmarks[-1]:
+        #         #         last_complete_value_2 = i + 1
+        #         #     else:
+        #         #         last_complete_value_2 = i
+        #         #     complete_found = True
+        #         #     break
+        #         elif total_complete + proposed_complete > self.proposed_complete_limit:
+        #             treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
+        #             sorted_keys = sorted(treatment_priorities)
+        #             remaining_time = self.proposed_complete_limit - total_complete
+        #             used_time = 0
+        #             last_treatment_priority = 0
+        #             for treatment_priority in sorted_keys:
+        #                 proposed_duration = treatment_priorities[treatment_priority]
+        #                 if used_time + proposed_duration <= remaining_time:
+        #                     used_time += proposed_duration
+        #                     last_treatment_priority = treatment_priority
+        #                 else:
+        #                     # if used_time > 0
+        #                     break
+        #             if used_time > 0:
+        #                 self.complete_winner = next_benchmark[0]
+        #                 last_complete_value_2 = next_benchmark[1]
+        #                 self.complete_max_treatment_priority = last_treatment_priority
+        #             else:
+        #                 self.complete_winner = last_complete_value
+        #             complete_found = True
+        #             break
+        #         else:
+        #             self.complete_winner = last_complete_value
+        #             complete_found = True
+        #             break
+        #     if complete_found:
+        #         break
+        # if not complete_found:
+        #     self.complete_winner = max([last_complete_value, 1])
+        # self.complete_winner_column = last_complete_value_2
 
         comprehensive_cost_params  = {
             0: 'comprehensive_duration_min_rep_one_set_total',
@@ -736,69 +742,141 @@ class Activity(object):
             2: 'comprehensive_duration_min_rep_two_set_total',
             3: 'comprehensive_duration_max_rep_two_set_total'
         }
-        for i in range(4):
-            cost_param = comprehensive_cost_params[i]
+        comprehensive_winner, comprehensive_winner_column, comprehensive_max_treatment_priority = self.find_winner(comprehensive_cost_params, 4, self.proposed_comprehensive_limit)
+        self.comprehensive_winner = comprehensive_winner
+        self.comprehensive_winner_column = comprehensive_winner_column
+        self.comprehensive_max_treatment_priority = comprehensive_max_treatment_priority
+        # for i in range(4):
+        #     cost_param = comprehensive_cost_params[i]
+        #     for b in benchmarks:
+        #         total_comprehensive += getattr(self.dosage_durations[b], cost_param)  # self.dosage_durations[benchmarks[b]].comprehensive_duration_min_rep_one_set
+        #         if getattr(self.dosage_durations[b], cost_param) > 0:  #self.dosage_durations[benchmarks[b]].comprehensive_duration_min_rep_one_set > 0:
+        #             last_comprehensive_value = b
+        #             last_comprehensive_value_2 = i
+        #         if b == benchmarks[-1]:
+        #             if i != 3:
+        #                 next_benchmark = (1, i + 1)
+        #                 next_cost_param = comprehensive_cost_params[i + 1]
+        #                 proposed_comprehensive = getattr(self.dosage_durations[1], next_cost_param)
+        #             else:
+        #                 break
+        #                 # next_benchmark = (None, None)
+        #                 # proposed_comprehensive = 0
+        #                 # next_cost_param = next_cost_param
+        #         else:
+        #             next_benchmark = (b + 1, i)
+        #             next_cost_param = comprehensive_cost_params[i]
+        #             proposed_comprehensive = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param)  #self.dosage_durations[benchmarks[b + 1]].comprehensive_duration_min_rep_one_set
+        #         if total_comprehensive >= self.proposed_comprehensive_limit:
+        #             self.comprehensive_winner = last_comprehensive_value
+        #             comprehensive_found = True
+        #             break
+        #         elif proposed_comprehensive == 0:
+        #             continue
+        #         elif 0 < total_comprehensive + proposed_comprehensive <= self.proposed_comprehensive_limit:
+        #             continue
+        #         # elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
+        #         #     self.comprehensive_winner = last_comprehensive_value
+        #         #     comprehensive_found = True
+        #         #     break
+        #         elif total_comprehensive + proposed_comprehensive > self.proposed_comprehensive_limit:
+        #             treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
+        #             sorted_keys = sorted(treatment_priorities)
+        #             remaining_time = self.proposed_comprehensive_limit - total_comprehensive
+        #             used_time = 0
+        #             last_treatment_priority = 0
+        #             for treatment_priority in sorted_keys:
+        #                 proposed_duration = treatment_priorities[treatment_priority]
+        #                 if used_time + proposed_duration <= remaining_time:
+        #                     used_time += proposed_duration
+        #                     last_treatment_priority = treatment_priority
+        #                 else:
+        #                     # if used_time > 0:
+        #                     break
+        #             if used_time > 0:
+        #                 self.comprehensive_winner = next_benchmark[0]
+        #                 last_comprehensive_value_2 = next_benchmark[1]
+        #                 self.comprehensive_max_treatment_priority = last_treatment_priority
+        #             else:
+        #                 self.comprehensive_winner = last_comprehensive_value
+        #             comprehensive_found = True
+        #             break
+        #         else:
+        #             self.comprehensive_winner = last_comprehensive_value
+        #             comprehensive_found = True
+        #             break
+        #     if comprehensive_found:
+        #         break
+        # if not comprehensive_found:
+        #     self.comprehensive_winner = max([last_comprehensive_value, 1])
+        # self.comprehensive_winner_column = last_comprehensive_value_2
+
+
+
+    def find_winner(self, cost_params, max_column, max_duration):
+        benchmarks = sorted(self.dosage_durations.keys())
+        total_duration = 0
+        winner_found = False
+        last_used_benchmark = 0
+        last_used_benchmark_column = 0
+        last_treatment_priority = 33
+        winner = 0
+        for i in range(max_column):
+            cost_param = cost_params[i]
             for b in benchmarks:
-                total_comprehensive += getattr(self.dosage_durations[b], cost_param)  # self.dosage_durations[benchmarks[b]].comprehensive_duration_min_rep_one_set
-                if getattr(self.dosage_durations[b], cost_param) > 0:  #self.dosage_durations[benchmarks[b]].comprehensive_duration_min_rep_one_set > 0:
-                    last_comprehensive_value = b
-                    last_comprehensive_value_2 = i
+                total_duration += getattr(self.dosage_durations[b], cost_param)
+                if getattr(self.dosage_durations[b], cost_param) > 0:
+                    last_used_benchmark = b
+                    last_used_benchmark_column = i
                 if b == benchmarks[-1]:
-                    if i != 3:
+                    if i == 0:
                         next_benchmark = (1, i + 1)
-                        next_cost_param = comprehensive_cost_params[i + 1]
-                        proposed_comprehensive = getattr(self.dosage_durations[1], next_cost_param)
+                        next_cost_param = cost_params[i + 1]
+                        next_benchmark_duration = getattr(self.dosage_durations[1], next_cost_param)
                     else:
                         break
-                        # next_benchmark = (None, None)
-                        # proposed_comprehensive = 0
-                        # next_cost_param = next_cost_param
                 else:
+                    next_cost_param = cost_params[i]
                     next_benchmark = (b + 1, i)
-                    next_cost_param = comprehensive_cost_params[i]
-                    proposed_comprehensive = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param)  #self.dosage_durations[benchmarks[b + 1]].comprehensive_duration_min_rep_one_set
-                if total_comprehensive >= self.proposed_comprehensive_limit:
-                    self.comprehensive_winner = last_comprehensive_value
-                    comprehensive_found = True
+                    next_benchmark_duration = getattr(self.dosage_durations[b + 1], next_cost_param)
+                if total_duration >= max_duration:
+                    winner = last_used_benchmark
+                    winner_found = True
                     break
-                elif proposed_comprehensive == 0:
+                elif next_benchmark_duration == 0:
                     continue
-                elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
+                elif 0 < total_duration + next_benchmark_duration <= max_duration:
                     continue
-                # elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
-                #     self.comprehensive_winner = last_comprehensive_value
-                #     comprehensive_found = True
-                #     break
-                elif total_comprehensive + proposed_comprehensive > self.proposed_comprehensive_limit:
+                elif total_duration + next_benchmark_duration > max_duration:
                     treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
+                    treatment_priorities = {treatment_priority: duration for treatment_priority, duration in treatment_priorities.items() if duration > 0}
                     sorted_keys = sorted(treatment_priorities)
-                    remaining_time = self.proposed_comprehensive_limit - total_comprehensive
+                    remaining_time = max_duration - total_duration
                     used_time = 0
-                    last_treatment_priority = 0
                     for treatment_priority in sorted_keys:
                         proposed_duration = treatment_priorities[treatment_priority]
                         if used_time + proposed_duration <= remaining_time:
                             used_time += proposed_duration
                             last_treatment_priority = treatment_priority
                         else:
-                            self.comprehensive_max_treatment_priority = last_treatment_priority
                             break
                     if used_time > 0:
-                        self.comprehensive_winner = next_benchmark[0]
-                        last_comprehensive_value_2 = next_benchmark[1]
+                        winner = next_benchmark[0]
+                        last_used_benchmark_column = next_benchmark[1]
                     else:
-                        self.comprehensive_winner = last_comprehensive_value
-                    comprehensive_found = True
+                        winner = last_used_benchmark
+                    winner_found = True
                     break
                 else:
-                    self.comprehensive_winner = last_comprehensive_value
-                    comprehensive_found = True
+                    winner = last_used_benchmark
+                    winner_found = True
                     break
-            if comprehensive_found:
+            if winner_found:
                 break
-        if not comprehensive_found:
-            self.comprehensive_winner = max([last_comprehensive_value, 1])
-        self.comprehensive_winner_column = last_comprehensive_value_2
+        if not winner_found:
+            winner = max([last_used_benchmark, 1])
+        return winner, last_used_benchmark_column, last_treatment_priority
+
 
     def set_winners(self):
 
