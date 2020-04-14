@@ -168,13 +168,29 @@ class ActivityGoal(Serialisable):
 
 class DosageDuration(object):
     def __init__(self):
-        self.efficient_duration_min_rep_one_set = 0
-        self.complete_duration_min_rep_one_set = 0
-        self.complete_duration_max_rep_one_set = 0
-        self.comprehensive_duration_min_rep_one_set = 0
-        self.comprehensive_duration_max_rep_one_set = 0
-        self.comprehensive_duration_min_rep_two_set = 0
-        self.comprehensive_duration_max_rep_two_set = 0
+        self.efficient_duration_min_rep_one_set = {}
+        self.complete_duration_min_rep_one_set = {}
+        self.complete_duration_max_rep_one_set = {}
+        self.comprehensive_duration_min_rep_one_set = {}
+        self.comprehensive_duration_max_rep_one_set = {}
+        self.comprehensive_duration_min_rep_two_set = {}
+        self.comprehensive_duration_max_rep_two_set = {}
+        self.efficient_duration_min_rep_one_set_total = 0
+        self.complete_duration_min_rep_one_set_total = 0
+        self.complete_duration_max_rep_one_set_total = 0
+        self.comprehensive_duration_min_rep_one_set_total = 0
+        self.comprehensive_duration_max_rep_one_set_total = 0
+        self.comprehensive_duration_min_rep_two_set_total = 0
+        self.comprehensive_duration_max_rep_two_set_total = 0
+
+    # def aggregate_durations(self):
+    #     self.efficient_duration_min_rep_one_set_duration = sum(self.efficient_duration_min_rep_one_set.values())
+    #     self.complete_duration_min_rep_one_set_duration = sum(self.complete_duration_min_rep_one_set.values())
+    #     self.complete_duration_max_rep_one_set_duration = sum(self.complete_duration_max_rep_one_set.values())
+    #     self.comprehensive_duration_min_rep_one_set_duration = sum(self.comprehensive_duration_min_rep_one_set.values())
+    #     self.comprehensive_duration_max_rep_one_set_duration = sum(self.comprehensive_duration_max_rep_one_set.values())
+    #     self.comprehensive_duration_min_rep_two_set_duration = sum(self.comprehensive_duration_min_rep_two_set.values())
+    #     self.comprehensive_duration_max_rep_two_set_duration = sum(self.comprehensive_duration_max_rep_two_set.values())
 
 
 class Activity(object):
@@ -203,8 +219,10 @@ class Activity(object):
         self.efficient_winner = 1
         self.complete_winner = 1
         self.complete_winner_column = 0
+        self.complete_max_treatment_priority = 33
         self.comprehensive_winner = 1
         self.comprehensive_winner_column = 0
+        self.comprehensive_max_treatment_priority = 33
         self.rankings = set()
         self.body_part_factory = BodyPartFactory()
         self.proposed_efficient_limit = 480
@@ -428,7 +446,7 @@ class Activity(object):
             self.default_plan = "Complete"
 
     def copy_exercises(self, source_collection, target_phase, goal, tier, severity, exercise_library,
-                       sports=[]):
+                       treatment_priority=33):
 
         position_order = 0
 
@@ -458,8 +476,9 @@ class Activity(object):
             dosage.tier = tier
             dosage.last_severity = severity
             dosage.ranking = ranking
-            dosage.sports = sports
+            dosage.sports = []
             dosage.goal = goal
+            dosage.treatment_priority = treatment_priority
             #dosage = self.update_dosage(dosage, target_collection[s.exercise.id].exercise)
             #if dosage.get_total_dosage() > 0:
             target_collection[s.exercise.id].dosages.append(dosage)
@@ -535,7 +554,8 @@ class Activity(object):
                 #dosage = a.dosages[0]
                 # dosage = consolidated_dosage
                 benchmark = self.get_benchmark(a.dosages, ex_phase_type)
-                self.calc_dosage_durations_2(benchmark, a, max_priority)
+                treatment_priority = min([d.treatment_priority for d in a.dosages])
+                self.calc_dosage_durations_2(benchmark, a, max_priority, treatment_priority)
                 for dosage in a.dosages:
                     dosage.benchmark = benchmark
 
@@ -555,6 +575,7 @@ class Activity(object):
     def get_benchmark(self, dosages, ex_phase_type):
         priority = int(dosages[0].priority)
         benchmarks_per_priority = int(len(self.dosage_durations) / 3)
+        # treatment_priority = min([d.treatment_priority for d in dosages])
 
         phase_benchmark = self.ranked_exercise_phases.get(ex_phase_type.name, len(self.ranked_exercise_phases) - 1)
         goal_benchmarks = []
@@ -601,10 +622,10 @@ class Activity(object):
             if b == benchmarks[-1]:
                 continue
             # only way this could be too high is if it's Priorty 1 (and nothing we can do)
-            total_efficient += self.dosage_durations[b].efficient_duration_min_rep_one_set
-            if self.dosage_durations[b].efficient_duration_min_rep_one_set > 0:
+            total_efficient += self.dosage_durations[b].efficient_duration_min_rep_one_set_total
+            if self.dosage_durations[b].efficient_duration_min_rep_one_set_total > 0:
                 last_efficient_value = b
-            proposed_efficient = self.dosage_durations[b + 1].efficient_duration_min_rep_one_set
+            proposed_efficient = self.dosage_durations[b + 1].efficient_duration_min_rep_one_set_total
             if total_efficient >= self.proposed_efficient_limit:
                 self.efficient_winner = last_efficient_value
                 efficient_found = True
@@ -633,11 +654,13 @@ class Activity(object):
         if not efficient_found:
             self.efficient_winner = max([last_efficient_value, 1])
 
+        complete_cost_params = {
+            0: 'complete_duration_min_rep_one_set_total',
+            1: 'complete_duration_max_rep_one_set_total'
+        }
         for i in range(2):
-            if i == 0: 
-                cost_param = 'complete_duration_min_rep_one_set'
-            else:
-                cost_param = 'complete_duration_max_rep_one_set'
+
+            cost_param = complete_cost_params[i]
             for b in benchmarks:
                 total_complete += getattr(self.dosage_durations[b], cost_param) #.complete_duration_min_rep_one_set
                 if getattr(self.dosage_durations[b], cost_param) > 0: #self.dosage_durations[benchmarks[b]].complete_duration_min_rep_one_set > 0:
@@ -645,11 +668,17 @@ class Activity(object):
                     last_complete_value_2 = i
                 if b == benchmarks[-1]:
                     if i == 0:
-                        proposed_complete = getattr(self.dosage_durations[1], 'complete_duration_max_rep_one_set')
+                        next_benchmark = (1, i + 1)
+                        next_cost_param = 'complete_duration_max_rep_one_set_total'
+                        proposed_complete = getattr(self.dosage_durations[1], next_cost_param)
                     else:
-                        proposed_complete = 0
+                        break
+                        # next_benchmark = (None, None)
+                        # proposed_complete = 0
                 else:
-                    proposed_complete = getattr(self.dosage_durations[b + 1], cost_param) #self.dosage_durations[benchmarks[b + 1]].complete_duration_min_rep_one_set
+                    next_cost_param = complete_cost_params[i]
+                    next_benchmark = (b + 1, i)
+                    proposed_complete = getattr(self.dosage_durations[b + 1], next_cost_param) #self.dosage_durations[benchmarks[b + 1]].complete_duration_min_rep_one_set
                 if total_complete >= self.proposed_complete_limit:
                     self.complete_winner = last_complete_value
                     complete_found = True
@@ -658,16 +687,37 @@ class Activity(object):
                     continue
                 elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
                     continue
-                elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
-                    self.complete_winner = last_complete_value
-                    complete_found = True
-                    break
-                elif total_complete + proposed_complete <= self.proposed_complete_limit + 120:
-                    self.complete_winner = b + 1
-                    if b == benchmarks[-1]:
-                        last_complete_value_2 = i + 1
+                # elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
+                #     self.complete_winner = last_complete_value
+                #     complete_found = True
+                #     break
+                # elif total_complete + proposed_complete <= self.proposed_complete_limit + 120:
+                #     self.complete_winner = b + 1
+                #     if b == benchmarks[-1]:
+                #         last_complete_value_2 = i + 1
+                #     else:
+                #         last_complete_value_2 = i
+                #     complete_found = True
+                #     break
+                elif total_complete + proposed_complete > self.proposed_complete_limit:
+                    treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
+                    sorted_keys = sorted(treatment_priorities)
+                    remaining_time = self.proposed_complete_limit - total_complete
+                    used_time = 0
+                    last_treatment_priority = 0
+                    for treatment_priority in sorted_keys:
+                        proposed_duration = treatment_priorities[treatment_priority]
+                        if used_time + proposed_duration <= remaining_time:
+                            used_time += proposed_duration
+                            last_treatment_priority = treatment_priority
+                        else:
+                            self.complete_max_treatment_priority = last_treatment_priority
+                            break
+                    if used_time > 0:
+                        self.complete_winner = next_benchmark[0]
+                        last_complete_value_2 = next_benchmark[1]
                     else:
-                        last_complete_value_2 = i
+                        self.complete_winner = last_complete_value
                     complete_found = True
                     break
                 else:
@@ -681,10 +731,10 @@ class Activity(object):
         self.complete_winner_column = last_complete_value_2
 
         comprehensive_cost_params  = {
-            0: 'comprehensive_duration_min_rep_one_set',
-            1: 'comprehensive_duration_max_rep_one_set',
-            2: 'comprehensive_duration_min_rep_two_set',
-            3: 'comprehensive_duration_min_rep_two_set'
+            0: 'comprehensive_duration_min_rep_one_set_total',
+            1: 'comprehensive_duration_max_rep_one_set_total',
+            2: 'comprehensive_duration_min_rep_two_set_total',
+            3: 'comprehensive_duration_max_rep_two_set_total'
         }
         for i in range(4):
             cost_param = comprehensive_cost_params[i]
@@ -695,12 +745,18 @@ class Activity(object):
                     last_comprehensive_value_2 = i
                 if b == benchmarks[-1]:
                     if i != 3:
-                        cost_param = comprehensive_cost_params[i + 1]
-                        proposed_comprehensive = getattr(self.dosage_durations[1], cost_param)
+                        next_benchmark = (1, i + 1)
+                        next_cost_param = comprehensive_cost_params[i + 1]
+                        proposed_comprehensive = getattr(self.dosage_durations[1], next_cost_param)
                     else:
-                        proposed_comprehensive = 0
+                        break
+                        # next_benchmark = (None, None)
+                        # proposed_comprehensive = 0
+                        # next_cost_param = next_cost_param
                 else:
-                    proposed_comprehensive = getattr(self.dosage_durations[b + 1], cost_param)  #self.dosage_durations[benchmarks[b + 1]].comprehensive_duration_min_rep_one_set
+                    next_benchmark = (b + 1, i)
+                    next_cost_param = comprehensive_cost_params[i]
+                    proposed_comprehensive = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param)  #self.dosage_durations[benchmarks[b + 1]].comprehensive_duration_min_rep_one_set
                 if total_comprehensive >= self.proposed_comprehensive_limit:
                     self.comprehensive_winner = last_comprehensive_value
                     comprehensive_found = True
@@ -709,16 +765,29 @@ class Activity(object):
                     continue
                 elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
                     continue
-                elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
-                    self.comprehensive_winner = last_comprehensive_value
-                    comprehensive_found = True
-                    break
-                elif total_comprehensive + proposed_comprehensive <= self.proposed_comprehensive_limit + 180:
-                    self.comprehensive_winner = b + 1
-                    if b == benchmarks[-1]:
-                        last_comprehensive_value_2 = i + 1
+                # elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
+                #     self.comprehensive_winner = last_comprehensive_value
+                #     comprehensive_found = True
+                #     break
+                elif total_comprehensive + proposed_comprehensive > self.proposed_comprehensive_limit:
+                    treatment_priorities = getattr(self.dosage_durations[next_benchmark[0]], next_cost_param.split('_total')[0])
+                    sorted_keys = sorted(treatment_priorities)
+                    remaining_time = self.proposed_comprehensive_limit - total_comprehensive
+                    used_time = 0
+                    last_treatment_priority = 0
+                    for treatment_priority in sorted_keys:
+                        proposed_duration = treatment_priorities[treatment_priority]
+                        if used_time + proposed_duration <= remaining_time:
+                            used_time += proposed_duration
+                            last_treatment_priority = treatment_priority
+                        else:
+                            self.comprehensive_max_treatment_priority = last_treatment_priority
+                            break
+                    if used_time > 0:
+                        self.comprehensive_winner = next_benchmark[0]
+                        last_comprehensive_value_2 = next_benchmark[1]
                     else:
-                        last_comprehensive_value_2 = i
+                        self.comprehensive_winner = last_comprehensive_value
                     comprehensive_found = True
                     break
                 else:
@@ -866,38 +935,35 @@ class Activity(object):
 
     def scale_active_time_2(self, assigned_exercises):
 
-        if self.efficient_winner is not None:  # if None, don't reduce
-            for ex, a in assigned_exercises.items():
-                for d in a.dosages:
-                    if d.benchmark <= self.efficient_winner:
-                        d.efficient_reps_assigned = a.exercise.min_reps
-                        d.efficient_sets_assigned = 1
-                        d.default_efficient_reps_assigned = a.exercise.min_reps
-                        d.default_efficient_sets_assigned = 1
-                    else:
-                        d.efficient_reps_assigned = 0
-                        d.efficient_sets_assigned = 0
-                        d.default_efficient_reps_assigned = 0
-                        d.default_efficient_sets_assigned = 0
+        # if self.efficient_winner is not None:  # if None, don't reduce
+        for ex, a in assigned_exercises.items():
+            for d in a.dosages:
+                if d.benchmark <= self.efficient_winner:
+                    d.efficient_reps_assigned = a.exercise.min_reps
+                    d.efficient_sets_assigned = 1
+                    d.default_efficient_reps_assigned = a.exercise.min_reps
+                    d.default_efficient_sets_assigned = 1
+                else:
+                    d.efficient_reps_assigned = 0
+                    d.efficient_sets_assigned = 0
+                    d.default_efficient_reps_assigned = 0
+                    d.default_efficient_sets_assigned = 0
 
-        if self.complete_winner is not None:  # if None, don't reduce
-            for ex, a in assigned_exercises.items():
-                for d in a.dosages:
-                    assigned = False
-                    if self.complete_winner_column == 0:
-                        if d.benchmark <= self.complete_winner:
+        # if self.complete_winner is not None:  # if None, don't reduce
+        for ex, a in assigned_exercises.items():
+            for d in a.dosages:
+                assigned = False
+                if self.complete_winner_column == 0:
+                    if d.benchmark <= self.complete_winner:
+                        if d.treatment_priority <= self.complete_max_treatment_priority or d.benchmark < self.complete_winner:
                             d.complete_reps_assigned = a.exercise.min_reps
                             d.complete_sets_assigned = 1
                             d.default_complete_reps_assigned = a.exercise.min_reps
                             d.default_complete_sets_assigned = 1
                             assigned = True
-                        # else:
-                        #     d.complete_reps_assigned = 0
-                        #     d.complete_sets_assigned = 0
-                        #     d.default_complete_reps_assigned = 0
-                        #     d.default_complete_sets_assigned = 0
-                    else:
-                        if d.benchmark <= self.complete_winner:
+                else:
+                    if d.benchmark <= self.complete_winner:
+                        if d.treatment_priority <= self.complete_max_treatment_priority or d.benchmark < self.complete_winner:
                             d.complete_reps_assigned = a.exercise.max_reps
                             d.complete_sets_assigned = 1
                             d.default_complete_reps_assigned = a.exercise.max_reps
@@ -910,23 +976,27 @@ class Activity(object):
                                 d.default_complete_reps_assigned = a.exercise.min_reps
                                 d.default_complete_sets_assigned = 1
                                 assigned = True
-                            # else:
-                            #     d.complete_reps_assigned = a.exercise.min_reps
-                            #     d.complete_sets_assigned = 1
-                            #     d.default_complete_reps_assigned = a.exercise.min_reps
-                            #     d.default_complete_sets_assigned = 1
 
-                    if not assigned:
-                        d.complete_reps_assigned = 0
-                        d.complete_sets_assigned = 0
-                        d.default_complete_reps_assigned = 0
-                        d.default_complete_sets_assigned = 0
+                    else:
+                        if d.priority == "1" or d.priority == "2":
+                            d.complete_reps_assigned = a.exercise.min_reps
+                            d.complete_sets_assigned = 1
+                            d.default_complete_reps_assigned = a.exercise.min_reps
+                            d.default_complete_sets_assigned = 1
+                            assigned = True
 
-        if self.comprehensive_winner is not None:  # if None, don't reduce
-            for ex, a in assigned_exercises.items():
-                for d in a.dosages:
-                    if self.comprehensive_winner_column == 0:
-                        if d.benchmark <= self.comprehensive_winner:
+                if not assigned:
+                    d.complete_reps_assigned = 0
+                    d.complete_sets_assigned = 0
+                    d.default_complete_reps_assigned = 0
+                    d.default_complete_sets_assigned = 0
+
+        # if self.comprehensive_winner is not None:  # if None, don't reduce
+        for ex, a in assigned_exercises.items():
+            for d in a.dosages:
+                if self.comprehensive_winner_column == 0:
+                    if d.benchmark <= self.comprehensive_winner:
+                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
                             d.comprehensive_reps_assigned = a.exercise.min_reps
                             d.comprehensive_sets_assigned = 1
                             d.default_comprehensive_reps_assigned = a.exercise.min_reps
@@ -936,21 +1006,31 @@ class Activity(object):
                             d.comprehensive_sets_assigned = 0
                             d.default_comprehensive_reps_assigned = 0
                             d.default_comprehensive_sets_assigned = 0
-                    elif self.comprehensive_winner_column == 1:
-                        if d.benchmark <= self.comprehensive_winner:
+                    else:
+                        d.comprehensive_reps_assigned = 0
+                        d.comprehensive_sets_assigned = 0
+                        d.default_comprehensive_reps_assigned = 0
+                        d.default_comprehensive_sets_assigned = 0
+                elif self.comprehensive_winner_column == 1:
+                    if d.benchmark <= self.comprehensive_winner:
+                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
                             d.comprehensive_reps_assigned = a.exercise.max_reps
                             d.comprehensive_sets_assigned = 1
                             d.default_comprehensive_reps_assigned = a.exercise.max_reps
                             d.default_comprehensive_sets_assigned = 1
-                            # assigned = True
                         else:
                             d.comprehensive_reps_assigned = a.exercise.min_reps
                             d.comprehensive_sets_assigned = 1
                             d.default_comprehensive_reps_assigned = a.exercise.min_reps
                             d.default_comprehensive_sets_assigned = 1
-                            # assigned = True
-                    elif self.comprehensive_winner_column == 2:
-                        if d.benchmark <= self.comprehensive_winner:
+                    else:
+                        d.comprehensive_reps_assigned = a.exercise.min_reps
+                        d.comprehensive_sets_assigned = 1
+                        d.default_comprehensive_reps_assigned = a.exercise.min_reps
+                        d.default_comprehensive_sets_assigned = 1
+                elif self.comprehensive_winner_column == 2:
+                    if d.benchmark <= self.comprehensive_winner:
+                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
                             d.comprehensive_reps_assigned = a.exercise.min_reps
                             d.comprehensive_sets_assigned = 2
                             d.default_comprehensive_reps_assigned = a.exercise.min_reps
@@ -966,8 +1046,21 @@ class Activity(object):
                                 d.comprehensive_sets_assigned = 1
                                 d.default_comprehensive_reps_assigned = a.exercise.min_reps
                                 d.default_comprehensive_sets_assigned = 1
-                    else:  # winning column is 3
-                        if d.benchmark <= self.comprehensive_winner:
+
+                    else:
+                        if d.priority == "1" or d.priority == "2":
+                            d.comprehensive_reps_assigned = a.exercise.max_reps
+                            d.comprehensive_sets_assigned = 1
+                            d.default_comprehensive_reps_assigned = a.exercise.max_reps
+                            d.default_comprehensive_sets_assigned = 1
+                        else:
+                            d.comprehensive_reps_assigned = a.exercise.min_reps
+                            d.comprehensive_sets_assigned = 1
+                            d.default_comprehensive_reps_assigned = a.exercise.min_reps
+                            d.default_comprehensive_sets_assigned = 1
+                else:  # winning column is 3
+                    if d.benchmark <= self.comprehensive_winner:
+                        if d.treatment_priority <= self.comprehensive_max_treatment_priority or d.benchmark < self.comprehensive_winner:
                             d.comprehensive_reps_assigned = a.exercise.max_reps
                             d.comprehensive_sets_assigned = 2
                             d.default_comprehensive_reps_assigned = a.exercise.max_reps
@@ -988,6 +1081,22 @@ class Activity(object):
                                 d.comprehensive_sets_assigned = 1
                                 d.default_comprehensive_reps_assigned = a.exercise.min_reps
                                 d.default_comprehensive_sets_assigned = 1
+                    else:
+                        if d.priority == "1":
+                            d.comprehensive_reps_assigned = a.exercise.min_reps
+                            d.comprehensive_sets_assigned = 2
+                            d.default_comprehensive_reps_assigned = a.exercise.min_reps
+                            d.default_comprehensive_sets_assigned = 2
+                        elif d.priority == "2":
+                            d.comprehensive_reps_assigned = a.exercise.max_reps
+                            d.comprehensive_sets_assigned = 1
+                            d.default_comprehensive_reps_assigned = a.exercise.max_reps
+                            d.default_comprehensive_sets_assigned = 1
+                        else:
+                            d.comprehensive_reps_assigned = a.exercise.min_reps
+                            d.comprehensive_sets_assigned = 1
+                            d.default_comprehensive_reps_assigned = a.exercise.min_reps
+                            d.default_comprehensive_sets_assigned = 1
 
     def scale_active_time(self, assigned_exercises):
 
@@ -1129,7 +1238,7 @@ class Activity(object):
             self.dosage_durations[benchmark_value].comprehensive_duration += assigned_exercise.duration(
                 dosage.comprehensive_reps_assigned, dosage.comprehensive_sets_assigned)
 
-    def calc_dosage_durations_2(self, benchmark_value, assigned_exercise, priority):
+    def calc_dosage_durations_2(self, benchmark_value, assigned_exercise, priority, treatment_priority):
         min_rep_one_set = assigned_exercise.duration(assigned_exercise.exercise.min_reps, 1)
         max_rep_one_set = assigned_exercise.duration(assigned_exercise.exercise.max_reps, 1)
         min_rep_two_set = assigned_exercise.duration(assigned_exercise.exercise.min_reps, 2)
@@ -1137,21 +1246,70 @@ class Activity(object):
         max_rep_one_set_cost = max_rep_one_set - min_rep_one_set
         min_rep_two_set_cost = min_rep_two_set - max_rep_one_set
         max_rep_two_set_cost = max_rep_two_set - min_rep_two_set
-        if priority == '1':
-            self.dosage_durations[benchmark_value].efficient_duration_min_rep_one_set += min_rep_one_set
-            self.dosage_durations[benchmark_value].complete_duration_min_rep_one_set += min_rep_one_set
-            self.dosage_durations[benchmark_value].complete_duration_max_rep_one_set += max_rep_one_set_cost
-            self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
-            self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_one_set += max_rep_one_set_cost
-            self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_two_set += min_rep_two_set_cost
-            self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_two_set += max_rep_two_set_cost
-        elif priority == '2':
-            self.dosage_durations[benchmark_value].complete_duration_min_rep_one_set += min_rep_one_set
-            self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
-            self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_one_set += max_rep_one_set_cost
-        elif priority == '3':
-            self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
 
+        cost_dict = {
+            'min_rep_one_set': min_rep_one_set,
+            'max_rep_one_set': max_rep_one_set_cost,
+            'min_rep_two_set': min_rep_two_set_cost,
+            'max_rep_two_set': max_rep_two_set_cost
+        }
+        if priority == '1':
+            attributes_to_update = [
+                'efficient_duration_min_rep_one_set',
+                'complete_duration_min_rep_one_set',
+                'complete_duration_max_rep_one_set',
+                'comprehensive_duration_min_rep_one_set',
+                'comprehensive_duration_max_rep_one_set',
+                'comprehensive_duration_min_rep_two_set',
+                'comprehensive_duration_max_rep_two_set'
+            ]
+            for attribute in attributes_to_update:
+                duration_dict = getattr(self.dosage_durations[benchmark_value], attribute)
+                cost = cost_dict.get(attribute.split('duration_')[1])
+                if treatment_priority in duration_dict:
+                    duration_dict[treatment_priority] += cost
+                else:
+                    duration_dict[treatment_priority] = cost
+                current_total = getattr(self.dosage_durations[benchmark_value], f"{attribute}_total")
+                current_total += cost
+                setattr(self.dosage_durations[benchmark_value], f"{attribute}_total", current_total)
+            # self.dosage_durations[benchmark_value].efficient_duration_min_rep_one_set += min_rep_one_set
+            # self.dosage_durations[benchmark_value].complete_duration_min_rep_one_set += min_rep_one_set
+            # self.dosage_durations[benchmark_value].complete_duration_max_rep_one_set += max_rep_one_set_cost
+            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
+            # self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_one_set += max_rep_one_set_cost
+            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_two_set += min_rep_two_set_cost
+            # self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_two_set += max_rep_two_set_cost
+        elif priority == '2':
+            attributes_to_update = [
+                'complete_duration_min_rep_one_set',
+                'comprehensive_duration_min_rep_one_set',
+                'comprehensive_duration_max_rep_one_set'
+            ]
+            for attribute in attributes_to_update:
+                duration_dict = getattr(self.dosage_durations[benchmark_value], attribute)
+                cost = cost_dict.get(attribute.split('duration_')[1])
+                if treatment_priority in duration_dict:
+                    duration_dict[treatment_priority] += cost
+                else:
+                    duration_dict[treatment_priority] = cost
+                setattr(self.dosage_durations[benchmark_value], f"{attribute}_total", getattr(self.dosage_durations[benchmark_value], f"{attribute}_total") + cost)
+            # self.dosage_durations[benchmark_value].complete_duration_min_rep_one_set += min_rep_one_set
+            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
+            # self.dosage_durations[benchmark_value].comprehensive_duration_max_rep_one_set += max_rep_one_set_cost
+        elif priority == '3':
+            attributes_to_update = [
+                'comprehensive_duration_min_rep_one_set'
+            ]
+            for attribute in attributes_to_update:
+                duration_dict = getattr(self.dosage_durations[benchmark_value], attribute)
+                cost = cost_dict.get(attribute.split('duration_')[1])
+                if treatment_priority in duration_dict:
+                    duration_dict[treatment_priority] += cost
+                else:
+                    duration_dict[treatment_priority] = cost
+                setattr(self.dosage_durations[benchmark_value], f"{attribute}_total", getattr(self.dosage_durations[benchmark_value], f"{attribute}_total") + cost)
+            # self.dosage_durations[benchmark_value].comprehensive_duration_min_rep_one_set += min_rep_one_set
 
     #@staticmethod
     def update_dosage(self, dosage, exercise):
@@ -1568,16 +1726,15 @@ class ActiveRestBase(Activity):
     #             # Note: this is just returning the primary mover related exercises for sport
     #             if body_part is not None:  # and not prohibiting_soreness:
     #                 self.copy_exercises(body_part.inhibit_exercises,
-    #                                     ExercisePhaseType.inhibit, goal, "1", trigger_list[t], exercise_library)
+    #                                     ExercisePhaseType.inhibit, goal, "1", trigger_list[t], exercise_library, treatment_priority=body_part.treatment_priority)
     #                 # if not prohibiting_soreness:
     #                 if max_severity < 7:
     #                     self.copy_exercises(body_part.static_stretch_exercises,
-    #                                         ExercisePhaseType.static_stretch, goal, "1", trigger_list[t], exercise_library,
-    #                                         sports)
+    #                                         ExercisePhaseType.static_stretch, goal, "1", trigger_list[t], exercise_library, treatment_priority=body_part.treatment_priority)
     #                 if max_severity < 5:
     #                     self.copy_exercises(body_part.isolated_activate_exercises,
     #                                         ExercisePhaseType.isolated_activate, goal, "1", trigger_list[t],
-    #                                         exercise_library, sports)
+    #                                         exercise_library, treatment_priority=body_part.treatment_priority)
     #
     #             self.check_reactive_recover_from_sport_general(sports, exercise_library, goal, max_severity)
 
@@ -1627,39 +1784,39 @@ class MovementIntegrationPrep(ActiveRestBase):
             agonist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None), use_cache=True)
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
-                                    exercise_library)
+                                    exercise_library, treatment_priority=agonist.treatment_priority)
                 if max_severity < 7:
-                    #self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
-                    self.copy_exercises(agonist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
+                    #self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library, treatment_priority=agonist.treatment_priority)
+                    self.copy_exercises(agonist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library, treatment_priority=agonist.treatment_priority)
                 if max_severity < 5:
                     self.copy_exercises(agonist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        1, 0, exercise_library)
+                                        1, 0, exercise_library, treatment_priority=agonist.treatment_priority)
 
         for y in body_part.synergists:
             synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None), use_cache=True)
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, 0,
-                                    exercise_library)
+                                    exercise_library, treatment_priority=synergist.treatment_priority)
                 if max_severity < 7:
-                    self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2, 0, exercise_library)
+                    self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2, 0, exercise_library, treatment_priority=synergist.treatment_priority)
                 if max_severity < 5:
                     self.copy_exercises(synergist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        2, 0, exercise_library)
+                                        2, 0, exercise_library, treatment_priority=synergist.treatment_priority)
 
         for t in body_part.stabilizers:
             stabilizer = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None), use_cache=True)
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 4, 0,
-                                    exercise_library)
+                                    exercise_library, treatment_priority=stabilizer.treatment_priority)
                 # if max_severity < 7:
-                #     self.copy_exercises(stabilizer.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 3, 0, exercise_library)
+                #     self.copy_exercises(stabilizer.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 3, 0, exercise_library, treatment_priority=stabilizer.treatment_priority)
                 if max_severity < 5:
                     self.copy_exercises(stabilizer.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        3, 0, exercise_library)
+                                        3, 0, exercise_library, treatment_priority=stabilizer.treatment_priority)
 
         if max_severity < 5:
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, 1, 0,
-                                exercise_library)
+                                exercise_library, treatment_priority=body_part.treatment_priority)
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
         compensating = False
@@ -1703,14 +1860,14 @@ class MovementIntegrationPrep(ActiveRestBase):
                         goal = AthleteGoal("Expected Load - Compensation", 1, AthleteGoalType.expected_asymmetric_session)
 
                     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal,
-                                        tier + 1, 0, exercise_library)
+                                        tier + 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
                     if max_severity < 7.0:
                         if self.sport_cardio_plyometrics:
                             self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal,
-                                                tier, 0, exercise_library)
+                                                tier, 0, exercise_library, treatment_priority=body_part.treatment_priority)
                         else:
                             self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal,
-                                                tier, 0, exercise_library)
+                                                tier, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             if excessive_strain:
 
@@ -1722,16 +1879,16 @@ class MovementIntegrationPrep(ActiveRestBase):
                     if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover]:
                         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                             body_part_injury_risk.total_volume_percent_tier,
-                                            0, exercise_library)
+                                            0, exercise_library, treatment_priority=body_part.treatment_priority)
                     # self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal,
                     #                     body_part_injury_risk.total_volume_percent_tier,
-                    #                     0, exercise_library)
+                    #                     0, exercise_library, treatment_priority=body_part.treatment_priority)
                 # if max_severity < 4.0:
                 #     # TODO: What does "match upcoming sport and intensity mean"
                 #     if body_part.location in sport_body_parts.keys():
                 #         self.copy_exercises(body_part.dynamic_integrate_exercises, ExercisePhaseType.dynamic_integrate, goal,
                 #                             body_part_injury_risk.total_volume_percent_tier,
-                #                             0, exercise_library)
+                #                             0, exercise_library, treatment_priority=body_part.treatment_priority)
 
     def check_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
         muscle_spasm = False
@@ -1782,35 +1939,35 @@ class MovementIntegrationPrep(ActiveRestBase):
                 last_severity = max(last_severity, body_part_injury_risk.get_inflammation_severity(self.event_date_time.date()))
 
             self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
-                                exercise_library)
+                                exercise_library, treatment_priority=body_part.treatment_priority)
 
             if muscle_spasm or knots:
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
-                                        last_muscle_spasm_knots_severity, exercise_library)
+                                        last_muscle_spasm_knots_severity, exercise_library, treatment_priority=body_part.treatment_priority)
 
             if max_severity < 7.0:
                 if self.sport_cardio_plyometrics:
                     self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1,
-                                        last_severity, exercise_library)
+                                        last_severity, exercise_library, treatment_priority=body_part.treatment_priority)
                 else:
                     self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1,
-                                        last_severity, exercise_library)
+                                        last_severity, exercise_library, treatment_priority=body_part.treatment_priority)
 
             if sharp_tight_ache:  # muscles tagged with muscle spasm only due to being related will be excluded
                 for s in body_part.synergists:
                     synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None), use_cache=True)
                     self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, last_severity,
-                                        exercise_library)
+                                        exercise_library, treatment_priority=synergist.treatment_priority)
 
                     if max_severity < 7.0:
                         if self.sport_cardio_plyometrics:
                             self.copy_exercises(synergist.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 2,
-                                                last_severity, exercise_library)
+                                                last_severity, exercise_library, treatment_priority=synergist.treatment_priority)
                         else:
                             self.copy_exercises(synergist.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 2,
-                                                last_severity, exercise_library)
+                                                last_severity, exercise_library, treatment_priority=synergist.treatment_priority)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
         if body_part is not None and body_part.location in sport_body_parts:
@@ -1826,10 +1983,10 @@ class MovementIntegrationPrep(ActiveRestBase):
             if is_overactive_short:
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 # tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             elif is_underactive_long or is_weak:
 
@@ -1837,47 +1994,47 @@ class MovementIntegrationPrep(ActiveRestBase):
                 # tier_one = True
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal, 1,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             elif is_overactive_long:
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 # tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             elif is_underactive_short:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 # tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
                 if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
                     if self.sport_cardio_plyometrics:
-                        self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library)
+                        self.copy_exercises(body_part.dynamic_stretch_exercises, ExercisePhaseType.dynamic_stretch, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
                     else:
-                        self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library)
+                        self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
                 if max_severity < 5.0:
-                    self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal, 1, 0, exercise_library)
+                    self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             # TODO: The logic below is not found in movement_prep spreadsheet.
             # elif is_short:
             #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
             #     tier_one = True
-            #     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+            #     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
             #
             #     if max_severity < 7.0:
             #         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-            #                             0, exercise_library)
+            #                             0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             # if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
             #     goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
             #
             #     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2,
-            #                         0, exercise_library)
+            #                         0, exercise_library, treatment_priority=body_part.treatment_priority)
             #
             #     if max_severity < 7.0:
-            #         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2, 0, exercise_library)
+            #         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
             #         # self.copy_exercises(body_part.active_stretch_exercises, ExercisePhaseType.active_stretch, goal, "1",
-            #         #                     last_severity, exercise_library)
+            #         #                     last_severity, exercise_library, treatment_priority=body_part.treatment_priority)
             #
             # if not tier_one and body_part_injury_risk.underactive_weak_tier == 2:
             #
@@ -1885,7 +2042,7 @@ class MovementIntegrationPrep(ActiveRestBase):
             #
             #     if max_severity < 5.0:
             #         self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-            #                             2, 0, exercise_library)
+            #                             2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
 
 class ActiveRest(ActiveRestBase):
@@ -1923,9 +2080,9 @@ class ActiveRest(ActiveRestBase):
             if agonist is not None:
                 if max_severity < 7.0:
                     self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, "1", None,
-                                        exercise_library)
+                                        exercise_library, treatment_priority=body_part.treatment_priority)
                     self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, "1",
-                                        None, exercise_library)
+                                        None, exercise_library, treatment_priority=body_part.treatment_priority)
 
         for t in body_part.antagonists:
             antagonist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None), use_cache=True)
@@ -1933,11 +2090,11 @@ class ActiveRest(ActiveRestBase):
                 if max_severity < 5.0:
                     self.copy_exercises(antagonist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         "1",
-                                        None, exercise_library)
+                                        None, exercise_library, treatment_priority=body_part.treatment_priority)
 
         if max_severity < 5.0:
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, "1", None,
-                                exercise_library)
+                                exercise_library, treatment_priority=body_part.treatment_priority)
 
     def get_general_exercises(self, exercise_library, max_severity):
 
@@ -1949,41 +2106,41 @@ class ActiveRest(ActiveRestBase):
             agonist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(a), None), use_cache=True)
             if agonist is not None:
                 self.copy_exercises(agonist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0,
-                                    exercise_library)
+                                    exercise_library, treatment_priority=agonist.treatment_priority)
                 if max_severity < 7:
                     self.copy_exercises(agonist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=agonist.treatment_priority)
                 if max_severity < 5:
                     self.copy_exercises(agonist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        1, 0, exercise_library)
+                                        1, 0, exercise_library, treatment_priority=agonist.treatment_priority)
 
         for y in body_part.synergists:
             synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(y), None), use_cache=True)
             if synergist is not None:
                 self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0,
-                                    exercise_library)
+                                    exercise_library, treatment_priority=synergist.treatment_priority)
                 if max_severity < 7:
                     self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=synergist.treatment_priority)
                 if max_severity < 5:
                     self.copy_exercises(synergist.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        2, 0, exercise_library)
+                                        2, 0, exercise_library, treatment_priority=synergist.treatment_priority)
 
         for t in body_part.stabilizers:
             stabilizer = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(t), None), use_cache=True)
             if stabilizer is not None:
                 self.copy_exercises(stabilizer.inhibit_exercises, ExercisePhaseType.inhibit, goal, 3, 0,
-                                    exercise_library)
+                                    exercise_library, treatment_priority=stabilizer.treatment_priority)
                 if max_severity < 7:
                     self.copy_exercises(stabilizer.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 3,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=stabilizer.treatment_priority)
                 if max_severity < 5:
                     self.copy_exercises(stabilizer.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        3, 0, exercise_library)
+                                        3, 0, exercise_library, treatment_priority=stabilizer.treatment_priority)
 
         if max_severity < 5:
             self.copy_exercises(body_part.static_integrate_exercises, ExercisePhaseType.static_integrate, goal, 1, 0,
-                                exercise_library)
+                                exercise_library, treatment_priority=body_part.treatment_priority)
 
     def check_recovery(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
 
@@ -2035,11 +2192,11 @@ class ActiveRest(ActiveRestBase):
                         goal = AthleteGoal("Recover from training", 1, AthleteGoalType.asymmetric_session)
 
                     self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal,
-                                        tier, 0, exercise_library)
+                                        tier, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
                     if max_severity < 7.0:
                         self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal,
-                                            tier, 0, exercise_library)
+                                            tier, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             if high_load:
 
@@ -2048,7 +2205,7 @@ class ActiveRest(ActiveRestBase):
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
                                         body_part_injury_risk.total_volume_percent_tier,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=body_part.treatment_priority)
 
     def check_care(self, body_part, body_part_injury_risk, exercise_library, max_severity):
 
@@ -2102,21 +2259,21 @@ class ActiveRest(ActiveRestBase):
                 last_severity = max(last_severity, body_part_injury_risk.get_inflammation_severity(self.event_date_time.date()))
 
             self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, last_severity,
-                                exercise_library)
+                                exercise_library, treatment_priority=body_part.treatment_priority)
 
             if max_severity < 7.0:
                 self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
-                                    last_severity, exercise_library)
+                                    last_severity, exercise_library, treatment_priority=body_part.treatment_priority)
 
             if sharp_tight_ache:
                 for s in body_part.synergists:
                     synergist = self.body_part_factory.get_body_part(BodyPart(BodyPartLocation(s), None), use_cache=True)
                     self.copy_exercises(synergist.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, last_severity,
-                                        exercise_library)
+                                        exercise_library, treatment_priority=synergist.treatment_priority)
 
                     if max_severity < 7.0:
                         self.copy_exercises(synergist.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                            last_severity, exercise_library)
+                                            last_severity, exercise_library, treatment_priority=synergist.treatment_priority)
 
     def check_prevention(self, body_part, body_part_injury_risk, exercise_library, max_severity, sport_body_parts):
 
@@ -2134,11 +2291,11 @@ class ActiveRest(ActiveRestBase):
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             elif is_underactive_long or is_weak:
 
@@ -2146,46 +2303,46 @@ class ActiveRest(ActiveRestBase):
                 tier_one = True
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal, 1,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             elif is_overactive_long:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             elif is_underactive_short:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
                 if max_severity < 7.0:
-                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library)
+                    self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        1, 0, exercise_library)
+                                        1, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             elif is_short:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
                 tier_one = True
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             if not tier_one and body_part_injury_risk.limited_mobility_tier == 2:
 
                 goal = AthleteGoal("Reduce injury risks", 1, AthleteGoalType.corrective)
 
-                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library)
+                self.copy_exercises(body_part.inhibit_exercises, ExercisePhaseType.inhibit, goal, 2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
                 if max_severity < 7.0:
                     self.copy_exercises(body_part.static_stretch_exercises, ExercisePhaseType.static_stretch, goal, 2,
-                                        0, exercise_library)
+                                        0, exercise_library, treatment_priority=body_part.treatment_priority)
 
             if not tier_one and body_part_injury_risk.underactive_weak_tier == 2:
 
@@ -2193,7 +2350,7 @@ class ActiveRest(ActiveRestBase):
 
                 if max_severity < 5.0:
                     self.copy_exercises(body_part.isolated_activate_exercises, ExercisePhaseType.isolated_activate, goal,
-                                        2, 0, exercise_library)
+                                        2, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
 
 class ActiveRecovery(Activity):
@@ -2271,7 +2428,7 @@ class ActiveRecovery(Activity):
 
                     #if max_severity < 4.0:
                     self.copy_exercises(body_part.dynamic_integrate_2_exercises, ExercisePhaseType.dynamic_integrate, goal,
-                                        tier, 0, exercise_library)
+                                        tier, 0, exercise_library, treatment_priority=body_part.treatment_priority)
 
 
 class IceSession(object):

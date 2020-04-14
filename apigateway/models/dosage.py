@@ -31,6 +31,7 @@ class ExerciseDosage(object):
         self.ranking = 0
         self.dosage_progression = None  # just used for calcs, no need to ser/de-ser
         self.benchmark = 0
+        self.treatment_priority = 33
 
     def set_reps_and_sets(self, exercise):
 
