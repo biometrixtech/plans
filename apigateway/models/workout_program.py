@@ -129,7 +129,7 @@ class WorkoutSection(Serialisable):
             for exercise in self.exercises:
                 # TODO: validate the filtering here
                 if exercise.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics,
-                                              TrainingType.integrated_resistance_olympic_lift, TrainingType.strength_integrated_resistance
+                                              TrainingType.strength_integrated_resistance
                                               ]:
                     self.assess_shrz = False
                     break

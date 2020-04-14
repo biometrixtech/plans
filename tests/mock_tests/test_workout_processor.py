@@ -170,3 +170,20 @@ def test_shrz():
         assert action.training_intensity == shrz
     for action in workout_exercise4.secondary_actions:
         assert action.training_intensity == shrz
+
+
+def test_new_actions():
+    workout_exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="5823768d473c06100052ed9a")  # run
+
+    start_time = datetime.datetime.now()
+    section1_start = start_time + datetime.timedelta(seconds=2)
+    section1_end = section1_start + datetime.timedelta(seconds=3000)
+
+    section1 = get_section('stamina', exercises=[workout_exercise], start=section1_start, end=section1_end)
+
+    workout = WorkoutProgramModule()
+    workout.workout_sections = [section1]
+
+    processor = WorkoutProcessor()
+    processor.process_workout(workout)
+    print('here')
