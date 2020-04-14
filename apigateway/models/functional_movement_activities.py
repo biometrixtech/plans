@@ -506,13 +506,6 @@ class Activity(object):
         for ex, a in assigned_exercises.items():
             a.dosages = [dosage for dosage in a.dosages if isinstance(dosage.priority, str)]
             if len(a.dosages) > 0:
-                # a.dosages = sorted(a.dosages, key=lambda x: (3 - int(x.priority),
-                #                                              x.default_efficient_sets_assigned,
-                #                                              x.default_efficient_reps_assigned,
-                #                                              x.default_complete_sets_assigned,
-                #                                              x.default_complete_reps_assigned,
-                #                                              x.default_comprehensive_sets_assigned,
-                #                                              x.default_comprehensive_reps_assigned), reverse=True)
                 a.dosages = sorted(a.dosages, key=lambda x: int(x.priority))
                 max_priority = a.dosages[0].priority
                 a.dosages = [d for d in a.dosages if d.priority == max_priority]
