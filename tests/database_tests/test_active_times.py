@@ -250,6 +250,8 @@ def get_ex_assigned_details(activity):
     total_duration_efficient = round(total_duration_efficient / 60, 2)
     total_duration_complete = round(total_duration_complete / 60, 2)
     total_duration_comprehensive = round(total_duration_comprehensive / 60, 2)
+    if total_duration_comprehensive < 2:
+        print('here')
 
     total_duration_efficient_pre = round(total_duration_efficient_pre / 60, 2)
     total_duration_complete_pre = round(total_duration_complete_pre / 60, 2)
@@ -351,10 +353,10 @@ def test_generate_spreadsheets():
             'dynamic_integrate_minutes_comprehensive,dynamic_integrate_minutes_comprehensive_pre'
             )
 
-    active_rest_file = open("../../output/active_rest_11.csv", 'w')
+    active_rest_file = open("../../output/active_rest_13.csv", 'w')
     active_rest_file.write(line + '\n')
 
-    movement_integration_prep_file = open("../../output/movement_integration_prep_11.csv", 'w')
+    movement_integration_prep_file = open("../../output/movement_integration_prep_13.csv", 'w')
     movement_integration_prep_file.write(line + '\n')
 
     possible_symptoms = [('sharp',), ('knots', 'sharp'), ('tight', 'ache')]

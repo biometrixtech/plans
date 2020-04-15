@@ -75,7 +75,7 @@ def test_active_recovery_check_recovery_volume_tier_1_3_severity_3_no_high_inten
         active_recovery.fill_exercises(exercise_library, injury_risk_dict, sport_body_parts=[],
                                        high_intensity_session=False)
 
-        assert len(active_recovery.exercise_phases) == 0
+        assert len(active_recovery.exercise_phases[0].exercises) == 0
 
 
 def test_active_recovery_check_recovery_volume_tiers_0_4_severity_3():
@@ -101,7 +101,7 @@ def test_active_recovery_check_recovery_volume_tiers_0_4_severity_3():
         active_recovery.fill_exercises(exercise_library, injury_risk_dict, sport_body_parts=[],
                                        high_intensity_session=True)
 
-        assert len(active_recovery.exercise_phases) == 0
+        assert len(active_recovery.exercise_phases[0].exercises) == 0
 
 
 def test_active_recovery_check_recovery_volume_tier_1_3_severity_4():
@@ -127,7 +127,7 @@ def test_active_recovery_check_recovery_volume_tier_1_3_severity_4():
         active_recovery.fill_exercises(exercise_library, injury_risk_dict, sport_body_parts=[],
                                        high_intensity_session=True)
 
-        assert len(active_recovery.exercise_phases) == 0
+        assert len(active_recovery.exercise_phases[0].exercises) == 0
 
 
 def test_active_recovery_check_recovery_compensation_tier_1_3_severity_3():
@@ -182,7 +182,7 @@ def test_active_recovery_check_recovery_compensation_tier_1_3_severity_4():
         active_recovery.fill_exercises(exercise_library, injury_risk_dict, sport_body_parts=[],
                                        high_intensity_session=True)
 
-        assert len(active_recovery.exercise_phases) == 0
+        assert len(active_recovery.exercise_phases[0].exercises) == 0
 
 
 def test_active_recovery_check_recovery_compensation_tier_1_3_severity_3_no_high_intensity():
@@ -209,7 +209,7 @@ def test_active_recovery_check_recovery_compensation_tier_1_3_severity_3_no_high
         active_recovery.fill_exercises(exercise_library, injury_risk_dict, sport_body_parts=[],
                                        high_intensity_session=False)
 
-        assert len(active_recovery.exercise_phases) == 0
+        assert len(active_recovery.exercise_phases[0].exercises) == 0
 
 
 def test_active_recovery_check_recovery_compensation_tiers_0_4_severity_3():
@@ -235,4 +235,4 @@ def test_active_recovery_check_recovery_compensation_tiers_0_4_severity_3():
         active_recovery.fill_exercises(exercise_library, injury_risk_dict, sport_body_parts=[],
                                        high_intensity_session=True)
 
-        assert len(active_recovery.exercise_phases) == 0
+        assert len(active_recovery.exercise_phases[0].exercises) == 0

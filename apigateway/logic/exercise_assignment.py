@@ -72,12 +72,6 @@ class ExerciseAssignment(object):
                 sport_cardio_plyometrics=self.sport_cardio_plyometrics)
         movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict, sport_body_parts=self.sport_body_parts)
         self.set_and_scale_dosage(movement_integration_prep)
-        # movement_integration_prep.set_plan_dosage()
-        # movement_integration_prep.set_exercise_dosage_ranking()
-        # movement_integration_prep.aggregate_dosages()
-        # movement_integration_prep.set_winners()
-        # movement_integration_prep.scale_all_active_time()
-        # movement_integration_prep.reconcile_default_plan_with_active_time()
 
         # create movement prep and add activity
         movement_prep = MovementPrep(athlete_id, self.event_date_time)
@@ -91,12 +85,6 @@ class ExerciseAssignment(object):
         active_rest = ActiveRest(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
         active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
         self.set_and_scale_dosage(active_rest)
-        # active_rest.set_plan_dosage()
-        # active_rest.set_exercise_dosage_ranking()
-        # active_rest.aggregate_dosages()
-        # active_rest.set_winners()
-        # active_rest.scale_all_active_time()
-        # active_rest.reconcile_default_plan_with_active_time()
 
         # create mobility wod and add activity
         mobility_wod = MobilityWOD(athlete_id, self.event_date_time)
@@ -115,12 +103,6 @@ class ExerciseAssignment(object):
         )
         movement_integration_prep.fill_exercises(self.exercise_library, self.injury_risk_dict, sport_body_parts=self.sport_body_parts)
         self.set_and_scale_dosage(movement_integration_prep)
-        # movement_integration_prep.set_plan_dosage()
-        # movement_integration_prep.set_exercise_dosage_ranking()
-        # movement_integration_prep.aggregate_dosages()
-        # movement_integration_prep.set_winners()
-        # movement_integration_prep.scale_all_active_time()
-        # movement_integration_prep.reconcile_default_plan_with_active_time()
         if movement_integration_prep.get_total_exercises() > 0:
             return [movement_integration_prep]
 
@@ -131,13 +113,6 @@ class ExerciseAssignment(object):
         active_rest = ActiveRestAfterTraining(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
         active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
         self.set_and_scale_dosage(active_rest)
-        # active_rest.set_plan_dosage()
-        # active_rest.set_exercise_dosage_ranking()
-        # active_rest.aggregate_dosages()
-        # active_rest.set_winners()
-        # active_rest.scale_all_active_time()
-        # active_rest.reconcile_default_plan_with_active_time()
-        # return [active_rest]
         if active_rest.get_total_exercises() > 0:
             return [active_rest]
 
@@ -149,12 +124,6 @@ class ExerciseAssignment(object):
         active_recovery = ActiveRecovery(self.event_date_time)
         active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict, high_intensity_session=self.high_intensity_session)
         self.set_and_scale_dosage(active_recovery)
-        # active_recovery.set_plan_dosage()
-        # active_recovery.set_exercise_dosage_ranking()
-        # active_recovery.aggregate_dosages()
-        # active_recovery.set_winners()
-        # active_recovery.scale_all_active_time()
-        # active_recovery.reconcile_default_plan_with_active_time()
         if active_recovery.get_total_exercises() > 0:
             responsive_recovery.active_recovery = active_recovery
         else:
@@ -165,12 +134,6 @@ class ExerciseAssignment(object):
             active_rest = ActiveRest(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
             active_rest.fill_exercises(self.exercise_library, self.injury_risk_dict)
             self.set_and_scale_dosage(active_rest)
-            # active_rest.set_plan_dosage()
-            # active_rest.set_exercise_dosage_ranking()
-            # active_rest.aggregate_dosages()
-            # active_rest.set_winners()
-            # active_rest.scale_all_active_time()
-            # active_rest.reconcile_default_plan_with_active_time()
             if active_rest.get_total_exercises() > 0:
                 responsive_recovery.active_rest = active_rest
             else:
@@ -189,12 +152,6 @@ class ExerciseAssignment(object):
         active_recovery = ActiveRecoveryModality(self.event_date_time)
         active_recovery.fill_exercises(self.exercise_library, self.injury_risk_dict, high_intensity_session=self.high_intensity_session)
         self.set_and_scale_dosage(active_recovery)
-        # active_recovery.set_plan_dosage()
-        # active_recovery.set_exercise_dosage_ranking()
-        # active_recovery.aggregate_dosages()
-        # active_recovery.set_winners()
-        # active_recovery.scale_all_active_time()
-        # active_recovery.reconcile_default_plan_with_active_time()
         active_recovery.source_training_session_id = source_session_id
         if active_recovery.get_total_exercises() > 0:
             exercise_activity = [active_recovery]
