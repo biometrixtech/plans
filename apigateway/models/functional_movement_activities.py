@@ -516,7 +516,7 @@ class Activity(object):
                 benchmark = self.get_benchmark(a.dosages, ex_phase_type)
 
                 treatment_priority = min([d.treatment_priority for d in a.dosages])
-                self.calc_dosage_durations_2(benchmark, a, max_priority, treatment_priority)
+                self.calc_dosage_durations(benchmark, a, max_priority, treatment_priority)
 
                 for dosage in a.dosages:
                     dosage.benchmark = benchmark
@@ -555,7 +555,7 @@ class Activity(object):
 
         return benchmark
 
-    def set_winners_2(self):
+    def set_winners(self):
         efficient_reps_sets_ranking_parameters = {
             0: 'efficient_duration_min_rep_one_set'
         }
@@ -653,137 +653,12 @@ class Activity(object):
             winner = max([last_used_benchmark, 1])
         return winner, last_used_reps_sets_ranking, last_treatment_priority
 
-    def set_winners(self):
-
-        # key off efficient as the guide
-        total_efficient = 0
-        total_complete = 0
-        total_comprehensive = 0
-        benchmarks = [1, 2, 3, 4, 5]
-
-        # TODO verify this change from modality logic is correct
-        # proposed_efficient_limit = 300
-        # proposed_complete_limit = 600
-        # proposed_comprehensive_limit = 900
-        last_efficient_value = 0
-        last_complete_value = 0
-        last_comprehensive_value = 0
-        efficient_found = False
-        complete_found = False
-        comprehensive_found = False
-
-        for b in range(0, len(benchmarks) - 1):
-            # only way this could be too high is if it's Priorty 1 (and nothing we can do)
-            total_efficient += self.dosage_durations[benchmarks[b]].efficient_duration
-            if self.dosage_durations[benchmarks[b]].efficient_duration > 0:
-                last_efficient_value = b
-            proposed_efficient = self.dosage_durations[benchmarks[b + 1]].efficient_duration
-            if total_efficient >= self.proposed_efficient_limit:
-                self.efficient_winner = benchmarks[last_efficient_value]
-                efficient_found = True
-                break
-            elif proposed_efficient == 0:
-                continue
-            elif 0 < total_efficient + proposed_efficient < self.proposed_efficient_limit:
-                if b == len(benchmarks) - 2:
-                    self.efficient_winner = benchmarks[b + 1]
-                    efficient_found = True
-                    break
-                else:
-                    continue
-            elif abs(total_efficient - self.proposed_efficient_limit) < abs(total_efficient + proposed_efficient - self.proposed_efficient_limit):
-                self.efficient_winner = benchmarks[last_efficient_value]
-                efficient_found = True
-                break
-            elif total_efficient + proposed_efficient <= self.proposed_efficient_limit + 120:
-                self.efficient_winner = benchmarks[b + 1]
-                efficient_found = True
-                break
-            else:
-                self.efficient_winner = benchmarks[last_efficient_value]
-                # self.efficient_winner = benchmarks[b + 1]
-                efficient_found = True
-                # TODO - see if a `break` is needed here. Modality logic had it
-                break
-        if not efficient_found:
-            self.efficient_winner = benchmarks[last_efficient_value]
-
-        for b in range(0, len(benchmarks) - 1):
-            total_complete += self.dosage_durations[benchmarks[b]].complete_duration
-            if self.dosage_durations[benchmarks[b]].complete_duration > 0:
-                last_complete_value = b
-            proposed_complete = self.dosage_durations[benchmarks[b + 1]].complete_duration
-            if total_complete >= self.proposed_complete_limit:
-                self.complete_winner = benchmarks[last_complete_value]
-                complete_found = True
-                break
-            elif proposed_complete == 0:
-                continue
-            elif 0 < total_complete + proposed_complete < self.proposed_complete_limit:
-                if b == len(benchmarks) - 2:
-                    self.complete_winner = benchmarks[b + 1]
-                    complete_found = True
-                    break
-                else:
-                    continue
-            elif abs(total_complete - self.proposed_complete_limit) < abs(total_complete + proposed_complete - self.proposed_complete_limit):
-                self.complete_winner = benchmarks[last_complete_value]
-                complete_found = True
-                break
-            elif total_complete + proposed_complete <= self.proposed_complete_limit + 180:
-                self.complete_winner = benchmarks[b + 1]
-                complete_found = True
-                break
-            else:
-                self.complete_winner = benchmarks[last_complete_value]
-                # self.complete_winner = benchmarks[b + 1]
-                complete_found = True
-                # TODO - see if a `break` is needed here. Modality logic had it
-                break
-        if not complete_found:
-            self.complete_winner = benchmarks[last_complete_value]
-        for b in range(0, len(benchmarks) - 1):
-            total_comprehensive += self.dosage_durations[benchmarks[b]].comprehensive_duration
-            if self.dosage_durations[benchmarks[b]].comprehensive_duration > 0:
-                last_comprehensive_value = b
-            proposed_comprehensive = self.dosage_durations[benchmarks[b + 1]].comprehensive_duration
-            if total_comprehensive >= self.proposed_comprehensive_limit:
-                self.comprehensive_winner = benchmarks[last_comprehensive_value]
-                comprehensive_found = True
-                break
-            elif proposed_comprehensive == 0:
-                continue
-            elif 0 < total_comprehensive + proposed_comprehensive < self.proposed_comprehensive_limit:
-                if b == len(benchmarks) - 2:
-                    self.comprehensive_winner = benchmarks[b + 1]
-                    comprehensive_found = True
-                    break
-                else:
-                    continue
-            elif abs(total_comprehensive - self.proposed_comprehensive_limit) <= abs(total_comprehensive + proposed_comprehensive - self.proposed_comprehensive_limit):
-                self.comprehensive_winner = benchmarks[last_comprehensive_value]
-                comprehensive_found = True
-                break
-            elif total_comprehensive + proposed_comprehensive <= self.proposed_comprehensive_limit + 180:
-                self.comprehensive_winner = benchmarks[b + 1]
-                comprehensive_found = True
-                break
-            else:
-                self.comprehensive_winner = benchmarks[last_comprehensive_value]
-                # self.comprehensive_winner = benchmarks[b + 1]
-                comprehensive_found = True
-                # TODO - see if a `break` is needed here. Modality logic had it
-                break
-        if not comprehensive_found:
-            self.comprehensive_winner = benchmarks[last_comprehensive_value]
-
     def scale_all_active_time(self):
         for phase in self.exercise_phases:
-            # self.scale_active_time(phase.exercises)
-            self.scale_active_time_2(phase.exercises)
+            self.scale_active_time(phase.exercises)
             phase.exercises = {ex: a for ex, a in phase.exercises.items() if len(a.dosages) > 0 and a.duration_comprehensive() > 0}
 
-    def scale_active_time_2(self, assigned_exercises):
+    def scale_active_time(self, assigned_exercises):
 
         for ex, a in assigned_exercises.items():
             for d in a.dosages:
@@ -904,146 +779,7 @@ class Activity(object):
             for goal_dosage in a.dosages:
                 self.update_goals(goal_dosage)
 
-    def scale_active_time(self, assigned_exercises):
-
-        if self.efficient_winner is not None:  # if None, don't reduce
-            for ex, a in assigned_exercises.items():
-                if len(a.dosages) > 0:
-
-                    if self.efficient_winner == 1:
-                        if self.dosage_durations[1].efficient_duration > self.proposed_efficient_limit:
-                            for d in a.dosages:
-                                if d.priority == '1' and d.efficient_sets_assigned > 1:
-                                    d.efficient_sets_assigned = 1
-                                    d.default_efficient_sets_assigned = 1
-                        for d in a.dosages:
-                            if d.priority != '1':
-                                d.efficient_reps_assigned = 0
-                                d.efficient_sets_assigned = 0
-                                d.default_efficient_reps_assigned = 0
-                                d.default_efficient_sets_assigned = 0
-                    elif self.efficient_winner == 2:
-                        for d in a.dosages:
-                            if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
-                                d.efficient_reps_assigned = 0
-                                d.efficient_sets_assigned = 0
-                                d.default_efficient_reps_assigned = 0
-                                d.default_efficient_sets_assigned = 0
-                    elif self.efficient_winner == 3:
-                        for d in a.dosages:
-                            if d.priority == '3':
-                                d.efficient_reps_assigned = 0
-                                d.efficient_sets_assigned = 0
-                                d.default_efficient_reps_assigned = 0
-                                d.default_efficient_sets_assigned = 0
-                    elif self.efficient_winner == 4:
-                        for d in a.dosages:
-                            if d.priority == '3' and d.severity() <= 4:
-                                d.efficient_reps_assigned = 0
-                                d.efficient_sets_assigned = 0
-                                d.default_efficient_reps_assigned = 0
-                                d.default_efficient_sets_assigned = 0
-                    elif self.efficient_winner == 5:
-                        pass
-                    elif self.efficient_winner == 0:
-                        pass
-
-        if self.complete_winner is not None:  # if None, don't reduce
-            for ex, a in assigned_exercises.items():
-                if len(a.dosages) > 0:
-
-                    if self.complete_winner == 1:
-                        if self.dosage_durations[1].complete_duration > self.proposed_complete_limit:
-                            for d in a.dosages:
-                                if d.priority == '1' and d.complete_sets_assigned > 1:
-                                    d.complete_sets_assigned = d.complete_sets_assigned - 1
-                                    d.default_complete_sets_assigned = d.complete_sets_assigned - 1
-                        for d in a.dosages:
-                            if d.priority != '1':
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                                # d.default_complete_reps_assigned = 0
-                                # d.default_complete_sets_assigned = 0
-                    elif self.complete_winner == 2:
-                        for d in a.dosages:
-                            if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                                # d.default_complete_reps_assigned = 0
-                                # d.default_complete_sets_assigned = 0
-                    elif self.complete_winner == 3:
-                        for d in a.dosages:
-                            if d.priority == '3':
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                                # d.default_complete_reps_assigned = 0
-                                # d.default_complete_sets_assigned = 0
-                    elif self.complete_winner == 4:
-                        for d in a.dosages:
-                            if d.priority == '3' and d.severity() <= 4:
-                                d.complete_reps_assigned = 0
-                                d.complete_sets_assigned = 0
-                                # d.default_complete_reps_assigned = 0
-                                # d.default_complete_sets_assigned = 0
-                    elif self.complete_winner == 5:
-                        pass
-                    elif self.complete_winner == 0:
-                        pass
-
-        if self.comprehensive_winner is not None:  # if None, don't reduce
-            for ex, a in assigned_exercises.items():
-                if len(a.dosages) > 0:
-
-                    if self.comprehensive_winner == 1:
-                        if self.dosage_durations[1].comprehensive_duration > self.proposed_comprehensive_limit:
-                            for d in a.dosages:
-                                if d.priority == '1' and d.comprehensive_sets_assigned > 1:
-                                    d.comprehensive_sets_assigned = d.comprehensive_sets_assigned - 1
-                                    d.default_comprehensive_sets_assigned = d.comprehensive_sets_assigned - 1
-                        for d in a.dosages:
-                            if d.priority != '1':
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                                d.default_comprehensive_reps_assigned = 0
-                                d.default_comprehensive_sets_assigned = 0
-                    elif self.comprehensive_winner == 2:
-                        for d in a.dosages:
-                            if d.priority == '3' or (d.priority == '2' and d.severity() <= 4):
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                                d.default_comprehensive_reps_assigned = 0
-                                d.default_comprehensive_sets_assigned = 0
-                    elif self.comprehensive_winner == 3:
-                        for d in a.dosages:
-                            if d.priority == '3':
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                                d.default_comprehensive_reps_assigned = 0
-                                d.default_comprehensive_sets_assigned = 0
-                    elif self.comprehensive_winner == 4:
-                        for d in a.dosages:
-                            if d.priority == '3' and d.severity() <= 4:
-                                d.comprehensive_reps_assigned = 0
-                                d.comprehensive_sets_assigned = 0
-                                d.default_comprehensive_reps_assigned = 0
-                                d.default_comprehensive_sets_assigned = 0
-                    elif self.comprehensive_winner == 5:
-                        pass
-                    elif self.comprehensive_winner == 0:
-                        pass
-
-    def calc_dosage_durations(self, benchmark_value, assigned_exercise, dosage):
-        if dosage.efficient_reps_assigned is not None and dosage.efficient_sets_assigned is not None:
-            self.dosage_durations[benchmark_value].efficient_duration += assigned_exercise.duration(
-                dosage.efficient_reps_assigned, dosage.efficient_sets_assigned)
-        if dosage.complete_reps_assigned is not None and dosage.complete_sets_assigned is not None:
-            self.dosage_durations[benchmark_value].complete_duration += assigned_exercise.duration(
-                dosage.complete_reps_assigned, dosage.complete_sets_assigned)
-        if dosage.comprehensive_reps_assigned is not None and dosage.comprehensive_sets_assigned is not None:
-            self.dosage_durations[benchmark_value].comprehensive_duration += assigned_exercise.duration(
-                dosage.comprehensive_reps_assigned, dosage.comprehensive_sets_assigned)
-
-    def calc_dosage_durations_2(self, benchmark_value, assigned_exercise, priority, treatment_priority):
+    def calc_dosage_durations(self, benchmark_value, assigned_exercise, priority, treatment_priority):
         min_rep_one_set = assigned_exercise.duration(assigned_exercise.exercise.min_reps, 1)
         max_rep_one_set = assigned_exercise.duration(assigned_exercise.exercise.max_reps, 1)
         min_rep_two_set = assigned_exercise.duration(assigned_exercise.exercise.min_reps, 2)
