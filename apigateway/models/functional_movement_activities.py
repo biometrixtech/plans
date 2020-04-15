@@ -185,13 +185,6 @@ class DosageDuration(object):
         self.comprehensive_duration_max_rep_two_set = 0
 
 
-class RepsAndSetsRanking(Enum):
-    min_rep_one_set = 0
-    max_rep_one_set = 1
-    min_rep_two_set = 2
-    max_rep_two_set = 3
-
-
 class Activity(object):
     def __init__(self, event_date_time, activity_type, relative_load_level=3, possible_benchmarks=5):
         self.id = None
@@ -292,12 +285,6 @@ class Activity(object):
     def initialize_dosage_durations(self):
         for i in range(1, self.possible_benchmarks + 1):
             self.dosage_durations[i] = DosageDuration()
-
-        # self.dosage_durations[1] = DosageDuration(0, 0, 0)
-        # self.dosage_durations[2] = DosageDuration(0, 0, 0)
-        # self.dosage_durations[3] = DosageDuration(0, 0, 0)
-        # self.dosage_durations[4] = DosageDuration(0, 0, 0)
-        # self.dosage_durations[5] = DosageDuration(0, 0, 0)
 
     @abc.abstractmethod
     def conditions_for_increased_sensitivity_met(self, soreness_list, muscular_strain_high):
