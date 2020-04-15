@@ -510,9 +510,9 @@ class Activity(object):
                 max_priority = a.dosages[0].priority
                 a.dosages = [d for d in a.dosages if d.priority == max_priority]
 
-                self.add_goals(a.dosages)
-                for goal_dosage in a.dosages:
-                    self.update_goals(goal_dosage)
+                # self.add_goals(a.dosages)
+                # for goal_dosage in a.dosages:
+                #     self.update_goals(goal_dosage)
                 benchmark = self.get_benchmark(a.dosages, ex_phase_type)
 
                 treatment_priority = min([d.treatment_priority for d in a.dosages])
@@ -898,6 +898,11 @@ class Activity(object):
                             d.comprehensive_sets_assigned = 1
                             d.default_comprehensive_reps_assigned = a.exercise.min_reps
                             d.default_comprehensive_sets_assigned = 1
+
+        for ex, a in assigned_exercises.items():
+            self.add_goals(a.dosages)
+            for goal_dosage in a.dosages:
+                self.update_goals(goal_dosage)
 
     def scale_active_time(self, assigned_exercises):
 
