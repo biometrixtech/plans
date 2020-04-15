@@ -106,8 +106,8 @@ class ModalityTypeDisplay(object):
 
 
 class Modality(Activity):
-    def __init__(self, event_date_time, modality_type, relative_load_level=3):
-        super().__init__(event_date_time, modality_type, relative_load_level)
+    def __init__(self, event_date_time, modality_type, relative_load_level=3, possible_benchmarks=5):
+        super().__init__(event_date_time, modality_type, relative_load_level, possible_benchmarks=possible_benchmarks)
         #self.id = None
         self.type = modality_type
         #self.title = self.type.get_display_name().upper()
@@ -154,7 +154,7 @@ class Modality(Activity):
                     value = ModalityType.post_active_rest
         super().__setattr__(name, value)
 
-    def json_serialise(self, mobility_api=False):
+    def json_serialise(self, mobility_api=False, api=False, consolidated=False):
          return {
              "id": self.id,
              "type": self.type.value,
@@ -173,7 +173,7 @@ class Modality(Activity):
              "locked_text": self.locked_text,
              # "goal_defs": [agd.json_serialise() for agd in self.goal_defs],
              "goals": {goal_text: goal.json_serialise() for (goal_text, goal) in self.goals.items()},
-             "exercise_phases":[ex_phase.json_serialise(mobility_api) for ex_phase in self.exercise_phases],
+             "exercise_phases":[ex_phase.json_serialise(mobility_api=mobility_api, api=api, consolidated=consolidated) for ex_phase in self.exercise_phases],
              "source_training_session_id": self.source_training_session_id if self.source_training_session_id is not None else None
              }
 
@@ -949,7 +949,7 @@ class Modality(Activity):
 
 class ActiveRestBeforeTraining(ActiveRestBase, Modality):
     def __init__(self, event_date_time, force_data=False, relative_load_level=3, force_on_demand=False):
-        super().__init__(event_date_time, ModalityType.pre_active_rest, force_data, relative_load_level, force_on_demand)
+        super().__init__(event_date_time, ModalityType.pre_active_rest, force_data, relative_load_level, force_on_demand, possible_benchmarks=63)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.active_stretch),
@@ -959,6 +959,24 @@ class ActiveRestBeforeTraining(ActiveRestBase, Modality):
         self.when_card = "before training"
         self.display_image = "inhibit"  # do not include .png or _activity or _tab
         self.locked_text = "Sorry, you missed the optimal window for Mobilize today."
+
+        self.proposed_efficient_limit = 300
+        self.proposed_complete_limit = 600
+        self.proposed_comprehensive_limit = 900
+        self.ranked_exercise_phases = {
+                'isolated_activate': 0,
+                'static_stretch': 1,
+                'active_stretch': 2,
+                'dynamic_stretch': 3,
+                'inhibit': 4,
+                'static_integrate': 5,
+                'dynamic_integrate': 6
+            }
+        self.ranked_goals = {
+                "care": 0,
+                "prevention": 1,
+                "recovery": 2
+            }
 
     def check_reactive_recover_from_sport_general(self, sports, exercise_library, goal, max_severity):
 
@@ -1264,6 +1282,17 @@ class ActiveRestAfterTraining(ActiveRest, Modality):
         self.when_card = "anytime"
         self.display_image = "static_stretch"   # do not include .png or _activity or _tab
         self.locked_text = "You skipped this Mobility Workout. Tap + to create another."
+        self.ranked_exercise_phases = {
+                'inhibit': 0,
+                'static_stretch': 1,
+                'isolated_activate': 2,
+                'static_integrate': 3
+            }
+        self.ranked_goals = {
+                "care": 0,
+                "recovery": 1,
+                "prevention": 2
+            }
 
 #
 # class ActiveRestAfterTraining(ActiveRestBase, Modality):

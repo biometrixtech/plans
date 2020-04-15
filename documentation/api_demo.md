@@ -1,4 +1,4 @@
-# FathomAI - Mobility API (v 5.0.1 - Demo)
+# FathomAI - Mobility API (v 5.0.2 - Demo)
 
 ## Overview
 FathomAI provides this limited implementation of its Mobility API to demonstrate the core functionality to potential customers.
@@ -649,8 +649,8 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 
 * `name` __should__ be an identifying section name
 * `duration_seconds` __should__ be total time assigned or taken to complete the section
-* `start_date_time` __should__ reflect the start time of the workout section
-* `end_date_time` __should__ reflect the end time of the workout section
+* `start_date_time` is an __optional__ parameter and should reflect the start time of the workout section
+* `end_date_time` is an __optional__ parameter and should reflect the end time of the workout section
 * `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
 
 `exercise` __should__ be of the following schema:
@@ -774,8 +774,6 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 
 Exercises are assigned to each phase based on the needs of the athlete.  Each assigned exercise contains instructions that can be provided to end users.
 
-Each  __Assigned Exercise__ also includes one or more  __Exercise Dosage__, based on the goals that exercise may achieve.  Exercises that address more than one goal will likely have more than one __Exercise Dosage__ assigned.  Based on the needs of the athlete, each __Exercise Dosage__ may have different priorities and dosage durations.  This enables athletes and coaches to prioritize exercises when time is constrained. 
-
 * `assigned_exercise` will be of the following schema:
 
 ```
@@ -793,9 +791,15 @@ Each  __Assigned Exercise__ also includes one or more  __Exercise Dosage__, base
     "duration_efficient" : integer,
     "duration_complete" : integer,
     "duration_comprehensive" : integer,
+    "efficient_reps_assigned": integer,
+    "efficient_sets_assigned": integer,
+    "complete_reps_assigned": integer,
+    "complete_sets_assigned": integer,
+    "comprehensive_reps_assigned": integer,
+    "comprehensive_sets_assigned": integer,
+    "goals": [exercise_goal, exercise_goal],
     "goal_text" : string,
     "equipment_required" : [string, string],
-    "dosages" : [exercise_dosage, exercise_dosage]
 }
 ```
 
@@ -809,55 +813,31 @@ Each  __Assigned Exercise__ also includes one or more  __Exercise Dosage__, base
 * `seconds_per_set` used for estimating exercise dosage duration and indicates the number of seconds to complete one set
 * `unit_of_measure` will be the string representation of the Unit of Measure enumeration as defined in this Appendix (e.g. "seconds", "count", etc.). 
 * `position_order` can be used by the client to order exercises to the end user
-* `duration_efficient` provides the estimated duration of the exercise given the efficient dosage of the highest ranked goal
-* `duration_complete` provides the estimated duration of the exercise given the complete dosage of the highest ranked goal
-* `duration_comprehensive` provides the estimated duration of the exercise given the comprehensive dosage of the highest ranked goal
-* `goal_text` will typically be empty and is reserved for future use.
-* `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
-* `dosages` will be a list of  __Exercise Dosage__ objects of the schema defined in this Appendix.
-
-
-### Exercise Dosage
-
-`exercise_dosage` will be of the following schema:
-
-```
-{
-    "goal" : goal,
-    "priority" : string,
-    "efficient_reps_assigned" : integer,
-    "efficient_sets_assigned" : integer,
-    "complete_reps_assigned" : integer,
-    "complete_sets_assigned" : integer,
-    "comprehensive_reps_assigned" : integer,
-    "comprehensive_sets_assigned" : integer
-}
-```
-
-* `goal` will be a Goal as defined in this Appendix
-* `priority` is the normalized ranking of this  __Exercise Dosage__ across all  __Exercise Phase__ objects returned
+* `duration_efficient` provides the estimated duration of the exercise given the  __efficient__ dosage
+* `duration_complete` provides the estimated duration of the exercise given the  __complete__ dosage
+* `duration_comprehensive` provides the estimated duration of the exercise given the  __comprehensive__ dosage
 * `efficient_reps_assigned` the number of reps assigned of this exercise for the  __efficient__ dosage
 * `efficient_sets_assigned` the number of sets assigned of this exercise for the  __efficient__ dosage
 * `complete_reps_assigned` the number of reps assigned of this exercise for the  __complete__ dosage
 * `complete_sets_assigned` the number of sets assigned of this exercise for the  __complete__ dosage
 * `comprehensive_reps_assigned` the number of reps assigned of this exercise for the  __comprehensive__ dosage
 * `comprehensive_sets_assigned` the number sets reps assigned of this exercise for the  __comprehensive__ dosage
+* `goals` will be a list of `exercise_goal` items as defined in this Appendix
+* `goal_text` will typically be empty and is reserved for future use.
+* `equipment_required` is a list of equipment required for the exercise that can be displayed to the end user
 
-<div style="page-break-after: always;"></div>
-### Goal
+_Note: There is an option for a more detailed version of the  `assigned_exercise` object. Please refer to our expanded API documentation._
 
-* `goal` will have the following schema 
-
+### Exercise Goal
+* `exercise_goal` will have the following schema:
 ```
-{
-     "text" : string,
-     "goal_type" : integer
-           
-}
+    {
+        goal_text : priority
+    }
 ```
 
-* `text` will be the name of the goal that can be displayed to an end-user
-* `goal_type` will be an integer reflecting the Athlete Goal Type enumeration as defined in Appendix
+* `goal_text` will be name of the ActivityGoal that can be displayed to an end-user
+* `priority` is the normalized ranking of this Exercise Goal across all  __Exercise Phase__ objects returned
 
 <div style="page-break-after: always;"></div>
 
@@ -1066,5 +1046,5 @@ The following reportable body parts are considered muscles. Allowable Sides (0, 
     rotator_cuff = 119 {1, 2}
     serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: March 26, 2020
+###### Last Modified: April 13, 2020
 

@@ -12,6 +12,9 @@ from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
 from logic.activities_processing import ActivitiesProcessing
 from utils import parse_datetime, get_timezone
+from routes.environments import consolidated_dosage
+
+consolidated = consolidated_dosage()
 
 datastore_collection = DatastoreCollection()
 user_stats_datastore = datastore_collection.user_stats_datastore
@@ -76,7 +79,7 @@ def handle_movement_prep_create(user_id):
             activity_type='movement_prep'
     )
 
-    return {'movement_prep': movement_prep.json_serialise()}, 201
+    return {'movement_prep': movement_prep.json_serialise(api=True, consolidated=consolidated)}, 201
 
 
 @app.route('/<uuid:user_id>/<uuid:movement_prep_id>/start_activity', methods=['POST'])
@@ -140,7 +143,7 @@ def handle_movement_prep_get(user_id, movement_prep_id):
     if movement_prep.user_id != user_id:
         return {'message': 'user_id and movement_prep_id do not match'}, 404
 
-    return {'movement_prep': movement_prep.json_serialise()}
+    return {'movement_prep': movement_prep.json_serialise(api=True, consolidated=consolidated)}
 
 
 @xray_recorder.capture('routes.movement_prep.validate')

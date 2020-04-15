@@ -127,8 +127,9 @@ def test_historical_update_multiple_day_data():
                                         dates[2])
 
     active_rest = calc.get_pre_active_rest()[0]
-    assert len(active_rest.exercise_phases[0].exercises) > 0
+    assert len(active_rest.exercise_phases[1].exercises) > 0
     assert len(active_rest.exercise_phases[2].exercises) > 0
+    assert len(active_rest.exercise_phases[3].exercises) > 0
 
     # assert len(active_rest[0].inhibit_exercises) > 0
     # assert len(active_rest[0].active_stretch_exercises) > 0
