@@ -1154,7 +1154,7 @@
     "29": {
         "id": 29,
         "name": "deltoid",
-        "treatment_priority": 12,
+        "treatment_priority": 22,
         "inhibit": [
             "259"
         ],
