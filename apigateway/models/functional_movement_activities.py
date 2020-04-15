@@ -294,7 +294,7 @@ class Activity(object):
 
         efficient_duration = self.dosage_durations[self.efficient_winner].efficient_duration_min_rep_one_set
 
-        complete_duration = self.dosage_durations[self.complete_winner].efficient_duration_min_rep_one_set
+        complete_duration = self.dosage_durations[self.complete_winner].complete_duration_min_rep_one_set
 
         if complete_duration == 0 and self.default_plan == "Complete":
             self.reactivate_complete_goals()
