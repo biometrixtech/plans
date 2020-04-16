@@ -1555,6 +1555,9 @@ class ActiveRest(ActiveRestBase):
                          relative_load_level,
                          force_on_demand,
                          possible_benchmarks=36)
+        self.proposed_efficient_limit = 480
+        self.proposed_complete_limit = 900
+        self.proposed_comprehensive_limit = 2700
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.inhibit),
                                 ExercisePhase(ExercisePhaseType.static_stretch),
                                 ExercisePhase(ExercisePhaseType.isolated_activate),
@@ -1855,6 +1858,9 @@ class ActiveRecovery(Activity):
     def __init__(self, event_date_time):
         super().__init__(event_date_time, ActivityType.active_recovery, possible_benchmarks=3)
         self.exercise_phases = [ExercisePhase(ExercisePhaseType.dynamic_integrate)]
+        self.proposed_efficient_limit = 240
+        self.proposed_complete_limit = 360
+        self.proposed_comprehensive_limit = 600
         self.ranked_exercise_phases = {
                 'dynamic_integrate': 0
             }
