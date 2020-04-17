@@ -152,7 +152,7 @@
             },
             {
                 "priority": 3,
-                "joint_action": 4
+                "joint_action": 5
             }
         ],
         "trunk_joint_action": [],
@@ -273,7 +273,7 @@
             },
             {
                 "priority": 3,
-                "joint_action": 4
+                "joint_action": 5
             }
         ],
         "trunk_joint_action": [],
@@ -2539,7 +2539,7 @@
             },
             {
                 "priority": 3,
-                "joint_action": 4
+                "joint_action": 5
             }
         ],
         "trunk_joint_action": [],
@@ -2733,7 +2733,7 @@
             },
             {
                 "priority": 3,
-                "joint_action": 4
+                "joint_action": 5
             }
         ],
         "trunk_joint_action": [],

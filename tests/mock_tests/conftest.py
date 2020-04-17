@@ -9,5 +9,5 @@ def pytest_configure():
     os.environ['ENVIRONMENT'] = 'dev'
     Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
                                  'body_part_mapping_filename': 'body_part_mapping_fathom.json',
-                                 'movement_library_filename': 'movement_library_soflete.json',
+                                 'movement_library_filename': 'movement_library_demo.json',
                                  'cardio_data_filename': 'cardiorespiratory_data_soflete.json'})
