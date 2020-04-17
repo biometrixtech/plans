@@ -63,6 +63,7 @@ class StrengthEnduranceAction(Enum):
     double_leg = 8
     staggered_leg = 9
     split_leg = 10
+    single_leg = 11
 
 
 class BodyPosition(Enum):
@@ -84,7 +85,6 @@ class BodyPosition(Enum):
     non_stationary_other = 15
     two_arms = 16
     single_arm = 17
-    single_leg = 11
 
 
 class Equipment(Enum):
