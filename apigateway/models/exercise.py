@@ -179,11 +179,6 @@ class AssignedExercise(Serialisable):
             dosages = sorted(self.dosages, key=lambda x: (x.efficient_sets_assigned, x.efficient_reps_assigned), reverse=True)
 
             return self.duration(dosages[0].efficient_reps_assigned, dosages[0].efficient_sets_assigned)
-            # duration = 0
-            # for d in self.dosages:
-            #     duration += self.duration(d.efficient_reps_assigned, d.efficient_sets_assigned)
-            #
-            # return duration
         else:
             return 0
 
@@ -193,11 +188,6 @@ class AssignedExercise(Serialisable):
             dosages = sorted(self.dosages, key=lambda x: (x.complete_sets_assigned, x.complete_reps_assigned), reverse=True)
 
             return self.duration(dosages[0].complete_reps_assigned, dosages[0].complete_sets_assigned)
-            # duration = 0
-            # for d in self.dosages:
-            #     duration += self.duration(d.complete_reps_assigned, d.complete_sets_assigned)
-            #
-            # return duration
         else:
             return 0
 
@@ -207,11 +197,6 @@ class AssignedExercise(Serialisable):
             dosages = sorted(self.dosages, key=lambda x: (x.comprehensive_sets_assigned, x.comprehensive_reps_assigned), reverse=True)
 
             return self.duration(dosages[0].comprehensive_reps_assigned, dosages[0].comprehensive_sets_assigned)
-            # duration = 0
-            # for d in self.dosages:
-            #     duration += self.duration(d.comprehensive_reps_assigned, d.comprehensive_sets_assigned)
-            #
-            # return duration
         else:
             return 0
 
