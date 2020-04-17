@@ -1,4 +1,4 @@
-# FathomAI - Plans API (v 4.6.0)
+# FathomAI - Plans API (v 4.8.0)
 
 ## Common provisions
 
@@ -107,6 +107,8 @@ The following simple types __may__ be used in requests and responses:
 * `Datetime`: a `string` matching the regular expression `/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|+\d{2}:\d{2})/` and representing a date and time in full  [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
 
 <div style="page-break-after: always;"></div>
+
+
 ## Endpoints
 
 ### Daily Readiness
@@ -189,6 +191,8 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
@@ -202,6 +206,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 <div style="page-break-after: always;"></div>
+
+
 ### Session
 
 #### Create
@@ -229,6 +235,8 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `sessions_planned` __should__ represent whether the user plans to train again that day
 * `user_age` (Fathom Mobile App Only) is __optional__ and only provided if one of the sessions is obtained from a third party source and contains heart rate data
 <div style="page-break-after: always;"></div>
+
+
 * `session` __should__ be of the following schema
 ```
 {
@@ -246,9 +254,9 @@ The client __must__ submit a request body containing a JSON object having the fo
     "post_session_survey": {
                             "event_date": Datetime
                             "RPE": integer,
-                            "soreness": [sore_part, sore_part],
-                            "clear_candidates": [sore_part]}
+                            "soreness": [sore_part, sore_part]
                         },
+    "workout_program_module": workout_program_module
     "hr_data": [hr, hr, hr],
 }
 ```
@@ -264,6 +272,46 @@ The client __must__ submit a request body containing a JSON object having the fo
 * `ignored` __if present__, __should__ be true for short walking workouts.
 * `hr_data` __if present__, __should__ be the heart rate data associated with the third party workout. Each hr will have `startDate`, `endDate` and `value` _(only needed for third party workout)_
 * `description` is __optional__ parameter to provide short description of the session they're adding
+* `post_session_survey` __should__ follow requirements below
+* `workout_program_module` __if present__ __should__ provide details about the workout and follow the requirements defined below
+
+`post_session_survey` data elements
+
+* `event_date` __should__ be a Datetime and reflect the local date and time when the survey (associated with the workout) was completed
+* `RPE` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the session
+* `soreness` __should__ follow the same definition as in  _Daily Readiness_
+
+`workout_program_module` data elements
+
+* `provider_id` __should__ be an unique identifier for the partner
+* `program_id` __should__ be an identifier of the workout program
+* `program_module_id` __should__ be an identifier for the specific program module
+* `workout_sections` __should__ be a list of individual _workout_section_ elements contained within the module
+
+`workout_section` data elements
+
+* `name` __should__ be an identifying section name
+* `duration_seconds` __should__ be total time assigned or taken to complete the section
+* `difficulty` __should__ be the difficulty rating for the section
+* `intensity_pace` __should__ be the intensity rating for the section
+* `exercises` __should__ be a list of of all _exercise_ elements assigned within the section
+
+`exercise` data elements
+
+* `id` __should__ be provider's unique identifier for the exercise
+* `name` __should__ be the exercise name
+* `weight_measure` __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
+* `weight` __should__ represent the numeric value of the weight used according to the `weight_measure` attribute
+* `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
+* `side` __should__ represent the side (left or right) on which the exercise is performed if `bilateral` is false
+* `sets` __should__ be an integer representation of total sets of the exercise to be performed
+* `reps_per_set` __should__ be an integer representing of total reps of exercise to be performed per set
+* `unit_of_measure` __should__ be an enum representation of the unit the reps are measured in
+* `intensity_pace` __should__
+* `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
+* `rpe` __should__ be an integer between 1 and 10 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
+
+<div style="page-break-after: always;"></div>
 
 ```
 POST /plans/{version}/session/{User UUID} HTTP/1.1
@@ -297,7 +345,39 @@ Cache-Control: no-cache
                                             "RPE": 5,
                                             "soreness": [],
                                             "clear_candidates": []
-                                            }
+                                            },
+                    "workout_program_module": {
+                                            "provider_id": "test_id",
+                                            "program_id": "23G",
+                                            "program_module_id": "56",
+                                            "workout_sections": [{
+                                                "name": "Upper Body Work",
+                                                "duration_seconds": 360,
+                                                "workout_section_type": "1",
+                                                "difficulty": 5,
+                                                "intensity_pace": 5,
+                                                "exercises": [
+                                                    {
+                                                        "id": "1",
+                                                        "name": "Bent over Row",
+                                                        "weight_measure": 2,
+```
+```
+                                                        "weight_in_lbs": 150,
+                                                        "rep_max": null,
+                                                        "percent_bodyweight": null,
+                                                        "sets": 2,
+                                                        "reps_per_set": 10,
+                                                        "unit_of_measure": 1,
+                                                        "intensity_pace": 5,
+                                                        "movement_id": "",
+                                                        "bilateral": true,
+                                                        "side": 0,
+                                                        "rpe": 5
+                                                    }
+                                                    ]
+                                            }]
+                                        }
                     }
                     
                 ],
@@ -306,7 +386,6 @@ Cache-Control: no-cache
 }
 ```
 
-<div style="page-break-after: always;"></div>
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
@@ -320,6 +399,8 @@ Cache-Control: no-cache
 
 
 <div style="page-break-after: always;"></div>
+
+
 #### Mark no sessions planned
 
 This endpoint can be called to notify that no sessions are planned for the day.
@@ -362,6 +443,8 @@ Cache-Control: no-cache
 * `daily_plan` will have the same schema as defined in Get Daily Plan.
 
 <div style="page-break-after: always;"></div>
+
+
 #### Delete
 
 This endpoint can be called to delete existing externally regimented session from today or yesterday's plan.
@@ -404,9 +487,11 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 #### Update
 
-This endpoint can be called to update and combine a manually logged session with a third party workout session
+This endpoint can be called to update a session that was previously logged/planned
 
 ##### Query String
  
@@ -418,11 +503,14 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
+    "return_updated_plan": boolean,
+    "user_age": integer
     "sessions": [session],
-    "health_sync_date": Datetime
 }
 ```
 * `event_date` __should__ reflect the local date and time when the call is being made
+* `return_updated_plan` __should__ reflect whether an updated plan is expected
+* `user_age` __should__ reflect the user's age
 * `session` __should__ follow the same schema as defined in Create Session
 * `health_sync_date` (Fathom Mobile App only) __should__ reflect the time when the data was obtained from the third party source
 
@@ -468,6 +556,8 @@ Authorization: eyJraWQ...ajBc4VQ
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 #### Typical Sessions history
 
 This endpoint can be called to get typical sessions that the user logs
@@ -507,6 +597,8 @@ Authentication is required for this endpoint
 ```
 * `typical sessions` will be a list of sessions that the user has logged in the last 14 days
 <div style="page-break-after: always;"></div>
+
+
 * `session` object will be of the following schema
 
 ``` 
@@ -522,6 +614,8 @@ Authentication is required for this endpoint
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 ### Symptoms
 
 #### Submit
@@ -566,6 +660,8 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 ##### Response
  
  If the write was successful, the Service __will__ respond with HTTP Status `201 Created`, with a body having the following schema:
@@ -579,6 +675,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 <div style="page-break-after: always;"></div>
+
+
 ### Active Recovery
 
 #### Mark Started (Exercise Modalities)
@@ -595,11 +693,11 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
-    "recovery_type": string
+    "recovery_type": integer
 }
 ```
 * `event_date` __should__ be the time when user checks the first exercise for the session.
-* `recovery_type` __should__ be one of `pre_active_rest` or `post_active_rest`<!--  or `cool_down` -->
+* `recovery_type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix.
 
 ```
 POST /plans/{version}/active_recovery/{User UUID}/exercise_modalities HTTPS/1.1
@@ -608,7 +706,7 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "pre_active_rest"
+    "recovery_type": 0
 }
 ```
 ##### Response
@@ -622,6 +720,8 @@ If the write was successful, the Service __will__ respond with HTTP Status `200 
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 #### Mark Completed (Exercise Modalities)
 
 This endpoint can be called to mark the completion of exercise-based modalities.
@@ -636,12 +736,12 @@ The client __must__ submit a request body containing a JSON object having the fo
 ```
 {
     "event_date": Datetime,
-    "recovery_type": string
+    "recovery_type": integer
     "completed_exercises": [string]
 }
 ```
 * `event_date` __should__ be the time when user completes the session.
-* `recovery_type` __should__ be one of `pre_active_rest` or `post_active_rest`<!--  or `cool_down` -->
+* `recovery_type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix.
 * `completed_exercises` __should__ be a list representing the exercises that the user checked off
 
 ```
@@ -651,13 +751,13 @@ Content-Type: application/json
 Authorization: eyJraWQ...ajBc4VQ
 {
     "event_date": "2018-09-21T17:53:39Z",
-    "recovery_type": "post_active_rest",
+    "recovery_type": 1,
     "completed_exercises": ["3", "5", "20", "142"]
 }
 ```
 ##### Response
  
-If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body with following schema.
+ If the write was successful, the Service __will__ respond with HTTP Status `202 Accepted`, and return the daily_plan in the body having the following schema:
  
 ```
 {
@@ -772,6 +872,8 @@ Authorization: eyJraWQ...ajBc4VQ
 
 
 <div style="page-break-after: always;"></div>
+
+
 ### Daily Plan
 
 #### Get Daily Plan
@@ -804,6 +906,8 @@ Authorization: eyJraWQ...ajBc4VQ
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 ##### Response
  
 The Service __will__ respond with HTTP Status `200 OK`, with a body having the following schema:
@@ -847,15 +951,18 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "post_active_rest_completed": Boolean,
     "pre_active_rest_completed": Boolean,
     "sessions_planned": Boolean,
-    "train_later": Bolean
+    "train_later": Boolean
 }
 ``` -->
 ```
 {
     "date": Date,
     "day_of_week": integer,
-    "pre_active_rest": [PreActiveRest],
-    "completed_pre_active_rest": [PreActiveRest],
+    "modalities": [modality],
+    "completed_modalities": [modality],
+    "modalities_available_on_demand": [modality_display]
+    "pre_active_rest": [],
+    "completed_pre_active_rest": [],
     "heat": null,
     "completed_heat": [],
     "warm_up": [],
@@ -863,8 +970,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "training_sessions": [Session],
     "cool_down": [],
     "completed_cool_down": [],
-    "post_active_rest": [PostActiveRest],
-    "completed_post_active_rest": [PostActiveRest],
+    "post_active_rest": [],
+    "completed_post_active_rest": [],
     "ice": null,
     "completed_ice": [],
     "cold_water_immersion": null,
@@ -882,9 +989,11 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 }
 ```
 <div style="page-break-after: always;"></div>
+
+
 * Any of the `completed_*` attributes could be empty list
-* Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
-* `warm_up` and `cool_down` will always be empty list
+<!--* Any of the exercise modalities (`pre_active_rest`, `post_active_rest`, `warm_up` and `cool_down`) could be empty list
+* `warm_up` and `cool_down` will always be empty list-->
 * All of the body part modalities (`heat`, `ice`, `cold_water_immersion`) will be null
 <!-- * Any of the body part modalities (`heat`, `ice`, `cold_water_immersion`) could be null -->
 <!-- * `Heat` has following example schema
@@ -966,6 +1075,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 }
 
 ``` -->
+<!--
 * `PreActiveRest` has the following example schema
 ```
 {
@@ -1003,6 +1113,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "static_stretch_exercises": [AssignedExercise, AssignedExercise]
 }
 ```
+-->
 <!-- * `CoolDown` has the following example schema
 ```
 {
@@ -1019,7 +1130,55 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     "start_date_time": null
     }
 ``` -->
+* `modality` has the following example schema:
+
+```
+{
+    "id" : "ef1db466-4ccf-45cf-980a-2632a600e3ee",
+    "type" : 0,
+    "title" : "MOBILIZE",
+    "when" : "before training",
+    "when_card" : "before training",
+    "start_date_time" : null,
+    "completed_date_time" : null,
+    "event_date_time" : "2020-01-03T09:32:14Z",
+    "completed" : false,
+    "active" : false,
+    "default_plan" : "Complete",
+    "force_data" : false,
+    "goal_title" : "",
+    "display_image" : "inhibit",
+    "locked_text" : "Sorry, you missed the optimal window for Mobilize today.",
+    "goals" : {
+        "Recover from training" : {
+            "efficient_active" : true,
+            "complete_active" : true,
+            "comprehensive_active" : true
+        },
+        "Care for symptoms" : {
+            "efficient_active" : false,
+            "complete_active" : true,
+            "comprehensive_active" : true
+        }
+    },
+    "exercise_phases" : [ExercisePhase, ExercisePhase]
+}
+```
+* `type` __should__ be an integer reflecting Recovery Types enumeration as defined in Appendix
+* `ExercisePhase` has the following example schema:
+
+```
+{
+    "type" : 0,
+    "name" : "inhibit",
+    "title" : "FOAM ROLL",
+    "exercises" : [AssignedExercise, AssignedExercise]
+}
+```
+* `type` __should__ be an integer reflecting Exercise Phase Type enumeration as defined in Appendix
 <div style="page-break-after: always;"></div>
+
+
 * `AssignedExercise` has the following example schema
 
 ```
@@ -1071,6 +1230,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 ## Appendix
 
 ### Enumerations
@@ -1117,9 +1278,31 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
     user_health = 2
     three_sensor = 3
 ```
+<div style="page-break-after: always;"></div>
 
+
+#### Recovery Types
+``` 
+    pre_active_rest = 0
+    post_active_rest = 1
+    warm_up = 2
+    cool_down = 3
+    functional_strength = 4
+```
+
+#### Exercise Phase Type
+```
+    inhibit = 0
+    static_stretch = 1
+    active_stretch = 2
+    dynamic_stretch = 3
+    isolated_activate = 4
+    static_integrate = 5
+```
 
 <div style="page-break-after: always;"></div>
+
+
 #### All body parts
 
 ```
@@ -1217,6 +1400,7 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 
 <div style="page-break-after: always;"></div>
 
+
 #### SportName
 ```
     basketball = 0
@@ -1308,6 +1492,8 @@ The Service __will__ respond with HTTP Status `200 OK`, with a body having the f
 ```
 
 <div style="page-break-after: always;"></div>
+
+
 ### Body Part Types
 
 #### Joints
@@ -1347,5 +1533,5 @@ The following reportable body parts are considered muscles
     hip_flexor = 28
     deltoid = 29
 ```
-###### Last Modified: November 22, 2019
+###### Last Modified: February 20, 2020
 

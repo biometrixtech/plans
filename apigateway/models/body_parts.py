@@ -1,3 +1,4 @@
+import os, json
 from random import shuffle
 
 from models.exercise import AssignedExercise
@@ -5,8 +6,18 @@ from models.soreness_base import BodyPartLocation, BodyPartSide
 from models.sport import SportName
 import random
 
+from fathomapi.api.config import Config
+
+file_name = Config.get('PROVIDER_INFO')['body_part_mapping_filename']
+script_dir = os.path.dirname(__file__)
+file_path = os.path.join(script_dir, file_name)
+with open(file_path, 'r') as f:
+    print('reading body part mapping json')
+    body_part_mapping = json.load(f)
 
 class BodyPartFactory(object):
+    def __init__(self, mapped_body_parts=None):
+        self.mapped_body_parts = mapped_body_parts or {}
 
     def is_joint(self, body_part):
 
@@ -43,7 +54,7 @@ class BodyPartFactory(object):
 
         location = self.get_body_part_location(body_part)
         muscle_groups = BodyPartLocation.muscle_groups()
-        if location in muscle_groups.keys():  # is a muscle group
+        if location in muscle_groups:  # is a muscle group
             return True
         else:
             for key, value in muscle_groups.items():
@@ -62,6 +73,28 @@ class BodyPartFactory(object):
         elif isinstance(body_part, BodyPartLocation):
             location = body_part
         return location
+
+    def get_body_part_side_list(self, body_part_enum):
+
+        body_part_side_list = []
+
+        body_part_factory = BodyPartFactory()
+        #body_part = body_part_factory.get_body_part(BodyPart(BodyPartLocation(body_part_enum), None))
+        bilateral = body_part_factory.get_bilateral(BodyPartLocation(body_part_enum))
+
+        # if bilateral:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), side)
+        # else:
+        #     body_part_side = BodyPartSide(BodyPartLocation(p), 0)
+        if not bilateral:
+            sides = [0]
+        else:
+            sides = [1, 2]
+        for side in sides:
+            body_part_side = BodyPartSide(BodyPartLocation(body_part_enum), side=side)
+            body_part_side_list.append(body_part_side)
+
+        return body_part_side_list
 
     def get_progression_list(self, exercise):
 
@@ -95,19 +128,26 @@ class BodyPartFactory(object):
         else:
             return []
 
-    def get_exercise_dictionary(self, exercise_list):
+    def get_exercise_dictionary(self, exercise_list, sample=1):
 
         exercise_dict = {}
 
         # pick on exercise from the list:
         if len(exercise_list) > 0:
-            position = random.randint(0, len(exercise_list) - 1)
+            if sample < len(exercise_list):
+                sampled_list = random.sample(exercise_list, sample)
+            else:
+                sampled_list = exercise_list
+            for e in sampled_list:
+                if isinstance(e, int):
+                    e = str(e)
+                exercise_dict[e] = []
+            # position = random.randint(0, len(exercise_list) - 1)
+            # # ignoring progressions for now
+            # #for e in exercise_list:
+            # #    exercise_dict[e] = self.get_progression_list(e)
 
-            # ignoring progressions for now
-            #for e in exercise_list:
-            #    exercise_dict[e] = self.get_progression_list(e)
-
-            exercise_dict[exercise_list[position]] = []
+            # exercise_dict[exercise_list[position]] = []
 
         return exercise_dict
 
@@ -176,81 +216,19 @@ class BodyPartFactory(object):
         else:
             return self.get_body_part(BodyPart(BodyPartLocation.full_body, None))
 
-    def get_body_part(self, body_part, sample=True):
-
+    def get_body_part(self, body_part, sample=True, use_cache=False):
         location = self.get_body_part_location(body_part)
-
-        if location == BodyPartLocation.general:
-            return self.get_general(sample)
-        elif location == BodyPartLocation.abdominals:
-            return self.get_abdominals(sample)
-        elif location == BodyPartLocation.achilles:
-            return self.get_achilles(sample)
-        elif location == BodyPartLocation.ankle:
-            return self.get_ankle(sample)
-        elif location == BodyPartLocation.biceps:
-            return self.get_biceps(sample)
-        elif location == BodyPartLocation.calves:
-            return self.get_calves(sample)
-        elif location == BodyPartLocation.chest:
-            return self.get_chest(sample)
-        elif location == BodyPartLocation.core_stabilizers:
-            return self.get_core_stabilizers(sample)
-        elif location == BodyPartLocation.elbow:
-            return self.get_elbow(sample)
-        elif location == BodyPartLocation.erector_spinae:
-            return self.get_erector_spinae(sample)
-        elif location == BodyPartLocation.foot:
-            return self.get_foot(sample)
-        elif location == BodyPartLocation.forearm:
-            return self.get_forearm(sample)
-        elif location == BodyPartLocation.glutes:
-            return self.get_glutes(sample)
-        elif location == BodyPartLocation.groin:
-            return self.get_groin(sample)
-        elif location == BodyPartLocation.hamstrings:
-            return self.get_hamstrings(sample)
-        elif location == BodyPartLocation.hip:
-            return self.get_hip(sample)
-        elif location == BodyPartLocation.hip_flexor:
-            return self.get_hip_flexor(sample)
-        elif location == BodyPartLocation.deep_rotators_hip:
-            return self.get_deep_rotators_hip()
-        elif location == BodyPartLocation.knee:
-            return self.get_knee(sample)
-        elif location == BodyPartLocation.lats:
-            return self.get_lats(sample)
-        elif location == BodyPartLocation.lower_back:
-            return self.get_lower_back(sample)
-        elif location == BodyPartLocation.obliques:
-            return self.get_obliques(sample)
-        elif location == BodyPartLocation.it_band:
-            return self.get_outer_thigh(sample)
-        elif location == BodyPartLocation.it_band_lateral_knee:
-            return self.get_outer_knee(sample)
-        elif location == BodyPartLocation.quads:
-            return self.get_quads(sample)
-        elif location == BodyPartLocation.shin:
-            return self.get_shin(sample)
-        elif location == BodyPartLocation.triceps:
-            return self.get_triceps(sample)
-        elif location == BodyPartLocation.shoulder:
-            return self.get_shoulder(sample)
-        elif location == BodyPartLocation.deltoid:
-            return self.get_deltoid(sample)
-        elif location == BodyPartLocation.upper_back_neck:
-            return self.get_upper_back_traps_neck(sample)
-        elif location == BodyPartLocation.wrist:
-            return self.get_wrist(sample)
-
-        elif location == BodyPartLocation.lower_body:
-            return self.get_lower_body()
-        elif location == BodyPartLocation.upper_body:
-            return self.get_upper_body()
-        elif location == BodyPartLocation.full_body:
-            return self.get_full_body()
-
-        else:
+        try:
+            if use_cache:
+                if location in self.mapped_body_parts:
+                    return self.mapped_body_parts[location]
+                else:
+                    body_part_mapping = self.get_part_mapping_from_json(sample, location)
+                    self.mapped_body_parts[location] = body_part_mapping
+                    return body_part_mapping
+            else:
+                return self.get_part_mapping_from_json(sample, location)
+        except KeyError:
             return self.get_base_body_part(location)
 
     def get_bilateral(self, body_part_location):
@@ -287,7 +265,56 @@ class BodyPartFactory(object):
 
         return primary_body_part
 
-    def get_general(self, sample = True):
+    def get_part_mapping_from_json(self, sample, body_part_location):
+        try:
+            part_json = body_part_mapping[str(body_part_location.value)]
+        except KeyError:
+            raise KeyError(f"{body_part_location.name} not present in mapping" )
+
+        part = BodyPart(body_part_location, part_json['treatment_priority'])
+        part.bilateral = self.get_bilateral(part.location)
+
+        if body_part_location in [BodyPartLocation.full_body, BodyPartLocation.upper_body, body_part_location.lower_body]:
+            # these three body parts always sample (either 1 or 4(full_dict)
+            inhibit = {}
+            static_stretch = {}
+            active_stretch = {}
+            dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'])  # sample 4
+            isolated_activate = {}
+            static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])  # sample 1
+            dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'])  # sample 4
+            dynamic_integrate_2 = {}
+            dynamic_integrate_with_speed = {}
+
+        else:
+            if sample:
+                inhibit = self.get_exercise_dictionary(part_json['inhibit'])
+                static_stretch = self.get_exercise_dictionary(part_json['static_lengthen'])
+                active_stretch = self.get_exercise_dictionary(part_json['active_lengthen'])
+                dynamic_stretch = self.get_exercise_dictionary(part_json['dynamic_lengthen'])
+                isolated_activate = self.get_exercise_dictionary(part_json['isolated_activate'])
+                static_integrate = self.get_exercise_dictionary(part_json['static_integrate'])
+                dynamic_integrate = self.get_exercise_dictionary(part_json['dynamic_integrate'])
+                dynamic_integrate_2 = self.get_exercise_dictionary(part_json['dynamic_integrate'], sample=2)
+                dynamic_integrate_with_speed = self.get_exercise_dictionary(part_json['dynamic_integrate_with_speed'])
+            else:
+                inhibit = self.get_full_exercise_dictionary(part_json['inhibit'], False)
+                static_stretch = self.get_full_exercise_dictionary(part_json['static_lengthen'], False)
+                active_stretch = self.get_full_exercise_dictionary(part_json['active_lengthen'], False)
+                dynamic_stretch = self.get_full_exercise_dictionary(part_json['dynamic_lengthen'], False)
+                isolated_activate = self.get_full_exercise_dictionary(part_json['isolated_activate'], False)
+                static_integrate = self.get_full_exercise_dictionary(part_json['static_integrate'], False)
+                dynamic_integrate = self.get_full_exercise_dictionary(part_json['dynamic_integrate'], False)
+                dynamic_integrate_2 = self.get_exercise_dictionary(part_json['dynamic_integrate'], False)
+                dynamic_integrate_with_speed = self.get_full_exercise_dictionary(part_json['dynamic_integrate_with_speed'], False)
+
+        part.add_extended_exercise_phases(inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activate, static_integrate)
+        part.add_dynamic_exercise_phases({}, dynamic_integrate, dynamic_integrate_with_speed, dynamic_integrate_2)  # dynamic_stretch is already added above
+
+        part.add_muscle_groups(part_json['agonists'], part_json['synergists'], part_json['stabilizers'], part_json['antagonists'])
+        return part
+
+    def get_general(self, sample=True):
 
         #############
         # WARNING: If you change anything here ALSO change full body
@@ -321,7 +348,7 @@ class BodyPartFactory(object):
 
         upper_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        upper_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         upper_body.add_muscle_groups([1, 18], [2], [], [21, 18])
         return upper_body
@@ -338,7 +365,7 @@ class BodyPartFactory(object):
 
         lower_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        lower_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         lower_body.add_muscle_groups([16, 15], [5, 11], [], [14])
 
@@ -358,7 +385,7 @@ class BodyPartFactory(object):
 
         full_body.add_extended_exercise_phases({}, {}, {}, {}, {}, static_integrate)
 
-        full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed)
+        full_body.add_dynamic_exercise_phases(dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, {})
 
         full_body.add_muscle_groups([12, 6, 4], [5, 15], [21, 11], [25, 14])
 
@@ -753,7 +780,7 @@ class BodyPartFactory(object):
 
     def get_lats(self, sample=True):
 
-        part = BodyPart(BodyPartLocation.lats, 15)
+        part = BodyPart(BodyPartLocation.latissmus_dorsi, 15)
 
         if sample:
             inhibit = self.get_exercise_dictionary([55])
@@ -798,7 +825,7 @@ class BodyPartFactory(object):
 
     def get_obliques(self, sample=True):
 
-        part = BodyPart(BodyPartLocation.abdominals, 4)
+        part = BodyPart(BodyPartLocation.obliques, 4)
         part.bilateral = self.get_bilateral(part.location)
 
         if sample:
@@ -969,7 +996,7 @@ class BodyPartFactory(object):
     def get_upper_back_traps_neck(self, sample=True):
 
         part = BodyPart(BodyPartLocation.upper_back_neck, 13)
-        part.bilateral = part.bilateral = self.get_bilateral(part.location)
+        part.bilateral = self.get_bilateral(part.location)
 
         if sample:
             inhibit = self.get_exercise_dictionary([102, 125, 126])
@@ -1030,6 +1057,7 @@ class BodyPart(object):
         self.isolated_activate_exercises = []
         self.static_integrate_exercises = []
         self.dynamic_integrate_exercises = []
+        self.dynamic_integrate_2_exercises = []
         self.dynamic_stretch_integrate_exercises = []
         self.dynamic_integrate_with_speed_exercises = []
 
@@ -1055,7 +1083,7 @@ class BodyPart(object):
 
         priority = 1
 
-        keys = list(exercise_dict.keys())
+        keys = list(exercise_dict)
 
         if randomize:
             shuffle(keys)
@@ -1086,10 +1114,11 @@ class BodyPart(object):
         self.activate_exercises = self.add_exercises(self.activate_exercises, activate,
                                                      self.treatment_priority, randomize)
 
-    def add_dynamic_exercise_phases(self, dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed):
+    def add_dynamic_exercise_phases(self, dynamic_stretch, dynamic_integrate, dynamic_integrate_with_speed, dynamic_integrate_2):
 
         self.dynamic_stretch_exercises = self.add_exercises(self.dynamic_stretch_exercises, dynamic_stretch, self.treatment_priority, False)
         self.dynamic_integrate_exercises = self.add_exercises(self.dynamic_integrate_exercises, dynamic_integrate, self.treatment_priority, False)
+        self.dynamic_integrate_2_exercises = self.add_exercises(self.dynamic_integrate_2_exercises, dynamic_integrate_2, self.treatment_priority, False)
         self.dynamic_integrate_with_speed_exercises = self.add_exercises(self.dynamic_integrate_with_speed_exercises, dynamic_integrate_with_speed, self.treatment_priority, False)
 
     def add_extended_exercise_phases(self, inhibit, static_stretch, active_stretch, dynamic_stretch, isolated_activation, static_integrate, randomize=False):

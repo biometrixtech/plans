@@ -1,19 +1,14 @@
-# import datetime
-
 from fathomapi.utils.xray import xray_recorder
 from logic.functional_trend_processing import TrendProcessor
 from logic.soreness_processing import SorenessCalculator
-# from logic.trigger_processing import TriggerFactory
 
 from logic.injury_risk_processing import InjuryRiskProcessor
-from logic.functional_exercise_mapping import ExerciseAssignmentCalculator
+from logic.exercise_assignment import ExerciseAssignment
 from models.daily_plan import DailyPlan
 from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
-# from models.functional_movement_stats import FunctionalMovementSummary
-from models.functional_movement_modalities import ModalityType, CoolDown, FunctionalStrength
+from models.functional_movement_modalities import ModalityType
 from utils import format_date, parse_datetime, parse_date, format_datetime
-# from models.body_parts import BodyPartFactory
 import copy
 
 
@@ -35,10 +30,13 @@ class TrainingPlanManager(object):
         self.longitudinal_alerts = []
         self.soreness_list = []
         self.symptoms = []
+        self.active_training_sessions = []
+        self.exercise_assignment = None
 
     def load_data(self, event_date):
         daily_plans = self.daily_plan_datastore.get(self.athlete_id, event_date, event_date)
         plan_today = [plan for plan in daily_plans if plan.event_date == event_date]
+
         if len(plan_today) == 0:
             self.daily_plan = DailyPlan(event_date)
             self.daily_plan.user_id = self.athlete_id
@@ -54,6 +52,10 @@ class TrainingPlanManager(object):
         for c in plan_today:
             self.training_sessions.extend(c.training_sessions)
             self.symptoms.extend(c.symptoms)
+
+        self.training_sessions.sort(key=lambda x: x.completed_date_time, reverse=True)  # now we can always grab the 0 element
+
+        # self.active_training_sessions = [session for session in self.training_sessions]
 
     @staticmethod
     def preserve_completed_modality(modalities):
@@ -78,19 +80,44 @@ class TrainingPlanManager(object):
         # only retain not-completed
         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
 
+    def set_active_sessions(self, active_sessions):
+
+        self.active_training_sessions = active_sessions
+        self.set_exercise_assignment_session_info()
+
+    def set_exercise_assignment_session_info(self):
+
+        self.exercise_assignment.sport_cardio_plyometrics = self.check_cardio_sport()
+        self.exercise_assignment.sport_body_parts = self.get_sport_body_parts()
+        self.exercise_assignment.high_intensity_session = self.is_high_intensity_session()
+
+    def is_high_intensity_session(self):
+        for session in self.active_training_sessions:
+            if session.ultra_high_intensity_session() and session.high_intensity_RPE():
+                return True
+        return False
+
+    def get_sport_body_parts(self):
+        sport_body_parts = {}
+        for session in self.active_training_sessions:
+            sport_body_parts.update(session.get_load_body_parts())
+        return sport_body_parts
+
+    def check_cardio_sport(self):
+        sport_cardio_plyometrics = False
+        for session in self.active_training_sessions:
+            if session.is_cardio_plyometrics():
+                sport_cardio_plyometrics = True
+        return sport_cardio_plyometrics
+
     @xray_recorder.capture('logic.TrainingPlanManager.create_daily_plan')
-    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True):
+    def create_daily_plan(self, event_date, last_updated, athlete_stats=None, force_data=False, mobilize_only=False, visualizations=True, force_on_demand=False, log_symptoms=False):
         self.athlete_stats = athlete_stats
         self.trigger_date_time = parse_datetime(last_updated)
         self.load_data(event_date)
+
         date = parse_date(event_date)
 
-        # historic_soreness_present = False
-        # if self.athlete_stats is None:
-        #     historic_soreness = []
-        # else:
-        #     historic_soreness = copy.deepcopy([hs for hs in self.athlete_stats.historic_soreness if not hs.is_dormant_cleared()])
-        #     historic_soreness_present = len(historic_soreness) > 0
         historic_soreness = []
 
         self.soreness_list = SorenessCalculator().get_soreness_summary_from_surveys(self.readiness_surveys,
@@ -99,52 +126,7 @@ class TrainingPlanManager(object):
                                                                                     historic_soreness,
                                                                                     self.symptoms)
 
-        # trigger_factory = TriggerFactory(parse_date(event_date), self.athlete_stats, self.soreness_list, self.training_sessions)
-        # trigger_factory.load_triggers()
-        # self.athlete_stats.triggers = trigger_factory.triggers
         historical_injury_risk_dict = self.injury_risk_datastore.get(self.athlete_id)
-
-        # relative_load_level = 3
-        # two_days_ago = (parse_date(event_date) - datetime.timedelta(days=1)).date()
-        #
-        # # check workload for relative load level
-        # if len(athlete_stats.high_relative_load_sessions) > 0:
-        #
-        #     max_percent = 49.9
-        #
-        #     relevant_high_load_sessions = [s for s in athlete_stats.high_relative_load_sessions if s.date.date()
-        #                                    >= two_days_ago]
-        #     if len(relevant_high_load_sessions) > 0:
-        #
-        #         for r in relevant_high_load_sessions:
-        #             if r.percent_of_max is not None:
-        #                 max_percent = max(r.percent_of_max, max_percent)
-        #
-        #     if max_percent >= 75.0:
-        #         relative_load_level = 1
-        #     elif max_percent >= 50.0:
-        #         relative_load_level = 2
-        #
-        #  # check RPE for relative load level
-        # # Low
-        # # RPE <= 1 and self.ultra_high_intensity_session
-        # # RPE <= 3 and not self.ultra_high_intensity_session():
-        # # Mod
-        # # RPE >= 3 and self.ultra_high_intensity_session
-        # # RPE >= 5 and not self.ultra_high_intensity_session():
-        # # High
-        # # RPE >= 5 and self.ultra_high_intensity_session
-        # # RPE >= 7 and not self.ultra_high_intensity_session():
-        # relevant_training_sessions = [s for s in self.daily_plan.training_sessions if s.event_date.date()
-        #                                    >= two_days_ago]
-        #
-        # for r in relevant_training_sessions:
-        #     high_intensity_session = r.ultra_high_intensity_session()
-        #     if r.session_RPE is not None:
-        #         if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
-        #             relative_load_level = 1
-        #         elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
-        #             relative_load_level = 2
 
         injury_risk_processor = InjuryRiskProcessor(date, self.soreness_list, self.daily_plan.training_sessions,
                                                     historical_injury_risk_dict, self.athlete_stats,
@@ -153,148 +135,109 @@ class TrainingPlanManager(object):
 
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
 
-        # body_part_factory = BodyPartFactory()
-        #
-        # for body_part_side, body_part_injury_risk in aggregated_injury_risk_dict.items():
-        #     body_part = body_part_factory.get_body_part(body_part_side)
-        #     if body_part not in consolidated_injury_risk_dict:
-        #         consolidated_injury_risk_dict[body_part] = copy.deepcopy(body_part_injury_risk)
-        #     else:
-        #         consolidated_injury_risk_dict[body_part].merge(copy.deepcopy(body_part_injury_risk))
-
-        # save this for later
-        #
-        # detailed_dict = injury_risk_processor.injury_risk_dict
-        #
-        # functional_movement_stats = {}
-        #
-        # for body_part_side, body_part_inury_risk in detailed_dict.items():
-        #     functional_movement_stats[body_part_side] = FunctionalMovementSummary()
-        #
-        # for body_part_side, body_part_inury_risk in detailed_dict.items():
-        #     today_volume_today = detailed_dict[body_part_side].total_volume_today()
-        #     if today_volume_today > 0:
-        #         functional_movement_stats[body_part_side].percent_total_volume_compensating = detailed_dict[body_part_side].compensating_volume_today() / today_volume_today
-        #     eccentric_volume_today = detailed_dict[body_part_side].eccentric_volume_today()
-        #     if eccentric_volume_today > 0:
-        #         functional_movement_stats[body_part_side].percent_eccentric_volume_compensating = detailed_dict[
-        #                                                                                           body_part_side].compensating_volume_today() / eccentric_volume_today
-        #     for c in detailed_dict[body_part_side].compensating_causes_volume_today:
-        #         functional_movement_stats[c].caused_compensation_count += 1
-        #
-        # percent_total_compensating_list = sorted(functional_movement_stats.items(), key=lambda x:x[1].percent_total_volume_compensating, reverse=True)
-        # percent_eccentric_compensating_list = sorted(functional_movement_stats.items(), key=lambda x:x[1].percent_eccentric_volume_compensating, reverse=True)
-        # compensation_count = sorted(functional_movement_stats.items(),
-        #                                              key=lambda x: x[1].caused_compensation_count,
-        #                                              reverse=True)
-        # compensation_count_eccentric = sorted(functional_movement_stats.items(),
-        #                             key=lambda x: (x[1].caused_compensation_count, x[1].percent_eccentric_volume_compensating),
-        #                             reverse=True)
-        #
-        # body_part_ranking = sorted(functional_movement_stats.items(),
-        #                             key=lambda x: (x[0].body_part_location.value,x[0].side),
-        #                             reverse=False)
-
         if visualizations:
-                trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date),
-                                                 athlete_trend_categories=self.athlete_stats.trend_categories,
-                                                 athlete_insight_categories=self.athlete_stats.insight_categories)
-                trend_processor.process_triggers()
-                self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
-                self.athlete_stats.insight_categories = trend_processor.athlete_insight_categories
+            trend_processor = TrendProcessor(aggregated_injury_risk_dict, parse_date(event_date),
+                                             athlete_trend_categories=self.athlete_stats.trend_categories,
+                                             athlete_insight_categories=self.athlete_stats.insight_categories)
+            trend_processor.process_triggers()
+            self.athlete_stats.trend_categories = trend_processor.athlete_trend_categories
+            self.athlete_stats.insight_categories = trend_processor.athlete_insight_categories
 
         modality_date_time = self.trigger_date_time or date
-        calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
-                                            modality_date_time, injury_risk_processor.relative_load_level)
+        self.exercise_assignment = ExerciseAssignment(consolidated_injury_risk_dict, self.exercise_library_datastore,
+                                                      self.completed_exercise_datastore,
+                                                      modality_date_time, injury_risk_processor.relative_load_level)
 
         # new modalities
         self.move_completed_modalities()
-        if not self.daily_plan.train_later:
-            if mobilize_only:
-                # if any completed post_active rest exists, preserve it
-                # for post_active_rest in self.daily_plan.post_active_rest:
-                #     if post_active_rest.completed:
-                #         self.daily_plan.completed_post_active_rest.append(post_active_rest)
-                # create a new post active rest
-                # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
 
-                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
-                post_active_rests = calc.get_post_active_rest(force_data)
-                self.daily_plan.modalities.extend(post_active_rests)
+        if not log_symptoms:
+            if not self.daily_plan.train_later:
+                if len(self.daily_plan.training_sessions) > 0:
+                    self.set_active_sessions([self.training_sessions[0]])
+
+                    responsive_recovery, ice, cold_water_immersion = self.exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, force_data, force_on_demand)
+
+                    if len(responsive_recovery) > 0:
+                        # get rid of both possible active recovery and active rest modalities
+                        # and go with whatever is responsive to last session
+                        self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                                      m.type.value not in [ModalityType.active_recovery.value,
+                                                                           ModalityType.post_active_rest.value]]
+
+                    self.daily_plan.ice = ice
+                    self.daily_plan.cold_water_immersion = cold_water_immersion
+                    self.daily_plan.modalities.extend(responsive_recovery)
+
+                else:
+                    self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+                    active_rests = self.exercise_assignment.get_active_rest(force_data, force_on_demand)
+                    self.daily_plan.modalities.extend(active_rests)
             else:
-                # if any completed post-training modalities exist, preserve them
-                # for post_active_rest in self.daily_plan.post_active_rest:
-                #     if post_active_rest.completed:
-                #         self.daily_plan.completed_post_active_rest.append(post_active_rest)
-                # TODO: revert
-                # if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
-                #     self.daily_plan.completed_ice.append(self.daily_plan.ice)
-                # if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
-                #     self.daily_plan.completed_cold_water_immersion.append(self.daily_plan.cold_water_immersion)
 
-                # make pre-training modalities inactive
-                # if self.daily_plan.heat is not None:
-                #     self.daily_plan.heat.active = False
-                pre_active_rests = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.pre_active_rest.value]
-                for pre_active_rest in pre_active_rests:
-                    pre_active_rest.active = False
+                if len(self.daily_plan.training_sessions) > 0:
+                    self.set_active_sessions([self.training_sessions[0]])
 
-                # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.cool_down.value]
-                # cool_down = calc.get_cool_down()
-                # self.daily_plan.modalities.extend(cool_down)
+                    responsive_recovery = self.exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, force_data, force_on_demand, ice_cwi=False)[0]
 
-                # remove existing post active rest
-                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
-                # create new post active rest
-                post_active_rests = calc.get_post_active_rest(force_data)
-                self.daily_plan.modalities.extend(post_active_rests)
+                    if len(responsive_recovery) > 0:
+                        # get rid of both possible active recovery and active rest modalities
+                        # and go with whatever is responsive to last session
+                        self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                                      m.type.value not in [ModalityType.active_recovery.value,
+                                                                           ModalityType.post_active_rest.value]]
 
-                # self.daily_plan.post_active_rest = calc.get_post_active_rest(force_data)
-                # self.daily_plan.ice = calc.get_ice()
-                # self.daily_plan.cold_water_immersion = calc.get_cold_water_immersion()
-                # if self.daily_plan.cold_water_immersion is not None:
-                #     self.daily_plan.ice = calc.adjust_ice_session(self.daily_plan.ice, self.daily_plan.cold_water_immersion)
+                    # don't assign ice or cwi if they are training later
+                    self.daily_plan.ice = None
+                    self.daily_plan.cold_water_immersion = None
+                    self.daily_plan.modalities.extend(responsive_recovery)
+
+                else:
+
+                    # remove existing movement preps
+                    self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.movement_integration_prep.value]
+                    movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
+                    self.daily_plan.modalities.extend(movement_preps)
         else:
-            if mobilize_only:
-                # if any completed pre active rest is present, preserve it
-                # for pre_active_rest in self.daily_plan.pre_active_rest:
-                #     if pre_active_rest.completed:
-                #         self.daily_plan.completed_pre_active_rest.append(pre_active_rest)
-                # create new pre active rest
-                # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
-                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
-                pre_active_rests = calc.get_pre_active_rest(force_data)
-                self.daily_plan.modalities.extend(pre_active_rests)
 
-            else:
-                # if any post-training modalities are present and complete, preserve the completed ones
-                # self.daily_plan.post_active_rest = self.preserve_completed_modality(self.daily_plan.post_active_rest)
-                # self.daily_plan.ice = self.preserve_completed_modality(self.daily_plan.ice)
-                # self.daily_plan.cold_water_immersion = self.preserve_completed_modality(self.daily_plan.cold_water_immersion)
+            # replace any existing uncompleted active rests so we can add a new, updated one
+            self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                          m.type.value != ModalityType.post_active_rest.value]
+            active_rests = self.exercise_assignment.get_active_rest(force_data, force_on_demand)
+            self.daily_plan.modalities.extend(active_rests)
 
-                # if any completed pre-training modalities exist, preserve them
-                # if self.daily_plan.heat is not None and self.daily_plan.heat.completed:
-                #     self.daily_plan.completed_heat.append(self.daily_plan.heat)
+            # update any existing movement preps
+            movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value]
 
-                # remove existing post-training modalities rest
-                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+            if len(movement_preps) > 0:
+                # remove existing movement preps
+                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                              m.type.value != ModalityType.movement_integration_prep.value]
+                movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
+                self.daily_plan.modalities.extend(movement_preps)
 
+            # update any active recovery in place:
+            active_recoveries = [m for m in self.daily_plan.modalities if
+                                 m.type.value == ModalityType.active_recovery.value]
 
-                # create new pre-training modalities
-                # remove existing pre_active rest
-                self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.pre_active_rest.value]
-                # get new pre active rest
-                pre_active_rests = calc.get_pre_active_rest(force_data)
-                self.daily_plan.modalities.extend(pre_active_rests)
+            if len(active_recoveries) > 0:
+                source_session_id = active_recoveries[0].source_training_session_id
 
-                # remove existing warm_up
-                # self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.warm_up.value]
-                # get new warm_up
-                # warm_up = calc.get_warm_up()
-                # self.daily_plan.modalities.extend(warm_up)
+                source_sessions = [t for t in self.training_sessions if t.id == source_session_id]
 
-                # self.daily_plan.heat = calc.get_heat()
-                # self.daily_plan.pre_active_rest = calc.get_pre_active_rest(force_data)
+                if len(source_sessions) > 0:
+                    self.set_active_sessions([source_sessions[0]])
+
+                    responsive_recovery = self.exercise_assignment.get_responsive_recovery_modality(source_session_id, force_data, force_on_demand,
+                                                                                                    ice_cwi=False)[0]
+
+                    if len(responsive_recovery) > 0:
+                        # if we get any responsive recovery and if it's active_recovery, replace it
+                        # If it's active rest, ignore it as it's already added earlier
+                        if responsive_recovery[0].type.value == ModalityType.active_recovery.value:
+                            self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
+                                                          m.type.value != ModalityType.active_recovery.value]
+                            self.daily_plan.modalities.append(responsive_recovery[0])
 
         self.daily_plan.last_updated = last_updated
         self.daily_plan.define_available_modalities()
@@ -323,22 +266,24 @@ class TrainingPlanManager(object):
                                                     self.athlete_id)
         consolidated_injury_risk_dict = injury_risk_processor.get_consolidated_dict()
         injury_risk_processor.set_relative_load_level(event_date.date())
-        calc = ExerciseAssignmentCalculator(consolidated_injury_risk_dict, self.exercise_library_datastore, self.completed_exercise_datastore,
-                                            event_date, injury_risk_processor.relative_load_level)
+        exercise_assignment = ExerciseAssignment(consolidated_injury_risk_dict, self.exercise_library_datastore,
+                                                 self.completed_exercise_datastore,
+                                                 event_date, injury_risk_processor.relative_load_level)
 
         self.move_completed_modalities()
 
         modality_type = ModalityType(modality_type)
-        if modality_type == ModalityType.pre_active_rest:
-            new_modality = calc.get_pre_active_rest(force_data)
-        elif modality_type == ModalityType.post_active_rest:
-            new_modality = calc.get_post_active_rest(force_data)
-        elif modality_type == ModalityType.warm_up:
-            new_modality = calc.get_warm_up()
-        elif modality_type == ModalityType.cool_down:
-            new_modality = calc.get_cool_down()
-        elif modality_type == ModalityType.functional_strength:
-            new_modality = calc.get_functional_strength()
+        if modality_type == ModalityType.pre_active_rest or modality_type == ModalityType.post_active_rest:
+            new_modality = exercise_assignment.get_active_rest()
+        # elif modality_type == ModalityType.warm_up:
+        #     new_modality = calc.get_warm_up()
+        elif modality_type == ModalityType.cool_down or modality_type == ModalityType.active_recovery:
+            self.set_active_sessions([self.training_sessions[0]])
+            new_modality = exercise_assignment.get_responsive_recovery_modality(self.training_sessions[0].id, ice_cwi=False)[0]
+        # elif modality_type == ModalityType.functional_strength:
+        #     new_modality = calc.get_functional_strength()
+        elif modality_type == ModalityType.movement_integration_prep:
+            new_modality = exercise_assignment.get_movement_integration_prep()
         else:
             new_modality = None
 

@@ -23,7 +23,7 @@ USERS_API_VERSION = os.environ['USERS_API_VERSION']
 
 @app.route('/<uuid:user_id>/clear_user_data', methods=['POST'])
 @require.body({'event_date': str})
-@require.authenticated.any
+@require.authenticated.self
 @xray_recorder.capture('routes.misc.clearuser')
 def handle_clear_user_data(user_id=None):
     # users_service = Service('users', '2_0')
@@ -134,7 +134,7 @@ def handle_data_migration():
 
 
 @app.route('/<uuid:user_id>/app_logs', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @xray_recorder.capture('routes.misc.app_logs')
 def handle_app_open_tracking(user_id=None):
     event_date = request.json['event_date']
@@ -236,7 +236,7 @@ def update_dates(daily_plans, athlete_stats, event_date):
 @xray_recorder.capture('routes.misc.dailycron')
 def handle_dailycron():
     # This route will be called daily via a CloudWatch Scheduled Event.
-    Service('plans', Config.get('API_VERSION')).call_apigateway_sync('POST', 'misc/activeusers', body={})
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', 'misc/activeusers', body={})
 
     return {'status': 'Success'}, 200
 

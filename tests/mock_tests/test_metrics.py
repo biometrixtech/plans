@@ -125,7 +125,7 @@ def test_populate_thresholds_athlete_daily_soreness_thresh_mod_diff():
     soreness1.pain = True
     soreness1.streak = 2
     soreness1.side = 1
-    soreness1.body_part = BodyPart(BodyPartLocation.lats, None)
+    soreness1.body_part = BodyPart(BodyPartLocation.latissmus_dorsi, None)
 
     soreness2 = Soreness()
     soreness2.severity = 4

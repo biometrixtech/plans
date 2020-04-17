@@ -19,7 +19,7 @@ from config import get_mongo_collection
 from logic.survey_processing import SurveyProcessing, create_session, update_session, create_plan, cleanup_plan
 from logic.athlete_status_processing import AthleteStatusProcessing
 # from logic.session_processing import merge_sessions
-from models.functional_movement import MovementPatterns
+from models.movement_patterns import MovementPatterns
 
 datastore_collection = DatastoreCollection()
 athlete_stats_datastore = datastore_collection.athlete_stats_datastore
@@ -31,7 +31,7 @@ app = Blueprint('session', __name__)
 
 
 @app.route('/<uuid:user_id>/', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str, 'sessions': list})
 @xray_recorder.capture('routes.session.create')
 def handle_session_create(user_id=None):
@@ -172,7 +172,7 @@ def handle_session_create(user_id=None):
 
 
 @app.route('/<uuid:user_id>/<uuid:session_id>', methods=['DELETE'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str, 'session_type': int})
 @xray_recorder.capture('routes.session.delete')
 def handle_session_delete(session_id, user_id=None):
@@ -197,20 +197,28 @@ def handle_session_delete(session_id, user_id=None):
 
 
 @app.route('/<uuid:user_id>/<uuid:session_id>', methods=['PATCH'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.session.update')
 def handle_session_update(session_id, user_id=None):
     #user_id = principal_id
     event_date = parse_datetime(request.json['event_date'])
     plan_event_date = format_date(event_date)
+    return_updated_plan = request.json.get('return_updated_plan', False)
+    if not isinstance(return_updated_plan, bool):
+        return_updated_plan = False
 
     # create session
     survey_processor = SurveyProcessing(user_id,
                                         event_date,
                                         datastore_collection=datastore_collection)
+    survey_processor.user_age = request.json.get('user_age')
+
     session = request.json['sessions'][0]
 
+    if 'hr_data' in session and len(session['hr_data']) > 0:
+        if request.json.get('user_age') is None:
+            raise InvalidSchemaException("Cannot process heart rate data without also providing user age")
 
     # get existing session
     if not _check_plan_exists(user_id, plan_event_date):
@@ -221,15 +229,23 @@ def handle_session_update(session_id, user_id=None):
                                         session_id=session_id
                                         )[0]
     # update existing session with new data
-    if session_obj.source == SessionSource.user:
+    if session_obj.source != SessionSource.three_sensor:
         survey_processor.create_session_from_survey(session)
         new_session = survey_processor.sessions[0]
         session_obj.event_date = new_session.event_date
         session_obj.end_date = new_session.end_date
-        session_obj.duration_health = new_session.duration_health
-        session_obj.calories = new_session.calories
-        session_obj.distance = new_session.distance
-        session_obj.source = SessionSource.user_health
+        session_obj.duration_health = new_session.duration_health if new_session.duration_health is not None else session_obj.duration_health
+        session_obj.calories = new_session.calories if new_session.calories is not None else session_obj.calories
+        session_obj.distance = new_session.distance if new_session.distance is not None else session_obj.distance
+        session_obj.sport_name = new_session.sport_name if new_session.sport_name is not None else session_obj.sport_name
+        session_obj.description = new_session.description if new_session.description != '' else session_obj.description
+        session_obj.duration_minutes = new_session.duration_minutes if new_session.duration_minutes is not None else session_obj.duration_minutes
+        session_obj.deleted = new_session.deleted if new_session.deleted != session_obj.deleted else session_obj.deleted
+        session_obj.ignored = new_session.ignored if new_session.ignored != session_obj.ignored else session_obj.ignored
+        session_obj.source = new_session.source if new_session.source != session_obj.source else session_obj.source
+        session_obj.workout_program_module = new_session.workout_program_module if new_session.workout_program_module is not None else session_obj.workout_program_module
+        session_obj.post_session_survey = new_session.post_session_survey if new_session.post_session_survey is not None else session_obj.post_session_survey
+        session_obj.session_RPE = new_session.session_RPE if new_session.session_RPE != session_obj.session_RPE else session_obj.session_RPE
         session_datastore.update(session_obj,
                                  user_id=user_id,
                                  event_date=plan_event_date
@@ -242,10 +258,24 @@ def handle_session_update(session_id, user_id=None):
                 Service('users', os.environ['USERS_API_VERSION']).call_apigateway_async(method='PATCH',
                                                                                         endpoint=f"user/{user_id}",
                                                                                         body={"health_sync_date": request.json['health_sync_date']})
+        if not return_updated_plan:
+            return {'message': 'success'}, 200
+        else:
+            athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
+            visualizations = is_fathom_environment()
+            hist_update = False
+            if athlete_stats.api_version in [None, '4_4', '4_5']:
+                hist_update = True
+            plan = create_plan(user_id,
+                               event_date,
+                               athlete_stats=athlete_stats,
+                               datastore_collection=datastore_collection,
+                               visualizations=visualizations,
+                               hist_update=hist_update)
 
-        return {'message': 'success'}, 200
+            return {'daily_plans': [plan]}, 200
 
-    elif session_obj.source == SessionSource.three_sensor:
+    else: #session_obj.source == SessionSource.three_sensor:
         athlete_stats = athlete_stats_datastore.get(athlete_id=user_id)
         timezone = get_timezone(event_date)
         if athlete_stats is None:
@@ -279,11 +309,11 @@ def handle_session_update(session_id, user_id=None):
 
         return {'daily_plans': [plan]}, 200
 
-    return {'message': 'success'}, 200
+    #return {'message': 'success'}, 200
 
 
 @app.route('/<uuid:user_id>/sensor_data', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'last_sensor_sync': str, 'sessions': list})
 @xray_recorder.capture('routes.session.add_sensor_data')
 def handle_session_sensor_data(user_id=None):
@@ -432,7 +462,7 @@ def handle_session_three_sensor_data(user_id):
 
 
 @app.route('/<uuid:user_id>/typical', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.typical_sessions')
 def handle_get_typical_sessions(user_id=None):
@@ -445,7 +475,7 @@ def handle_get_typical_sessions(user_id=None):
 
 
 @app.route('/<uuid:user_id>/no_sessions', methods=['POST'])
-@require.authenticated.any
+@require.authenticated.self
 @require.body({'event_date': str})
 @xray_recorder.capture('routes.no_sessions_planned')
 def handle_no_sessions_planned(user_id=None):

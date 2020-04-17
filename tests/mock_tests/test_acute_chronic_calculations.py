@@ -1,7 +1,6 @@
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-
+# from aws_xray_sdk.core import xray_recorder
+# xray_recorder.configure(sampling=False)
+# xray_recorder.begin_segment(name="test")
 from datetime import datetime, timedelta
 from models.daily_plan import DailyPlan
 from models.session import SportTrainingSession

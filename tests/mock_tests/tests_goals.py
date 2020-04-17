@@ -1,7 +1,3 @@
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-
 from models.exercise import AssignedExercise
 from models.goal import AthleteGoalType, AthleteGoal
 from models.dosage import ExerciseDosage

@@ -1,8 +1,6 @@
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-import os
-os.environ['ENVIRONMENT'] = 'dev'
+# from aws_xray_sdk.core import xray_recorder
+# xray_recorder.configure(sampling=False)
+# xray_recorder.begin_segment(name="test")
 import datetime
 from logic.survey_processing import SurveyProcessing, force_datetime_iso, cleanup_sleep_data_from_api, cleanup_hr_data_from_api, create_session
 from models.soreness import Soreness

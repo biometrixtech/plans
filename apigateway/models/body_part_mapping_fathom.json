@@ -1,0 +1,1412 @@
+{
+    "13": {
+        "id": 13,
+        "name": "general",
+        "treatment_priority": 31,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [],
+        "isolated_activate": [],
+        "static_integrate": [
+            "14",
+            "15",
+            "231"
+        ],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            12,
+            6,
+            4
+        ],
+        "synergists": [
+            5,
+            15
+        ],
+        "stabilizers": [
+            21,
+            11
+        ],
+        "antagonists": [
+            25,
+            14
+        ]
+    },
+    "3": {
+        "id": 3,
+        "name": "abdominals",
+        "treatment_priority": 6,
+        "inhibit": [
+            "54"
+        ],
+        "static_lengthen": [
+            "98"
+        ],
+        "active_lengthen": [
+            "265"
+        ],
+        "dynamic_lengthen": [
+            "140",
+            "165",
+            "178",
+            "180"
+        ],
+        "isolated_activate": [
+            "50",
+            "79",
+            "84",
+            "234"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            3
+        ],
+        "synergists": [
+            4
+        ],
+        "stabilizers": [
+            12,
+            5
+        ],
+        "antagonists": [
+            18,
+            25
+        ]
+    },
+    "17": {
+        "id": 17,
+        "name": "achilles",
+        "treatment_priority": 25,
+        "inhibit": [
+            "2"
+        ],
+        "static_lengthen": [
+            "7",
+            "26"
+        ],
+        "active_lengthen": [
+            "267",
+            "268"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "31",
+            "67",
+            "68",
+            "78"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            16
+        ],
+        "synergists": [
+            10
+        ],
+        "stabilizers": [
+            15
+        ],
+        "antagonists": [
+            8
+        ]
+    },
+    "9": {
+        "id": 9,
+        "name": "ankle",
+        "treatment_priority": 19,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [],
+        "isolated_activate": [],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            16
+        ],
+        "synergists": [
+            15
+        ],
+        "stabilizers": [
+            10
+        ],
+        "antagonists": [
+            8
+        ]
+    },
+    "22": {
+        "id": 22,
+        "name": "biceps",
+        "treatment_priority": 26,
+        "inhibit": [
+            "243",
+            "244"
+        ],
+        "static_lengthen": [
+            "246"
+        ],
+        "active_lengthen": [
+            "264"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "249",
+            "250"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            22
+        ],
+        "synergists": [
+            1
+        ],
+        "stabilizers": [],
+        "antagonists": [
+            23
+        ]
+    },
+    "16": {
+        "id": 16,
+        "name": "calves",
+        "treatment_priority": 17,
+        "inhibit": [
+            "2",
+            "71"
+        ],
+        "static_lengthen": [
+            "7",
+            "26",
+            "214",
+            "215",
+            "216",
+            "219"
+        ],
+        "active_lengthen": [
+            "267",
+            "268",
+            "270",
+            "271"
+        ],
+        "dynamic_lengthen": [
+            "139",
+            "140",
+            "161",
+            "164",
+            "165",
+            "177"
+        ],
+        "isolated_activate": [
+            "31",
+            "67",
+            "68",
+            "78"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "145",
+            "146",
+            "150",
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            16
+        ],
+        "synergists": [
+            11
+        ],
+        "stabilizers": [
+            8
+        ],
+        "antagonists": [
+            8,
+            10
+        ]
+    },
+    "2": {
+        "id": 2,
+        "name": "chest",
+        "treatment_priority": 23,
+        "inhibit": [
+            "260"
+        ],
+        "static_lengthen": [
+            "98",
+            "238",
+            "246"
+        ],
+        "active_lengthen": [
+            "276"
+        ],
+        "dynamic_lengthen": [
+            "140",
+            "165",
+            "180",
+            "181"
+        ],
+        "isolated_activate": [
+            "201"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            2
+        ],
+        "synergists": [
+            1,
+            21
+        ],
+        "stabilizers": [
+            2
+        ],
+        "antagonists": [
+            18
+        ]
+    },
+    "25": {
+        "id": 25,
+        "name": "core_stabilizers",
+        "treatment_priority": 8,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "50",
+            "79",
+            "84",
+            "234"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [],
+        "synergists": [],
+        "stabilizers": [],
+        "antagonists": []
+    },
+    "19": {
+        "id": 19,
+        "name": "elbow",
+        "treatment_priority": 28,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [],
+        "isolated_activate": [],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            22,
+            23
+        ],
+        "synergists": [
+            1
+        ],
+        "stabilizers": [
+            24
+        ],
+        "antagonists": [
+            22,
+            23
+        ]
+    },
+    "26": {
+        "id": 26,
+        "name": "erector_spinae",
+        "treatment_priority": 7,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [],
+        "isolated_activate": [],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [],
+        "synergists": [],
+        "stabilizers": [],
+        "antagonists": []
+    },
+    "10": {
+        "id": 10,
+        "name": "foot",
+        "treatment_priority": 24,
+        "inhibit": [
+            "74"
+        ],
+        "static_lengthen": [
+            "59",
+            "60"
+        ],
+        "active_lengthen": [
+            "269"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "53",
+            "63",
+            "64",
+            "66",
+            "106",
+            "114"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            10
+        ],
+        "synergists": [
+            16
+        ],
+        "stabilizers": [
+            8
+        ],
+        "antagonists": []
+    },
+    "24": {
+        "id": 24,
+        "name": "forearm",
+        "treatment_priority": 30,
+        "inhibit": [
+            "245"
+        ],
+        "static_lengthen": [
+            "247",
+            "248"
+        ],
+        "active_lengthen": [
+            "261",
+            "262"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "253",
+            "254",
+            "255"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            24
+        ],
+        "synergists": [
+            22,
+            23
+        ],
+        "stabilizers": [
+            1
+        ],
+        "antagonists": [
+            24
+        ]
+    },
+    "14": {
+        "id": 14,
+        "name": "glutes",
+        "treatment_priority": 5,
+        "inhibit": [
+            "44"
+        ],
+        "static_lengthen": [
+            "46",
+            "56",
+            "221",
+            "222",
+            "223",
+            "225"
+        ],
+        "active_lengthen": [
+            "272",
+            "273",
+            "274"
+        ],
+        "dynamic_lengthen": [
+            "139",
+            "140",
+            "144",
+            "149",
+            "161",
+            "164",
+            "165",
+            "177"
+        ],
+        "isolated_activate": [
+            "10",
+            "53",
+            "63",
+            "64",
+            "81",
+            "119",
+            "226",
+            "230",
+            "232",
+            "233"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "145",
+            "146",
+            "148",
+            "150",
+            "162",
+            "204"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            14
+        ],
+        "synergists": [
+            6,
+            15,
+            12
+        ],
+        "stabilizers": [
+            11
+        ],
+        "antagonists": [
+            4,
+            5
+        ]
+    },
+    "5": {
+        "id": 5,
+        "name": "groin",
+        "treatment_priority": 14,
+        "inhibit": [
+            "1"
+        ],
+        "static_lengthen": [
+            "8"
+        ],
+        "active_lengthen": [
+            "122"
+        ],
+        "dynamic_lengthen": [
+            "149",
+            "163",
+            "179",
+            "180"
+        ],
+        "isolated_activate": [
+            "226",
+            "227",
+            "232"
+        ],
+        "static_integrate": [
+            "142",
+            "143"
+        ],
+        "dynamic_integrate": [
+            "148"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            5
+        ],
+        "synergists": [
+            4
+        ],
+        "stabilizers": [
+            3,
+            6
+        ],
+        "antagonists": [
+            14
+        ]
+    },
+    "15": {
+        "id": 15,
+        "name": "hamstrings",
+        "treatment_priority": 11,
+        "inhibit": [
+            "3"
+        ],
+        "static_lengthen": [
+            "9",
+            "121",
+            "215",
+            "216",
+            "218",
+            "219"
+        ],
+        "active_lengthen": [
+            "271"
+        ],
+        "dynamic_lengthen": [
+            "139",
+            "144",
+            "161",
+            "177"
+        ],
+        "isolated_activate": [
+            "230"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "145",
+            "146",
+            "150",
+            "162",
+            "204"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            15
+        ],
+        "synergists": [
+            16,
+            14
+        ],
+        "stabilizers": [
+            11,
+            12
+        ],
+        "antagonists": [
+            6
+        ]
+    },
+    "4": {
+        "id": 4,
+        "name": "hip",
+        "treatment_priority": 2,
+        "inhibit": [
+            "54"
+        ],
+        "static_lengthen": [
+            "6",
+            "28",
+            "49",
+            "217",
+            "224"
+        ],
+        "active_lengthen": [
+            "277"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "228",
+            "229",
+            "232",
+            "236"
+        ],
+        "static_integrate": [
+            "142",
+            "143"
+        ],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            4
+        ],
+        "synergists": [
+            15,
+            6
+        ],
+        "stabilizers": [
+            5,
+            11
+        ],
+        "antagonists": [
+            14
+        ]
+    },
+    "28": {
+        "id": 28,
+        "name": "hip_flexor",
+        "treatment_priority": 3,
+        "inhibit": [
+            "54"
+        ],
+        "static_lengthen": [
+            "6",
+            "28",
+            "49",
+            "217",
+            "224"
+        ],
+        "active_lengthen": [
+            "277"
+        ],
+        "dynamic_lengthen": [
+            "140",
+            "147",
+            "149",
+            "161",
+            "164",
+            "165",
+            "176",
+            "178",
+            "179"
+        ],
+        "isolated_activate": [
+            "228",
+            "229",
+            "232",
+            "236"
+        ],
+        "static_integrate": [
+            "142",
+            "143"
+        ],
+        "dynamic_integrate": [
+            "148",
+            "151",
+            "203",
+            "204"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            4
+        ],
+        "synergists": [
+            15,
+            6
+        ],
+        "stabilizers": [
+            5,
+            11
+        ],
+        "antagonists": [
+            14
+        ]
+    },
+    "30": {
+        "id": 30,
+        "name": "deep_rotators_hip",
+        "treatment_priority": 4,
+        "inhibit": [
+            "54"
+        ],
+        "static_lengthen": [
+            "6",
+            "28",
+            "49",
+            "217",
+            "224"
+        ],
+        "active_lengthen": [
+            "277"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "228",
+            "229",
+            "232",
+            "236"
+        ],
+        "static_integrate": [
+            "142",
+            "143"
+        ],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            4
+        ],
+        "synergists": [
+            15,
+            6
+        ],
+        "stabilizers": [
+            5,
+            11
+        ],
+        "antagonists": [
+            14
+        ]
+    },
+    "7": {
+        "id": 7,
+        "name": "knee",
+        "treatment_priority": 16,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [],
+        "isolated_activate": [],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            15
+        ],
+        "synergists": [
+            16,
+            4
+        ],
+        "stabilizers": [
+            11,
+            8
+        ],
+        "antagonists": [
+            6
+        ]
+    },
+    "21": {
+        "id": 21,
+        "name": "lats",
+        "treatment_priority": 9,
+        "inhibit": [
+            "55"
+        ],
+        "static_lengthen": [
+            "57",
+            "103",
+            "104"
+        ],
+        "active_lengthen": [
+            "263"
+        ],
+        "dynamic_lengthen": [
+            "140",
+            "165",
+            "180",
+            "181"
+        ],
+        "isolated_activate": [
+            "239",
+            "241"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            21
+        ],
+        "synergists": [
+            3,
+            18
+        ],
+        "stabilizers": [
+            12,
+            2
+        ],
+        "antagonists": [
+            1,
+            22
+        ]
+    },
+    "12": {
+        "id": 12,
+        "name": "lower_back",
+        "treatment_priority": 1,
+        "inhibit": [
+            "44"
+        ],
+        "static_lengthen": [
+            "56",
+            "103",
+            "104"
+        ],
+        "active_lengthen": [
+            "266"
+        ],
+        "dynamic_lengthen": [
+            "139",
+            "144",
+            "181"
+        ],
+        "isolated_activate": [
+            "51",
+            "79"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            12
+        ],
+        "synergists": [
+            21,
+            6
+        ],
+        "stabilizers": [
+            11,
+            5
+        ],
+        "antagonists": [
+            3,
+            14
+        ]
+    },
+    "31": {
+        "id": 31,
+        "name": "obliques",
+        "treatment_priority": 10,
+        "inhibit": [
+            "54"
+        ],
+        "static_lengthen": [
+            "98"
+        ],
+        "active_lengthen": [
+            "265"
+        ],
+        "dynamic_lengthen": [
+            "149",
+            "164",
+            "181"
+        ],
+        "isolated_activate": [
+            "50",
+            "79",
+            "84",
+            "234"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            3
+        ],
+        "synergists": [
+            4
+        ],
+        "stabilizers": [
+            12,
+            5
+        ],
+        "antagonists": [
+            18,
+            25
+        ]
+    },
+    "11": {
+        "id": 11,
+        "name": "it_band",
+        "treatment_priority": 13,
+        "inhibit": [
+            "4"
+        ],
+        "static_lengthen": [
+            "46",
+            "56",
+            "224",
+            "225"
+        ],
+        "active_lengthen": [
+            "272",
+            "273",
+            "274"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "226",
+            "227",
+            "228",
+            "232",
+            "236"
+        ],
+        "static_integrate": [
+            "142",
+            "143"
+        ],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            11
+        ],
+        "synergists": [
+            6,
+            4
+        ],
+        "stabilizers": [
+            15
+        ],
+        "antagonists": [
+            5,
+            14
+        ]
+    },
+    "27": {
+        "id": 27,
+        "name": "it_band_lateral_knee",
+        "treatment_priority": 12,
+        "inhibit": [
+            "4"
+        ],
+        "static_lengthen": [
+            "46",
+            "56",
+            "224",
+            "225"
+        ],
+        "active_lengthen": [
+            "272",
+            "273",
+            "274"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "226",
+            "227",
+            "228",
+            "232",
+            "236"
+        ],
+        "static_integrate": [
+            "142",
+            "143"
+        ],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            11
+        ],
+        "synergists": [
+            6,
+            4
+        ],
+        "stabilizers": [
+            15
+        ],
+        "antagonists": [
+            5,
+            14
+        ]
+    },
+    "6": {
+        "id": 6,
+        "name": "quads",
+        "treatment_priority": 15,
+        "inhibit": [
+            "48"
+        ],
+        "static_lengthen": [
+            "118"
+        ],
+        "active_lengthen": [
+            "275"
+        ],
+        "dynamic_lengthen": [
+            "140",
+            "147",
+            "161",
+            "164",
+            "165",
+            "176",
+            "178"
+        ],
+        "isolated_activate": [
+            "10",
+            "119",
+            "234"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "145",
+            "146",
+            "150",
+            "151",
+            "162",
+            "203",
+            "204"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            6
+        ],
+        "synergists": [
+            11,
+            5
+        ],
+        "stabilizers": [
+            4,
+            14
+        ],
+        "antagonists": [
+            15
+        ]
+    },
+    "8": {
+        "id": 8,
+        "name": "shin",
+        "treatment_priority": 18,
+        "inhibit": [
+            "72",
+            "73"
+        ],
+        "static_lengthen": [
+            "60"
+        ],
+        "active_lengthen": [
+            "269"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "29",
+            "64",
+            "65",
+            "75"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            8
+        ],
+        "synergists": [
+            6
+        ],
+        "stabilizers": [
+            5,
+            11
+        ],
+        "antagonists": [
+            16,
+            10
+        ]
+    },
+    "23": {
+        "id": 23,
+        "name": "triceps",
+        "treatment_priority": 27,
+        "inhibit": [
+            "258"
+        ],
+        "static_lengthen": [
+            "57",
+            "103",
+            "104"
+        ],
+        "active_lengthen": [
+            "263"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "199"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            23
+        ],
+        "synergists": [
+            1
+        ],
+        "stabilizers": [],
+        "antagonists": [
+            22
+        ]
+    },
+    "1": {
+        "id": 1,
+        "name": "shoulder",
+        "treatment_priority": 21,
+        "inhibit": [
+            "259"
+        ],
+        "static_lengthen": [
+            "130",
+            "215",
+            "246"
+        ],
+        "active_lengthen": [
+            "276"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "135",
+            "136",
+            "137",
+            "239",
+            "241",
+            "242"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            1
+        ],
+        "synergists": [
+            21
+        ],
+        "stabilizers": [
+            22
+        ],
+        "antagonists": [
+            2,
+            18
+        ]
+    },
+    "29": {
+        "id": 29,
+        "name": "deltoid",
+        "treatment_priority": 22,
+        "inhibit": [
+            "259"
+        ],
+        "static_lengthen": [
+            "130",
+            "215",
+            "246"
+        ],
+        "active_lengthen": [
+            "276"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "135",
+            "136",
+            "137",
+            "239",
+            "241",
+            "242"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            1
+        ],
+        "synergists": [
+            21
+        ],
+        "stabilizers": [
+            22
+        ],
+        "antagonists": [
+            2,
+            18
+        ]
+    },
+    "18": {
+        "id": 18,
+        "name": "upper_back_neck",
+        "treatment_priority": 20,
+        "inhibit": [
+            "102",
+            "125",
+            "126"
+        ],
+        "static_lengthen": [
+            "103",
+            "104",
+            "127",
+            "128",
+            "129",
+            "215",
+            "246"
+        ],
+        "active_lengthen": [
+            "131",
+            "132",
+            "133"
+        ],
+        "dynamic_lengthen": [],
+        "isolated_activate": [
+            "51",
+            "134",
+            "135",
+            "136",
+            "137",
+            "242"
+        ],
+        "static_integrate": [],
+        "dynamic_integrate": [
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            18
+        ],
+        "synergists": [
+            2
+        ],
+        "stabilizers": [
+            12,
+            21
+        ],
+        "antagonists": [
+            1
+        ]
+    },
+    "20": {
+        "id": 20,
+        "name": "wrist",
+        "treatment_priority": 29,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [],
+        "isolated_activate": [],
+        "static_integrate": [],
+        "dynamic_integrate": [],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            24
+        ],
+        "synergists": [
+            22,
+            23
+        ],
+        "stabilizers": [],
+        "antagonists": []
+    },
+    "92": {
+        "id": 92,
+        "name": "lower_body",
+        "treatment_priority": 32,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [
+            "139",
+            "140",
+            "144",
+            "147",
+            "149",
+            "161",
+            "163",
+            "164",
+            "165",
+            "176"
+        ],
+        "isolated_activate": [],
+        "static_integrate": [
+            "14",
+            "15",
+            "142",
+            "143",
+            "182"
+        ],
+        "dynamic_integrate": [
+            "145",
+            "146",
+            "148",
+            "150",
+            "151",
+            "203",
+            "204"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            16,
+            15
+        ],
+        "synergists": [
+            5,
+            11
+        ],
+        "stabilizers": [],
+        "antagonists": [
+            14
+        ]
+    },
+    "91": {
+        "id": 91,
+        "name": "upper_body",
+        "treatment_priority": 33,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [
+            "149",
+            "164",
+            "165",
+            "179",
+            "180",
+            "181"
+        ],
+        "isolated_activate": [],
+        "static_integrate": [
+            "240"
+        ],
+        "dynamic_integrate": [
+            "145",
+            "148",
+            "162"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            1,
+            18
+        ],
+        "synergists": [
+            2
+        ],
+        "stabilizers": [],
+        "antagonists": [
+            21,
+            18
+        ]
+    },
+    "93": {
+        "id": 93,
+        "name": "full_body",
+        "treatment_priority": 31,
+        "inhibit": [],
+        "static_lengthen": [],
+        "active_lengthen": [],
+        "dynamic_lengthen": [
+            "139",
+            "140",
+            "144",
+            "149",
+            "164",
+            "165",
+            "177",
+            "178",
+            "179",
+            "180"
+        ],
+        "isolated_activate": [],
+        "static_integrate": [
+            "14",
+            "15",
+            "231"
+        ],
+        "dynamic_integrate": [
+            "145",
+            "146",
+            "148",
+            "150",
+            "151",
+            "162",
+            "203",
+            "204"
+        ],
+        "dynamic_integrate_with_speed": [],
+        "agonists": [
+            12,
+            6,
+            4
+        ],
+        "synergists": [
+            5,
+            15
+        ],
+        "stabilizers": [
+            21,
+            11
+        ],
+        "antagonists": [
+            25,
+            14
+        ]
+    }
+}

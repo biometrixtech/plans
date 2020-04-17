@@ -1,7 +1,3 @@
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-
 from models.daily_plan import DailyPlan
 from models.session import SportTrainingSession, SessionType
 from models.post_session_survey import PostSurvey, PostSessionSurvey

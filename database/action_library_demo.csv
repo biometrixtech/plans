@@ -1,0 +1,95 @@
+Define categories for actions to align with adaptation types and similar functional movements,,Define candidate action's applicability to movement,,,,,,,,How to Apply Weight,,,,,,,,,,,,,,Primary Joint Actions: selecting muscles to apply primary load type - dependent on adaptation type power/maxstrength/endstrength,,,,,,,,,,,,
+id,component_actions,compound_action_name,action_name,Rep_Conversion,example,example_urls,Categorization,categorization,,training_type,eligible_external_resistance,stance_lower_body,stance_upper_body,lateral_distribution_pattern,arm,torso,leg,percent_bodyweight,lateral_distribution,apply_resistance,relative_explosiveness,apply_instability,,muscle_action,hip_joint_priority,hip_joint_action,knee_joint_priority,knee_joint_action,ankle_joint_priority,ankle_joint_action,trunk_joint_priority,trunk_joint_action,shoulder_scapula_joint_priority,shoulder_scapula_joint_action,elbow_joint_priority,elbow_joint_action
+,,Cardio - Gait Types,,,,,cardio_action,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,Bipedal,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+0_a,,ruck,Propulsion,,,,ruck,,,strength_cardiorespiratory,"ruck, sandbag",single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,no_speed,TRUE,,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+0_b,,,Loading,,,,ruck,,,strength_cardiorespiratory,"ruck, sandbag",single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,no_speed,TRUE,,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+0_c,,,Swing,,,,ruck,,,strength_cardiorespiratory,,single_leg,,unilateral_alternating,0,0,1,20.37,"100, 0",FALSE,no_speed,FALSE,,concentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+1_a,,run,Propulsion,,,,run,,,strength_cardiorespiratory,,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,no_speed,TRUE,,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+1_b,,,Loading,,,,run,,,strength_cardiorespiratory,,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,no_speed,TRUE,,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+1_c,,,Swing,,,,run,,,strength_cardiorespiratory,,single_leg,,unilateral_alternating,0,0,1,20.37,"100, 0",FALSE,no_speed,TRUE,,concentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+2_a,,sprint,Propulsion,,,,sprint,,,strength_cardiorespiratory,sled,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,low_force,TRUE,,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+2_b,,,Loading,,,,sprint,,,strength_cardiorespiratory,,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,no_speed,TRUE,,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+2_c,,,Swing,,,,sprint,,,strength_cardiorespiratory,,single_leg,,unilateral_alternating,0,0,1,20.37,"100, 0",FALSE,no_speed,FALSE,,concentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,,Cycling ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+100_a,,Cycling not clipped in,power phase,,,,cycle,,,strength_cardiorespiratory,"machine resistence, elevation, wind",single_leg,,unilateral_alternating,0,0,1,20.37,"100, 0",TRUE,no_speed,TRUE,,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+100_b,,,recovery phase,,,,cycle,,,strength_cardiorespiratory,,single_leg,,unilateral_alternating,0,0,1,20.37,"100, 0",FALSE,no_speed,FALSE,,concentric,1,hip flexion,1,knee flexion,3,ankle dorsiflexion,,,,,,
+,,Misc Equipment,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+200_a,,row,power phase,,,,row,,,strength_cardiorespiratory,machine resistence,double_leg,double_arm,bilateral,0,0,0,0,"50, 50",TRUE,low_force,TRUE,,concentric,1,hip extension,2,knee extension,,,2,Trunk Extension,2,Shoulder Horizontal Abduction (Horizontal Extension),2,elbow flexion
+200_b,,,recovery phase,,,,row,,,strength_cardiorespiratory,,double_leg,double_arm,bilateral,0,0,0,0,"50, 50",FALSE,no_speed,FALSE,,concentric,3,hip flexion,3,knee flexion,,,3,Trunk Flexion,3,Shoulder Horizontal Adduction (Horizontal Flexion),3,elbow extension
+201_a,,ski erg,power phase,,,https://www.concept2.com/skierg/training/technique-video,ski_erg,,,strength_cardiorespiratory,machine resistence,double_leg,double_arm,bilateral,2,1,0,59.26,"50, 50",TRUE,low_force,TRUE,,concentric,2,hip flexion,2,knee flexion,,,1,Trunk Flexion,,Shoulder Extension,,elbow extension
+201_b,,,recovery phase,,,,ski_erg,,,strength_cardiorespiratory,,double_leg,double_arm,bilateral,2,1,0,59.26,"50, 50",FALSE,no_speed,FALSE,,concentric,2,hip extension,2,knee extension,2,ankle plantar flexion,2,Trunk Extension,2,Shoulder Flexion,2,elbow flexion
+,,Swimming,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+300_a,,freestyle,against resistence,,,,swim,,,strength_cardiorespiratory,,,alternating_arms,unilateral_alternating,0,0,0,0,"100, 0",TRUE,no_speed,TRUE,,concentric,,,,,,,2,Trunk Rotation,1,Shoulder Extension,,
+300_b,,,return to start,,,,swim,,,strength_cardiorespiratory,,,alternating_arms,unilateral_alternating,1,0,0,4.715,"100, 0",FALSE,no_speed,FALSE,,concentric,,,,,,,,,1,"Shoulder Flexion
+Shoulder External Rotation
+Shoulder Internal Rotation",,
+303_a,,scissor kicking,kick towards belly,,,,swim,,,strength_cardiorespiratory,,double_leg,,unilateral_alternating,0,0,0,0,"100, 0",TRUE,no_speed,TRUE,,concentric,1,hip flexion,,,,,,,,,,
+303_b,,,hold leg straight while kick towards belly,,,,swim,,,strength_cardiorespiratory,,double_leg,,unilateral_alternating,0,0,0,0,"100, 0",TRUE,no_speed,FALSE,,isometric,,,2,knee extension,,,,,,,,
+303_c,,,kick towards butt,,,,swim,,,strength_cardiorespiratory,,double_leg,,unilateral_alternating,0,0,0,0,"100, 0",TRUE,no_speed,TRUE,,concentric,1,hip extension,,,,,,,,,,
+303_d,,,hold leg straight while kick towards butt,,,,swim,,,strength_cardiorespiratory,,double_leg,,unilateral_alternating,0,0,0,0,"100, 0",TRUE,no_speed,FALSE,,isometric,,,2,knee flexion,,,,,,,,
+,,Strength Component Actions ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,postural stabilization,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1004,,prone plank stabilization,,,,,,,,strength_endurance,,prone,double_arm,bilateral,0,1,2,90.57,100,TRUE,no_speed,FALSE,,isometric,1,hip flexion,2,knee extension,3,ankle dorsiflexion,1,Trunk Flexion,2,Shoulder Extension,,
+2304_a,,"move weight from floor, to the side, to above the head","floor, side, above head",,,,,,,strength_integrated_resistance,,double_leg,double_arm,bilateral,2,0,0,9.43,30,TRUE,no_speed,FALSE,,concentric,1,hip extension,2,knee extension,,,1,Trunk Extension w/ Rotation,1,"Shoulder Horizontal Adduction (Horizontal Flexion)
+Shoulder Horizontal Abduction (Horizontal Extension)
+Shoulder Flexion",,
+2304_b,,,"above head, side, floor",,,,,,,strength_integrated_resistance,,double_leg,double_arm,bilateral,2,0,0,9.43,30,TRUE,no_speed,FALSE,,eccentric,1,hip flexion,2,knee flexion,,,1,Trunk Flexion with Rotation,1,"Shoulder Horizontal Adduction (Horizontal Flexion)
+Shoulder Horizontal Abduction (Horizontal Extension)
+Shoulder Extension",,
+2305_a,,move weight from floor to above the head,"floor, above head",,,,,,,strength_integrated_resistance,,double_leg,double_arm,bilateral,2,0,0,9.43,30,TRUE,no_speed,FALSE,,concentric,1,hip extension,2,knee extension,,,1,Trunk Extension,1,"Shoulder Horizontal Adduction (Horizontal Flexion)
+Shoulder Horizontal Abduction (Horizontal Extension)
+Shoulder Flexion",,
+2305_b,,,"above head, floor",,,,,,,strength_integrated_resistance,,double_leg,double_arm,bilateral,2,0,0,9.43,30,TRUE,no_speed,FALSE,,eccentric,1,hip flexion,2,knee flexion,,,1,Trunk Flexion,1,"Shoulder Horizontal Adduction (Horizontal Flexion)
+Shoulder Horizontal Abduction (Horizontal Extension)
+Shoulder Extension",,
+,,Plyometric Actions,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,Jumps,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3001_a,,squat jump,squat jump take off,,,,,,,power_action_plyometrics,,double_leg,,bilateral,2,1,2,100,100,TRUE,high_force,TRUE,,concentric,1,hip extension,2,knee extension,,,,,,,,
+3001_b,,,squat jump landing,,,,,,,power_action_plyometrics,,double_leg,,bilateral,2,1,2,100,100,TRUE,low_force,TRUE,,eccentric,1,hip flexion,2,knee flexion,,,,,,,,
+3020_a,,jump into prone plank,arms stabilize,,,,,,,power_action_plyometrics,,prone,double_arm,bilateral,2,1,2,100,,FALSE,low_force,TRUE,,isometric,,,,,,,,,1,Shoulder Flexion,,
+3020_b,,,leg extension,,,,,,,power_action_plyometrics,,double_leg,,bilateral,2,1,2,100,,FALSE,low_force,FALSE,,concentric,1,hip extension,1,knee extension,,,2,Trunk Extension,,,,
+3020_c,,jump out of prone plank,arms stabilize,,,,,,,power_action_plyometrics,,prone,double_arm,bilateral,2,1,2,100,,FALSE,low_force,TRUE,,isometric,,,,,,,,,1,Shoulder Extension,,
+3020_d,,,feet to hands,,,,,,,power_action_plyometrics,,double_leg,,bilateral,2,1,2,100,,FALSE,low_force,FALSE,,concentric,1,hip flexion,1,knee flexion,,,2,Trunk Flexion,,,,
+3021_a,,Push Up Jump,push up,,,,,,,power_action_plyometrics,,prone,double_arm,bilateral,2,1,2,100,,TRUE,mod_force,TRUE,,concentric,,,,,,,,,1,"Shoulder Horizontal Adduction (Horizontal Flexion)
+Shoulder Flexion",2,elbow extension
+3021_b,,,catch,,,,,,,power_action_plyometrics,,prone,double_arm,bilateral,2,1,2,100,,TRUE,mod_force,TRUE,,eccentric,,,,,,,,,1,"Shoulder Horizontal Abduction (Horizontal Extension)
+Shoulder Extension",2,elbow flexion
+,,Med ball throws,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3100_a,,chest / push throw,throw,,,,,,,power_action_plyometrics,,,double_arm,bilateral,2,0,0,9.43,,TRUE,mod_force,TRUE,,concentric,,,,,,,,,,Shoulder Horizontal Adduction (Horizontal Flexion),,elbow extension
+3100_b,,,loading / catch,,,,,,,power_action_plyometrics,,,double_arm,bilateral,2,0,0,9.43,,TRUE,mod_force,TRUE,,eccentric,,,,,,,,,,Shoulder Horizontal Abduction (Horizontal Extension),,elbow flexion
+3103,,slam from overhead,throw,,,,,,,power_action_plyometrics,,,double_arm,bilateral,2,0,0,9.43,,TRUE,high_force,TRUE,,concentric,,,,,,,1,Trunk Flexion,2,Shoulder Flexion,,
+,,Integrated Resistance Actions,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,Upper Body Target,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2400_a,,Dumbbell Bench Press,positive,,,,,,,strength_integrated_resistance,dumbbells,supine,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,1,Shoulder Horizontal Adduction (Horizontal Flexion),1,elbow extension
+2400_b,,,negative,,,,,,,strength_integrated_resistance,dumbbells,supine,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,1,Shoulder Horizontal Abduction (Horizontal Extension),1,elbow flexion
+2401_a,,Incline Bench Press,positive,,,,,,,strength_integrated_resistance,barbells,supine,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,1,Shoulder Horizontal Adduction (Horizontal Flexion),1,elbow extension
+2401_b,,,positive,,,,,,,strength_integrated_resistance,barbells,supine,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,2,Shoulder Flexion,,
+2401_c,,,negative,,,,,,,strength_integrated_resistance,barbells,supine,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,1,Shoulder Horizontal Abduction (Horizontal Extension),1,elbow flexion
+2401_d,,,negative,,,,,,,strength_integrated_resistance,barbells,supine,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,2,Shoulder Extension,,
+2402_a,,Bent Over Row,positive,,,,,,,strength_integrated_resistance,dumbbells,,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,1,Shoulder Extension,0,elbow flexion
+2402_b,,,negative,,,,,,,strength_integrated_resistance,dumbbells,,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,1,Shoulder Flexion,0,elbow extension
+2402_c,,,stance,,,,,,,strength_integrated_resistance,dumbbells,double_leg,,bilateral,2,1,2,100,"50, 50",TRUE,no_speed,TRUE,,isometric,1,hip extension,2,knee extension,3,ankle plantar flexion,1,Trunk Extension,,,,
+2403_a,,Dips,positive,,,,,,,strength_integrated_resistance,bodyweight,,double_arm,bilateral,2,1,2,100,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,1,Shoulder Horizontal Adduction (Horizontal Flexion),2,elbow extension
+2403_b,,,positive,,,,,,,strength_integrated_resistance,bodyweight,,double_arm,bilateral,2,1,2,100,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,2,Shoulder Flexion,,
+2403_c,,,positive,,,,,,,strength_integrated_resistance,bodyweight,,double_arm,bilateral,2,1,2,100,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,2,Scapular Depression,,
+2403_d,,,negative,,,,,,,strength_integrated_resistance,bodyweight,,double_arm,bilateral,2,1,2,100,"50, 50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,1,Shoulder Horizontal Abduction (Horizontal Extension),2,elbow flexion
+2403_e,,,negative,,,,,,,strength_integrated_resistance,bodyweight,,double_arm,bilateral,2,1,2,100,"50, 50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,2,Shoulder Extension,,
+2403_f,,,negative,,,,,,,strength_integrated_resistance,bodyweight,,double_arm,bilateral,2,1,2,100,"50, 50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,2,Scapular Elevation,,
+2403_g,,,stance,,,,,,,strength_integrated_resistance,bodyweight,double_leg,,bilateral,0,0,2,40.74,"50, 50",TRUE,no_speed,TRUE,,isometric,3,hip extension,,,,,,,,,,
+,,Lower Body Target,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2404_a,,Lunge,positive,,,,,,,strength_integrated_resistance,dumbbells,double_leg,,bilateral_uneven,2,1,2,100,"75, 25",TRUE,no_speed,TRUE,,concentric,1,hip flexion,1,knee flexion,3,ankle plantar flexion,,,,,,
+2404_b,,,negative,,,,,,,strength_integrated_resistance,dumbbells,double_leg,,bilateral_uneven,2,1,2,100,"75, 25",TRUE,no_speed,TRUE,,eccentric,1,hip extension,1,knee extension,3,ankle dorsiflexion,,,,,,
+2404_c,,,holding weight,,,,,,,strength_integrated_resistance,dumbbells,,double_arm,bilateral,2,,,9.43,"50, 50",TRUE,,FALSE,,isometric,,,,,,,2,Trunk Extension,3,Shoulder Horizontal Abduction (Horizontal Extension),,
+,,Compound Action,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2405_a,,Clean and Jerk,Deadlift: positive:bar from floor to knee,,,,,,,strength_integrated_resistance,barbells,double_leg,double_arm,bilateral,2,1,2,100,"50,50",TRUE,no_speed,TRUE,,concentric,3,hip extension,1,knee extension,4,ankle plantar flexion,,,,,,
+2405_b,,,Deadlift: positive:bar from knee to hip,,,,,,,strength_integrated_resistance,barbells,double_leg,double_arm,bilateral,2,1,2,100,"50,50",TRUE,no_speed,TRUE,,concentric,1,hip extension,,,,,,,,,,
+2405_c,,,Explosive Extension with shrug,,,,,,,power_action_olympic_lift,barbells,double_leg,,bilateral,2,1,2,100,"50, 50",TRUE,max_force,TRUE,,concentric,1,hip extension,1,knee extension,,,,,,,,
+2405_d,,,Explosive Extension with shrug,,,,,,,power_action_olympic_lift,barbells,,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,max_force,TRUE,,concentric,,,,,,,,,1,Scapular Elevation,,
+2405_e,,,bending arm,,,,,,,strength_integrated_resistance,barbells,,double_arm,bilateral,2,0,0,9.43,"50, 50",TRUE,no_speed,TRUE,,concentric,,,,,,,,,4,Shoulder Flexion,4,elbow flexion
+2405_f,,,Push Jerk: Negative:Drop and Receive,,,,,,,power_action_olympic_lift,barbells,double_leg,,bilateral,2,1,2,100,"50,50",TRUE,no_speed,TRUE,,eccentric,3,hip flexion,1,knee flexion,3,ankle dorsiflexion,,,,,,
+2405_g,,,Push Jerk: Negative: Drop and Receive,,,,,,,power_action_olympic_lift,barbells,,double_arm,bilateral,2,0,0,9.43,"50,50",TRUE,no_speed,TRUE,,eccentric,,,,,,,,,3,Shoulder Flexion,,
+2405_h,,,Push Jerk: Positive: explode upward,,,,,,,power_action_olympic_lift,barbells,double_leg,,bilateral,2,1,2,100,"50,50",TRUE,max_force,TRUE,,concentric,3,hip extension,1,knee extension,3,ankle plantar flexion,,,,,,
+2405_i,,,Push Jerk: Positive: explode upward,,,,,,,power_action_olympic_lift,barbells,,double_arm,bilateral,2,0,0,9.43,"50,50",FALSE,no_speed,FALSE,,concentric,,,,,,,,,1,Shoulder Flexion,,
+2405_j,,,Push Jerk: Positive: drop and catch,,,,,,,power_action_olympic_lift,barbells,double_leg,double_arm,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,eccentric,3,hip flexion,1,knee flexion,3,ankle dorsiflexion,,,,,,
+2405_k,,,Push Jerk: Positive: drive upward,,,,,,,power_action_olympic_lift,barbells,double_leg,double_arm,bilateral,2,1,2,100,"50,50",TRUE,no_speed,TRUE,,concentric,3,hip extension,1,knee extension,3,ankle plantar flexion,,,,,,

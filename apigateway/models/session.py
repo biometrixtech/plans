@@ -4,12 +4,14 @@ import uuid
 import datetime
 from serialisable import Serialisable
 from utils import format_datetime, parse_datetime
-from models.sport import SportName, SportType, BaseballPosition, BasketballPosition, FootballPosition, LacrossePosition, SoccerPosition, SoftballPosition, TrackAndFieldPosition, FieldHockeyPosition, VolleyballPosition
+from models.sport import SportName, SportType
 from models.post_session_survey import PostSurvey
-from models.load_stats import LoadStats
 from models.asymmetry import Asymmetry
-from models.functional_movement import MovementPatterns
-from models.soreness_base import BodyPartSide
+from models.movement_patterns import MovementPatterns
+from models.soreness_base import BodyPartSide, BodyPartLocation
+from models.workout_program import WorkoutProgramModule
+from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
+from models.movement_tags import TrainingType, AdaptationType
 
 
 class SessionType(Enum):
@@ -20,6 +22,7 @@ class SessionType(Enum):
     bump_up = 4
     corrective = 5
     sport_training = 6
+    mixed_activity = 7
 
     @classmethod
     def has_value(cls, value):
@@ -27,7 +30,7 @@ class SessionType(Enum):
 
 
 class StrengthConditioningType(Enum):
-    "sub-type for session_type=1"
+    """sub-type for session_type=1"""
     endurance = 0
     power = 1
     speed_agility = 2
@@ -60,6 +63,7 @@ class SessionSource(Enum):
 class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def __init__(self):
+        self.user_id = None
         self.id = None
         self.apple_health_kit_id = None
         self.apple_health_kit_source_name = None
@@ -79,10 +83,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.mod_intensity_minutes = None
         self.low_intensity_minutes = None
         self.inactive_minutes = None
-        #self.high_intensity_RPE = None
-        #self.mod_intensity_RPE = None
-        #self.low_intensity_RPE = None
-        self.post_session_soreness = []     # post_session_soreness object array
+        self.post_session_soreness = []  # post_session_soreness object array
         self.duration_minutes = None
         self.created_date = None
         self.completed_date_time = None
@@ -124,6 +125,20 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         # self.short_body_parts = []
         # self.long_body_parts = []
 
+        # workout content provider
+        self.workout_program_module = None
+
+        self.session_load_dict = None
+
+        self.not_tracked_load = None
+        self.strength_endurance_cardiorespiratory_load = None
+        self.strength_endurance_strength_load = None
+        self.power_drill_load = None
+        self.maximal_strength_hypertrophic_load = None
+        self.power_explosive_action_load = None
+        self.cardio_plyometrics = None
+        self.ultra_high_intensity = None
+
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
             if not isinstance(value, datetime.datetime) and value is not None:
@@ -139,6 +154,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                     value = SportName(None)
         elif name == "sport_name" and isinstance(value, SportName):
             self.sport_type = self.get_sport_type(value)
+        elif name == "workout_program_module" and not isinstance(value, WorkoutProgramModule):
+            value = WorkoutProgramModule.json_deserialise(value) if value is not None else None
         elif name == "strength_and_conditioning_type" and not isinstance(value, StrengthConditioningType):
             if value == '':
                 value = StrengthConditioningType(None)
@@ -159,28 +176,28 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def create(self):
         return None
 
-    @abc.abstractmethod
-    def missing_post_session_survey(self):
-        if self.session_RPE is None:
-            return True
-        elif self.post_session_soreness is None and (self.movement_limited or self.same_muscle_discomfort_over_72_hrs):
-            return True
-        else:
-            return False
+    # @abc.abstractmethod
+    # def missing_post_session_survey(self):
+    #     if self.session_RPE is None:
+    #         return True
+    #     elif self.post_session_soreness is None and (self.movement_limited or self.same_muscle_discomfort_over_72_hrs):
+    #         return True
+    #     else:
+    #         return False
 
-    def cycling_load(self):
-        return self.get_distance_load(SportName.cycling)
+    def cycling_training_volume(self):
+        return self.get_distance_training_volume(SportName.cycling)
 
-    def running_load(self):
-        return self.get_distance_load(SportName.distance_running)
+    def running_training_volume(self):
+        return self.get_distance_training_volume(SportName.distance_running)
 
-    def swimming_load(self):
-        return self.get_distance_load(SportName.swimming)
+    def swimming_training_volume(self):
+        return self.get_distance_training_volume(SportName.swimming)
 
-    def walking_load(self):
-        return self.get_distance_load(SportName.walking)
+    def walking_training_volume(self):
+        return self.get_distance_training_volume(SportName.walking)
 
-    def duration_minutes_load(self):
+    def duration_minutes_training_volume(self):
         return self.duration_minutes
 
         # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
@@ -191,7 +208,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         # else:
         #     return None
 
-    def duration_health_load(self):
+    def duration_health_training_volume(self):
         return self.duration_health
 
         # distance_sports = [SportName.swimming, SportName.cycling, SportName.distance_running, SportName.walking]
@@ -203,13 +220,13 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         # else:
         #     return None
 
-    def training_volume(self, load_stats):
+    def training_load(self, load_stats):
 
         normalized_intensity = self.normalized_intensity()
-        normalized_load = self.normalized_load(load_stats)
+        normalized_training_volume = self.normalized_training_volume(load_stats)
 
-        if normalized_intensity is not None and normalized_load is not None:
-            return normalized_intensity * normalized_load
+        if normalized_intensity is not None and normalized_training_volume is not None:
+            return normalized_intensity * normalized_training_volume
         else:
             return None
 
@@ -222,14 +239,14 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return 0
 
-    def normalized_load(self, load_stats):
+    def normalized_training_volume(self, load_stats):
 
-        duration_minutes_load = self.duration_minutes_load()
-        duration_health_load = self.duration_health_load()
-        walking_load = self.walking_load()
-        swimming_load = self.swimming_load()
-        running_load = self.running_load()
-        cycling_load = self.cycling_load()
+        duration_minutes_load = self.duration_minutes_training_volume()
+        duration_health_load = self.duration_health_training_volume()
+        walking_load = self.walking_training_volume()
+        swimming_load = self.swimming_training_volume()
+        running_load = self.running_training_volume()
+        cycling_load = self.cycling_training_volume()
 
         load = 0
 
@@ -258,9 +275,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         if len(loads) > 0:
             load = max(loads)
 
-        return  load
+        return load
 
-    def get_distance_load(self, sport_name):
+    def get_distance_training_volume(self, sport_name):
         if self.sport_name == sport_name is not None and self.distance is not None:
             return self.distance
         else:
@@ -268,7 +285,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
     def get_sport_type(self, sport_name):
 
-        ultra_high = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting, SportName.strength,
+        ultra_high = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
+                      SportName.power, SportName.speed_agility, SportName.strength,
                       SportName.functional_strength_training, SportName.traditional_strength_training,
                       SportName.core_training, SportName.high_intensity_interval_training, SportName.pilates]
 
@@ -289,6 +307,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def json_serialise(self):
         session_type = self.session_type()
         ret = {
+            'user_id': self.user_id,
             'session_id': self.id,
             'apple_health_kit_id': self.apple_health_kit_id,
             'apple_health_kit_source_name': self.apple_health_kit_source_name,
@@ -328,6 +347,19 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'source': self.source.value if self.source is not None else SessionSource.user.value,
             'asymmetry': self.asymmetry.json_serialise() if self.asymmetry is not None else None,
             'movement_patterns': self.movement_patterns.json_serialise() if self.movement_patterns is not None else None,
+            # 'workout_program_module': self.workout_program_module.json_serialise() if self.workout_program_module is not None else None,
+            'session_RPE': self.session_RPE,
+            'session_load_dict': [{"body_part": key.json_serialise(),
+                                   "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None and session_type == SessionType.mixed_activity else None,
+
+            'not_tracked_load': self.not_tracked_load if self.not_tracked_load is not None else None,
+            'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load if self.strength_endurance_cardiorespiratory_load is not None else None,
+            'strength_endurance_strength_load': self.strength_endurance_strength_load if self.strength_endurance_strength_load is not None else None,
+            'power_drill_load': self.power_drill_load if self.power_drill_load is not None else None,
+            'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load if self.maximal_strength_hypertrophic_load is not None else None,
+            'power_explosive_action_load': self.power_explosive_action_load if self.power_explosive_action_load is not None else None,
+            'cardio_plyometrics': self.cardio_plyometrics,
+            'ultra_high_intensity': self.ultra_high_intensity
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
             # 'underactive_weak_body_parts': [u.json_serialise() for u in self.underactive_weak_body_parts],
@@ -341,6 +373,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     def json_deserialise(cls, input_dict):
         session = SessionFactory().create(SessionType(input_dict['session_type']))
         session.id = input_dict["session_id"]
+        session.user_id = input_dict.get("user_id")
         session.apple_health_kit_id = input_dict.get("apple_health_kit_id")
         session.apple_health_kit_source_name = input_dict.get("apple_health_kit_source_name")
         session.merged_apple_health_kit_ids = input_dict.get("merged_apple_health_kit_ids", [])
@@ -374,17 +407,36 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
                             "shrz",
                             "calories",
                             "distance",
-                            "source"]
+                            "source",
+                            "session_RPE"]
         for key in attrs_from_mongo:
             setattr(session, key, input_dict.get(key, None))
         if "post_session_survey" in input_dict and input_dict["post_session_survey"] is not None:
             session.post_session_survey = PostSurvey(input_dict["post_session_survey"], input_dict["post_session_survey"]["event_date"])
-            session.session_RPE = session.post_session_survey.RPE if session.post_session_survey.RPE is not None else None
+            if session.post_session_survey.RPE is not None:
+                session.session_RPE = session.post_session_survey.RPE
         else:
             session.post_session_survey = None
         session.asymmetry = Asymmetry.json_deserialise(input_dict['asymmetry']) if input_dict.get('asymmetry') is not None else None
         session.movement_patterns = MovementPatterns.json_deserialise(input_dict['movement_patterns']) if input_dict.get(
             'movement_patterns') is not None else None
+        # session.workout_program_module = WorkoutProgramModule.json_deserialise(input_dict['workout_program_module']) if input_dict.get('workout_program_module') is not None else None
+        if input_dict.get('session_load_dict') is not None and session.session_type() == SessionType.mixed_activity:
+            session.session_load_dict = {}
+            for item in input_dict.get('session_load_dict', []):
+                session.session_load_dict[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartFunctionalMovement.json_deserialise(item['injury_risk'])
+        else:
+            session.session_load_dict = None
+
+        session.not_tracked_load = input_dict.get('not_tracked_load')
+        session.strength_endurance_cardiorespiratory_load = input_dict.get('strength_endurance_cardiorespiratory_load')
+        session.strength_endurance_strength_load = input_dict.get('strength_endurance_strength_load')
+        session.power_drill_load = input_dict.get('power_drill_load')
+        session.maximal_strength_hypertrophic_load = input_dict.get('maximal_strength_hypertrophic_load')
+        session.power_explosive_action_load = input_dict.get('power_explosive_action_load')
+        session.cardio_plyometrics = input_dict.get('cardio_plyometrics')
+        session.ultra_high_intensity = input_dict.get('ultra_high_intensity')
+
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]
         # session.underactive_weak_body_parts = [BodyPartSide.json_deserialise(u) for u in
@@ -406,13 +458,33 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             return True
 
+    def get_load_body_parts(self):
+        body_parts = {}
+
+        if self.session_load_dict is not None:
+            for body_part_side, body_part_functional_movement in self.session_load_dict.items():
+                muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
+                body_part_function = body_part_functional_movement.body_part_function
+                if isinstance(muscle_group, BodyPartLocation):
+                    body_part_location = muscle_group
+                else:
+                    body_part_location = body_part_side.body_part_location
+                if body_part_location in body_parts:
+                    body_part_function = BodyPartFunction.merge(body_part_function, body_parts[body_part_location])
+                body_parts[body_part_location] = body_part_function
+
+        return body_parts
+
+    def is_cardio_plyometrics(self):
+        return False
+
 
 class SessionFactory(object):
 
     def create(self, session_type: SessionType):
 
-        #if session_type == SessionType.practice:
-        #    session_object = PracticeSession()
+        # if session_type == SessionType.practice:
+        #     session_object = PracticeSession()
         if session_type == SessionType.game:
             session_object = Game()
         elif session_type == SessionType.bump_up:
@@ -423,6 +495,8 @@ class SessionFactory(object):
             session_object = Tournament()
         elif session_type == SessionType.sport_training:
             session_object = SportTrainingSession()
+        elif session_type == SessionType.mixed_activity:
+            session_object = MixedActivitySession()
         else:
             session_object = CorrectiveSession()
 
@@ -444,56 +518,42 @@ class BumpUpSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
-
-'''Deprecated
-class PracticeSession(Session):
-    def __init__(self):
-        Session.__init__(self)
-
-    def session_type(self):
-        return SessionType.practice
-
-    def create(self):
-        new_session = PracticeSession()
-        new_session.id = str(uuid.uuid4())
-        return new_session
-
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
-'''
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
-class SportTrainingSession(Session):
+class MixedActivitySession(Session):
     def __init__(self):
         Session.__init__(self)
         self.leads_to_soreness = False
         self.atypical_session_type = False
         self.atypical_high_load = False
+        self.sport_name = SportName.other
 
     def session_type(self):
-        return SessionType.sport_training
+        return SessionType.mixed_activity
 
     def create(self):
-        new_session = SportTrainingSession()
+        new_session = MixedActivitySession()
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
     def ultra_high_intensity_session(self):
-
-        ultra_high_intensity_sports = [SportName.diving, SportName.jumps, SportName.throws, SportName.weightlifting,
-                                       SportName.strength, SportName.functional_strength_training,
-                                       SportName.traditional_strength_training, SportName.core_training,
-                                       SportName.high_intensity_interval_training, SportName.pilates]
-
-        if self.sport_name in ultra_high_intensity_sports:
-            return True
-        else:
-            return False
+        if self.ultra_high_intensity is not None:
+            return self.ultra_high_intensity
+        if self.workout_program_module is not None:
+            for section in self.workout_program_module.workout_sections:
+                if section.assess_load:
+                    for exercise in section.exercises:
+                        for action in exercise.primary_actions:
+                            if action.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                                self.ultra_high_intensity = True
+                                return True
+        self.ultra_high_intensity = False
+        return False
 
     def high_intensity_RPE(self):
 
@@ -511,6 +571,101 @@ class SportTrainingSession(Session):
         else:
             return False
 
+    def training_load(self, load_stats):
+
+        # training_load = self.workout_program_module.get_training_load()
+
+        # return training_load
+        return None
+
+    def is_cardio_plyometrics(self):
+        # TODO: Validate/Update this logic
+        if self.cardio_plyometrics is not None:
+            return self.cardio_plyometrics
+        if self.workout_program_module is not None:
+            for section in self.workout_program_module.workout_sections:
+                if section.assess_load:
+                    for exercise in section.exercises:
+                        if exercise.training_type in [TrainingType.strength_cardiorespiratory, TrainingType.power_drills_plyometrics, TrainingType.power_action_plyometrics]:
+                            self.cardio_plyometrics = True
+                            return True
+        self.cardio_plyometrics = False
+        return False
+
+
+class SportTrainingSession(Session):
+    def __init__(self):
+        Session.__init__(self)
+        self.leads_to_soreness = False
+        self.atypical_session_type = False
+        self.atypical_high_load = False
+
+    def session_type(self):
+        return SessionType.sport_training
+
+    def create(self):
+        new_session = SportTrainingSession()
+        new_session.id = str(uuid.uuid4())
+        return new_session
+
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
+
+    def ultra_high_intensity_session(self):
+        """
+        Determining if a session is Type 1.5 sports to determine recovery needs
+        :return:
+        """
+
+        ultra_high_intensity_sports = [
+            SportName.cycling, SportName.football, SportName.gymnastics, SportName.skate_sports,
+            SportName.lacrosse, SportName.rowing, SportName.rugby, SportName.diving,
+            SportName.soccer, SportName.sprints, SportName.jumps, SportName.throws,
+            SportName.wrestling, SportName.weightlifting, SportName.track_field, SportName.australian_football,
+            SportName.hockey, SportName.martial_arts, SportName.downhill_skiing, SportName.snowboarding,
+            SportName.power, SportName.speed_agility, SportName.strength, SportName.functional_strength_training,
+            SportName.stair_climbing, SportName.traditional_strength_training, SportName.barre, SportName.core_training,
+            SportName.high_intensity_interval_training, SportName.pilates
+        ]
+
+        if self.sport_name in ultra_high_intensity_sports:
+            return True
+        else:
+            return False
+
+    def high_intensity_RPE(self):
+
+        if self.session_RPE is not None and self.session_RPE >= 5:
+            return True
+        else:
+            return False
+
+    def high_intensity(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5 and self.ultra_high_intensity_session():
+            return True
+        elif self.session_RPE is not None and self.session_RPE >= 7 and not self.ultra_high_intensity_session():
+            return True
+        else:
+            return False
+
+    def is_cardio_plyometrics(self):
+        # TODO: Validate list/approach
+        cardio_sports = [
+            SportName.cycling, SportName.rowing, SportName.distance_running,
+            SportName.dance, SportName.swimming, SportName.endurance,
+            SportName.elliptical, SportName.hiking, SportName.stair_climbing,
+            SportName.walking, SportName.water_fitness, SportName.yoga,
+            SportName.barre, SportName.high_intensity_interval_training, SportName.jump_rope,
+            SportName.pilates, SportName.stairs, SportName.step_training,
+            SportName.wheelchair_walk_pace, SportName.wheelchair_run_pace, SportName.mixed_cardio,
+            SportName.taichi, SportName.hand_cycling, SportName.climbing,
+        ]
+        if self.sport_name is not None:
+            if self.sport_name in cardio_sports:
+                return True
+        return False
+
 
 class StrengthConditioningSession(Session):
     def __init__(self):
@@ -524,8 +679,8 @@ class StrengthConditioningSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class Game(Session):
@@ -540,8 +695,8 @@ class Game(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class Tournament(Session):
@@ -559,8 +714,8 @@ class Tournament(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        return Session.missing_post_session_survey()
+    # def missing_post_session_survey(self):
+    #     return Session.missing_post_session_survey()
 
 
 class CorrectiveSession(Session):
@@ -576,11 +731,32 @@ class CorrectiveSession(Session):
         new_session.id = str(uuid.uuid4())
         return new_session
 
-    def missing_post_session_survey(self):
-        if self.session_RPE is None:
-            return True
-        else:
-            return False
+    # def missing_post_session_survey(self):
+    #     if self.session_RPE is None:
+    #         return True
+    #     else:
+    #         return False
+
+
+class HighDetailedLoadSession(Serialisable):
+    def __init__(self, date):
+        self.date = date
+        self.percent_of_max = None
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        session = HighDetailedLoadSession(parse_datetime(input_dict["date"]))
+        session.percent_of_max = input_dict['percent_of_max'] if input_dict.get('percent_of_max') is not None else None
+        return session
+
+    def json_serialise(self):
+        ret = {
+            'date': format_datetime(self.date),
+            'percent_of_max': self.percent_of_max if self.percent_of_max is not None else None
+        }
+
+        return ret
 
 
 class HighLoadSession(Serialisable):
@@ -605,439 +781,6 @@ class HighLoadSession(Serialisable):
 
         return ret
 
-'''deprecated
-class FunctionalStrengthSession(Serialisable):
-
-    def __init__(self):
-        self.equipment_required = []
-        self.warm_up = []
-        self.dynamic_movement = []
-        self.stability_work = []
-        self.victory_lap = []
-        self.duration_minutes = 0
-        self.warm_up_target_minutes = 0
-        self.dynamic_movement_target_minutes = 0
-        self.stability_work_target_minutes = 0
-        self.victory_lap_target_minutes = 0
-        self.warm_up_max_percentage = 0
-        self.dynamic_movement_max_percentage = 0
-        self.stability_work_max_percentage = 0
-        self.victory_lap_max_percentage = 0
-        self.completed = False
-        self.start_date = None
-        self.event_date = None
-        self.sport_name = None
-        self.position = None
-
-    def __setattr__(self, name, value):
-        if name == "sport_name":
-            try:
-                value = SportName(value)
-            except ValueError:
-                value = SportName(None)
-        elif name == "position":
-            if self.sport_name == SportName.no_sport and value is not None:
-                value = StrengthConditioningType(value)
-            elif self.sport_name == SportName.soccer:
-                value = SoccerPosition(value)
-            elif self.sport_name == SportName.basketball:
-                value = BasketballPosition(value)
-            elif self.sport_name == SportName.baseball:
-                value = BaseballPosition(value)
-            elif self.sport_name == SportName.softball:
-                value = SoftballPosition(value)
-            elif self.sport_name == SportName.football:
-                value = FootballPosition(value)
-            elif self.sport_name == SportName.lacrosse:
-                value = LacrossePosition(value)
-            elif self.sport_name == SportName.track_field:
-                value = TrackAndFieldPosition(value)
-            elif self.sport_name == SportName.field_hockey:
-                value = FieldHockeyPosition(value)
-            elif self.sport_name == SportName.volleyball:
-                value = VolleyballPosition(value)
-        elif name in ['start_date', 'event_date']:
-            if not isinstance(value, datetime.datetime) and value is not None:
-                value = parse_datetime(value)
-        super().__setattr__(name, value)
-
-    def json_serialise(self):
-            ret = {'equipment_required':  [e for e in self.equipment_required],
-                   'minutes_duration': self.duration_minutes,
-                   'completed': self.completed,
-                   'start_date': format_datetime(self.start_date),
-                   'event_date': format_datetime(self.event_date),
-                   'warm_up': [ex.json_serialise() for ex in self.warm_up],
-                   'dynamic_movement': [ex.json_serialise() for ex in self.dynamic_movement],
-                   'stability_work': [ex.json_serialise() for ex in self.stability_work],
-                   'victory_lap': [ex.json_serialise() for ex in self.victory_lap],
-                   'sport_name': self.sport_name.value,
-                   'position': self.position.value if self.position is not None else None
-                   }
-            return ret
-'''
-
-# class CompletedFunctionalStrengthSession(Serialisable):
-
-#     def __init__(self, user_id, event_date, sport_name, position=None):
-#         self.user_id = user_id
-#         self.event_date = event_date
-#         self.sport_name = sport_name,
-#         self.position = position
-
-#     def json_serialise(self):
-#         ret = {'user_id': self.user_id,
-#                'sport_name': self.sport_name,
-#                'position': self.position,
-#                'event_date': format_datetime(self.event_date),
-#                }
-#         return ret
-
-
-# class CompletedFunctionalStrengthSummary(Serialisable):
-
-#     def __init__(self, user_id, completed_count):
-#         self.user_id = user_id
-#         self.completed_count = completed_count
-
-#     def json_serialise(self):
-#         ret = {'user_id': self.user_id,
-#                'completed_count': self.completed_count,
-#                }
-#         return ret
-
-
-# class RecoverySession(Serialisable):
-
-#     def __init__(self):
-#         self.inhibit_exercises = []
-#         self.lengthen_exercises = []
-#         self.activate_exercises = []
-#         self.integrate_exercises = []
-#         self.duration_minutes = 0
-#         self.inhibit_target_minutes = 0
-#         self.lengthen_target_minutes = 0
-#         self.activate_target_minutes = 0
-#         self.integrate_target_minutes = 0
-
-#         # new modalities
-#         self.static_stretch_exercises = []
-#         self.static_then_active_stretch_exercises = []
-#         self.static_then_active_or_dynamic_stretch_exercises = []
-#         self.active_stretch_exercises = []
-#         self.active_or_dynamic_stretch_exercises = []
-#         self.isolated_activation_exercises = []
-#         self.dynamic_integrate_exercises = []
-#         self.dynamic_integrate_with_speed_exercises = []
-#         self.static_integrate_exercises = []
-#         self.heat_minutes = 0
-#         self.ice_minutes = 0
-#         self.cold_water_immersion_minutes = 0
-#         self.dynamic_movement_minutes = 0
-#         self.dynamic_flexibility_minutes = 0
-#         self.static_stretch_minutes = 0
-#         self.active_stretch_minutes = 0
-
-#         self.inhibit_iterations = 0
-#         self.lengthen_iterations = 0
-#         self.activate_iterations = 0
-#         self.integrate_iterations = 0
-#         self.inhibit_max_percentage = 0
-#         self.lengthen_max_percentage = 0
-#         self.activate_max_percentage = 0
-#         self.integrate_max_percentage = 0
-#         self.start_date = None
-#         self.event_date = None
-#         self.impact_score = 0
-#         self.why_text = ""
-#         self.goal_text = ""
-#         self.completed = False
-#         self.display_exercises = False
-
-#     def __setattr__(self, name, value):
-#         if name in ['start_date', 'event_date']:
-#             if not isinstance(value, datetime.datetime) and value is not None:
-#                 value = parse_datetime(value)
-#         super().__setattr__(name, value)
-
-#     def json_serialise(self):
-#         ret = {'minutes_duration': self.duration_minutes,
-#                'why_text': self.why_text,
-#                'goal_text': self.goal_text,
-#                'start_date': format_datetime(self.start_date),
-#                'event_date': format_datetime(self.event_date),
-#                'impact_score': self.impact_score,
-#                'completed': self.completed,
-#                'display_exercises': self.display_exercises,
-#                'inhibit_exercises': [ex.json_serialise() for ex in self.inhibit_exercises],
-#                'lengthen_exercises': [ex.json_serialise() for ex in self.lengthen_exercises],
-#                'activate_exercises': [ex.json_serialise() for ex in self.activate_exercises],
-#                'integrate_exercises': [ex.json_serialise() for ex in self.integrate_exercises],
-#                'inhibit_iterations': self.inhibit_iterations,
-#                'lengthen_iterations': self.lengthen_iterations,
-#                'activate_iterations': self.activate_iterations,
-#                'integrate_iterations': self.integrate_iterations,
-#                }
-#         return ret
-
-#     def recommended_exercises(self):
-#         exercise_list = []
-#         exercise_list.extend(self.inhibit_exercises)
-#         exercise_list.extend(self.lengthen_exercises)
-#         exercise_list.extend(self.activate_exercises)
-#         exercise_list.extend(self.integrate_exercises)
-
-#         #for s in range(0, len(exercise_list)):
-#         #    exercise_list[s].position_order = s
-
-#         return exercise_list
-
-#     def update_from_exercise_assignments(self, exercise_assignments):
-#         self.inhibit_exercises = exercise_assignments.inhibit_exercises
-#         self.lengthen_exercises = exercise_assignments.lengthen_exercises
-#         self.activate_exercises = exercise_assignments.activate_exercises
-#         self.integrate_exercises = exercise_assignments.integrate_exercises
-#         self.duration_minutes = exercise_assignments.duration_minutes_target
-#         # self.duration_minutes = (exercise_assignments.inhibit_minutes +
-#         #                          exercise_assignments.lengthen_minutes +
-#         #                          exercise_assignments.activate_minutes +
-#         #                          exercise_assignments.integrate_minutes)
-
-#         self.inhibit_iterations = exercise_assignments.inhibit_iterations
-#         self.lengthen_iterations = exercise_assignments.lengthen_iterations
-#         self.activate_iterations = exercise_assignments.activate_iterations
-#         self.integrate_iterations = exercise_assignments.integrate_iterations
-
-#         num = 0
-
-#         for s in range(0, len(self.inhibit_exercises)):
-#             self.inhibit_exercises[s].position_order = num
-#             num = num + 1
-
-#         for s in range(0, len(self.lengthen_exercises)):
-#             self.lengthen_exercises[s].position_order = num
-#             num = num + 1
-
-#         for s in range(0, len(self.activate_exercises)):
-#             self.activate_exercises[s].position_order = num
-#             num = num + 1
-
-#         for s in range(0, len(self.integrate_exercises)):
-#             self.integrate_exercises[s].position_order = num
-#             num = num + 1
-
-#     #def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, functional_strength_active=False, is_active_prep=True):
-#     def set_exercise_target_minutes(self, soreness_list, total_minutes_target, max_severity, historic_soreness_present=False, is_active_prep=True):
-#         max_severity_and_historic_soreness = False
-#         high_severity_is_pain = False
-
-#         if soreness_list is not None:
-#             for soreness in [s for s in soreness_list if s.daily]:
-#                 if (not soreness.is_dormant_cleared() and
-#                     soreness.severity == max_severity and
-#                     soreness.severity > 0):
-#                     max_severity_and_historic_soreness = True
-#                 if soreness.severity > 3 and soreness.pain:
-#                     high_severity_is_pain = True
-
-#         if (max_severity > 3 and high_severity_is_pain) or (max_severity > 4 and not high_severity_is_pain):
-#             self.integrate_target_minutes = 0
-#             self.activate_target_minutes = 0
-#             self.lengthen_target_minutes = 0
-#             self.inhibit_target_minutes = 0
-#             self.integrate_max_percentage = 0
-#             self.activate_max_percentage = 0
-#             self.lengthen_max_percentage = 0
-#             self.inhibit_max_percentage = 0
-#         elif total_minutes_target == 5:
-#             self.integrate_target_minutes = 0
-#             self.activate_target_minutes = 0
-#             self.lengthen_target_minutes = 0
-#             self.inhibit_target_minutes = total_minutes_target
-#             self.integrate_max_percentage = 0
-#             self.activate_max_percentage = 0
-#             self.lengthen_max_percentage = 0
-#             self.inhibit_max_percentage = 1.0
-#         elif 3 < max_severity <= 4 and not high_severity_is_pain:
-#             self.integrate_target_minutes = 0
-#             self.activate_target_minutes = 0
-#             self.lengthen_target_minutes = 0
-#             self.inhibit_target_minutes = total_minutes_target
-#             self.integrate_max_percentage = 0
-#             self.activate_max_percentage = 0
-#             self.lengthen_max_percentage = 0
-#             self.inhibit_max_percentage = 1.0
-#         elif max_severity == 3:
-#             if max_severity_and_historic_soreness:
-#                 #if not functional_strength_active:
-#                 self.set_70_30_time_split(total_minutes_target)
-#                 #else:
-#                 #    self.set_50_50_time_split(total_minutes_target)
-#             elif historic_soreness_present:
-#                 #if not functional_strength_active:
-#                 self.set_60_40_time_split(total_minutes_target)
-#                 #else:
-#                 #    self.set_50_50_time_split(total_minutes_target)
-#             else:
-#                 self.set_50_50_time_split(total_minutes_target)
-#         elif max_severity == 2:
-#             if max_severity_and_historic_soreness:
-#                 #if not functional_strength_active:
-#                 if is_active_prep:
-#                     self.set_35_35_30_time_split(total_minutes_target)
-#                 else:
-#                     self.set_40_40_20_time_split(total_minutes_target)
-#                 #else:
-#                 #    self.set_40_60_time_split(total_minutes_target)
-#             elif historic_soreness_present:
-#                 #if not functional_strength_active:
-#                 if is_active_prep:
-#                     self.set_30_30_40_time_split(total_minutes_target)
-#                 else:
-#                     self.set_40_40_20_time_split(total_minutes_target)
-#                 #else:
-#                 #    self.set_50_50_time_split(total_minutes_target)
-#             else:
-#                 self.set_33_33_33_time_split(total_minutes_target)
-#         elif 0 < max_severity <= 1:
-#             if max_severity_and_historic_soreness:
-#                 #if not functional_strength_active:
-#                 if is_active_prep:
-#                     self.set_30_30_40_time_split(total_minutes_target)
-#                 else:
-#                     self.set_40_40_20_time_split(total_minutes_target)
-#                 #else:
-#                 #    # no difference between AP/AR
-#                 #    self.set_40_60_time_split(total_minutes_target)
-#             elif historic_soreness_present:
-#                 #if not functional_strength_active:
-#                 if is_active_prep:
-#                     self.set_35_35_30_time_split(total_minutes_target)
-#                 else:
-#                     self.set_40_40_20_time_split(total_minutes_target)
-#                 #else:
-#                 # no difference between AP/AR
-#                 #self.set_50_50_time_split(total_minutes_target)
-#             else:
-#                 self.set_25_25_50_time_split(total_minutes_target)
-
-#         elif max_severity == 0:
-#             if historic_soreness_present:
-#                 #if not functional_strength_active:
-#                 if is_active_prep:
-#                     self.set_25_25_50_time_split(total_minutes_target)
-#                 else:
-#                     self.set_35_35_30_time_split(total_minutes_target)
-#                 #else:
-#                     # no difference between AP/AR
-#                 #    self.set_50_50_time_split(total_minutes_target)
-#             else:
-#                 self.set_25_25_50_time_split(total_minutes_target)
-
-#         if total_minutes_target == 10:
-#             lengthen_percentage = self.lengthen_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
-#             inhibit_percentage = self.inhibit_target_minutes / (self.lengthen_target_minutes + self.inhibit_target_minutes)
-#             self.integrate_target_minutes = None
-#             self.activate_target_minutes = None
-#             self.lengthen_target_minutes = total_minutes_target * lengthen_percentage
-#             self.inhibit_target_minutes = total_minutes_target * inhibit_percentage
-#             self.integrate_max_percentage = None
-#             self.activate_max_percentage = None
-#             self.lengthen_max_percentage = lengthen_percentage + .1
-#             self.inhibit_max_percentage = inhibit_percentage + .1
-
-#     def set_70_30_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = None
-#         self.lengthen_target_minutes = total_minutes_target / 3.3
-#         self.inhibit_target_minutes = total_minutes_target / 1.43
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = None
-#         self.lengthen_max_percentage = .4
-#         self.inhibit_max_percentage = .8
-
-
-#     def set_60_40_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = None
-#         self.lengthen_target_minutes = total_minutes_target / 2.5
-#         self.inhibit_target_minutes = total_minutes_target / 1.67
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = None
-#         self.lengthen_max_percentage = .5
-#         self.inhibit_max_percentage = .7
-
-
-#     def set_40_60_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = None
-#         self.lengthen_target_minutes = total_minutes_target / 1.67
-#         self.inhibit_target_minutes = total_minutes_target / 2.5
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = None
-#         self.lengthen_max_percentage = .7
-#         self.inhibit_max_percentage = .5
-
-#     def set_30_30_40_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = total_minutes_target / 2.5
-#         self.lengthen_target_minutes = total_minutes_target / 3.3
-#         self.inhibit_target_minutes = total_minutes_target / 3.3
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = .45
-#         self.lengthen_max_percentage = .35
-#         self.inhibit_max_percentage = .35
-
-#     def set_33_33_33_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = total_minutes_target / 3
-#         self.lengthen_target_minutes = total_minutes_target / 3
-#         self.inhibit_target_minutes = total_minutes_target / 3
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = .4
-#         self.lengthen_max_percentage = .4
-#         self.inhibit_max_percentage = .4
-
-#     def set_25_25_50_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = total_minutes_target / 2
-#         self.lengthen_target_minutes = total_minutes_target / 4
-#         self.inhibit_target_minutes = total_minutes_target / 4
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = .6
-#         self.lengthen_max_percentage = .3
-#         self.inhibit_max_percentage = .3
-
-#     def set_50_50_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = None
-#         self.lengthen_target_minutes = total_minutes_target / 2
-#         self.inhibit_target_minutes = total_minutes_target / 2
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = None
-#         self.lengthen_max_percentage = .6
-#         self.inhibit_max_percentage = .6
-
-#     def set_40_40_20_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = total_minutes_target / 5
-#         self.lengthen_target_minutes = total_minutes_target / 2.5
-#         self.inhibit_target_minutes = total_minutes_target / 2.5
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = .3
-#         self.lengthen_max_percentage = .5
-#         self.inhibit_max_percentage = .5
-
-#     def set_35_35_30_time_split(self, total_minutes_target):
-#         self.integrate_target_minutes = None
-#         self.activate_target_minutes = total_minutes_target / 3.3
-#         self.lengthen_target_minutes = total_minutes_target / 2.85
-#         self.inhibit_target_minutes = total_minutes_target / 2.85
-#         self.integrate_max_percentage = None
-#         self.activate_max_percentage = .4
-#         self.lengthen_max_percentage = .4
-#         self.inhibit_max_percentage = .4
-
 
 class GlobalLoadEstimationParameters(object):
 
@@ -1054,7 +797,7 @@ class GlobalLoadEstimationParameters(object):
 class SessionLoadEstimationParameter(GlobalLoadEstimationParameters):
 
     def __init__(self):
-        GlobalLoadEstimationParameters.__init__()
+        GlobalLoadEstimationParameters.__init__(self)
         self.session_type = SessionType.practice
 
 

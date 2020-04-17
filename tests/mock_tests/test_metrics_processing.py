@@ -1,7 +1,3 @@
-from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
-xray_recorder.begin_segment(name="test")
-
 from logic.metrics_processing import MetricsProcessing, RecommendationMatrix
 from models.stats import AthleteStats
 from models.metrics import AthleteMetric, MetricColor, MetricType, SpecificAction

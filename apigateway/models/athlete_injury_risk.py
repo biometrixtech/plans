@@ -1,5 +1,6 @@
+from fathomapi.utils.xray import xray_recorder
 from models.soreness_base import BodyPartSide
-from models.functional_movement import BodyPartInjuryRisk, BodyPartHistInjuryRisk
+from models.body_part_injury_risk import BodyPartInjuryRisk, BodyPartHistInjuryRisk
 
 
 class AthleteInjuryRisk(object):
@@ -7,14 +8,17 @@ class AthleteInjuryRisk(object):
         self.user_id = user_id
         self.items = {}
 
+    @xray_recorder.capture('datastore.AthleteInjuryRisk.json_serialise')
     def json_serialise(self):
-        return {
+        ret = {
             'user_id': self.user_id,
             'items': [{"body_part": key.json_serialise(),
                        "injury_risk": value.json_serialise()} for key, value in self.items.items()]
         }
+        return ret
 
     @classmethod
+    @xray_recorder.capture('datastore.AthleteInjuryRisk.json_deserialise')
     def json_deserialise(cls, input_dict):
         athlete_injury_risk = cls(input_dict['user_id'])
         for item in input_dict.get('items', []):
@@ -28,6 +32,7 @@ class AthleteHistInjuryRisk(object):
         self.user_id = user_id
         self.items = {}
 
+    @xray_recorder.capture('datastore.AthleteHistInjuryRisk.json_serialise')
     def json_serialise(self):
         return {
             'user_id': self.user_id,
@@ -36,6 +41,7 @@ class AthleteHistInjuryRisk(object):
         }
 
     @classmethod
+    @xray_recorder.capture('datastore.AthleteHistInjuryRisk.json_deserialise')
     def json_deserialise(cls, input_dict):
         athlete_hist_injury_risk = cls(input_dict['user_id'])
         for item in input_dict.get('items', []):
