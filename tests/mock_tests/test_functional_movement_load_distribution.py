@@ -55,12 +55,12 @@ def get_max_load(exercise):
     functional_movement_dict = factory.get_functional_movement_dictinary()
     max_loads = {}
     for exercise_action in exercise.primary_actions:
-        try:
-            functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.datetime.now(), functional_movement_dict)
-            max_action_load = get_max_action_load(functional_movement_action_mapping)
-            max_loads[exercise_action.id] = max_action_load
-        except:
-            pass
+        # try:
+        functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.datetime.now(), functional_movement_dict)
+        max_action_load = get_max_action_load(functional_movement_action_mapping)
+        max_loads[exercise_action.id] = max_action_load
+        # except:
+        #     pass
     return max_loads
 
 
