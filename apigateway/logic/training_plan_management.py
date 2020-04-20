@@ -164,6 +164,9 @@ class TrainingPlanManager(object):
                         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                       m.type.value not in [ModalityType.active_recovery.value,
                                                                            ModalityType.post_active_rest.value]]
+                    # make everything else inactive
+                    for modality in self.daily_plan.modalities:
+                        modality.active = False
 
                     self.daily_plan.ice = ice
                     self.daily_plan.cold_water_immersion = cold_water_immersion
@@ -171,6 +174,14 @@ class TrainingPlanManager(object):
 
                 else:
                     self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+
+                    # make everything else inactive
+                    for modality in self.daily_plan.modalities:
+                        modality.active = False
+                    if self.daily_plan.cold_water_immersion is not None:
+                        self.daily_plan.cold_water_immersion .active = False
+                    if self.daily_plan.ice is not None:
+                        self.daily_plan.ice.active = False
                     active_rests = self.exercise_assignment.get_active_rest(force_data, force_on_demand)
                     self.daily_plan.modalities.extend(active_rests)
             else:
@@ -186,6 +197,9 @@ class TrainingPlanManager(object):
                         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                       m.type.value not in [ModalityType.active_recovery.value,
                                                                            ModalityType.post_active_rest.value]]
+                    # make everything else inactive
+                    for modality in self.daily_plan.modalities:
+                        modality.active = False
 
                     # don't assign ice or cwi if they are training later
                     self.daily_plan.ice = None
@@ -196,6 +210,14 @@ class TrainingPlanManager(object):
 
                     # remove existing movement preps
                     self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.movement_integration_prep.value]
+
+                    # make everything else inactive
+                    for modality in self.daily_plan.modalities:
+                        modality.active = False
+                    if self.daily_plan.cold_water_immersion is not None:
+                        self.daily_plan.cold_water_immersion .active = False
+                    if self.daily_plan.ice is not None:
+                        self.daily_plan.ice.active = False
                     movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
                     self.daily_plan.modalities.extend(movement_preps)
         else:
