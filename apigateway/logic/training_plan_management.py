@@ -80,6 +80,14 @@ class TrainingPlanManager(object):
         # only retain not-completed
         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
 
+        # move ice and cwi
+        if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
+            self.daily_plan.completed_ice.append(copy.deepcopy(self.daily_plan.ice))
+            self.daily_plan.ice = None
+        if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
+            self.daily_plan.completed_cold_water_immersion.append(copy.deepcopy(self.daily_plan.cold_water_immersion))
+            self.daily_plan.cold_water_immersion = None
+
     def set_active_sessions(self, active_sessions):
 
         self.active_training_sessions = active_sessions
@@ -164,13 +172,23 @@ class TrainingPlanManager(object):
                         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                       m.type.value not in [ModalityType.active_recovery.value,
                                                                            ModalityType.post_active_rest.value]]
+                    # make movement prep inactive
+                    movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value]
+                    for modality in movement_preps:
+                        modality.active = False
 
                     self.daily_plan.ice = ice
                     self.daily_plan.cold_water_immersion = cold_water_immersion
                     self.daily_plan.modalities.extend(responsive_recovery)
 
                 else:
+                    # This scenario happens if you submit RS with no session + don't train later or when you mark off day
                     self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.post_active_rest.value]
+
+                    # remove movement prep.
+                    # this is only possible if you initially submitted RS with no session + train later and later marked off day
+                    self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.movement_integration_prep.value]
+
                     active_rests = self.exercise_assignment.get_active_rest(force_data, force_on_demand)
                     self.daily_plan.modalities.extend(active_rests)
             else:
@@ -186,6 +204,10 @@ class TrainingPlanManager(object):
                         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                       m.type.value not in [ModalityType.active_recovery.value,
                                                                            ModalityType.post_active_rest.value]]
+                    # make movement prep inactive
+                    movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value]
+                    for modality in movement_preps:
+                        modality.active = False
 
                     # don't assign ice or cwi if they are training later
                     self.daily_plan.ice = None
@@ -193,9 +215,9 @@ class TrainingPlanManager(object):
                     self.daily_plan.modalities.extend(responsive_recovery)
 
                 else:
-
                     # remove existing movement preps
                     self.daily_plan.modalities = [m for m in self.daily_plan.modalities if m.type.value != ModalityType.movement_integration_prep.value]
+
                     movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
                     self.daily_plan.modalities.extend(movement_preps)
         else:
@@ -207,12 +229,14 @@ class TrainingPlanManager(object):
             self.daily_plan.modalities.extend(active_rests)
 
             # update any existing movement preps
-            movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value]
+            movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value and m.active]
 
             if len(movement_preps) > 0:
-                # remove existing movement preps
+                # remove existing active movement preps, keep the "missed" ones
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
-                                              m.type.value != ModalityType.movement_integration_prep.value]
+                                              m.type.value != ModalityType.movement_integration_prep.value or 
+                                              (m.type.value == ModalityType.movement_integration_prep.value and not m.active)
+                                              ]
                 movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(movement_preps)
 
@@ -238,6 +262,10 @@ class TrainingPlanManager(object):
                             self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                           m.type.value != ModalityType.active_recovery.value]
                             self.daily_plan.modalities.append(responsive_recovery[0])
+            if self.daily_plan.ice is not None and not self.daily_plan.ice.completed:
+                self.daily_plan.ice.event_date_time = modality_date_time
+            if self.daily_plan.cold_water_immersion is not None and not self.daily_plan.cold_water_immersion.completed:
+                self.daily_plan.cold_water_immersion.event_date_time = modality_date_time
 
         self.daily_plan.last_updated = last_updated
         self.daily_plan.define_available_modalities()
