@@ -262,6 +262,10 @@ class TrainingPlanManager(object):
                             self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
                                                           m.type.value != ModalityType.active_recovery.value]
                             self.daily_plan.modalities.append(responsive_recovery[0])
+            if self.daily_plan.ice is not None and not self.daily_plan.ice.completed:
+                self.daily_plan.ice.event_date_time = modality_date_time
+            if self.daily_plan.cold_water_immersion is not None and not self.daily_plan.cold_water_immersion.completed:
+                self.daily_plan.cold_water_immersion.event_date_time = modality_date_time
 
         self.daily_plan.last_updated = last_updated
         self.daily_plan.define_available_modalities()
