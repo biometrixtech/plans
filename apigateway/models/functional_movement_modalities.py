@@ -1281,7 +1281,7 @@ class ActiveRestAfterTraining(ActiveRest, Modality):
         self.when = "anytime, up to 3 per day"
         self.when_card = "anytime"
         self.display_image = "static_stretch"   # do not include .png or _activity or _tab
-        self.locked_text = "You skipped this Mobility Workout. Tap + to create another."
+        self.locked_text = "Mobility Workout missed. Tap + to create another."
         self.ranked_exercise_phases = {
                 'inhibit': 0,
                 'static_stretch': 1,
@@ -1578,7 +1578,7 @@ class MovementIntegrationPrepModality(MovementIntegrationPrep, Modality):
         self.when = "before training"
         self.when_card = "before training"
         self.display_image = "dynamic_flexibility"   # do not include .png or _activity or _tab
-        self.locked_text = "You skipped this Movement Prep before your Workout today."
+        self.locked_text = "You skipped this Movement Prep before your Workout."
 
 
 # class MovementIntegrationPrepModality(ActiveRestBase, Modality):

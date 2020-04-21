@@ -290,7 +290,7 @@ class BodyPartLocation(Enum):
     def muscle_groups_viz(cls):
         grouped_muscles = {
             cls.semimembranosus_semitendinosus: [cls.semimembranosus, cls.semitendinosus],
-            cls.anterior_adductors: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_brevis, cls.pectineus],
+            cls.anterior_adductors: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_brevis, cls.adductor_magnus_posterior_fibers],
             cls.rectus_femoris_vastus_intermedius: [cls.rectus_femoris, cls.vastus_intermedius],
             cls.hip_flexor_merge: [cls.psoas, cls.iliacus],
             cls.quadratus_femoris: [cls.piriformis, cls.quadratus_femoris], # this is intentional
@@ -298,7 +298,11 @@ class BodyPartLocation(Enum):
             cls.obliques: [cls.internal_obliques, cls.external_obliques],
             cls.upper_traps_levator_scapulae: [cls.upper_trapezius, cls.levator_scapulae],
             cls.middle_traps_rhomboids: [cls.middle_trapezius, cls.rhomboids],
-            cls.pec_major_minor: [cls.pectoralis_minor, cls.pectoralis_major]
+            cls.pec_major_minor: [cls.pectoralis_minor, cls.pectoralis_major],
+            cls.forearm: [cls.forearm_intrinsic_muscles, cls.forearm_extrinsic_muscles],
+            cls.biceps: [cls.brachialis, cls.biceps_brachii, cls.brachioradialis, cls.coracobrachialis],
+            cls.triceps: [cls.tricep_brachii_medial_head, cls.tricep_brachii_lateral_head, cls.tricep_brachii_long_head],
+            cls.lats: [cls.latissmus_dorsi, cls.teres_major]
 
         }
         return grouped_muscles
@@ -309,7 +313,7 @@ class BodyPartLocation(Enum):
             cls.shin: [cls.anterior_tibialis, cls.peroneals_longus],
             cls.calves: [cls.posterior_tibialis, cls.soleus, cls.gastrocnemius_medial, cls.gastrocnemius_lateral, cls.popliteus],
             cls.hamstrings: [cls.bicep_femoris_long_head, cls.bicep_femoris_short_head, cls.semimembranosus, cls.semitendinosus],
-            cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis],
+            cls.groin: [cls.adductor_longus, cls.adductor_magnus_anterior_fibers, cls.adductor_magnus_posterior_fibers, cls.adductor_brevis, cls.gracilis, cls.pectineus],
             cls.quads: [cls.vastus_lateralis, cls.vastus_medialis, cls.vastus_intermedius, cls.rectus_femoris],
             cls.hip_flexor: [cls.tensor_fascia_latae, cls.psoas, cls.iliacus],
             cls.deep_rotators_hip: [cls.piriformis, cls.quadratus_femoris],
