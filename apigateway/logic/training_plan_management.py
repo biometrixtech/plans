@@ -80,6 +80,14 @@ class TrainingPlanManager(object):
         # only retain not-completed
         self.daily_plan.modalities = [m for m in self.daily_plan.modalities if not m.completed]
 
+        # move ice and cwi
+        if self.daily_plan.ice is not None and self.daily_plan.ice.completed:
+            self.daily_plan.completed_ice.append(copy.deepcopy(self.daily_plan.ice))
+            self.daily_plan.ice = None
+        if self.daily_plan.cold_water_immersion is not None and self.daily_plan.cold_water_immersion.completed:
+            self.daily_plan.completed_cold_water_immersion.append(copy.deepcopy(self.daily_plan.cold_water_immersion))
+            self.daily_plan.cold_water_immersion = None
+
     def set_active_sessions(self, active_sessions):
 
         self.active_training_sessions = active_sessions
