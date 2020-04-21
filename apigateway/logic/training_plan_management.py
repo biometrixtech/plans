@@ -229,12 +229,14 @@ class TrainingPlanManager(object):
             self.daily_plan.modalities.extend(active_rests)
 
             # update any existing movement preps
-            movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value]
+            movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value and m.active]
 
             if len(movement_preps) > 0:
                 # remove existing active movement preps, keep the "missed" ones
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
-                                              m.type.value != ModalityType.movement_integration_prep.value and m.active]
+                                              m.type.value != ModalityType.movement_integration_prep.value or 
+                                              (m.type.value == ModalityType.movement_integration_prep.value and not m.active)
+                                              ]
                 movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(movement_preps)
 
