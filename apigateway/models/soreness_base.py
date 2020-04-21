@@ -298,7 +298,11 @@ class BodyPartLocation(Enum):
             cls.obliques: [cls.internal_obliques, cls.external_obliques],
             cls.upper_traps_levator_scapulae: [cls.upper_trapezius, cls.levator_scapulae],
             cls.middle_traps_rhomboids: [cls.middle_trapezius, cls.rhomboids],
-            cls.pec_major_minor: [cls.pectoralis_minor, cls.pectoralis_major]
+            cls.pec_major_minor: [cls.pectoralis_minor, cls.pectoralis_major],
+            cls.forearm: [cls.forearm_intrinsic_muscles, cls.forearm_extrinsic_muscles],
+            cls.biceps: [cls.brachialis, cls.biceps_brachii, cls.brachioradialis, cls.coracobrachialis],
+            cls.triceps: [cls.tricep_brachii_medial_head, cls.tricep_brachii_lateral_head, cls.tricep_brachii_long_head],
+            cls.lats: [cls.latissmus_dorsi, cls.teres_major],
 
         }
         return grouped_muscles
