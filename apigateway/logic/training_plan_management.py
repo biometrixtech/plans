@@ -224,9 +224,9 @@ class TrainingPlanManager(object):
             movement_preps = [m for m in self.daily_plan.modalities if m.type.value == ModalityType.movement_integration_prep.value]
 
             if len(movement_preps) > 0:
-                # remove existing movement preps
+                # remove existing active movement preps, keep the "missed" ones
                 self.daily_plan.modalities = [m for m in self.daily_plan.modalities if
-                                              m.type.value != ModalityType.movement_integration_prep.value]
+                                              m.type.value != ModalityType.movement_integration_prep.value and m.active]
                 movement_preps = self.exercise_assignment.get_movement_integration_prep(force_data, force_on_demand)
                 self.daily_plan.modalities.extend(movement_preps)
 
