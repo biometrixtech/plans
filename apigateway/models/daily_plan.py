@@ -138,9 +138,9 @@ class DailyPlan(Serialisable):
         active_rest_available_on_demand = True
         movement_prep_available = True
         for m in self.modalities:
-            if m.type.value == 1 and not m.completed:
+            if m.type.value == 1 and not m.completed and m.active:
                 active_rest_available_on_demand = False
-            if m.type.value == 5 and not m.completed:
+            if m.type.value == 5 and not m.completed and m.active:
                 movement_prep_available = False
         if active_rest_available_on_demand:
             self.modalities_available_on_demand.append(ModalityTypeDisplay(ModalityType(1)))

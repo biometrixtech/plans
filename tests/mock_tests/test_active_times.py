@@ -260,7 +260,7 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
     assert activity.type == ModalityType.post_active_rest
     assert activity.display_image == "static_stretch"
     assert activity.when == "anytime, up to 3 per day"
-    assert activity.locked_text == "You skipped this Mobility Workout. Tap + to create another."
+    assert activity.locked_text == "Mobility Workout missed. Tap + to create another."
     assert activity.title == "Mobility".upper()
 
     exercise_phases = activity.exercise_phases
@@ -325,7 +325,7 @@ def test_get_movement_prep_with_mixed_activity_session_one_symptom():
     movement_prep = get_activity(dates[0], symptoms, sessions, 'movement_prep')[0]
     assert movement_prep.display_image == "dynamic_flexibility"
     assert movement_prep.when == "before training"
-    assert movement_prep.locked_text == "You skipped this Movement Prep before your Workout today."
+    assert movement_prep.locked_text == "You skipped this Movement Prep before your Workout."
     assert movement_prep.title == "Movement Prep".upper()
 
     # assert len(movement_prep.exercise_phases[0].exercises) > 0  # make sure there's something in inhibit
