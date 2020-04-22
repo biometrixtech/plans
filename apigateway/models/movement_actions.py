@@ -352,8 +352,8 @@ class ExerciseAction(object):
                 elif self.side == 2:
                     self.training_volume_right = self.reps
                 else:
-                    self.training_volume_left = self.reps
-                    self.training_volume_right = self.reps
+                    self.training_volume_left = self.reps / 2
+                    self.training_volume_right = self.reps / 2
             elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:
                 if self.side == 1:
                     if self.lateral_distribution[0] != 0:

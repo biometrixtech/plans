@@ -51,10 +51,10 @@ def test_external_intensity_barbell_unilateral_no_side_defined():
     assert action.external_intensity_left == 100
     assert action.external_intensity_right == 100
 
-    assert action.training_volume_left == 10
-    assert action.training_volume_right == 10
+    assert action.training_volume_left == 5
+    assert action.training_volume_right == 5
 
-    assert action.total_load_left == action.total_load_right == 80
+    assert action.total_load_left == action.total_load_right == 40
 
 
 def test_external_intensity_unilateral_alternating_barbell():
@@ -117,8 +117,8 @@ def test_external_intensity_unilateral_dumbbell_no_side_defined():
     assert action.external_intensity_left == 50
     assert action.external_intensity_right == 50
 
-    assert action.training_volume_left == 10
-    assert action.training_volume_right == 10
+    assert action.training_volume_left == 5
+    assert action.training_volume_right == 5
 
 
 def test_external_intensity_unilateral_dumbbell_side_defined():
@@ -161,8 +161,8 @@ def test_bodyweight_intensity_unilateral_no_side():
     assert action.bodyweight_intensity_left == 50
     assert action.bodyweight_intensity_right == 50
 
-    assert action.training_volume_left == 10
-    assert action.training_volume_right == 10
+    assert action.training_volume_left == 5
+    assert action.training_volume_right == 5
 
 
 def test_bodyweight_intensity_unilateral_side():
