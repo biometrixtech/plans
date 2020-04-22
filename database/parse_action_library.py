@@ -1,5 +1,5 @@
 from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness, MuscleAction, PrioritizedJointAction
-from movement_tags import CardioAction, TrainingType, Equipment, WeightDistribution
+from movement_tags import TrainingType, Equipment, WeightDistribution
 from models.functional_movement_type import FunctionalMovementType
 import os
 import json
@@ -11,17 +11,27 @@ class ActionLibraryParser(object):
         self.actions_pd = None
         self.actions = []
 
-    def load_data(self, file=""):
-        self.actions_pd = pd.read_csv(f'action_library{file}.csv', keep_default_na=False, skiprows=1)
+    def load_data(self, files):
+        """
 
-        self.actions = []
+        :param files: prioritized ordered list of file suffix.
+                      If the same action occurs in second file as the first one, data from first file will be discarded
+        :return:
+        """
+        actions_json = {}
+        for file in files:
+            self.actions_pd = pd.read_csv(f'action_library{file}.csv', keep_default_na=False, skiprows=1)
 
-        for index, row in self.actions_pd.iterrows():
-            action_item = self.parse_row(row)
-            if action_item is not None:
-                self.actions.append(action_item)
+            self.actions = []
 
-        self.write_actions_json()
+            for index, row in self.actions_pd.iterrows():
+                action_item = self.parse_row(row)
+                if action_item is not None:
+                    self.actions.append(action_item)
+            actions_json_file = self.get_actions_json()
+            actions_json.update(actions_json_file)
+
+        self.write_actions_json(actions_json)
 
     def parse_row(self, row):
         if row['id'] is not None and row['id'] != '':
@@ -103,6 +113,8 @@ class ActionLibraryParser(object):
             return None
 
     def get_prioritized_joint_actions(self, row, joint):
+
+        res = []
         if self.is_valid(row, f'{joint}_action'):
             if self.is_valid(row, f'{joint}_priority'):
                 joint_priority = int(row[f'{joint}_priority'])
@@ -121,13 +133,16 @@ class ActionLibraryParser(object):
                         cleaned_joint_action.append(mapping[joint_action])
                     else:
                         cleaned_joint_action.append(joint_action)
+                for j_action in cleaned_joint_action:
+                    try:
+                        res.append(PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]))
+                    except:
+                        print(j_action)
 
-                try:
-                    return [PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]) for j_action in cleaned_joint_action]
-                except:
-                    print(cleaned_joint_action)
-        return []
-
+                    # return [PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]) for j_action in cleaned_joint_action]
+                # except:
+                #     print(cleaned_joint_action)
+        return res
 
     @staticmethod
     def is_valid(row, name):
@@ -135,13 +150,18 @@ class ActionLibraryParser(object):
             return True
         return False
 
-    def write_actions_json(self):
+    def get_actions_json(self):
         actions_json = {}
         for action in self.actions:
             actions_json[action.id] = action.json_serialise(initial_read=True)
+        return actions_json
 
+    @staticmethod
+    def write_actions_json(actions_json):
+        # actions_json = sorted(actions_json.items())
         json_string = json.dumps(actions_json, indent=4)
         file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/actions_library.json")
+        # file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/actions_library_running.json")
         print(f"writing: {file_name}")
         f1 = open(file_name, 'w')
         f1.write(json_string)
@@ -156,9 +176,12 @@ mapping = {
     'shoulder_horizontal_abduction_(horizontal_extension)': "shoulder_horizontal_abduction",
     "shoulder_abduction": "shoulder_horizontal_abduction",
     "shoulder_internal_rotation": "internal_rotation",
-    "shoulder_external_rotation": "external_rotation"
+    "shoulder_external_rotation": "external_rotation",
+    "ankle_inversion": "ankle_dorsiflexion_and_inversion",
+    "ankle_eversion": "ankle_plantar_flexion_and_eversion"
 }
 
 if __name__ == '__main__':
     action_parser = ActionLibraryParser()
-    action_parser.load_data("_demo")
+    # action_parser.load_data("_demo")
+    action_parser.load_data(["_demo", "_running"])

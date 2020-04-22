@@ -64,7 +64,6 @@ def test_with_timezone():
         "2020-03-03T10:43:08-05:00"
     ]
     for datetime_string in datetime_strings:
-        print(datetime_string)
         event_date_time_0_0 = parse_datetime(datetime_string)
         datetime_string_0_1 = format_datetime(event_date_time_0_0)
         event_date_time_0_1 = parse_datetime(datetime_string_0_1)

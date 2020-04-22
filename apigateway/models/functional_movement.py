@@ -1033,6 +1033,8 @@ class FunctionalMovementFactory(object):
         dict[FunctionalMovementType.eversion_of_the_foot.value] = self.convert_ints_to_objects(self.get_eversion_of_the_foot())
         dict[FunctionalMovementType.knee_flexion.value] = self.convert_ints_to_objects(self.get_knee_flexion())
         dict[FunctionalMovementType.knee_extension.value] = self.convert_ints_to_objects(self.get_knee_extension())
+        dict[FunctionalMovementType.tibial_external_rotation.value] = self.convert_ints_to_objects(self.get_tibial_external_rotation())
+        dict[FunctionalMovementType.tibial_internal_rotation.value] = self.convert_ints_to_objects(self.get_tibial_internal_rotation())
         dict[FunctionalMovementType.hip_adduction.value] = self.convert_ints_to_objects(self.get_hip_adduction())
         dict[FunctionalMovementType.hip_horizontal_adduction.value] = self.convert_ints_to_objects(self.get_hip_horizontal_adduction())
         dict[FunctionalMovementType.hip_abduction.value] = self.convert_ints_to_objects(self.get_hip_abduction())
@@ -1112,10 +1114,10 @@ class FunctionalMovementFactory(object):
             return self.get_knee_flexion()
         elif movement_type == FunctionalMovementType.knee_extension:
             return self.get_knee_extension()
-        # elif movement_type == FunctionalMovementType.tibial_external_rotation:
-        #     return self.get_tibial_external_rotation()
-        # elif movement_type == FunctionalMovementType.tibial_internal_rotation:
-        #     return self.get_tibial_internal_rotation()
+        elif movement_type == FunctionalMovementType.tibial_external_rotation:
+            return self.get_tibial_external_rotation()
+        elif movement_type == FunctionalMovementType.tibial_internal_rotation:
+            return self.get_tibial_internal_rotation()
 
         elif movement_type == FunctionalMovementType.hip_adduction:
             return self.get_hip_adduction()
@@ -1270,6 +1272,26 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [40, 41, 42]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [43, 61]
+        return functional_movement
+
+    def get_tibial_external_rotation(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.tibial_external_rotation)
+        functional_movement.prime_movers = [45, 46]
+        functional_movement.synergists = []
+        functional_movement.antagonists = [47, 48]
+        functional_movement.stabilizers = []
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = []
+        return functional_movement
+
+    def get_tibial_internal_rotation(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.tibial_internal_rotation)
+        functional_movement.prime_movers = [47, 48]
+        functional_movement.synergists = [53, 68]
+        functional_movement.antagonists = [45, 46]
+        functional_movement.stabilizers = []
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = [53, 68]
         return functional_movement
 
     def get_knee_flexion(self):
