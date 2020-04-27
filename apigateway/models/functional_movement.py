@@ -178,7 +178,7 @@ class BodyPartFunctionalMovement(Serialisable):
                 'concentric_load': self.concentric_load,
                 'eccentric_load': self.eccentric_load,
                 'compensated_concentric_load': self.compensated_concentric_load,
-                'compensated_eccentric_load': self.compensated_concentric_load,
+                'compensated_eccentric_load': self.compensated_eccentric_load,
                 'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
                 #'concentric_intensity': self.concentric_intensity,
                 #'eccentric_intensity': self.eccentric_intensity,
