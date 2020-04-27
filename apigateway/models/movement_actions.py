@@ -68,6 +68,9 @@ class ExerciseAction(object):
 
         # obtained from exercise
         self.rpe = None
+        self.pace = None
+        self.rep_tempo = None
+        self.cardio_action = None
         self.reps = 1
         self.external_weight = []  # list of ExternalWeight objects
         self.bilateral = True
@@ -80,11 +83,15 @@ class ExerciseAction(object):
         self.explosiveness_rating = 0
         self.total_load_left = 0
         self.total_load_right = 0
+        self.tissue_load_left = 0
+        self.tissue_load_right = 0
         # TODO: Remove these once strength-level intensity is implemented
         self.external_intensity_left = 0
         self.external_intensity_right = 0
         self.bodyweight_intensity_left = 0
         self.bodyweight_intensity_right = 0
+        self.tissue_intensity = 0
+        self.readiness = 1
         self.training_intensity = 0
         self.training_intensity_left = 0
         self.training_intensity_right = 0
@@ -127,6 +134,9 @@ class ExerciseAction(object):
             additional_params = {
                 # obtained from exercises
                 "rpe": self.rpe,
+                "pace": self.pace,
+                "rep_tempo": self.rep_tempo,
+                "cardio_action": self.cardio_action.value if self.cardio_action is not None else None,
                 "reps": self.reps,
                 "side": self.side,
                 "external_weight": [ex_weight.json_serialise() for ex_weight in self.external_weight],
@@ -185,6 +195,9 @@ class ExerciseAction(object):
 
         # obtained from exercise
         action.rpe = input_dict.get('rpe')
+        action.pace = input_dict.get('pace')
+        action.rep_tempo = input_dict.get('rep_tempo')
+        action.cardio_action = CardioAction(input_dict.get('cardio_action')) if input_dict.get('cardio_action') is not None else None
         action.reps = input_dict.get('reps', 1)
         action.side = input_dict.get('side', 0)  # both
         action.external_weight = [ExternalWeight.json_deserialise(ex_weight) for ex_weight in input_dict.get('external_weight', [])]  # list of ExternalWeight objects
@@ -214,6 +227,21 @@ class ExerciseAction(object):
 
     def set_strength_training_intensity(self):
         self.training_intensity = 8
+
+    def set_cardio_tissue_intensity(self):
+        force = None
+        if self.cardio_action == CardioAction.row:
+            # if self.pace is not None:
+            #     self.pace /= 500
+            # elif self.watts is not None:
+            #     self.pace = (2.8 / self.watts) ** (1 / 3)
+            # elif self.calories is not None:
+            #     self.watts = (4200 * self.calories - .35 * self.reps) / (4 * self.reps)  #  based on formula used by concept2 rower; reps is assumed to be in seconds 
+            #     # self.watts = self.calories / self.reps * 1000  # approx calculation; reps is assumed to be in seconds 
+            #     self.pace = (2.8 / self.watts) ** (1 / 3)
+            if self.pace is not None:
+                force = 2.8 / (self.pace ** 2)
+                self.tissue_intensity = force * self.rep_tempo
 
     def set_external_intensity(self):
         external_weight_left = 0
@@ -320,6 +348,10 @@ class ExerciseAction(object):
             # both sides have same volume (duration) and intensity (rpe)
             self.total_load_left = self.training_volume_left * self.training_intensity
             self.total_load_right = self.training_volume_right * self.training_intensity
+            self.tissue_load_left = self.training_volume_left * self.readiness * self.tissue_intensity
+            self.tissue_load_right = self.training_volume_right * self.readiness * self.tissue_intensity
+            # self.total_load_left = self.training_volume_left * self.readiness * self.tissue_intensity
+            # self.total_load_right = self.training_volume_right * self.readiness * self.tissue_intensity
         else:
             left_dist = 1
             right_dist = 1
@@ -374,6 +406,7 @@ class ExerciseAction(object):
 
     def set_intensity(self):
         if self.training_type == TrainingType.strength_cardiorespiratory:
+            self.set_cardio_tissue_intensity()
             if self.rpe is None:
                 self.rpe = 4
             self.training_intensity = self.rpe

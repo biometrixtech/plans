@@ -11,6 +11,8 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
     exercise.sets = sets
     exercise.unit_of_measure = unit
     exercise.movement_id = movement_id
+    exercise.pace = 120
+    exercise.stroke_rate = 22
     if movement_id == "":
         action = ExerciseAction('0', 'test_action')
         action.training_type = TrainingType.strength_cardiorespiratory

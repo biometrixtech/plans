@@ -3,7 +3,7 @@ from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
-from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
+from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
@@ -78,6 +78,11 @@ class WorkoutProcessor(object):
         action.side = exercise.side
         action.rpe = exercise.rpe
         action.bilateral = exercise.bilateral
+        action.pace = exercise.pace
+        action.cardio_action = exercise.cardio_action
+        if action.cardio_action is not None and action.cardio_action == CardioAction.row:
+            action.rep_tempo = self.get_rowing_rep_tempo(exercise.stroke_rate)
+            action.pace = self.convert_to_pace(exercise.pace, exercise.watts, exercise.calories, action.reps)
         # action.get_training_load()
 
     @staticmethod
@@ -257,6 +262,29 @@ class WorkoutProcessor(object):
         elif unit_of_measure == UnitOfMeasure.calories:
             reps = self.convert_calories_to_seconds(reps, cardio_action)
         return reps
+
+    @staticmethod
+    def get_rowing_rep_tempo(stroke_rate):
+        if stroke_rate is None or stroke_rate <= 23:
+            return 1
+        elif stroke_rate <= 28:
+            return 2
+        elif stroke_rate <= 36:
+            return 3
+        else:
+            return 4
+
+    @staticmethod
+    def convert_to_pace(pace, watts, calories, reps):
+        if pace is not None:
+            pace /= 500
+        elif watts is not None:
+            pace = (2.8 / watts) ** (1 / 3)
+        elif calories is not None:
+            watts = (4200 * calories - .35 * reps) / (4 * reps)  # based on formula used by concept2 rower; reps is assumed to be in seconds
+            # watts = calories / reps * 1000  # approx calculation; reps is assumed to be in seconds
+            pace = (2.8 / watts) ** (1 / 3)
+        return pace
 
     @staticmethod
     def calculate_lower_body_stability_rating(exercise, action):
