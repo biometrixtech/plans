@@ -116,13 +116,15 @@ class WorkoutExercise(Serialisable):
         self.reps_per_set = 1
         self.unit_of_measure = UnitOfMeasure.count
         self.rpe = None
-        self.pace = None  # time in seconds for 500m for rowing
-        self.stroke_rate = None  # stroke rate for rowing
-        self.watts = None  # for rowing/other cardio
-        self.calories = None  # for rowing/other cardio
         self.side = 0
         self.bilateral = True
         self.movement_id = ""
+        self.pace = None  # pace as time(s)/distance. distance is 500m for rowing, 1mile for running
+        self.stroke_rate = None  # stroke rate for rowing
+        self.watts = None  # for rowing/other cardio
+        self.calories = None  # for rowing/other cardio
+        self.cadence = None  # for biking/running
+        self.grade = None  # for biking/running
 
         self.training_type = None
         self.explosiveness_rating = 0
@@ -148,13 +150,15 @@ class WorkoutExercise(Serialisable):
             'reps_per_set': self.reps_per_set,
             'unit_of_measure': self.unit_of_measure.value if self.unit_of_measure is not None else None,
             'rpe': self.rpe,
+            'side': self.side,
+            'bilateral': self.bilateral,
+            'movement_id': self.movement_id,
             'pace': self.pace,
             'stroke_rate': self.stroke_rate,
             'watts': self.watts,
             'calories': self.calories,
-            'side': self.side,
-            'bilateral': self.bilateral,
-            'movement_id': self.movement_id,
+            'cadence': self.cadence,
+            'grade': self.grade,
             'equipments': [equipment.value for equipment in self.equipments],
             'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
@@ -201,6 +205,8 @@ class WorkoutExercise(Serialisable):
         exercise.stroke_rate = input_dict.get('stroke_rate')
         exercise.watts = input_dict.get('watts')
         exercise.calories = input_dict.get('calories')
+        exercise.cadence = input_dict.get('cadence')
+        exercise.grade = input_dict.get('grade')
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
         exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
