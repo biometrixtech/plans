@@ -119,6 +119,7 @@ class WorkoutExercise(Serialisable):
         self.side = 0
         self.bilateral = True
         self.movement_id = ""
+        self.distance = None  # distance covered for cardio exercises
         self.pace = None  # pace as time(s)/distance. distance is 500m for rowing, 1mile for running
         self.stroke_rate = None  # stroke rate for rowing
         self.watts = None  # for rowing/other cardio
@@ -153,6 +154,7 @@ class WorkoutExercise(Serialisable):
             'side': self.side,
             'bilateral': self.bilateral,
             'movement_id': self.movement_id,
+            'distance': self.distance,
             'pace': self.pace,
             'stroke_rate': self.stroke_rate,
             'watts': self.watts,
@@ -201,6 +203,7 @@ class WorkoutExercise(Serialisable):
         exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
             'training_type') is not None else None
         exercise.rpe = input_dict.get('rpe')
+        exercise.distance = input_dict.get('distance')
         exercise.pace = input_dict.get('pace')
         exercise.stroke_rate = input_dict.get('stroke_rate')
         exercise.watts = input_dict.get('watts')
