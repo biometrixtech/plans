@@ -438,34 +438,39 @@
     },
     "200_a": {
         "id": "200_a",
-        "name": "power phase",
+        "name": "Drive",
         "training_type": 1,
         "eligible_external_resistance": [],
-        "lower_body_stance": 0,
-        "upper_body_stance": 0,
+        "lower_body_stance": 4,
+        "upper_body_stance": null,
         "lateral_distribution_pattern": 0,
-        "percent_bodyweight": 0,
+        "percent_bodyweight": 100,
         "lateral_distribution": [
             50,
             50
         ],
         "apply_resistance": true,
-        "explosiveness": 1,
+        "explosiveness": 3,
         "apply_instability": true,
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 1,
+                "priority": 2,
                 "joint_action": 14
             }
         ],
         "knee_joint_action": [
             {
-                "priority": 2,
+                "priority": 1,
                 "joint_action": 7
             }
         ],
-        "ankle_joint_action": [],
+        "ankle_joint_action": [
+            {
+                "priority": 3,
+                "joint_action": 1
+            }
+        ],
         "trunk_joint_action": [
             {
                 "priority": 2,
@@ -473,6 +478,14 @@
             }
         ],
         "shoulder_scapula_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 31
+            },
+            {
+                "priority": 2,
+                "joint_action": 28
+            },
             {
                 "priority": 2,
                 "joint_action": 29
@@ -487,49 +500,58 @@
     },
     "200_b": {
         "id": "200_b",
-        "name": "recovery phase",
+        "name": "Recovery",
         "training_type": 1,
         "eligible_external_resistance": [],
-        "lower_body_stance": 0,
-        "upper_body_stance": 0,
+        "lower_body_stance": 4,
+        "upper_body_stance": null,
         "lateral_distribution_pattern": 0,
-        "percent_bodyweight": 0,
+        "percent_bodyweight": 100,
         "lateral_distribution": [
             50,
             50
         ],
         "apply_resistance": false,
         "explosiveness": 0,
-        "apply_instability": false,
+        "apply_instability": true,
         "primary_muscle_action": 0,
         "hip_joint_action": [
             {
-                "priority": 3,
+                "priority": 2,
                 "joint_action": 15
             }
         ],
         "knee_joint_action": [
             {
-                "priority": 3,
+                "priority": 1,
                 "joint_action": 6
             }
         ],
-        "ankle_joint_action": [],
+        "ankle_joint_action": [
+            {
+                "priority": 2,
+                "joint_action": 0
+            }
+        ],
         "trunk_joint_action": [
             {
-                "priority": 3,
+                "priority": 2,
                 "joint_action": 20
             }
         ],
         "shoulder_scapula_joint_action": [
             {
-                "priority": 3,
+                "priority": 2,
                 "joint_action": 28
+            },
+            {
+                "priority": 2,
+                "joint_action": 30
             }
         ],
         "elbow_joint_action": [
             {
-                "priority": 3,
+                "priority": 2,
                 "joint_action": 27
             }
         ]
