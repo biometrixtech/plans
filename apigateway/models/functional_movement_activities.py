@@ -1373,7 +1373,7 @@ class MovementIntegrationPrep(ActiveRestBase):
 
             if excessive_strain:
 
-                goal = AthleteGoal("Expected Load - Compensation", 1, AthleteGoalType.expected_asymmetric_session)
+                goal = AthleteGoal("Expected Load - Elevated Stress", 1, AthleteGoalType.expected_high_load)
 
                 if max_severity < 5.0:
                     # if sport_body_parts[body_part.location] in [BodyPartFunction.prime_mover, BodyPartFunction.stabilizer]:
