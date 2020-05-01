@@ -689,7 +689,7 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
 * `distance` __if present__, __should__ be an number representing distance covered in meters
-* `pace` __if present__, __should__ be an number representing seconds per distance for the activity. If the exercise is running, it should represent a mile pace. If the activity is rowing, it should represent a 500m pace.
+* `pace` __if present__, __should__ be an number representing seconds per distance for the running(1 mile pace) and rowing (500m pace)
 * `watts` __if present__, __should__ be an number representing the average power production during the exercise
 * `calories` __if present__, __should__ be an number representing calories burned during the exercise
 * `stroke_rate` __if present__, __should__ be an number representing average rowing stroke rate
