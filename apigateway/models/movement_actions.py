@@ -235,24 +235,15 @@ class ExerciseAction(object):
         self.training_intensity = 8
 
     def set_cardio_tissue_intensity(self):
-        force = None
         if self.cardio_action == CardioAction.row:
-            # if self.pace is not None:
-            #     self.pace /= 500
-            # elif self.watts is not None:
-            #     self.pace = (2.8 / self.watts) ** (1 / 3)
-            # elif self.calories is not None:
-            #     self.watts = (4200 * self.calories - .35 * self.reps) / (4 * self.reps)  #  based on formula used by concept2 rower; reps is assumed to be in seconds 
-            #     # self.watts = self.calories / self.reps * 1000  # approx calculation; reps is assumed to be in seconds 
-            #     self.pace = (2.8 / self.watts) ** (1 / 3)
             if self.pace is not None:
                 force = 2.8 / (self.pace ** 2)
                 self.tissue_intensity = force * self.rep_tempo
-        if self.cardio_action == CardioAction.cycle:
+        elif self.cardio_action == CardioAction.cycle:
             if self.power is not None and self.speed is not None:
                 force = self.power / self.speed
                 self.tissue_intensity = force * self.rep_tempo
-        if self.cardio_action == CardioAction.run:
+        elif self.cardio_action == CardioAction.run:
             if self.power is not None and self.speed is not None:
                 force = self.power / self.speed
                 self.tissue_intensity = force * self.rep_tempo
