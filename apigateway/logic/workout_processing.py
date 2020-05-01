@@ -74,15 +74,32 @@ class WorkoutProcessor(object):
 
         action.lower_body_stability_rating = self.calculate_lower_body_stability_rating(exercise, action)
         action.upper_body_stability_rating = self.calculate_upper_body_stability_rating(exercise, action)
-
         action.side = exercise.side
         action.rpe = exercise.rpe
         action.bilateral = exercise.bilateral
-        action.pace = exercise.pace
         action.cardio_action = exercise.cardio_action
-        if action.cardio_action is not None and action.cardio_action == CardioAction.row:
-            action.rep_tempo = self.get_rowing_rep_tempo(exercise.stroke_rate)
-            action.pace = self.convert_to_pace(exercise.pace, exercise.watts, exercise.calories, action.reps)
+
+        if action.cardio_action is not None:
+            action.rep_tempo = self.get_rep_tempo(exercise)
+            speed, pace = self.get_speed_pace(exercise)
+            action.speed = speed
+            action.pace = pace
+            # copy over duration and distance from exercise to action
+            if exercise.duration is not None:
+                action.duration = exercise.duration
+            elif speed is not None and exercise.distance is not None:
+                action.duration = exercise.distance / speed
+            if exercise.distance is not None:
+                action.distance = exercise.distance
+            elif speed is not None and exercise.duration is not None:
+                action.distance = exercise.duration * speed
+            # copy other variables
+            action.power = exercise.power  # power for rowing/other cardio in watts
+            action.grade = exercise.grade  # for biking/running
+
+        # not using these for now in action level
+        # action.calories = exercise.calories  # for rowing/other cardio
+
         # action.get_training_load()
 
     @staticmethod
@@ -264,15 +281,71 @@ class WorkoutProcessor(object):
         return reps
 
     @staticmethod
-    def get_rowing_rep_tempo(stroke_rate):
-        if stroke_rate is None or stroke_rate <= 23:
-            return 1
-        elif stroke_rate <= 28:
-            return 2
-        elif stroke_rate <= 36:
-            return 3
+    def get_rep_tempo(exercise):
+        if exercise.cardio_action == CardioAction.row:
+            if exercise.stroke_rate is None or exercise.stroke_rate <= 23:
+                return 1
+            elif exercise.stroke_rate <= 28:
+                return 2
+            elif exercise.stroke_rate <= 36:
+                return 3
+            else:
+                return 4
+        elif exercise.cardio_action == CardioAction.run:
+            if exercise.cadence is None or exercise.cadence <= 130:
+                return 1  # walking
+            elif exercise.cadence <= 165:
+                return 2  # jogging
+            elif exercise.cadence <= 195:
+                return 3  # running
+            else:
+                return 4  # sprinting
+        elif exercise.cardio_action == CardioAction.cycle:
+            if exercise.cadence is None or exercise.cadence <= 70:
+                return 1
+            elif exercise.cadence <= 90:
+                return 2
+            elif exercise.cadence <= 110:
+                return 3
+            else:
+                return 4
         else:
-            return 4
+            return 1
+
+    @staticmethod
+    def get_speed_pace(exercise):
+        speed = None
+        pace = None
+        # get pace
+        if exercise.cardio_action == CardioAction.row:
+            if exercise.pace is not None:
+                if exercise.cardio_action == CardioAction.row:
+                    pace = exercise.pace / 500
+                elif exercise.cardio_action == CardioAction.run:
+                    pace = exercise.pace / 1609.34
+                else:
+                    pace = exercise.pace
+            elif exercise.speed is not None:
+                pace = 1 / exercise.speed
+            elif exercise.duration is not None and exercise.distance is not None:
+                pace = exercise.duration / exercise.distance
+            elif exercise.power is not None:
+                if exercise.cardio_action == CardioAction.row:
+                    pace = (2.8 / exercise.power) ** (1 / 3)
+            elif exercise.calories is not None and exercise.duration is not None:
+                if exercise.cardio_action == CardioAction.row:
+                    exercise.power = (4200 * exercise.calories - .35 * exercise.duration) / (4 * exercise.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
+                    # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
+                    pace = (2.8 / exercise.power) ** (1 / 3)
+
+        # get speed
+        if exercise.speed is not None:
+            speed = exercise.speed
+        elif exercise.duration is not None and exercise.distance is not None:
+            speed = exercise.distance / exercise.duration
+        elif pace is not None:
+            speed = 1 / pace
+        return speed, pace
 
     @staticmethod
     def convert_to_pace(pace, watts, calories, reps):

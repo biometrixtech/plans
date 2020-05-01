@@ -68,13 +68,19 @@ class ExerciseAction(object):
 
         # obtained from exercise
         self.rpe = None
-        self.pace = None
-        self.rep_tempo = None
         self.cardio_action = None
         self.reps = 1
         self.external_weight = []  # list of ExternalWeight objects
         self.bilateral = True
         self.side = 0  # both
+        # new variables for tissue intensity
+        self.duration = None  # seconds
+        self.distance = None  # meters
+        self.pace = None  # in seconds/meter
+        self.speed = None  # meters/second
+        self.power = None  # watts
+        self.grade = None  # percentage (decimal)
+        self.rep_tempo = None
 
         # derived
         self.adaptation_type = None
@@ -241,6 +247,14 @@ class ExerciseAction(object):
             #     self.pace = (2.8 / self.watts) ** (1 / 3)
             if self.pace is not None:
                 force = 2.8 / (self.pace ** 2)
+                self.tissue_intensity = force * self.rep_tempo
+        if self.cardio_action == CardioAction.cycle:
+            if self.power is not None and self.speed is not None:
+                force = self.power / self.speed
+                self.tissue_intensity = force * self.rep_tempo
+        if self.cardio_action == CardioAction.run:
+            if self.power is not None and self.speed is not None:
+                force = self.power / self.speed
                 self.tissue_intensity = force * self.rep_tempo
 
     def set_external_intensity(self):
