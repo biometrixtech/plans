@@ -317,26 +317,25 @@ class WorkoutProcessor(object):
         speed = None
         pace = None
         # get pace
-        if exercise.cardio_action == CardioAction.row:
-            if exercise.pace is not None:
-                if exercise.cardio_action == CardioAction.row:
-                    pace = exercise.pace / 500
-                elif exercise.cardio_action == CardioAction.run:
-                    pace = exercise.pace / 1609.34
-                else:
-                    pace = exercise.pace
-            elif exercise.speed is not None:
-                pace = 1 / exercise.speed
-            elif exercise.duration is not None and exercise.distance is not None:
-                pace = exercise.duration / exercise.distance
-            elif exercise.power is not None:
-                if exercise.cardio_action == CardioAction.row:
-                    pace = (2.8 / exercise.power) ** (1 / 3)
-            elif exercise.calories is not None and exercise.duration is not None:
-                if exercise.cardio_action == CardioAction.row:
-                    exercise.power = (4200 * exercise.calories - .35 * exercise.duration) / (4 * exercise.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
-                    # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
-                    pace = (2.8 / exercise.power) ** (1 / 3)
+        if exercise.pace is not None:
+            if exercise.cardio_action == CardioAction.row:
+                pace = exercise.pace / 500
+            elif exercise.cardio_action == CardioAction.run:
+                pace = exercise.pace / 1609.34
+            else:
+                pace = exercise.pace
+        elif exercise.speed is not None:
+            pace = 1 / exercise.speed
+        elif exercise.duration is not None and exercise.distance is not None:
+            pace = exercise.duration / exercise.distance
+        elif exercise.power is not None:
+            if exercise.cardio_action == CardioAction.row:
+                pace = (2.8 / exercise.power) ** (1 / 3)
+        elif exercise.calories is not None and exercise.duration is not None:
+            if exercise.cardio_action == CardioAction.row:
+                exercise.power = (4200 * exercise.calories - .35 * exercise.duration) / (4 * exercise.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
+                # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
+                pace = (2.8 / exercise.power) ** (1 / 3)
 
         # get speed
         if exercise.speed is not None:

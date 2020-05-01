@@ -92,3 +92,45 @@ def test_rowing_stroke_rate_25():
     create_and_process_workout([exercise])
     for action in exercise.primary_actions:
         assert action.tissue_intensity == 2.8 / (120 / 500) ** 2 * 2
+
+
+def test_running():
+    exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459df8dc2ce90011f93d87")  # rowing
+    exercise.pace = None
+    exercise.cadence = 170  # rep tempo = 3
+    exercise.duration = 3000
+    exercise.power = 100
+    exercise.speed = 5
+    create_and_process_workout([exercise])
+    for action in exercise.primary_actions:
+        assert action.tissue_intensity == 100 / 5 * 3
+        assert action.pace == .2
+        assert action.distance == 5 * 3000
+
+
+def test_walking():
+    exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459df8dc2ce90011f93d87")  # rowing
+    exercise.pace = None
+    exercise.cadence = 120  # rep tempo = 1
+    exercise.duration = 3000
+    exercise.power = 100
+    exercise.speed = 5
+    create_and_process_workout([exercise])
+    for action in exercise.primary_actions:
+        assert action.tissue_intensity == 100 / 5 * 1
+        assert action.pace == .2
+        assert action.distance == 5 * 3000
+
+
+def test_cycling():
+    exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="57e2fd3a4c6a031dc777e90c")  # rowing
+    exercise.pace = None
+    exercise.cadence = 120  # rep tempo = 4
+    exercise.distance = 5000
+    exercise.power = 100
+    exercise.speed = 5
+    create_and_process_workout([exercise])
+    for action in exercise.primary_actions:
+        assert action.tissue_intensity == 100 / 5 * 4
+        assert action.pace == .2
+        assert action.duration == 1000
