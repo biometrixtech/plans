@@ -114,7 +114,8 @@ def fix_early_survey_event_date(event_date):
                             day=event_date.day,
                             hour=23,
                             minute=59,
-                            second=59
+                            second=59,
+                            tzinfo=event_date.tzinfo
                             )
     else:
         return event_date
