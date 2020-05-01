@@ -1537,11 +1537,13 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
     "unit_of_measure": integer,
     "movement_id": string,
     "rpe": number,
+    "duration" number,
     "distance": number,
+    "speed": number,
     "pace": number,
-    "watts": number,
+    "power": number,
     "calories": number,
-    "rate": number,
+    "stroke_rate": number,
     "cadence": number,
     "grade": number
 }
@@ -1559,12 +1561,14 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `unit_of_measure` __should__ be an integer reflecting the Unit of Measure enumeration and should indicate the unit in which the reps are measured
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
-* `distance` __if present__, __should__ be an number representing distance covered in meters
-* `pace` __if present__, __should__ be an number representing seconds per distance for the running(1 mile pace) and rowing (500m pace)
-* `watts` __if present__, __should__ be an number representing the average power production during the exercise
+* `duration` __if present__, __should__ be the total time assigned or taken to complete the exercise
+* `distance` __if present__, __should__ be an number representing distance assigned or covered in meters
+* `speed` __if present__, __should__ be an number representing average speed (meters/second) for the exercise
+* `pace` __if present__, __should__ be an number representing duration (seconds) per distance for the running (1 mile pace) and rowing (500m pace)
+* `power` __if present__, __should__ be an number representing the average power production during the exercise in watts
 * `calories` __if present__, __should__ be an number representing calories burned during the exercise
 * `stroke_rate` __if present__, __should__ be an number representing average rowing stroke rate
-* `cadence` __if present__, __should__ be an number representing cadence for running(steps per min) or biking (RPM) 
+* `cadence` __if present__, __should__ be an number representing cadence for running (steps per min) or biking (RPM) 
 * `grade` __if present__, __should__ be a number representing average percent grade during the exercise
 
 
