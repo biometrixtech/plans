@@ -667,7 +667,7 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
     "unit_of_measure": integer,
     "movement_id": string,
     "rpe": number,
-    "duration" number,
+    "duration": number,
     "distance": number,
     "speed": number,
     "pace": number,
