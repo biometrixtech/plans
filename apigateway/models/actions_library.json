@@ -2104,7 +2104,7 @@
             50
         ],
         "apply_resistance": true,
-        "explosiveness": null,
+        "explosiveness": 0,
         "apply_instability": false,
         "primary_muscle_action": 2,
         "hip_joint_action": [],

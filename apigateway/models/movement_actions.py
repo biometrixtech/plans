@@ -116,7 +116,7 @@ class ExerciseAction(object):
             "percent_bodyweight": self.percent_bodyweight,
             "lateral_distribution": self.lateral_distribution,
             "apply_resistance": self.apply_resistance,
-            "explosiveness": self.explosiveness,
+            "explosiveness": self.explosiveness.value if self.explosiveness is not None else None,
             "apply_instability": self.apply_instability,
 
             "primary_muscle_action": self.primary_muscle_action.value if self.primary_muscle_action is not None else None,

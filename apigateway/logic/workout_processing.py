@@ -456,11 +456,12 @@ class WorkoutProcessor(object):
             if len(action_explosiveness) > 0:
                 max_action_explosiveness = max(action_explosiveness)
                 for a in action_list:
-                    if a.explosiveness.value == max_action_explosiveness:
-                        a.explosiveness_rating = exercise.explosiveness_rating
-                    else:
-                        explosive_factor = self.get_scaled_explosiveness_factor(max_action_explosiveness, a.explosiveness)
-                        a.explosiveness_rating = explosive_factor * exercise.explosiveness_rating
+                    if a.explosiveness is not None:
+                        if a.explosiveness.value == max_action_explosiveness:
+                            a.explosiveness_rating = exercise.explosiveness_rating
+                        else:
+                            explosive_factor = self.get_scaled_explosiveness_factor(max_action_explosiveness, a.explosiveness)
+                            a.explosiveness_rating = explosive_factor * exercise.explosiveness_rating
 
     @staticmethod
     def get_scaled_explosiveness_factor(explosive_value_1, explosive_value_2):
