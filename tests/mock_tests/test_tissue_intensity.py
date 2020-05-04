@@ -124,6 +124,7 @@ def test_walking():
 
 def test_cycling():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="57e2fd3a4c6a031dc777e90c")  # airdyne
+    exercise.reps_per_set = None
     exercise.pace = None
     exercise.cadence = 120  # rep tempo = 4
     exercise.distance = 5000
@@ -134,3 +135,4 @@ def test_cycling():
         assert action.tissue_intensity == 100 / 5 * 4
         assert action.pace == .2
         assert action.duration == 1000
+        assert action.reps == 1000

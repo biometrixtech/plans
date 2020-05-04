@@ -63,7 +63,10 @@ class WorkoutProcessor(object):
         action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
         if action.training_type == TrainingType.strength_cardiorespiratory:
-            action.reps = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
+            if exercise.duration is not None:
+                action.reps = exercise.duration
+            elif exercise.reps_per_set is not None:
+                action.reps = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
         elif exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
             reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
             action.reps = int(reps_meters / 5)
@@ -96,6 +99,9 @@ class WorkoutProcessor(object):
             # copy other variables
             action.power = exercise.power  # power for rowing/other cardio in watts
             action.grade = exercise.grade  # for biking/running
+            # final check if duration was derived, update action reps with duration
+            if action.duration is not None and action.reps != action.duration:
+                action.reps = action.duration
 
         # not using these for now in action level
         # action.calories = exercise.calories  # for rowing/other cardio
