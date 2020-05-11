@@ -9,7 +9,8 @@ class HeartRateProcessing(object):
 
     def get_shrz(self, heart_rate_data):
 
-        max_heart_rate = float(220) - float(self.user_age)
+        # max_heart_rate = float(220) - float(self.user_age)  # Fox
+        max_heart_rate = float(208) - 0.7 * float(self.user_age)  # Tanaka
 
         zone_1_duration = 0
         zone_2_duration = 0
