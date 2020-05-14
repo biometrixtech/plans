@@ -132,7 +132,7 @@ class WorkoutProcessor(object):
         rpe_lookup_tuples.append((1, 75, 77))
         rpe_lookup_tuples.append((0, 73, 75))
 
-        rpe_tuple = [r for r in rpe_lookup_tuples if r[1] <= rep_max_percentage < r[2]]
+        rpe_tuple = [r for r in rpe_lookup_tuples if r[1] <= rep_max_percentage <= r[2]]
 
         if len(rpe_tuple) > 0:
 
@@ -163,7 +163,7 @@ class WorkoutProcessor(object):
         unrounded_reps = actual_reps_weight / (96.7 * .033)
         # ceil_reps = ceil(unrounded_reps)
 
-        reps = round(unrounded_reps, 0)
+        reps = max(round(unrounded_reps, 0), 1)
 
         return reps
 
@@ -258,7 +258,7 @@ class WorkoutProcessor(object):
 
             elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
 
-                weight = workout_exercise.weight_in_lbs
+                weight = workout_exercise.weight
 
             else:
                 return rpe

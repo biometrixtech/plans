@@ -1,18 +1,10 @@
-from models.functional_movement import FunctionalMovementPairs, FunctionalMovementActionMapping, FunctionalMovementFactory
-from models.functional_movement_type import FunctionalMovementType
-from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
-from models.workout_program import WorkoutExercise
-from models.soreness_base import BodyPartLocation, BodyPartSide
-
-
+from models.functional_movement import FunctionalMovementActionMapping, FunctionalMovementFactory
 from logic.workout_processing import WorkoutProcessor
 from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
-from models.movement_tags import AdaptationType, CardioAction, TrainingType
-from models.movement_actions import ExerciseAction, Movement, Explosiveness
+from models.movement_tags import TrainingType
+from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
 import datetime
-from utils import format_datetime
-
 
 
 def create_and_process_wokout(exercises):
@@ -24,6 +16,7 @@ def create_and_process_wokout(exercises):
     workout.workout_sections = [section]
     processor = WorkoutProcessor()
     processor.process_workout(workout)
+
 
 def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
     exercise = WorkoutExercise()
@@ -55,12 +48,9 @@ def get_max_load(exercise):
     functional_movement_dict = factory.get_functional_movement_dictinary()
     max_loads = {}
     for exercise_action in exercise.primary_actions:
-        # try:
         functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.datetime.now(), functional_movement_dict)
         max_action_load = get_max_action_load(functional_movement_action_mapping)
         max_loads[exercise_action.id] = max_action_load
-        # except:
-        #     pass
     return max_loads
 
 
@@ -68,16 +58,6 @@ def test_run():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="5823768d473c06100052ed9a")  # run
     create_and_process_wokout([exercise])
     max_loads = get_max_load(exercise)
-
-    # factory = FunctionalMovementFactory()
-    # functional_movement_dict = factory.get_functional_movement_dictinary()
-    # for exercise_action in exercise.primary_actions:
-    #     try:
-    #         functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.datetime.now(), functional_movement_dict)
-    #         max_action_load = get_max_load(ex)
-    #         max_loads[exercise_action.id] = max_action_load
-    #     except:
-    #         pass
     assert max_loads['1_a'] > max_loads['1_b'] > max_loads['1_c']
 
 
@@ -87,4 +67,3 @@ def test_sprint():
     max_loads = get_max_load(exercise)
 
     assert max_loads['2_a'] > max_loads['2_b'] > max_loads['2_c']
-
