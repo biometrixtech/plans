@@ -1,6 +1,7 @@
 from fathomapi.utils.xray import xray_recorder
 from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
+from logic.calculators import Calculators
 from logic.heart_rate_processing import HeartRateProcessing
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
@@ -18,7 +19,7 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 class WorkoutProcessor(object):
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
-    def process_workout(self, workout_program, hr_data=None, user_age=20):
+    def process_workout(self, workout_program, hr_data=None, user_age=20, user_weight=70, female=True):
 
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
@@ -31,27 +32,25 @@ class WorkoutProcessor(object):
                     workout_section.shrz = heart_rate_processing.get_shrz(section_hr)
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
-                self.add_movement_detail_to_exercise(workout_exercise)
+                self.add_movement_detail_to_exercise(workout_exercise, user_weight, female)
 
             workout_section.should_assess_shrz()
 
-
-    def add_movement_detail_to_exercise(self, exercise):
+    def add_movement_detail_to_exercise(self, exercise, user_weight=70, female=True):
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
-            self.add_action_details_to_exercise(exercise, movement)
-
+            self.add_action_details_to_exercise(exercise, movement, user_weight, female)
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
 
-    def add_action_details_to_exercise(self, exercise, movement):
+    def add_action_details_to_exercise(self, exercise, movement, user_weight=70, female=True):
         for action_id in movement.primary_actions:
             action_json = action_library.get(action_id)
             if action_json is not None:
                 action = ExerciseAction.json_deserialise(action_json)
-                self.initialize_action_from_exercise(action, exercise)
+                self.initialize_action_from_exercise(action, exercise, user_weight, female)
                 exercise.primary_actions.append(action)
         self.set_action_explosiveness_from_exercise(exercise, exercise.primary_actions)
         for action in exercise.primary_actions:
@@ -61,13 +60,13 @@ class WorkoutProcessor(object):
             action_json = action_library.get(action_id)
             if action_json is not None:
                 action = ExerciseAction.json_deserialise(action_json)
-                self.initialize_action_from_exercise(action, exercise)
+                self.initialize_action_from_exercise(action, exercise, user_weight, female)
                 exercise.secondary_actions.append(action)
         self.set_action_explosiveness_from_exercise(exercise, exercise.secondary_actions)
         for action in exercise.secondary_actions:
             action.set_training_load()
 
-    def initialize_action_from_exercise(self, action, exercise):
+    def initialize_action_from_exercise(self, action, exercise, user_weight=70, female=True):
         # athlete_bodyweight = 100
         # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
@@ -100,6 +99,8 @@ class WorkoutProcessor(object):
             speed, pace = self.get_speed_pace(exercise)
             action.speed = speed
             action.pace = pace
+            self.set_power_force_cardio(exercise, user_weight, female)
+
             # copy over duration and distance from exercise to action
             if exercise.duration is not None:
                 action.duration = exercise.duration
@@ -111,6 +112,7 @@ class WorkoutProcessor(object):
                 action.distance = exercise.duration * speed
             # copy other variables
             action.power = exercise.power  # power for rowing/other cardio in watts
+            action.force = exercise.force
             action.grade = exercise.grade  # for biking/running
             # final check if duration was derived, update action reps with duration
             if action.duration is not None and action.reps != action.duration:
@@ -120,6 +122,65 @@ class WorkoutProcessor(object):
         # action.calories = exercise.calories  # for rowing/other cardio
 
         # action.get_training_load()
+
+    @staticmethod
+    def set_power_force_cardio(exercise, user_weight=70.0, female=True):
+        # if power is not provided, calculate from available dta or estimate
+        if exercise.power is None:
+            if exercise.speed is not None:
+                if exercise.cardio_action == CardioAction.row:
+                    exercise.power = Calculators.power_rowing(exercise.speed)
+                elif exercise.cardio_action == CardioAction.run:
+                    exercise.power = Calculators.power_running(exercise.speed, exercise.grade, user_weight)
+                elif exercise.cardio_action == CardioAction.cycle:
+                    exercise.power = Calculators.power_cycling(exercise.speed, user_weight=user_weight, grade=exercise.grade)
+                else:  # for all other cardio types
+                    exercise.power = Calculators.power_cardio(exercise.cardio_action.name, user_weight, female)
+            else:
+                exercise.power = Calculators.power_cardio(exercise.cardio_action.name, user_weight, female)
+
+        if exercise.cardio_action == CardioAction.row:
+            exercise.force = Calculators.force_rowing(exercise.power, exercise.speed)
+        elif exercise.cardio_action == CardioAction.run:
+            exercise.force = Calculators.force_running(exercise.power, exercise.speed)
+        elif exercise.cardio_action == CardioAction.cycle:
+            exercise.force = Calculators.force_cycling(exercise.power, exercise.speed)
+        else:  # for all other cardio types
+            exercise.power = Calculators.power_cardio(exercise.cardio_action.name, user_weight, female)
+
+    @staticmethod
+    def get_speed_pace(exercise):
+        speed = None
+        pace = None
+        # get pace
+        if exercise.pace is not None:
+            if exercise.cardio_action == CardioAction.row:
+                pace = exercise.pace / 500  # row pace is s/500m
+            elif exercise.cardio_action == CardioAction.run:
+                pace = exercise.pace / 1609.34  # run pace is s/1mile
+            else:
+                pace = exercise.pace  # all others are s/m
+        elif exercise.speed is not None:
+            pace = 1 / exercise.speed
+        elif exercise.duration is not None and exercise.distance is not None:
+            pace = exercise.duration / exercise.distance
+        elif exercise.power is not None:
+            if exercise.cardio_action == CardioAction.row:
+                pace = (2.8 / exercise.power) ** (1 / 3)
+        elif exercise.calories is not None and exercise.duration is not None:
+            if exercise.cardio_action == CardioAction.row:
+                exercise.power = (4200 * exercise.calories - .35 * exercise.duration) / (4 * exercise.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
+                # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
+                pace = (2.8 / exercise.power) ** (1 / 3)
+
+        # get speed
+        if exercise.speed is not None:
+            speed = exercise.speed
+        elif exercise.duration is not None and exercise.distance is not None:
+            speed = exercise.distance / exercise.duration
+        elif pace is not None:
+            speed = 1 / pace
+        return speed, pace
 
     @staticmethod
     def get_rpe_from_rep_max(rep_max, reps):
@@ -330,40 +391,6 @@ class WorkoutProcessor(object):
                 return 4
         else:
             return 1
-
-    @staticmethod
-    def get_speed_pace(exercise):
-        speed = None
-        pace = None
-        # get pace
-        if exercise.pace is not None:
-            if exercise.cardio_action == CardioAction.row:
-                pace = exercise.pace / 500
-            elif exercise.cardio_action == CardioAction.run:
-                pace = exercise.pace / 1609.34
-            else:
-                pace = exercise.pace
-        elif exercise.speed is not None:
-            pace = 1 / exercise.speed
-        elif exercise.duration is not None and exercise.distance is not None:
-            pace = exercise.duration / exercise.distance
-        elif exercise.power is not None:
-            if exercise.cardio_action == CardioAction.row:
-                pace = (2.8 / exercise.power) ** (1 / 3)
-        elif exercise.calories is not None and exercise.duration is not None:
-            if exercise.cardio_action == CardioAction.row:
-                exercise.power = (4200 * exercise.calories - .35 * exercise.duration) / (4 * exercise.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
-                # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
-                pace = (2.8 / exercise.power) ** (1 / 3)
-
-        # get speed
-        if exercise.speed is not None:
-            speed = exercise.speed
-        elif exercise.duration is not None and exercise.distance is not None:
-            speed = exercise.distance / exercise.duration
-        elif pace is not None:
-            speed = 1 / pace
-        return speed, pace
 
     @staticmethod
     def convert_to_pace(pace, watts, calories, reps):

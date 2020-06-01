@@ -170,13 +170,15 @@ class WorkoutExercise(Serialisable):
         # for cardio exercises
         self.duration = None  # duration in seconds for cardio exercises
         self.distance = None  # distance covered for cardio exercises
-        self.speed = None
+        self.speed = None  # in m/s
         self.pace = None  # pace as time(s)/distance. distance is 500m for rowing, 1mile for running
         self.stroke_rate = None  # stroke rate for rowing
         self.cadence = None  # for biking/running
         self.power = None  # power for rowing/other cardio in watts
+        self.force = None  # force exerted in Newtons
         self.calories = None  # for rowing/other cardio
         self.grade = None  # for biking/running
+        self.force = None
 
         self.training_type = None
         self.explosiveness_rating = 0
@@ -213,6 +215,7 @@ class WorkoutExercise(Serialisable):
             'stroke_rate': self.stroke_rate,
             'cadence': self.cadence,
             'power': self.power,
+            'force': self.force,
             'calories': self.calories,
             'grade': self.grade,
             'equipments': [equipment.value for equipment in self.equipments],
@@ -265,6 +268,7 @@ class WorkoutExercise(Serialisable):
         exercise.stroke_rate = input_dict.get('stroke_rate')
         exercise.cadence = input_dict.get('cadence')
         exercise.power = input_dict.get('power')
+        exercise.force = input_dict.get('force')
         exercise.calories = input_dict.get('calories')
         exercise.grade = input_dict.get('grade')
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None

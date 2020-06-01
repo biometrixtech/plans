@@ -2,6 +2,7 @@ from enum import Enum, IntEnum
 from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution,\
     AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction, StrengthResistanceAction, StrengthEnduranceAction
 from models.functional_movement_type import FunctionalMovementType
+from logic.calculators import Calculators
 from serialisable import Serialisable
 
 
@@ -82,6 +83,7 @@ class ExerciseAction(object):
         self.power = None  # watts
         self.grade = None  # percentage (decimal)
         self.rep_tempo = None
+        self.force = None
 
         # derived
         self.adaptation_type = None
