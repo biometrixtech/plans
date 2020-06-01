@@ -62,16 +62,22 @@ class APIProcessing(object):
         session_obj = create_session(session_type, session_data)
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
+        if 'hr_data' in session and len(session['hr_data']) > 0:
+            heart_rate_processing = HeartRateProcessing(self.user_age)
+            self.create_session_hr_data(session_obj, session['hr_data'])
+            # session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         if session_obj.workout_program_module is not None:
             session_obj.workout_program_module.session_id = session_obj.id
             session_obj.workout_program_module.user_id = session_obj.user_id
             session_obj.workout_program_module.event_date_time = session_obj.event_date
-            WorkoutProcessor().process_workout(session_obj.workout_program_module)
+            hr_workout = self.heart_rate_data[0].hr_workout if len(self.heart_rate_data) > 0 else None
+            WorkoutProcessor().process_workout(session_obj.workout_program_module, hr_workout, self.user_age)
             self.workout_programs.append(session_obj.workout_program_module)
-        if 'hr_data' in session and len(session['hr_data']) > 0:
-            heart_rate_processing = HeartRateProcessing(self.user_age)
-            self.create_session_hr_data(session_obj, session['hr_data'])
-            session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
+        if len(self.heart_rate_data) > 0:
+            if session_obj.workout_program_module is not None:
+                session_obj.shrz = session_obj.workout_program_module.aggregate_shrz()
+            else:
+                session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         return session_obj
 
     def create_session_hr_data(self, session, hr_data):
@@ -79,6 +85,7 @@ class APIProcessing(object):
                                               session_id=session.id,
                                               event_date=session.event_date)
         session_heart_rate.hr_workout = [HeartRateData(cleanup_hr_data_from_api(hr)) for hr in hr_data]
+        session_heart_rate.hr_workout = [hr for hr in session_heart_rate.hr_workout if hr.start_date is not None]
         self.heart_rate_data.append(session_heart_rate)
 
     def create_symptom_from_survey(self, symptom):
@@ -159,13 +166,14 @@ def update_session(session, data):
 
 def cleanup_hr_data_from_api(hr_data):
     return {
-            'start_date': force_datetime_iso(hr_data['startDate']),
-            'end_date': force_datetime_iso(hr_data['endDate']),
+            'start_date': hr_data.get('startDate') or hr_data.get('event_date_time'),
+            'end_date': hr_data.get('endDate') or hr_data.get('end_date_time'),
             'value': hr_data['value']
             }
 
 
-def force_datetime_iso(event_date):
-    if len(event_date.split('.')) == 2:
-        event_date = event_date.split(".")[0] + 'Z'
-    return event_date
+
+# def force_datetime_iso(event_date):
+#     if len(event_date.split('.')) == 2:
+#         event_date = event_date.split(".")[0] + 'Z'
+#     return event_date

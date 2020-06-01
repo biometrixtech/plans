@@ -1,6 +1,7 @@
 from fathomapi.utils.xray import xray_recorder
 from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
+from logic.heart_rate_processing import HeartRateProcessing
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
@@ -17,12 +18,23 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 class WorkoutProcessor(object):
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
-    def process_workout(self, workout_program):
+    def process_workout(self, workout_program, hr_data=None, user_age=20):
 
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
+            heart_rate_processing = HeartRateProcessing(user_age)
+            if hr_data is not None and workout_section.start_date_time is not None and workout_section.end_date_time is not None:
+                # assumption here is that all exercises in the section are of similar training/adaptation types
+                # such that a single shrz can be calculated for each section
+                section_hr = [hr for hr in hr_data if workout_section.start_date_time <= hr.start_date <= workout_section.end_date_time]
+                if len(section_hr) > 0:
+                    workout_section.shrz = heart_rate_processing.get_shrz(section_hr)
             for workout_exercise in workout_section.exercises:
+                workout_exercise.shrz = workout_section.shrz
                 self.add_movement_detail_to_exercise(workout_exercise)
+
+            workout_section.should_assess_shrz()
+
 
     def add_movement_detail_to_exercise(self, exercise):
         if exercise.movement_id in movement_library:
@@ -77,6 +89,7 @@ class WorkoutProcessor(object):
 
         action.side = exercise.side
         action.rpe = exercise.rpe
+        action.shrz = exercise.shrz
         action.bilateral = exercise.bilateral
         # action.get_training_load()
 

@@ -68,6 +68,7 @@ class ExerciseAction(object):
 
         # obtained from exercise
         self.rpe = None
+        self.shrz = None
         self.reps = 1
         self.external_weight = []  # list of ExternalWeight objects
         self.bilateral = True
@@ -127,6 +128,7 @@ class ExerciseAction(object):
             additional_params = {
                 # obtained from exercises
                 "rpe": self.rpe,
+                "shrz": self.shrz,
                 "reps": self.reps,
                 "side": self.side,
                 "external_weight": [ex_weight.json_serialise() for ex_weight in self.external_weight],
@@ -376,7 +378,7 @@ class ExerciseAction(object):
         if self.training_type == TrainingType.strength_cardiorespiratory:
             if self.rpe is None:
                 self.rpe = 4
-            self.training_intensity = self.rpe
+            self.training_intensity = self.shrz or self.rpe
         elif self.training_type in [TrainingType.strength_endurance, TrainingType.strength_integrated_resistance]:
             self.set_strength_training_intensity()
         else:
