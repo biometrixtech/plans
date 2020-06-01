@@ -20,25 +20,6 @@ cardio_mets_table = {
     "race_walking": 6.5
 }
 
-# cardio_speed_table = {
-#     "run": 8.0,
-#     "sprint": 23.0,
-#     "row": 7.0,
-#     "cycle": 7.0,
-#     "ski_erg": 6.8,
-#     "swim": 7.0,
-#     "ruck": 5.0,
-#     "stairmaster": 9.0,
-#     "pilates": 3.0,
-#     "airdyne": 4.3,
-#     "yoga": 3.0,
-#     "power_yoga": 4.0,
-#     "elliptical": 5.0,
-#     "rope_skipping": 12.3,
-#     "bicycling_stationary": 7.0,
-#     "race_walking": 6.5
-# }
-
 
 class Calculators(object):
     @classmethod
@@ -101,7 +82,7 @@ class Calculators(object):
         return vo2_max
 
     @classmethod
-    def vo2max_jack_daniels(cls, time, distance):
+    def vo2max_running_jack_daniels(cls, time, distance):
         """
 
         :param time: minutes
@@ -115,7 +96,7 @@ class Calculators(object):
         return vo2, vo2_max
 
     @classmethod
-    def vo2max_workvo2_percent_hr_max(cls, percent_hr_max, work_vo2):
+    def vo2max_percent_hr_max(cls, percent_hr_max, work_vo2):
         """
 
         :param percent_hr_max:
@@ -140,10 +121,11 @@ class Calculators(object):
         """
         greater than 5.0 mph - or 3.0 mph or greater if the subject is jogging)
 
-        :param speed: meters/minute
+        :param speed: meters/s
         :param grade: float ( 0-1)
         :return:
         """
+        speed /= 60
         work_vo2 = 0.2 * speed + 0.9 * speed * grade + 3.5
         return work_vo2
 
@@ -153,10 +135,11 @@ class Calculators(object):
         based on this https://www.ajconline.org/article/S0002-9149(17)30873-1/fulltext
         This is a modification of work_vo2_running()
 
-        :param speed: meters/min
+        :param speed: meters/sec
         :param grade: float (0-1)
         :return:
         """
+        speed /= 60
         work_vo2 = speed * (0.17 + grade * 0.79) + 3.5
         return work_vo2
 

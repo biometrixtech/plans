@@ -194,6 +194,7 @@ class WorkoutExercise(Serialisable):
         self.primary_actions = []
         self.secondary_actions = []
         self.shrz = None
+        self.work_vo2 = None
 
     def json_serialise(self):
         ret = {
@@ -230,7 +231,8 @@ class WorkoutExercise(Serialisable):
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             # 'primary_actions': [action.json_serialise() for action in self.primary_actions],
             # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions],
-            'shrz': self.shrz
+            'shrz': self.shrz,
+            'work_vo2': self.work_vo2
         }
         return ret
 
@@ -275,6 +277,7 @@ class WorkoutExercise(Serialisable):
         exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
         exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
         exercise.shrz = input_dict.get('shrz')
+        exercise.work_vo2 = input_dict.get('work_vo2')
 
         return exercise
 

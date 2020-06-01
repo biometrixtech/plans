@@ -81,6 +81,7 @@ class ExerciseAction(object):
         self.pace = None  # in seconds/meter
         self.speed = None  # meters/second
         self.power = None  # watts
+        self.force = None  # newtons
         self.grade = None  # percentage (decimal)
         self.rep_tempo = None
         self.force = None
@@ -238,19 +239,19 @@ class ExerciseAction(object):
     def set_strength_training_intensity(self):
         self.training_intensity = 8
 
-    def set_cardio_tissue_intensity(self):
-        if self.cardio_action == CardioAction.row:
-            if self.pace is not None:
-                force = 2.8 / (self.pace ** 2)
-                self.tissue_intensity = force * self.rep_tempo
-        elif self.cardio_action == CardioAction.cycle:
-            if self.power is not None and self.speed is not None:
-                force = self.power / self.speed
-                self.tissue_intensity = force * self.rep_tempo
-        elif self.cardio_action == CardioAction.run:
-            if self.power is not None and self.speed is not None:
-                force = self.power / self.speed
-                self.tissue_intensity = force * self.rep_tempo
+    # def set_cardio_tissue_intensity(self):
+    #     if self.cardio_action == CardioAction.row:
+    #         if self.pace is not None:
+    #             force = 2.8 / (self.pace ** 2)
+    #             self.tissue_intensity = force * self.rep_tempo
+    #     elif self.cardio_action == CardioAction.cycle:
+    #         if self.power is not None and self.speed is not None:
+    #             force = self.power / self.speed
+    #             self.tissue_intensity = force * self.rep_tempo
+    #     elif self.cardio_action == CardioAction.run:
+    #         if self.power is not None and self.speed is not None:
+    #             force = self.power / self.speed
+    #             self.tissue_intensity = force * self.rep_tempo
 
     def set_external_intensity(self):
         external_weight_left = 0
@@ -357,10 +358,12 @@ class ExerciseAction(object):
             # both sides have same volume (duration) and intensity (rpe)
             self.total_load_left = self.training_volume_left * self.training_intensity
             self.total_load_right = self.training_volume_right * self.training_intensity
-            self.tissue_load_left = self.training_volume_left * self.readiness * self.tissue_intensity
-            self.tissue_load_right = self.training_volume_right * self.readiness * self.tissue_intensity
-            # self.total_load_left = self.training_volume_left * self.readiness * self.tissue_intensity
-            # self.total_load_right = self.training_volume_right * self.readiness * self.tissue_intensity
+            # self.tissue_load_left = self.training_volume_left * self.readiness * self.tissue_intensity
+            # self.tissue_load_right = self.training_volume_right * self.readiness * self.tissue_intensity
+            self.power_load_left = self.power * self.duration
+            self.power_load_right = self.power * self.duration
+            self.force_load_left = self.force * self.duration
+            self.force_load_right = self.force * self.duration
         else:
             left_dist = 1
             right_dist = 1
@@ -415,7 +418,7 @@ class ExerciseAction(object):
 
     def set_intensity(self):
         if self.training_type == TrainingType.strength_cardiorespiratory:
-            self.set_cardio_tissue_intensity()
+            # self.set_cardio_tissue_intensity()
             if self.rpe is None:
                 self.rpe = 4
             self.training_intensity = self.shrz or self.rpe
