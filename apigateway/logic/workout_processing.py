@@ -117,11 +117,24 @@ class WorkoutProcessor(object):
             # final check if duration was derived, update action reps with duration
             if action.duration is not None and action.reps != action.duration:
                 action.reps = action.duration
+        if action.training_type != TrainingType.strength_cardiorespiratory:
+            self.set_force_weighted(exercise, user_weight)
+            action.force = exercise.force
 
         # not using these for now in action level
         # action.calories = exercise.calories  # for rowing/other cardio
 
         # action.get_training_load()
+
+    @staticmethod
+    def set_force_weighted(exercise, user_weight=70):
+        if exercise.weight_measure == WeightMeasure.actual_weight:
+            weight = exercise.weight
+        elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
+            weight = exercise.weight * user_weight
+        else:
+            weight = 20  # TODO: need to change this
+        exercise.force = Calculators.force_resistance_exercise(weight)
 
     @staticmethod
     def set_power_force_cardio(exercise, user_weight=70.0, female=True):

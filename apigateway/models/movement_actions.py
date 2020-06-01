@@ -95,6 +95,10 @@ class ExerciseAction(object):
         self.total_load_right = 0
         self.tissue_load_left = 0
         self.tissue_load_right = 0
+        self.force_load_left = 0
+        self.force_load_right = 0
+        self.power_load_left = 0
+        self.power_load_right = 0
         # TODO: Remove these once strength-level intensity is implemented
         self.external_intensity_left = 0
         self.external_intensity_right = 0
@@ -157,6 +161,10 @@ class ExerciseAction(object):
                 "adaptation_type": self.adaptation_type.value if self.adaptation_type is not None else None,
                 "total_load_left": self.total_load_left,
                 "total_load_right": self.total_load_right,
+                "force_load_left": self.force_load_left,
+                "force_load_right": self.force_load_right,
+                "power_load_left": self.power_load_left,
+                "power_load_right": self.power_load_right,
                 # "external_intensity_left": self.external_intensity_left,
                 # "external_intensity_right": self.external_intensity_right,
                 # "bodyweight_intensity_left": self.bodyweight_intensity_left,
@@ -221,6 +229,10 @@ class ExerciseAction(object):
         action.explosiveness_rating = input_dict.get('explosiveness_rating', 0)
         action.total_load_left = input_dict.get('total_load_left', 0)
         action.total_load_right = input_dict.get('total_load_right', 0)
+        action.power_load_left = input_dict.get('power_load_left', 0)
+        action.power_load_right = input_dict.get('power_load_right', 0)
+        action.force_load_left = input_dict.get('force_load_left', 0)
+        action.force_load_right = input_dict.get('force_load_right', 0)
         # action.external_intensity_left = input_dict.get('external_intensity_left', 0)
         # action.external_intensity_right = input_dict.get('external_intensity_right', 0)
         # action.bodyweight_intensity_left = input_dict.get('bodyweight_intensity_left', 0)
@@ -360,10 +372,10 @@ class ExerciseAction(object):
             self.total_load_right = self.training_volume_right * self.training_intensity
             # self.tissue_load_left = self.training_volume_left * self.readiness * self.tissue_intensity
             # self.tissue_load_right = self.training_volume_right * self.readiness * self.tissue_intensity
-            self.power_load_left = self.power * self.duration
-            self.power_load_right = self.power * self.duration
-            self.force_load_left = self.force * self.duration
-            self.force_load_right = self.force * self.duration
+            self.power_load_left = self.power * self.training_volume_left
+            self.power_load_right = self.power * self.training_volume_right
+            self.force_load_left = self.force * self.training_volume_left
+            self.force_load_right = self.force * self.training_volume_right
         else:
             left_dist = 1
             right_dist = 1
@@ -383,6 +395,8 @@ class ExerciseAction(object):
                     right_dist = self.lateral_distribution[0] / 100 * 2
             self.total_load_left = self.training_volume_left * self.training_intensity * left_dist
             self.total_load_right = self.training_volume_right * self.training_intensity * right_dist
+            self.force_load_left = self.force * self.training_volume_left * left_dist
+            self.force_load_right = self.force * self.training_volume_right * right_dist
 
     def set_training_volume(self):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
@@ -390,35 +404,36 @@ class ExerciseAction(object):
             self.training_volume_left = self.reps
             self.training_volume_right = self.reps
         else:
+            # use 1 rep = 4s to get volume in seconds
+            total_volume = self.reps * 4
             if self.lateral_distribution_pattern == WeightDistribution.unilateral:
                 if self.side == 1:
-                    self.training_volume_left = self.reps
+                    self.training_volume_left = total_volume
                 elif self.side == 2:
-                    self.training_volume_right = self.reps
+                    self.training_volume_right = total_volume
                 else:
-                    self.training_volume_left = self.reps / 2
-                    self.training_volume_right = self.reps / 2
+                    self.training_volume_left = total_volume / 2
+                    self.training_volume_right = total_volume / 2
             elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:
                 if self.side == 1:
                     if self.lateral_distribution[0] != 0:
-                        self.training_volume_left = self.reps
+                        self.training_volume_left = total_volume
                     if self.lateral_distribution[1] != 0:
-                        self.training_volume_right = self.reps
+                        self.training_volume_right = total_volume
                 elif self.side == 2:
                     if self.lateral_distribution[1] != 0:
-                        self.training_volume_left = self.reps
+                        self.training_volume_left = total_volume
                     if self.lateral_distribution[0] != 0:
-                        self.training_volume_right = self.reps
+                        self.training_volume_right = total_volume
                 else:
-                    self.training_volume_left = self.reps
-                    self.training_volume_right = self.reps
+                    self.training_volume_left = total_volume
+                    self.training_volume_right = total_volume
             else:
-                self.training_volume_left = self.reps
-                self.training_volume_right = self.reps
+                self.training_volume_left = total_volume
+                self.training_volume_right = total_volume
 
     def set_intensity(self):
         if self.training_type == TrainingType.strength_cardiorespiratory:
-            # self.set_cardio_tissue_intensity()
             if self.rpe is None:
                 self.rpe = 4
             self.training_intensity = self.shrz or self.rpe
