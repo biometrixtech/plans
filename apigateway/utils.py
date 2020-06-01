@@ -53,6 +53,8 @@ def format_datetime(datetime_input):
 
 
 def parse_datetime(datetime_string):
+    if isinstance(datetime_string, datetime.datetime):
+        return datetime_string
     format_strings = [
         "%Y-%m-%dT%H:%M:%SZ",
         "%Y-%m-%dT%H:%M:%S.%fZ",

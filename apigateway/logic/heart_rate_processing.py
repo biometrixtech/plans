@@ -1,6 +1,7 @@
-from models.heart_rate import HeartRateData, SessionHeartRate
-from datetime import timedelta
+# from models.heart_rate import HeartRateData, SessionHeartRate
+# from datetime import timedelta
 from utils import parse_datetime
+
 
 class HeartRateProcessing(object):
     def __init__(self, user_age):
@@ -8,7 +9,8 @@ class HeartRateProcessing(object):
 
     def get_shrz(self, heart_rate_data):
 
-        max_heart_rate = float(220) - float(self.user_age)
+        # max_heart_rate = float(220) - float(self.user_age)  # Fox
+        max_heart_rate = float(208) - 0.7 * float(self.user_age)  # Tanaka
 
         zone_1_duration = 0
         zone_2_duration = 0
@@ -40,7 +42,7 @@ class HeartRateProcessing(object):
 
         total_possible_duration = len(full_heart_data) * 5
 
-        shrz = (total_duration / total_possible_duration) * 10
+        shrz = round((total_duration / total_possible_duration) * 10, 2)
 
         shrz = max(1, shrz)
 
@@ -57,11 +59,9 @@ class HeartRateProcessing(object):
             new_heart_rate_data.append(heart_rate_data[h].value)
             if seconds_diff > 0:
                 for s in range(1, seconds_diff):
-                    new_heart_rate = ((heart_rate_data[h + 1].value - heart_rate_data[h].value) / s) + heart_rate_data[h].value
+                    new_heart_rate = ((heart_rate_data[h + 1].value - heart_rate_data[h].value) / seconds_diff * s) + heart_rate_data[h].value
                     new_heart_rate_data.append(new_heart_rate)
 
         new_heart_rate_data.append(heart_rate_data[len(heart_rate_data) - 1].value)
 
         return new_heart_rate_data
-
-

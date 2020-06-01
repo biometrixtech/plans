@@ -68,6 +68,7 @@ class ExerciseAction(object):
 
         # obtained from exercise
         self.rpe = None
+        self.shrz = None
         self.cardio_action = None
         self.reps = 1
         self.external_weight = []  # list of ExternalWeight objects
@@ -140,6 +141,7 @@ class ExerciseAction(object):
             additional_params = {
                 # obtained from exercises
                 "rpe": self.rpe,
+                "shrz": self.shrz,
                 "pace": self.pace,
                 "rep_tempo": self.rep_tempo,
                 "cardio_action": self.cardio_action.value if self.cardio_action is not None else None,
@@ -414,7 +416,7 @@ class ExerciseAction(object):
             self.set_cardio_tissue_intensity()
             if self.rpe is None:
                 self.rpe = 4
-            self.training_intensity = self.rpe
+            self.training_intensity = self.shrz or self.rpe
         elif self.training_type in [TrainingType.strength_endurance, TrainingType.strength_integrated_resistance]:
             self.set_strength_training_intensity()
         else:
