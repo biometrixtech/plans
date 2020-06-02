@@ -146,16 +146,13 @@ class WorkoutProcessor(object):
         action.power = exercise.power  # power for rowing/other cardio in watts
         action.force = exercise.force
         action.grade = exercise.grade  # for biking/running
-        if action.training_type == TrainingType.strength_cardiorespiratory:
-            action.rep_tempo = exercise.rep_tempo
-            action.speed = exercise.speed
-            action.pace = exercise.pace
-            # copy over duration and distance from exercise to action
-            if exercise.duration is not None:
-                action.duration = exercise.duration
 
-            if exercise.distance is not None:
-                action.distance = exercise.distance
+        action.rep_tempo = exercise.rep_tempo
+        action.speed = exercise.speed
+        action.pace = exercise.pace
+        # copy over duration and distance from exercise to action
+        action.duration = exercise.duration
+        action.distance = exercise.distance
 
         # if action.cardio_action is not None:
         #if action.training_type == TrainingType.strength_cardiorespiratory:
