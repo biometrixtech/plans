@@ -1564,7 +1564,7 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `duration` __if present__, __should__ be the total time assigned or taken to complete the exercise
 * `distance` __if present__, __should__ be an number representing distance assigned or covered in meters
 * `speed` __if present__, __should__ be an number representing average speed (meters/second) for the exercise
-* `pace` __if present__, __should__ be an number representing duration (seconds) per distance for the running (1 mile pace) and rowing (500m pace)
+* `pace` __if present__, __should__ be an number representing average pace (seconds/meters) for the exercise
 * `power` __if present__, __should__ be an number representing the average power production during the exercise in watts
 * `calories` __if present__, __should__ be an number representing calories burned during the exercise
 * `stroke_rate` __if present__, __should__ be an number representing average rowing stroke rate
