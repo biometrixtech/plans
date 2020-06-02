@@ -106,6 +106,16 @@ class StandardErrorRange(Serialisable):
         }
         return ret
 
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        error_range = cls()
+        error_range.lower_bound = input_dict.get('lower_bound')
+        error_range.upper_bound = input_dict.get('upper_bound')
+        error_range.observed_value = input_dict.get('observed_value')
+        error_range.insufficient_data = input_dict.get('insufficient_data', False)
+
+        return error_range
+
 
 class StandardErrorRangeMetric(StandardErrorRange):
     def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):

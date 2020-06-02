@@ -126,22 +126,14 @@ class BodyPartFunctionalMovement(Serialisable):
         self.compensated_concentric_load = 0
         self.compensated_eccentric_load = 0
         self.compensating_causes_load = []
-        # self.concentric_intensity = 0
-        # self.eccentric_intensity = 0
-        # self.compensated_concentric_intensity = 0
-        # self.compensated_eccentric_intensity = 0
-        # self.compensating_causes_intensity = []
-        self.concentric_ramp = 0.0
-        self.eccentric_ramp = 0.0
         self.is_compensating = False
-        self.compensation_source_load = None
-        # self.compensation_source_intensity = None
+        #self.compensation_source_load = None
         self.body_part_function = None
-        self.inhibited = 0
-        self.weak = 0
-        self.tight = 0
-        self.inflamed = 0
-        self.long = 0
+        #self.inhibited = 0
+        #self.weak = 0
+        #self.tight = 0
+        #self.inflamed = 0
+        #self.long = 0
 
         self.total_normalized_load = 0
 
@@ -156,10 +148,6 @@ class BodyPartFunctionalMovement(Serialisable):
     def total_eccentric_load(self):
 
         return self.eccentric_load + self.compensated_eccentric_load
-
-    # def total_intensity(self):
-    #
-    #     return max(self.concentric_intensity, self.eccentric_intensity, self.compensated_concentric_intensity, self.compensated_eccentric_intensity)
 
     def __hash__(self):
         return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
@@ -180,22 +168,14 @@ class BodyPartFunctionalMovement(Serialisable):
                 'compensated_concentric_load': self.compensated_concentric_load,
                 'compensated_eccentric_load': self.compensated_eccentric_load,
                 'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
-                #'concentric_intensity': self.concentric_intensity,
-                #'eccentric_intensity': self.eccentric_intensity,
-                #'compensated_concentric_intensity': self.compensated_concentric_intensity,
-                #'compensated_eccentric_intensity': self.compensated_eccentric_intensity,
-                # 'compensating_causes_intensity': [c.json_serialise() for c in self.compensating_causes_intensity],
-                'concentric_ramp': self.concentric_ramp,
-                'eccentric_ramp': self.eccentric_ramp,
                 'is_compensating': self.is_compensating,
-                'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
-                #'compensation_source_intensity': self.compensation_source_intensity.value if self.compensation_source_intensity is not None else None,
+                #'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
                 'body_part_function': self.body_part_function.value if self.body_part_function is not None else None,
-                'inhibited': self.inhibited if self.inhibited is not None else None,
-                'weak': self.weak,
-                'tight': self.tight,
-                'inflamed': self.inflamed,
-                'long': self.long,
+                #'inhibited': self.inhibited if self.inhibited is not None else None,
+                #'weak': self.weak,
+                #'tight': self.tight,
+                #'inflamed': self.inflamed,
+                #'long': self.long,
                 'total_normalized_load': self.total_normalized_load
             }
 
@@ -207,22 +187,14 @@ class BodyPartFunctionalMovement(Serialisable):
         movement.compensated_concentric_load = input_dict.get('compensated_concentric_load', 0)
         movement.compensated_eccentric_load = input_dict.get('compensated_eccentric_load', 0)
         movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
-        # movement.concentric_intensity = input_dict.get('concentric_intensity', 0)
-        # movement.eccentric_intensity = input_dict.get('eccentric_intensity', 0)
-        # movement.compensated_concentric_intensity = input_dict.get('compensated_concentric_intensity', 0)
-        # movement.compensated_eccentric_intensity = input_dict.get('compensated_eccentric_intensity', 0)
-        # movement.compensating_causes_intensity = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_intensity',[])]  # I don't know what gets saved here!
-        movement.concentric_ramp = input_dict.get('concentric_ramp', 0.0)
-        movement.eccentric_ramp = input_dict.get('eccentric_ramp', 0.0)
         movement.is_compensating = input_dict.get('is_compensating', False)
-        movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
-        # movement.compensation_source_intensity = CompensationSource(input_dict['compensation_source_intensity']) if input_dict.get('compensation_source_intensity') is not None else None
+        #movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
         movement.body_part_function = BodyPartFunction(input_dict['body_part_function']) if input_dict.get('body_part_function') is not None else None
-        movement.inhibited = input_dict.get('inhibited', 0)
-        movement.weak = input_dict.get('weak', 0)
-        movement.tight = input_dict.get('tight', 0)
-        movement.inflamed = input_dict.get('inflamed', 0)
-        movement.long = input_dict.get('long', 0)
+        #movement.inhibited = input_dict.get('inhibited', 0)
+        #movement.weak = input_dict.get('weak', 0)
+        #movement.tight = input_dict.get('tight', 0)
+        #movement.inflamed = input_dict.get('inflamed', 0)
+        #movement.long = input_dict.get('long', 0)
         movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
         return movement
 
@@ -236,25 +208,9 @@ class BodyPartFunctionalMovement(Serialisable):
             self.compensated_eccentric_load += target.compensated_eccentric_load
             self.compensating_causes_load.extend(target.compensating_causes_load)
             self.compensating_causes_load = list(set(self.compensating_causes_load))
-            # self.concentric_intensity += target.concentric_intensity
-            # self.eccentric_intensity += target.eccentric_intensity
-            # self.compensated_concentric_intensity += target.compensated_concentric_intensity
-            # self.compensated_eccentric_intensity += target.compensated_eccentric_intensity
-            #self.compensating_causes_intensity.extend(target.compensating_causes_intensity)
-            # self.compensating_causes_intensity = list(set(self.compensating_causes_intensity))
-            self.concentric_ramp = max(self.concentric_ramp, target.concentric_ramp)
-            self.eccentric_ramp = max(self.eccentric_ramp, target.eccentric_ramp)
             self.is_compensating = max(self.is_compensating, target.is_compensating)
-            self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
-            # self.compensation_source_intensity = self.merge_with_none(self.compensation_source_intensity, target.compensation_source_intensity)
+            #self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
             self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
-            # not sure these are even used
-            # self.body_part_function = None
-            # self.inhibited = 0
-            # self.weak = 0
-            # self.tight = 0
-            # self.inflamed = 0
-            # self.long = 0
             self.total_normalized_load += target.total_normalized_load
 
     def merge_with_none(self, value_a, value_b):
@@ -623,7 +579,7 @@ class FunctionalMovementActionMapping(object):
                         functional_movement_body_part_side.compensated_concentric_load += synergist_compensated_concentric_load
                         functional_movement_body_part_side.compensated_eccentric_load += synergist_compensated_eccentric_load
                         functional_movement_body_part_side.compensating_causes_load.append(c)
-                        functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
+                        #functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
                         if body_part_side_string not in self.muscle_load:
                             self.muscle_load[body_part_side_string] = functional_movement_body_part_side
                         else:
@@ -632,8 +588,8 @@ class FunctionalMovementActionMapping(object):
                             self.muscle_load[
                                 body_part_side_string].compensated_eccentric_load += synergist_compensated_eccentric_load
                             self.muscle_load[body_part_side_string].compensating_causes_load.append(c)
-                            self.muscle_load[
-                                body_part_side_string].compensation_source_load = CompensationSource.internal_processing
+                            #self.muscle_load[
+                            #    body_part_side_string].compensation_source_load = CompensationSource.internal_processing
 
     def apply_load_to_list(self, functional_movement_list, functional_movement_priority, target_body_part_function,
                            functional_movement_muscle_action, left_load, right_load, stability_rating):
@@ -853,14 +809,14 @@ class FunctionalMovementActivityMapping(object):
                     s.compensated_concentric_load += synergist_compensated_concentric_load
                     s.compensated_eccentric_load += synergist_compensated_eccentric_load
                     s.compensating_causes_load.append(c)
-                    s.compensation_source_load = CompensationSource.internal_processing
+                    #s.compensation_source_load = CompensationSource.internal_processing
                     if s.body_part_side not in self.muscle_load:
                         self.muscle_load[s.body_part_side] = s
                     else:
                         self.muscle_load[s.body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
                         self.muscle_load[s.body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
                         self.muscle_load[s.body_part_side].compensating_causes_load.append(c)
-                        self.muscle_load[s.body_part_side].compensation_source_load = CompensationSource.internal_processing
+                        #self.muscle_load[s.body_part_side].compensation_source_load = CompensationSource.internal_processing
 
         for p in self.prime_movers:
             attributed_concentric_load = training_load * self.concentric_level * prime_mover_ratio
