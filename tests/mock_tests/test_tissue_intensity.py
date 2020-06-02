@@ -77,6 +77,7 @@ def get_max_load(exercise):
 
 def test_rowing():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
+    exercise.pace = .24
     workout_program = create_and_process_workout([exercise])
     for action in exercise.primary_actions:
         assert action.force == round(2.8 / (120 / 500) ** 2, 2)
@@ -89,6 +90,7 @@ def test_rowing():
 def test_rowing_stroke_rate_25():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
     exercise.stroke_rate = 25
+    exercise.pace = .24
     create_and_process_workout([exercise])
     for action in exercise.primary_actions:
         assert action.force == round(2.8 / (120 / 500) ** 2, 2)

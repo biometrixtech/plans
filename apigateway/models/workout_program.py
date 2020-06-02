@@ -417,12 +417,12 @@ class WorkoutExercise(Serialisable):
         pace = None
         # get pace
         if self.pace is not None:
-            if self.cardio_action == CardioAction.row:
-                pace = self.pace / 500  # row pace is s/500m
-            elif self.cardio_action == CardioAction.run:
-                pace = self.pace / 1609.34  # run pace is s/1mile
-            else:
-                pace = self.pace  # all others are s/m
+            # if self.cardio_action == CardioAction.row:
+            #     pace = self.pace / 500  # row pace is s/500m
+            # elif self.cardio_action == CardioAction.run:
+            #     pace = self.pace / 1609.34  # run pace is s/1mile
+            # else:
+            pace = self.pace  # all others are s/m
         elif self.speed is not None:
             pace = 1 / self.speed
         elif self.duration is not None and self.distance is not None:
