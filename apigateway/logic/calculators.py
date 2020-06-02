@@ -320,7 +320,7 @@ class Calculators(object):
         :param handlebar_position: used for drag
         :return:
         """
-        user_weight = 70.0 if user_weight is None else user_weight
+        user_weight = 60.0 if user_weight is None else user_weight
         grade = .01 if grade is None else grade
         wind_speed = 1.4 if wind_speed is None else wind_speed
         cycle_weight = 15.0 if cycle_weight is None else cycle_weight
@@ -349,7 +349,7 @@ class Calculators(object):
         :param user_weight: kg
         :return:
         """
-        user_weight = 70.0 if user_weight is None else user_weight
+        user_weight = 60.0 if user_weight is None else user_weight
         grade = .01 if grade is None else grade
         speed /= 60  # convert m/s to m/min
         efficiency = .22
@@ -394,16 +394,18 @@ class Calculators(object):
         return average_force
 
     @classmethod
-    def power_cardio(cls, cardio_type, weight, female=True):
+    def power_cardio(cls, cardio_type, user_weight, female=True):
         """
 
         :param cardio_type: string
-        :param weight: kg
+        :param user_weight: kg
         :param female: bool
         :return:
         """
-        mets = cls.mets_cardio(cardio_type, female)
-        power = cls.mets_to_watts(mets, weight, efficiency=.21)
+        cardio_name = cardio_type.name if cardio_type is not None else None
+        # cardio_name = cardio_type.name or None
+        mets = cls.mets_cardio(cardio_name, female)
+        power = cls.mets_to_watts(mets, user_weight, efficiency=.21)
         return power
 
     @classmethod
@@ -446,16 +448,17 @@ class Calculators(object):
         return force
 
     @classmethod
-    def force_cardio(cls, cardio_type, weight=70, female=True):
+    def force_cardio(cls, cardio_type, user_weight=60.0, female=True):
         """
 
         :param cardio_type:
-        :param weight:
+        :param user_weight:
         :param female:
         :return:
         """
-        mets = cls.mets_cardio(cardio_type, female)
-        force = round(mets * 3.5 * weight * 427 / (200 * 60), 2)
+        cardio_name = cardio_type.name if cardio_type is not None else None
+        mets = cls.mets_cardio(cardio_name, female)
+        force = round(mets * 3.5 * user_weight * 427 / (200 * 60), 2)
         return force
 
     @classmethod

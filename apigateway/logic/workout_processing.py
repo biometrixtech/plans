@@ -19,7 +19,7 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 class WorkoutProcessor(object):
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
-    def process_workout(self, workout_program, hr_data=None, user_age=20, user_weight=70, female=True):
+    def process_workout(self, workout_program, hr_data=None, user_age=20, user_weight=60.0, female=True):
 
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
@@ -36,7 +36,7 @@ class WorkoutProcessor(object):
 
             workout_section.should_assess_shrz()
 
-    def add_movement_detail_to_exercise(self, exercise, user_weight=70, female=True):
+    def add_movement_detail_to_exercise(self, exercise, user_weight=60.0, female=True):
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
@@ -45,7 +45,7 @@ class WorkoutProcessor(object):
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
 
-    def add_action_details_to_exercise(self, exercise, movement, user_weight=70, female=True):
+    def add_action_details_to_exercise(self, exercise, movement, user_weight=60.0, female=True):
         for action_id in movement.primary_actions:
             action_json = action_library.get(action_id)
             if action_json is not None:
@@ -66,7 +66,7 @@ class WorkoutProcessor(object):
         for action in exercise.secondary_actions:
             action.set_training_load()
 
-    def initialize_action_from_exercise(self, action, exercise, user_weight=70, female=True):
+    def initialize_action_from_exercise(self, action, exercise, user_weight=60.0, female=True):
         # athlete_bodyweight = 100
         # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
         # sooooo, now what do we do with this estimated_rpe value !?!?!
@@ -94,7 +94,8 @@ class WorkoutProcessor(object):
         action.bilateral = exercise.bilateral
         action.cardio_action = exercise.cardio_action
 
-        if action.cardio_action is not None:
+        # if action.cardio_action is not None:
+        if action.training_type == TrainingType.strength_cardiorespiratory:
             action.rep_tempo = self.get_rep_tempo(exercise)
             speed, pace = self.get_speed_pace(exercise)
             action.speed = speed
@@ -127,7 +128,7 @@ class WorkoutProcessor(object):
         # action.get_training_load()
 
     @staticmethod
-    def set_force_weighted(exercise, user_weight=70):
+    def set_force_weighted(exercise, user_weight=60.0):
         if exercise.weight_measure == WeightMeasure.actual_weight:
             weight = exercise.weight
         elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
@@ -137,7 +138,7 @@ class WorkoutProcessor(object):
         exercise.force = Calculators.force_resistance_exercise(weight)
 
     @staticmethod
-    def set_power_force_cardio(exercise, user_weight=70.0, female=True):
+    def set_power_force_cardio(exercise, user_weight=60.0, female=True):
         # if power is not provided, calculate from available dta or estimate
         if exercise.power is None:
             if exercise.speed is not None:
@@ -148,9 +149,9 @@ class WorkoutProcessor(object):
                 elif exercise.cardio_action == CardioAction.cycle:
                     exercise.power = Calculators.power_cycling(exercise.speed, user_weight=user_weight, grade=exercise.grade)
                 else:  # for all other cardio types
-                    exercise.power = Calculators.power_cardio(exercise.cardio_action.name, user_weight, female)
+                    exercise.power = Calculators.power_cardio(exercise.cardio_action, user_weight, female)
             else:
-                exercise.power = Calculators.power_cardio(exercise.cardio_action.name, user_weight, female)
+                exercise.power = Calculators.power_cardio(exercise.cardio_action, user_weight, female)
 
         if exercise.cardio_action == CardioAction.row:
             exercise.force = Calculators.force_rowing(exercise.power, exercise.speed)
@@ -159,7 +160,7 @@ class WorkoutProcessor(object):
         elif exercise.cardio_action == CardioAction.cycle:
             exercise.force = Calculators.force_cycling(exercise.power, exercise.speed)
         else:  # for all other cardio types
-            exercise.power = Calculators.power_cardio(exercise.cardio_action.name, user_weight, female)
+            exercise.force = Calculators.power_cardio(exercise.cardio_action, user_weight, female)
 
     @staticmethod
     def get_speed_pace(exercise):
@@ -193,6 +194,7 @@ class WorkoutProcessor(object):
             speed = exercise.distance / exercise.duration
         elif pace is not None:
             speed = 1 / pace
+        exercise.speed = speed
         return speed, pace
 
     @staticmethod
