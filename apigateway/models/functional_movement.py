@@ -129,11 +129,11 @@ class BodyPartFunctionalMovement(Serialisable):
         self.is_compensating = False
         #self.compensation_source_load = None
         self.body_part_function = None
-        self.inhibited = 0
-        self.weak = 0
-        self.tight = 0
-        self.inflamed = 0
-        self.long = 0
+        #self.inhibited = 0
+        #self.weak = 0
+        #self.tight = 0
+        #self.inflamed = 0
+        #self.long = 0
 
         self.total_normalized_load = 0
 
@@ -171,11 +171,11 @@ class BodyPartFunctionalMovement(Serialisable):
                 'is_compensating': self.is_compensating,
                 #'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
                 'body_part_function': self.body_part_function.value if self.body_part_function is not None else None,
-                'inhibited': self.inhibited if self.inhibited is not None else None,
-                'weak': self.weak,
-                'tight': self.tight,
-                'inflamed': self.inflamed,
-                'long': self.long,
+                #'inhibited': self.inhibited if self.inhibited is not None else None,
+                #'weak': self.weak,
+                #'tight': self.tight,
+                #'inflamed': self.inflamed,
+                #'long': self.long,
                 'total_normalized_load': self.total_normalized_load
             }
 
@@ -190,11 +190,11 @@ class BodyPartFunctionalMovement(Serialisable):
         movement.is_compensating = input_dict.get('is_compensating', False)
         #movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
         movement.body_part_function = BodyPartFunction(input_dict['body_part_function']) if input_dict.get('body_part_function') is not None else None
-        movement.inhibited = input_dict.get('inhibited', 0)
-        movement.weak = input_dict.get('weak', 0)
-        movement.tight = input_dict.get('tight', 0)
-        movement.inflamed = input_dict.get('inflamed', 0)
-        movement.long = input_dict.get('long', 0)
+        #movement.inhibited = input_dict.get('inhibited', 0)
+        #movement.weak = input_dict.get('weak', 0)
+        #movement.tight = input_dict.get('tight', 0)
+        #movement.inflamed = input_dict.get('inflamed', 0)
+        #movement.long = input_dict.get('long', 0)
         movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
         return movement
 
