@@ -49,6 +49,8 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
     exercise.sets = sets
     exercise.unit_of_measure = unit
     exercise.movement_id = movement_id
+    exercise.pace = 120
+    exercise.stroke_rate = 22
     if movement_id == "":
         action = ExerciseAction('0', 'test_action')
         action.training_type = TrainingType.strength_cardiorespiratory
@@ -156,8 +158,8 @@ def test_shrz():
     workout = WorkoutProgramModule()
     workout.workout_sections = [section1, section2, section3]
 
-    processor = WorkoutProcessor()
-    processor.process_workout(workout, heart_rate_data)
+    processor = WorkoutProcessor(hr_data=heart_rate_data)
+    processor.process_workout(workout)
 
     assert not section1.assess_shrz  # no shrz for warmup
     assert section2.assess_shrz  # get shrz

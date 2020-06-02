@@ -45,13 +45,13 @@ def test_parse_date():
     assert parse_date(event_date) == datetime.datetime(2018, 11, 30, 0, 0, 0).replace(tzinfo=pytz.utc)
 
 def test_fix_early_survey_event_date_before_3_am():
-    event_date = datetime.datetime(2018, 6, 1, 1, 0, 0)
+    event_date = datetime.datetime(2018, 6, 1, 1, 0, 0).replace(tzinfo=pytz.utc)
     fixed_date_time = fix_early_survey_event_date(event_date)
-    assert fixed_date_time == datetime.datetime(2018, 5, 31, 23, 59, 59)
+    assert fixed_date_time == datetime.datetime(2018, 5, 31, 23, 59, 59).replace(tzinfo=pytz.utc)
 
 def test_fix_early_survey_event_date_after_3_am():
-    event_date = datetime.datetime(2018, 11, 30, 3, 0, 0)
-    assert fix_early_survey_event_date(event_date) == datetime.datetime(2018, 11, 30, 3, 00, 00)
+    event_date = datetime.datetime(2018, 11, 30, 3, 0, 0).replace(tzinfo=pytz.utc)
+    assert fix_early_survey_event_date(event_date) == datetime.datetime(2018, 11, 30, 3, 00, 00).replace(tzinfo=pytz.utc)
 
 def test_with_timezone():
     datetime_strings = [

@@ -167,6 +167,18 @@ class WorkoutExercise(Serialisable):
         self.bilateral = True
         self.movement_id = ""
 
+        # for cardio exercises
+        self.duration = None  # duration in seconds for cardio exercises
+        self.distance = None  # distance covered for cardio exercises
+        self.speed = None  # in m/s
+        self.pace = None  # pace as time(s)/distance. distance is 500m for rowing, 1mile for running
+        self.stroke_rate = None  # stroke rate for rowing
+        self.cadence = None  # for biking/running
+        self.power = None  # power for rowing/other cardio in watts
+        self.force = None  # force exerted in Newtons
+        self.calories = None  # for rowing/other cardio
+        self.grade = None  # for biking/running
+
         self.training_type = None
         self.explosiveness_rating = 0
         self.equipments = []   # TODO: do we get this from the api
@@ -181,6 +193,7 @@ class WorkoutExercise(Serialisable):
         self.primary_actions = []
         self.secondary_actions = []
         self.shrz = None
+        self.work_vo2 = None
 
     def json_serialise(self):
         ret = {
@@ -195,6 +208,16 @@ class WorkoutExercise(Serialisable):
             'side': self.side,
             'bilateral': self.bilateral,
             'movement_id': self.movement_id,
+            'duration': self.duration,
+            'distance': self.distance,
+            'speed': self.speed,
+            'pace': self.pace,
+            'stroke_rate': self.stroke_rate,
+            'cadence': self.cadence,
+            'power': self.power,
+            'force': self.force,
+            'calories': self.calories,
+            'grade': self.grade,
             'equipments': [equipment.value for equipment in self.equipments],
             'adaptation_type': self.adaptation_type.value if self.adaptation_type is not None else None,
             'cardio_action': self.cardio_action.value if self.cardio_action is not None else None,
@@ -207,7 +230,8 @@ class WorkoutExercise(Serialisable):
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             # 'primary_actions': [action.json_serialise() for action in self.primary_actions],
             # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions],
-            'shrz': self.shrz
+            'shrz': self.shrz,
+            'work_vo2': self.work_vo2
         }
         return ret
 
@@ -238,10 +262,21 @@ class WorkoutExercise(Serialisable):
         exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
             'training_type') is not None else None
         exercise.rpe = input_dict.get('rpe')
+        exercise.duration = input_dict.get('duration')
+        exercise.distance = input_dict.get('distance')
+        exercise.speed = input_dict.get('speed')
+        exercise.pace = input_dict.get('pace')
+        exercise.stroke_rate = input_dict.get('stroke_rate')
+        exercise.cadence = input_dict.get('cadence')
+        exercise.power = input_dict.get('power')
+        exercise.force = input_dict.get('force')
+        exercise.calories = input_dict.get('calories')
+        exercise.grade = input_dict.get('grade')
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
         exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
         exercise.shrz = input_dict.get('shrz')
+        exercise.work_vo2 = input_dict.get('work_vo2')
 
         return exercise
 
