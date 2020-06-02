@@ -158,8 +158,8 @@ def test_shrz():
     workout = WorkoutProgramModule()
     workout.workout_sections = [section1, section2, section3]
 
-    processor = WorkoutProcessor()
-    processor.process_workout(workout, heart_rate_data)
+    processor = WorkoutProcessor(hr_data=heart_rate_data)
+    processor.process_workout(workout)
 
     assert not section1.assess_shrz  # no shrz for warmup
     assert section2.assess_shrz  # get shrz

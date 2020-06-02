@@ -178,7 +178,6 @@ class WorkoutExercise(Serialisable):
         self.force = None  # force exerted in Newtons
         self.calories = None  # for rowing/other cardio
         self.grade = None  # for biking/running
-        self.force = None
 
         self.training_type = None
         self.explosiveness_rating = 0
