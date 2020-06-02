@@ -53,84 +53,44 @@ class UserStats(Serialisable):
                     value = parse_date(value)
         super().__setattr__(name, value)
 
-    def newtons_load_5_20(self):
+    def get_load_5_20(self, attribute_5_day_name, attribute_20_day_name):
 
-        if self.average_newtons_load_5_day is not None and self.average_newtons_load_20_day is not None:
+        attribute_5_day = getattr(self, attribute_5_day_name)
+        attribute_20_day = getattr(self, attribute_20_day_name)
+
+        if attribute_5_day is not None and attribute_20_day is not None:
             standard_error_range = StandardErrorRange()
-            standard_error_range.lower_bound = self.average_newtons_load_5_day.lower_bound / self.average_newtons_load_20_day.lower_bound
-            standard_error_range.upper_bound = self.average_newtons_load_5_day.upper_bound / self.average_newtons_load_20_day.upper_bound
-            standard_error_range.observed_value = self.average_newtons_load_5_day.observed_value / self.average_newtons_load_20_day.observed_value
-            standard_error_range.insufficient_data = min(self.average_newtons_load_5_day.insufficient_data, self.average_newtons_load_20_day.insufficient_data)
+            standard_error_range.lower_bound = attribute_5_day.lower_bound / attribute_20_day.lower_bound
+            standard_error_range.upper_bound = attribute_5_day.upper_bound / attribute_20_day.upper_bound
+            standard_error_range.observed_value = attribute_5_day.observed_value / attribute_20_day.observed_value
+            standard_error_range.insufficient_data = min(attribute_5_day.insufficient_data,
+                                                         attribute_20_day.insufficient_data)
 
             return standard_error_range
 
         else:
 
             return None
+
+    def newtons_load_5_20(self):
+
+        return self.get_load_5_20("average_newtons_load_5_day", "average_newtons_load_20_day")
 
     def rpe_load_5_20(self):
 
-        if self.average_rpe_load_5_day is not None and self.average_rpe_load_20_day is not None:
-            standard_error_range = StandardErrorRange()
-            standard_error_range.lower_bound = self.average_rpe_load_5_day.lower_bound / self.average_rpe_load_20_day.lower_bound
-            standard_error_range.upper_bound = self.average_rpe_load_5_day.upper_bound / self.average_rpe_load_20_day.upper_bound
-            standard_error_range.observed_value = self.average_rpe_load_5_day.observed_value / self.average_rpe_load_20_day.observed_value
-            standard_error_range.insufficient_data = min(self.average_rpe_load_5_day.insufficient_data,
-                                                         self.average_rpe_load_20_day.insufficient_data)
-
-            return standard_error_range
-
-        else:
-
-            return None
+        return self.get_load_5_20("average_rpe_load_5_day", "average_rpe_load_20_day")
 
     def trimp_5_20(self):
 
-        if self.average_trimp_5_day is not None and self.average_trimp_20_day is not None:
-            standard_error_range = StandardErrorRange()
-            standard_error_range.lower_bound = self.average_trimp_5_day.lower_bound / self.average_trimp_20_day.lower_bound
-            standard_error_range.upper_bound = self.average_trimp_5_day.upper_bound / self.average_trimp_20_day.upper_bound
-            standard_error_range.observed_value = self.average_trimp_5_day.observed_value / self.average_trimp_20_day.observed_value
-            standard_error_range.insufficient_data = min(self.average_trimp_5_day.insufficient_data,
-                                                         self.average_trimp_20_day.insufficient_data)
-
-            return standard_error_range
-
-        else:
-
-            return None
+        return self.get_load_5_20("average_trimp_load_5_day", "average_trimp_load_20_day")
 
     def watts_load_5_20(self):
 
-        if self.average_watts_load_5_day is not None and self.average_watts_load_20_day is not None:
-            standard_error_range = StandardErrorRange()
-            standard_error_range.lower_bound = self.average_watts_load_5_day.lower_bound / self.average_watts_load_20_day.lower_bound
-            standard_error_range.upper_bound = self.average_watts_load_5_day.upper_bound / self.average_watts_load_20_day.upper_bound
-            standard_error_range.observed_value = self.average_watts_load_5_day.observed_value / self.average_watts_load_20_day.observed_value
-            standard_error_range.insufficient_data = min(self.average_watts_load_5_day.insufficient_data,
-                                                         self.average_watts_load_20_day.insufficient_data)
-
-            return standard_error_range
-
-        else:
-
-            return None
+        return self.get_load_5_20("average_watts_load_5_day", "average_watts_load_20_day")
 
     def work_vo2_load_5_20(self):
 
-        if self.average_work_vo2_5_day is not None and self.average_work_vo2_load_20_day is not None:
-            standard_error_range = StandardErrorRange()
-            standard_error_range.lower_bound = self.average_work_vo2_5_day.lower_bound / self.average_work_vo2_load_20_day.lower_bound
-            standard_error_range.upper_bound = self.average_work_vo2_5_day.upper_bound / self.average_work_vo2_load_20_day.upper_bound
-            standard_error_range.observed_value = self.average_work_vo2_5_day.observed_value / self.average_work_vo2_load_20_day.observed_value
-            standard_error_range.insufficient_data = min(self.average_work_vo2_5_day.insufficient_data,
-                                                         self.average_work_vo2_load_20_day.insufficient_data)
-
-            return standard_error_range
-
-        else:
-
-            return None
+        return self.get_load_5_20("average_work_vo2_load_5_day", "average_work_vo2_load_20_day")
 
     def json_serialise(self):
         ret = {
