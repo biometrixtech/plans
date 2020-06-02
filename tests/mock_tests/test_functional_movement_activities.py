@@ -56,7 +56,9 @@ def get_exercise_json(name, movement_id, reps, reps_unit=1, weight_measure=None,
             "movement_id": movement_id,
             "bilateral": True,
             "side": 0,
-            "rpe": rpe
+            "rpe": rpe,
+            "pace": 120,
+            "stroke_rate": 22
         }
 
 

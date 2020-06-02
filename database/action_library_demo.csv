@@ -80,7 +80,7 @@ Shoulder Extension",2,elbow flexion
 ,,Lower Body Target,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 2404_a,,Lunge,positive,,,,,,,strength_integrated_resistance,dumbbells,double_leg,,bilateral_uneven,2,1,2,100,"75, 25",TRUE,no_speed,TRUE,,concentric,1,hip flexion,1,knee flexion,3,ankle plantar flexion,,,,,,
 2404_b,,,negative,,,,,,,strength_integrated_resistance,dumbbells,double_leg,,bilateral_uneven,2,1,2,100,"75, 25",TRUE,no_speed,TRUE,,eccentric,1,hip extension,1,knee extension,3,ankle dorsiflexion,,,,,,
-2404_c,,,holding weight,,,,,,,strength_integrated_resistance,dumbbells,,double_arm,bilateral,2,,,9.43,"50, 50",TRUE,,FALSE,,isometric,,,,,,,2,Trunk Extension,3,Shoulder Horizontal Abduction (Horizontal Extension),,
+2404_c,,,holding weight,,,,,,,strength_integrated_resistance,dumbbells,,double_arm,bilateral,2,,,9.43,"50, 50",TRUE,no_speed,FALSE,,isometric,,,,,,,2,Trunk Extension,3,Shoulder Horizontal Abduction (Horizontal Extension),,
 ,,Compound Action,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 2405_a,,Clean and Jerk,Deadlift: positive:bar from floor to knee,,,,,,,strength_integrated_resistance,barbells,double_leg,double_arm,bilateral,2,1,2,100,"50,50",TRUE,no_speed,TRUE,,concentric,3,hip extension,1,knee extension,4,ankle plantar flexion,,,,,,
 2405_b,,,Deadlift: positive:bar from knee to hip,,,,,,,strength_integrated_resistance,barbells,double_leg,double_arm,bilateral,2,1,2,100,"50,50",TRUE,no_speed,TRUE,,concentric,1,hip extension,,,,,,,,,,
