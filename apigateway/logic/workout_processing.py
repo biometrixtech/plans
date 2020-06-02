@@ -75,9 +75,9 @@ class WorkoutProcessor(object):
         if exercise.training_type == TrainingType.strength_cardiorespiratory:
             exercise.set_speed_pace()
             exercise = self.set_power_force_cardio(exercise)
-            if exercise.speed is not None and exercise.distance is not None:
+            if exercise.speed is not None and exercise.distance is not None and exercise.duration is None:
                 exercise.duration = exercise.distance / exercise.speed
-            elif exercise.speed is not None and exercise.duration is not None:
+            elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
         else:
             exercise = self.set_force_weighted(exercise)
