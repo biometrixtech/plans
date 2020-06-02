@@ -135,4 +135,4 @@ def test_cycling():
         assert action.force == round(100 / 5, 2)
         assert action.pace == .2
         assert action.duration == 1000
-        assert action.reps == 1000
+        assert action.training_volume_left == action.training_volume_right == 1000

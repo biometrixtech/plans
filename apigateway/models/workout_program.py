@@ -181,6 +181,8 @@ class WorkoutExercise(Serialisable):
 
         self.training_type = None
         self.explosiveness_rating = 0
+        self.training_intensity = 0
+        self.rep_tempo = 0
         self.equipments = []   # TODO: do we get this from the api
         self.adaptation_type = None
         self.body_position = None
@@ -194,6 +196,8 @@ class WorkoutExercise(Serialisable):
         self.secondary_actions = []
         self.shrz = None
         self.work_vo2 = None
+
+        self.total_volume = None
 
     def json_serialise(self):
         ret = {
@@ -231,7 +235,8 @@ class WorkoutExercise(Serialisable):
             # 'primary_actions': [action.json_serialise() for action in self.primary_actions],
             # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions],
             'shrz': self.shrz,
-            'work_vo2': self.work_vo2
+            'work_vo2': self.work_vo2,
+            'total_volume': self.total_volume
         }
         return ret
 
@@ -277,7 +282,7 @@ class WorkoutExercise(Serialisable):
         exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
         exercise.shrz = input_dict.get('shrz')
         exercise.work_vo2 = input_dict.get('work_vo2')
-
+        exercise.total_volume = input_dict.get('total_volume')
         return exercise
 
     # def get_training_volume(self):
@@ -336,6 +341,111 @@ class WorkoutExercise(Serialisable):
         self.surface_stability = movement.surface_stability
         self.equipments = movement.external_weight_implement  # TODO: do we get it from the api
         # self.set_adaption_type(movement)
+
+    def set_intensity(self):
+        if self.training_type == TrainingType.strength_cardiorespiratory:
+            if self.rpe is None:
+                self.rpe = 4
+            self.training_intensity = self.shrz or self.rpe
+        elif self.training_type in [TrainingType.strength_endurance, TrainingType.strength_integrated_resistance]:
+            self.set_strength_training_intensity()
+        else:
+            self.set_power_training_intensity()
+
+    def set_power_training_intensity(self):
+        self.training_intensity = self.explosiveness_rating
+
+    def set_strength_training_intensity(self):
+        self.training_intensity = 8
+
+    def set_adaption_type(self):
+        if self.training_type == TrainingType.flexibility:
+            self.adaptation_type = AdaptationType.not_tracked
+        if self.training_type == TrainingType.movement_prep:
+            self.adaptation_type = AdaptationType.not_tracked
+        if self.training_type == TrainingType.skill_development:
+            self.adaptation_type = AdaptationType.not_tracked
+        elif self.training_type == TrainingType.strength_cardiorespiratory:
+            self.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+        elif self.training_type == TrainingType.strength_endurance:
+            self.adaptation_type = AdaptationType.strength_endurance_strength
+        elif self.training_type == TrainingType.power_action_plyometrics:
+            self.adaptation_type = AdaptationType.power_explosive_action
+        elif self.training_type == TrainingType.power_action_olympic_lift:
+            self.adaptation_type = AdaptationType.power_explosive_action
+        elif self.training_type == TrainingType.power_drills_plyometrics:
+            self.adaptation_type = AdaptationType.power_drill
+        elif self.training_type == TrainingType.strength_integrated_resistance:
+            if self.training_intensity >= 5:  # TODO: validate this number
+                self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
+            else:
+                self.adaptation_type = AdaptationType.strength_endurance_strength
+
+    def set_rep_tempo(self):
+        if self.cardio_action == CardioAction.row:
+            if self.stroke_rate is None or self.stroke_rate <= 23:
+                self.rep_tempo = 1
+            elif self.stroke_rate <= 28:
+                self.rep_tempo = 2
+            elif self.stroke_rate <= 36:
+                self.rep_tempo = 3
+            else:
+                self.rep_tempo = 4
+        elif self.cardio_action == CardioAction.run:
+            if self.cadence is None or self.cadence <= 130:
+                self.rep_tempo = 1  # walking
+            elif self.cadence <= 165:
+                self.rep_tempo = 2  # jogging
+            elif self.cadence <= 195:
+                self.rep_tempo = 3  # running
+            else:
+                self.rep_tempo = 4  # sprinting
+        elif self.cardio_action == CardioAction.cycle:
+            if self.cadence is None or self.cadence <= 70:
+                self.rep_tempo = 1
+            elif self.cadence <= 90:
+                self.rep_tempo = 2
+            elif self.cadence <= 110:
+                self.rep_tempo = 3
+            else:
+                self.rep_tempo = 4
+        else:
+            self.rep_tempo = 1
+
+    def set_speed_pace(self):
+        speed = None
+        pace = None
+        # get pace
+        if self.pace is not None:
+            if self.cardio_action == CardioAction.row:
+                pace = self.pace / 500  # row pace is s/500m
+            elif self.cardio_action == CardioAction.run:
+                pace = self.pace / 1609.34  # run pace is s/1mile
+            else:
+                pace = self.pace  # all others are s/m
+        elif self.speed is not None:
+            pace = 1 / self.speed
+        elif self.duration is not None and self.distance is not None:
+            pace = self.duration / self.distance
+        elif self.power is not None:
+            if self.cardio_action == CardioAction.row:
+                pace = (2.8 / self.power) ** (1 / 3)
+        elif self.calories is not None and self.duration is not None:
+            if self.cardio_action == CardioAction.row:
+                self.power = (4200 * self.calories - .35 * self.duration) / (4 * self.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
+                # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
+                pace = (2.8 / self.power) ** (1 / 3)
+
+        # get speed
+        if self.speed is not None:
+            speed = self.speed
+        elif self.duration is not None and self.distance is not None:
+            speed = self.distance / self.duration
+        elif pace is not None:
+            speed = 1 / pace
+        self.speed = speed
+        self.pace = pace
+        #return speed, pace
 
     # def set_adaption_type(self, movement):
     #

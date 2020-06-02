@@ -26,9 +26,10 @@ class WorkoutProcessor(object):
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, workout_program):
 
+        heart_rate_processing = HeartRateProcessing(self.user_age)
+
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
-            heart_rate_processing = HeartRateProcessing(self.user_age)
             if self.hr_data is not None and workout_section.start_date_time is not None and workout_section.end_date_time is not None:
                 # assumption here is that all exercises in the section are of similar training/adaptation types
                 # such that a single shrz can be calculated for each section
@@ -46,30 +47,70 @@ class WorkoutProcessor(object):
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
-            self.add_action_details_to_exercise(exercise, movement)
+
+            exercise = self.update_exercise_details(exercise)
+
+            for action_id in movement.primary_actions:
+                action_json = action_library.get(action_id)
+                if action_json is not None:
+                    action = ExerciseAction.json_deserialise(action_json)
+                    exercise.primary_actions.append(action)
+            for action_id in movement.secondary_actions:
+                action_json = action_library.get(action_id)
+                if action_json is not None:
+                    action = ExerciseAction.json_deserialise(action_json)
+                    exercise.secondary_actions.append(action)
+
+            self.add_action_details_from_exercise(exercise, exercise.primary_actions)
+            self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
 
-    def add_action_details_to_exercise(self, exercise, movement):
-        for action_id in movement.primary_actions:
-            action_json = action_library.get(action_id)
-            if action_json is not None:
-                action = ExerciseAction.json_deserialise(action_json)
-                self.initialize_action_from_exercise(action, exercise)
-                exercise.primary_actions.append(action)
-        self.set_action_explosiveness_from_exercise(exercise, exercise.primary_actions)
-        for action in exercise.primary_actions:
-            action.set_training_load()
+    def update_exercise_details(self, exercise):
 
-        for action_id in movement.secondary_actions:
-            action_json = action_library.get(action_id)
-            if action_json is not None:
-                action = ExerciseAction.json_deserialise(action_json)
-                self.initialize_action_from_exercise(action, exercise)
-                exercise.secondary_actions.append(action)
-        self.set_action_explosiveness_from_exercise(exercise, exercise.secondary_actions)
-        for action in exercise.secondary_actions:
-            action.set_training_load()
+        exercise.set_intensity()
+        exercise.set_adaption_type()
+        exercise.set_rep_tempo()
+
+        if exercise.training_type == TrainingType.strength_cardiorespiratory:
+            exercise.set_speed_pace()
+            exercise = self.set_power_force_cardio(exercise)
+            if exercise.speed is not None and exercise.distance is not None:
+                exercise.duration = exercise.distance / exercise.speed
+            elif exercise.speed is not None and exercise.duration is not None:
+                exercise.distance = exercise.duration * exercise.speed
+        else:
+            exercise = self.set_force_weighted(exercise)
+
+        exercise = self.set_total_volume(exercise)
+
+        return exercise
+
+    def add_action_details_from_exercise(self, exercise, actions):
+
+        for action in actions:
+            self.initialize_action_from_exercise(action, exercise)
+
+        self.set_action_explosiveness_from_exercise(exercise, actions)
+
+        for action in actions:
+            action.training_intensity = exercise.training_intensity
+            action.set_external_weight_distribution()
+            action.set_body_weight_distribution()
+            action.set_training_load(exercise.total_volume)
+
+        # for action_id in movement.secondary_actions:
+        #     action_json = action_library.get(action_id)
+        #     if action_json is not None:
+        #         action = ExerciseAction.json_deserialise(action_json)
+        #         self.initialize_action_from_exercise(action, exercise)
+        #         exercise.secondary_actions.append(action)
+        # self.set_action_explosiveness_from_exercise(exercise, exercise.secondary_actions)
+        # for action in exercise.secondary_actions:
+        #     action.training_intensity = exercise.training_intensity
+        #     action.set_external_weight_distribution()
+        #     action.set_body_weight_distribution()
+        #     action.set_training_load(total_volume)
 
     def initialize_action_from_exercise(self, action, exercise):
         # athlete_bodyweight = 100
@@ -78,18 +119,21 @@ class WorkoutProcessor(object):
 
         action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
-        if action.training_type == TrainingType.strength_cardiorespiratory:
-            if exercise.duration is not None:
-                action.reps = exercise.duration
-            elif exercise.reps_per_set is not None:
-                action.reps = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
-        elif exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
-            reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
-            action.reps = int(reps_meters / 5)
-        elif exercise.unit_of_measure == UnitOfMeasure.seconds:
-            action.reps = self.convert_seconds_to_reps(exercise.reps_per_set)
-        else:
-            action.reps = exercise.reps_per_set
+        action.training_type = exercise.training_type
+        action.adaptation_type = exercise.adaptation_type
+
+        # if action.training_type == TrainingType.strength_cardiorespiratory:
+        #     if exercise.duration is not None:
+        #         action.reps = exercise.duration
+        #     elif exercise.reps_per_set is not None:
+        #         action.reps = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
+        # elif exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
+        #     reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
+        #     action.reps = int(reps_meters / 5)
+        # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
+        #     action.reps = self.convert_seconds_to_reps(exercise.reps_per_set)
+        # else:
+        #     action.reps = exercise.reps_per_set
 
         action.lower_body_stability_rating = self.calculate_lower_body_stability_rating(exercise, action)
         action.upper_body_stability_rating = self.calculate_upper_body_stability_rating(exercise, action)
@@ -98,34 +142,38 @@ class WorkoutProcessor(object):
         action.shrz = exercise.shrz
         action.bilateral = exercise.bilateral
         action.cardio_action = exercise.cardio_action
-
-        # if action.cardio_action is not None:
+        # copy other variables
+        action.power = exercise.power  # power for rowing/other cardio in watts
+        action.force = exercise.force
+        action.grade = exercise.grade  # for biking/running
         if action.training_type == TrainingType.strength_cardiorespiratory:
-            action.rep_tempo = self.get_rep_tempo(exercise)
-            speed, pace = self.get_speed_pace(exercise)
-            action.speed = speed
-            action.pace = pace
-            self.set_power_force_cardio(exercise)
-
+            action.rep_tempo = exercise.rep_tempo
+            action.speed = exercise.speed
+            action.pace = exercise.pace
             # copy over duration and distance from exercise to action
             if exercise.duration is not None:
                 action.duration = exercise.duration
-            elif speed is not None and exercise.distance is not None:
-                action.duration = exercise.distance / speed
+
             if exercise.distance is not None:
                 action.distance = exercise.distance
-            elif speed is not None and exercise.duration is not None:
-                action.distance = exercise.duration * speed
-            # copy other variables
-            action.power = exercise.power  # power for rowing/other cardio in watts
-            action.force = exercise.force
-            action.grade = exercise.grade  # for biking/running
+
+        # if action.cardio_action is not None:
+        #if action.training_type == TrainingType.strength_cardiorespiratory:
+            #action.rep_tempo = self.get_rep_tempo(exercise)
+            #speed, pace = self.get_speed_pace(exercise)
+            #action.speed = speed
+            #action.pace = pace
+            #self.set_power_force_cardio(exercise)
+
+
+
+
             # final check if duration was derived, update action reps with duration
-            if action.duration is not None and action.reps != action.duration:
-                action.reps = action.duration
-        if action.training_type != TrainingType.strength_cardiorespiratory:
-            self.set_force_weighted(exercise)
-            action.force = exercise.force
+            # if action.duration is not None and action.reps != action.duration:
+            #     action.reps = action.duration
+        #if action.training_type != TrainingType.strength_cardiorespiratory:
+            #self.set_force_weighted(exercise)
+            #action.force = exercise.force
 
         # not using these for now in action level
         # action.calories = exercise.calories  # for rowing/other cardio
@@ -140,6 +188,29 @@ class WorkoutProcessor(object):
         else:
             weight = 20  # TODO: need to change this
         exercise.force = Calculators.force_resistance_exercise(weight)
+        return exercise
+
+    def set_total_volume(self, exercise):
+
+        if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            #total_volume = exercise.reps
+            if exercise.duration is not None:
+                total_volume = exercise.duration
+            elif exercise.reps_per_set is not None:
+                total_volume = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
+            else:
+                total_volume = 0
+        elif exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
+            reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
+            total_volume = int(reps_meters / 5) * 4
+        elif exercise.unit_of_measure == UnitOfMeasure.seconds:
+            total_volume = exercise.reps_per_set
+        else:
+            # use 1 rep = 4s to get volume in seconds
+            total_volume = exercise.reps_per_set * 4
+
+        exercise.total_volume = total_volume
+        return exercise
 
     def set_power_force_cardio(self, exercise):
         # if power is not provided, calculate from available dta or estimate
@@ -165,40 +236,7 @@ class WorkoutProcessor(object):
         else:  # for all other cardio types
             exercise.force = Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female)
 
-    @staticmethod
-    def get_speed_pace(exercise):
-        speed = None
-        pace = None
-        # get pace
-        if exercise.pace is not None:
-            if exercise.cardio_action == CardioAction.row:
-                pace = exercise.pace / 500  # row pace is s/500m
-            elif exercise.cardio_action == CardioAction.run:
-                pace = exercise.pace / 1609.34  # run pace is s/1mile
-            else:
-                pace = exercise.pace  # all others are s/m
-        elif exercise.speed is not None:
-            pace = 1 / exercise.speed
-        elif exercise.duration is not None and exercise.distance is not None:
-            pace = exercise.duration / exercise.distance
-        elif exercise.power is not None:
-            if exercise.cardio_action == CardioAction.row:
-                pace = (2.8 / exercise.power) ** (1 / 3)
-        elif exercise.calories is not None and exercise.duration is not None:
-            if exercise.cardio_action == CardioAction.row:
-                exercise.power = (4200 * exercise.calories - .35 * exercise.duration) / (4 * exercise.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
-                # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
-                pace = (2.8 / exercise.power) ** (1 / 3)
-
-        # get speed
-        if exercise.speed is not None:
-            speed = exercise.speed
-        elif exercise.duration is not None and exercise.distance is not None:
-            speed = exercise.distance / exercise.duration
-        elif pace is not None:
-            speed = 1 / pace
-        exercise.speed = speed
-        return speed, pace
+        return exercise
 
     @staticmethod
     def get_rpe_from_rep_max(rep_max, reps):
@@ -377,38 +415,6 @@ class WorkoutProcessor(object):
         elif unit_of_measure == UnitOfMeasure.calories:
             reps = self.convert_calories_to_seconds(reps, cardio_action)
         return reps
-
-    @staticmethod
-    def get_rep_tempo(exercise):
-        if exercise.cardio_action == CardioAction.row:
-            if exercise.stroke_rate is None or exercise.stroke_rate <= 23:
-                return 1
-            elif exercise.stroke_rate <= 28:
-                return 2
-            elif exercise.stroke_rate <= 36:
-                return 3
-            else:
-                return 4
-        elif exercise.cardio_action == CardioAction.run:
-            if exercise.cadence is None or exercise.cadence <= 130:
-                return 1  # walking
-            elif exercise.cadence <= 165:
-                return 2  # jogging
-            elif exercise.cadence <= 195:
-                return 3  # running
-            else:
-                return 4  # sprinting
-        elif exercise.cardio_action == CardioAction.cycle:
-            if exercise.cadence is None or exercise.cadence <= 70:
-                return 1
-            elif exercise.cadence <= 90:
-                return 2
-            elif exercise.cadence <= 110:
-                return 3
-            else:
-                return 4
-        else:
-            return 1
 
     @staticmethod
     def convert_to_pace(pace, watts, calories, reps):
