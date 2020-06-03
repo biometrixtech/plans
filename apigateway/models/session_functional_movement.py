@@ -7,6 +7,7 @@ from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.movement_tags import AdaptationType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.training_volume import StandardErrorRange
 from datetime import timedelta
 from fathomapi.utils.xray import xray_recorder
 
@@ -75,15 +76,15 @@ class SessionFunctionalMovement(object):
                     session_load_dict[body_part_side] = BodyPartFunctionalMovement(body_part_side)
 
                 session_load_dict[body_part_side].body_part_function = BodyPartFunction.merge(body_part_functional_movement.body_part_function, session_load_dict[body_part_side].body_part_function)
-                session_load_dict[body_part_side].concentric_load += body_part_functional_movement.concentric_load
-                session_load_dict[body_part_side].eccentric_load += body_part_functional_movement.eccentric_load
-                session_load_dict[body_part_side].compensated_concentric_load += body_part_functional_movement.compensated_concentric_load
+                session_load_dict[body_part_side].concentric_load.add(body_part_functional_movement.concentric_load)
+                session_load_dict[body_part_side].eccentric_load.add(body_part_functional_movement.eccentric_load)
+                session_load_dict[body_part_side].compensated_concentric_load.add(body_part_functional_movement.compensated_concentric_load)
                 session_load_dict[
-                    body_part_side].compensated_eccentric_load += body_part_functional_movement.compensated_eccentric_load
+                    body_part_side].compensated_eccentric_load.add(body_part_functional_movement.compensated_eccentric_load)
 
                 session_load_dict[body_part_side].compensating_causes_load.extend(body_part_functional_movement.compensating_causes_load)
                 session_load_dict[body_part_side].compensating_causes_load = list(set(session_load_dict[body_part_side].compensating_causes_load))
-                session_load_dict[body_part_side].compensation_source_load = CompensationSource.internal_processing
+                #session_load_dict[body_part_side].compensation_source_load = CompensationSource.internal_processing
 
                 # session_load_dict[body_part_side].concentric_intensity = max(body_part_functional_movement.concentric_intensity, session_load_dict[body_part_side].concentric_intensity)
                 # session_load_dict[body_part_side].eccentric_intensity = max(body_part_functional_movement.eccentric_intensity, session_load_dict[body_part_side].eccentric_intensity)
@@ -188,55 +189,61 @@ class SessionFunctionalMovement(object):
         normalized_dict = {}
 
         # initialize session values
-        self.session.strength_endurance_cardiorespiratory_load = 0
-        self.session.strength_endurance_strength_load = 0
-        self.session.power_drill_load = 0
-        self.session.maximal_strength_hypertrophic_load = 0
-        self.session.power_explosive_action_load = 0
-        self.session.not_tracked_load = 0
+        self.session.strength_endurance_cardiorespiratory_load = StandardErrorRange(observed_value=0)
+        self.session.strength_endurance_strength_load = StandardErrorRange(observed_value=0)
+        self.session.power_drill_load = StandardErrorRange(observed_value=0)
+        self.session.maximal_strength_hypertrophic_load = StandardErrorRange(observed_value=0)
+        self.session.power_explosive_action_load = StandardErrorRange(observed_value=0)
+        self.session.not_tracked_load = StandardErrorRange(observed_value=0)
 
         for adaptation_type, muscle_load_dict in total_load_dict.items():
             scalar = self.get_adaption_type_scalar(adaptation_type)
             # concentric_values = [c.concentric_load for c in muscle_load_dict.values() if c.concentric_load > 0]
             # eccentric_values = [c.eccentric_load for c in muscle_load_dict.values() if c.eccentric_load > 0]
-            all_values = [c.total_load() for c in muscle_load_dict.values() if c.total_load() > 0]
+            all_values = [c.total_load() for c in muscle_load_dict.values() if c.total_load().observed_value > 0]
             # all_values.extend(concentric_values)
             # all_values.extend(eccentric_values)
             if len(all_values) > 0:
-                minimum = min(all_values)
+                minimum = StandardErrorRange().get_min_from_error_range_list(all_values)
                 # maximum = max(all_values)
                 # value_range = maximum - minimum
                 for muscle_string in muscle_load_dict:
                     muscle = BodyPartSide.from_string(muscle_string)
                     maximum = self.get_body_part_injury_risk_max(adaptation_type, muscle, event_date)
-                    max_current_load = muscle_load_dict[muscle_string].total_load()
+                    max_current_load = muscle_load_dict[muscle_string].total_load().highest_value()
 
                     if maximum < max_current_load:
                         self.set_body_part_injury_risk_max(adaptation_type, muscle, max_current_load, event_date)
                         maximum = max_current_load
 
                     value_range = maximum - minimum
-                    if muscle_load_dict[muscle_string].total_load() > 0 and value_range > 0:
-                        muscle_load_dict[muscle_string].total_normalized_load = scalar * ((muscle_load_dict[muscle_string].total_load() - minimum) / value_range)
+
+                    if muscle_load_dict[muscle_string].total_load().observed_value > 0 and value_range > 0:
+                        #muscle_load_dict[muscle_string].total_normalized_load = scalar * ((muscle_load_dict[muscle_string].total_load() - minimum) / value_range)
+                        total_load = muscle_load_dict[muscle_string].total_load()
+                        total_load.subtract_value(minimum)
+                        total_load.divide(value_range)
+                        total_load.multiply(scalar)
+                        muscle_load_dict[muscle_string].total_normalized_load = total_load
 
                     if muscle not in normalized_dict:
                         normalized_dict[muscle] = muscle_load_dict[muscle_string]
                     else:
-                        normalized_dict[muscle].total_normalized_load += muscle_load_dict[muscle_string].total_normalized_load
+                        normalized_dict[muscle].total_normalized_load.add(muscle_load_dict[muscle_string].total_normalized_load)
 
                     # saved normalized load to the session while we're looping through
                     if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
-                        self.session.strength_endurance_cardiorespiratory_load += muscle_load_dict[muscle_string].total_normalized_load
+                        self.session.strength_endurance_cardiorespiratory_load.add(muscle_load_dict[muscle_string].total_normalized_load)
                     elif adaptation_type == AdaptationType.strength_endurance_strength.value:
-                        self.session.strength_endurance_strength_load += muscle_load_dict[muscle_string].total_normalized_load
+                        self.session.strength_endurance_strength_load.add(muscle_load_dict[muscle_string].total_normalized_load)
                     elif adaptation_type == AdaptationType.power_drill.value:
-                        self.session.power_drill_load += muscle_load_dict[muscle_string].total_normalized_load
+                        self.session.power_drill_load.add(muscle_load_dict[muscle_string].total_normalized_load)
                     elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
-                        self.session.maximal_strength_hypertrophic_load += muscle_load_dict[muscle_string].total_normalized_load
+                        self.session.maximal_strength_hypertrophic_load.add(muscle_load_dict[muscle_string].total_normalized_load)
                     elif adaptation_type == AdaptationType.power_explosive_action.value:
-                        self.session.power_explosive_action_load += muscle_load_dict[muscle_string].total_normalized_load
+                        self.session.power_explosive_action_load.add(muscle_load_dict[muscle_string].total_normalized_load)
                     else:
-                        self.session.not_tracked_load += muscle_load_dict[muscle_string].total_normalized_load
+                        self.session.not_tracked_load.add(muscle_load_dict[muscle_string].total_normalized_load)
 
         return normalized_dict
 

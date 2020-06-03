@@ -137,8 +137,8 @@ class TrainingVolumeChart(BaseChart):
     def add_training_volume(self, training_session, load_stats):
 
         training_volume = training_session.training_load(load_stats)
-        if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
-            self.data[training_session.event_date.date()].training_volume += training_volume
+        if training_volume is not None and training_volume.observed_value > 0 and training_session.event_date.date() in self.data:
+            self.data[training_session.event_date.date()].training_volume += training_volume.observed_value
             self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
 
     def auto_fill_data(self):
@@ -803,9 +803,9 @@ class WorkoutChart(BaseChart, Serialisable):
     def add_training_volume(self, training_session, load_stats, sport_max_load):
 
         training_volume = training_session.training_load(load_stats)
-        if training_volume is not None and training_volume > 0 and training_session.event_date.date() in self.data:
-            training_volume = round(training_volume, 2)
-            self.data[training_session.event_date.date()].value += training_volume
+        if training_volume is not None and training_volume.observed_value > 0 and training_session.event_date.date() in self.data:
+            training_volume_value = round(training_volume.observed_value, 2)
+            self.data[training_session.event_date.date()].value += training_volume_value
             self.data[training_session.event_date.date()].sport_names.add(training_session.sport_name)
 
             summary = WorkoutSummary()
@@ -845,7 +845,7 @@ class WorkoutChart(BaseChart, Serialisable):
                         self.bolded_text = []
                         self.bolded_text.append(SportName(summary.sport_name.value).name)
                 else:
-                    percent = int(round((training_volume / sport_max_load[summary.sport_name.value].load) * 100, 0))
+                    percent = int(round((training_volume_value / sport_max_load[summary.sport_name.value].load) * 100, 0))
                     if percent >= 30:
                         self.status = f"Today's workout was {str(percent)}% of your {summary.sport_name.get_display_name()} PR"
                         self.bolded_text = []

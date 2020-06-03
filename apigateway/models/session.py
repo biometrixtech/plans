@@ -12,6 +12,7 @@ from models.soreness_base import BodyPartSide, BodyPartLocation
 from models.workout_program import WorkoutProgramModule
 from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
 from models.movement_tags import TrainingType, AdaptationType
+from models.training_volume import StandardErrorRange
 
 
 class SessionType(Enum):
@@ -226,7 +227,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         normalized_training_volume = self.normalized_training_volume(load_stats)
 
         if normalized_intensity is not None and normalized_training_volume is not None:
-            return normalized_intensity * normalized_training_volume
+            return StandardErrorRange(observed_value=normalized_intensity * normalized_training_volume)
         else:
             return None
 

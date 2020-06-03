@@ -4,6 +4,7 @@ from collections import namedtuple
 from models.compensation_source import CompensationSource
 from models.soreness_base import BodyPartSide
 from models.body_parts import BodyPartFactory
+from models.training_volume import StandardErrorRange
 from datetime import timedelta
 from models.movement_actions import MuscleAction
 from models.functional_movement_type import FunctionalMovementType
@@ -121,10 +122,10 @@ class FunctionalMovement(object):
 class BodyPartFunctionalMovement(Serialisable):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
-        self.concentric_load = 0
-        self.eccentric_load = 0
-        self.compensated_concentric_load = 0
-        self.compensated_eccentric_load = 0
+        self.concentric_load = StandardErrorRange()
+        self.eccentric_load = StandardErrorRange()
+        self.compensated_concentric_load = StandardErrorRange()
+        self.compensated_eccentric_load = StandardErrorRange()
         self.compensating_causes_load = []
         self.is_compensating = False
         #self.compensation_source_load = None
@@ -135,19 +136,27 @@ class BodyPartFunctionalMovement(Serialisable):
         #self.inflamed = 0
         #self.long = 0
 
-        self.total_normalized_load = 0
+        self.total_normalized_load = StandardErrorRange()
 
     def total_load(self):
 
-        return self.concentric_load + self.eccentric_load + self.compensated_concentric_load + self.compensated_eccentric_load
+        self.concentric_load.add(self.eccentric_load)
+        self.concentric_load.add(self.compensated_concentric_load)
+        self.concentric_load.add(self.compensated_eccentric_load)
+
+        return self.concentric_load
 
     def total_concentric_load(self):
 
-        return self.concentric_load + self.compensated_concentric_load
+        self.concentric_load.add(self.compensated_concentric_load)
+
+        return self.concentric_load
 
     def total_eccentric_load(self):
 
-        return self.eccentric_load + self.compensated_eccentric_load
+        self.eccentric_load.add(self.compensated_eccentric_load)
+
+        return self.eccentric_load
 
     def __hash__(self):
         return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
@@ -163,10 +172,10 @@ class BodyPartFunctionalMovement(Serialisable):
     def json_serialise(self):
         return {
                 'body_part_side': self.body_part_side.json_serialise(),
-                'concentric_load': self.concentric_load,
-                'eccentric_load': self.eccentric_load,
-                'compensated_concentric_load': self.compensated_concentric_load,
-                'compensated_eccentric_load': self.compensated_eccentric_load,
+                'concentric_load': self.concentric_load.json_serialise(),
+                'eccentric_load': self.eccentric_load.json_serialise(),
+                'compensated_concentric_load': self.compensated_concentric_load.json_serialise(),
+                'compensated_eccentric_load': self.compensated_eccentric_load.json_serialise(),
                 'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
                 'is_compensating': self.is_compensating,
                 #'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
@@ -182,10 +191,10 @@ class BodyPartFunctionalMovement(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
-        movement.concentric_load = input_dict.get('concentric_load', 0)
-        movement.eccentric_load = input_dict.get('eccentric_load', 0)
-        movement.compensated_concentric_load = input_dict.get('compensated_concentric_load', 0)
-        movement.compensated_eccentric_load = input_dict.get('compensated_eccentric_load', 0)
+        movement.concentric_load = StandardErrorRange.json_deserialise(input_dict.get('concentric_load', StandardErrorRange()))
+        movement.eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('eccentric_load', StandardErrorRange()))
+        movement.compensated_concentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_concentric_load', StandardErrorRange))
+        movement.compensated_eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_eccentric_load', StandardErrorRange))
         movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
         movement.is_compensating = input_dict.get('is_compensating', False)
         #movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
@@ -202,16 +211,16 @@ class BodyPartFunctionalMovement(Serialisable):
 
         if self.body_part_side == target.body_part_side:
 
-            self.concentric_load += target.concentric_load
-            self.eccentric_load += target.eccentric_load
-            self.compensated_concentric_load += target.compensated_concentric_load
-            self.compensated_eccentric_load += target.compensated_eccentric_load
+            self.concentric_load.add(target.concentric_load)
+            self.eccentric_load.add(target.eccentric_load)
+            self.compensated_concentric_load.add(target.compensated_concentric_load)
+            self.compensated_eccentric_load.add(target.compensated_eccentric_load)
             self.compensating_causes_load.extend(target.compensating_causes_load)
             self.compensating_causes_load = list(set(self.compensating_causes_load))
             self.is_compensating = max(self.is_compensating, target.is_compensating)
             #self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
             self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
-            self.total_normalized_load += target.total_normalized_load
+            self.total_normalized_load.add(target.total_normalized_load)
 
     def merge_with_none(self, value_a, value_b):
 
@@ -454,8 +463,10 @@ class FunctionalMovementActionMapping(object):
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date,
                                                                              functional_movement_list)
 
-        left_load = exercise_action.total_load_left
-        right_load = exercise_action.total_load_right
+        # left_load = exercise_action.total_load_left
+        # right_load = exercise_action.total_load_right
+        left_load = exercise_action.tissue_load_left
+        right_load = exercise_action.tissue_load_right
 
         for functional_movement_load in functional_movement_list:
             functional_movement = functional_movement_load.functional_movement
@@ -556,37 +567,40 @@ class FunctionalMovementActionMapping(object):
                             concentric_load = self.muscle_load[body_part_side_string].concentric_load
                             eccentric_load = self.muscle_load[body_part_side_string].eccentric_load
                         else:
-                            concentric_load = 0
-                            eccentric_load = 0
+                            concentric_load = StandardErrorRange(observed_value=0)
+                            eccentric_load = StandardErrorRange(observed_value=0)
 
                         if functional_movement_load.muscle_action == MuscleAction.concentric or functional_movement_load.muscle_action == MuscleAction.isometric:
-
-                            compensated_concentric_load = concentric_load * factor
-                            compensated_eccentric_load = 0
+                            concentric_load.multiply(factor)
+                            compensated_concentric_load = concentric_load
+                            compensated_eccentric_load = StandardErrorRange(observed_value=0)
 
                         else:
-                            compensated_concentric_load = 0
-                            compensated_eccentric_load = eccentric_load * factor
+                            eccentric_load.multiply(factor)
+                            compensated_concentric_load = StandardErrorRange(observed_value=0)
+                            compensated_eccentric_load = eccentric_load
 
                         functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
                         functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
 
-                        synergist_compensated_concentric_load = compensated_concentric_load / float(
-                            len(functional_movement.parts_receiving_compensation))
-                        synergist_compensated_eccentric_load = compensated_eccentric_load / float(
-                            len(functional_movement.parts_receiving_compensation))
+                        compensated_concentric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
+                        synergist_compensated_concentric_load = compensated_concentric_load
+
+                        compensated_eccentric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
+                        synergist_compensated_eccentric_load = compensated_eccentric_load
+
                         functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
-                        functional_movement_body_part_side.compensated_concentric_load += synergist_compensated_concentric_load
-                        functional_movement_body_part_side.compensated_eccentric_load += synergist_compensated_eccentric_load
+                        functional_movement_body_part_side.compensated_concentric_load.add(synergist_compensated_concentric_load)
+                        functional_movement_body_part_side.compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                         functional_movement_body_part_side.compensating_causes_load.append(c)
                         #functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
                         if body_part_side_string not in self.muscle_load:
                             self.muscle_load[body_part_side_string] = functional_movement_body_part_side
                         else:
                             self.muscle_load[
-                                body_part_side_string].compensated_concentric_load += synergist_compensated_concentric_load
+                                body_part_side_string].compensated_concentric_load.add(synergist_compensated_concentric_load)
                             self.muscle_load[
-                                body_part_side_string].compensated_eccentric_load += synergist_compensated_eccentric_load
+                                body_part_side_string].compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                             self.muscle_load[body_part_side_string].compensating_causes_load.append(c)
                             #self.muscle_load[
                             #    body_part_side_string].compensation_source_load = CompensationSource.internal_processing
@@ -598,12 +612,13 @@ class FunctionalMovementActionMapping(object):
             functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
             functional_movement_body_part_side.body_part_function = target_body_part_function
             attributed_muscle_load = 0
-            load = 0
+            #load = 0
+            load = StandardErrorRange()
 
             if body_part_side.side == 1 or body_part_side.side == 0:
-                load += left_load
+                load.add(left_load)
             elif body_part_side.side == 2 or body_part_side.side == 0:
-                load += right_load
+                load.add(right_load)
 
             if functional_movement_priority == 1:
                 priority_ratio = 1.00
@@ -627,23 +642,25 @@ class FunctionalMovementActionMapping(object):
             else:
                 muscle_ratio = 0.0
 
-            attributed_muscle_load = load * priority_ratio * muscle_ratio
+            #attributed_muscle_load = load.multiply(priority_ratio * muscle_ratio)
+            load.multiply(priority_ratio * muscle_ratio)
+            attributed_muscle_load = load
 
                 # self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load,
                 #                               functional_movement_load.muscle_action)
-            if attributed_muscle_load > 0:
+            if attributed_muscle_load.observed_value > 0:
                 body_part_side_string = body_part_side.to_string()
                 if body_part_side_string in self.muscle_load:
                     if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
-                        self.muscle_load[body_part_side_string].concentric_load += attributed_muscle_load
+                        self.muscle_load[body_part_side_string].concentric_load.add(attributed_muscle_load)
                     else:
-                        self.muscle_load[body_part_side_string].eccentric_load += attributed_muscle_load
+                        self.muscle_load[body_part_side_string].eccentric_load.add(attributed_muscle_load)
                 else:
                     self.muscle_load[body_part_side_string] = functional_movement_body_part_side
                     if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
-                        self.muscle_load[body_part_side_string].concentric_load = attributed_muscle_load
+                        self.muscle_load[body_part_side_string].concentric_load.add(attributed_muscle_load)
                     else:
-                        self.muscle_load[body_part_side_string].eccentric_load = attributed_muscle_load
+                        self.muscle_load[body_part_side_string].eccentric_load.add(attributed_muscle_load)
             # if body_part_side.side == 2 or body_part_side.side == 0:
             #     attributed_muscle_load = self.get_muscle_load(functional_movement_list_priority,
             #                                                   target_body_part_function, right_load,
@@ -798,49 +815,61 @@ class FunctionalMovementActivityMapping(object):
             else:
                 factor = .20
 
-            compensated_concentric_load = training_load * self.concentric_level * factor
-            compensated_eccentric_load = training_load * self.eccentric_level * factor
+            compensated_concentric_load = training_load.plagiarize()
+            compensated_eccentric_load = training_load.plagiarize()
+            compensated_concentric_load.multiply(self.concentric_level * factor)
+            compensated_eccentric_load.multiply(self.eccentric_level * factor)
 
             for s in self.parts_receiving_compensation:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-                    synergist_compensated_concentric_load = compensated_concentric_load / float(len(self.parts_receiving_compensation))
-                    synergist_compensated_eccentric_load = compensated_eccentric_load / float(len(self.parts_receiving_compensation))
+                    synergist_compensated_concentric_load = compensated_concentric_load.plagiarize()
+                    synergist_compensated_eccentric_load = compensated_eccentric_load.plagiarize()
+                    synergist_compensated_concentric_load.divide(float(len(self.parts_receiving_compensation)))
+                    synergist_compensated_eccentric_load.divide(float(len(self.parts_receiving_compensation)))
                     s.body_part_function = BodyPartFunction.synergist
-                    s.compensated_concentric_load += synergist_compensated_concentric_load
-                    s.compensated_eccentric_load += synergist_compensated_eccentric_load
+                    s.compensated_concentric_load.add(synergist_compensated_concentric_load)
+                    s.compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                     s.compensating_causes_load.append(c)
                     #s.compensation_source_load = CompensationSource.internal_processing
                     if s.body_part_side not in self.muscle_load:
                         self.muscle_load[s.body_part_side] = s
                     else:
-                        self.muscle_load[s.body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
-                        self.muscle_load[s.body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
+                        self.muscle_load[s.body_part_side].compensated_concentric_load.add(synergist_compensated_concentric_load)
+                        self.muscle_load[s.body_part_side].compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                         self.muscle_load[s.body_part_side].compensating_causes_load.append(c)
                         #self.muscle_load[s.body_part_side].compensation_source_load = CompensationSource.internal_processing
 
         for p in self.prime_movers:
-            attributed_concentric_load = training_load * self.concentric_level * prime_mover_ratio
-            attributed_eccentric_load = training_load * self.eccentric_level * prime_mover_ratio
+            concentric_training_load = training_load.plagiarize()
+            eccentric_training_load = training_load.plagiarize()
+            concentric_training_load.multiply(self.concentric_level * prime_mover_ratio)
+            eccentric_training_load.multiply(self.eccentric_level * prime_mover_ratio)
+            attributed_concentric_load = concentric_training_load
+            attributed_eccentric_load = eccentric_training_load
             p.body_part_function = BodyPartFunction.prime_mover
-            p.concentric_load = attributed_concentric_load
-            p.eccentric_load = attributed_eccentric_load
+            p.concentric_load.add(attributed_concentric_load)
+            p.eccentric_load.add(attributed_eccentric_load)
             if p.body_part_side not in self.muscle_load:
                 self.muscle_load[p.body_part_side] = p
             else:
-                self.muscle_load[p.body_part_side].concentric_load += p.concentric_load
-                self.muscle_load[p.body_part_side].eccentric_load += p.eccentric_load
+                self.muscle_load[p.body_part_side].concentric_load.add(p.concentric_load)
+                self.muscle_load[p.body_part_side].eccentric_load.add(p.eccentric_load)
 
         for s in self.synergists:
-            attributed_concentric_load = training_load * self.concentric_level * synergist_ratio
-            attributed_eccentric_load = training_load * self.eccentric_level * synergist_ratio
+            concentric_training_load = training_load.plagiarize()
+            eccentric_training_load = training_load.plagiarize()
+            concentric_training_load.multiply(self.concentric_level * prime_mover_ratio)
+            eccentric_training_load.multiply(self.eccentric_level * prime_mover_ratio)
+            attributed_concentric_load = concentric_training_load
+            attributed_eccentric_load = eccentric_training_load
             s.body_part_function = BodyPartFunction.synergist
             s.concentric_load = attributed_concentric_load
             s.eccentric_load = attributed_eccentric_load
             if s.body_part_side not in self.muscle_load:
                 self.muscle_load[s.body_part_side] = s
             else:
-                self.muscle_load[s.body_part_side].concentric_load += s.concentric_load
-                self.muscle_load[s.body_part_side].eccentric_load += s.eccentric_load
+                self.muscle_load[s.body_part_side].concentric_load.add(s.concentric_load)
+                self.muscle_load[s.body_part_side].eccentric_load.add(s.eccentric_load)
 
     def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date, prime_movers):
 

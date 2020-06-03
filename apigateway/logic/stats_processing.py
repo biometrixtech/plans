@@ -17,6 +17,7 @@ from models.asymmetry import HistoricAsymmetry, AsymmetryType
 from utils import parse_date, format_date
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.athlete_injury_risk import AthleteInjuryRisk
+from models.training_volume import StandardErrorRange
 from copy import deepcopy
 
 
@@ -429,23 +430,23 @@ class StatsProcessing(object):
         if cleared_soreness is not None:
             all_soreness.extend(cleared_soreness)
 
-        total_load = 0
-        sore_load = 0
+        total_load = StandardErrorRange(observed_value=0)
+        sore_load = StandardErrorRange(observed_value=0)
 
         athlete_stats.load_stats.set_min_max_values(training_sessions)
 
         for t in training_sessions:
             if t.session_RPE == 1:  # maintenance load, do not consider
-                total_load += t.training_load(athlete_stats.load_stats)
+                total_load.add(t.training_load(athlete_stats.load_stats))
             else:
                 sore_body_parts = list(a for a in all_soreness
                                        if a.first_reported_date_time <= t.event_date <= a.last_reported_date_time)
                 if len(sore_body_parts) > 0:
-                    sore_load += t.training_load(athlete_stats.load_stats)
-                total_load += t.training_load(athlete_stats.load_stats)
+                    sore_load.add(t.training_load(athlete_stats.load_stats))
+                total_load.add(t.training_load(athlete_stats.load_stats))
 
-        if total_load > 0:
-            muscular_strain = DataSeries(self.event_date, 100 - ((sore_load / float(total_load)) * 100))
+        if total_load.observed_value > 0:
+            muscular_strain = DataSeries(self.event_date, 100 - ((sore_load.observed_value / float(total_load.observed_value)) * 100))
         else:
             muscular_strain = DataSeries(self.event_date, 100)
 

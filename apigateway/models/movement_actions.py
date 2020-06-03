@@ -2,6 +2,7 @@ from enum import Enum, IntEnum
 from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution,\
     AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction, StrengthResistanceAction, StrengthEnduranceAction
 from models.functional_movement_type import FunctionalMovementType
+from models.training_volume import StandardErrorRange
 from logic.calculators import Calculators
 from serialisable import Serialisable
 
@@ -91,14 +92,14 @@ class ExerciseAction(object):
         self.lower_body_stability_rating = 0
         self.upper_body_stability_rating = 0
         self.explosiveness_rating = 0
-        self.total_load_left = 0
-        self.total_load_right = 0
-        self.tissue_load_left = 0
-        self.tissue_load_right = 0
-        self.force_load_left = 0
-        self.force_load_right = 0
-        self.power_load_left = 0
-        self.power_load_right = 0
+        self.total_load_left = StandardErrorRange(observed_value=0)
+        self.total_load_right = StandardErrorRange(observed_value=0)
+        self.tissue_load_left = StandardErrorRange(observed_value=0)
+        self.tissue_load_right = StandardErrorRange(observed_value=0)
+        self.force_load_left = StandardErrorRange(observed_value=0)
+        self.force_load_right = StandardErrorRange(observed_value=0)
+        self.power_load_left = StandardErrorRange(observed_value=0)
+        self.power_load_right = StandardErrorRange(observed_value=0)
         # TODO: Remove these once strength-level intensity is implemented
         self.external_weight_left = 0
         self.external_weight_right = 0
