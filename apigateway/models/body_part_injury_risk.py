@@ -286,8 +286,8 @@ class BodyPartInjuryRisk(object):
         compensating_eccentric_volume_today.observed_value += input_dict.get('compensating_eccentric_volume_today', 0)
         injury_risk.compensating_eccentric_volume_today = compensating_eccentric_volume_today
 
-        injury_risk.total_compensation_percent = StandardErrorRange.json_deserialise(input_dict.get('total_compensation_percent', 0))
-        injury_risk.eccentric_compensation_percent = StandardErrorRange.json_deserialise(input_dict.get('eccentric_compensation_percent', 0))
+        injury_risk.total_compensation_percent = StandardErrorRange.json_deserialise(input_dict.get('total_compensation_percent')) if input_dict.get('total_compensation_percent') is not None else StandardErrorRange()
+        injury_risk.eccentric_compensation_percent = StandardErrorRange.json_deserialise(input_dict.get('eccentric_compensation_percent')) if input_dict.get('eccentric_compensation_percent') is not None else StandardErrorRange()
         injury_risk.total_compensation_percent_tier = input_dict.get('total_compensation_percent_tier', 0)
         injury_risk.eccentric_compensation_percent_tier = input_dict.get('eccentric_compensation_percent_tier', 0)
         injury_risk.total_volume_percent_tier = input_dict.get('total_volume_percent_tier', 0)

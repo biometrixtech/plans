@@ -191,10 +191,10 @@ class BodyPartFunctionalMovement(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
-        movement.concentric_load = StandardErrorRange.json_deserialise(input_dict.get('concentric_load', StandardErrorRange()))
-        movement.eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('eccentric_load', StandardErrorRange()))
-        movement.compensated_concentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_concentric_load', StandardErrorRange))
-        movement.compensated_eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_eccentric_load', StandardErrorRange))
+        movement.concentric_load = StandardErrorRange.json_deserialise(input_dict.get('concentric_load')) if input_dict.get('concentric_load') is not None else StandardErrorRange()
+        movement.eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('eccentric_load')) if input_dict.get('eccentric_load') is not None else StandardErrorRange()
+        movement.compensated_concentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_concentric_load')) if input_dict.get('compensated_concentric_load') is not None else StandardErrorRange()
+        movement.compensated_eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_eccentric_load')) if input_dict.get('compensated_eccentric_load') is not None else StandardErrorRange()
         movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
         movement.is_compensating = input_dict.get('is_compensating', False)
         #movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
@@ -648,7 +648,7 @@ class FunctionalMovementActionMapping(object):
 
                 # self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load,
                 #                               functional_movement_load.muscle_action)
-            if attributed_muscle_load.observed_value > 0:
+            if attributed_muscle_load.observed_value is not None and attributed_muscle_load.observed_value > 0:
                 body_part_side_string = body_part_side.to_string()
                 if body_part_side_string in self.muscle_load:
                     if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:

@@ -176,6 +176,17 @@ class StandardErrorRange(Serialisable):
         if standard_error_range is not None:
             self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
 
+    def add_value(self, number_value):
+        if number_value is not None :
+            if self.lower_bound is not None:
+                self.lower_bound = self.lower_bound + number_value
+        if number_value is not None:
+            if self.upper_bound is not None:
+                self.upper_bound = self.upper_bound + number_value
+        if number_value is not None:
+            if self.observed_value is not None:
+                self.observed_value = self.observed_value + number_value
+
     def subtract_value(self, standard_error_range):
         if standard_error_range is not None :
             if self.lower_bound is not None:

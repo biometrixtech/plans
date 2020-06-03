@@ -52,7 +52,7 @@ def test_external_intensity_barbell():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == 320
 
 
 def test_external_intensity_barbell_unilateral_no_side_defined():
@@ -64,7 +64,7 @@ def test_external_intensity_barbell_unilateral_no_side_defined():
     assert action.training_volume_left == 20
     assert action.training_volume_right == 20
 
-    assert action.total_load_left == action.total_load_right == 160
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == 160
 
 
 def test_external_intensity_unilateral_alternating_barbell():
@@ -77,7 +77,7 @@ def test_external_intensity_unilateral_alternating_barbell():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == 320
 
 
 def test_external_intensity_dumbell_bilateral():
@@ -90,7 +90,7 @@ def test_external_intensity_dumbell_bilateral():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == 320
 
 
 def test_external_intensity_dumbell_bilateral_uneven_no_side():
@@ -103,7 +103,7 @@ def test_external_intensity_dumbell_bilateral_uneven_no_side():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == 320
 
 
 def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
@@ -116,8 +116,8 @@ def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == 384
-    assert action.total_load_right == 256
+    assert action.tissue_load_left.observed_value == 384
+    assert action.tissue_load_right.observed_value == 256
 
 
 def test_external_intensity_unilateral_dumbbell_no_side_defined():
@@ -272,8 +272,8 @@ def test_training_volume_load_cardioresp():
 
     assert action.rpe == 4
 
-    assert action.total_load_left == 400
-    assert action.total_load_right == 400
+    assert action.tissue_load_left.observed_value == 400
+    assert action.tissue_load_right.observed_value == 400
 
 
 def test_convert_distance_seconds_cardioresp_sandbag_run_mile():
@@ -307,4 +307,4 @@ def test_power_intensity():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_right == action.total_load_left == 200
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == 200
