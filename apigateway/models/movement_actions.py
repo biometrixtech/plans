@@ -331,6 +331,71 @@ class ExerciseAction(object):
         self.external_weight_left = external_weight_left
         self.external_weight_right = external_weight_right
 
+
+    def set_force_distribution(self):
+        left = 0
+        right = 0
+        if len(self.external_weight) == 0:
+            left = self.force
+            right = self.force
+        else:
+            ex_weight = self.external_weight[0]
+            if ex_weight.distribute_weight:  # e.g barbell weight is supposed to be total weight
+                if self.lateral_distribution_pattern == WeightDistribution.bilateral:  # each side gets half the load for each rep
+                    left = self.force * self.lateral_distribution[0] / 100
+                    right = self.force * self.lateral_distribution[0] / 100
+                elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:  # first item in percent body weight is the dominant side
+                    if self.side == 1:  # left dominant activity
+                        left = self.force * self.lateral_distribution[0] / 100
+                        right = self.force * self.lateral_distribution[1] / 100
+                    elif self.side == 2:  # right dominant activity
+                        left = self.force * self.lateral_distribution[1] / 100
+                        right = self.force * self.lateral_distribution[0] / 100
+                    else:  # since we don't know which side was loaded more, apply evenly
+                        left = self.force * sum(self.lateral_distribution) / 2 / 100
+                        right = self.force * sum(self.lateral_distribution) / 2 / 100
+                elif self.lateral_distribution_pattern == WeightDistribution.unilateral:
+                    if self.side == 1:  # performed left only
+                        left = self.force * self.lateral_distribution[0] / 100
+                        right = self.force * self.lateral_distribution[1] / 100
+                    elif self.side == 2:  # performed right only
+                        left = self.force * self.lateral_distribution[1] / 100
+                        right = self.force * self.lateral_distribution[0] / 100
+                    else:  # assuming assignment is per side, assign all of the intensity to each side
+                        left = self.force * self.lateral_distribution[0] / 100
+                        right = self.force * self.lateral_distribution[0] / 100
+                elif self.lateral_distribution_pattern == WeightDistribution.unilateral_alternating:  # each side gets all the intensity for each rep
+                    left = self.force * self.lateral_distribution[0] / 100
+                    right = self.force * self.lateral_distribution[1] / 100
+
+            else:  # dumbbell, weight is supposed to be weight for each side
+                if self.lateral_distribution_pattern == WeightDistribution.unilateral:
+                    if self.side == 1:  # performed left only
+                        left = self.force * self.lateral_distribution[0] / 100
+                    elif self.side == 2:  # performed right only
+                        right = self.force * self.lateral_distribution[0] / 100
+                    else:  # assuming assignment is per side, assign all of the intensity to each side
+                        left = self.force * self.lateral_distribution[0] / 100
+                        right = self.force * self.lateral_distribution[0] / 100
+                elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:  # first item in percent body weight is the dominant side
+                    if self.side == 1:  # left dominant activity
+                        left = self.force * 2 * self.lateral_distribution[0] / 100
+                        right = self.force * 2 * self.lateral_distribution[1] / 100
+                    elif self.side == 2:  # right dominant activity
+                        left = self.force * 2 * self.lateral_distribution[1] / 100
+                        right = self.force * 2 * self.lateral_distribution[0] / 100
+                    else:  # since we don't know which side was loaded more, apply evenly
+                        left = self.force * 2 * sum(self.lateral_distribution) / 2 / 100
+                        right = self.force * 2 * sum(self.lateral_distribution) / 2 / 100
+                elif self.lateral_distribution_pattern == WeightDistribution.unilateral_alternating:  # bilateral and unilateral alternating get full amount for each side
+                    left = self.force * self.lateral_distribution[0] / 100
+                    right = self.force * self.lateral_distribution[1] / 100
+                else:  # both side get reported value
+                    left = self.force * 2 * self.lateral_distribution[0] / 100
+                    right = self.force * 2 * self.lateral_distribution[1] / 100
+        return left, right
+
+
     def set_body_weight_distribution(self):
         left = 0
         right = 0
@@ -396,8 +461,9 @@ class ExerciseAction(object):
                     right_dist = self.lateral_distribution[0] / 100 * 2
             # self.tissue_load_left.add_value(self.training_volume_left * self.training_intensity * left_dist)
             # self.tissue_load_right.add_value(self.training_volume_right * self.training_intensity * right_dist)
-            self.force_load_left.add_value(self.force * self.training_volume_left * left_dist)
-            self.force_load_right.add_value(self.force * self.training_volume_right * right_dist)
+            left_force, right_force = self.set_force_distribution()
+            self.force_load_left.add_value(left_force * self.training_volume_left * left_dist)
+            self.force_load_right.add_value(right_force * self.training_volume_right * right_dist)
             self.tissue_load_left = self.force_load_left
             self.tissue_load_right = self.force_load_right
 

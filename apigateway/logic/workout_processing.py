@@ -239,7 +239,7 @@ class WorkoutProcessor(object):
         elif exercise.cardio_action == CardioAction.cycle:
             exercise.force = Calculators.force_cycling(exercise.power, exercise.speed)
         else:  # for all other cardio types
-            exercise.force = Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female)
+            exercise.force = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
 
         return exercise
 
