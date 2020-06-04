@@ -84,7 +84,7 @@ def test_rowing():
     session = get_session(workout_program=workout_program, rpe=5, duration=5)
     session_load_dict = get_session_load_dict(session)
     for body_part, muscle_load in session_load_dict.items():
-        assert muscle_load.total_normalized_load.observed_value in [.2, None]
+        assert None is muscle_load.total_load().observed_value or muscle_load.total_load().observed_value > 0
 
 
 def test_rowing_stroke_rate_25():

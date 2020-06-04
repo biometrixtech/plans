@@ -113,6 +113,6 @@ def test_normalize_load_concentric():
     session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
-    normalized_dict = session_functional_movement.normalize_and_consolidate_load(load_dict, datetime.now())
+    normalized_dict = session_functional_movement.consolidate_load(load_dict, datetime.now())
 
     assert len(normalized_dict) == 67
