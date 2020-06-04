@@ -136,7 +136,7 @@ class BodyPartFunctionalMovement(Serialisable):
         #self.inflamed = 0
         #self.long = 0
 
-        self.total_normalized_load = StandardErrorRange()
+        #self.total_normalized_load = StandardErrorRange()
 
     def total_load(self):
 
@@ -191,7 +191,7 @@ class BodyPartFunctionalMovement(Serialisable):
                 #'tight': self.tight,
                 #'inflamed': self.inflamed,
                 #'long': self.long,
-                'total_normalized_load': self.total_normalized_load
+                #'total_normalized_load': self.total_normalized_load
             }
 
     @classmethod
@@ -210,7 +210,7 @@ class BodyPartFunctionalMovement(Serialisable):
         #movement.tight = input_dict.get('tight', 0)
         #movement.inflamed = input_dict.get('inflamed', 0)
         #movement.long = input_dict.get('long', 0)
-        movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
+        #movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
         return movement
 
     def merge(self, target):
@@ -226,7 +226,7 @@ class BodyPartFunctionalMovement(Serialisable):
             self.is_compensating = max(self.is_compensating, target.is_compensating)
             #self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
             self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
-            self.total_normalized_load.add(target.total_normalized_load)
+            #self.total_normalized_load.add(target.total_normalized_load)
 
     def merge_with_none(self, value_a, value_b):
 
