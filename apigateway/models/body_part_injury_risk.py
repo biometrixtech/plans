@@ -260,31 +260,23 @@ class BodyPartInjuryRisk(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         injury_risk = cls()
-        concentric_volume_today = StandardErrorRange(observed_value=0)
-        concentric_volume_today.observed_value += input_dict.get('prime_mover_concentric_volume_today', 0)
-        concentric_volume_today.observed_value += input_dict.get('synergist_concentric_volume_today', 0)
-        # TODO: change this to handle obj or int
-        concentric_volume_today.observed_value += input_dict.get('concentric_volume_today', 0)
-        injury_risk.concentric_volume_today = concentric_volume_today
 
-        eccentric_volume_today = StandardErrorRange(observed_value=0)
-        eccentric_volume_today.observed_value += input_dict.get('prime_mover_eccentric_volume_today', 0)
-        eccentric_volume_today.observed_value += input_dict.get('synergist_eccentric_volume_today', 0)
-        # TODO: change this to handle obj or int
-        eccentric_volume_today.observed_value += input_dict.get('eccentric_volume_today', 0)
-        injury_risk.eccentric_volume_today = eccentric_volume_today
+        injury_risk.concentric_volume_today = StandardErrorRange.json_deserialise(input_dict.get('concentric_volume_today', 0))
+        injury_risk.concentric_volume_today.observed_value += input_dict.get('prime_mover_concentric_volume_today', 0)
+        injury_risk.concentric_volume_today.observed_value += input_dict.get('synergist_concentric_volume_today', 0)
 
-        compensating_concentric_volume_today = StandardErrorRange(observed_value=0)
-        compensating_concentric_volume_today.observed_value += input_dict.get('synergist_compensating_concentric_volume_today', 0)
-        # TODO: change this to handle obj or int
-        compensating_concentric_volume_today.observed_value += input_dict.get('compensating_concentric_volume_today', 0)
-        injury_risk.compensating_concentric_volume_today = compensating_concentric_volume_today
+        injury_risk.eccentric_volume_today = StandardErrorRange.json_deserialise(input_dict.get('eccentric_volume_today', 0))
+        injury_risk.eccentric_volume_today.observed_value += input_dict.get('prime_mover_eccentric_volume_today', 0)
+        injury_risk.eccentric_volume_today.observed_value += input_dict.get('synergist_eccentric_volume_today', 0)
 
-        compensating_eccentric_volume_today = StandardErrorRange(observed_value=0)
-        compensating_eccentric_volume_today.observed_value += input_dict.get('synergist_compensating_eccentric_volume_today', 0)
-        # TODO: change this to handle obj or int
-        compensating_eccentric_volume_today.observed_value += input_dict.get('compensating_eccentric_volume_today', 0)
-        injury_risk.compensating_eccentric_volume_today = compensating_eccentric_volume_today
+        injury_risk.compensating_concentric_volume_today = StandardErrorRange.json_deserialise(
+            input_dict.get('compensating_concentric_volume_today', 0))
+        injury_risk.compensating_concentric_volume_today.observed_value += input_dict.get('synergist_compensating_concentric_volume_today', 0)
+
+        injury_risk.compensating_eccentric_volume_today = StandardErrorRange.json_deserialise(
+            input_dict.get('compensating_eccentric_volume_today', 0))
+        injury_risk.compensating_eccentric_volume_today.observed_value += input_dict.get(
+            'synergist_compensating_eccentric_volume_today', 0)
 
         injury_risk.total_compensation_percent = StandardErrorRange.json_deserialise(input_dict.get('total_compensation_percent')) if input_dict.get('total_compensation_percent') is not None else StandardErrorRange()
         injury_risk.eccentric_compensation_percent = StandardErrorRange.json_deserialise(input_dict.get('eccentric_compensation_percent')) if input_dict.get('eccentric_compensation_percent') is not None else StandardErrorRange()
@@ -649,7 +641,6 @@ class BodyPartInjuryRisk(object):
 
         return max_severity
 
-    # TODO: make all of these percentages object based?
     def percent_eccentric_compensation(self):
 
         #percentage = StandardErrorRange(observed_value=0)

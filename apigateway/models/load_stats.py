@@ -1,5 +1,6 @@
 from serialisable import Serialisable
 from models.sport import SportName
+from models.training_volume import StandardErrorRange
 
 
 class LoadStats(Serialisable):
@@ -43,12 +44,12 @@ class LoadStats(Serialisable):
             'max_trimp': self.max_trimp,
             'min_shrz': self.min_shrz,
             'max_shrz': self.max_shrz,
-            'max_not_tracked': self.max_not_tracked,
-            'max_strength_endurance_cardiorespiratory': self.max_strength_endurance_cardiorespiratory,
-            'max_strength_endurance_strength': self.max_strength_endurance_strength,
-            'max_power_drill': self.max_power_drill,
-            'max_maximal_strength_hypertrophic': self.max_maximal_strength_hypertrophic,
-            'max_power_explosive_action': self.max_power_explosive_action
+            'max_not_tracked': self.max_not_tracked.json_serialise() if self.max_not_tracked is not None else None,
+            'max_strength_endurance_cardiorespiratory': self.max_strength_endurance_cardiorespiratory.json_serialise() if self.max_strength_endurance_cardiorespiratory is not None else None,
+            'max_strength_endurance_strength': self.max_strength_endurance_strength.json_serialise() if self.max_strength_endurance_strength is not None else None,
+            'max_power_drill': self.max_power_drill.json_serialise() if self.max_power_drill is not None else None,
+            'max_maximal_strength_hypertrophic': self.max_maximal_strength_hypertrophic.json_serialise() if self.max_maximal_strength_hypertrophic is not None else None,
+            'max_power_explosive_action': self.max_power_explosive_action.json_serialise() if self.max_power_explosive_action is not None else None
         }
         return ret
 
@@ -70,12 +71,12 @@ class LoadStats(Serialisable):
             load_stats.max_trimp = input_dict["max_trimp"]
             load_stats.min_shrz = input_dict["min_shrz"]
             load_stats.max_shrz = input_dict["max_shrz"]
-            load_stats.max_not_tracked = input_dict.get('max_not_tracked', None)
-            load_stats.max_strength_endurance_cardiorespiratory = input_dict.get('max_strength_endurance_cardiorespiratory', None)
-            load_stats.max_strength_endurance_strength = input_dict.get('max_strength_endurance_strength', None)
-            load_stats.max_power_drill = input_dict.get('max_power_drill', None)
-            load_stats.max_maximal_strength_hypertrophic = input_dict.get('max_maximal_strength_hypertrophic', None)
-            load_stats.max_power_explosive_action = input_dict.get('max_power_explosive_action', None)
+            load_stats.max_not_tracked = StandardErrorRange.json_deserialise(input_dict.get('max_not_tracked')) if input_dict.get('max_not_tracked') is not None else None
+            load_stats.max_strength_endurance_cardiorespiratory = StandardErrorRange.json_deserialise(input_dict.get('max_strength_endurance_cardiorespiratory')) if input_dict.get('max_strength_endurance_cardiorespiratory') is not None else None
+            load_stats.max_strength_endurance_strength = StandardErrorRange.json_deserialise(input_dict.get('max_strength_endurance_strength')) if input_dict.get('max_strength_endurance_strength') is not None else None
+            load_stats.max_power_drill = StandardErrorRange.json_deserialise(input_dict.get('max_power_drill')) if input_dict.get('max_power_drill') is not None else None
+            load_stats.max_maximal_strength_hypertrophic = StandardErrorRange.json_deserialise(input_dict.get('max_maximal_strength_hypertrophic')) if input_dict.get('max_maximal_strength_hypertrophic') is not None else None
+            load_stats.max_power_explosive_action = StandardErrorRange.json_deserialise(input_dict.get('max_power_explosive_action')) if input_dict.get('max_power_explosive_action') is not None else None
 
         return load_stats
 

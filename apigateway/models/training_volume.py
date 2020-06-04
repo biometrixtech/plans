@@ -109,11 +109,16 @@ class StandardErrorRange(Serialisable):
 
     @classmethod
     def json_deserialise(cls, input_dict):
+
         error_range = cls()
-        error_range.lower_bound = input_dict.get('lower_bound')
-        error_range.upper_bound = input_dict.get('upper_bound')
-        error_range.observed_value = input_dict.get('observed_value')
-        error_range.insufficient_data = input_dict.get('insufficient_data', False)
+
+        if isinstance(input_dict, int) or isinstance(input_dict, float):
+            error_range.observed_value = input_dict
+        elif isinstance(input_dict, dict):
+            error_range.observed_value = input_dict.get('observed_value')
+            error_range.lower_bound = input_dict.get('lower_bound')
+            error_range.upper_bound = input_dict.get('upper_bound')
+            error_range.insufficient_data = input_dict.get('insufficient_data', False)
 
         return error_range
 

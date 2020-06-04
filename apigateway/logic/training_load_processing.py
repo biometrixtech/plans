@@ -71,15 +71,15 @@ class TrainingLoadProcessing(object):
                     self.last_week_sport_training_loads[p.sport_name] = []
                     self.previous_week_sport_training_loads[p.sport_name] = []
                 training_load = p.training_load(self.load_stats)
-                if training_load is not None:
-                    self.previous_week_sport_training_loads[p.sport_name].append(training_load)
+                if training_load is not None and training_load.observed_value is not None and training_load.observed_value > 0:
+                    self.previous_week_sport_training_loads[p.sport_name].append(training_load.observed_value)
                     if p.sport_name.value in self.sport_max_load:
-                        if training_load > self.sport_max_load[p.sport_name.value].load:
-                            self.sport_max_load[p.sport_name.value].load = training_load
+                        if training_load.observed_value > self.sport_max_load[p.sport_name.value].load:
+                            self.sport_max_load[p.sport_name.value].load = training_load.observed_value
                             self.sport_max_load[p.sport_name.value].event_date_time = p.event_date
                             self.sport_max_load[p.sport_name.value].first_time_logged = False
                     else:
-                        self.sport_max_load[p.sport_name.value] = SportMaxLoad(p.event_date, training_load)
+                        self.sport_max_load[p.sport_name.value] = SportMaxLoad(p.event_date, training_load.observed_value)
                         self.sport_max_load[p.sport_name.value].first_time_logged = True
 
         for l in last_7_day_training_sessions:
@@ -89,15 +89,15 @@ class TrainingLoadProcessing(object):
                     self.last_week_sport_training_loads[l.sport_name] = []
                     self.previous_week_sport_training_loads[l.sport_name] = []
                 training_load = l.training_load(self.load_stats)
-                if training_load is not None:
-                    self.last_week_sport_training_loads[l.sport_name].append(training_load)
+                if training_load is not None and training_load.observed_value is not None and training_load.observed_value > 0:
+                    self.last_week_sport_training_loads[l.sport_name].append(training_load.observed_value)
                     if l.sport_name.value in self.sport_max_load:
-                        if training_load > self.sport_max_load[l.sport_name.value].load:
-                            self.sport_max_load[l.sport_name.value].load = training_load
+                        if training_load.observed_value > self.sport_max_load[l.sport_name.value].load:
+                            self.sport_max_load[l.sport_name.value].load = training_load.observed_value
                             self.sport_max_load[l.sport_name.value].event_date_time = l.event_date
                             self.sport_max_load[l.sport_name.value].first_time_logged = False
                     else:
-                        self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load)
+                        self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load.observed_value)
                         self.sport_max_load[l.sport_name.value].first_time_logged = True
 
     @xray_recorder.capture('logic.TrainingLoadProcessing.calc_training_load_metrics')
@@ -278,12 +278,12 @@ class TrainingLoadProcessing(object):
 
         if self.load_stats is not None and self.sport_max_load is not None:
             training_volume = training_session.training_load(self.load_stats)
-            if training_volume is not None and training_volume > 0:
-                training_volume = round(training_volume, 2)
+            if training_volume is not None and training_volume.observed_value > 0:
+                training_volume_value = round(training_volume.observed_value, 2)
 
                 if training_session.sport_name.value in self.sport_max_load:
 
-                    percent = int(round((training_volume / self.sport_max_load[training_session.sport_name.value].load) * 100, 0))
+                    percent = int(round((training_volume_value / self.sport_max_load[training_session.sport_name.value].load) * 100, 0))
 
         return percent
 
