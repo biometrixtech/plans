@@ -369,12 +369,14 @@ class ExerciseAction(object):
             #self.total_load_left = self.training_volume_left * self.training_intensity
             #self.total_load_right = self.training_volume_rning_intensityight * self.trai
 
-            self.tissue_load_left.add_value(self.training_volume_left * self.readiness * self.tissue_intensity)
-            self.tissue_load_right.add_value(self.training_volume_right * self.readiness * self.tissue_intensity)
+            #self.tissue_load_left.add_value(self.training_volume_left * self.readiness * self.tissue_intensity)
+            #self.tissue_load_right.add_value(self.training_volume_right * self.readiness * self.tissue_intensity)
             self.power_load_left.add_value(self.power * self.training_volume_left)
             self.power_load_right.add_value(self.power * self.training_volume_right)
             self.force_load_left.add_value(self.force * self.training_volume_left)
             self.force_load_right.add_value(self.force * self.training_volume_right)
+            self.tissue_load_left = self.force_load_left
+            self.tissue_load_right = self.force_load_right
         else:
             left_dist = 1
             right_dist = 1
@@ -392,10 +394,12 @@ class ExerciseAction(object):
                 elif self.side == 2:
                     left_dist = self.lateral_distribution[1] / 100 * 2
                     right_dist = self.lateral_distribution[0] / 100 * 2
-            self.tissue_load_left.add_value(self.training_volume_left * self.training_intensity * left_dist)
-            self.tissue_load_right.add_value(self.training_volume_right * self.training_intensity * right_dist)
+            # self.tissue_load_left.add_value(self.training_volume_left * self.training_intensity * left_dist)
+            # self.tissue_load_right.add_value(self.training_volume_right * self.training_intensity * right_dist)
             self.force_load_left.add_value(self.force * self.training_volume_left * left_dist)
             self.force_load_right.add_value(self.force * self.training_volume_right * right_dist)
+            self.tissue_load_left = self.force_load_left
+            self.tissue_load_right = self.force_load_right
 
     def set_training_volume(self, total_volume):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:

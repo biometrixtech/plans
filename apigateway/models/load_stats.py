@@ -101,18 +101,18 @@ class LoadStats(Serialisable):
                 if t.get_distance_training_volume(SportName.cycling) is not None and t.get_distance_training_volume(SportName.cycling) > 0:
                     self.min_cycling_distance = min(self.min_cycling_distance if self.min_cycling_distance is not None else 0, t.get_distance_training_volume(SportName.cycling))
                     self.max_cycling_distance = max(self.max_cycling_distance if self.max_cycling_distance is not None else 0, t.get_distance_training_volume(SportName.cycling))
-                if t.not_tracked_load is not None and t.not_tracked_load > 0:
-                    self.max_not_tracked = max(self.max_not_tracked if self.max_not_tracked is not None else 0, t.not_tracked_load)
-                if t.strength_endurance_cardiorespiratory_load is not None and t.strength_endurance_cardiorespiratory_load > 0:
-                    self.max_strength_endurance_cardiorespiratory = max(self.max_strength_endurance_cardiorespiratory if self.max_strength_endurance_cardiorespiratory is not None else 0, t.strength_endurance_cardiorespiratory_load)
-                if t.strength_endurance_strength_load is not None and t.strength_endurance_strength_load > 0:
-                    self.max_strength_endurance_strength = max(self.max_strength_endurance_strength if self.max_strength_endurance_strength is not None else 0, t.strength_endurance_strength_load)
-                if t.power_drill_load is not None and t.power_drill_load > 0:
-                    self.max_power_drill = max(self.max_power_drill if self.max_power_drill is not None else 0, t.power_drill_load)
-                if t.maximal_strength_hypertrophic_load is not None and t.maximal_strength_hypertrophic_load > 0:
-                    self.max_maximal_strength_hypertrophic = max(self.max_maximal_strength_hypertrophic if self.max_maximal_strength_hypertrophic is not None else 0, t.maximal_strength_hypertrophic_load)
-                if t.power_explosive_action_load is not None and t.power_explosive_action_load > 0:
-                    self.max_power_explosive_action = max(self.max_power_explosive_action if self.max_power_explosive_action is not None else 0, t.power_explosive_action_load)
+                if t.not_tracked_load is not None and t.not_tracked_load.observed_value > 0:
+                    self.max_not_tracked = max(self.max_not_tracked if self.max_not_tracked is not None else 0, t.not_tracked_load.observed_value)
+                if t.strength_endurance_cardiorespiratory_load is not None and t.strength_endurance_cardiorespiratory_load.observed_value > 0:
+                    self.max_strength_endurance_cardiorespiratory = max(self.max_strength_endurance_cardiorespiratory if self.max_strength_endurance_cardiorespiratory is not None else 0, t.strength_endurance_cardiorespiratory_load.observed_value)
+                if t.strength_endurance_strength_load is not None and t.strength_endurance_strength_load.observed_value > 0:
+                    self.max_strength_endurance_strength = max(self.max_strength_endurance_strength if self.max_strength_endurance_strength is not None else 0, t.strength_endurance_strength_load.observed_value)
+                if t.power_drill_load is not None and t.power_drill_load.observed_value > 0:
+                    self.max_power_drill = max(self.max_power_drill if self.max_power_drill is not None else 0, t.power_drill_load.observed_value)
+                if t.maximal_strength_hypertrophic_load is not None and t.maximal_strength_hypertrophic_load.observed_value > 0:
+                    self.max_maximal_strength_hypertrophic = max(self.max_maximal_strength_hypertrophic if self.max_maximal_strength_hypertrophic is not None else 0, t.maximal_strength_hypertrophic_load.observed_value)
+                if t.power_explosive_action_load is not None and t.power_explosive_action_load.observed_value > 0:
+                    self.max_power_explosive_action = max(self.max_power_explosive_action if self.max_power_explosive_action is not None else 0, t.power_explosive_action_load.observed_value)
 
     def get_attribute_load(self, attribute_name, value):
 

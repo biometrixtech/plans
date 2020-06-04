@@ -140,23 +140,29 @@ class BodyPartFunctionalMovement(Serialisable):
 
     def total_load(self):
 
-        self.concentric_load.add(self.eccentric_load)
-        self.concentric_load.add(self.compensated_concentric_load)
-        self.concentric_load.add(self.compensated_eccentric_load)
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.concentric_load)
+        total_load.add(self.eccentric_load)
+        total_load.add(self.compensated_concentric_load)
+        total_load.add(self.compensated_eccentric_load)
 
-        return self.concentric_load
+        return total_load
 
     def total_concentric_load(self):
 
-        self.concentric_load.add(self.compensated_concentric_load)
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.concentric_load)
+        total_load.add(self.compensated_concentric_load)
 
-        return self.concentric_load
+        return total_load
 
     def total_eccentric_load(self):
 
-        self.eccentric_load.add(self.compensated_eccentric_load)
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.eccentric_load)
+        total_load.add(self.compensated_eccentric_load)
 
-        return self.eccentric_load
+        return total_load
 
     def __hash__(self):
         return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))

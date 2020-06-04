@@ -8,6 +8,7 @@ from models.session_functional_movement import SessionFunctionalMovement
 from models.session import MixedActivitySession
 from models.exercise import WeightMeasure
 from models.athlete_injury_risk import AthleteInjuryRisk
+from models.training_volume import StandardErrorRange
 from datetime import datetime
 
 def test_aggregate_load_concentric():
@@ -17,8 +18,8 @@ def test_aggregate_load_concentric():
     exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_1.total_load_left = 100
-    exercise_action_1.total_load_right = 200
+    exercise_action_1.tissue_load_left = StandardErrorRange(observed_value=100)
+    exercise_action_1.tissue_load_right = StandardErrorRange(observed_value=200)
     exercise_action_1.lower_body_stability_rating = 1.1
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
@@ -28,8 +29,8 @@ def test_aggregate_load_concentric():
     exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_2.total_load_left = 200
-    exercise_action_2.total_load_right = 100
+    exercise_action_2.tissue_load_left = StandardErrorRange(observed_value=200)
+    exercise_action_2.tissue_load_right = StandardErrorRange(observed_value=100)
     exercise_action_2.lower_body_stability_rating = 1.1
     exercise_action_2.upper_body_stability_rating = 0.6
     exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
@@ -72,8 +73,8 @@ def test_normalize_load_concentric():
     exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_1.total_load_left = 100
-    exercise_action_1.total_load_right = 200
+    exercise_action_1.tissue_load_left = StandardErrorRange(observed_value=100)
+    exercise_action_1.tissue_load_right = StandardErrorRange(observed_value=200)
     exercise_action_1.lower_body_stability_rating = 1.1
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
@@ -83,8 +84,8 @@ def test_normalize_load_concentric():
     exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_2.total_load_left = 200
-    exercise_action_2.total_load_right = 100
+    exercise_action_2.total_load_left = StandardErrorRange(observed_value=200)
+    exercise_action_2.total_load_right = StandardErrorRange(observed_value=100)
     exercise_action_2.lower_body_stability_rating = 1.1
     exercise_action_2.upper_body_stability_rating = 0.6
     exercise_action_2.adaptation_type = AdaptationType.power_explosive_action

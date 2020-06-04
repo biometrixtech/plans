@@ -75,11 +75,19 @@ class WorkoutProcessor(object):
         if exercise.training_type == TrainingType.strength_cardiorespiratory:
             exercise.set_speed_pace()
             exercise = self.set_power_force_cardio(exercise)
+            # if exercise.reps_per_set is not None and exercise.duration is None:
+            #     exercise.duration = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
             if exercise.speed is not None and exercise.distance is not None and exercise.duration is None:
                 exercise.duration = exercise.distance / exercise.speed
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
         else:
+            # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
+            #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
+            #     reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
+            #     exercise.reps_per_set = int(reps_meters / 5)
+            # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
+            #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_weighted(exercise)
 
         exercise = self.set_total_volume(exercise)
