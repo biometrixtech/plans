@@ -4,6 +4,7 @@ from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgr
 from models.movement_tags import TrainingType
 from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
+from utils import none_max
 import datetime
 
 
@@ -39,7 +40,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
 def get_max_action_load(functional_movement_action_mapping):
     max_action_load = 0
     for muscle_load in functional_movement_action_mapping.muscle_load.values():
-        max_action_load = max([max_action_load, muscle_load.eccentric_load, muscle_load.concentric_load])
+        max_action_load = none_max([max_action_load, muscle_load.eccentric_load.observed_value, muscle_load.concentric_load.observed_value])
     return max_action_load
 
 

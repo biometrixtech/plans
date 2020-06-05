@@ -1,6 +1,6 @@
 from models.workout_program import WorkoutExercise
 from models.movement_tags import Equipment, WeightDistribution, TrainingType, CardioAction
-from models.exercise import UnitOfMeasure
+from models.exercise import UnitOfMeasure, WeightMeasure
 from models.movement_actions import ExerciseAction
 from logic.workout_processing import WorkoutProcessor
 
@@ -14,6 +14,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     exercise.movement_id = movement_id
     exercise.equipments = [equipment]
     exercise.weight = weight
+    exercise.weight_measure = WeightMeasure.actual_weight
     exercise.side = side
     exercise.training_type = training_type
     exercise.explosiveness_rating = explosiveness
@@ -32,6 +33,8 @@ def get_action(action_id, name, exercise,  perc_bodyweight=0,
     action.eligible_external_resistance = [Equipment.barbells, Equipment.dumbbells]
     action.lateral_distribution_pattern = weight_dist
     action.cardio_action = cardio_action
+    if cardio_action is not None:
+        exercise.cardio_action = cardio_action
     exercise = WorkoutProcessor().update_exercise_details(exercise)
     WorkoutProcessor().add_action_details_from_exercise(exercise, [action])
     # WorkoutProcessor().initialize_action_from_exercise(action, exercise)
@@ -51,8 +54,7 @@ def test_external_intensity_barbell():
 
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
-
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(50 * 9.8 * 40, 2)
 
 
 def test_external_intensity_barbell_unilateral_no_side_defined():
@@ -64,7 +66,7 @@ def test_external_intensity_barbell_unilateral_no_side_defined():
     assert action.training_volume_left == 20
     assert action.training_volume_right == 20
 
-    assert action.total_load_left == action.total_load_right == 160
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(100 * 9.8 * 20, 2)
 
 
 def test_external_intensity_unilateral_alternating_barbell():
@@ -77,7 +79,7 @@ def test_external_intensity_unilateral_alternating_barbell():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(100 * 9.8 * 40, 2)
 
 
 def test_external_intensity_dumbell_bilateral():
@@ -90,7 +92,7 @@ def test_external_intensity_dumbell_bilateral():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(50 * 9.8 * 40, 2)
 
 
 def test_external_intensity_dumbell_bilateral_uneven_no_side():
@@ -103,7 +105,7 @@ def test_external_intensity_dumbell_bilateral_uneven_no_side():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == action.total_load_right == 320
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(50 * 9.8 * 40, 2)
 
 
 def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
@@ -116,8 +118,8 @@ def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_left == 384
-    assert action.total_load_right == 256
+    assert action.tissue_load_left.observed_value == round(60 * 9.8 * 40 * 1.2, 2)
+    assert action.tissue_load_right.observed_value == round(40 * 9.8 * 40 * .8, 2)
 
 
 def test_external_intensity_unilateral_dumbbell_no_side_defined():
@@ -270,10 +272,10 @@ def test_training_volume_load_cardioresp():
     assert action.training_volume_left == 100
     assert action.training_volume_right == 100
 
-    assert action.rpe == 4
+    assert action.rpe.observed_value == 4
 
-    assert action.total_load_left == 400
-    assert action.total_load_right == 400
+    assert action.tissue_load_left.observed_value == 44.84 * 100
+    assert action.tissue_load_right.observed_value == 44.84 * 100
 
 
 def test_convert_distance_seconds_cardioresp_sandbag_run_mile():
@@ -302,9 +304,9 @@ def test_power_intensity():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=100, training_type=TrainingType.power_drills_plyometrics, explosiveness=5)
     action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral)
 
-    assert action.training_intensity == 5
+    assert action.force.observed_value == round(100 * 9.8, 2)
 
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert action.total_load_right == action.total_load_left == 200
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(100 * 9.8 * 40, 2)

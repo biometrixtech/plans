@@ -2,6 +2,7 @@ from enum import Enum, IntEnum
 from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution,\
     AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction, StrengthResistanceAction, StrengthEnduranceAction
 from models.functional_movement_type import FunctionalMovementType
+from models.training_volume import StandardErrorRange
 from logic.calculators import Calculators
 from serialisable import Serialisable
 
@@ -91,14 +92,14 @@ class ExerciseAction(object):
         self.lower_body_stability_rating = 0
         self.upper_body_stability_rating = 0
         self.explosiveness_rating = 0
-        self.total_load_left = 0
-        self.total_load_right = 0
-        self.tissue_load_left = 0
-        self.tissue_load_right = 0
-        self.force_load_left = 0
-        self.force_load_right = 0
-        self.power_load_left = 0
-        self.power_load_right = 0
+        self.total_load_left = StandardErrorRange(observed_value=0)
+        self.total_load_right = StandardErrorRange(observed_value=0)
+        self.tissue_load_left = StandardErrorRange(observed_value=0)
+        self.tissue_load_right = StandardErrorRange(observed_value=0)
+        self.force_load_left = StandardErrorRange(observed_value=0)
+        self.force_load_right = StandardErrorRange(observed_value=0)
+        self.power_load_left = StandardErrorRange(observed_value=0)
+        self.power_load_right = StandardErrorRange(observed_value=0)
         # TODO: Remove these once strength-level intensity is implemented
         self.external_weight_left = 0
         self.external_weight_right = 0
@@ -161,10 +162,12 @@ class ExerciseAction(object):
                 "adaptation_type": self.adaptation_type.value if self.adaptation_type is not None else None,
                 "total_load_left": self.total_load_left,
                 "total_load_right": self.total_load_right,
-                "force_load_left": self.force_load_left,
-                "force_load_right": self.force_load_right,
-                "power_load_left": self.power_load_left,
-                "power_load_right": self.power_load_right,
+                "tissue_load_left": self.tissue_load_left.json_serialise(),
+                "tissue_load_right": self.tissue_load_right.json_serialise(),
+                "force_load_left": self.force_load_left.json_serialise(),
+                "force_load_right": self.force_load_right.json_serialise(),
+                "power_load_left": self.power_load_left.json_serialise(),
+                "power_load_right": self.power_load_right.json_serialise(),
                 # "external_weight_left": self.external_weight_left,
                 # "external_weight_right": self.external_weight_right,
                 # "body_weight_left": self.body_weight_left,
@@ -229,10 +232,12 @@ class ExerciseAction(object):
         action.explosiveness_rating = input_dict.get('explosiveness_rating', 0)
         action.total_load_left = input_dict.get('total_load_left', 0)
         action.total_load_right = input_dict.get('total_load_right', 0)
-        action.power_load_left = input_dict.get('power_load_left', 0)
-        action.power_load_right = input_dict.get('power_load_right', 0)
-        action.force_load_left = input_dict.get('force_load_left', 0)
-        action.force_load_right = input_dict.get('force_load_right', 0)
+        action.tissue_load_left = StandardErrorRange.json_deserialise(input_dict.get('tissue_load_left')) if input_dict.get('tissue_load_left') is not None else StandardErrorRange()
+        action.tissue_load_right = StandardErrorRange.json_deserialise(input_dict.get('tissue_load_right')) if input_dict.get('tissue_load_right') is not None else StandardErrorRange()
+        action.power_load_left = StandardErrorRange.json_deserialise(input_dict.get('power_load_left')) if input_dict.get('power_load_left') is not None else StandardErrorRange()
+        action.power_load_right = StandardErrorRange.json_deserialise(input_dict.get('power_load_right')) if input_dict.get('power_load_right') is not None else StandardErrorRange()
+        action.force_load_left = StandardErrorRange.json_deserialise( input_dict.get('force_load_left')) if input_dict.get('force_load_left') is not None else StandardErrorRange()
+        action.force_load_right = StandardErrorRange.json_deserialise( input_dict.get('force_load_right')) if input_dict.get('force_load_right') is not None else StandardErrorRange()
         # action.external_weight_left = input_dict.get('external_weight_left', 0)
         # action.external_weight_right = input_dict.get('external_weight_right', 0)
         # action.body_weight_left = input_dict.get('body_weight_left', 0)
@@ -326,6 +331,75 @@ class ExerciseAction(object):
         self.external_weight_left = external_weight_left
         self.external_weight_right = external_weight_right
 
+    def set_force_distribution(self):
+        left = StandardErrorRange(observed_value=0)
+        right = StandardErrorRange(observed_value=0)
+        if len(self.external_weight) == 0:
+            if self.force is None:
+                left = StandardErrorRange(observed_value=0)
+                right = StandardErrorRange(observed_value=0)
+            else:
+                left = self.force.plagiarize()
+                right = self.force.plagiarize()
+        else:
+            ex_weight = self.external_weight[0]
+            left = self.force.plagiarize()
+            right = self.force.plagiarize()
+            if ex_weight.distribute_weight:  # e.g barbell weight is supposed to be total weight
+                if self.lateral_distribution_pattern == WeightDistribution.bilateral:  # each side gets half the load for each rep
+                    left.multiply(self.lateral_distribution[0] / 100)
+                    right.multiply(self.lateral_distribution[0] / 100)
+                elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:  # first item in percent body weight is the dominant side
+                    if self.side == 1:  # left dominant activity
+                        left.multiply(self.lateral_distribution[0] / 100)
+                        right.multiply(self.lateral_distribution[1] / 100)
+                    elif self.side == 2:  # right dominant activity
+                        left.multiply(self.lateral_distribution[1] / 100)
+                        right.multiply(self.lateral_distribution[0] / 100)
+                    else:  # since we don't know which side was loaded more, apply evenly
+                        left.multiply(sum(self.lateral_distribution) / 2 / 100)
+                        right.multiply(sum(self.lateral_distribution) / 2 / 100)
+                elif self.lateral_distribution_pattern == WeightDistribution.unilateral:
+                    if self.side == 1:  # performed left only
+                        left.multiply(self.lateral_distribution[0] / 100)
+                        right.multiply(self.lateral_distribution[1] / 100)
+                    elif self.side == 2:  # performed right only
+                        left.multiply(self.lateral_distribution[1] / 100)
+                        right.multiply(self.lateral_distribution[0] / 100)
+                    else:  # assuming assignment is per side, assign all of the intensity to each side
+                        left.multiply(self.lateral_distribution[0] / 100)
+                        right.multiply(self.lateral_distribution[0] / 100)
+                elif self.lateral_distribution_pattern == WeightDistribution.unilateral_alternating:  # each side gets all the intensity for each rep
+                    left.multiply(self.lateral_distribution[0] / 100)
+                    right.multiply(self.lateral_distribution[1] / 100)
+
+            else:  # dumbbell, weight is supposed to be weight for each side
+                if self.lateral_distribution_pattern == WeightDistribution.unilateral:
+                    if self.side == 1:  # performed left only
+                        left.multiply(self.lateral_distribution[0] / 100)
+                    elif self.side == 2:  # performed right only
+                        right.multiply(self.lateral_distribution[0] / 100)
+                    else:  # assuming assignment is per side, assign all of the intensity to each side
+                        left.multiply(self.lateral_distribution[0] / 100)
+                        right.multiply(self.lateral_distribution[0] / 100)
+                elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:  # first item in percent body weight is the dominant side
+                    if self.side == 1:  # left dominant activity
+                        left.multiply(2 * self.lateral_distribution[0] / 100)
+                        right.multiply(2 * self.lateral_distribution[1] / 100)
+                    elif self.side == 2:  # right dominant activity
+                        left.multiply(2 * self.lateral_distribution[1] / 100)
+                        right.multiply(2 * self.lateral_distribution[0] / 100)
+                    else:  # since we don't know which side was loaded more, apply evenly
+                        left.multiply(2 * sum(self.lateral_distribution) / 2 / 100)
+                        right.multiply(2 * sum(self.lateral_distribution) / 2 / 100)
+                elif self.lateral_distribution_pattern == WeightDistribution.unilateral_alternating:  # bilateral and unilateral alternating get full amount for each side
+                    left.multiply(self.lateral_distribution[0] / 100)
+                    right.multiply(self.lateral_distribution[1] / 100)
+                else:  # both side get reported value
+                    left.multiply(2 * self.lateral_distribution[0] / 100)
+                    right.multiply(2 * self.lateral_distribution[1] / 100)
+        return left, right
+
     def set_body_weight_distribution(self):
         left = 0
         right = 0
@@ -361,14 +435,27 @@ class ExerciseAction(object):
         self.set_training_volume(total_volume)
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             # both sides have same volume (duration) and intensity (rpe)
-            self.total_load_left = self.training_volume_left * self.training_intensity
-            self.total_load_right = self.training_volume_right * self.training_intensity
-            # self.tissue_load_left = self.training_volume_left * self.readiness * self.tissue_intensity
-            # self.tissue_load_right = self.training_volume_right * self.readiness * self.tissue_intensity
-            self.power_load_left = self.power * self.training_volume_left
-            self.power_load_right = self.power * self.training_volume_right
-            self.force_load_left = self.force * self.training_volume_left
-            self.force_load_right = self.force * self.training_volume_right
+            #self.total_load_left = self.training_volume_left * self.training_intensity
+            #self.total_load_right = self.training_volume_rning_intensityight * self.trai
+
+            #self.tissue_load_left.add_value(self.training_volume_left * self.readiness * self.tissue_intensity)
+            #self.tissue_load_right.add_value(self.training_volume_right * self.readiness * self.tissue_intensity)
+            power_left = self.power.plagiarize()
+            power_left.multiply(self.training_volume_left)
+            power_right = self.power.plagiarize()
+            power_right.multiply(self.training_volume_right)
+
+            force_left = self.force.plagiarize()
+            force_left.multiply(self.training_volume_left)
+            force_right = self.force.plagiarize()
+            force_right.multiply(self.training_volume_right)
+
+            self.power_load_left.add(power_left)
+            self.power_load_right.add(power_right)
+            self.force_load_left.add(force_left)
+            self.force_load_right.add(force_right)
+            self.tissue_load_left = self.force_load_left
+            self.tissue_load_right = self.force_load_right
         else:
             left_dist = 1
             right_dist = 1
@@ -386,10 +473,15 @@ class ExerciseAction(object):
                 elif self.side == 2:
                     left_dist = self.lateral_distribution[1] / 100 * 2
                     right_dist = self.lateral_distribution[0] / 100 * 2
-            self.total_load_left = self.training_volume_left * self.training_intensity * left_dist
-            self.total_load_right = self.training_volume_right * self.training_intensity * right_dist
-            self.force_load_left = self.force * self.training_volume_left * left_dist
-            self.force_load_right = self.force * self.training_volume_right * right_dist
+            # self.tissue_load_left.add_value(self.training_volume_left * self.training_intensity * left_dist)
+            # self.tissue_load_right.add_value(self.training_volume_right * self.training_intensity * right_dist)
+            left_force, right_force = self.set_force_distribution()
+            left_force.multiply(self.training_volume_left * left_dist)
+            right_force.multiply(self.training_volume_right * right_dist)
+            self.force_load_left.add(left_force)
+            self.force_load_right.add(right_force)
+            self.tissue_load_left = self.force_load_left
+            self.tissue_load_right = self.force_load_right
 
     def set_training_volume(self, total_volume):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
