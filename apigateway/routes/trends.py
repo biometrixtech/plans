@@ -7,6 +7,7 @@ from models.insights import InsightType
 # from models.styles import VisualizationType
 from routes.environments import is_fathom_environment
 from utils import parse_datetime, format_date
+import sklearn
 
 datastore_collection = DatastoreCollection()
 
