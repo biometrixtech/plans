@@ -2,6 +2,7 @@ from models.exercise import UnitOfMeasure, WeightMeasure
 from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability
 from models.movement_actions import ExerciseAction
 from utils import format_datetime, parse_datetime
+from models.training_volume import StandardErrorRange
 
 import re
 import datetime
@@ -199,6 +200,11 @@ class WorkoutExercise(Serialisable):
 
         self.total_volume = None
 
+        self.tissue_load = None
+        self.force_load = None
+        self.power_load = None
+        self.rpe_load = None
+
     def json_serialise(self):
         ret = {
             'id': self.id,
@@ -236,7 +242,11 @@ class WorkoutExercise(Serialisable):
             # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions],
             'shrz': self.shrz,
             'work_vo2': self.work_vo2,
-            'total_volume': self.total_volume
+            'total_volume': self.total_volume,
+            'tissue_load': self.tissue_load.json_serialise() if self.tissue_load is not None else None,
+            'force_load': self.force_load.json_serialise() if self.tissue_load is not None else None,
+            'power_load': self.power_load.json_serialise() if self.power_load is not None else None,
+            'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None
         }
         return ret
 
@@ -283,6 +293,13 @@ class WorkoutExercise(Serialisable):
         exercise.shrz = input_dict.get('shrz')
         exercise.work_vo2 = input_dict.get('work_vo2')
         exercise.total_volume = input_dict.get('total_volume')
+        exercise.tissue_load = StandardErrorRange.json_deserialise(input_dict.get('tissue_load')) if input_dict.get('tissue_load') is not None else None
+        exercise.force_load = StandardErrorRange.json_deserialise(input_dict.get('force_load')) if input_dict.get(
+            'force_load') is not None else None
+        exercise.power_load = StandardErrorRange.json_deserialise(input_dict.get('power_load')) if input_dict.get(
+            'power_load') is not None else None
+        exercise.rpe_load = StandardErrorRange.json_deserialise(input_dict.get('rpe_load')) if input_dict.get(
+            'rpe_load') is not None else None
         return exercise
 
     # def get_training_volume(self):
@@ -380,6 +397,18 @@ class WorkoutExercise(Serialisable):
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
+
+    def set_training_loads(self):
+        if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            if self.power is not None and self.total_volume is not None:
+                if self.power_load is None:
+                    self.power_load = StandardErrorRange(observed_value=0)
+                self.power_load.add_value(self.power * self.total_volume)
+        if self.force is not None and self.total_volume is not None:
+            if self.force_load is None:
+                self.force_load = StandardErrorRange(observed_value=0)
+            self.force_load.add_value(self.force * self.total_volume)
+            self.tissue_load = self.force_load.plagiarize()
 
     def set_rep_tempo(self):
         if self.cardio_action == CardioAction.row:

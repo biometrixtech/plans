@@ -9,6 +9,7 @@ from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceSt
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
+from models.training_load import TrainingLoad
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -27,6 +28,7 @@ class WorkoutProcessor(object):
     def process_workout(self, workout_program):
 
         heart_rate_processing = HeartRateProcessing(self.user_age)
+        session_training_load = TrainingLoad()
 
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
@@ -39,8 +41,13 @@ class WorkoutProcessor(object):
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
                 self.add_movement_detail_to_exercise(workout_exercise)
+                session_training_load.add_tissue_load(workout_exercise.tissue_load)
+                session_training_load.add_force_load(workout_exercise.force_load)
+                session_training_load.add_power_load(workout_exercise.power_load)
 
             workout_section.should_assess_shrz()
+
+        return session_training_load
 
     def add_movement_detail_to_exercise(self, exercise):
         if exercise.movement_id in movement_library:
@@ -91,6 +98,7 @@ class WorkoutProcessor(object):
             exercise = self.set_force_weighted(exercise)
 
         exercise = self.set_total_volume(exercise)
+        exercise.set_training_loads()
 
         return exercise
 

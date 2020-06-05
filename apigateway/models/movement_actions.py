@@ -331,7 +331,6 @@ class ExerciseAction(object):
         self.external_weight_left = external_weight_left
         self.external_weight_right = external_weight_right
 
-
     def set_force_distribution(self):
         left = 0
         right = 0
@@ -394,7 +393,6 @@ class ExerciseAction(object):
                     left = self.force * 2 * self.lateral_distribution[0] / 100
                     right = self.force * 2 * self.lateral_distribution[1] / 100
         return left, right
-
 
     def set_body_weight_distribution(self):
         left = 0
