@@ -129,7 +129,10 @@ class StandardErrorRange(Serialisable):
         observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
         observed_value_list.extend(lower_bound_list)
 
-        return min(observed_value_list)
+        if len(observed_value_list) > 0:
+            return min(observed_value_list)
+        else:
+            return None
 
     @staticmethod
     def get_max_from_error_range_list(error_range_list):
@@ -138,7 +141,10 @@ class StandardErrorRange(Serialisable):
         observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
         observed_value_list.extend(upper_bound_list)
 
-        return max(observed_value_list)
+        if len(observed_value_list) > 0:
+            return max(observed_value_list)
+        else:
+            return None
 
     def lowest_value(self):
 
