@@ -41,9 +41,10 @@ class WorkoutProcessor(object):
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
                 self.add_movement_detail_to_exercise(workout_exercise)
-                session_training_load.add_tissue_load(workout_exercise.tissue_load)
-                session_training_load.add_force_load(workout_exercise.force_load)
-                session_training_load.add_power_load(workout_exercise.power_load)
+                if workout_section.assess_load:
+                    session_training_load.add_tissue_load(workout_exercise.tissue_load)
+                    session_training_load.add_force_load(workout_exercise.force_load)
+                    session_training_load.add_power_load(workout_exercise.power_load)
 
             workout_section.should_assess_shrz()
 
