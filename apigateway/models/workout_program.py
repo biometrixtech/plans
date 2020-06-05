@@ -214,7 +214,7 @@ class WorkoutExercise(Serialisable):
             'sets': self.sets,
             'reps_per_set': self.reps_per_set,
             'unit_of_measure': self.unit_of_measure.value if self.unit_of_measure is not None else None,
-            'rpe': self.rpe,
+            'rpe': self.rpe.json_serialise() if self.rpe is not None else None,
             'side': self.side,
             'bilateral': self.bilateral,
             'movement_id': self.movement_id,
@@ -224,8 +224,8 @@ class WorkoutExercise(Serialisable):
             'pace': self.pace,
             'stroke_rate': self.stroke_rate,
             'cadence': self.cadence,
-            'power': self.power,
-            'force': self.force,
+            'power': self.power.json_serialise() if self.power is not None else None,
+            'force': self.force.json_serialise() if self.force is not None else None,
             'calories': self.calories,
             'grade': self.grade,
             'equipments': [equipment.value for equipment in self.equipments],
@@ -241,7 +241,7 @@ class WorkoutExercise(Serialisable):
             # 'primary_actions': [action.json_serialise() for action in self.primary_actions],
             # 'secondary_actions': [action.json_serialise() for action in self.secondary_actions],
             'shrz': self.shrz,
-            'work_vo2': self.work_vo2,
+            'work_vo2': self.work_vo2.json_serialise() if self.work_vo2 is not None else None,
             'total_volume': self.total_volume,
             'tissue_load': self.tissue_load.json_serialise() if self.tissue_load is not None else None,
             'force_load': self.force_load.json_serialise() if self.tissue_load is not None else None,
@@ -276,22 +276,22 @@ class WorkoutExercise(Serialisable):
             'cardio_action') is not None else None
         exercise.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
             'training_type') is not None else None
-        exercise.rpe = input_dict.get('rpe')
+        exercise.rpe = StandardErrorRange.json_deserialise(input_dict.get('rpe')) if input_dict.get('rpe') is not None else None
         exercise.duration = input_dict.get('duration')
         exercise.distance = input_dict.get('distance')
         exercise.speed = input_dict.get('speed')
         exercise.pace = input_dict.get('pace')
         exercise.stroke_rate = input_dict.get('stroke_rate')
         exercise.cadence = input_dict.get('cadence')
-        exercise.power = input_dict.get('power')
-        exercise.force = input_dict.get('force')
+        exercise.power = StandardErrorRange.json_deserialise(input_dict.get('power')) if input_dict.get('power') is not None else None
+        exercise.force = StandardErrorRange.json_deserialise(input_dict.get('force')) if input_dict.get('force') is not None else None
         exercise.calories = input_dict.get('calories')
         exercise.grade = input_dict.get('grade')
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
         exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
         exercise.shrz = input_dict.get('shrz')
-        exercise.work_vo2 = input_dict.get('work_vo2')
+        exercise.work_vo2 = StandardErrorRange.json_deserialise(input_dict.get('work_vo2')) if input_dict.get('work_vo2') is not None else None
         exercise.total_volume = input_dict.get('total_volume')
         exercise.tissue_load = StandardErrorRange.json_deserialise(input_dict.get('tissue_load')) if input_dict.get('tissue_load') is not None else None
         exercise.force_load = StandardErrorRange.json_deserialise(input_dict.get('force_load')) if input_dict.get(
@@ -362,8 +362,8 @@ class WorkoutExercise(Serialisable):
     def set_intensity(self):
         if self.training_type == TrainingType.strength_cardiorespiratory:
             if self.rpe is None:
-                self.rpe = 4
-            self.training_intensity = self.shrz or self.rpe
+                self.rpe = StandardErrorRange(observed_value=4)
+            self.training_intensity = self.shrz or self.rpe.observed_value
         elif self.training_type in [TrainingType.strength_endurance, TrainingType.strength_integrated_resistance]:
             self.set_strength_training_intensity()
         else:
@@ -401,13 +401,13 @@ class WorkoutExercise(Serialisable):
     def set_training_loads(self):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             if self.power is not None and self.total_volume is not None:
-                if self.power_load is None:
-                    self.power_load = StandardErrorRange(observed_value=0)
-                self.power_load.add_value(self.power * self.total_volume)
+                power_load = self.power.plagiarize()
+                power_load.multiply(self.total_volume)
+                self.power_load = power_load
         if self.force is not None and self.total_volume is not None:
-            if self.force_load is None:
-                self.force_load = StandardErrorRange(observed_value=0)
-            self.force_load.add_value(self.force * self.total_volume)
+            force_load = self.force.plagiarize()
+            force_load.multiply(self.total_volume)
+            self.force_load = force_load
             self.tissue_load = self.force_load.plagiarize()
 
     def set_rep_tempo(self):
@@ -458,12 +458,12 @@ class WorkoutExercise(Serialisable):
             pace = self.duration / self.distance
         elif self.power is not None:
             if self.cardio_action == CardioAction.row:
-                pace = (2.8 / self.power) ** (1 / 3)
+                pace = (2.8 / self.power.observed_value) ** (1 / 3)
         elif self.calories is not None and self.duration is not None:
             if self.cardio_action == CardioAction.row:
                 self.power = (4200 * self.calories - .35 * self.duration) / (4 * self.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
                 # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
-                pace = (2.8 / self.power) ** (1 / 3)
+                pace = (2.8 / self.power.observed_value) ** (1 / 3)
 
         # get speed
         if self.speed is not None:

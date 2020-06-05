@@ -10,6 +10,7 @@ from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodySt
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 from models.training_load import TrainingLoad
+from models.training_volume import StandardErrorRange
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -201,7 +202,7 @@ class WorkoutProcessor(object):
             weight = exercise.weight * self.user_weight
         else:
             weight = 20  # TODO: need to change this
-        exercise.force = Calculators.force_resistance_exercise(weight)
+        exercise.force = StandardErrorRange(observed_value=Calculators.force_resistance_exercise(weight))
         return exercise
 
     def set_total_volume(self, exercise):
@@ -231,24 +232,43 @@ class WorkoutProcessor(object):
         if exercise.power is None:
             if exercise.speed is not None:
                 if exercise.cardio_action == CardioAction.row:
-                    exercise.power = Calculators.power_rowing(exercise.speed)
+                    exercise.power = StandardErrorRange(observed_value=Calculators.power_rowing(exercise.speed))
                 elif exercise.cardio_action == CardioAction.run:
-                    exercise.power = Calculators.power_running(exercise.speed, exercise.grade, self.user_weight)
+                    exercise.power = StandardErrorRange(observed_value=Calculators.power_running(exercise.speed, exercise.grade, self.user_weight))
                 elif exercise.cardio_action == CardioAction.cycle:
-                    exercise.power = Calculators.power_cycling(exercise.speed, user_weight=self.user_weight, grade=exercise.grade)
+                    exercise.power = StandardErrorRange(observed_value=Calculators.power_cycling(exercise.speed, user_weight=self.user_weight, grade=exercise.grade))
                 else:  # for all other cardio types
-                    exercise.power = Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female)
+                    exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
             else:
-                exercise.power = Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female)
+                exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
 
         if exercise.cardio_action == CardioAction.row:
-            exercise.force = Calculators.force_rowing(exercise.power, exercise.speed)
+            exercise.force = StandardErrorRange(observed_value=Calculators.force_rowing(exercise.power.observed_value, exercise.speed))
+            if exercise.power.lower_bound is not None:
+                exercise.force.lower_bound = Calculators.force_rowing(exercise.power.lower_bound, exercise.speed)
+            if exercise.power.upper_bound is not None:
+                exercise.force.upper_bound = Calculators.force_rowing(exercise.power.upper_bound, exercise.speed)
         elif exercise.cardio_action == CardioAction.run:
-            exercise.force = Calculators.force_running(exercise.power, exercise.speed)
+            exercise.force = StandardErrorRange(
+                observed_value=Calculators.force_running(exercise.power.observed_value, exercise.speed))
+            if exercise.power.lower_bound is not None:
+                exercise.force.lower_bound = Calculators.force_running(exercise.power.lower_bound, exercise.speed)
+            if exercise.power.upper_bound is not None:
+                exercise.force.upper_bound = Calculators.force_running(exercise.power.upper_bound, exercise.speed)
         elif exercise.cardio_action == CardioAction.cycle:
-            exercise.force = Calculators.force_cycling(exercise.power, exercise.speed)
+            exercise.force = StandardErrorRange(
+                observed_value=Calculators.force_cycling(exercise.power.observed_value, exercise.speed))
+            if exercise.power.lower_bound is not None:
+                exercise.force.lower_bound = Calculators.force_cycling(exercise.power.lower_bound, exercise.speed)
+            if exercise.power.upper_bound is not None:
+                exercise.force.upper_bound = Calculators.force_cycling(exercise.power.upper_bound, exercise.speed)
         else:  # for all other cardio types
-            exercise.force = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
+            exercise.force = StandardErrorRange(
+                observed_value=Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female))
+            if exercise.power.lower_bound is not None:
+                exercise.force.lower_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
+            if exercise.power.upper_bound is not None:
+                exercise.force.upper_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
 
         return exercise
 

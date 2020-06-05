@@ -272,7 +272,7 @@ def test_training_volume_load_cardioresp():
     assert action.training_volume_left == 100
     assert action.training_volume_right == 100
 
-    assert action.rpe == 4
+    assert action.rpe.observed_value == 4
 
     assert action.tissue_load_left.observed_value == 44.84 * 100
     assert action.tissue_load_right.observed_value == 44.84 * 100
@@ -304,7 +304,7 @@ def test_power_intensity():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=100, training_type=TrainingType.power_drills_plyometrics, explosiveness=5)
     action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral)
 
-    assert action.force == round(100 * 9.8, 2)
+    assert action.force.observed_value == round(100 * 9.8, 2)
 
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40

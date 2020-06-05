@@ -6,6 +6,7 @@ from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgr
 from models.movement_tags import TrainingType
 from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
+from models.training_volume import StandardErrorRange
 import datetime
 
 
@@ -80,7 +81,7 @@ def test_rowing():
     exercise.pace = .24
     workout_program = create_and_process_workout([exercise])
     for action in exercise.primary_actions:
-        assert action.force == round(2.8 / (120 / 500) ** 2, 2)
+        assert action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
     session = get_session(workout_program=workout_program, rpe=5, duration=5)
     session_load_dict = get_session_load_dict(session)
     for body_part, muscle_load in session_load_dict.items():
@@ -93,7 +94,7 @@ def test_rowing_stroke_rate_25():
     exercise.pace = .24
     create_and_process_workout([exercise])
     for action in exercise.primary_actions:
-        assert action.force == round(2.8 / (120 / 500) ** 2, 2)
+        assert action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
 
 
 def test_running():
@@ -101,11 +102,11 @@ def test_running():
     exercise.pace = None
     exercise.cadence = 170  # rep tempo = 3
     exercise.duration = 3000
-    exercise.power = 100
+    exercise.power = StandardErrorRange(observed_value=100)
     exercise.speed = 5
     create_and_process_workout([exercise])
     for action in exercise.primary_actions:
-        assert action.force == round(100 / 5, 2)
+        assert action.force.observed_value == round(100 / 5, 2)
         assert action.pace == .2
         assert action.distance == 5 * 3000
 
@@ -115,11 +116,11 @@ def test_walking():
     exercise.pace = None
     exercise.cadence = 120  # rep tempo = 1
     exercise.duration = 3000
-    exercise.power = 100
+    exercise.power = StandardErrorRange(observed_value=100)
     exercise.speed = 5
     create_and_process_workout([exercise])
     for action in exercise.primary_actions:
-        assert action.force == round(100 / 5, 2)
+        assert action.force.observed_value == round(100 / 5, 2)
         assert action.pace == .2
         assert action.distance == 5 * 3000
 
@@ -130,11 +131,11 @@ def test_cycling():
     exercise.pace = None
     exercise.cadence = 120  # rep tempo = 4
     exercise.distance = 5000
-    exercise.power = 100
+    exercise.power = StandardErrorRange(observed_value=100)
     exercise.speed = 5
     create_and_process_workout([exercise])
     for action in exercise.primary_actions:
-        assert action.force == round(100 / 5, 2)
+        assert action.force.observed_value == round(100 / 5, 2)
         assert action.pace == .2
         assert action.duration == 1000
         assert action.training_volume_left == action.training_volume_right == 1000
