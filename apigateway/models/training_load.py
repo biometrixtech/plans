@@ -24,3 +24,13 @@ class TrainingLoad(object):
             self.power_load = StandardErrorRange(observed_value=0)
         if power_load is not None:
             self.power_load.add(power_load)
+
+
+class SessionLoad(TrainingLoad):
+    def __init__(self, session_id, user_id, event_date_time):
+        super().__init__()
+        self.session_id = session_id
+        self.user_id = user_id
+        self.event_date_time = event_date_time
+
+

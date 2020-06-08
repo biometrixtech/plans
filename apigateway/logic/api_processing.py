@@ -71,7 +71,7 @@ class APIProcessing(object):
             session_obj.workout_program_module.user_id = session_obj.user_id
             session_obj.workout_program_module.event_date_time = session_obj.event_date
             hr_workout = self.heart_rate_data[0].hr_workout if len(self.heart_rate_data) > 0 else None
-            WorkoutProcessor().process_workout(session_obj.workout_program_module, hr_workout, self.user_age)
+            WorkoutProcessor(hr_data=hr_workout, user_age=self.user_age).process_workout(session_obj.workout_program_module)
             self.workout_programs.append(session_obj.workout_program_module)
         if len(self.heart_rate_data) > 0:
             if session_obj.workout_program_module is not None:
