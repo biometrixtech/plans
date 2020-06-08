@@ -32,8 +32,8 @@ class UserStats(Serialisable):
         self.average_rpe_5_day = None
         self.average_rpe_20_day = None
 
-        self.average_force_load_5_day = None
-        self.average_force_load_20_day = None
+        self.average_tissue_load_5_day = None
+        self.average_tissue_load_20_day = None
         self.average_power_load_5_day = None
         self.average_power_load_20_day = None
         self.average_work_vo2_load_5_day = None
@@ -52,45 +52,6 @@ class UserStats(Serialisable):
                 except InvalidSchemaException:
                     value = parse_date(value)
         super().__setattr__(name, value)
-
-    def get_load_5_20(self, attribute_5_day_name, attribute_20_day_name):
-
-        attribute_5_day = getattr(self, attribute_5_day_name)
-        attribute_20_day = getattr(self, attribute_20_day_name)
-
-        if attribute_5_day is not None and attribute_20_day is not None:
-            standard_error_range = StandardErrorRange()
-            standard_error_range.lower_bound = attribute_5_day.lower_bound / attribute_20_day.lower_bound
-            standard_error_range.upper_bound = attribute_5_day.upper_bound / attribute_20_day.upper_bound
-            standard_error_range.observed_value = attribute_5_day.observed_value / attribute_20_day.observed_value
-            standard_error_range.insufficient_data = min(attribute_5_day.insufficient_data,
-                                                         attribute_20_day.insufficient_data)
-
-            return standard_error_range
-
-        else:
-
-            return None
-
-    def newtons_load_5_20(self):
-
-        return self.get_load_5_20("average_force_load_5_day", "average_force_load_20_day")
-
-    def rpe_load_5_20(self):
-
-        return self.get_load_5_20("average_rpe_load_5_day", "average_rpe_load_20_day")
-
-    def trimp_5_20(self):
-
-        return self.get_load_5_20("average_trimp_load_5_day", "average_trimp_load_20_day")
-
-    def watts_load_5_20(self):
-
-        return self.get_load_5_20("average_power_load_5_day", "average_power_load_20_day")
-
-    def work_vo2_load_5_20(self):
-
-        return self.get_load_5_20("average_work_vo2_load_5_day", "average_work_vo2_load_20_day")
 
     def json_serialise(self):
         ret = {
@@ -112,8 +73,8 @@ class UserStats(Serialisable):
             'average_work_vo2_20_day': self.average_work_vo2_20_day.json_serialise() if self.average_work_vo2_20_day is not None else None,
             'average_rpe_5_day': self.average_rpe_5_day.json_serialise() if self.average_rpe_5_day is not None else None,
             'average_rpe_20_day': self.average_rpe_20_day.json_serialise() if self.average_rpe_20_day is not None else None,
-            'average_force_load_5_day': self.average_force_load_5_day.json_serialise() if self.average_force_load_5_day is not None else None,
-            'average_force_load_20_day': self.average_force_load_20_day.json_serialise() if self.average_force_load_20_day is not None else None,
+            'average_tissue_load_5_day': self.average_tissue_load_5_day.json_serialise() if self.average_tissue_load_5_day is not None else None,
+            'average_tissue_load_20_day': self.average_tissue_load_20_day.json_serialise() if self.average_tissue_load_20_day is not None else None,
             'average_power_load_5_day': self.average_power_load_5_day.json_serialise() if self.average_power_load_5_day is not None else None,
             'average_power_load_20_day': self.average_power_load_20_day.json_serialise() if self.average_power_load_20_day is not None else None,
             'average_work_vo2_load_5_day': self.average_work_vo2_load_5_day.json_serialise() if self.average_work_vo2_load_5_day is not None else None,

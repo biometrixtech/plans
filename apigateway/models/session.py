@@ -95,8 +95,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.sensor_end_date_time = None
         self.day_of_week = DayOfWeek.monday
         self.estimated = False
-        self.internal_load_imputed = False
-        self.external_load_imputed = False
+        # self.internal_load_imputed = False
+        # self.external_load_imputed = False
         self.data_transferred = False
         self.movement_limited = False
         self.same_muscle_discomfort_over_72_hrs = False
@@ -139,6 +139,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.power_explosive_action_load = None
         self.cardio_plyometrics = None
         self.ultra_high_intensity = None
+
+        self.tissue_load = None
+        self.force_load = None
+        self.power_load = None
+        self.rpe_load = None
 
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
@@ -185,6 +190,41 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     #         return True
     #     else:
     #         return False
+
+    def add_tissue_load(self, tissue_load):
+        if self.tissue_load is None:
+            self.tissue_load = StandardErrorRange(observed_value=0)
+        if tissue_load is not None:
+            self.tissue_load.add(tissue_load)
+
+    def add_force_load(self, force_load):
+        if self.force_load is None:
+            self.force_load = StandardErrorRange(observed_value=0)
+        if force_load is not None:
+            self.force_load.add(force_load)
+
+    def add_power_load(self, power_load):
+        if self.power_load is None:
+            self.power_load = StandardErrorRange(observed_value=0)
+        if power_load is not None:
+            self.power_load.add(power_load)
+
+    def add_rpe_load(self, rpe_load):
+        if self.rpe_load is None:
+            self.rpe_load = StandardErrorRange(observed_value=0)
+        if rpe_load is not None:
+            self.rpe_load.add(rpe_load)
+
+    def update_training_loads(self, training_load):
+
+        if training_load.tissue_load is not None:
+            self.add_tissue_load(training_load.tissue_load)
+        if training_load.force_load is not None:
+            self.add_force_load(training_load.force_load)
+        if training_load.power_load is not None:
+            self.add_power_load(training_load.power_load)
+        if training_load.rpe_load is not None:
+            self.add_rpe_load(training_load.rpe_load)
 
     def cycling_training_volume(self):
         return self.get_distance_training_volume(SportName.cycling)
