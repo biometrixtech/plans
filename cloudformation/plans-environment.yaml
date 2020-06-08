@@ -136,6 +136,10 @@ Resources:
                           - "sqs:SendMessage"
                         Effect: "Allow"
                         Resource: "*"
+                      - Action:
+                          - "s3:GetObject"
+                        Effect: "Allow"
+                        Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
 
     ##########################################################################################################
