@@ -1,7 +1,11 @@
 from fathomapi.api.handler import handler as fathom_handler
 from fathomapi.api.flask_app import app
 import sklearn
+import joblib
 print(sklearn.__version__)
+model = joblib.load('/opt/hr_rpe.joblib')
+print(model.n_features_)
+
 
 from routes.active_recovery import app as active_recovery_routes
 from routes.athlete import app as athlete_routes

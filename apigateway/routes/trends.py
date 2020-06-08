@@ -7,8 +7,7 @@ from models.insights import InsightType
 # from models.styles import VisualizationType
 from routes.environments import is_fathom_environment
 from utils import parse_datetime, format_date
-import sklearn
-print(sklearn.__version__)
+
 datastore_collection = DatastoreCollection()
 
 app = Blueprint('trends', __name__)
