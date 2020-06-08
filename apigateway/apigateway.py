@@ -3,8 +3,17 @@ from fathomapi.api.flask_app import app
 import sklearn
 import joblib
 print(sklearn.__version__)
-model = joblib.load('/opt/hr_rpe.joblib')
-print(model.n_features_)
+import boto3
+
+def predict():
+    bucket = boto3.resource('s3').Bucket('biometrix-globalmodels')
+    bucket.download_file('hr_rpe.joblib','/tmp/hr_rpe.joblib')
+    model = joblib.load('/tmp/hr_rpe.joblib')
+    print(model.n_features_)
+    print(model.predict(x = np.array([[1, 2, 3, 4, 5]])))
+    return model
+
+predict()
 
 
 from routes.active_recovery import app as active_recovery_routes

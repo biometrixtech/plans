@@ -182,6 +182,9 @@ Resources:
             MemorySize: "512"
             Role: { "Fn::GetAtt" : [ "ApiGatewayLambdaExecutionRole", "Arn" ] }
             FunctionName: { "Fn::Sub": "plans-${Environment}-apigateway-execute" }
+            Layers: [
+              "arn:aws:lambda:us-west-2:887689817172:layer:sklearn:1"
+            ]
             Tags:
               - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-apigateway-execute" } }
               - { Key: "Management", Value: "managed" }
