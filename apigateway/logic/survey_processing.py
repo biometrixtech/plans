@@ -128,9 +128,9 @@ class SurveyProcessing(object):
                         self.athlete_stats.session_RPE = survey.RPE
                         self.athlete_stats.session_RPE_event_date = self.event_date
         session_obj = create_session(session_type, session_data)
-        if session_obj.workout_program_module is not None:
-            session_training_load = WorkoutProcessor().process_workout(session_obj.workout_program_module)
-            session_obj.update_training_loads(session_training_load)
+        # if session_obj.workout_program_module is not None:
+        #     session_training_load = WorkoutProcessor().process_workout(session_obj.workout_program_module)
+        #     session_obj.update_training_loads(session_training_load)
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:
