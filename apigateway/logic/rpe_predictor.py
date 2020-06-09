@@ -2,12 +2,13 @@ import os
 # import numpy as np
 import joblib
 import boto3
-
+from fathomapi.utils.xray import xray_recorder
 
 class RPEPredictor(object):
     def __init__(self):
         self.model = self.load_model()
 
+    @xray_recorder.capture('logic.RPEPredictor.load_model')
     def load_model(self):
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
             return None
@@ -23,6 +24,7 @@ class RPEPredictor(object):
 
             return model
 
+    @xray_recorder.capture('logic.RPEPredictor.predict_rpe')
     def predict_rpe(self, hr, user_weight=60.0, user_age=20.0, vo2_max=40.0, female=True):
         if female:
             gender = 1.0
