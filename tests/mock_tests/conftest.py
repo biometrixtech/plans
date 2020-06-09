@@ -1,6 +1,6 @@
 import os
 from aws_xray_sdk.core import xray_recorder
-xray_recorder.configure(sampling=False)
+xray_recorder.configure(sampling=False, context_missing='LOG_ERROR')
 xray_recorder.begin_segment(name="test")
 from fathomapi.api.config import Config
 

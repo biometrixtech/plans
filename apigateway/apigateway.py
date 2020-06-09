@@ -1,6 +1,5 @@
 from fathomapi.api.handler import handler as fathom_handler
 from fathomapi.api.flask_app import app
-import routes.predict_rpe
 
 from routes.active_recovery import app as active_recovery_routes
 from routes.athlete import app as athlete_routes
