@@ -353,12 +353,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'session_load_dict': [{"body_part": key.json_serialise(),
                                    "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None and session_type == SessionType.mixed_activity else None,
 
-            'not_tracked_load': self.not_tracked_load if self.not_tracked_load is not None else None,
-            'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load if self.strength_endurance_cardiorespiratory_load is not None else None,
-            'strength_endurance_strength_load': self.strength_endurance_strength_load if self.strength_endurance_strength_load is not None else None,
-            'power_drill_load': self.power_drill_load if self.power_drill_load is not None else None,
-            'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load if self.maximal_strength_hypertrophic_load is not None else None,
-            'power_explosive_action_load': self.power_explosive_action_load if self.power_explosive_action_load is not None else None,
+            # 'not_tracked_load': self.not_tracked_load if self.not_tracked_load is not None else None,
+            # 'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load if self.strength_endurance_cardiorespiratory_load is not None else None,
+            # 'strength_endurance_strength_load': self.strength_endurance_strength_load if self.strength_endurance_strength_load is not None else None,
+            # 'power_drill_load': self.power_drill_load if self.power_drill_load is not None else None,
+            # 'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load if self.maximal_strength_hypertrophic_load is not None else None,
+            # 'power_explosive_action_load': self.power_explosive_action_load if self.power_explosive_action_load is not None else None,
             'cardio_plyometrics': self.cardio_plyometrics,
             'ultra_high_intensity': self.ultra_high_intensity
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
