@@ -3,6 +3,7 @@ from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
 from logic.calculators import Calculators
 from logic.heart_rate_processing import HeartRateProcessing
+from logic.rpe_predictor import RPEPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction
@@ -16,14 +17,18 @@ movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
 action_library = ActionLibraryDatastore().get()
 bodyweight_coefficients = get_bodyweight_coefficients()
+import random
 
 
 class WorkoutProcessor(object):
-    def __init__(self, user_age=20, user_weight=60.0, female=True, hr_data=None):
+    def __init__(self, user_age=20, user_weight=60.0, female=True, hr_data=None, vo2_max=40):
         self.user_age = user_age
         self.user_weight = user_weight
         self.female = female
         self.hr_data = hr_data
+        self.hr_rpe_predictor = RPEPredictor()
+        self.vo2_max = vo2_max
+
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, workout_program):
@@ -90,6 +95,7 @@ class WorkoutProcessor(object):
                 exercise.duration = exercise.distance / exercise.speed
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
+            exercise.predicted_rpe = self.hr_rpe_predictor.predict_rpe(hr=random.randint(130, 170))
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:

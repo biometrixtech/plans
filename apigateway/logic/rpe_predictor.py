@@ -4,15 +4,15 @@ import joblib
 import boto3
 
 class RPEPredictor(object):
-    def __init__(self, test=False):
-        self.model = self.load_model(test)
+    def __init__(self):
+        self.model = self.load_model()
 
-    def load_model(self, test):
+    def load_model(self):
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
             return None
         else:
             bucket = boto3.resource('s3').Bucket('biometrix-globalmodels')
-            if test:
+            if os.environ.get('UNIT_TESTS', '') == 'TRUE':
                 download_loc = os.path.join('..', 'data', 'hr_rpe.joblib')
             else:
                 download_loc = '/tmp/hr_rpe.joblib'
@@ -22,9 +22,17 @@ class RPEPredictor(object):
 
             return model
 
-    def predict_rpe(self):
+    def predict_rpe(self, hr, user_weight=60.0, user_age=20.0, vo2_max=40.0, female=True):
+        if female:
+            gender = 1.0
+        else:
+            gender = 0.0
+        max_hr = 207 - .7 * user_age
+        percent_max_hr = hr / max_hr
+        prediction_features = [[user_age, user_weight, gender, percent_max_hr, vo2_max]]
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
             return 5
         else:
-            print(self.model.n_features_)
-            return self.model.predict([[1, 2, 3, 4, 5]])
+            predicted_rpe = self.model.predict(prediction_features)
+            print(prediction_features, predicted_rpe)
+            return predicted_rpe
