@@ -78,6 +78,7 @@ def run_unit_tests():
 def main():
     os.environ['PROJECT'] = os.environ['LAMBCI_REPO'].split('/')[-1].lower()
     config = read_config()
+    os.environ['CODEBUILD_RUN'] = 'TRUE'
 
 
     print("Deploying Lambda functions")

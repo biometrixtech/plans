@@ -5,4 +5,3 @@ def test_load():
     predictor = RPEPredictor(test=True)
     rpe = predictor.predict_rpe()
     assert rpe
-    print('here')
