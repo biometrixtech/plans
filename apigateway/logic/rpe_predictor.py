@@ -3,6 +3,7 @@ import os
 import joblib
 import boto3
 
+
 class RPEPredictor(object):
     def __init__(self):
         self.model = self.load_model()
@@ -31,6 +32,7 @@ class RPEPredictor(object):
         percent_max_hr = hr / max_hr
         prediction_features = [[user_age, user_weight, gender, percent_max_hr, vo2_max]]
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
+            print('here')
             return 5
         else:
             predicted_rpe = self.model.predict(prediction_features)
