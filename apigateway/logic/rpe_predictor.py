@@ -13,12 +13,13 @@ class RPEPredictor(object):
         self.model = self.load_model()
 
     @xray_recorder.capture('logic.RPEPredictor.load_model')
-    def load_model(self):
+    @classmethod
+    def load_model(cls):
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
             return None
         else:
-            self.download_file()
-            model = joblib.load(self.file_location())
+            cls.download_file()
+            model = joblib.load(cls.file_location())
             return model
 
     @staticmethod

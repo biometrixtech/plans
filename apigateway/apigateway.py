@@ -1,7 +1,7 @@
 from fathomapi.api.handler import handler as fathom_handler
 from fathomapi.api.flask_app import app
 from logic.rpe_predictor import RPEPredictor
-RPEPredictor.download_file()
+RPEPredictor.load_model()
 
 from routes.active_recovery import app as active_recovery_routes
 from routes.athlete import app as athlete_routes
