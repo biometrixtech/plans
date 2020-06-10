@@ -7,6 +7,7 @@ from fathomapi.utils.xray import xray_recorder
 model_filename = Config.get('PROVIDER_INFO')['hr_rpe_model_filename']
 model_bucket_name = Config.get('PROVIDER_INFO')['hr_rpe_model_bucket']
 
+_hr_rpe_model = None
 
 class RPEPredictor(object):
     def __init__(self):
@@ -18,9 +19,11 @@ class RPEPredictor(object):
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
             return None
         else:
-            cls.download_file()
-            model = joblib.load(cls.file_location())
-            return model
+            global _hr_rpe_model
+            if _hr_rpe_model is None:
+                cls.download_file()
+                _hr_rpe_model = joblib.load(cls.file_location())
+            return _hr_rpe_model
 
     @staticmethod
     def file_location():
