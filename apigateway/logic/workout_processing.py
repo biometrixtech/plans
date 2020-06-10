@@ -102,7 +102,6 @@ class WorkoutProcessor(object):
                 exercise.distance = exercise.duration * exercise.speed
             if exercise.hr is not None:
                 exercise.predicted_rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
-                print(exercise.predicted_rpe)
             else:
                 exercise.predicted_rpe = exercise.shrz or 4
         else:
