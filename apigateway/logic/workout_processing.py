@@ -38,6 +38,7 @@ class WorkoutProcessor(object):
 
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
+            section_hr = []
             if self.hr_data is not None and workout_section.start_date_time is not None and workout_section.end_date_time is not None:
                 # assumption here is that all exercises in the section are of similar training/adaptation types
                 # such that a single shrz can be calculated for each section
@@ -46,6 +47,8 @@ class WorkoutProcessor(object):
                     workout_section.shrz = heart_rate_processing.get_shrz(section_hr)
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
+                if len(section_hr) > 0:
+                    workout_exercise.hr = max([hr.value for hr in section_hr])
                 self.add_movement_detail_to_exercise(workout_exercise)
                 if workout_section.assess_load:
                     session_training_load.add_tissue_load(workout_exercise.tissue_load)
@@ -95,7 +98,10 @@ class WorkoutProcessor(object):
                 exercise.duration = exercise.distance / exercise.speed
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
-            exercise.predicted_rpe = self.hr_rpe_predictor.predict_rpe(hr=random.randint(130, 170))
+            if exercise.hr is not None:
+                exercise.predicted_rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
+            else:
+                exercise.predict_rpe = exercise.shrz or 4
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
