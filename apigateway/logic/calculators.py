@@ -125,7 +125,7 @@ class Calculators(object):
         :param grade: float ( 0-1)
         :return:
         """
-        speed /= 60
+        speed *= 60  # convert to m/min
         work_vo2 = 0.2 * speed + 0.9 * speed * grade + 3.5
         return work_vo2
 
@@ -139,7 +139,7 @@ class Calculators(object):
         :param grade: float (0-1)
         :return:
         """
-        speed /= 60
+        speed *= 60  # convert to m/min
         work_vo2 = speed * (0.17 + grade * 0.79) + 3.5
         return work_vo2
 
@@ -351,7 +351,6 @@ class Calculators(object):
         """
         user_weight = 60.0 if user_weight is None else user_weight
         grade = .01 if grade is None else grade
-        speed /= 60  # convert m/s to m/min
         efficiency = .22
         work_vo2 = cls.work_vo2_running_alternate(speed, grade)
         mets = work_vo2 / 3.5
