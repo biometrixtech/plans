@@ -298,51 +298,51 @@ class TrainingLoadProcessing(object):
                         high_load_session.percent_of_max = max(greater_than_50)
                         self.high_relative_load_sessions.append(high_load_session)
 
-                average_5_day_tissue_load_list = [f.tissue_load for f in self.last_5_days_training_sessions if
-                                                  f.tissue_load is not None]
-                if len(average_5_day_tissue_load_list) > 0:
-                    self.average_tissue_load_5_day = self.get_average_for_error_ranges(average_5_day_tissue_load_list,
-                                                                                       0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+        average_5_day_tissue_load_list = [f.tissue_load for f in self.last_5_days_training_sessions if
+                                          f.tissue_load is not None]
+        if len(average_5_day_tissue_load_list) > 0:
+            self.average_tissue_load_5_day = self.get_average_for_error_ranges(average_5_day_tissue_load_list,
+                                                                               0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
 
-                average_20_day_tissue_load_list = [f.tissue_load for f in self.last_20_days_training_sessions if
-                                                   f.tissue_load is not None]
-                if len(average_20_day_tissue_load_list) > 0:
-                    self.average_tissue_load_20_day = self.get_average_for_error_ranges(average_20_day_tissue_load_list,
-                                                                                        0.95 * (
-                                                                                                    self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+        average_20_day_tissue_load_list = [f.tissue_load for f in self.last_20_days_training_sessions if
+                                           f.tissue_load is not None]
+        if len(average_20_day_tissue_load_list) > 0:
+            self.average_tissue_load_20_day = self.get_average_for_error_ranges(average_20_day_tissue_load_list,
+                                                                                0.95 * (
+                                                                                            self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
 
-                average_5_day_power_load_list = [f.power_load for f in self.last_5_days_training_sessions if
-                                                 f.power_load is not None]
-                if len(average_5_day_power_load_list) > 0:
-                    self.average_power_load_5_day = self.get_average_for_error_ranges(average_5_day_power_load_list,
-                                                                                      0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+        average_5_day_power_load_list = [f.power_load for f in self.last_5_days_training_sessions if
+                                         f.power_load is not None]
+        if len(average_5_day_power_load_list) > 0:
+            self.average_power_load_5_day = self.get_average_for_error_ranges(average_5_day_power_load_list,
+                                                                              0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
 
-                average_20_day_power_load_list = [f.power_load for f in self.last_20_days_training_sessions if
-                                                  f.power_load is not None]
-                if len(average_20_day_power_load_list) > 0:
-                    self.average_power_load_20_day = self.get_average_for_error_ranges(average_20_day_power_load_list,
-                                                                                       0.95 * (
-                                                                                                   self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
-                tissue_load_5_20_lowest_value = 0.0
-                power_load_5_20_lowest_value = 0.0
+        average_20_day_power_load_list = [f.power_load for f in self.last_20_days_training_sessions if
+                                          f.power_load is not None]
+        if len(average_20_day_power_load_list) > 0:
+            self.average_power_load_20_day = self.get_average_for_error_ranges(average_20_day_power_load_list,
+                                                                               0.95 * (
+                                                                                           self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+        tissue_load_5_20_lowest_value = 0.0
+        power_load_5_20_lowest_value = 0.0
 
-                tissue_load_5_20 = self.tissue_load_5_20()
-                if tissue_load_5_20 is not None:
-                    tissue_load_5_20_lowest_value = tissue_load_5_20.lowest_value()
-                power_load_5_20 = self.power_load_5_20()
-                if power_load_5_20 is not None:
-                    power_load_5_20_lowest_value = power_load_5_20.lowest_value()
+        tissue_load_5_20 = self.tissue_load_5_20()
+        if tissue_load_5_20 is not None:
+            tissue_load_5_20_lowest_value = tissue_load_5_20.lowest_value()
+        power_load_5_20 = self.power_load_5_20()
+        if power_load_5_20 is not None:
+            power_load_5_20_lowest_value = power_load_5_20.lowest_value()
 
-                tissue_load_percent = 50
-                power_load_percent = 50
+        tissue_load_percent = 50
+        power_load_percent = 50
 
-                if tissue_load_5_20_lowest_value is not None and tissue_load_5_20_lowest_value > 1.1:
-                    tissue_load_percent = min(100, ((tissue_load_5_20_lowest_value - 1.1) * 100) + 50)
+        if tissue_load_5_20_lowest_value is not None and tissue_load_5_20_lowest_value > 1.1:
+            tissue_load_percent = min(100, ((tissue_load_5_20_lowest_value - 1.1) * 100) + 50)
 
-                if power_load_5_20_lowest_value is not None and power_load_5_20_lowest_value > 1.1:
-                    power_load_percent = min(100, ((power_load_5_20_lowest_value - 1.1) * 100) + 50)
+        if power_load_5_20_lowest_value is not None and power_load_5_20_lowest_value > 1.1:
+            power_load_percent = min(100, ((power_load_5_20_lowest_value - 1.1) * 100) + 50)
 
-                self.high_relative_load_score = max(tissue_load_percent, power_load_percent, max_percent)
+        self.high_relative_load_score = max(tissue_load_percent, power_load_percent)
 
     def get_average_error_range(self, atrribute_name, session_list):
 

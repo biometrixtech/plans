@@ -25,6 +25,7 @@ class InjuryRiskProcessor(object):
         self.hist_injury_risk_dict = hist_injury_risk_dict
         self.relative_load_level = 3
         self.high_relative_load_sessions = athlete_stats.high_relative_load_sessions
+        self.high_relative_load_score = athlete_stats.high_relative_load_score
         self.aggregated_injury_risk_dict = {}
         self.viz_aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
@@ -64,7 +65,7 @@ class InjuryRiskProcessor(object):
         # check workload for relative load level
         if len(self.high_relative_load_sessions) > 0:
 
-            max_percent = 49.9
+            max_percent = max(50, self.high_relative_load_score)
 
             relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date() == base_date]
 
@@ -76,7 +77,7 @@ class InjuryRiskProcessor(object):
 
             if max_percent >= 75.0:
                 self.relative_load_level = 1
-            elif max_percent >= 50.0:
+            elif max_percent > 50.0:
                 self.relative_load_level = 2
 
          # check RPE for relative load level
