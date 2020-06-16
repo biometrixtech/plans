@@ -369,18 +369,30 @@ class Calculators(object):
         return power
 
     @classmethod
-    def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_down=None, time_up=None):
+    def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_eccentric=None, time_concentric=None):
         """
 
         :param weight_used: kg, weight of equipment used
-        :param distance_moved: m, expected distance moved in both up and down direction
-        :param time_down: s, time taken to move weight down
-        :param time_up: s, time taken to move weight up
         :param user_weight: kg
+        :param distance_moved: m, expected distance moved in each concentric and eccentric direction, default of .5m is used (about halfway between squat and bench press)
+        :param time_eccentric: s, time taken for eccentric movement, default of 1.5s
+        :param time_concentric: s, time taken for concentric movement, default of 1.5s
         :return:
         """
-
-        return 5
+        total_weight = weight_used + user_weight
+        distance_moved = distance_moved or .5
+        time_concentric = time_concentric or 1.5
+        time_eccentric = time_eccentric or 1.5
+        accel_concentric = cls.get_accel(distance_moved, time_concentric)
+        accel_eccentric = cls.get_accel(distance_moved, time_eccentric)
+        force_concentric = cls.get_force(total_weight, accel_concentric)
+        force_eccentric = cls.get_force(total_weight, -accel_eccentric)
+        velocity_concentric = distance_moved / time_concentric
+        velocity_eccentric = distance_moved / time_eccentric
+        power_concentric = force_concentric * velocity_concentric
+        power_eccentric = force_eccentric * velocity_eccentric
+        average_power = round((power_concentric * time_concentric + power_eccentric * time_eccentric) / (time_concentric + time_eccentric), 1)
+        return average_power
 
     @classmethod
     def force_resistance_exercise(cls, weight, distance_moved=None, time_down=None, time_up=None):
@@ -397,7 +409,7 @@ class Calculators(object):
             accel_up = cls.get_accel(distance_moved, time_up)
             force_down = cls.get_force(weight, -accel_down)
             force_up = cls.get_force(weight, accel_up)
-            average_force = round((force_down + force_up) / 2, 1)
+            average_force = round((force_down * time_down + force_up * time_up) / (time_down + time_up), 1)
         else:
             average_force = cls.get_force(weight)
         return average_force
