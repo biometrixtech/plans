@@ -324,12 +324,22 @@ class FunctionalMovementActionMapping(object):
 
     def set_muscle_load(self, injury_risk_dict, event_date):
 
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.hip_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.knee_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.ankle_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.trunk_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements, self.exercise_action)
+        if self.exercise_action.power_load_left is not None and self.exercise_action.power_load_right is not None:
+            left_load = self.exercise_action.power_load_left
+            right_load = self.exercise_action.power_load_right
+        elif self.exercise_action.tissue_load_left is not None and self.exercise_action.tissue_load_right is not None:
+            left_load = self.exercise_action.tissue_load_left
+            right_load = self.exercise_action.tissue_load_right
+        else:
+            left_load = self.exercise_action.power_load_left
+            right_load = self.exercise_action.power_load_right
+
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.hip_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.knee_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.ankle_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.trunk_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements, self.exercise_action, left_load, right_load)
 
 
     def get_matching_stability_rating(self, functional_movement_load, exercise_action):
@@ -464,15 +474,15 @@ class FunctionalMovementActionMapping(object):
     #                             self.muscle_load[
     #                                 body_part_side].compensation_source_load = CompensationSource.internal_processing
 
-    def apply_load_to_functional_movements(self, injury_risk_dict, event_date, functional_movement_list, exercise_action):
+    def apply_load_to_functional_movements(self, injury_risk_dict, event_date, functional_movement_list, exercise_action, left_load, right_load):
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date,
                                                                              functional_movement_list)
 
         # left_load = exercise_action.total_load_left
         # right_load = exercise_action.total_load_right
-        left_load = exercise_action.tissue_load_left
-        right_load = exercise_action.tissue_load_right
+        #left_load = exercise_action.tissue_load_left
+        #right_load = exercise_action.tissue_load_right
 
         for functional_movement_load in functional_movement_list:
             functional_movement = functional_movement_load.functional_movement

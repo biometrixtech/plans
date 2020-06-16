@@ -370,8 +370,18 @@ class Calculators(object):
         return power
 
     @classmethod
-    def power_resistance_exercise(cls):
-        pass
+    def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_down=None, time_up=None):
+        """
+
+        :param weight_used: kg, weight of equipment used
+        :param distance_moved: m, expected distance moved in both up and down direction
+        :param time_down: s, time taken to move weight down
+        :param time_up: s, time taken to move weight up
+        :param user_weight: kg
+        :return:
+        """
+
+        return 5
 
     @classmethod
     def force_resistance_exercise(cls, weight, distance_moved=None, time_down=None, time_up=None):

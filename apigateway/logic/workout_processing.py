@@ -97,7 +97,7 @@ class WorkoutProcessor(object):
             #     exercise.reps_per_set = int(reps_meters / 5)
             # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
-            exercise = self.set_force_weighted(exercise)
+            exercise = self.set_force_power_weighted(exercise)
 
         exercise = self.set_total_volume(exercise)
         exercise.set_training_loads()
@@ -195,7 +195,7 @@ class WorkoutProcessor(object):
 
         # action.get_training_load()
 
-    def set_force_weighted(self, exercise):
+    def set_force_power_weighted(self, exercise):
         if exercise.weight_measure == WeightMeasure.actual_weight:
             weight = exercise.weight
         elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
@@ -203,6 +203,8 @@ class WorkoutProcessor(object):
         else:
             weight = 20  # TODO: need to change this
         exercise.force = StandardErrorRange(observed_value=Calculators.force_resistance_exercise(weight))
+        exercise.power = StandardErrorRange(
+            observed_value=Calculators.power_resistance_exercise(weight_used=weight, user_weight=self.user_weight))
         return exercise
 
     def set_total_volume(self, exercise):

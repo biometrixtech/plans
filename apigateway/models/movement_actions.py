@@ -331,20 +331,23 @@ class ExerciseAction(object):
         self.external_weight_left = external_weight_left
         self.external_weight_right = external_weight_right
 
-    def set_force_distribution(self):
+    def set_left_right_distribution(self, attribute_name):
         left = StandardErrorRange(observed_value=0)
         right = StandardErrorRange(observed_value=0)
+
+        object_value = getattr(self, attribute_name)
+
         if len(self.external_weight) == 0:
-            if self.force is None:
+            if object_value is None:
                 left = StandardErrorRange(observed_value=0)
                 right = StandardErrorRange(observed_value=0)
             else:
-                left = self.force.plagiarize()
-                right = self.force.plagiarize()
+                left = object_value.plagiarize()
+                right = object_value.plagiarize()
         else:
             ex_weight = self.external_weight[0]
-            left = self.force.plagiarize()
-            right = self.force.plagiarize()
+            left = object_value.plagiarize()
+            right = object_value.plagiarize()
             if ex_weight.distribute_weight:  # e.g barbell weight is supposed to be total weight
                 if self.lateral_distribution_pattern == WeightDistribution.bilateral:  # each side gets half the load for each rep
                     left.multiply(self.lateral_distribution[0] / 100)
@@ -475,11 +478,16 @@ class ExerciseAction(object):
                     right_dist = self.lateral_distribution[0] / 100 * 2
             # self.tissue_load_left.add_value(self.training_volume_left * self.training_intensity * left_dist)
             # self.tissue_load_right.add_value(self.training_volume_right * self.training_intensity * right_dist)
-            left_force, right_force = self.set_force_distribution()
+            left_force, right_force = self.set_left_right_distribution("force")
+            left_power, right_power = self.set_left_right_distribution("power")
             left_force.multiply(self.training_volume_left * left_dist)
             right_force.multiply(self.training_volume_right * right_dist)
+            left_power.multiply(self.training_volume_left * left_dist)
+            right_power.multiply(self.training_volume_right * right_dist)
             self.force_load_left.add(left_force)
             self.force_load_right.add(right_force)
+            self.power_load_left.add(left_power)
+            self.power_load_right.add(right_power)
             self.tissue_load_left = self.force_load_left
             self.tissue_load_right = self.force_load_right
 
