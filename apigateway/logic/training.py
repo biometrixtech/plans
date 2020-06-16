@@ -144,274 +144,274 @@ class TrainingCycle(object):
             return self.daily_readiness_surveys[readiness_count - 1]
 
 
-class TrainingHistory(object):
-
-    def __init__(self):
-        self.calculator = Calculator()
-
-        self.training_cycles = []   # in reverse order where training_cycle = 0 is current, assuming max 5
-
-    def internal_strain_spiking(self):
-        return self.calculator.is_strain_spiking("internal_strain", self.training_cycles)
-
-    def external_total_strain_spiking(self):
-        return self.calculator.is_strain_spiking("external_total_strain", self.training_cycles)
-
-    def external_high_strain_spiking(self):
-        return self.calculator.is_strain_spiking("external_high_strain", self.training_cycles)
-
-    def external_mod_strain_spiking(self):
-        return self.calculator.is_strain_spiking("external_mod_strain", self.training_cycles)
-
-    def external_low_strain_spiking(self):
-        return self.calculator.is_strain_spiking("external_low_strain", self.training_cycles)
-
-    def actual_internal_ACWR(self):
-        return self.calculator.get_ACWR("internal_load", self.training_cycles, False)
-
-    def estimated_internal_ACWR(self):
-        return self.calculator.get_ACWR("internal_load", self.training_cycles, True)
-
-    def actual_external_total_ACWR(self):
-        return self.calculator.get_ACWR("external_load", self.training_cycles, False)
-
-    def estimated_external_total_ACWR(self):
-        return self.calculator.get_ACWR("external_load", self.training_cycles, True)
-
-    def actual_external_high_ACWR(self):
-        return self.calculator.get_ACWR("high_intensity_load", self.training_cycles, False)
-
-    def estimated_external_high_ACWR(self):
-        return self.calculator.get_ACWR("high_intensity_load", self.training_cycles, True)
-
-    def actual_external_mod_ACWR(self):
-        return self.calculator.get_ACWR("mod_intensity_load", self.training_cycles, False)
-
-    def estimated_external_mod_ACWR(self):
-        return self.calculator.get_ACWR("mod_intensity_load", self.training_cycles, True)
-
-    def actual_external_low_ACWR(self):
-        return self.calculator.get_ACWR("low_intensity_load", self.training_cycles, False)
-
-    def estimated_external_low_ACWR(self):
-        return self.calculator.get_ACWR("low_intensity_load", self.training_cycles, True)
-
-    def actual_internal_ramp(self):
-        return self.calculator.get_ramp("internal_load", self.training_cycles, False)
-
-    def estimated_internal_ramp(self):
-        return self.calculator.get_ramp("internal_load", self.training_cycles, True)
-
-    def actual_external_total_ramp(self):
-        return self.calculator.get_ramp("external_load", self.training_cycles, False)
-
-    def estimated_external_total_ramp(self):
-        return self.calculator.get_ramp("external_load", self.training_cycles, True)
-
-    def actual_external_high_ramp(self):
-        return self.calculator.get_ramp("high_intensity_load", self.training_cycles, False)
-
-    def estimated_external_high_ramp(self):
-        return self.calculator.get_ramp("high_intensity_load", self.training_cycles, True)
-
-    def actual_external_mod_ramp(self):
-        return self.calculator.get_ramp("mod_intensity_load", self.training_cycles, False)
-
-    def estimated_external_mod_ramp(self):
-        return self.calculator.get_ramp("mod_intensity_load", self.training_cycles, True)
-
-    def actual_external_low_ramp(self):
-        return self.calculator.get_ramp("low_intensity_load", self.training_cycles, False)
-
-    def estimated_external_low_ramp(self):
-        return self.calculator.get_ramp("low_intensity_load", self.training_cycles, True)
-
-    def weighted_internal_external_load_ratio(self):
-
-        ratios = []
-
-        for t in range(0, len(self.training_cycles) + 1):
-            weighting_factor = 1 / (t + 1)
-            ratio = self.training_cycles[t].actual_internal_external_load_ratio()
-            if ratio is not None:
-                ratios.append(ratio * weighting_factor)
-
-        if len(ratios) > 0:
-            return mean(ratios)
-        else:
-            return None
-
-    def is_athlete_fatiguing(self):
-        actual_ratios = list(x.actual_internal_external_load_ratio() for x in self.training_cycles
-                             if x.actual_internal_external_load_ratio() is not None)
-        training_history_ratio = mean(actual_ratios)
-        current_ratio = self.training_cycles[0].actual_internal_external_load_ratio()
-
-        if training_history_ratio is None or current_ratio is None:
-            return None
-
-        if training_history_ratio < current_ratio:
-            return True
-        else:
-            return False
-
-    def global_load_estimation_parameters(self):
-
-        sessions = []
-
-        for training_cycle in self.training_cycles:
-            # we do not want to include estimated sessions from the current training cycle in our calculations
-            filtered_sessions = list(c for c in training_cycle.sessions if c.estimated is not False)
-            sessions.extend(filtered_sessions)
-
-        parameter = session.GlobalLoadEstimationParameters()
-
-        total_load = list(s.external_load for s in sessions if s.external_load is not None)
-        total_load_minutes = list(s.duration_minutes for s in sessions if s.duration_minutes is not None)
-        parameter.external_load_per_minute = total_load / total_load_minutes
-
-        high_load = list(s.high_intensity_load for s in sessions if s.high_intensity_load is not None)
-        high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
-        parameter.high_intensity_load_per_minute = high_load / high_load_minutes
-
-        mod_load = list(s.mod_intensity_load for s in sessions if s.mod_intensity_load is not None)
-        mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
-        parameter.moderate_intensity_avg_load_per_minute = mod_load / mod_load_minutes
-
-        low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
-        low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
-        parameter.low_intensity_avg_load_per_minute = low_load / low_load_minutes
-
-        parameter.high_intensity_percentage = \
-            high_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
-
-        parameter.moderate_intensity_percentage = \
-            mod_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
-
-        parameter.low_intensity_percentage = \
-            low_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
-
-        return parameter
-
-    def session_load_estimation_parameters(self):
-
-        parameters = []
-
-        for session_type in session.SessionType:
-            sessions = []
-            for training_cycle in self.training_cycles:
-                # we do not want to include estimated sessions from the current training cycle in our calculations
-                filtered_sessions = list(c for c in training_cycle.sessions if c.session_type is session_type and
-                                         c.estimated is not False)
-                sessions.extend(filtered_sessions)
-            parameter = session.SessionLoadEstimationParameter()
-            parameter.session_type = session_type
-
-            total_load = list(s.external_load for s in sessions if s.external_load is not None)
-            total_load_minutes = list(s.duration_minutes for s in sessions if s.duration_minutes is not None)
-            parameter.total_avg_external_load_per_minute = total_load / total_load_minutes
-
-            high_load = list(s.high_intensity_load for s in sessions if s.high_intensity_load is not None)
-            parameter.high_intensity_avg_load_per_minute = high_load / total_load_minutes
-
-            mod_load = list(s.mod_intensity_load for s in sessions if s.mod_intensity_load is not None)
-            parameter.moderate_intensity_avg_load_per_minute = mod_load / total_load_minutes
-
-            low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
-            parameter.low_intensity_avg_load_per_minute = low_load / total_load_minutes
-
-            # intensity minutes are NOT used to calculate average but are used to calculate percentage of time
-            high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
-            mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
-            low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
-
-            parameter.high_intensity_percentage = \
-                high_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
-
-            parameter.moderate_intensity_percentage = \
-                mod_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
-
-            parameter.low_intensity_percentage = \
-                low_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
-
-            parameters.append(parameter)
-
-        return parameters
-
-    def current_load_gap(self):
-
-        calc = Calculator()
-        load_gap = calc.get_load_gap(self.training_cycles, True)
-
-        return load_gap
-
-    def impute_load(self):
-
-        training_cycle = self.training_cycles[0]
-
-        internal_external_load_ratio = self.weighted_internal_external_load_ratio()
-
-        for s in range(0, len(training_cycle.sessions)):
-            if not training_cycle.sessions[s].estimated:
-                if training_cycle.sessions[s].internal_load() is None:
-                    if (training_cycle.sessions[s].external_load is not None
-                            and training_cycle.sessions[s].duration_minutes is not None
-                            and training_cycle.sessions[s].internal_load_imputed):
-                        training_cycle.sessions[s].session_RPE = \
-                            (internal_external_load_ratio * training_cycle.sessions[s].external_load) / \
-                            training_cycle.sessions[s].duration_minutes
-
-                elif training_cycle.sessions[s].external_load is None:
-                    if (training_cycle.sessions[s].internal_load() is not None
-                            and training_cycle.sessions[s].external_load_imputed):
-                        training_cycle.sessions[s].external_load = \
-                            (internal_external_load_ratio / training_cycle.sessions[s].internal_load())
-
-                        training_cycle.sessions[s] = self.impute_intensity(training_cycle.sessions[s])
-
-            else:   # estimated session
-                if training_cycle.sessions[s].internal_load() is not None:  # should always be populated
-                    training_cycle.sessions[s].external_load = \
-                        (internal_external_load_ratio / training_cycle.sessions[s].internal_load())
-                    training_cycle.sessions[s].external_load_imputed = True
-
-                    training_cycle.sessions[s] = self.impute_intensity(training_cycle.sessions[s])
-
-    def impute_intensity(self, training_session):
-        estimation_parameters = self.session_load_estimation_parameters()
-
-        # now estimate high, moderate and low
-        estimation_parameter = (p for p in estimation_parameters if p.session_type == training_session.session_type)
-
-        if estimation_parameter is None:
-            estimation_parameter = self.global_load_estimation_parameters()
-
-        if estimation_parameter is not None:
-            training_session.high_intensity_load = \
-                estimation_parameter.high_intensity_avg_load_per_minute * \
-                training_session.duration_minutes
-
-            training_session.high_intensity_minutes = \
-                estimation_parameter.high_intensity_percentage * \
-                training_session.duration_minutes
-
-            training_session.mod_intensity_load = \
-                estimation_parameter.mod_intensity_avg_load_per_minute * \
-                training_session.duration_minutes
-
-            training_session.mod_intensity_minutes = \
-                estimation_parameter.mod_intensity_percentage * \
-                training_session.duration_minutes
-
-            training_session.low_intensity_load = \
-                estimation_parameter.low_intensity_avg_load_per_minute * \
-                training_session.duration_minutes
-
-            training_session.low_intensity_minutes = \
-                estimation_parameter.low_intensity_percentage * \
-                training_session.duration_minutes
-
-        return training_session
+# class TrainingHistory(object):
+#
+#     def __init__(self):
+#         self.calculator = Calculator()
+#
+#         self.training_cycles = []   # in reverse order where training_cycle = 0 is current, assuming max 5
+#
+#     def internal_strain_spiking(self):
+#         return self.calculator.is_strain_spiking("internal_strain", self.training_cycles)
+#
+#     def external_total_strain_spiking(self):
+#         return self.calculator.is_strain_spiking("external_total_strain", self.training_cycles)
+#
+#     def external_high_strain_spiking(self):
+#         return self.calculator.is_strain_spiking("external_high_strain", self.training_cycles)
+#
+#     def external_mod_strain_spiking(self):
+#         return self.calculator.is_strain_spiking("external_mod_strain", self.training_cycles)
+#
+#     def external_low_strain_spiking(self):
+#         return self.calculator.is_strain_spiking("external_low_strain", self.training_cycles)
+#
+#     def actual_internal_ACWR(self):
+#         return self.calculator.get_ACWR("internal_load", self.training_cycles, False)
+#
+#     def estimated_internal_ACWR(self):
+#         return self.calculator.get_ACWR("internal_load", self.training_cycles, True)
+#
+#     def actual_external_total_ACWR(self):
+#         return self.calculator.get_ACWR("external_load", self.training_cycles, False)
+#
+#     def estimated_external_total_ACWR(self):
+#         return self.calculator.get_ACWR("external_load", self.training_cycles, True)
+#
+#     def actual_external_high_ACWR(self):
+#         return self.calculator.get_ACWR("high_intensity_load", self.training_cycles, False)
+#
+#     def estimated_external_high_ACWR(self):
+#         return self.calculator.get_ACWR("high_intensity_load", self.training_cycles, True)
+#
+#     def actual_external_mod_ACWR(self):
+#         return self.calculator.get_ACWR("mod_intensity_load", self.training_cycles, False)
+#
+#     def estimated_external_mod_ACWR(self):
+#         return self.calculator.get_ACWR("mod_intensity_load", self.training_cycles, True)
+#
+#     def actual_external_low_ACWR(self):
+#         return self.calculator.get_ACWR("low_intensity_load", self.training_cycles, False)
+#
+#     def estimated_external_low_ACWR(self):
+#         return self.calculator.get_ACWR("low_intensity_load", self.training_cycles, True)
+#
+#     def actual_internal_ramp(self):
+#         return self.calculator.get_ramp("internal_load", self.training_cycles, False)
+#
+#     def estimated_internal_ramp(self):
+#         return self.calculator.get_ramp("internal_load", self.training_cycles, True)
+#
+#     def actual_external_total_ramp(self):
+#         return self.calculator.get_ramp("external_load", self.training_cycles, False)
+#
+#     def estimated_external_total_ramp(self):
+#         return self.calculator.get_ramp("external_load", self.training_cycles, True)
+#
+#     def actual_external_high_ramp(self):
+#         return self.calculator.get_ramp("high_intensity_load", self.training_cycles, False)
+#
+#     def estimated_external_high_ramp(self):
+#         return self.calculator.get_ramp("high_intensity_load", self.training_cycles, True)
+#
+#     def actual_external_mod_ramp(self):
+#         return self.calculator.get_ramp("mod_intensity_load", self.training_cycles, False)
+#
+#     def estimated_external_mod_ramp(self):
+#         return self.calculator.get_ramp("mod_intensity_load", self.training_cycles, True)
+#
+#     def actual_external_low_ramp(self):
+#         return self.calculator.get_ramp("low_intensity_load", self.training_cycles, False)
+#
+#     def estimated_external_low_ramp(self):
+#         return self.calculator.get_ramp("low_intensity_load", self.training_cycles, True)
+
+    # def weighted_internal_external_load_ratio(self):
+    #
+    #     ratios = []
+    #
+    #     for t in range(0, len(self.training_cycles) + 1):
+    #         weighting_factor = 1 / (t + 1)
+    #         ratio = self.training_cycles[t].actual_internal_external_load_ratio()
+    #         if ratio is not None:
+    #             ratios.append(ratio * weighting_factor)
+    #
+    #     if len(ratios) > 0:
+    #         return mean(ratios)
+    #     else:
+    #         return None
+
+    # def is_athlete_fatiguing(self):
+    #     actual_ratios = list(x.actual_internal_external_load_ratio() for x in self.training_cycles
+    #                          if x.actual_internal_external_load_ratio() is not None)
+    #     training_history_ratio = mean(actual_ratios)
+    #     current_ratio = self.training_cycles[0].actual_internal_external_load_ratio()
+    #
+    #     if training_history_ratio is None or current_ratio is None:
+    #         return None
+    #
+    #     if training_history_ratio < current_ratio:
+    #         return True
+    #     else:
+    #         return False
+
+    # def global_load_estimation_parameters(self):
+    #
+    #     sessions = []
+    #
+    #     for training_cycle in self.training_cycles:
+    #         # we do not want to include estimated sessions from the current training cycle in our calculations
+    #         filtered_sessions = list(c for c in training_cycle.sessions if c.estimated is not False)
+    #         sessions.extend(filtered_sessions)
+    #
+    #     parameter = session.GlobalLoadEstimationParameters()
+    #
+    #     total_load = list(s.external_load for s in sessions if s.external_load is not None)
+    #     total_load_minutes = list(s.duration_minutes for s in sessions if s.duration_minutes is not None)
+    #     parameter.external_load_per_minute = total_load / total_load_minutes
+    #
+    #     high_load = list(s.high_intensity_load for s in sessions if s.high_intensity_load is not None)
+    #     high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
+    #     parameter.high_intensity_load_per_minute = high_load / high_load_minutes
+    #
+    #     mod_load = list(s.mod_intensity_load for s in sessions if s.mod_intensity_load is not None)
+    #     mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
+    #     parameter.moderate_intensity_avg_load_per_minute = mod_load / mod_load_minutes
+    #
+    #     low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
+    #     low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
+    #     parameter.low_intensity_avg_load_per_minute = low_load / low_load_minutes
+    #
+    #     parameter.high_intensity_percentage = \
+    #         high_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+    #
+    #     parameter.moderate_intensity_percentage = \
+    #         mod_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+    #
+    #     parameter.low_intensity_percentage = \
+    #         low_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+    #
+    #     return parameter
+
+    # def session_load_estimation_parameters(self):
+    #
+    #     parameters = []
+    #
+    #     for session_type in session.SessionType:
+    #         sessions = []
+    #         for training_cycle in self.training_cycles:
+    #             # we do not want to include estimated sessions from the current training cycle in our calculations
+    #             filtered_sessions = list(c for c in training_cycle.sessions if c.session_type is session_type and
+    #                                      c.estimated is not False)
+    #             sessions.extend(filtered_sessions)
+    #         parameter = session.SessionLoadEstimationParameter()
+    #         parameter.session_type = session_type
+    #
+    #         total_load = list(s.external_load for s in sessions if s.external_load is not None)
+    #         total_load_minutes = list(s.duration_minutes for s in sessions if s.duration_minutes is not None)
+    #         parameter.total_avg_external_load_per_minute = total_load / total_load_minutes
+    #
+    #         high_load = list(s.high_intensity_load for s in sessions if s.high_intensity_load is not None)
+    #         parameter.high_intensity_avg_load_per_minute = high_load / total_load_minutes
+    #
+    #         mod_load = list(s.mod_intensity_load for s in sessions if s.mod_intensity_load is not None)
+    #         parameter.moderate_intensity_avg_load_per_minute = mod_load / total_load_minutes
+    #
+    #         low_load = list(s.low_intensity_load for s in sessions if s.low_intensity_load is not None)
+    #         parameter.low_intensity_avg_load_per_minute = low_load / total_load_minutes
+    #
+    #         # intensity minutes are NOT used to calculate average but are used to calculate percentage of time
+    #         high_load_minutes = list(s.high_intensity_minutes for s in sessions if s.high_intensity_load is not None)
+    #         mod_load_minutes = list(s.mod_intensity_minutes for s in sessions if s.mod_intensity_load is not None)
+    #         low_load_minutes = list(s.low_intensity_minutes for s in sessions if s.low_intensity_load is not None)
+    #
+    #         parameter.high_intensity_percentage = \
+    #             high_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+    #
+    #         parameter.moderate_intensity_percentage = \
+    #             mod_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+    #
+    #         parameter.low_intensity_percentage = \
+    #             low_load_minutes / (high_load_minutes + mod_load_minutes + low_load_minutes)
+    #
+    #         parameters.append(parameter)
+    #
+    #     return parameters
+
+    # def current_load_gap(self):
+    #
+    #     calc = Calculator()
+    #     load_gap = calc.get_load_gap(self.training_cycles, True)
+    #
+    #     return load_gap
+
+    # def impute_load(self):
+    #
+    #     training_cycle = self.training_cycles[0]
+    #
+    #     internal_external_load_ratio = self.weighted_internal_external_load_ratio()
+    #
+    #     for s in range(0, len(training_cycle.sessions)):
+    #         if not training_cycle.sessions[s].estimated:
+    #             if training_cycle.sessions[s].internal_load() is None:
+    #                 if (training_cycle.sessions[s].external_load is not None
+    #                         and training_cycle.sessions[s].duration_minutes is not None
+    #                         and training_cycle.sessions[s].internal_load_imputed):
+    #                     training_cycle.sessions[s].session_RPE = \
+    #                         (internal_external_load_ratio * training_cycle.sessions[s].external_load) / \
+    #                         training_cycle.sessions[s].duration_minutes
+    #
+    #             elif training_cycle.sessions[s].external_load is None:
+    #                 if (training_cycle.sessions[s].internal_load() is not None
+    #                         and training_cycle.sessions[s].external_load_imputed):
+    #                     training_cycle.sessions[s].external_load = \
+    #                         (internal_external_load_ratio / training_cycle.sessions[s].internal_load())
+    #
+    #                     training_cycle.sessions[s] = self.impute_intensity(training_cycle.sessions[s])
+    #
+    #         else:   # estimated session
+    #             if training_cycle.sessions[s].internal_load() is not None:  # should always be populated
+    #                 training_cycle.sessions[s].external_load = \
+    #                     (internal_external_load_ratio / training_cycle.sessions[s].internal_load())
+    #                 training_cycle.sessions[s].external_load_imputed = True
+    #
+    #                 training_cycle.sessions[s] = self.impute_intensity(training_cycle.sessions[s])
+
+    # def impute_intensity(self, training_session):
+    #     estimation_parameters = self.session_load_estimation_parameters()
+    #
+    #     # now estimate high, moderate and low
+    #     estimation_parameter = (p for p in estimation_parameters if p.session_type == training_session.session_type)
+    #
+    #     if estimation_parameter is None:
+    #         estimation_parameter = self.global_load_estimation_parameters()
+    #
+    #     if estimation_parameter is not None:
+    #         training_session.high_intensity_load = \
+    #             estimation_parameter.high_intensity_avg_load_per_minute * \
+    #             training_session.duration_minutes
+    #
+    #         training_session.high_intensity_minutes = \
+    #             estimation_parameter.high_intensity_percentage * \
+    #             training_session.duration_minutes
+    #
+    #         training_session.mod_intensity_load = \
+    #             estimation_parameter.mod_intensity_avg_load_per_minute * \
+    #             training_session.duration_minutes
+    #
+    #         training_session.mod_intensity_minutes = \
+    #             estimation_parameter.mod_intensity_percentage * \
+    #             training_session.duration_minutes
+    #
+    #         training_session.low_intensity_load = \
+    #             estimation_parameter.low_intensity_avg_load_per_minute * \
+    #             training_session.duration_minutes
+    #
+    #         training_session.low_intensity_minutes = \
+    #             estimation_parameter.low_intensity_percentage * \
+    #             training_session.duration_minutes
+    #
+    #     return training_session
 
 
 class LoadGap(object):

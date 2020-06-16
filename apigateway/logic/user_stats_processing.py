@@ -100,15 +100,18 @@ class UserStatsProcessing(object):
 
         training_load_processing = TrainingLoadProcessing(self.start_date,
                                                           format_date(self.event_date),
-                                                          current_user_stats.load_stats)  # want event date since end date = event_date + 1
+                                                          current_user_stats.load_stats,
+                                                          current_user_stats.expected_weekly_workouts
+                                                          )  # want event date since end date = event_date + 1
 
         # this gets updated in load plan values
         training_load_processing.sport_max_load = current_user_stats.sport_max_load
 
-        training_load_processing.load_training_session_values(self.last_7_days_training_sessions,
-                                                              self.days_8_14_training_sessions,
-                                                              self.chronic_training_sessions
-                                                              )
+        all_training_sessions = []
+        all_training_sessions.extend(self.acute_training_sessions)
+        all_training_sessions.extend(self.chronic_training_sessions)
+
+        training_load_processing.load_training_session_values(all_training_sessions)
 
         # three_sensor_sessions = [s for s in self.training_sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
         # if len(three_sensor_sessions) > 0:

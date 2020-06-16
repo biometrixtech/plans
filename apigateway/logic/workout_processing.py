@@ -10,7 +10,7 @@ from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceSt
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
-from models.training_load import TrainingLoad
+from models.training_load import SessionLoad
 from models.training_volume import StandardErrorRange
 
 movement_library = MovementLibraryDatastore().get()
@@ -34,7 +34,7 @@ class WorkoutProcessor(object):
     def process_workout(self, workout_program):
 
         heart_rate_processing = HeartRateProcessing(self.user_age)
-        session_training_load = TrainingLoad()
+        session_training_load = SessionLoad(session_id=workout_program.session_id, user_id=workout_program.user_id, event_date_time=workout_program.event_date_time)
 
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
@@ -111,7 +111,7 @@ class WorkoutProcessor(object):
             #     exercise.reps_per_set = int(reps_meters / 5)
             # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
-            exercise = self.set_force_weighted(exercise)
+            exercise = self.set_force_power_weighted(exercise)
 
         exercise = self.set_total_volume(exercise)
         exercise.set_training_loads()
@@ -209,7 +209,7 @@ class WorkoutProcessor(object):
 
         # action.get_training_load()
 
-    def set_force_weighted(self, exercise):
+    def set_force_power_weighted(self, exercise):
         if exercise.weight_measure == WeightMeasure.actual_weight:
             weight = exercise.weight
         elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
@@ -217,6 +217,8 @@ class WorkoutProcessor(object):
         else:
             weight = 20  # TODO: need to change this
         exercise.force = StandardErrorRange(observed_value=Calculators.force_resistance_exercise(weight))
+        exercise.power = StandardErrorRange(
+            observed_value=Calculators.power_resistance_exercise(weight_used=weight, user_weight=self.user_weight))
         return exercise
 
     def set_total_volume(self, exercise):

@@ -1,5 +1,6 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
+from statistics import mean
 
 '''deprecated for now
 class TrainingStatus(object):
@@ -145,6 +146,24 @@ class StandardErrorRange(Serialisable):
             return max(observed_value_list)
         else:
             return None
+
+    @staticmethod
+    def get_average_from_error_range_list(error_range_list):
+
+        upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
+        observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
+        lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+
+        average_range = StandardErrorRange()
+
+        if len(lower_bound_list) > 0:
+            average_range.lower_bound = mean(lower_bound_list)
+        if len(observed_value_list) > 0:
+            average_range.observed_value = mean(observed_value_list)
+        if len(upper_bound_list) > 0:
+            average_range.upper_bound = mean(upper_bound_list)
+
+        return average_range
 
     def lowest_value(self):
 
