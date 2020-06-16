@@ -65,9 +65,10 @@ def test_aggregate_load_concentric():
     session_functional_movement = SessionFunctionalMovement(None, {})
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
-    assert len(load_dict) == 2
-    assert len(load_dict[AdaptationType.strength_endurance_strength.value]) == 67
-    assert len(load_dict[AdaptationType.power_explosive_action.value]) == 67
+    # assert len(load_dict) == 2
+    # assert len(load_dict[AdaptationType.strength_endurance_strength.value]) == 67
+    # assert len(load_dict[AdaptationType.power_explosive_action.value]) == 67
+    assert len(load_dict) == 67
 
 
 def test_normalize_load_concentric():
@@ -121,6 +122,7 @@ def test_normalize_load_concentric():
     session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
-    normalized_dict = session_functional_movement.consolidate_load(load_dict, datetime.now())
+    # not used anymore
+    #normalized_dict = session_functional_movement.consolidate_load(load_dict, datetime.now())
 
-    assert len(normalized_dict) == 67
+    assert len(load_dict) == 67

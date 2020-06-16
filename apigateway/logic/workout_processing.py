@@ -29,7 +29,6 @@ class WorkoutProcessor(object):
         self.hr_rpe_predictor = RPEPredictor()
         self.vo2_max = vo2_max
 
-
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, workout_program):
 
@@ -56,6 +55,16 @@ class WorkoutProcessor(object):
                     session_training_load.add_tissue_load(workout_exercise.tissue_load)
                     session_training_load.add_force_load(workout_exercise.force_load)
                     session_training_load.add_power_load(workout_exercise.power_load)
+                    if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+                        session_training_load.add_strength_endurance_cardiorespiratory_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.strength_endurance_strength:
+                        session_training_load.add_strength_endurance_strength_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.power_drill:
+                        session_training_load.add_power_drill_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                        session_training_load.add_maximal_strength_hypertrophic_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.power_explosive_action:
+                        session_training_load.add_power_explosive_action_load(workout_exercise.power_load)
 
             workout_section.should_assess_shrz()
 
