@@ -16,6 +16,7 @@ class UserStats(Serialisable):
         self.load_stats = LoadStats()
         self.sport_max_load = {}
         self.high_relative_load_sessions = []
+        self.high_relative_load_score = 50
         self.eligible_for_high_load_trigger = False
 
         self.expected_weekly_workouts = 3

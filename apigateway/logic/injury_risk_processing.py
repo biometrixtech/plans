@@ -61,12 +61,6 @@ class InjuryRiskProcessor(object):
 
         self.relative_load_level = 3
 
-        # if base_date == datetime(2019, 11, 19).date():
-        #     g =0
-        #
-        # if base_date == datetime(2019, 11, 20).date():
-        #     g = 0
-
         # check workload for relative load level
         if len(self.high_relative_load_sessions) > 0:
 
