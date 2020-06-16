@@ -167,6 +167,8 @@ class WorkoutExercise(Serialisable):
         self.side = 0
         self.bilateral = True
         self.movement_id = ""
+        self.hr = None
+        self.predicted_rpe = None
 
         # for cardio exercises
         self.duration = None  # duration in seconds for cardio exercises
@@ -218,6 +220,8 @@ class WorkoutExercise(Serialisable):
             'side': self.side,
             'bilateral': self.bilateral,
             'movement_id': self.movement_id,
+            'hr': self.hr,
+            'predicted_rpe':self.predicted_rpe,
             'duration': self.duration,
             'distance': self.distance,
             'speed': self.speed,
@@ -262,6 +266,8 @@ class WorkoutExercise(Serialisable):
         exercise.reps_per_set = input_dict.get('reps_per_set', 0)
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
         exercise.movement_id = input_dict.get('movement_id')
+        exercise.hr = input_dict.get('hr')
+        exercise.predicted_rpe = input_dict.get('predicted_rpe')
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None

@@ -44,7 +44,7 @@ def upload_lambda_bundle(local_filepath, s3_filename, pip_install=True):
         # Install pip requirements first
         if pip_install:
             replace_in_file(os.path.join(local_filepath, 'pip_requirements'), '{GITHUB_TOKEN}', os.environ['GITHUB_TOKEN'])
-            subprocess.check_call('python3 -m pip install -t {f} -r {f}/pip_requirements'.format(f=local_filepath), shell=True)
+            subprocess.check_call('python3 -m pip install --no-cache-dir -t {f} -r {f}/pip_requirements'.format(f=local_filepath), shell=True)
 
         # Write the version into the bundle
         with open(os.path.join(local_filepath, 'version'), "w") as file:
@@ -78,6 +78,7 @@ def run_unit_tests():
 def main():
     os.environ['PROJECT'] = os.environ['LAMBCI_REPO'].split('/')[-1].lower()
     config = read_config()
+    os.environ['CODEBUILD_RUN'] = 'TRUE'
 
 
     print("Deploying Lambda functions")

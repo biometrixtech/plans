@@ -35,3 +35,6 @@ apigateway/session.py
 output/*
 tests/database_tests/*.csv
 output_persona/*
+tests/data/*
+ml_training/hr_rpe/data/*
+ml_training/hr_rpe/model/*

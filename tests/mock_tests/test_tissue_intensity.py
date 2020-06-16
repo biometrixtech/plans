@@ -7,6 +7,7 @@ from models.movement_tags import TrainingType
 from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
 from models.training_volume import StandardErrorRange
+from logic.calculators import Calculators
 import datetime
 
 
@@ -139,3 +140,8 @@ def test_cycling():
         assert action.pace == .2
         assert action.duration == 1000
         assert action.training_volume_left == action.training_volume_right == 1000
+
+def test_power_lifting():
+    power_same_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1.5, time_eccentric=1.5)
+    power_different_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1, time_eccentric=2)
+    assert power_same_duration < power_different_duration

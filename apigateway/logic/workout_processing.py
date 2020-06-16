@@ -3,6 +3,7 @@ from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
 from logic.calculators import Calculators
 from logic.heart_rate_processing import HeartRateProcessing
+from logic.rpe_predictor import RPEPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction
@@ -16,14 +17,18 @@ movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
 action_library = ActionLibraryDatastore().get()
 bodyweight_coefficients = get_bodyweight_coefficients()
+import random
 
 
 class WorkoutProcessor(object):
-    def __init__(self, user_age=20, user_weight=60.0, female=True, hr_data=None):
+    def __init__(self, user_age=20, user_weight=60.0, female=True, hr_data=None, vo2_max=40):
         self.user_age = user_age
         self.user_weight = user_weight
         self.female = female
         self.hr_data = hr_data
+        self.hr_rpe_predictor = RPEPredictor()
+        self.vo2_max = vo2_max
+
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, workout_program):
@@ -33,6 +38,7 @@ class WorkoutProcessor(object):
 
         for workout_section in workout_program.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
+            section_hr = []
             if self.hr_data is not None and workout_section.start_date_time is not None and workout_section.end_date_time is not None:
                 # assumption here is that all exercises in the section are of similar training/adaptation types
                 # such that a single shrz can be calculated for each section
@@ -41,6 +47,10 @@ class WorkoutProcessor(object):
                     workout_section.shrz = heart_rate_processing.get_shrz(section_hr)
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
+                if len(section_hr) > 0:
+                    hr_values = sorted([hr.value for hr in section_hr])  # TODO: improve this to use eercise specific values, not inherit all from section
+                    top_25_percentile_hr = hr_values[int(len(hr_values) * .75):]
+                    workout_exercise.hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)  # use the average of top 25% ideally this is the end of exercise HR
                 self.add_movement_detail_to_exercise(workout_exercise)
                 if workout_section.assess_load:
                     session_training_load.add_tissue_load(workout_exercise.tissue_load)
@@ -90,6 +100,10 @@ class WorkoutProcessor(object):
                 exercise.duration = exercise.distance / exercise.speed
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
+            if exercise.hr is not None:
+                exercise.predicted_rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
+            else:
+                exercise.predicted_rpe = exercise.shrz or 4
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
