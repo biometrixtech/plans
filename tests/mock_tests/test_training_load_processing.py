@@ -9,11 +9,11 @@ from utils import format_date, format_datetime
 from tests.mocks.mock_datastore_collection import DatastoreCollection
 import pytz
 
-def get_session_with_tissue_load_observed_value(session_event_date, observed_load_value):
+def get_session_with_power_load_observed_value(session_event_date, observed_load_value):
 
     session = SportTrainingSession()
     session.event_date = session_event_date
-    session.tissue_load = StandardErrorRange(observed_value=observed_load_value)
+    session.power_load = StandardErrorRange(observed_value=observed_load_value)
     return session
 
 def test_first_session_unknown_high_load():
@@ -31,7 +31,7 @@ def test_first_session_unknown_high_load():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    session = get_session_with_tissue_load_observed_value(session_event_date, 100)
+    session = get_session_with_power_load_observed_value(session_event_date, 100)
     training_load_processing.load_training_session_values([session])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert training_load_processing.high_relative_load_score == 50
@@ -45,7 +45,7 @@ def test_several_sessions_high_load():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -67,7 +67,7 @@ def test_several_sessions_medium_high_load():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -89,7 +89,7 @@ def test_sparse_sessions_normal_load():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -111,7 +111,7 @@ def test_sparse_sessions_high_but_normal_load():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -134,7 +134,7 @@ def test_sparse_sessions_high_load_but_somehow_still_normal():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -156,7 +156,7 @@ def test_sparse_sessions_high_load_but_not_normal():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -178,7 +178,7 @@ def test_very_sparse_sessions_mod_high_load():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -200,7 +200,7 @@ def test_very_sparse_sessions_high_load():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
@@ -223,7 +223,7 @@ def test_very_sparse_sessions_high_load_no_workout_last_day():
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
-        session = get_session_with_tissue_load_observed_value(session_event_date, tissue_loads[t])
+        session = get_session_with_power_load_observed_value(session_event_date, tissue_loads[t])
         sessions.append(session)
     load_stats = LoadStats()
     expected_weekly_workouts = 3
