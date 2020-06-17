@@ -4,6 +4,7 @@ from datastores.action_library_datastore import ActionLibraryDatastore
 from logic.calculators import Calculators
 from logic.heart_rate_processing import HeartRateProcessing
 from logic.rpe_predictor import RPEPredictor
+from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction
@@ -27,6 +28,7 @@ class WorkoutProcessor(object):
         self.female = female
         self.hr_data = hr_data
         self.hr_rpe_predictor = RPEPredictor()
+        self.bodyweight_ratio_predictor = BodyWeightRatioPredictor()
         self.vo2_max = vo2_max
 
 
@@ -366,34 +368,42 @@ class WorkoutProcessor(object):
             joint_action_type = prioritized_joint_action.joint_action
             functional_movement = functional_movement_factory.get_functional_movement(joint_action_type)
             if prioritized_joint_action.priority == 1:
-                prime_movers['first_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['first_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 2:
-                prime_movers['second_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['second_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 3:
-                prime_movers['third_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['third_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 4:
-                prime_movers['fourth_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['fourth_prime_movers'].update(functional_movement.prime_movers)
 
-    @staticmethod
-    def get_bodyweight_ratio_from_model(bodyweight, prime_movers, equipment):
-        bodyweight_ratio = bodyweight_coefficients['const']
-        if equipment == Equipment.dumbbells:
-            bodyweight_ratio += bodyweight_coefficients['equipment_dumbbells']
-        elif equipment == Equipment.cable:
-            bodyweight_ratio += bodyweight_coefficients['equipment_cable']
-        elif equipment == Equipment.machine:
-            bodyweight_ratio += bodyweight_coefficients['equipment_machine']
-        bodyweight_ratio += bodyweight * bodyweight_coefficients['bodyweight']
+    # @staticmethod
+    # def get_bodyweight_ratio_from_model(prime_movers, equipment):
 
-        for prime_mover in prime_movers['first_prime_movers']:
-            var = f'prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients:
-                bodyweight_ratio += bodyweight_coefficients[var]
-        for prime_mover in prime_movers['second_prime_movers']:
-            var = f'second_prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients:
-                bodyweight_ratio += bodyweight_coefficients[var]
-        return bodyweight_ratio
+
+
+        # bodyweight_ratio = bodyweight_coefficients['const']
+        # if equipment == Equipment.dumbbells:
+        #     bodyweight_ratio += bodyweight_coefficients['equipment_dumbbells']
+        # elif equipment == Equipment.cable:
+        #     bodyweight_ratio += bodyweight_coefficients['equipment_cable']
+        # elif equipment == Equipment.machine:
+        #     bodyweight_ratio += bodyweight_coefficients['equipment_machine']
+        #
+        # self.user_weight = user_weight
+        # self.female = female
+        #
+        #
+        # bodyweight_ratio += bodyweight * bodyweight_coefficients['bodyweight']
+        #
+        # for prime_mover in prime_movers['first_prime_movers']:
+        #     var = f'prime_mover_{prime_mover}'
+        #     if var in bodyweight_coefficients:
+        #         bodyweight_ratio += bodyweight_coefficients[var]
+        # for prime_mover in prime_movers['second_prime_movers']:
+        #     var = f'second_prime_mover_{prime_mover}'
+        #     if var in bodyweight_coefficients:
+        #         bodyweight_ratio += bodyweight_coefficients[var]
+        # return bodyweight_ratio
 
     def get_action_rep_max_bodyweight_ratio(self, athlete_bodyweight, exercise):
 
@@ -404,10 +414,10 @@ class WorkoutProcessor(object):
 
         # get prime movers from action
         prime_movers = {
-            "first_prime_movers": [],
-            "second_prime_movers": [],
-            "third_prime_movers": [],
-            "fourth_prime_movers": []
+            "first_prime_movers": set(),
+            "second_prime_movers": set(),
+            "third_prime_movers": set(),
+            "fourth_prime_movers": set()
             }
         for action in exercise.primary_actions:
             self.get_prime_movers_from_joint_actions(action.hip_joint_action, prime_movers)
@@ -417,7 +427,8 @@ class WorkoutProcessor(object):
             self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action, prime_movers)
             self.get_prime_movers_from_joint_actions(action.elbow_joint_action, prime_movers)
 
-        bodyweight_ratio = self.get_bodyweight_ratio_from_model(athlete_bodyweight, prime_movers, exercise.equipment)
+        bodyweight_ratio = self.bodyweight_ratio_predictor.predict_bodyweight_ratio(self.user_weight, self.female, prime_movers, exercise.equipment)
+        # bodyweight_ratio = self.get_bodyweight_ratio_from_model(athlete_bodyweight, prime_movers, exercise.equipment)
 
         return bodyweight_ratio
 
