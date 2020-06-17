@@ -14,6 +14,10 @@
 # completed_exercise_datastore = CompletedExerciseDatastore()
 #
 #
+# TODO: update from workout processor refactor
+# TODO: have this work with the planned_exercise models
+# TODO: update plans logic and related to handle "planned load" vs actual
+
 # @pytest.fixture(scope="session", autouse=True)
 # def load_exercises():
 #     exercise_library_datastore.side_load_exericse_list_from_csv()
