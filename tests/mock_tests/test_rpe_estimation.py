@@ -210,3 +210,19 @@ def test_get_reps_for_percent_rep_max_68():
     assert 14 == reps
 
 
+def test_get_reps_for_bodyweight_ex_98():
+    workout_processor = WorkoutProcessor()
+    reps = workout_processor.get_max_reps_for_bodyweight_ratio_bodyweight_exercises(.98)
+    assert reps == 1
+
+
+def test_get_reps_for_bodyweight_ex_149():
+    workout_processor = WorkoutProcessor()
+    reps = workout_processor.get_max_reps_for_bodyweight_ratio_bodyweight_exercises(1.49)
+    assert reps == 14
+
+
+def test_get_reps_for_bodyweight_ex_460():
+    workout_processor = WorkoutProcessor()
+    reps = workout_processor.get_max_reps_for_bodyweight_ratio_bodyweight_exercises(4.6)
+    assert reps == 109
