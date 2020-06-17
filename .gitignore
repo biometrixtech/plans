@@ -38,3 +38,5 @@ output_persona/*
 tests/data/*
 ml_training/hr_rpe/data/*
 ml_training/hr_rpe/model/*
+ml_training/bodyweight_ratio/data/*
+ml_training/bodyweight_ratio/model/*

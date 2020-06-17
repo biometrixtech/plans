@@ -4,6 +4,7 @@ from datastores.action_library_datastore import ActionLibraryDatastore
 from logic.calculators import Calculators
 from logic.heart_rate_processing import HeartRateProcessing
 from logic.rpe_predictor import RPEPredictor
+from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction
@@ -17,7 +18,6 @@ movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
 action_library = ActionLibraryDatastore().get()
 bodyweight_coefficients = get_bodyweight_coefficients()
-import random
 
 
 class WorkoutProcessor(object):
@@ -27,6 +27,7 @@ class WorkoutProcessor(object):
         self.female = female
         self.hr_data = hr_data
         self.hr_rpe_predictor = RPEPredictor()
+        self.bodyweight_ratio_predictor = BodyWeightRatioPredictor()
         self.vo2_max = vo2_max
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
@@ -124,6 +125,7 @@ class WorkoutProcessor(object):
             # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
+            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
 
         exercise = self.set_total_volume(exercise)
         exercise.set_training_loads()
@@ -360,6 +362,13 @@ class WorkoutProcessor(object):
         return reps
 
     @staticmethod
+    def get_max_reps_for_bodyweight_ratio_bodyweight_exercises(bodyweight_ratio):
+
+        if bodyweight_ratio <= 1:
+            return 1
+        return max(int((bodyweight_ratio - 1) / .033), 1)
+
+    @staticmethod
     def get_prime_movers_from_joint_actions(joint_action_list, prime_movers):
 
         functional_movement_factory = FunctionalMovementFactory()
@@ -378,36 +387,44 @@ class WorkoutProcessor(object):
             joint_action_type = prioritized_joint_action.joint_action
             functional_movement = functional_movement_factory.get_functional_movement(joint_action_type)
             if prioritized_joint_action.priority == 1:
-                prime_movers['first_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['first_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 2:
-                prime_movers['second_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['second_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 3:
-                prime_movers['third_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['third_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 4:
-                prime_movers['fourth_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['fourth_prime_movers'].update(functional_movement.prime_movers)
 
-    @staticmethod
-    def get_bodyweight_ratio_from_model(bodyweight, prime_movers, equipment):
-        bodyweight_ratio = bodyweight_coefficients['const']
-        if equipment == Equipment.dumbbells:
-            bodyweight_ratio += bodyweight_coefficients['equipment_dumbbells']
-        elif equipment == Equipment.cable:
-            bodyweight_ratio += bodyweight_coefficients['equipment_cable']
-        elif equipment == Equipment.machine:
-            bodyweight_ratio += bodyweight_coefficients['equipment_machine']
-        bodyweight_ratio += bodyweight * bodyweight_coefficients['bodyweight']
+    # @staticmethod
+    # def get_bodyweight_ratio_from_model(prime_movers, equipment):
 
-        for prime_mover in prime_movers['first_prime_movers']:
-            var = f'prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients:
-                bodyweight_ratio += bodyweight_coefficients[var]
-        for prime_mover in prime_movers['second_prime_movers']:
-            var = f'second_prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients:
-                bodyweight_ratio += bodyweight_coefficients[var]
-        return bodyweight_ratio
 
-    def get_action_rep_max_bodyweight_ratio(self, athlete_bodyweight, exercise):
+
+        # bodyweight_ratio = bodyweight_coefficients['const']
+        # if equipment == Equipment.dumbbells:
+        #     bodyweight_ratio += bodyweight_coefficients['equipment_dumbbells']
+        # elif equipment == Equipment.cable:
+        #     bodyweight_ratio += bodyweight_coefficients['equipment_cable']
+        # elif equipment == Equipment.machine:
+        #     bodyweight_ratio += bodyweight_coefficients['equipment_machine']
+        #
+        # self.user_weight = user_weight
+        # self.female = female
+        #
+        #
+        # bodyweight_ratio += bodyweight * bodyweight_coefficients['bodyweight']
+        #
+        # for prime_mover in prime_movers['first_prime_movers']:
+        #     var = f'prime_mover_{prime_mover}'
+        #     if var in bodyweight_coefficients:
+        #         bodyweight_ratio += bodyweight_coefficients[var]
+        # for prime_mover in prime_movers['second_prime_movers']:
+        #     var = f'second_prime_mover_{prime_mover}'
+        #     if var in bodyweight_coefficients:
+        #         bodyweight_ratio += bodyweight_coefficients[var]
+        # return bodyweight_ratio
+
+    def get_action_rep_max_bodyweight_ratio(self, exercise):
 
         # # if weight_used = 0, assume it's a bodyweight only exercise
         # # TODO - test this assumption
@@ -416,10 +433,10 @@ class WorkoutProcessor(object):
 
         # get prime movers from action
         prime_movers = {
-            "first_prime_movers": [],
-            "second_prime_movers": [],
-            "third_prime_movers": [],
-            "fourth_prime_movers": []
+            "first_prime_movers": set(),
+            "second_prime_movers": set(),
+            "third_prime_movers": set(),
+            "fourth_prime_movers": set()
             }
         for action in exercise.primary_actions:
             self.get_prime_movers_from_joint_actions(action.hip_joint_action, prime_movers)
@@ -429,14 +446,25 @@ class WorkoutProcessor(object):
             self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action, prime_movers)
             self.get_prime_movers_from_joint_actions(action.elbow_joint_action, prime_movers)
 
-        bodyweight_ratio = self.get_bodyweight_ratio_from_model(athlete_bodyweight, prime_movers, exercise.equipment)
+        if len(exercise.equipments) > 0:
+            equipment = exercise.equipments[0]
+        else:
+            equipment = Equipment.bodyweight
+        if equipment == Equipment.no_equipment:
+            equipment = Equipment.bodyweight
+        bodyweight_ratio = self.bodyweight_ratio_predictor.predict_bodyweight_ratio(self.user_weight, self.female, prime_movers, equipment)
 
         return bodyweight_ratio
 
-    def get_rpe_from_weight(self, workout_exercise, athlete_bodyweight):
+    def get_rpe_from_weight(self, workout_exercise):
 
         rpe = 0
-
+        if len(workout_exercise.equipments) > 0:
+            equipment = workout_exercise.equipments[0]
+        else:
+            equipment = Equipment.bodyweight
+        if equipment == Equipment.no_equipment:
+            equipment = Equipment.bodyweight
         reps = workout_exercise.reps_per_set * workout_exercise.sets
 
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
@@ -446,23 +474,27 @@ class WorkoutProcessor(object):
         else:
             if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
 
-                weight = workout_exercise.weight * athlete_bodyweight
+                weight = workout_exercise.weight * self.user_weight
 
             elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
 
                 weight = workout_exercise.weight
 
-            else:
+            elif equipment != Equipment.bodyweight:
                 return rpe
+            else:
+                weight = 0
 
-            bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, workout_exercise)
-            one_rep_max_weight = bodyweight_ratio * athlete_bodyweight
+            one_rep_max_bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(workout_exercise)
+            if equipment == Equipment.bodyweight:
+                rep_max_reps = self.get_max_reps_for_bodyweight_ratio_bodyweight_exercises(one_rep_max_bodyweight_ratio)
+            else:
+                one_rep_max_weight = one_rep_max_bodyweight_ratio * self.user_weight
+                # find the % 1RM value
+                percent_one_rep_max_weight = min(100, (weight / one_rep_max_weight) * 100)
 
-            # find the % 1RM value
-            percent_one_rep_max_weight = min(100, (weight/one_rep_max_weight) * 100)
-
-            # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
-            rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
+                # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
+                rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
 
             # given the amount of reps they completed and the n of nRM, find the RPE
             rpe = self.get_rpe_from_rep_max(rep_max_reps, reps)

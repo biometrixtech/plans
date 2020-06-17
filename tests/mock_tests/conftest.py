@@ -13,6 +13,7 @@ def pytest_configure():
                                  'movement_library_filename': 'movement_library_demo.json',
                                  'cardio_data_filename': 'cardiorespiratory_data_soflete.json',
                                  'hr_rpe_model_filename': 'hr_rpe.joblib',
-                                 'hr_rpe_model_bucket': 'biometrix-globalmodels'
+                                 'bodyweight_ratio_model_filename': 'bodyweight_ratio.joblib',
+                                 'model_bucket': 'biometrix-globalmodels'
                                  }
                )
