@@ -1,45 +1,13 @@
 import os
-import joblib
-import boto3
-from fathomapi.api.config import Config
+# import joblib
+# import boto3
+# from fathomapi.api.config import Config
 from fathomapi.utils.xray import xray_recorder
-
-model_filename = Config.get('PROVIDER_INFO')['hr_rpe_model_filename']
-model_bucket_name = Config.get('PROVIDER_INFO')['hr_rpe_model_bucket']
-
-_hr_rpe_model = None
+from datastores.ml_model_datastore import MLModelsDatastore
 
 class RPEPredictor(object):
     def __init__(self):
-        self.model = self.load_model()
-
-    @xray_recorder.capture('logic.RPEPredictor.load_model')
-    @classmethod
-    def load_model(cls):
-        if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
-            return None
-        else:
-            global _hr_rpe_model
-            if _hr_rpe_model is None:
-                cls.download_file()
-                _hr_rpe_model = joblib.load(cls.file_location())
-            return _hr_rpe_model
-
-    @staticmethod
-    def file_location():
-        if os.environ.get('UNIT_TESTS', '') == 'TRUE':
-            file_location = os.path.join('..', 'data', model_filename)
-        else:
-            file_location = f'/tmp/{model_filename}'
-        return file_location
-
-    @classmethod
-    @xray_recorder.capture('logic.RPEPredictor.download_file')
-    def download_file(cls):
-        bucket = boto3.resource('s3').Bucket(model_bucket_name)
-        file_location = cls.file_location()
-        if not os.path.exists(file_location):
-            bucket.download_file(model_filename, file_location)
+        self.model = MLModelsDatastore.get_hr_model()
 
     @xray_recorder.capture('logic.RPEPredictor.predict_rpe')
     def predict_rpe(self, hr, user_weight=60.0, user_age=20.0, vo2_max=40.0, female=True):
