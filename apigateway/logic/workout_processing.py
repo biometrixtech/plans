@@ -10,7 +10,7 @@ from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceSt
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
-from models.training_load import SessionLoad
+#from models.training_load import SessionLoad
 from models.training_volume import StandardErrorRange
 
 movement_library = MovementLibraryDatastore().get()
@@ -30,12 +30,14 @@ class WorkoutProcessor(object):
         self.vo2_max = vo2_max
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
-    def process_workout(self, workout_program):
+    def process_workout(self, session):
 
         heart_rate_processing = HeartRateProcessing(self.user_age)
-        session_training_load = SessionLoad(session_id=workout_program.session_id, user_id=workout_program.user_id, event_date_time=workout_program.event_date_time)
+        # session_training_load = SessionLoad(session_id=session.workout_program.session_id,
+        #                                     user_id=session.workout_program.user_id,
+        #                                     event_date_time=session.workout_program.event_date_time)
 
-        for workout_section in workout_program.workout_sections:
+        for workout_section in session.workout_program_module.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
             section_hr = []
             if self.hr_data is not None and workout_section.start_date_time is not None and workout_section.end_date_time is not None:
@@ -52,23 +54,24 @@ class WorkoutProcessor(object):
                     workout_exercise.hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)  # use the average of top 25% ideally this is the end of exercise HR
                 self.add_movement_detail_to_exercise(workout_exercise)
                 if workout_section.assess_load:
-                    session_training_load.add_tissue_load(workout_exercise.tissue_load)
-                    session_training_load.add_force_load(workout_exercise.force_load)
-                    session_training_load.add_power_load(workout_exercise.power_load)
+                    session.add_tissue_load(workout_exercise.tissue_load)
+                    session.add_force_load(workout_exercise.force_load)
+                    session.add_power_load(workout_exercise.power_load)
+                    session.add_rpe_load(workout_exercise.rpe_load)
                     if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-                        session_training_load.add_strength_endurance_cardiorespiratory_load(workout_exercise.power_load)
+                        session.add_strength_endurance_cardiorespiratory_load(workout_exercise.power_load)
                     elif workout_exercise.adaptation_type == AdaptationType.strength_endurance_strength:
-                        session_training_load.add_strength_endurance_strength_load(workout_exercise.power_load)
+                        session.add_strength_endurance_strength_load(workout_exercise.power_load)
                     elif workout_exercise.adaptation_type == AdaptationType.power_drill:
-                        session_training_load.add_power_drill_load(workout_exercise.power_load)
+                        session.add_power_drill_load(workout_exercise.power_load)
                     elif workout_exercise.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
-                        session_training_load.add_maximal_strength_hypertrophic_load(workout_exercise.power_load)
+                        session.add_maximal_strength_hypertrophic_load(workout_exercise.power_load)
                     elif workout_exercise.adaptation_type == AdaptationType.power_explosive_action:
-                        session_training_load.add_power_explosive_action_load(workout_exercise.power_load)
+                        session.add_power_explosive_action_load(workout_exercise.power_load)
 
             workout_section.should_assess_shrz()
 
-        return session_training_load
+        return session
 
     def add_movement_detail_to_exercise(self, exercise):
         if exercise.movement_id in movement_library:

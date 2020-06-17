@@ -11,25 +11,26 @@ from logic.calculators import Calculators
 import datetime
 
 
-def get_session(rpe=5, duration=100, workout_program=None):
+def get_session(rpe=5, duration=100, exercises=[]):
     session = MixedActivitySession()
     session.event_date = datetime.datetime.now()
     session.session_RPE = rpe
     session.duration_minutes = duration
-    session.workout_program_module = workout_program
+    session.workout_program_module = create_and_process_workout(session, exercises)
 
     return session
 
 
-def create_and_process_workout(exercises):
+def create_and_process_workout(session, exercises):
     section = WorkoutSection()
     section.name = 'stamina'
     section.exercises = exercises
 
     workout = WorkoutProgramModule()
     workout.workout_sections = [section]
+    session.workout_program_module = workout
     processor = WorkoutProcessor()
-    processor.process_workout(workout)
+    processor.process_workout(session)
     return workout
 
 
@@ -80,10 +81,10 @@ def get_max_load(exercise):
 def test_rowing():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
     exercise.pace = .24
-    workout_program = create_and_process_workout([exercise])
+    #workout_program = create_and_process_workout([exercise])
     for action in exercise.primary_actions:
         assert action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
-    session = get_session(workout_program=workout_program, rpe=5, duration=5)
+    session = get_session(rpe=5, duration=5, exercises=[exercise])
     session_load_dict = get_session_load_dict(session)
     for body_part, muscle_load in session_load_dict.items():
         assert None is muscle_load.total_load().observed_value or muscle_load.total_load().observed_value > 0
@@ -93,7 +94,8 @@ def test_rowing_stroke_rate_25():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
     exercise.stroke_rate = 25
     exercise.pace = .24
-    create_and_process_workout([exercise])
+    #create_and_process_workout([exercise])
+    session = get_session(rpe=5, duration=5, exercises=[exercise])
     for action in exercise.primary_actions:
         assert action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
 
@@ -105,7 +107,8 @@ def test_running():
     exercise.duration = 3000
     exercise.power = StandardErrorRange(observed_value=100)
     exercise.speed = 5
-    create_and_process_workout([exercise])
+    #create_and_process_workout([exercise])
+    session = get_session(rpe=5, duration=5, exercises=[exercise])
     for action in exercise.primary_actions:
         assert action.force.observed_value == round(100 / 5, 2)
         assert action.pace == .2
@@ -119,7 +122,8 @@ def test_walking():
     exercise.duration = 3000
     exercise.power = StandardErrorRange(observed_value=100)
     exercise.speed = 5
-    create_and_process_workout([exercise])
+    #create_and_process_workout([exercise])
+    session = get_session(rpe=5, duration=5, exercises=[exercise])
     for action in exercise.primary_actions:
         assert action.force.observed_value == round(100 / 5, 2)
         assert action.pace == .2
@@ -134,7 +138,8 @@ def test_cycling():
     exercise.distance = 5000
     exercise.power = StandardErrorRange(observed_value=100)
     exercise.speed = 5
-    create_and_process_workout([exercise])
+    #create_and_process_workout([exercise])
+    session = get_session(rpe=5, duration=5, exercises=[exercise])
     for action in exercise.primary_actions:
         assert action.force.observed_value == round(100 / 5, 2)
         assert action.pace == .2

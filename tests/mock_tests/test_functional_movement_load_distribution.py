@@ -4,6 +4,7 @@ from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgr
 from models.movement_tags import TrainingType
 from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
+from models.session import MixedActivitySession
 from utils import none_max
 import datetime
 
@@ -15,8 +16,10 @@ def create_and_process_wokout(exercises):
 
     workout = WorkoutProgramModule()
     workout.workout_sections = [section]
+    session = MixedActivitySession()
     processor = WorkoutProcessor()
-    processor.process_workout(workout)
+    session.workout_program_module = workout
+    processor.process_workout(session)
 
 
 def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
