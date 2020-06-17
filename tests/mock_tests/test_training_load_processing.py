@@ -1,5 +1,5 @@
 from models.load_stats import LoadStats
-from models.session import SportTrainingSession
+from models.session import MixedActivitySession
 from models.training_volume import StandardErrorRange
 from models.user_stats import UserStats
 from logic.training_load_processing import TrainingLoadProcessing
@@ -11,7 +11,7 @@ import pytz
 
 def get_session_with_power_load_observed_value(session_event_date, observed_load_value):
 
-    session = SportTrainingSession()
+    session = MixedActivitySession()
     session.event_date = session_event_date
     session.power_load = StandardErrorRange(observed_value=observed_load_value)
     return session

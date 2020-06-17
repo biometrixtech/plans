@@ -324,15 +324,16 @@ class FunctionalMovementActionMapping(object):
 
     def set_muscle_load(self, injury_risk_dict, event_date):
 
-        if self.exercise_action.power_load_left is not None and self.exercise_action.power_load_right is not None:
-            left_load = self.exercise_action.power_load_left
-            right_load = self.exercise_action.power_load_right
-        elif self.exercise_action.tissue_load_left is not None and self.exercise_action.tissue_load_right is not None:
-            left_load = self.exercise_action.tissue_load_left
-            right_load = self.exercise_action.tissue_load_right
-        else:
-            left_load = self.exercise_action.power_load_left
-            right_load = self.exercise_action.power_load_right
+        # TODO - deal with this later
+        # if self.exercise_action.power_load_left is not None and self.exercise_action.power_load_right is not None:
+        #     left_load = self.exercise_action.power_load_left
+        #     right_load = self.exercise_action.power_load_right
+        # elif self.exercise_action.tissue_load_left is not None and self.exercise_action.tissue_load_right is not None:
+        #     left_load = self.exercise_action.tissue_load_left
+        #     right_load = self.exercise_action.tissue_load_right
+        # else:
+        left_load = self.exercise_action.power_load_left
+        right_load = self.exercise_action.power_load_right
 
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.hip_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.knee_joint_functional_movements, self.exercise_action, left_load, right_load)

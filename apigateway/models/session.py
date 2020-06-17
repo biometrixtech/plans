@@ -215,6 +215,42 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         if rpe_load is not None:
             self.rpe_load.add(rpe_load)
 
+    def add_strength_endurance_cardiorespiratory_load(self, load):
+        if self.strength_endurance_cardiorespiratory_load is None:
+            self.strength_endurance_cardiorespiratory_load = StandardErrorRange(observed_value=0)
+        if self.strength_endurance_cardiorespiratory_load is not None:
+            self.strength_endurance_cardiorespiratory_load.add(load)
+
+    def add_strength_endurance_strength_load(self, load):
+        if self.strength_endurance_strength_load is None:
+            self.strength_endurance_strength_load = StandardErrorRange(observed_value=0)
+        if self.strength_endurance_strength_load is not None:
+            self.strength_endurance_strength_load.add(load)
+
+    def add_power_drill_load(self, load):
+        if self.power_drill_load is None:
+            self.power_drill_load = StandardErrorRange(observed_value=0)
+        if self.power_drill_load is not None:
+            self.power_drill_load.add(load)
+
+    def add_maximal_strength_hypertrophic_load(self, load):
+        if self.maximal_strength_hypertrophic_load is None:
+            self.maximal_strength_hypertrophic_load = StandardErrorRange(observed_value=0)
+        if self.maximal_strength_hypertrophic_load is not None:
+            self.maximal_strength_hypertrophic_load.add(load)
+
+    def add_power_explosive_action_load(self, load):
+        if self.power_explosive_action_load is None:
+            self.power_explosive_action_load = StandardErrorRange(observed_value=0)
+        if self.power_explosive_action_load is not None:
+            self.power_explosive_action_load.add(load)
+
+    def add_not_tracked_load(self, load):
+        if self.not_tracked_load is None:
+            self.not_tracked_load = StandardErrorRange(observed_value=0)
+        if self.not_tracked_load is not None:
+            self.not_tracked_load.add(load)
+
     def update_training_loads(self, training_load):
 
         if training_load.tissue_load is not None:
@@ -225,6 +261,18 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             self.add_power_load(training_load.power_load)
         if training_load.rpe_load is not None:
             self.add_rpe_load(training_load.rpe_load)
+        if training_load.strength_endurance_cardiorespiratory_load is not None:
+            self.add_strength_endurance_cardiorespiratory_load(training_load.strength_endurance_cardiorespiratory_load)
+        if training_load.strength_endurance_strength_load is not None:
+            self.add_strength_endurance_strength_load(training_load.strength_endurance_strength_load)
+        if training_load.power_drill_load is not None:
+            self.add_power_drill_load(training_load.power_drill_load)
+        if training_load.maximal_strength_hypertrophic_load is not None:
+            self.add_maximal_strength_hypertrophic_load(training_load.maximal_strength_hypertrophic_load)
+        if training_load.power_explosive_action_load is not None:
+            self.add_power_explosive_action_load(training_load.power_explosive_action_load)
+        if training_load.not_tracked_load is not None:
+            self.add_not_tracked_load(training_load.not_tracked_load)
 
     def cycling_training_volume(self):
         return self.get_distance_training_volume(SportName.cycling)
@@ -393,12 +441,17 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'session_load_dict': [{"body_part": key.json_serialise(),
                                    "injury_risk": value.json_serialise()} for key, value in self.session_load_dict.items()] if self.session_load_dict is not None and session_type == SessionType.mixed_activity else None,
 
-            # 'not_tracked_load': self.not_tracked_load if self.not_tracked_load is not None else None,
-            # 'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load if self.strength_endurance_cardiorespiratory_load is not None else None,
-            # 'strength_endurance_strength_load': self.strength_endurance_strength_load if self.strength_endurance_strength_load is not None else None,
-            # 'power_drill_load': self.power_drill_load if self.power_drill_load is not None else None,
-            # 'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load if self.maximal_strength_hypertrophic_load is not None else None,
-            # 'power_explosive_action_load': self.power_explosive_action_load if self.power_explosive_action_load is not None else None,
+            'not_tracked_load': self.not_tracked_load.json_serialise() if self.not_tracked_load is not None else None,
+            'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load.json_serialise() if self.strength_endurance_cardiorespiratory_load is not None else None,
+            'strength_endurance_strength_load': self.strength_endurance_strength_load.json_serialise() if self.strength_endurance_strength_load is not None else None,
+            'power_drill_load': self.power_drill_load if self.power_drill_load.json_serialise() is not None else None,
+            'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load.json_serialise() if self.maximal_strength_hypertrophic_load is not None else None,
+            'power_explosive_action_load': self.power_explosive_action_load.json_serialise() if self.power_explosive_action_load is not None else None,
+            'tissue_load': self.tissue_load.json_serialise() if self.tissue_load is not None else None,
+            'power_load': self.power_load.json_serialise() if self.power_load is not None else None,
+            'force_load': self.force_load.json_serialise() if self.force_load is not None else None,
+            'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None,
+
             'cardio_plyometrics': self.cardio_plyometrics,
             'ultra_high_intensity': self.ultra_high_intensity
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
@@ -469,12 +522,20 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             session.session_load_dict = None
 
-        session.not_tracked_load = input_dict.get('not_tracked_load')
-        session.strength_endurance_cardiorespiratory_load = input_dict.get('strength_endurance_cardiorespiratory_load')
-        session.strength_endurance_strength_load = input_dict.get('strength_endurance_strength_load')
-        session.power_drill_load = input_dict.get('power_drill_load')
-        session.maximal_strength_hypertrophic_load = input_dict.get('maximal_strength_hypertrophic_load')
-        session.power_explosive_action_load = input_dict.get('power_explosive_action_load')
+        session.tissue_load = StandardErrorRange.json_deserialise(input_dict['tissue_load'])
+        session.force_load = StandardErrorRange.json_deserialise(input_dict['force_load'])
+        session.power_load = StandardErrorRange.json_deserialise(input_dict['power_load'])
+        session.rpe_load = StandardErrorRange.json_deserialise(input_dict['rpe_load'])
+        session.strength_endurance_cardiorespiratory_load = StandardErrorRange.json_deserialise(
+            input_dict['strength_endurance_cardiorespiratory_load'])
+        session.strength_endurance_strength_load = StandardErrorRange.json_deserialise(
+            input_dict['strength_endurance_strength_load'])
+        session.power_drill_load = StandardErrorRange.json_deserialise(input_dict['power_drill_load'])
+        session.maximal_strength_hypertrophic_load = StandardErrorRange.json_deserialise(
+            input_dict['maximal_strength_hypertrophic_load'])
+        session.power_explosive_action_load = StandardErrorRange.json_deserialise(
+            input_dict['power_explosive_action_load'])
+        session.not_tracked_load = StandardErrorRange.json_deserialise(input_dict['not_tracked_load'])
         session.cardio_plyometrics = input_dict.get('cardio_plyometrics')
         session.ultra_high_intensity = input_dict.get('ultra_high_intensity')
 

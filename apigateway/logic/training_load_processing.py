@@ -237,25 +237,92 @@ class TrainingLoadProcessing(object):
                         high_load_session = HighLoadSession(t.event_date, t.sport_name)
                         high_load_session.percent_of_max = self.get_max_training_percent(t)
                         self.high_relative_load_sessions.append(high_load_session)
-            #elif t.session_type() == SessionType.mixed_activity:
+            elif t.session_type() == SessionType.mixed_activity:
 
-        average_5_day_tissue_load_list = [f.tissue_load for f in self.last_5_days_training_sessions if f.tissue_load is not None]
+                max_percent = 0
+                greater_than_50 = []
+
+                percent = self.get_percent(t.not_tracked_load, self.adaptation_type_load[AdaptationType.not_tracked.value])
+                if percent > 80:
+                    max_percent = percent
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.strength_endurance_cardiorespiratory_load,
+                                             self.adaptation_type_load[AdaptationType.strength_endurance_cardiorespiratory.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.strength_endurance_strength_load,
+                                               self.adaptation_type_load[
+                                                   AdaptationType.strength_endurance_strength.value])
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                percent = self.get_percent(t.power_drill_load, self.adaptation_type_load[AdaptationType.power_drill.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.maximal_strength_hypertrophic_load,
+                                                 self.adaptation_type_load[AdaptationType.maximal_strength_hypertrophic.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                percent = self.get_percent(t.power_explosive_action_load,self.adaptation_type_load[AdaptationType.power_explosive_action.value])
+                if percent > 80 and percent > max_percent:
+                    max_percent = percent
+
+                if percent > 50:
+                    greater_than_50.append(percent)
+
+                if max_percent > 80:
+                    high_load_session = HighDetailedLoadSession(t.event_date)
+                    high_load_session.percent_of_max = max_percent
+                    self.high_relative_load_sessions.append(high_load_session)
+
+                else:
+                    if len(greater_than_50) >= 2:
+                        high_load_session = HighDetailedLoadSession(t.event_date)
+                        high_load_session.percent_of_max = max(greater_than_50)
+                        self.high_relative_load_sessions.append(high_load_session)
+
+        average_5_day_tissue_load_list = [f.tissue_load for f in self.last_5_days_training_sessions if
+                                          f.tissue_load is not None]
         if len(average_5_day_tissue_load_list) > 0:
-            self.average_tissue_load_5_day = self.get_average_for_error_ranges(average_5_day_tissue_load_list, 0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+            self.average_tissue_load_5_day = self.get_average_for_error_ranges(average_5_day_tissue_load_list,
+                                                                               0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
 
-        average_20_day_tissue_load_list = [f.tissue_load for f in self.last_20_days_training_sessions if f.tissue_load is not None]
+        average_20_day_tissue_load_list = [f.tissue_load for f in self.last_20_days_training_sessions if
+                                           f.tissue_load is not None]
         if len(average_20_day_tissue_load_list) > 0:
             self.average_tissue_load_20_day = self.get_average_for_error_ranges(average_20_day_tissue_load_list,
-                                                                            0.95 * (self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+                                                                                0.95 * (
+                                                                                            self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
 
-        average_5_day_power_load_list = [f.power_load for f in self.last_5_days_training_sessions if f.power_load is not None]
+        average_5_day_power_load_list = [f.power_load for f in self.last_5_days_training_sessions if
+                                         f.power_load is not None]
         if len(average_5_day_power_load_list) > 0:
-            self.average_power_load_5_day = self.get_average_for_error_ranges(average_5_day_power_load_list, 0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+            self.average_power_load_5_day = self.get_average_for_error_ranges(average_5_day_power_load_list,
+                                                                              0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
 
-        average_20_day_power_load_list = [f.power_load for f in self.last_20_days_training_sessions if f.power_load is not None]
+        average_20_day_power_load_list = [f.power_load for f in self.last_20_days_training_sessions if
+                                          f.power_load is not None]
         if len(average_20_day_power_load_list) > 0:
             self.average_power_load_20_day = self.get_average_for_error_ranges(average_20_day_power_load_list,
-                                                                            0.95 * (self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+                                                                               0.95 * (
+                                                                                           self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
         tissue_load_5_20_lowest_value = 0.0
         power_load_5_20_lowest_value = 0.0
 
@@ -276,65 +343,6 @@ class TrainingLoadProcessing(object):
             power_load_percent = min(100, ((power_load_5_20_lowest_value - 1.1) * 100) + 50)
 
         self.high_relative_load_score = max(tissue_load_percent, power_load_percent)
-
-                # max_percent = 0
-                # greater_than_50 = []
-                #
-                # percent = self.get_percent(t.not_tracked_load, self.adaptation_type_load[AdaptationType.not_tracked.value])
-                # if percent > 80:
-                #     max_percent = percent
-                # if percent > 50:
-                #     greater_than_50.append(percent)
-                #
-                # percent = self.get_percent(t.strength_endurance_cardiorespiratory_load,
-                #                              self.adaptation_type_load[AdaptationType.strength_endurance_cardiorespiratory.value])
-                # if percent > 80 and percent > max_percent:
-                #     max_percent = percent
-                #
-                # if percent > 50:
-                #     greater_than_50.append(percent)
-                #
-                # percent = self.get_percent(t.strength_endurance_strength_load,
-                #                                self.adaptation_type_load[
-                #                                    AdaptationType.strength_endurance_strength.value])
-                # if percent > 50:
-                #     greater_than_50.append(percent)
-                #
-                # if percent > 80 and percent > max_percent:
-                #     max_percent = percent
-                #
-                # percent = self.get_percent(t.power_drill_load, self.adaptation_type_load[AdaptationType.power_drill.value])
-                # if percent > 80 and percent > max_percent:
-                #     max_percent = percent
-                #
-                # if percent > 50:
-                #     greater_than_50.append(percent)
-                #
-                # percent = self.get_percent(t.maximal_strength_hypertrophic_load,
-                #                                  self.adaptation_type_load[AdaptationType.maximal_strength_hypertrophic.value])
-                # if percent > 80 and percent > max_percent:
-                #     max_percent = percent
-                #
-                # if percent > 50:
-                #     greater_than_50.append(percent)
-                #
-                # percent = self.get_percent(t.power_explosive_action_load,self.adaptation_type_load[AdaptationType.power_explosive_action.value])
-                # if percent > 80 and percent > max_percent:
-                #     max_percent = percent
-                #
-                # if percent > 50:
-                #     greater_than_50.append(percent)
-                #
-                # if max_percent > 80:
-                #     high_load_session = HighDetailedLoadSession(t.event_date)
-                #     high_load_session.percent_of_max = max_percent
-                #     self.high_relative_load_sessions.append(high_load_session)
-                #
-                # else:
-                #     if len(greater_than_50) >= 2:
-                #         high_load_session = HighDetailedLoadSession(t.event_date)
-                #         high_load_session.percent_of_max = max(greater_than_50)
-                #         self.high_relative_load_sessions.append(high_load_session)
 
     def get_average_error_range(self, atrribute_name, session_list):
 

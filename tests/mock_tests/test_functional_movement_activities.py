@@ -83,7 +83,7 @@ def get_section_json(name, exercises):
             }
 
 
-def get_workout_program(sections):
+def get_workout_program(session, sections):
     all_exercises = define_all_exercises()
     # rowing = all_exercises['rowing']
     # indoor_cycle = all_exercises['indoor_cycle']
@@ -100,7 +100,8 @@ def get_workout_program(sections):
 
     workout = WorkoutProgramModule.json_deserialise(workout_program)
     processor = WorkoutProcessor()
-    processor.process_workout(workout)
+    session.workout_program_module = workout
+    processor.process_workout(session)
     return workout
 
 
@@ -124,23 +125,32 @@ def is_high_intensity_session(training_sessions):
             return True
     return False
 
-def get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs):
+def get_sessions(session_types, dates, rpes, durations, sport_names):
 
-    if len(session_types) != len(dates) != len(rpes) != len(durations) != len(sport_names) != len(workout_programs):
+    if len(session_types) != len(dates) != len(rpes) != len(durations) != len(sport_names):
         raise Exception("length must match for all arguments")
 
     sessions = []
 
+    sections = {
+                   "Warmup / Movement Prep": ['rowing'],
+                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
+                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
+                   'Recovery Protocol': ['indoor_cycle']
+    }
+
     for d in range(0, len(dates)):
         if session_types[d] == 7:
             session = MixedActivitySession()
+            session.workout_program_module = get_workout_program(session, sections=sections)
         else:
             session = SportTrainingSession()
+            session.sport_name = sport_names[d]
         session.event_date = dates[d]
         session.session_RPE = rpes[d]
         session.duration_minutes = durations[d]
-        session.sport_name = sport_names[d]
-        session.workout_program_module = workout_programs[d]
+
+
         sessions.append(session)
 
     return sessions
@@ -207,15 +217,10 @@ def test_get_movement_prep_with_mixed_activity_session_no_symptoms():
     rpes = [5]
     durations = [100]
     sport_names = [None]
-    sections = {
-                   "Warmup / Movement Prep": ['rowing'],
-                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-                   'Recovery Protocol': ['indoor_cycle']
-    }
-    workout_programs = [get_workout_program(sections=sections)]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    # workout_programs = [get_workout_program(sections=sections)]
+
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = []
 
     print("\nmovement prep, mixed activity session, no symptoms")
@@ -236,15 +241,15 @@ def test_get_movement_prep_with_mixed_activity_session_one_symptom():
     rpes = [5]
     durations = [100]
     sport_names = [None]
-    sections = {
-                   "Warmup / Movement Prep": ['rowing'],
-                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-                   'Recovery Protocol': ['indoor_cycle']
-    }
-    workout_programs = [get_workout_program(sections=sections)]
+    # sections = {
+    #                "Warmup / Movement Prep": ['rowing'],
+    #                'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
+    #                'Strength': ['dumbbell_bench_press', 'bent_over_row'],
+    #                'Recovery Protocol': ['indoor_cycle']
+    # }
+    # workout_programs = [get_workout_program(sections=sections)]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = get_symptoms(body_parts=[(7, 1, None, None, None, 2)])  # left knee sharp=2
 
     print("\nmovement prep, mixed activity session, knee sharp")
@@ -265,15 +270,15 @@ def test_get_movement_prep_with_mixed_activity_session_two_symptoms():
     rpes = [5]
     durations = [100]
     sport_names = [None]
-    sections = {
-                   "Warmup / Movement Prep": ['rowing'],
-                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-                   'Recovery Protocol': ['indoor_cycle']
-    }
-    workout_programs = [get_workout_program(sections=sections)]
+    # sections = {
+    #                "Warmup / Movement Prep": ['rowing'],
+    #                'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
+    #                'Strength': ['dumbbell_bench_press', 'bent_over_row'],
+    #                'Recovery Protocol': ['indoor_cycle']
+    # }
+    # workout_programs = [get_workout_program(sections=sections)]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = get_symptoms(body_parts=[
         (7, 1, None, None, None, 2),  # left knee sharp=2
         (14, 2, 3, None, 3, None)  # right glutes tight, ache=3
@@ -297,9 +302,9 @@ def test_get_movement_prep_with_simple_session_no_symptoms():
     rpes = [5]
     durations = [100]
     sport_names = [SportName.distance_running]
-    workout_programs = [None]
+    #workout_programs = [None]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = []
 
     print("\nmovement prep, 100 mins weightlifting, no symptoms")
@@ -320,15 +325,15 @@ def test_get_responsive_recovery_with_mixed_activity_session_no_symptoms():
     rpes = [6]
     durations = [100]
     sport_names = [None]
-    sections = {
-                   "Warmup / Movement Prep": ['rowing'],
-                   'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-                   'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-                   'Recovery Protocol': ['indoor_cycle']
-    }
-    workout_programs = [get_workout_program(sections=sections)]
+    # sections = {
+    #                "Warmup / Movement Prep": ['rowing'],
+    #                'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
+    #                'Strength': ['dumbbell_bench_press', 'bent_over_row'],
+    #                'Recovery Protocol': ['indoor_cycle']
+    # }
+    # workout_programs = [get_workout_program(sections=sections)]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = []
 
     print("\nactive_recovery, 100 mins mixed activity, no symptoms")
@@ -351,9 +356,9 @@ def test_get_responsive_recovery_with_simple_session_no_symptoms():
     rpes = [6]
     durations = [100]
     sport_names = [SportName.weightlifting]
-    workout_programs = [None]
+    #workout_programs = [None]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = []
 
     print("\nactive_recovery, 100 mins weightlifting, no symptoms")
@@ -376,9 +381,9 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
     rpes = [7]
     durations = [100]
     sport_names = [SportName.weightlifting]
-    workout_programs = [None]
+    #workout_programs = [None]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = get_symptoms(body_parts=[
         (7, 1, None, None, None, 2)  # left knee sharp=2
     ])
@@ -406,9 +411,9 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():
     rpes = [5]
     durations = [100]
     sport_names = [SportName.distance_running]
-    workout_programs = [None]
+    #workout_programs = [None]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = get_symptoms(body_parts=[
         (7, 1, None, None, None, 2)  # left knee sharp=2
     ])
@@ -436,9 +441,9 @@ def test_get_mobility_wod_with_simple_session_no_symptoms():
     rpes = [5]
     durations = [100]
     sport_names = [SportName.distance_running]
-    workout_programs = [None]
+    #workout_programs = [None]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = []
 
     print("\nmobility_wod, 100 mins run, no symptoms")
@@ -461,9 +466,9 @@ def test_get_mobility_wod_with_simple_session_one_symptom():
     rpes = [5]
     durations = [100]
     sport_names = [SportName.distance_running]
-    workout_programs = [None]
+    #workout_programs = [None]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, workout_programs)
+    sessions = get_sessions(session_types, dates, rpes, durations, sport_names)
     symptoms = get_symptoms(body_parts=[
         (16, 1, None, None, None, 2)  # left glutes sharp=2
     ])

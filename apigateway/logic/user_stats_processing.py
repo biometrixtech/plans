@@ -123,6 +123,7 @@ class UserStatsProcessing(object):
         current_user_stats.load_stats = training_load_processing.load_stats
         current_user_stats = training_load_processing.calc_training_load_metrics(current_user_stats)
         current_user_stats.high_relative_load_sessions = training_load_processing.high_relative_load_sessions
+        current_user_stats.high_relative_load_score = training_load_processing.high_relative_load_score
 
         if current_user_stats.event_date.date() == self.event_date.date():
             # persist all of soreness/pain and session_RPE

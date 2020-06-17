@@ -16,6 +16,7 @@ class UserStats(Serialisable):
         self.load_stats = LoadStats()
         self.sport_max_load = {}
         self.high_relative_load_sessions = []
+        self.high_relative_load_score = 50
         self.eligible_for_high_load_trigger = False
 
         self.expected_weekly_workouts = 3
@@ -82,7 +83,8 @@ class UserStats(Serialisable):
             'average_rpe_load_5_day': self.average_rpe_load_5_day.json_serialise() if self.average_rpe_load_5_day is not None else None,
             'average_rpe_load_20_day': self.average_rpe_load_20_day.json_serialise() if self.average_rpe_load_20_day is not None else None,
             'average_trimp_5_day': self.average_trimp_5_day.json_serialise() if self.average_trimp_5_day is not None else None,
-            'average_trimp_20_day': self.average_trimp_20_day.json_serialise() if self.average_trimp_20_day is not None else None
+            'average_trimp_20_day': self.average_trimp_20_day.json_serialise() if self.average_trimp_20_day is not None else None,
+            'high_relative_load_score': self.high_relative_load_score
         }
         return ret
 
@@ -116,6 +118,7 @@ class UserStats(Serialisable):
         user_stats.average_rpe_load_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_rpe_load_20_day') is not None else None
         user_stats.average_trimp_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_trimp_5_day') is not None else None
         user_stats.average_trimp_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_trimp_20_day') is not None else None
+        user_stats.high_relative_load_score = input_dict.get('high_relative_load_score', 50)
 
         return user_stats
 
