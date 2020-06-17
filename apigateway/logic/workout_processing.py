@@ -361,11 +361,12 @@ class WorkoutProcessor(object):
 
         return reps
 
-    @staticmethod
-    def get_max_reps_for_bodyweight_ratio_bodyweight_exercises(bodyweight_ratio):
-
+    def get_max_reps_for_bodyweight_ratio_bodyweight_exercises(self, bodyweight_ratio, weight):
+        external_weight_ratio = weight / self.user_weight
+        bodyweight_ratio -= external_weight_ratio
         if bodyweight_ratio <= 1:
             return 1
+
         return max(int((bodyweight_ratio - 1) / .033), 1)
 
     @staticmethod
@@ -487,7 +488,7 @@ class WorkoutProcessor(object):
 
             one_rep_max_bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(workout_exercise)
             if equipment == Equipment.bodyweight:
-                rep_max_reps = self.get_max_reps_for_bodyweight_ratio_bodyweight_exercises(one_rep_max_bodyweight_ratio)
+                rep_max_reps = self.get_max_reps_for_bodyweight_ratio_bodyweight_exercises(one_rep_max_bodyweight_ratio, weight)
             else:
                 one_rep_max_weight = one_rep_max_bodyweight_ratio * self.user_weight
                 # find the % 1RM value
