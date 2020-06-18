@@ -13,6 +13,7 @@ from models.workout_program import WorkoutProgramModule
 from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
 from models.movement_tags import TrainingType, AdaptationType
 from models.training_volume import StandardErrorRange
+from models.planned_exercise import PlannedWorkout
 
 
 class SessionType(Enum):
@@ -59,6 +60,11 @@ class SessionSource(Enum):
     health = 1
     user_health = 2
     three_sensor = 3
+
+
+class PlannedSession(object):
+    def __init__(self):
+        self.workout = None
 
 
 class Session(Serialisable, metaclass=abc.ABCMeta):

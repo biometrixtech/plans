@@ -1,5 +1,5 @@
 from logic.workout_processing import WorkoutProcessor
-from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
+from models.workout_program import WorkoutExercise, CompletedWorkoutSection, WorkoutProgramModule
 from models.movement_tags import AdaptationType, CardioAction, TrainingType
 from models.movement_actions import ExerciseAction, Movement, Explosiveness
 from models.exercise import UnitOfMeasure
@@ -65,7 +65,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
 
 
 def get_section(name, exercises, start=None, end=None):
-    section = WorkoutSection()
+    section = CompletedWorkoutSection()
     section.name = name
     section.exercises = exercises
     section.start_date_time = format_datetime(start)

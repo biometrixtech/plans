@@ -23,7 +23,7 @@ def parse_file(file_name):
                 }
                 new_section = {
                     'name': section_name,
-                    'duration': new_duration_assignment,
+                    'duration_seconds': new_duration_assignment,
                     'exercises': []
                 }
                 sections[section_name] = new_section

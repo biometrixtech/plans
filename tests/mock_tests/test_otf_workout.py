@@ -4,7 +4,8 @@ from logic.workout_processing import WorkoutProcessor
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.exercise_assignment import ExerciseAssignment
 from models.workout_program import WorkoutProgramModule
-from models.session import MixedActivitySession
+from models.planned_exercise import PlannedWorkout, PlannedWorkoutSection, PlannedExercise
+from models.session import MixedActivitySession, PlannedSession
 from models.sport import SportName
 from models.user_stats import UserStats
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
@@ -29,11 +30,11 @@ def read_json(file_name):
     return workout
 
 
-def get_workout_program(file_name):
-    workout_json = read_json(file_name)
-    workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
-    WorkoutProcessor().process_workout(workout_program_module)
-    return workout_program_module
+# def get_workout_program(file_name):
+#     workout_json = read_json(file_name)
+#     workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
+#     WorkoutProcessor().process_workout(workout_program_module)
+#     return workout_program_module
 
 
 def get_sport_body_parts(training_sessions):
@@ -58,19 +59,22 @@ def is_high_intensity_session(training_sessions):
     return False
 
 
-def get_session(date, rpe=5, duration=60, file_name=None):
-    session = MixedActivitySession()
-    session.event_date = date
-    session.session_RPE = rpe
-    session.duration_minutes = duration
-    session.sport_name = SportName.high_intensity_interval_training
+def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default'):
+    # session = MixedActivitySession()
+    # session.event_date = date
+    # session.session_RPE = rpe
+    # session.duration_minutes = duration
+    # session.sport_name = SportName.high_intensity_interval_training
+
+    planned_session = PlannedSession()
 
     workout_json = read_json(file_name)
-    workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
-    session.workout_program_module = workout_program_module
-    WorkoutProcessor().process_workout(session)
+    #workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
+    planned_workout = PlannedWorkout.json_deserialise(workout_json)
+    planned_session.workout = planned_workout
+    WorkoutProcessor().process_planned_workout(planned_session, assignment_type)
 
-    return session
+    return planned_session
 
 
 def get_activity(event_date_time, symptoms, sessions):
@@ -91,28 +95,30 @@ def get_activity(event_date_time, symptoms, sessions):
     return movement_prep
 
 
-def test_may1():
-    session = get_session(datetime.datetime.now(), file_name='may1')
-    movement_prep = get_activity(datetime.datetime.now(), [], [session])
-    assigned_exercises = {}
-    for ex_phase in movement_prep[0].exercise_phases:
-        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
-    print('here')
-
-
-def test_may2():
-    session = get_session(datetime.datetime.now(), file_name='may2')
-    movement_prep = get_activity(datetime.datetime.now(), [], [session])
-    assigned_exercises = {}
-    for ex_phase in movement_prep[0].exercise_phases:
-        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
-    print('here')
-
-
-def test_at_home1():
-    session = get_session(datetime.datetime.now(), file_name='at_home1')
-    movement_prep = get_activity(datetime.datetime.now(), [], [session])
-    assigned_exercises = {}
-    for ex_phase in movement_prep[0].exercise_phases:
-        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
-    print('here')
+# def test_may1():
+#     session = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
+#     session = get_session(datetime.datetime.now(), file_name='may1_alt')
+#
+#     movement_prep = get_activity(datetime.datetime.now(), [], [session])
+#     assigned_exercises = {}
+#     for ex_phase in movement_prep[0].exercise_phases:
+#         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+#     print('here')
+#
+#
+# def test_may2():
+#     session = get_session(datetime.datetime.now(), file_name='may2')
+#     movement_prep = get_activity(datetime.datetime.now(), [], [session])
+#     assigned_exercises = {}
+#     for ex_phase in movement_prep[0].exercise_phases:
+#         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+#     print('here')
+#
+#
+# def test_at_home1():
+#     session = get_session(datetime.datetime.now(), file_name='at_home1')
+#     movement_prep = get_activity(datetime.datetime.now(), [], [session])
+#     assigned_exercises = {}
+#     for ex_phase in movement_prep[0].exercise_phases:
+#         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+#     print('here')

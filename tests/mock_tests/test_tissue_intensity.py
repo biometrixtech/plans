@@ -2,7 +2,7 @@ from models.functional_movement import FunctionalMovementActionMapping, Function
 from models.session import MixedActivitySession
 from models.session_functional_movement import SessionFunctionalMovement
 from logic.workout_processing import WorkoutProcessor
-from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
+from models.workout_program import WorkoutExercise, CompletedWorkoutSection, WorkoutProgramModule
 from models.movement_tags import TrainingType
 from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
@@ -22,7 +22,7 @@ def get_session(rpe=5, duration=100, exercises=[]):
 
 
 def create_and_process_workout(session, exercises):
-    section = WorkoutSection()
+    section = CompletedWorkoutSection()
     section.name = 'stamina'
     section.exercises = exercises
 

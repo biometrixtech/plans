@@ -1,6 +1,6 @@
 from models.functional_movement import FunctionalMovementActionMapping, FunctionalMovementFactory
 from logic.workout_processing import WorkoutProcessor
-from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
+from models.workout_program import WorkoutExercise, CompletedWorkoutSection, WorkoutProgramModule
 from models.movement_tags import TrainingType
 from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
@@ -10,7 +10,7 @@ import datetime
 
 
 def create_and_process_wokout(exercises):
-    section = WorkoutSection()
+    section = CompletedWorkoutSection()
     section.name = 'stamina'
     section.exercises = exercises
 
