@@ -103,6 +103,7 @@ class WorkoutProcessor(object):
         exercise.set_intensity()
         exercise.set_adaption_type()
         exercise.set_rep_tempo()
+        exercise.set_reps_duration()
 
         if exercise.training_type == TrainingType.strength_cardiorespiratory:
             exercise.set_speed_pace()
@@ -113,10 +114,11 @@ class WorkoutProcessor(object):
                 exercise.duration = exercise.distance / exercise.speed
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
+            exercise.predicted_rpe = StandardErrorRange()
             if exercise.hr is not None:
-                exercise.predicted_rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
+                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
             else:
-                exercise.predicted_rpe = exercise.shrz or 4
+                exercise.predicted_rpe.observed_value = exercise.shrz or 4
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -231,8 +233,32 @@ class WorkoutProcessor(object):
         else:
             weight = 20  # TODO: need to change this
         exercise.force = StandardErrorRange(observed_value=Calculators.force_resistance_exercise(weight))
-        exercise.power = StandardErrorRange(
-            observed_value=Calculators.power_resistance_exercise(weight_used=weight, user_weight=self.user_weight))
+
+        # TODO: still need to differentiate distance traveled by exercise
+        observed_power = Calculators.power_resistance_exercise(
+            weight_used=weight,
+            user_weight=self.user_weight,
+            time_eccentric=exercise.duration_per_rep.observed_value / 2,
+            time_concentric=exercise.duration_per_rep.observed_value / 2
+            )
+        exercise.power = StandardErrorRange(observed_value=observed_power)
+        if exercise.reps_per_set is None:
+            # TODO: still need to differentiate distance traveled by exercise
+            power_1 = Calculators.power_resistance_exercise(
+                weight_used=weight,
+                user_weight=self.user_weight,
+                time_eccentric=exercise.duration_per_rep.lower_bound / 2,
+                time_concentric=exercise.duration_per_rep.lower_bound / 2
+                )
+            power_2 = Calculators.power_resistance_exercise(
+                weight_used=weight,
+                user_weight=self.user_weight,
+                time_eccentric=exercise.duration_per_rep.upper_bound / 2,
+                time_concentric=exercise.duration_per_rep.upper_bound / 2
+                )
+            exercise.power.lower_bound = min([power_1, power_2])
+            exercise.power.upper_bound = max([power_1, power_2])
+
         return exercise
 
     def set_total_volume(self, exercise):
@@ -251,8 +277,17 @@ class WorkoutProcessor(object):
         elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             total_volume = exercise.reps_per_set
         else:
-            # use 1 rep = 4s to get volume in seconds
-            total_volume = exercise.reps_per_set * 4
+            # adaptation_type based volume
+            if exercise.duration is not None:
+                total_volume = exercise.duration
+            elif exercise.reps_per_set is not None:
+                if exercise.duration_per_rep is not None:
+                    duration_per_rep = exercise.duration_per_rep.observed_value
+                else:
+                    duration_per_rep = 3
+                total_volume = exercise.reps_per_set * duration_per_rep
+            else:
+                total_volume = 0
 
         exercise.total_volume = total_volume
         return exercise
@@ -312,7 +347,7 @@ class WorkoutProcessor(object):
         rep_max_percentage = round(min((float(actual_reps_weight) / one_rep_max_weight) * 96.7, 100), 0)
 
         # even though we base it on 100, math is off by ~ 3.3%
-
+        # TODO: check to see if this is too restrictive
         rpe_lookup_tuples = []
         rpe_lookup_tuples.append((10, 97, 100))
         rpe_lookup_tuples.append((9, 94, 97))
@@ -338,7 +373,7 @@ class WorkoutProcessor(object):
             rpe = max(0, rpe)
 
         else:
-            rpe = 0
+            rpe = 1
 
         return round(rpe, 1)
 
@@ -361,7 +396,7 @@ class WorkoutProcessor(object):
 
         return reps
 
-    def get_max_reps_for_bodyweight_ratio_bodyweight_exercises(self, bodyweight_ratio, weight):
+    def get_max_reps_for_bodyweight_exercises(self, bodyweight_ratio, weight=0):
         external_weight_ratio = weight / self.user_weight
         bodyweight_ratio -= external_weight_ratio
         if bodyweight_ratio <= 1:
@@ -373,16 +408,6 @@ class WorkoutProcessor(object):
     def get_prime_movers_from_joint_actions(joint_action_list, prime_movers):
 
         functional_movement_factory = FunctionalMovementFactory()
-        # prime_movers = []
-
-        # for prioritized_joint_action in joint_action_list:
-        #     joint_action_type = prioritized_joint_action.joint_action
-        #     functional_movement = functional_movement_factory.get_functional_movement(joint_action_type)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        # return prime_movers
 
         for prioritized_joint_action in joint_action_list:
             joint_action_type = prioritized_joint_action.joint_action
@@ -396,42 +421,7 @@ class WorkoutProcessor(object):
             elif prioritized_joint_action.priority == 4:
                 prime_movers['fourth_prime_movers'].update(functional_movement.prime_movers)
 
-    # @staticmethod
-    # def get_bodyweight_ratio_from_model(prime_movers, equipment):
-
-
-
-        # bodyweight_ratio = bodyweight_coefficients['const']
-        # if equipment == Equipment.dumbbells:
-        #     bodyweight_ratio += bodyweight_coefficients['equipment_dumbbells']
-        # elif equipment == Equipment.cable:
-        #     bodyweight_ratio += bodyweight_coefficients['equipment_cable']
-        # elif equipment == Equipment.machine:
-        #     bodyweight_ratio += bodyweight_coefficients['equipment_machine']
-        #
-        # self.user_weight = user_weight
-        # self.female = female
-        #
-        #
-        # bodyweight_ratio += bodyweight * bodyweight_coefficients['bodyweight']
-        #
-        # for prime_mover in prime_movers['first_prime_movers']:
-        #     var = f'prime_mover_{prime_mover}'
-        #     if var in bodyweight_coefficients:
-        #         bodyweight_ratio += bodyweight_coefficients[var]
-        # for prime_mover in prime_movers['second_prime_movers']:
-        #     var = f'second_prime_mover_{prime_mover}'
-        #     if var in bodyweight_coefficients:
-        #         bodyweight_ratio += bodyweight_coefficients[var]
-        # return bodyweight_ratio
-
-    def get_action_rep_max_bodyweight_ratio(self, exercise):
-
-        # # if weight_used = 0, assume it's a bodyweight only exercise
-        # # TODO - test this assumption
-        # if weight_used == 0:
-        #     weight_used = athlete_bodyweight
-
+    def get_one_rep_max_bodyweight_ratio(self, exercise):
         # get prime movers from action
         prime_movers = {
             "first_prime_movers": set(),
@@ -458,19 +448,31 @@ class WorkoutProcessor(object):
         return bodyweight_ratio
 
     def get_rpe_from_weight(self, workout_exercise):
-
-        rpe = 0
+        rpe = StandardErrorRange()
+        # get correct equipment
         if len(workout_exercise.equipments) > 0:
             equipment = workout_exercise.equipments[0]
         else:
             equipment = Equipment.bodyweight
         if equipment == Equipment.no_equipment:
             equipment = Equipment.bodyweight
-        reps = workout_exercise.reps_per_set * workout_exercise.sets
+
+        # get reps
+        reps = StandardErrorRange(observed_value=0)
+        if workout_exercise.reps_per_set is not None:
+            reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
+        elif workout_exercise.duration is not None:
+            reps.lower_bound = workout_exercise.duration / workout_exercise.duration_per_rep.upper_bound
+            reps.upper_bound = workout_exercise.duration / workout_exercise.duration_per_rep.lower_bound
+            reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
 
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
-
-            rpe = self.get_rpe_from_rep_max(workout_exercise.weight, reps)
+            rpe.observed_value = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
+            if reps.lower_bound is not None:
+                rpe1 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
+                rpe2 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
+                rpe.lower_bound = min([rpe1, rpe2])
+                rpe.upper_bound = max([rpe1, rpe2])
 
         else:
             if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
@@ -486,9 +488,9 @@ class WorkoutProcessor(object):
             else:
                 weight = 0
 
-            one_rep_max_bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(workout_exercise)
+            one_rep_max_bodyweight_ratio = self.get_one_rep_max_bodyweight_ratio(workout_exercise)
             if equipment == Equipment.bodyweight:
-                rep_max_reps = self.get_max_reps_for_bodyweight_ratio_bodyweight_exercises(one_rep_max_bodyweight_ratio, weight)
+                rep_max_reps = self.get_max_reps_for_bodyweight_exercises(one_rep_max_bodyweight_ratio, weight)
             else:
                 one_rep_max_weight = one_rep_max_bodyweight_ratio * self.user_weight
                 # find the % 1RM value
@@ -498,7 +500,12 @@ class WorkoutProcessor(object):
                 rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
 
             # given the amount of reps they completed and the n of nRM, find the RPE
-            rpe = self.get_rpe_from_rep_max(rep_max_reps, reps)
+            rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
+            if reps.lower_bound is not None:
+                rpe1 = self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound)
+                rpe2 = self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound)
+                rpe.lower_bound = min([rpe1, rpe2])
+                rpe.upper_bound = max([rpe1, rpe2])
 
         return rpe
 

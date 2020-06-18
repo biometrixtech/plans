@@ -161,7 +161,7 @@ class WorkoutExercise(Serialisable):
         self.weight_measure = None
         self.weight = None
         self.sets = 1
-        self.reps_per_set = 1
+        self.reps_per_set = None
         self.unit_of_measure = UnitOfMeasure.count
         self.rpe = None
         self.side = 0
@@ -202,6 +202,7 @@ class WorkoutExercise(Serialisable):
 
         self.total_volume = None
 
+        self.duration_per_rep = None
         self.tissue_load = None
         self.force_load = None
         self.power_load = None
@@ -263,7 +264,7 @@ class WorkoutExercise(Serialisable):
         exercise.equipments = [Equipment(equipment) for equipment in input_dict.get('equipments', [])]
         exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get('weight_measure') is not None else None
         exercise.sets = input_dict.get('sets', 0)
-        exercise.reps_per_set = input_dict.get('reps_per_set', 0)
+        exercise.reps_per_set = input_dict.get('reps_per_set')
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
         exercise.movement_id = input_dict.get('movement_id')
         exercise.hr = input_dict.get('hr')
@@ -399,53 +400,57 @@ class WorkoutExercise(Serialisable):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            if self.training_intensity >= 5:  # TODO: validate this number
+            if self.training_intensity >= 5:  # TODO: This really needs to be fixed
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
 
     def set_training_loads(self):
-        if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-            if self.power is not None and self.total_volume is not None:
-                power_load = self.power.plagiarize()
-                power_load.multiply(self.total_volume)
-                self.power_load = power_load
+        if self.power is not None and self.total_volume is not None:
+            power_load = self.power.plagiarize()
+            power_load.multiply(self.total_volume)
+            self.power_load = power_load
         if self.force is not None and self.total_volume is not None:
             force_load = self.force.plagiarize()
             force_load.multiply(self.total_volume)
             self.force_load = force_load
             self.tissue_load = self.force_load.plagiarize()
+        if self.predicted_rpe is not None:
+            rpe_load = self.predicted_rpe.plagiarize()
+            rpe_load.multiply(self.total_volume)
+            self.rpe_load = rpe_load
 
     def set_rep_tempo(self):
-        if self.cardio_action == CardioAction.row:
-            if self.stroke_rate is None or self.stroke_rate <= 23:
+        if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            if self.cardio_action == CardioAction.row:
+                if self.stroke_rate is None or self.stroke_rate <= 23:
+                    self.rep_tempo = 1
+                elif self.stroke_rate <= 28:
+                    self.rep_tempo = 2
+                elif self.stroke_rate <= 36:
+                    self.rep_tempo = 3
+                else:
+                    self.rep_tempo = 4
+            elif self.cardio_action == CardioAction.run:
+                if self.cadence is None or self.cadence <= 130:
+                    self.rep_tempo = 1  # walking
+                elif self.cadence <= 165:
+                    self.rep_tempo = 2  # jogging
+                elif self.cadence <= 195:
+                    self.rep_tempo = 3  # running
+                else:
+                    self.rep_tempo = 4  # sprinting
+            elif self.cardio_action == CardioAction.cycle:
+                if self.cadence is None or self.cadence <= 70:
+                    self.rep_tempo = 1
+                elif self.cadence <= 90:
+                    self.rep_tempo = 2
+                elif self.cadence <= 110:
+                    self.rep_tempo = 3
+                else:
+                    self.rep_tempo = 4
+            else:
                 self.rep_tempo = 1
-            elif self.stroke_rate <= 28:
-                self.rep_tempo = 2
-            elif self.stroke_rate <= 36:
-                self.rep_tempo = 3
-            else:
-                self.rep_tempo = 4
-        elif self.cardio_action == CardioAction.run:
-            if self.cadence is None or self.cadence <= 130:
-                self.rep_tempo = 1  # walking
-            elif self.cadence <= 165:
-                self.rep_tempo = 2  # jogging
-            elif self.cadence <= 195:
-                self.rep_tempo = 3  # running
-            else:
-                self.rep_tempo = 4  # sprinting
-        elif self.cardio_action == CardioAction.cycle:
-            if self.cadence is None or self.cadence <= 70:
-                self.rep_tempo = 1
-            elif self.cadence <= 90:
-                self.rep_tempo = 2
-            elif self.cadence <= 110:
-                self.rep_tempo = 3
-            else:
-                self.rep_tempo = 4
-        else:
-            self.rep_tempo = 1
 
     def set_speed_pace(self):
         speed = None
@@ -481,6 +486,19 @@ class WorkoutExercise(Serialisable):
         self.speed = speed
         self.pace = pace
         #return speed, pace
+
+    def set_reps_duration(self):
+        if self.adaptation_type == AdaptationType.strength_endurance_strength:
+            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+        elif self.adaptation_type == AdaptationType.power_drill:
+            self.duration_per_rep = StandardErrorRange(lower_bound=3.5, upper_bound=7, observed_value=5)
+        elif self.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+            self.duration_per_rep = StandardErrorRange(lower_bound=3, upper_bound=5, observed_value=4)
+        elif self.adaptation_type == AdaptationType.power_explosive_action:
+            self.duration_per_rep = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+        else:
+            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+
 
     # def set_adaption_type(self, movement):
     #
