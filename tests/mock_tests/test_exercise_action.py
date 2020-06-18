@@ -304,9 +304,9 @@ def test_power_intensity():
     workout_exercise = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, equipment=Equipment.dumbbells, weight=100, training_type=TrainingType.power_drills_plyometrics, explosiveness=5)
     action = get_action('100', "test action", exercise=workout_exercise, weight_dist=WeightDistribution.bilateral)
 
-    assert action.force.observed_value == round(100 * 9.8, 2)
+    assert action.force.observed_value == round(100  * 9.8, 2)
 
-    assert action.training_volume_left == 40
-    assert action.training_volume_right == 40
+    assert action.training_volume_left == 50
+    assert action.training_volume_right == 50
 
-    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(100 * 9.8 * 40, 2)
+    assert action.tissue_load_left.observed_value == action.tissue_load_right.observed_value == round(100 * 9.8 * 50, 2)

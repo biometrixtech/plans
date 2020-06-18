@@ -195,4 +195,3 @@ def test_new_actions():
     session = MixedActivitySession()
     session.workout_program_module = workout
     processor.process_workout(session)
-    print('here')
