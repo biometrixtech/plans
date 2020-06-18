@@ -78,7 +78,7 @@ class TrainingLoad(object):
 
 
 class SessionLoad(Serialisable, TrainingLoad):
-    def __init__(self, session_id, user_id, event_date_time):
+    def __init__(self, session_id=None, user_id=None, event_date_time=None):
         super().__init__()
         self.session_id = session_id
         self.user_id = user_id

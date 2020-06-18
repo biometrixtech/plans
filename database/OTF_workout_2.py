@@ -48,7 +48,9 @@ def parse_file(file_name):
                 if is_valid(row, 'reps'):  #if not np.isnan(row['reps']):
                     exercise['reps_per_set'] = row['reps']
                 if is_valid(row, 'incline'):  #if not np.isnan(row['incline']):
-                    exercise['grade'] = row['incline']
+                    exercise['grade'] = {
+                        'assignment_value': row['incline']
+                    }
                 if is_valid(row, 'stroke_rate'):  #if not np.isnan(row['incline']):
                     exercise['stroke_rate'] = row['stroke_rate']
                 if is_valid(row, 'pace'):  #if not np.isnan(row['pace']):

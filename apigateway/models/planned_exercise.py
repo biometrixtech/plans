@@ -1,8 +1,8 @@
 from utils import format_date, parse_date
-from logic.calculators import Calculators
-from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability
-from models.workout_program import WorkoutSection, BaseWorkoutExercise
-from models.training_volume import StandardErrorRange
+from models.movement_tags import CardioAction, Equipment
+from models.workout_program import WorkoutSection, BaseWorkoutExercise, ExerciseAction
+from models.training_volume import StandardErrorRange, Assignment
+from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 
 
@@ -83,13 +83,13 @@ class PlannedExercise(BaseWorkoutExercise):
         self.tempo = None  # OTF defines tempo for concentric/eccentric part of movement
 
         # primary assignments
-        self.duration = Assignment()
-        self.distance = Assignment()
-        self.pace = Assignment()
-        self.speed = Assignment()
+        self.duration = None
+        self.distance = None
+        self.pace = None
+        self.speed = None
         #self.grade = Assignment()
-        self.grade = None
-        self.cadence = Assignment()
+        self.grade = Assignment(assigned_value=0.0)
+        self.cadence = None
         #self.stroke_rate = Assignment()
         self.stroke_rate = None
 
@@ -114,6 +114,7 @@ class PlannedExercise(BaseWorkoutExercise):
 
         self.maximal_intensity = False  # Potentially use this in calculating HRMax, VO2Max etc
 
+        self.total_volume = None
         # only need this to set default values. So, possibly need it in spreadsheet but not stored
         # self.intensity = None  # e.g. base/push/all_out for OTF, potentially used to determine pace,watts etc e.g. rowing all out power is base + 50 or more
 
@@ -125,17 +126,25 @@ class PlannedExercise(BaseWorkoutExercise):
             'movement_id': self.movement_id,
             'weight': self.weight,
             'weight_measure': self.weight_measure.value if self.weight_measure is not None else None,
+            'side': self.side,
             'reps': self.reps,
+
+            'sets': self.sets,
+            'reps_per_set': self.reps_per_set,
+            'unit_of_measure': self.unit_of_measure.value if self.unit_of_measure is not None else None,
+            'rpe': self.rpe.json_serialise() if self.rpe is not None else None,
+
+            'predicted_rpe': self.predicted_rpe,
+
             'prescribed_per_side': self.prescribed_per_side,
             'tempo': self.tempo,
-
-            'duration': self.duration.json_serialise(),
-            'distance': self.distance.json_serialise(),
-            'pace': self.pace.json_serialise(),
-            'speed': self.speed.json_serialise(),
-            #'grade': self.grade.json_serialise(),
-            'grade': self.grade if self.grade is not None else None,
-            'cadence': self.cadence.json_serialise(),
+            'explosiveness_rating': self.explosiveness_rating,
+            'duration': self.duration.json_serialise() if self.duration is not None else None,
+            'distance': self.distance.json_serialise() if self.distance is not None else None,
+            'pace': self.pace.json_serialise() if self.pace is not None else None,
+            'speed': self.speed.json_serialise() if self.speed is not None else None,
+            'grade': self.grade.json_serialise(),
+            'cadence': self.cadence.json_serialise() if self.cadence is not None else None,
             #'stroke_rate': self.stroke_rate.json_serialise(),
             'stroke_rate': self.stroke_rate if self.stroke_rate is not None else None,
 
@@ -152,7 +161,12 @@ class PlannedExercise(BaseWorkoutExercise):
             'force': self.force.json_serialise() if self.force is not None else None,
             'power': self.power.json_serialise() if self.power is not None else None,
             'calories': self.calories,
-            'maximal_intensity': self.maximal_intensity
+            'maximal_intensity': self.maximal_intensity,
+            'total_volume': self.total_volume.json_serialise() if self.total_volume is not None else None,
+            'tissue_load': self.tissue_load.json_serialise() if self.tissue_load is not None else None,
+            'force_load': self.force_load.json_serialise() if self.tissue_load is not None else None,
+            'power_load': self.power_load.json_serialise() if self.power_load is not None else None,
+            'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None
         }
         return ret
 
@@ -161,13 +175,24 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise = cls()
         exercise.id = input_dict.get('id', "")
         exercise.name = input_dict.get('name', "")
-        exercise.equipments = []  # probably need to define this but could come from movement
         exercise.movement_id = input_dict.get('movement_id', "")
 
         exercise.weight = input_dict.get('weight')  # in lbs
-        exercise.weight_measure = input_dict.get('weight_measure')
+        exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get(
+            'weight_measure') is not None else None
 
+        exercise.sets = input_dict.get('sets', 0)
+        exercise.reps_per_set = input_dict.get('reps_per_set')
         exercise.reps = input_dict.get('reps', 1)
+        exercise.side = input_dict.get('side', 0)
+        exercise.equipments = [Equipment(equipment) for equipment in input_dict.get('equipments', [])]
+        exercise.explosiveness_rating = input_dict.get('explosiveness_rating', 0)
+        exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get(
+            'unit_of_measure') is not None else None
+
+        exercise.predicted_rpe = input_dict.get('predicted_rpe')
+        exercise.rpe = StandardErrorRange.json_deserialise(input_dict.get('rpe')) if input_dict.get('rpe') is not None else None
+
         exercise.prescribed_per_side = input_dict.get('prescribed_per_side', False)  # if the prescribed dosage is per side or total
         exercise.tempo = input_dict.get('tempo')  # OTF defines tempo for concentric/eccentric part of movement
 
@@ -177,7 +202,7 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise.pace = Assignment.json_deserialise(input_dict['pace']) if input_dict.get('pace') is not None else None
         exercise.speed = Assignment.json_deserialise(input_dict['speed']) if input_dict.get('speed') is not None else None
         #exercise.grade = Assignment.json_deserialise(input_dict['grade']) if input_dict.get('grade') is not None else Assignment()
-        exercise.grade = input_dict.get('grade', None)
+        exercise.grade = Assignment.json_deserialise(input_dict['grade']) if input_dict.get('grade') is not None else Assignment(assigned_value=0.0)
         exercise.cadence = Assignment.json_deserialise(input_dict['cadence']) if input_dict.get('cadence') is not None else None
         #exercise.stroke_rate = Assignment.json_deserialise(input_dict['stroke_rate']) if input_dict.get('stroke_rate') is not None else Assignment()
         exercise.stroke_rate = input_dict.get('stroke_rate', None)
@@ -198,6 +223,20 @@ class PlannedExercise(BaseWorkoutExercise):
             'power') is not None else None
         exercise.calories = input_dict.get('calories')  # calorie goal for exercise
         exercise.maximal_intensity = input_dict.get('maximal_intensity', False)  # calorie goal for exercise
+
+        exercise.total_volume = Assignment.json_deserialise(input_dict['total_volume']) if input_dict.get(
+            'total_volume') is not None else None
+
+        exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
+        exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
+
+        exercise.tissue_load = StandardErrorRange.json_deserialise(input_dict.get('tissue_load')) if input_dict.get('tissue_load') is not None else None
+        exercise.force_load = StandardErrorRange.json_deserialise(input_dict.get('force_load')) if input_dict.get(
+            'force_load') is not None else None
+        exercise.power_load = StandardErrorRange.json_deserialise(input_dict.get('power_load')) if input_dict.get(
+            'power_load') is not None else None
+        exercise.rpe_load = StandardErrorRange.json_deserialise(input_dict.get('rpe_load')) if input_dict.get(
+            'rpe_load') is not None else None
 
         return exercise
 
@@ -222,6 +261,18 @@ class PlannedExercise(BaseWorkoutExercise):
             if grade.assignment_type == assignment_type:
                 self.grade = grade
                 break
+
+        if self.grade is not None and self.grade.min_value is not None and self.grade.max_value is '':
+            self.grade.max_value = 15.0
+
+        if self.duration is not None and self.duration.min_value is not None and isinstance(self.duration.min_value, str):
+            self.duration.min_value = None
+        else:
+            if self.duration is not None:
+                self.duration.assigned_value = None
+
+        if self.duration is not None and self.duration.max_value is not None and isinstance(self.duration.max_value, str):
+            self.duration.max_value = None
 
     def set_speed_pace(self):
         speed = None
@@ -254,89 +305,16 @@ class PlannedExercise(BaseWorkoutExercise):
         self.speed = speed
         self.pace = pace
 
+    def set_training_loads(self):
+        if self.power is not None and self.total_volume is not None:
+            power_load = self.power.plagiarize()
+            self.power_load = Assignment.multiply_range_by_assignment(power_load, self.total_volume)
+        if self.force is not None and self.total_volume is not None:
+            force_load = self.force.plagiarize()
+            self.force_load = Assignment.multiply_range_by_assignment(force_load, self.total_volume)
+            self.tissue_load = self.force_load.plagiarize()
+        if self.predicted_rpe is not None:
+            rpe_load = self.predicted_rpe.plagiarize()
+            self.rpe_load = Assignment.multiply_range_by_assignment(rpe_load, self.total_volume)
 
-class Assignment(object):
-    def __init__(self, assignment_type=None, assigned_value=None, min_value=None, max_value=None):
-        self.assignment_type = assignment_type  # e.g. runner/jogger/power walker for OTF. This might have to be provider specific
-        self.assigned_value = assigned_value
-        self.min_value = min_value
-        self.max_value = max_value
 
-    def json_serialise(self):
-        ret = {
-            'assignment_type': self.assignment_type,
-            'assigned_value': self.assigned_value,
-            'min_value': self.min_value,
-            'max_value': self.max_value
-        }
-        return ret
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        assignment = cls()
-        assignment.assignment_type = input_dict.get('assignment_type')
-        assignment.assigned_value = input_dict.get('assigned_value')
-        assignment.min_value = input_dict.get('min_value')
-        assignment.max_value = input_dict.get('max_value')
-
-        return assignment
-
-    @staticmethod
-    def divide_scalar_assignment(divisor_scalar, dividend_assignment):
-
-        result_assignment = Assignment()
-        if dividend_assignment.assigned_value is not None:
-            result_assignment.assigned_value = divisor_scalar / float(dividend_assignment.assigned_value)
-        else:
-            if dividend_assignment.min_value is not None:
-                result_assignment.min_value = divisor_scalar / float(dividend_assignment.min_value)
-                result_assignment.assigned_value = None
-            if dividend_assignment.max_value is not None:
-                result_assignment.max_value = divisor_scalar / float(dividend_assignment.max_value)
-                result_assignment.assigned_value = None
-
-        return result_assignment
-
-    @staticmethod
-    def divide_assignments(divisor_assignment, dividend_assignment):
-
-        result_assignment = Assignment()
-        if dividend_assignment.assigned_value is not None:
-            if divisor_assignment.assigned_value is not None:
-                result_assignment.assigned_value = divisor_assignment.assigned_value / float(dividend_assignment.assigned_value)
-            else:
-                result_assignment.min_value = divisor_assignment.min_value / float(dividend_assignment.assigned_value)
-                result_assignment.max_value = divisor_assignment.max_value / float(dividend_assignment.assigned_value)
-        else:
-            if divisor_assignment.assigned_value is not None:
-                result_assignment.min_value = divisor_assignment.assigned_value / float(dividend_assignment.min_value)
-                result_assignment.max_value = divisor_assignment.assigned_value / float(dividend_assignment.max_value)
-            else:
-                if divisor_assignment.min_value is not None:
-                    result_assignment.min_value = divisor_assignment.min_value / float(dividend_assignment.min_value)
-                if dividend_assignment.max_value is not None:
-                    result_assignment.max_value = divisor_assignment.max_value / float(dividend_assignment.max_value)
-
-        return result_assignment
-
-    @staticmethod
-    def multiply_assignments(factor_1_assignment, factor_2_assignment):
-
-        result_assignment = Assignment()
-        if factor_2_assignment.assigned_value is not None:
-            if factor_1_assignment.assigned_value is not None:
-                result_assignment.assigned_value = factor_1_assignment.assigned_value * float(factor_2_assignment.assigned_value)
-            else:
-                result_assignment.min_value = factor_1_assignment.min_value * float(factor_2_assignment.assigned_value)
-                result_assignment.max_value = factor_1_assignment.max_value * float(factor_2_assignment.assigned_value)
-        else:
-            if factor_1_assignment.assigned_value is not None:
-                result_assignment.min_value = factor_1_assignment.assigned_value * float(factor_2_assignment.min_value)
-                result_assignment.max_value = factor_1_assignment.assigned_value * float(factor_2_assignment.max_value)
-            else:
-                if factor_1_assignment.min_value is not None:
-                    result_assignment.min_value = factor_1_assignment.min_value * float(factor_2_assignment.min_value)
-                if factor_2_assignment.max_value is not None:
-                    result_assignment.max_value = factor_1_assignment.max_value * float(factor_2_assignment.max_value)
-
-        return result_assignment

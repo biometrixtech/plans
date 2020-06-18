@@ -2,6 +2,7 @@ from enum import Enum, IntEnum
 from serialisable import Serialisable
 from statistics import mean
 
+
 '''deprecated for now
 class TrainingStatus(object):
     def __init__(self, training_level, projected_days_duration=0):
@@ -186,6 +187,11 @@ class StandardErrorRange(Serialisable):
         return new_object
 
     def add(self, standard_error_range):
+        if standard_error_range.lower_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.lower_bound = standard_error_range.observed_value
+        if standard_error_range.upper_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.upper_bound = standard_error_range.observed_value
+
         if standard_error_range is not None and standard_error_range.lower_bound is not None:
             if self.lower_bound is None:
                 self.lower_bound = standard_error_range.lower_bound
@@ -416,3 +422,121 @@ class TrainingReport(object):
         self.suggested_training_days = []
 '''
 
+
+class Assignment(object):
+    def __init__(self, assignment_type=None, assigned_value=None, min_value=None, max_value=None):
+        self.assignment_type = assignment_type  # e.g. runner/jogger/power walker for OTF. This might have to be provider specific
+        self.assigned_value = assigned_value
+        self.min_value = min_value
+        self.max_value = max_value
+
+    def json_serialise(self):
+        ret = {
+            'assignment_type': self.assignment_type,
+            'assigned_value': self.assigned_value,
+            'min_value': self.min_value,
+            'max_value': self.max_value
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        assignment = cls()
+        assignment.assignment_type = input_dict.get('assignment_type')
+        assignment.assigned_value = input_dict.get('assigned_value')
+        assignment.min_value = input_dict.get('min_value')
+        assignment.max_value = input_dict.get('max_value')
+
+        return assignment
+
+    @staticmethod
+    def divide_scalar_assignment(divisor_scalar, dividend_assignment):
+
+        result_assignment = Assignment()
+        if dividend_assignment.assigned_value is not None:
+            result_assignment.assigned_value = divisor_scalar / float(dividend_assignment.assigned_value)
+        else:
+            if dividend_assignment.min_value is not None:
+                result_assignment.min_value = divisor_scalar / float(dividend_assignment.min_value)
+                result_assignment.assigned_value = None
+            if dividend_assignment.max_value is not None:
+                result_assignment.max_value = divisor_scalar / float(dividend_assignment.max_value)
+                result_assignment.assigned_value = None
+
+        return result_assignment
+
+    @staticmethod
+    def divide_assignments(divisor_assignment, dividend_assignment):
+
+        result_assignment = Assignment()
+        if dividend_assignment.assigned_value is not None:
+            if divisor_assignment.assigned_value is not None:
+                result_assignment.assigned_value = divisor_assignment.assigned_value / float(dividend_assignment.assigned_value)
+            else:
+                result_assignment.min_value = divisor_assignment.min_value / float(dividend_assignment.assigned_value)
+                if divisor_assignment.max_value is not None:
+                    result_assignment.max_value = divisor_assignment.max_value / float(dividend_assignment.assigned_value)
+        else:
+            if divisor_assignment.assigned_value is not None:
+                result_assignment.min_value = divisor_assignment.assigned_value / float(dividend_assignment.min_value)
+                if dividend_assignment.max_value is not None:
+                    result_assignment.max_value = divisor_assignment.assigned_value / float(dividend_assignment.max_value)
+            else:
+                if divisor_assignment.min_value is not None:
+                    result_assignment.min_value = divisor_assignment.min_value / float(dividend_assignment.min_value)
+                if dividend_assignment.max_value is not None:
+                    result_assignment.max_value = divisor_assignment.max_value / float(dividend_assignment.max_value)
+
+        return result_assignment
+
+    @staticmethod
+    def multiply_assignments(factor_1_assignment, factor_2_assignment):
+
+        result_assignment = Assignment()
+        if factor_2_assignment.assigned_value is not None:
+            if factor_1_assignment.assigned_value is not None:
+                result_assignment.assigned_value = factor_1_assignment.assigned_value * float(factor_2_assignment.assigned_value)
+            else:
+                result_assignment.min_value = factor_1_assignment.min_value * float(factor_2_assignment.assigned_value)
+                if factor_1_assignment.max_value is not None:
+                    result_assignment.max_value = factor_1_assignment.max_value * float(factor_2_assignment.assigned_value)
+        else:
+            if factor_1_assignment.assigned_value is not None:
+                result_assignment.min_value = factor_1_assignment.assigned_value * float(factor_2_assignment.min_value)
+                if factor_2_assignment.max_value is not None:
+                    result_assignment.max_value = factor_1_assignment.assigned_value * float(factor_2_assignment.max_value)
+            else:
+                if factor_1_assignment.min_value is not None:
+                    result_assignment.min_value = factor_1_assignment.min_value * float(factor_2_assignment.min_value)
+                if factor_2_assignment.max_value is not None:
+                    result_assignment.max_value = factor_1_assignment.max_value * float(factor_2_assignment.max_value)
+
+        return result_assignment
+
+    @staticmethod
+    def multiply_range_by_assignment(range, assignment):
+
+        new_range = StandardErrorRange()
+
+        if assignment.assigned_value is not None:
+            if range.lower_bound is not None:
+                new_range.lower_bound = range.lower_bound * assignment.assigned_value
+
+            new_range.observed_value = range.observed_value * assignment.assigned_value
+
+            if range.upper_bound is not None:
+                new_range.upper_bound = range.upper_bound * assignment.assigned_value
+        else:
+            if range.lower_bound is not None:
+                new_range.lower_bound = range.lower_bound * assignment.min_value
+
+            if assignment.max_value is not None:
+                avg_value = (assignment.max_value + assignment.min_value) / 2
+                new_range.observed_value = range.observed_value * avg_value
+            else:
+                new_range.observed_value = range.observed_value * assignment.min_value
+
+            if range.upper_bound is not None and assignment.max_value is not None:
+                new_range.upper_bound = range.upper_bound * assignment.max_value
+
+        return new_range

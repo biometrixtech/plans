@@ -72,7 +72,7 @@ def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='defau
     #workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
     planned_workout = PlannedWorkout.json_deserialise(workout_json)
     planned_session.workout = planned_workout
-    WorkoutProcessor().process_planned_workout(planned_session, assignment_type)
+    WorkoutProcessor(user_weight=60).process_planned_workout(planned_session, assignment_type)
 
     return planned_session
 
@@ -96,10 +96,12 @@ def get_activity(event_date_time, symptoms, sessions):
 
 
 # def test_may1():
-#     session = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
-#     session = get_session(datetime.datetime.now(), file_name='may1_alt')
+#     #session_power_walker = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
+#     session_runner = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='runner')
+#     session_jogger = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='joggger')
+#     #session = get_session(datetime.datetime.now(), file_name='may1_alt')
 #
-#     movement_prep = get_activity(datetime.datetime.now(), [], [session])
+#     movement_prep = get_activity(datetime.datetime.now(), [], [session_jogger])
 #     assigned_exercises = {}
 #     for ex_phase in movement_prep[0].exercise_phases:
 #         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())

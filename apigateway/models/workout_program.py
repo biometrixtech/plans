@@ -158,17 +158,36 @@ class BaseWorkoutExercise(object):
         self.explosiveness_rating = 0
         self.surface_stability = None
 
+        self.side = 0
+        self.weight_measure = None
+        self.weight = None
+        self.sets = 1
+        self.reps_per_set = None
+        self.unit_of_measure = UnitOfMeasure.count
+
         self.cardio_action = None
         self.power_action = None
         self.power_drill_action = None
         self.strength_endurance_action = None
         self.strength_resistance_action = None
 
+        self.primary_actions = []
+        self.secondary_actions = []
+
         self.equipments = []  # TODO: do we get this from the api
 
         self.training_intensity = 0
 
         self.rpe = None
+
+        self.duration_per_rep = None
+
+        self.tissue_load = None
+        self.force_load = None
+        self.power_load = None
+        self.rpe_load = None
+
+        self.predicted_rpe = None
 
     def initialize_from_movement(self, movement):
         # self.body_position = movement.body_position
@@ -206,20 +225,25 @@ class BaseWorkoutExercise(object):
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
 
+    def set_reps_duration(self):
+        if self.adaptation_type == AdaptationType.strength_endurance_strength:
+            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+        elif self.adaptation_type == AdaptationType.power_drill:
+            self.duration_per_rep = StandardErrorRange(lower_bound=3.5, upper_bound=7, observed_value=5)
+        elif self.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+            self.duration_per_rep = StandardErrorRange(lower_bound=3, upper_bound=5, observed_value=4)
+        elif self.adaptation_type == AdaptationType.power_explosive_action:
+            self.duration_per_rep = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+        else:
+            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+
 
 class WorkoutExercise(BaseWorkoutExercise, Serialisable):
     def __init__(self):
         super().__init__()
-        self.weight_measure = None
-        self.weight = None
-        self.sets = 1
-        self.reps_per_set = None
-        self.unit_of_measure = UnitOfMeasure.count
 
-        self.side = 0
         self.bilateral = True
         self.hr = None
-        self.predicted_rpe = None
 
         # for cardio exercises
         self.duration = None  # duration in seconds for cardio exercises
@@ -233,23 +257,14 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         self.calories = None  # for rowing/other cardio
         self.grade = None  # for biking/running
 
-
         self.rep_tempo = 0
 
         self.body_position = None
 
-        self.primary_actions = []
-        self.secondary_actions = []
         self.shrz = None
         self.work_vo2 = None
 
         self.total_volume = None
-
-        self.duration_per_rep = None
-        self.tissue_load = None
-        self.force_load = None
-        self.power_load = None
-        self.rpe_load = None
 
     def json_serialise(self):
         ret = {
@@ -315,7 +330,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None
-        exercise.explosiveness_rating = input_dict.get('explosiveness_rating', False)
+        exercise.explosiveness_rating = input_dict.get('explosiveness_rating', 0)
         exercise.side = input_dict.get('side', 0)
         exercise.bilateral = input_dict.get('bilateral', True)
 
@@ -450,17 +465,6 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         self.pace = pace
         #return speed, pace
 
-    def set_reps_duration(self):
-        if self.adaptation_type == AdaptationType.strength_endurance_strength:
-            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
-        elif self.adaptation_type == AdaptationType.power_drill:
-            self.duration_per_rep = StandardErrorRange(lower_bound=3.5, upper_bound=7, observed_value=5)
-        elif self.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
-            self.duration_per_rep = StandardErrorRange(lower_bound=3, upper_bound=5, observed_value=4)
-        elif self.adaptation_type == AdaptationType.power_explosive_action:
-            self.duration_per_rep = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
-        else:
-            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
 
 
     # def set_adaption_type(self, movement):
