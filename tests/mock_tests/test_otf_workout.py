@@ -96,9 +96,9 @@ def get_activity(event_date_time, symptoms, sessions):
 
 
 def test_may1():
-    session_power_walker = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
+    # session_power_walker = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
     session_runner = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='runner')
-    session_jogger = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='joggger')
+    session_jogger = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='jogger')
     #session = get_session(datetime.datetime.now(), file_name='may1_alt')
 
     movement_prep_power_walker = get_activity(datetime.datetime.now(), [], [session_power_walker])
