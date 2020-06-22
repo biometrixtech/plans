@@ -49,7 +49,7 @@ def parse_file(file_name):
                     exercise['reps_per_set'] = row['reps']
                 if is_valid(row, 'incline'):  #if not np.isnan(row['incline']):
                     exercise['grade'] = {
-                        'assignment_value': row['incline']
+                        'assigned_value': row['incline']
                     }
                 if is_valid(row, 'stroke_rate'):  #if not np.isnan(row['incline']):
                     exercise['stroke_rate'] = row['stroke_rate']
@@ -58,17 +58,17 @@ def parse_file(file_name):
 
                         pw_pace = {
                             'assignment_type': "power_walker",
-                            'min_value': 1028,
-                            'max_value': 800,
+                            'min_value': 1028 / 1609,
+                            'max_value': 800 / 1609,
                         }
                         jog_pace = {
                             'assignment_type': "jogger",
-                            'min_value': 801,
-                            'max_value': 655,
+                            'min_value': 801 / 1609,
+                            'max_value': 655 / 1609,
                         }
                         run_pace = {
                             'assignment_type': "runner",
-                            'min_value': 656
+                            'min_value': 656 / 1609
                         }
                         pace_alternatives = [pw_pace, jog_pace, run_pace]
                         # pw: 1028 - 800 (3.5 - 4.5)
@@ -78,23 +78,23 @@ def parse_file(file_name):
                     elif row['pace'] == 'push':
                         jog_pace = {
                             'assignment_type': "jogger",
-                            'min_value': 553,
-                            'max_value': 480,
+                            'min_value': 553 / 1609,
+                            'max_value': 480 / 1609,
                         }
                         run_pace = {
                             'assignment_type': "runner",
-                            'min_value': 481
+                            'min_value': 481 / 1609
                         }
                         pace_alternatives = [jog_pace, run_pace]
                         exercise['alternate_pace'] = pace_alternatives
                     elif row['pace'] == 'all_out':
                         jog_pace = {
                             'assignment_type': "jogger",
-                            'min_value': 480
+                            'min_value': 480 / 1609
                         }
                         run_pace = {
                             'assignment_type': "runner",
-                            'min_value': 481
+                            'min_value': 481 / 1609
                         }
                         pace_alternatives = [jog_pace, run_pace]
                         exercise['alternate_pace'] = pace_alternatives
