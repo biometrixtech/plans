@@ -26,6 +26,7 @@ class SessionType(Enum):
     corrective = 5
     sport_training = 6
     mixed_activity = 7
+    planned = 8
 
     @classmethod
     def has_value(cls, value):
@@ -61,12 +62,6 @@ class SessionSource(Enum):
     health = 1
     user_health = 2
     three_sensor = 3
-
-
-class PlannedSession(SessionLoad):
-    def __init__(self):
-        super().__init__()
-        self.workout = None
 
 
 class Session(Serialisable, metaclass=abc.ABCMeta):
@@ -630,6 +625,25 @@ class BumpUpSession(Session):
 
     # def missing_post_session_survey(self):
     #     return Session.missing_post_session_survey()
+
+
+class PlannedSession(Session):
+    def __init__(self):
+        super().__init__()
+        self.workout = None
+        self.event_date = None
+        self.session_RPE = None
+
+    def session_type(self):
+        return SessionType.planned
+
+    def create(self):
+        new_session = PlannedSession()
+        new_session.id = str(uuid.uuid4())
+        return new_session
+
+    def ultra_high_intensity_session(self):
+        return False
 
 
 class MixedActivitySession(Session):

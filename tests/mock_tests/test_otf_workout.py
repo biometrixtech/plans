@@ -67,7 +67,7 @@ def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='defau
     # session.sport_name = SportName.high_intensity_interval_training
 
     planned_session = PlannedSession()
-
+    planned_session.event_date = date
     workout_json = read_json(file_name)
     #workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
     planned_workout = PlannedWorkout.json_deserialise(workout_json)
@@ -95,17 +95,19 @@ def get_activity(event_date_time, symptoms, sessions):
     return movement_prep
 
 
-# def test_may1():
-#     #session_power_walker = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
-#     session_runner = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='runner')
-#     session_jogger = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='joggger')
-#     #session = get_session(datetime.datetime.now(), file_name='may1_alt')
-#
-#     movement_prep = get_activity(datetime.datetime.now(), [], [session_jogger])
-#     assigned_exercises = {}
-#     for ex_phase in movement_prep[0].exercise_phases:
-#         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
-#     print('here')
+def test_may1():
+    session_power_walker = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
+    session_runner = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='runner')
+    session_jogger = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='joggger')
+    #session = get_session(datetime.datetime.now(), file_name='may1_alt')
+
+    movement_prep_power_walker = get_activity(datetime.datetime.now(), [], [session_power_walker])
+    movement_prep_runner = get_activity(datetime.datetime.now(), [], [session_runner])
+    movement_prep_jogger = get_activity(datetime.datetime.now(), [], [session_jogger])
+    assigned_exercises = {}
+    for ex_phase in movement_prep_power_walker[0].exercise_phases:
+        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+    print('here')
 #
 #
 # def test_may2():
