@@ -49,9 +49,14 @@ def handle_movement_prep_create(user_id):
             user_stats=user_stats,
             datastore_collection=datastore_collection
     )
+    # process stored planned session
+    if 'program_id' in request.json:
+        program_id = request.json['program_id']
+        if program_id is not None:
+            api_processor.create_planned_workout_from_id(program_id)
 
     # process planned session
-    if 'session' in request.json:
+    elif 'session' in request.json:
         session = request.json['session']
         if session is not None:
             api_processor.create_session_from_survey(session)

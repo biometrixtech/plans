@@ -2,6 +2,7 @@ from models.session import SessionType, SessionFactory
 from models.sport import SportName
 from models.symptom import Symptom
 from models.heart_rate import SessionHeartRate, HeartRateData
+from models.planned_exercise import PlannedWorkout
 from logic.user_stats_processing import UserStatsProcessing
 from logic.activity_management import ActivityManager
 from logic.heart_rate_processing import HeartRateProcessing
@@ -22,6 +23,15 @@ class APIProcessing(object):
         self.workout_programs = []
         self.symptoms = []
         self.user_stats_processor = None
+
+    def create_planned_workout_from_id(self, program_id):
+
+        planned_workout = self.datastore_collection.workout_datastore.get(program_id)
+
+        if planned_workout is not None:
+            self.sessions.append(planned_workout)
+        else:
+            raise ValueError("invalid program_id")
 
     def create_session_from_survey(self, session):
         session_obj = self.convert_session(session)
