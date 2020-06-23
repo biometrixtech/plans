@@ -24,8 +24,7 @@ def load_exercises():
 
 
 def read_json(file_name):
-
-    if os.environ['CODEBUILD_RUN'] == 'TRUE':
+    if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
         file_name = f"tests/data/otf/{file_name}.json"
     else:
         file_name = os.path.join(os.path.realpath(".."), f"data/otf/{file_name}.json")
