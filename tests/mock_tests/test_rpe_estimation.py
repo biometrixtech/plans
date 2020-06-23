@@ -91,7 +91,7 @@ def test_get_rpe_from_rep_max_11_1():
     workout_processor = WorkoutProcessor()
     rpe = workout_processor.get_rpe_from_rep_max(11, 1)
 
-    assert 0.0 == rpe
+    assert 1.0 == rpe
 
 def test_get_reps_for_percent_rep_max_100():
 
