@@ -49,7 +49,7 @@ def parse_file(file_name):
                     exercise['reps_per_set'] = row['reps']
                 if is_valid(row, 'incline'):  #if not np.isnan(row['incline']):
                     exercise['grade'] = {
-                        'assigned_value': row['incline']
+                        'assigned_value': row['incline'] / 100
                     }
                 if is_valid(row, 'stroke_rate'):  #if not np.isnan(row['incline']):
                     exercise['stroke_rate'] = row['stroke_rate']
@@ -103,8 +103,8 @@ def parse_file(file_name):
                 if is_valid(row, 'pw_incline_min') or is_valid(row, 'pw_incline_max'):  #if not np.isnan(row['duration']):
                     pw_assignment = {
                         'assignment_type': "power_walker",
-                        'min_value': row['pw_incline_min'],
-                        'max_value': row['pw_incline_max'],
+                        'min_value': row['pw_incline_min'] / 100,
+                        'max_value': row['pw_incline_max'] / 100 if not isinstance(row['pw_incline_max'], str) else row['pw_incline_max'],
                     }
                     incline_alternatives.append(pw_assignment)
                 exercise['alternate_grade'] = incline_alternatives

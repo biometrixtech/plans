@@ -460,6 +460,13 @@ class WorkoutProcessor(object):
                     else:
                         if exercise.grade.assigned_value is not None:
                             power_ranger.lower_bound = Calculators.power_running(exercise.speed.min_value, exercise.grade.assigned_value, self.user_weight)
+                            if exercise.speed.max_value is not None:
+                                average_speed = (exercise.speed.min_value + exercise.speed.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_running(average_speed, exercise.grade.assigned_value, self.user_weight)
+                                power_ranger.upper_bound = Calculators.power_running(exercise.speed.max_value, exercise.grade.assigned_value, self.user_weight)
+                            else:
+                                power_ranger.observed_value = power_ranger.lower_bound
+
                         else:
                             # means both speed and grade use min/max values
                             power_ranger.lower_bound = Calculators.power_running(exercise.speed.min_value,
@@ -509,6 +516,13 @@ class WorkoutProcessor(object):
                             power_ranger.lower_bound = Calculators.power_cycling(exercise.speed.min_value,
                                                                                  grade=exercise.grade.assigned_value,
                                                                                  user_weight=self.user_weight)
+                            if exercise.speed.max_value is not None:
+                                average_speed = (exercise.speed.min_value + exercise.speed.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_cycling(average_speed, exercise.grade.assigned_value, self.user_weight)
+                                power_ranger.upper_bound = Calculators.power_cycling(exercise.speed.max_value, exercise.grade.assigned_value, self.user_weight)
+                            else:
+                                power_ranger.observed_value = power_ranger.lower_bound
+
                         else:
                             # means both speed and grade use min/max values
                             power_ranger.lower_bound = Calculators.power_cycling(exercise.speed.min_value,
