@@ -14,7 +14,6 @@ from datastores import user_stats_datastore
 from datastores import movement_prep_datastore
 from datastores import mobility_wod_datastore
 from datastores import responsive_recovery_datastore
-from datastores import session_load_datastore
 
 
 class DatastoreCollection(object):
@@ -41,4 +40,3 @@ class DatastoreCollection(object):
         self.movement_prep_datastore = movement_prep_datastore.MovementPrepDatastore()
         self.mobility_wod_datastore = mobility_wod_datastore.MobilityWODDatastore()
         self.responsive_recovery_datastore = responsive_recovery_datastore.ResponsiveRecoveryDatastore()
-        self.session_load_datastore = session_load_datastore.SessionLoadDatastore()

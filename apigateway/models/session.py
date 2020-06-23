@@ -14,7 +14,6 @@ from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunct
 from models.movement_tags import TrainingType, AdaptationType
 from models.training_volume import StandardErrorRange
 from models.planned_exercise import PlannedWorkout
-from models.training_load import SessionLoad
 
 
 class SessionType(Enum):

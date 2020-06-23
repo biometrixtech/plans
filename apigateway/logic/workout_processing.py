@@ -11,7 +11,6 @@ from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceSt
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
-#from models.training_load import SessionLoad
 from models.training_volume import StandardErrorRange, Assignment
 
 movement_library = MovementLibraryDatastore().get()
@@ -57,9 +56,6 @@ class WorkoutProcessor(object):
     def process_workout(self, session):
 
         heart_rate_processing = HeartRateProcessing(self.user_age)
-        # session_training_load = SessionLoad(session_id=session.workout_program.session_id,
-        #                                     user_id=session.workout_program.user_id,
-        #                                     event_date_time=session.workout_program.event_date_time)
 
         for workout_section in session.workout_program_module.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
