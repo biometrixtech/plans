@@ -16,4 +16,5 @@ class DatastoreCollection(object):
         self.post_session_survey_datastore = mock_post_session_survey_datastore.PostSessionSurveyDatastore()
         self.cleared_soreness_datastore = mock_cleared_soreness_datastore.ClearedSorenessDatastore()
         self.injury_risk_datastore = mock_injury_risk_datastore.InjuryRiskDatastore()
+        self.workout_datastore = mock_workout_datastore.WorkoutDatastore()
 

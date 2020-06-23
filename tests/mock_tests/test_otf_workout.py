@@ -8,8 +8,11 @@ from models.planned_exercise import PlannedWorkout, PlannedWorkoutSection, Plann
 from models.session import MixedActivitySession, PlannedSession
 from models.sport import SportName
 from models.user_stats import UserStats
+from logic.api_processing import APIProcessing
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
+from tests.mocks.mock_workout_datastore import WorkoutDatastore
+from tests.mocks.mock_datastore_collection import DatastoreCollection
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
@@ -111,6 +114,22 @@ def test_may1():
     for ex_phase in movement_prep_power_walker[0].exercise_phases:
         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
     print('here')
+
+
+def test_api_may1():
+
+    mock_datastore_collection = DatastoreCollection()
+    workout_datastore = WorkoutDatastore()
+
+    # TODO - make a decision, are we saving the PROCESSED workout or just the workout..and then processing?
+
+    workout = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
+    workout_datastore.side_load_planned_workout(workout)
+    mock_datastore_collection.workout_datastore = workout_datastore
+
+    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=None, datastore_collection=mock_datastore_collection)
+    api_processing.create_planned_workout_from_id("1")
+    assert 1 == len(api_processing.sessions)
 #
 #
 # def test_may2():
