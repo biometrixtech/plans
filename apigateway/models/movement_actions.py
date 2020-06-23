@@ -2,10 +2,9 @@ from enum import Enum, IntEnum
 from models.movement_tags import BodyPosition, CardioAction, TrainingType, Equipment, WeightDistribution,\
     AdaptationType, MovementSurfaceStability, PowerAction, PowerDrillAction, StrengthResistanceAction, StrengthEnduranceAction
 from models.functional_movement_type import FunctionalMovementType
-from models.training_volume import StandardErrorRange
+from models.training_volume import StandardErrorRange, Assignment
 from logic.calculators import Calculators
 from serialisable import Serialisable
-
 
 class MuscleAction(Enum):
     concentric = 0
@@ -438,27 +437,40 @@ class ExerciseAction(object):
         self.set_training_volume(total_volume)
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             # both sides have same volume (duration) and intensity (rpe)
-            #self.total_load_left = self.training_volume_left * self.training_intensity
-            #self.total_load_right = self.training_volume_rning_intensityight * self.trai
 
-            #self.tissue_load_left.add_value(self.training_volume_left * self.readiness * self.tissue_intensity)
-            #self.tissue_load_right.add_value(self.training_volume_right * self.readiness * self.tissue_intensity)
             power_left = self.power.plagiarize()
-            power_left.multiply(self.training_volume_left)
-            power_right = self.power.plagiarize()
-            power_right.multiply(self.training_volume_right)
+            if isinstance(self.training_volume_left, Assignment):
+                power_left = Assignment.multiply_range_by_assignment(power_left, self.training_volume_left)
+            else:
+                power_left.multiply(self.training_volume_left)
 
-            force_left = self.force.plagiarize()
-            force_left.multiply(self.training_volume_left)
-            force_right = self.force.plagiarize()
-            force_right.multiply(self.training_volume_right)
+            power_right = self.power.plagiarize()
+            if isinstance(self.training_volume_right, Assignment):
+                power_right = Assignment.multiply_range_by_assignment(power_right, self.training_volume_right)
+            else:
+                power_right.multiply(self.training_volume_right)
 
             self.power_load_left.add(power_left)
             self.power_load_right.add(power_right)
-            self.force_load_left.add(force_left)
-            self.force_load_right.add(force_right)
-            self.tissue_load_left = self.force_load_left
-            self.tissue_load_right = self.force_load_right
+
+            if self.force is not None:
+                force_left = self.force.plagiarize()
+                if isinstance(self.training_volume_left, Assignment):
+                    force_left = Assignment.multiply_range_by_assignment(force_left, self.training_volume_left)
+                else:
+                    force_left.multiply(self.training_volume_left)
+
+                force_right = self.force.plagiarize()
+                if isinstance(self.training_volume_right, Assignment):
+                    force_right = Assignment.multiply_range_by_assignment(force_right, self.training_volume_right)
+                else:
+                    force_right.multiply(self.training_volume_right)
+                self.force_load_left.add(force_left)
+                self.force_load_right.add(force_right)
+                self.tissue_load_left = self.force_load_left
+                self.tissue_load_right = self.force_load_right
+
+
         else:
             left_dist = 1
             right_dist = 1
@@ -478,18 +490,45 @@ class ExerciseAction(object):
                     right_dist = self.lateral_distribution[0] / 100 * 2
             # self.tissue_load_left.add_value(self.training_volume_left * self.training_intensity * left_dist)
             # self.tissue_load_right.add_value(self.training_volume_right * self.training_intensity * right_dist)
-            left_force, right_force = self.set_left_right_distribution("force")
-            left_power, right_power = self.set_left_right_distribution("power")
-            left_force.multiply(self.training_volume_left * left_dist)
-            right_force.multiply(self.training_volume_right * right_dist)
-            left_power.multiply(self.training_volume_left * left_dist)
-            right_power.multiply(self.training_volume_right * right_dist)
-            self.force_load_left.add(left_force)
-            self.force_load_right.add(right_force)
-            self.power_load_left.add(left_power)
-            self.power_load_right.add(right_power)
-            self.tissue_load_left = self.force_load_left
-            self.tissue_load_right = self.force_load_right
+            force_left, force_right = self.set_left_right_distribution("force")
+            power_left, power_right = self.set_left_right_distribution("power")
+
+            if force_left is not None:
+                #force_left.multiply(self.training_volume_left * left_dist)
+                if isinstance(self.training_volume_left, Assignment):
+                    force_left = Assignment.multiply_range_by_assignment(force_left, self.training_volume_left)
+                    force_left.multiply(left_dist)
+                else:
+                    force_left.multiply(self.training_volume_left * left_dist)
+                self.force_load_left.add(force_left)
+                self.tissue_load_left = self.force_load_left
+
+            if force_right is not None:
+                #force_right.multiply(self.training_volume_right * right_dist)
+                if isinstance(self.training_volume_right, Assignment):
+                    force_right = Assignment.multiply_range_by_assignment(force_right, self.training_volume_right)
+                    force_right.multiply(right_dist)
+                else:
+                    force_right.multiply(self.training_volume_right * right_dist)
+                self.force_load_right.add(force_right)
+                self.tissue_load_right = self.force_load_right
+
+            #power_left.multiply(self.training_volume_left * left_dist)
+            if isinstance(self.training_volume_left, Assignment):
+                power_left = Assignment.multiply_range_by_assignment(power_left, self.training_volume_left)
+                power_left.multiply(left_dist)
+            else:
+                power_left.multiply(self.training_volume_left * left_dist)
+
+            #power_right.multiply(self.training_volume_right * right_dist)
+            if isinstance(self.training_volume_right, Assignment):
+                power_right = Assignment.multiply_range_by_assignment(power_right, self.training_volume_right)
+                power_right.multiply(right_dist)
+            else:
+                power_right.multiply(self.training_volume_right * right_dist)
+
+            self.power_load_left.add(power_left)
+            self.power_load_right.add(power_right)
 
     def set_training_volume(self, total_volume):
         if self.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:

@@ -13,6 +13,8 @@ from models.workout_program import WorkoutProgramModule
 from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
 from models.movement_tags import TrainingType, AdaptationType
 from models.training_volume import StandardErrorRange
+from models.planned_exercise import PlannedWorkout
+from models.training_load import SessionLoad
 
 
 class SessionType(Enum):
@@ -24,6 +26,7 @@ class SessionType(Enum):
     corrective = 5
     sport_training = 6
     mixed_activity = 7
+    planned = 8
 
     @classmethod
     def has_value(cls, value):
@@ -622,6 +625,25 @@ class BumpUpSession(Session):
 
     # def missing_post_session_survey(self):
     #     return Session.missing_post_session_survey()
+
+
+class PlannedSession(Session):
+    def __init__(self):
+        super().__init__()
+        self.workout = None
+        self.event_date = None
+        self.session_RPE = None
+
+    def session_type(self):
+        return SessionType.planned
+
+    def create(self):
+        new_session = PlannedSession()
+        new_session.id = str(uuid.uuid4())
+        return new_session
+
+    def ultra_high_intensity_session(self):
+        return False
 
 
 class MixedActivitySession(Session):

@@ -80,7 +80,6 @@ def main():
     config = read_config()
     os.environ['CODEBUILD_RUN'] = 'TRUE'
 
-
     print("Deploying Lambda functions")
     for lambda_bundle in config['lambdas']:
         upload_lambda_bundle(
