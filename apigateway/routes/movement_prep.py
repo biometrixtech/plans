@@ -50,10 +50,13 @@ def handle_movement_prep_create(user_id):
             datastore_collection=datastore_collection
     )
     # process stored planned session
+    workout = None
     if 'program_id' in request.json:
         program_id = request.json['program_id']
         if program_id is not None:
             api_processor.create_planned_workout_from_id(program_id)
+            if len(api_processor.sessions) > 0:
+                workout = api_processor.sessions[0]
 
     # process planned session
     elif 'session' in request.json:
@@ -81,7 +84,7 @@ def handle_movement_prep_create(user_id):
 
     # create movement_prep
     movement_prep = api_processor.create_activity(
-            activity_type='movement_prep'
+            activity_type='movement_prep', planned_session=workout
     )
 
     return {'movement_prep': movement_prep.json_serialise(api=True, consolidated=consolidated)}, 201

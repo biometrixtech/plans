@@ -115,7 +115,7 @@ class APIProcessing(object):
         symptom = Symptom.json_deserialise(symptom)
         self.symptoms.append(symptom)
 
-    def create_activity(self, activity_type, update_stats=True, activity_id=None, training_session_id=None):
+    def create_activity(self, activity_type, update_stats=True, activity_id=None, training_session_id=None, planned_session=None):
         if update_stats:
             # update stats
             if self.user_stats_processor is None:
@@ -136,7 +136,8 @@ class APIProcessing(object):
                 self.event_date_time,
                 training_sessions=self.sessions,
                 symptoms=self.symptoms,
-                user_stats=self.user_stats
+                user_stats=self.user_stats,
+                planned_workout=planned_session
         )
         if activity_type == 'mobility_wod':
             activity = activity_manager.create_mobility_wod()

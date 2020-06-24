@@ -6,7 +6,8 @@ from models.athlete_injury_risk import AthleteInjuryRisk
 
 
 class ActivityManager(object):
-    def __init__(self, athlete_id, datastore_collection, event_date_time, training_sessions=None, symptoms=None, user_stats=None):
+    def __init__(self, athlete_id, datastore_collection, event_date_time, training_sessions=None, symptoms=None,
+                 user_stats=None, planned_workout=None):
         """
         :param athlete_id:
         :param datastore_collection:
@@ -32,6 +33,7 @@ class ActivityManager(object):
         self.historical_injury_risk_dict = None
         self.exercise_assignment_calculator = None
         self.active_training_sessions = [session for session in self.training_sessions]
+        self.planned_training_session = planned_workout
         self.load_data()
 
     @xray_recorder.capture('logic.ActivityManager.load_data')
@@ -75,19 +77,25 @@ class ActivityManager(object):
         return sport_cardio_plyometrics
 
     @xray_recorder.capture('logic.ActivityManager.prepare_data')
-    def prepare_data(self, default_rpe=None):
+    def prepare_data(self, default_rpe=None, use_planned_session=False):
 
         # self.soreness_list = SorenessCalculator().update_soreness_list(self.soreness_list, self.symptoms)
         if default_rpe is not None:
-            for t in self.training_sessions:
-                if t.session_RPE is None:
-                    t.session_RPE = default_rpe
+            if not use_planned_session:
+                for t in self.training_sessions:
+                    if t.session_RPE is None:
+                        t.session_RPE = default_rpe
 
         # process injury risk with new information
+        if not use_planned_session:
+            sessions = self.training_sessions
+        else:
+            sessions = [self.planned_training_session]
+
         injury_risk_processor = InjuryRiskProcessor(
                 self.event_date_time,
                 self.symptoms,
-                self.training_sessions,
+                sessions,
                 self.historical_injury_risk_dict,
                 self.user_stats,
                 self.athlete_id
@@ -115,12 +123,15 @@ class ActivityManager(object):
         :param force_on_demand: boolean
         :return movement_prep: MovementPrep
         """
-        self.prepare_data(8)  # we don't want to persist this RPE
+        self.prepare_data(default_rpe=8, use_planned_session=True)  # we don't want to persist this RPE
         self.get_session_details()
         movement_prep = self.exercise_assignment_calculator.get_movement_prep(self.athlete_id, force_on_demand=force_on_demand)
-        movement_prep.training_session_id = self.active_training_sessions[0].id
+        # movement_prep.training_session_id = self.active_training_sessions[0].id
+        movement_prep.training_session_id = self.planned_training_session.id
         self.movement_prep_datastore.put(movement_prep)
-        self.save_session()
+
+        # not going to save a planned session
+        # self.save_session()
 
         return movement_prep
 

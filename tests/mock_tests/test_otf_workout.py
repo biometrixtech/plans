@@ -141,10 +141,11 @@ def test_api_mobility_wod_may1():
     user_stats.user_weight = 70
     user_stats.event_date = datetime.datetime.now()
 
-    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats, datastore_collection=mock_datastore_collection)
+    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats,
+                                   datastore_collection=mock_datastore_collection)
     api_processing.create_planned_workout_from_id("1")
 
-    mobility_wod = api_processing.create_activity(activity_type='mobility_wod')
+    movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=workout)
 
     assert 1 == len(api_processing.sessions)
 #
