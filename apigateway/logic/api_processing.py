@@ -27,6 +27,16 @@ class APIProcessing(object):
     def create_planned_workout_from_id(self, program_id):
 
         planned_workout = self.datastore_collection.workout_datastore.get(program_id)
+        user_weight = 60
+
+        if self.user_stats is not None:
+            if self.user_stats.user_weight is not None:
+                user_weight = self.user_stats.user_weight
+            if self.user_stats.fitness_provider_profile is not None:
+                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout,
+                                                                                  assignment_type=self.user_stats.fitness_provider_profile)
+            else:
+                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout)
 
         if planned_workout is not None:
             self.sessions.append(planned_workout)

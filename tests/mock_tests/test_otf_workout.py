@@ -65,6 +65,16 @@ def is_high_intensity_session(training_sessions):
     return False
 
 
+def get_workout(date, file_name):
+    planned_session = PlannedSession()
+    planned_session.event_date = date
+    workout_json = read_json(file_name)
+    # workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
+    planned_workout = PlannedWorkout.json_deserialise(workout_json)
+    planned_session.workout = planned_workout
+
+    return planned_session
+
 def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default'):
     # session = MixedActivitySession()
     # session.event_date = date
@@ -116,19 +126,26 @@ def test_may1():
     print('here')
 
 
-def test_api_may1():
+def test_api_mobility_wod_may1():
 
     mock_datastore_collection = DatastoreCollection()
     workout_datastore = WorkoutDatastore()
 
-    # TODO - make a decision, are we saving the PROCESSED workout or just the workout..and then processing?
-
-    workout = get_session(datetime.datetime.now(), file_name='may1_alt', assignment_type='power_walker')
+    workout = get_workout(datetime.datetime.now(), file_name='may1_alt')
     workout_datastore.side_load_planned_workout(workout)
     mock_datastore_collection.workout_datastore = workout_datastore
+    mock_datastore_collection.exercise_datastore = exercise_library_datastore
 
-    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=None, datastore_collection=mock_datastore_collection)
+    user_stats = UserStats("tester")
+    user_stats.fitness_provider_profile = "power_walker"
+    user_stats.user_weight = 70
+    user_stats.event_date = datetime.datetime.now()
+
+    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats, datastore_collection=mock_datastore_collection)
     api_processing.create_planned_workout_from_id("1")
+
+    mobility_wod = api_processing.create_activity(activity_type='mobility_wod')
+
     assert 1 == len(api_processing.sessions)
 #
 #
