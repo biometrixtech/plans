@@ -7,6 +7,7 @@ from models.user_stats import UserStats
 from utils import parse_date, format_date
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.athlete_injury_risk import AthleteInjuryRisk
+from logic.calculators import Calculators
 
 
 class UserStatsProcessing(object):
@@ -124,6 +125,7 @@ class UserStatsProcessing(object):
         current_user_stats = training_load_processing.calc_training_load_metrics(current_user_stats)
         current_user_stats.high_relative_load_sessions = training_load_processing.high_relative_load_sessions
         current_user_stats.high_relative_load_score = training_load_processing.high_relative_load_score
+        self.update_vo2_max_estimations(current_user_stats)
 
         if current_user_stats.event_date.date() == self.event_date.date():
             # persist all of soreness/pain and session_RPE
@@ -271,6 +273,21 @@ class UserStatsProcessing(object):
         self.last_25_days = self.end_date_time - timedelta(days=25 + adjustment_factor)
         self.previous_week = self.last_week - timedelta(days=7)
         self.days_7_13 = self.previous_week + timedelta(days=1)
+
+    def update_vo2_max_estimations(self, current_user_stats):
+        user_provided_vo2_max = (current_user_stats.vo2_max is not None and
+                                 current_user_stats.vo2_max.observed_value is not None and
+                                 current_user_stats.vo2_max.lower_bound is None and
+                                 current_user_stats.vo2_max.upper_bound is None)
+        if not user_provided_vo2_max:  # TODO: maybe add date check to see if it was recently calculated
+            current_user_stats.vo2_max = Calculators.vo2_max_estimation_demographics(
+                    age=current_user_stats.age,
+                    user_weight=current_user_stats.user_weight,
+                    user_height=current_user_stats.user_height,
+                    gender=current_user_stats.gender,
+                    activity_level=5.0 # need to change
+            )
+            current_user_stats.vo2_max_date_time = self.event_date
 
     # def get_historic_asymmetry(self, sessions):
     #

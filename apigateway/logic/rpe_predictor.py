@@ -1,7 +1,5 @@
 import os
-# import joblib
-# import boto3
-# from fathomapi.api.config import Config
+from models.movement_tags import Gender
 from fathomapi.utils.xray import xray_recorder
 from datastores.ml_model_datastore import MLModelsDatastore
 
@@ -10,17 +8,17 @@ class RPEPredictor(object):
         self.model = MLModelsDatastore.get_hr_model()
 
     @xray_recorder.capture('logic.RPEPredictor.predict_rpe')
-    def predict_rpe(self, hr, user_weight=60.0, user_age=20.0, vo2_max=40.0, female=True):
+    def predict_rpe(self, hr, user_weight=60.0, user_age=20.0, vo2_max=40.0, gender=Gender.female):
         """
 
         :param hr:
         :param user_weight:
         :param user_age:
         :param vo2_max:
-        :param female:
+        :param gender:
         :return:
         """
-        if female:
+        if gender == Gender.female:
             gender = 1.0
         else:
             gender = 0.0

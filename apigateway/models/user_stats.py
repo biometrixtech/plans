@@ -1,8 +1,9 @@
+from models.movement_tags import Gender
 from serialisable import Serialisable
 from models.load_stats import LoadStats
 from models.session import HighLoadSession, HighDetailedLoadSession
 from models.stats import StandardErrorRange
-from utils import format_date, parse_date, format_datetime, parse_datetime
+from utils import parse_date, format_datetime, parse_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
 
@@ -18,10 +19,15 @@ class UserStats(Serialisable):
         self.high_relative_load_sessions = []
         self.high_relative_load_score = 50
         self.eligible_for_high_load_trigger = False
+        self.athlete_age = 25
+        self.athlete_weight = 60.0
+        self.athlete_height = 1.7
+        self.athlete_gender = Gender.female
 
         self.expected_weekly_workouts = 3
 
         self.vo2_max = None
+        self.vo2_max_date_time = None
         self.functional_threshold_power = None
 
         self.average_force_5_day = None
@@ -65,6 +71,11 @@ class UserStats(Serialisable):
             'api_version': self.api_version,
             'timezone': self.timezone,
             'vo2_max': self.vo2_max,
+            'vo2_max_date_time': format_datetime(self.vo2_max_date_time),
+            'athlete_age': self.athlete_age,
+            'athlete_weight': self.athlete_weight,
+            'athlete_height': self.athlete_height,
+            'athlete_gender': self.athlete_gender.value if self.athlete_gender is not None else None,
             'functional_threshold_power': self.functional_threshold_power,
             'average_force_5_day': self.average_force_5_day.json_serialise() if self.average_force_5_day is not None else None,
             'average_force_20_day': self.average_force_20_day.json_serialise() if self.average_force_20_day is not None else None,
@@ -119,6 +130,12 @@ class UserStats(Serialisable):
         user_stats.average_trimp_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_trimp_5_day') is not None else None
         user_stats.average_trimp_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_trimp_20_day') is not None else None
         user_stats.high_relative_load_score = input_dict.get('high_relative_load_score', 50)
+
+        user_stats.vo2_max_date_time = input_dict.get('vo2_max_date_time')
+        user_stats.athlete_age = input_dict.get('athlete_age', 25)
+        user_stats.athlete_weight = input_dict.get('athlete_weight', 60.0)
+        user_stats.athlete_height = input_dict.get('athlete_height', 1.7)
+        user_stats.athlete_gender = input_dict.get('athlete_gender') or Gender.female
 
         return user_stats
 

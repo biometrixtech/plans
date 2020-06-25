@@ -7,7 +7,7 @@ from logic.rpe_predictor import RPEPredictor
 from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
-from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction
+from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
@@ -21,14 +21,14 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 
 
 class WorkoutProcessor(object):
-    def __init__(self, user_age=20, user_weight=60.0, female=True, hr_data=None, vo2_max=40):
+    def __init__(self, user_age=20, user_weight=60.0, gender=Gender.female, hr_data=None, vo2_max=None):
         self.user_age = user_age
         self.user_weight = user_weight
-        self.female = female
+        self.gender = gender
         self.hr_data = hr_data
         self.hr_rpe_predictor = RPEPredictor()
         self.bodyweight_ratio_predictor = BodyWeightRatioPredictor()
-        self.vo2_max = vo2_max
+        self.vo2_max = vo2_max or Calculators.vo2_max_estimation_demographics(age=user_age, user_weight=user_weight, gender=gender)
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_planned_workout')
     def process_planned_workout(self, session, assignment_type):
@@ -197,10 +197,7 @@ class WorkoutProcessor(object):
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = Assignment.multiply_assignments(exercise.duration, exercise.speed)
             # TODO planned exercise predicted RPE?
-            # if exercise.hr is not None:
-            #     exercise.predicted_rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
-            # else:
-            #     exercise.predicted_rpe = exercise.shrz or 4
+            self.set_planned_cardio_rpe(exercise)
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -383,9 +380,9 @@ class WorkoutProcessor(object):
                 elif exercise.cardio_action == CardioAction.cycle:
                     exercise.power = StandardErrorRange(observed_value=Calculators.power_cycling(exercise.speed, user_weight=self.user_weight, grade=exercise.grade))
                 else:  # for all other cardio types
-                    exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
+                    exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
             else:
-                exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
+                exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
 
         if exercise.cardio_action == CardioAction.row:
             exercise.force = StandardErrorRange(observed_value=Calculators.force_rowing(exercise.power.observed_value, exercise.speed))
@@ -409,13 +406,54 @@ class WorkoutProcessor(object):
                 exercise.force.upper_bound = Calculators.force_cycling(exercise.power.upper_bound, exercise.speed)
         else:  # for all other cardio types
             exercise.force = StandardErrorRange(
-                observed_value=Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female))
+                observed_value=Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.gender))
             if exercise.power.lower_bound is not None:
-                exercise.force.lower_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
+                exercise.force.lower_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.gender)
             if exercise.power.upper_bound is not None:
-                exercise.force.upper_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
+                exercise.force.upper_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.gender)
 
         return exercise
+
+    def set_planned_cardio_rpe(self, exercise):
+        # assume planned power is already in place for some of cardio types
+        work_vo2 = StandardErrorRange()
+        if exercise.cardio_action == CardioAction.run:
+            if exercise.power.lower_bound is not None:
+                work_vo2.lower_bound = Calculators.work_vo2_running_from_power(exercise.power.lower_bound, self.user_weight)
+            if exercise.power.observed_value is not None:
+                work_vo2.observed_value = Calculators.work_vo2_running_from_power(exercise.power.observed_value, self.user_weight)
+            if exercise.power.upper_bound is not None:
+                work_vo2.upper_bound = Calculators.work_vo2_running_from_power(exercise.power.upper_bound, self.user_weight)
+        elif exercise.cardio_action == CardioAction.cycle:
+            if exercise.power.lower_bound is not None:
+                work_vo2.lower_bound = Calculators.work_vo2_cycling_alternate(exercise.power.lower_bound, self.user_weight)
+            if exercise.power.observed_value is not None:
+                work_vo2.observed_value = Calculators.work_vo2_cycling_alternate(exercise.power.observed_value, self.user_weight)
+            if exercise.power.upper_bound is not None:
+                work_vo2.upper_bound = Calculators.work_vo2_cycling_alternate(exercise.power.upper_bound, self.user_weight)
+        elif exercise.cardio_action == CardioAction.row:
+            if exercise.power.lower_bound is not None:
+                work_vo2.lower_bound = Calculators.work_vo2_rowing_from_power(exercise.power.lower_bound, self.user_weight)
+            if exercise.power.observed_value is not None:
+                work_vo2.observed_value = Calculators.work_vo2_rowing_from_power(exercise.power.observed_value, self.user_weight)
+            if exercise.power.upper_bound is not None:
+                work_vo2.upper_bound = Calculators.work_vo2_rowing_from_power(exercise.power.upper_bound, self.user_weight)
+        else:
+            work_vo2.observed_value = Calculators.work_vo2_cardio(exercise.cardio_action, self.gender)
+
+        percent_vo2max = work_vo2.plagiarize()
+        # self.vo2_max = StandardErrorRange(lower_bound=30, observed_value=32, upper_bound=35)
+        percent_vo2max.divide_range(self.vo2_max)
+        percent_vo2max.multiply(100)
+        predicted_rpe = StandardErrorRange()
+        if percent_vo2max.lower_bound is not None:
+            predicted_rpe.lower_bound = Calculators.rpe_from_percent_vo2_max(percent_vo2max.lower_bound)
+        if percent_vo2max.observed_value is not None:
+            predicted_rpe.observed_value = Calculators.rpe_from_percent_vo2_max(percent_vo2max.observed_value)
+        if percent_vo2max.upper_bound is not None:
+            predicted_rpe.upper_bound = Calculators.rpe_from_percent_vo2_max(percent_vo2max.upper_bound)
+
+        exercise.predicted_rpe = predicted_rpe
 
     def set_planned_power(self, exercise):
         # if power is not provided, calculate from available dta or estimate
@@ -547,10 +585,10 @@ class WorkoutProcessor(object):
                     exercise.power = power_ranger
                 else:  # for all other cardio types
                     exercise.power = StandardErrorRange(
-                        observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
+                        observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
             else:
                 exercise.power = StandardErrorRange(
-                    observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
+                    observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
 
         return exercise
 
@@ -660,7 +698,7 @@ class WorkoutProcessor(object):
             equipment = Equipment.bodyweight
         if equipment == Equipment.no_equipment:
             equipment = Equipment.bodyweight
-        bodyweight_ratio = self.bodyweight_ratio_predictor.predict_bodyweight_ratio(self.user_weight, self.female, prime_movers, equipment)
+        bodyweight_ratio = self.bodyweight_ratio_predictor.predict_bodyweight_ratio(self.user_weight, self.gender, prime_movers, equipment)
 
         return bodyweight_ratio
 

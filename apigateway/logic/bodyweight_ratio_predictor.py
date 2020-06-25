@@ -1,6 +1,7 @@
 import os
 from datastores.ml_model_datastore import MLModelsDatastore
 from fathomapi.utils.xray import xray_recorder
+from models.movement_tags import Gender
 
 
 
@@ -22,11 +23,11 @@ class BodyWeightRatioPredictor(object):
         self.model = MLModelsDatastore.get_bodyweight_ratio_model()
 
     @xray_recorder.capture('logic.BodyWeightRatioPredictor.predict_bodyweight_ratio')
-    def predict_bodyweight_ratio(self, user_weight, female, prime_movers, equipment):
+    def predict_bodyweight_ratio(self, user_weight, gender, prime_movers, equipment):
         """
 
         :param user_weight:
-        :param female:
+        :param gender:
         :param prime_movers:
         :param equipment:
         :return:
@@ -34,7 +35,7 @@ class BodyWeightRatioPredictor(object):
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
             return .5
         else:
-            gender = 1.0 if female else 0.0
+            gender = 1.0 if gender.name == 'female' else 0.0
             equipment_barbells = 0.0
             equipment_bodyweight = 0.0
             equipment_cable = 0.0

@@ -257,15 +257,46 @@ class StandardErrorRange(Serialisable):
             self.observed_value = self.observed_value / factor
 
     def divide_range(self, standard_error_range):
-        if standard_error_range is not None and standard_error_range.lower_bound is not None and self.lower_bound is not None:
-            if standard_error_range.lower_bound > 0:
-                self.lower_bound = self.lower_bound / float(standard_error_range.lower_bound)
-        if standard_error_range is not None and standard_error_range.upper_bound is not None and self.upper_bound is not None:
-            if standard_error_range.upper_bound > 0:
-                self.upper_bound = self.upper_bound / float(standard_error_range.upper_bound)
-        if standard_error_range is not None and standard_error_range.observed_value is not None and self.observed_value is not None:
-            if standard_error_range.observed_value > 0:
-                self.observed_value = self.observed_value / float(standard_error_range.observed_value)
+        values = []
+        if standard_error_range is not None:
+            if self.lower_bound is not None:
+                if standard_error_range.lower_bound is not None and standard_error_range.lower_bound > 0:
+                    values.append(self.lower_bound / standard_error_range.lower_bound)
+                if standard_error_range.observed_value is not None and standard_error_range.observed_value > 0:
+                    values.append(self.lower_bound / standard_error_range.observed_value)
+                if standard_error_range.upper_bound is not None and standard_error_range.upper_bound > 0:
+                    values.append(self.lower_bound / standard_error_range.upper_bound)
+            if self.observed_value is not None:
+                if standard_error_range.lower_bound is not None and standard_error_range.lower_bound > 0:
+                    values.append(self.observed_value / standard_error_range.lower_bound)
+                if standard_error_range.observed_value is not None and standard_error_range.observed_value > 0:
+                    values.append(self.observed_value / standard_error_range.observed_value)
+                if standard_error_range.upper_bound is not None and standard_error_range.upper_bound > 0:
+                    values.append(self.observed_value / standard_error_range.upper_bound)
+            if self.upper_bound is not None:
+                if standard_error_range.lower_bound is not None and standard_error_range.lower_bound > 0:
+                    values.append(self.upper_bound / standard_error_range.lower_bound)
+                if standard_error_range.observed_value is not None and standard_error_range.observed_value > 0:
+                    values.append(self.upper_bound / standard_error_range.observed_value)
+                if standard_error_range.upper_bound is not None and standard_error_range.upper_bound > 0:
+                    values.append(self.upper_bound / standard_error_range.upper_bound)
+            if len(values) > 0:
+                self.lower_bound = min(values)
+                self.upper_bound = max(values)
+                if self.observed_value is not None and standard_error_range.observed_value is not None:
+                    self.observed_value = self.observed_value / standard_error_range.observed_value
+                else:
+                    self.observed_value = sum(values) / len(values)
+
+        # if standard_error_range is not None and standard_error_range.lower_bound is not None and self.lower_bound is not None:
+        #     if standard_error_range.lower_bound > 0:
+        #         self.lower_bound = self.lower_bound / float(standard_error_range.lower_bound)
+        # if standard_error_range is not None and standard_error_range.upper_bound is not None and self.upper_bound is not None:
+        #     if standard_error_range.upper_bound > 0:
+        #         self.upper_bound = self.upper_bound / float(standard_error_range.upper_bound)
+        # if standard_error_range is not None and standard_error_range.observed_value is not None and self.observed_value is not None:
+        #     if standard_error_range.observed_value > 0:
+        #         self.observed_value = self.observed_value / float(standard_error_range.observed_value)
 
     def max(self, standard_error_range):
         if standard_error_range is not None and standard_error_range.lower_bound is not None:

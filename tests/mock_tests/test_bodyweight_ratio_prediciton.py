@@ -1,4 +1,4 @@
-from models.movement_tags import Equipment
+from models.movement_tags import Equipment, Gender
 from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 
 
@@ -25,5 +25,5 @@ def test_prediction():
     }
     bodyweight = 70
     equipment = Equipment.barbells
-    rm_ratio = BodyWeightRatioPredictor().predict_bodyweight_ratio(bodyweight, True, prime_movers, equipment)
+    rm_ratio = BodyWeightRatioPredictor().predict_bodyweight_ratio(bodyweight, Gender.female, prime_movers, equipment)
     assert rm_ratio > 0
