@@ -548,6 +548,12 @@ class WorkoutProcessor(object):
                 exercise.power = StandardErrorRange(
                     observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
 
+        if exercise.power.lower_bound is None:
+            exercise.power.lower_bound = exercise.power.observed_value
+
+        if exercise.power.upper_bound is None:
+            exercise.power.upper_bound = exercise.power.observed_value
+
         return exercise
 
     @staticmethod

@@ -263,7 +263,7 @@ class PlannedExercise(BaseWorkoutExercise):
                 break
 
         if self.grade is not None and self.grade.min_value is not None and self.grade.max_value is '':
-            self.grade.max_value = 15.0
+            self.grade.max_value = .15
 
         if self.duration is not None and self.duration.min_value is not None and isinstance(self.duration.min_value, str):
             self.duration.min_value = None

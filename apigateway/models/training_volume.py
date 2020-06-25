@@ -424,8 +424,9 @@ class TrainingReport(object):
 
 
 class Assignment(object):
-    def __init__(self, assignment_type=None, assigned_value=None, min_value=None, max_value=None):
+    def __init__(self, assignment_type=None, assigned_value=None, min_value=None, max_value=None, assignment_level="default"):
         self.assignment_type = assignment_type  # e.g. runner/jogger/power walker for OTF. This might have to be provider specific
+        self.assignment_level = assignment_level
         self.assigned_value = assigned_value
         self.min_value = min_value
         self.max_value = max_value

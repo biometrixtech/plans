@@ -6,6 +6,7 @@ from logic.exercise_assignment import ExerciseAssignment
 from models.workout_program import WorkoutProgramModule
 from models.planned_exercise import PlannedWorkout, PlannedWorkoutSection, PlannedExercise
 from models.session import MixedActivitySession, PlannedSession
+from models.training_volume import Assignment
 from models.sport import SportName
 from models.user_stats import UserStats
 from logic.api_processing import APIProcessing
@@ -13,6 +14,7 @@ from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from tests.mocks.mock_workout_datastore import WorkoutDatastore
 from tests.mocks.mock_datastore_collection import DatastoreCollection
+from database.OTF_calculator import OTFCalculator
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
@@ -126,7 +128,125 @@ def test_may1():
     print('here')
 
 
-def test_api_mobility_wod_may1():
+def get_treadmill_exercise(exercise_id, exercise_name, duration_assignment, grade_assignment):
+
+    planned_exercise = PlannedExercise()
+    planned_exercise.name = exercise_name
+    planned_exercise.id = exercise_id
+
+    planned_exercise.duration = duration_assignment
+
+    planned_exercise.grade = grade_assignment
+
+    return  planned_exercise
+
+
+def get_rowing_exercise(exercise_id, exercise_name, duration_assignment, stroke_rate):
+
+    planned_exercise = PlannedExercise()
+    planned_exercise.name = exercise_name
+    planned_exercise.id = exercise_id
+
+    planned_exercise.duration = duration_assignment
+
+    planned_exercise.stroke_rate = stroke_rate
+
+    return  planned_exercise
+
+def test_walking():
+
+    otf_calc = OTFCalculator()
+
+    jogging = get_treadmill_exercise("walk", "walk", Assignment(assigned_value=60.00, min_value='', max_value=''),
+                                     Assignment(assigned_value=.01))
+    jogging.movement_id = "5823768d473c06100052ed9a"
+    jogging.speed = Assignment(assigned_value=1.65)
+
+    running = get_treadmill_exercise("walk", "walk", Assignment(assigned_value=60.00, min_value='', max_value=''),
+                                     Assignment(assigned_value=.01))
+    running.movement_id = "5823768d473c06100052ed9a"
+    running.speed = Assignment(assigned_value=1.65)
+
+    power_walking = get_treadmill_exercise("walk", "walk", Assignment(assignment_type=None, assigned_value=60.00, min_value='', max_value=''),
+                                              otf_calc.get_grade("power_walker", "base", 0))
+    power_walking.movement_id = "5823768d473c06100052ed9a"
+    power_walking.speed = Assignment(assigned_value=1.65)
+
+    workout_processor = WorkoutProcessor()
+
+    workout_processor.add_movement_detail_to_planned_exercise(jogging, "jogger")
+    workout_processor.add_movement_detail_to_planned_exercise(power_walking, "power_walker")
+    workout_processor.add_movement_detail_to_planned_exercise(running, "runner")
+
+    assert jogging.power.observed_value == running.power.observed_value < power_walking.power.observed_value
+    assert power_walking.power.lower_bound < power_walking.power.observed_value < power_walking.power.upper_bound
+
+
+def test_running():
+
+    otf_calc = OTFCalculator()
+
+    jogging = get_treadmill_exercise("run", "run", Assignment(assigned_value=60.00, min_value='', max_value=''),
+                                     Assignment(assigned_value=0.0))
+    jogging.movement_id = "5823768d473c06100052ed9a"
+    jogging.pace = otf_calc.get_pace("jogger", "base")
+
+    running = get_treadmill_exercise("run", "run",
+                                            Assignment(assigned_value=60.00, min_value='', max_value=''),
+                                            Assignment(assigned_value=0.0))
+    running.movement_id = "5823768d473c06100052ed9a"
+    running.pace = otf_calc.get_pace("runner", "base")
+
+    power_walking = get_treadmill_exercise("run", "run",
+                                           Assignment(assignment_type=None, assigned_value=60.00, min_value='',
+                                                      max_value=''), Assignment(assigned_value=0.0))
+    power_walking.movement_id = "5823768d473c06100052ed9a"
+    power_walking.pace = otf_calc.get_pace("power_walker", "base")
+
+    workout_processor = WorkoutProcessor()
+
+    workout_processor.add_movement_detail_to_planned_exercise(jogging, "jogger")
+    workout_processor.add_movement_detail_to_planned_exercise(power_walking, "power_walker")
+    workout_processor.add_movement_detail_to_planned_exercise(running, "runner")
+
+    assert power_walking.power.lower_bound < jogging.power.lower_bound < running.power.lower_bound
+    assert power_walking.power.observed_value < jogging.power.observed_value < running.power.observed_value
+    assert power_walking.power.upper_bound < jogging.power.upper_bound < running.power.upper_bound
+
+
+def test_rowing():
+
+    otf_calc = OTFCalculator()
+
+    activity_name = "row"
+    duration = 180.0
+    movement_id = "58459d9ddc2ce90011f93d84"
+    jogging = get_rowing_exercise(activity_name, activity_name, Assignment(assigned_value=duration, min_value='', max_value=''),
+                                     24)
+    jogging.movement_id = movement_id
+
+    running = get_rowing_exercise(activity_name, activity_name,
+                                            Assignment(assigned_value=duration, min_value='', max_value=''),
+                                            24)
+    running.movement_id = movement_id
+
+    power_walking = get_rowing_exercise(activity_name, activity_name,
+                                           Assignment(assignment_type=None, assigned_value=duration, min_value='',
+                                                      max_value=''), 24)
+    power_walking.movement_id = movement_id
+
+    workout_processor = WorkoutProcessor()
+
+    workout_processor.add_movement_detail_to_planned_exercise(jogging, "jogger")
+    workout_processor.add_movement_detail_to_planned_exercise(power_walking, "power_walker")
+    workout_processor.add_movement_detail_to_planned_exercise(running, "runner")
+
+    assert power_walking.power.lower_bound == jogging.power.lower_bound == running.power.lower_bound
+    assert power_walking.power.observed_value == jogging.power.observed_value == running.power.observed_value
+    assert power_walking.power.upper_bound == jogging.power.upper_bound == running.power.upper_bound
+
+
+def test_api_movement_prep_compare_may1():
 
     mock_datastore_collection = DatastoreCollection()
     workout_datastore = WorkoutDatastore()
@@ -146,9 +266,124 @@ def test_api_mobility_wod_may1():
     api_processing.create_planned_workout_from_id("1")
 
     movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=workout)
+    injury_risk_dict_1 = api_processing.activity_manager.exercise_assignment_calculator.injury_risk_dict
 
-    assert 1 == len(api_processing.sessions)
-#
+    total_concentric_volume_1_lower_bound = 0
+    total_concentric_volume_1_observed = 0
+    total_concentric_volume_1_upper_bound = 0
+
+    for body_part_side, body_part_injury_risk in injury_risk_dict_1.items():
+        total_concentric_volume_1_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
+        total_concentric_volume_1_observed += body_part_injury_risk.concentric_volume_today.observed_value
+        total_concentric_volume_1_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
+
+    mock_datastore_collection_2 = DatastoreCollection()
+    workout_datastore_2 = WorkoutDatastore()
+    workout_2 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_datastore_2.side_load_planned_workout(workout_2)
+    mock_datastore_collection_2.workout_datastore = workout_datastore_2
+    mock_datastore_collection_2.exercise_datastore = exercise_library_datastore
+
+    user_stats_2 = UserStats("tester")
+    user_stats_2.fitness_provider_profile = "jogger"
+    user_stats_2.user_weight = 70
+    user_stats_2.event_date = datetime.datetime.now()
+
+    api_processing_2 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_2,
+                                   datastore_collection=mock_datastore_collection_2)
+    api_processing_2.create_planned_workout_from_id("1")
+
+    movement_prep_2 = api_processing_2.create_activity(activity_type='movement_prep', planned_session=workout_2)
+    injury_risk_dict_2 = api_processing_2.activity_manager.exercise_assignment_calculator.injury_risk_dict
+
+    total_concentric_volume_2_lower_bound = 0
+    total_concentric_volume_2_observed = 0
+    total_concentric_volume_2_upper_bound = 0
+
+    for body_part_side, body_part_injury_risk in injury_risk_dict_2.items():
+        total_concentric_volume_2_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
+        total_concentric_volume_2_observed += body_part_injury_risk.concentric_volume_today.observed_value
+        total_concentric_volume_2_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
+
+    mock_datastore_collection_3 = DatastoreCollection()
+    workout_datastore_3 = WorkoutDatastore()
+    workout_3 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_datastore_3.side_load_planned_workout(workout_3)
+    mock_datastore_collection_3.workout_datastore = workout_datastore_3
+    mock_datastore_collection_3.exercise_datastore = exercise_library_datastore
+
+    user_stats_3 = UserStats("tester")
+    user_stats_3.fitness_provider_profile = "runner"
+    user_stats_3.user_weight = 70
+    user_stats_3.event_date = datetime.datetime.now()
+
+    api_processing_3 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_3,
+                                   datastore_collection=mock_datastore_collection_3)
+    api_processing_3.create_planned_workout_from_id("1")
+
+    movement_prep_3 = api_processing_3.create_activity(activity_type='movement_prep', planned_session=workout_3)
+    injury_risk_dict_3 = api_processing_3.activity_manager.exercise_assignment_calculator.injury_risk_dict
+
+    total_concentric_volume_3_lower_bound = 0
+    total_concentric_volume_3_observed = 0
+    total_concentric_volume_3_upper_bound = 0
+
+    for body_part_side, body_part_injury_risk in injury_risk_dict_3.items():
+        total_concentric_volume_3_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
+        total_concentric_volume_3_observed += body_part_injury_risk.concentric_volume_today.observed_value
+        total_concentric_volume_3_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
+
+    inhibit_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[0].exercises)
+    inhibit_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[0].exercises)
+    inhibit_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[0].exercises)
+
+    static_stretch_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[1].exercises)
+    static_stretch_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[1].exercises)
+    static_stretch_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[1].exercises)
+
+    active_stretch_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[2].exercises)
+    active_stretch_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[2].exercises)
+    active_stretch_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[2].exercises)
+
+    dynamic_stretch_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[3].exercises)
+    dynamic_stretch_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[3].exercises)
+    dynamic_stretch_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[3].exercises)
+
+    isolated_activate_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[4].exercises)
+    isolated_activate_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[4].exercises)
+    isolated_activate_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[4].exercises)
+
+    static_integrate_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[5].exercises)
+    static_integrate_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[5].exercises)
+    static_integrate_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[5].exercises)
+
+    dynamic_integrate_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[6].exercises)
+    dynamic_integrate_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[6].exercises)
+    dynamic_integrate_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[6].exercises)
+
+    assert total_concentric_volume_1_lower_bound < total_concentric_volume_1_observed < total_concentric_volume_1_upper_bound
+    assert total_concentric_volume_2_lower_bound < total_concentric_volume_2_observed < total_concentric_volume_2_upper_bound
+    #assert total_concentric_volume_3_lower_bound < total_concentric_volume_3_observed < total_concentric_volume_3_upper_bound
+    assert total_concentric_volume_1_lower_bound < total_concentric_volume_2_lower_bound
+    assert total_concentric_volume_2_lower_bound < total_concentric_volume_3_lower_bound
+    #assert total_concentric_volume_1_observed < total_concentric_volume_2_observed
+    assert total_concentric_volume_2_observed < total_concentric_volume_3_observed
+    #assert total_concentric_volume_1_upper_bound < total_concentric_volume_2_upper_bound
+    #assert total_concentric_volume_2_upper_bound < total_concentric_volume_3_upper_bound
+    assert inhibit_1_exercise_count != inhibit_2_exercise_count and inhibit_2_exercise_count != inhibit_3_exercise_count
+    assert 0 == static_stretch_1_exercise_count
+    assert 0 == static_stretch_2_exercise_count
+    assert 0 == static_stretch_3_exercise_count
+    assert active_stretch_1_exercise_count != active_stretch_2_exercise_count and active_stretch_1_exercise_count != active_stretch_3_exercise_count
+    assert 0 == dynamic_stretch_1_exercise_count
+    assert 0 == dynamic_stretch_2_exercise_count
+    assert 0 == dynamic_stretch_3_exercise_count
+    assert isolated_activate_1_exercise_count != isolated_activate_2_exercise_count and isolated_activate_1_exercise_count != isolated_activate_3_exercise_count
+    assert static_integrate_1_exercise_count > static_integrate_2_exercise_count == static_integrate_3_exercise_count
+    assert 0 == dynamic_integrate_1_exercise_count
+    assert 0 == dynamic_integrate_2_exercise_count
+    assert 0 == dynamic_integrate_3_exercise_count
+
 #
 # def test_may2():
 #     session = get_session(datetime.datetime.now(), file_name='may2')

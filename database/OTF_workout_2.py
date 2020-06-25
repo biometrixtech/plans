@@ -31,6 +31,8 @@ def parse_file(file_name):
                 exercise = {}
                 exercise['name'] = row['activity']
                 exercise['id'] = row['activity']
+                if row['activity'] == 'walk':
+                    exercise['speed'] = 1.56
                 exercise['movement_id'] = row['movement']
                 if is_valid(row, 'duration_value') or is_valid(row, 'duration_min') or is_valid(row, 'duration_max'):  #if not np.isnan(row['duration']):
                     duration_assignment = {
