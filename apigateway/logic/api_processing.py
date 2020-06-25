@@ -33,9 +33,9 @@ class APIProcessing(object):
         if self.user_stats is not None:
             if self.user_stats.athlete_weight is not None:
                 user_weight = self.user_stats.athlete_weight
-            if self.user_stats.fitness_provider_profile is not None:
+            if self.user_stats.fitness_provider_cardio_profile is not None:
                 WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout,
-                                                                                  assignment_type=self.user_stats.fitness_provider_profile)
+                                                                                  assignment_type=self.user_stats.fitness_provider_cardio_profile)
             else:
                 WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout)
 

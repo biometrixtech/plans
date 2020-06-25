@@ -186,21 +186,22 @@ def test_running():
 
     otf_calc = OTFCalculator()
 
-    jogging = get_treadmill_exercise("run", "run", Assignment(assigned_value=60.00, min_value='', max_value=''),
-                                     Assignment(assigned_value=0.0))
-    jogging.movement_id = "5823768d473c06100052ed9a"
+    movement_id = "5823768d473c06100052ed9a"
+
+    duration_assignment = Assignment(assigned_value=60.00, min_value='', max_value='')
+    grade_assignment = Assignment(assigned_value=0.0)
+
+    jogging = get_treadmill_exercise("run", "run", duration_assignment, grade_assignment)
+    jogging.movement_id = movement_id
     jogging.pace = otf_calc.get_pace("jogger", "base")
 
-    running = get_treadmill_exercise("run", "run",
-                                            Assignment(assigned_value=60.00, min_value='', max_value=''),
-                                            Assignment(assigned_value=0.0))
-    running.movement_id = "5823768d473c06100052ed9a"
+    running = get_treadmill_exercise("run", "run", duration_assignment, grade_assignment)
+    running.movement_id = movement_id
     running.pace = otf_calc.get_pace("runner", "base")
 
     power_walking = get_treadmill_exercise("run", "run",
-                                           Assignment(assignment_type=None, assigned_value=60.00, min_value='',
-                                                      max_value=''), Assignment(assigned_value=0.0))
-    power_walking.movement_id = "5823768d473c06100052ed9a"
+                                           duration_assignment, grade_assignment)
+    power_walking.movement_id = movement_id
     power_walking.pace = otf_calc.get_pace("power_walker", "base")
 
     workout_processor = WorkoutProcessor()
@@ -214,25 +215,53 @@ def test_running():
     assert power_walking.power.upper_bound < jogging.power.upper_bound < running.power.upper_bound
 
 
-def test_rowing():
+def test_running_diff_inclines():
 
     otf_calc = OTFCalculator()
 
+    movement_id = "5823768d473c06100052ed9a"
+
+    duration_assignment = Assignment(assigned_value=90.00, min_value='', max_value='')
+    base_grade_assignment = Assignment(assigned_value=.06)
+    power_walker_grade_assignment = Assignment(min_value=.08, max_value=.15)
+
+    jogging = get_treadmill_exercise("run", "run", duration_assignment, base_grade_assignment)
+    jogging.movement_id = movement_id
+    jogging.pace = otf_calc.get_pace("jogger", "base")
+
+    running = get_treadmill_exercise("run", "run", duration_assignment, base_grade_assignment)
+    running.movement_id = movement_id
+    running.pace = otf_calc.get_pace("runner", "base")
+
+    power_walking = get_treadmill_exercise("run", "run",
+                                           duration_assignment, power_walker_grade_assignment)
+    power_walking.movement_id = movement_id
+    power_walking.pace = otf_calc.get_pace("power_walker", "base")
+
+    workout_processor = WorkoutProcessor()
+
+    workout_processor.add_movement_detail_to_planned_exercise(jogging, "jogger")
+    workout_processor.add_movement_detail_to_planned_exercise(power_walking, "power_walker")
+    workout_processor.add_movement_detail_to_planned_exercise(running, "runner")
+
+    assert power_walking.power.lower_bound < jogging.power.lower_bound < running.power.lower_bound
+    assert power_walking.power.observed_value < jogging.power.observed_value < running.power.observed_value
+    assert power_walking.power.upper_bound > jogging.power.upper_bound < running.power.upper_bound
+
+
+def test_rowing():
+
     activity_name = "row"
-    duration = 180.0
     movement_id = "58459d9ddc2ce90011f93d84"
-    jogging = get_rowing_exercise(activity_name, activity_name, Assignment(assigned_value=duration, min_value='', max_value=''),
-                                     24)
+    duration = 180.0
+    duration_assignment = Assignment(assigned_value=duration, min_value='', max_value='')
+    jogging = get_rowing_exercise(activity_name, activity_name, duration_assignment, 24)
     jogging.movement_id = movement_id
 
-    running = get_rowing_exercise(activity_name, activity_name,
-                                            Assignment(assigned_value=duration, min_value='', max_value=''),
-                                            24)
+    running = get_rowing_exercise(activity_name, activity_name, duration_assignment, 24)
     running.movement_id = movement_id
 
-    power_walking = get_rowing_exercise(activity_name, activity_name,
-                                           Assignment(assignment_type=None, assigned_value=duration, min_value='',
-                                                      max_value=''), 24)
+    power_walking = get_rowing_exercise(activity_name, activity_name, duration_assignment, 24)
     power_walking.movement_id = movement_id
 
     workout_processor = WorkoutProcessor()
@@ -246,8 +275,7 @@ def test_rowing():
     assert power_walking.power.upper_bound == jogging.power.upper_bound == running.power.upper_bound
 
 
-def test_api_movement_prep_compare_may1():
-
+def test_api_movement_prep_compare_exercise_counts():
     mock_datastore_collection = DatastoreCollection()
     workout_datastore = WorkoutDatastore()
 
@@ -257,25 +285,15 @@ def test_api_movement_prep_compare_may1():
     mock_datastore_collection.exercise_datastore = exercise_library_datastore
 
     user_stats = UserStats("tester")
-    user_stats.fitness_provider_profile = "power_walker"
+    user_stats.fitness_provider_cardio_profile = "power_walker"
     user_stats.athlete_weight = 70
     user_stats.event_date = datetime.datetime.now()
 
-    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats,
+    api_processing = APIProcessing("tester", datetime.datetime.now(), user_stats=user_stats,
                                    datastore_collection=mock_datastore_collection)
     api_processing.create_planned_workout_from_id("1")
 
     movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=workout)
-    injury_risk_dict_1 = api_processing.activity_manager.exercise_assignment_calculator.injury_risk_dict
-
-    total_concentric_volume_1_lower_bound = 0
-    total_concentric_volume_1_observed = 0
-    total_concentric_volume_1_upper_bound = 0
-
-    for body_part_side, body_part_injury_risk in injury_risk_dict_1.items():
-        total_concentric_volume_1_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
-        total_concentric_volume_1_observed += body_part_injury_risk.concentric_volume_today.observed_value
-        total_concentric_volume_1_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
 
     mock_datastore_collection_2 = DatastoreCollection()
     workout_datastore_2 = WorkoutDatastore()
@@ -285,25 +303,15 @@ def test_api_movement_prep_compare_may1():
     mock_datastore_collection_2.exercise_datastore = exercise_library_datastore
 
     user_stats_2 = UserStats("tester")
-    user_stats_2.fitness_provider_profile = "jogger"
+    user_stats_2.fitness_provider_cardio_profile = "jogger"
     user_stats_2.athlete_weight = 70
     user_stats_2.event_date = datetime.datetime.now()
 
-    api_processing_2 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_2,
-                                   datastore_collection=mock_datastore_collection_2)
+    api_processing_2 = APIProcessing("tester", datetime.datetime.now(), user_stats=user_stats_2,
+                                     datastore_collection=mock_datastore_collection_2)
     api_processing_2.create_planned_workout_from_id("1")
 
     movement_prep_2 = api_processing_2.create_activity(activity_type='movement_prep', planned_session=workout_2)
-    injury_risk_dict_2 = api_processing_2.activity_manager.exercise_assignment_calculator.injury_risk_dict
-
-    total_concentric_volume_2_lower_bound = 0
-    total_concentric_volume_2_observed = 0
-    total_concentric_volume_2_upper_bound = 0
-
-    for body_part_side, body_part_injury_risk in injury_risk_dict_2.items():
-        total_concentric_volume_2_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
-        total_concentric_volume_2_observed += body_part_injury_risk.concentric_volume_today.observed_value
-        total_concentric_volume_2_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
 
     mock_datastore_collection_3 = DatastoreCollection()
     workout_datastore_3 = WorkoutDatastore()
@@ -313,25 +321,15 @@ def test_api_movement_prep_compare_may1():
     mock_datastore_collection_3.exercise_datastore = exercise_library_datastore
 
     user_stats_3 = UserStats("tester")
-    user_stats_3.fitness_provider_profile = "runner"
+    user_stats_3.fitness_provider_cardio_profile = "runner"
     user_stats_3.athlete_weight = 70
     user_stats_3.event_date = datetime.datetime.now()
 
-    api_processing_3 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_3,
-                                   datastore_collection=mock_datastore_collection_3)
+    api_processing_3 = APIProcessing("tester", datetime.datetime.now(), user_stats=user_stats_3,
+                                     datastore_collection=mock_datastore_collection_3)
     api_processing_3.create_planned_workout_from_id("1")
 
     movement_prep_3 = api_processing_3.create_activity(activity_type='movement_prep', planned_session=workout_3)
-    injury_risk_dict_3 = api_processing_3.activity_manager.exercise_assignment_calculator.injury_risk_dict
-
-    total_concentric_volume_3_lower_bound = 0
-    total_concentric_volume_3_observed = 0
-    total_concentric_volume_3_upper_bound = 0
-
-    for body_part_side, body_part_injury_risk in injury_risk_dict_3.items():
-        total_concentric_volume_3_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
-        total_concentric_volume_3_observed += body_part_injury_risk.concentric_volume_today.observed_value
-        total_concentric_volume_3_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
 
     inhibit_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[0].exercises)
     inhibit_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[0].exercises)
@@ -361,28 +359,125 @@ def test_api_movement_prep_compare_may1():
     dynamic_integrate_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[6].exercises)
     dynamic_integrate_3_exercise_count = len(movement_prep_3.movement_integration_prep.exercise_phases[6].exercises)
 
-    assert total_concentric_volume_1_lower_bound < total_concentric_volume_1_observed < total_concentric_volume_1_upper_bound
-    assert total_concentric_volume_2_lower_bound < total_concentric_volume_2_observed < total_concentric_volume_2_upper_bound
-    #assert total_concentric_volume_3_lower_bound < total_concentric_volume_3_observed < total_concentric_volume_3_upper_bound
-    assert total_concentric_volume_1_lower_bound < total_concentric_volume_2_lower_bound
-    assert total_concentric_volume_2_lower_bound < total_concentric_volume_3_lower_bound
-    #assert total_concentric_volume_1_observed < total_concentric_volume_2_observed
-    assert total_concentric_volume_2_observed < total_concentric_volume_3_observed
-    #assert total_concentric_volume_1_upper_bound < total_concentric_volume_2_upper_bound
-    #assert total_concentric_volume_2_upper_bound < total_concentric_volume_3_upper_bound
-    #assert inhibit_1_exercise_count != inhibit_2_exercise_count and inhibit_2_exercise_count != inhibit_3_exercise_count
+    assert 0 < inhibit_1_exercise_count
+    assert 0 < inhibit_2_exercise_count
+    assert 0 < inhibit_3_exercise_count
     assert 0 == static_stretch_1_exercise_count
     assert 0 == static_stretch_2_exercise_count
     assert 0 == static_stretch_3_exercise_count
-    #assert active_stretch_1_exercise_count != active_stretch_2_exercise_count and active_stretch_1_exercise_count != active_stretch_3_exercise_count
+    assert 0 < active_stretch_1_exercise_count
+    assert 0 < active_stretch_2_exercise_count
+    assert 0 < active_stretch_3_exercise_count
     assert 0 == dynamic_stretch_1_exercise_count
     assert 0 == dynamic_stretch_2_exercise_count
     assert 0 == dynamic_stretch_3_exercise_count
-    # assert isolated_activate_1_exercise_count != isolated_activate_2_exercise_count and isolated_activate_1_exercise_count != isolated_activate_3_exercise_count
-    #assert static_integrate_1_exercise_count > static_integrate_2_exercise_count == static_integrate_3_exercise_count
+    assert 0 < isolated_activate_1_exercise_count
+    assert 0 < isolated_activate_2_exercise_count
+    assert 0 < isolated_activate_3_exercise_count
+    assert 0 == static_integrate_1_exercise_count
+    assert 0 == static_integrate_2_exercise_count
+    assert 0 == static_integrate_3_exercise_count
     assert 0 == dynamic_integrate_1_exercise_count
     assert 0 == dynamic_integrate_2_exercise_count
     assert 0 == dynamic_integrate_3_exercise_count
+
+
+def test_api_movement_prep_compare_volume_may1_alt():
+
+    mock_datastore_collection = DatastoreCollection()
+    workout_datastore = WorkoutDatastore()
+
+    workout = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_datastore.side_load_planned_workout(workout)
+    mock_datastore_collection.workout_datastore = workout_datastore
+    mock_datastore_collection.exercise_datastore = exercise_library_datastore
+
+    user_stats = UserStats("tester")
+    user_stats.fitness_provider_cardio_profile = "power_walker"
+    user_stats.athlete_weight = 70
+    user_stats.event_date = datetime.datetime.now()
+
+    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats,
+                                   datastore_collection=mock_datastore_collection)
+    api_processing.create_planned_workout_from_id("1")
+
+    movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=workout)
+    injury_risk_dict_1 = api_processing.activity_manager.exercise_assignment_calculator.injury_risk_dict
+
+    total_concentric_volume_1_lower_bound = 0
+    total_concentric_volume_1_observed = 0
+    total_concentric_volume_1_upper_bound = 0
+
+    for body_part_side, body_part_injury_risk in injury_risk_dict_1.items():
+        total_concentric_volume_1_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
+        total_concentric_volume_1_observed += body_part_injury_risk.concentric_volume_today.observed_value
+        total_concentric_volume_1_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
+
+    mock_datastore_collection_2 = DatastoreCollection()
+    workout_datastore_2 = WorkoutDatastore()
+    workout_2 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_datastore_2.side_load_planned_workout(workout_2)
+    mock_datastore_collection_2.workout_datastore = workout_datastore_2
+    mock_datastore_collection_2.exercise_datastore = exercise_library_datastore
+
+    user_stats_2 = UserStats("tester")
+    user_stats_2.fitness_provider_cardio_profile = "jogger"
+    user_stats_2.athlete_weight = 70
+    user_stats_2.event_date = datetime.datetime.now()
+
+    api_processing_2 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_2,
+                                   datastore_collection=mock_datastore_collection_2)
+    api_processing_2.create_planned_workout_from_id("1")
+
+    movement_prep_2 = api_processing_2.create_activity(activity_type='movement_prep', planned_session=workout_2)
+    injury_risk_dict_2 = api_processing_2.activity_manager.exercise_assignment_calculator.injury_risk_dict
+
+    total_concentric_volume_2_lower_bound = 0
+    total_concentric_volume_2_observed = 0
+    total_concentric_volume_2_upper_bound = 0
+
+    for body_part_side, body_part_injury_risk in injury_risk_dict_2.items():
+        total_concentric_volume_2_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
+        total_concentric_volume_2_observed += body_part_injury_risk.concentric_volume_today.observed_value
+        total_concentric_volume_2_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
+
+    mock_datastore_collection_3 = DatastoreCollection()
+    workout_datastore_3 = WorkoutDatastore()
+    workout_3 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_datastore_3.side_load_planned_workout(workout_3)
+    mock_datastore_collection_3.workout_datastore = workout_datastore_3
+    mock_datastore_collection_3.exercise_datastore = exercise_library_datastore
+
+    user_stats_3 = UserStats("tester")
+    user_stats_3.fitness_provider_cardio_profile = "runner"
+    user_stats_3.athlete_weight = 70
+    user_stats_3.event_date = datetime.datetime.now()
+
+    api_processing_3 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_3,
+                                   datastore_collection=mock_datastore_collection_3)
+    api_processing_3.create_planned_workout_from_id("1")
+
+    movement_prep_3 = api_processing_3.create_activity(activity_type='movement_prep', planned_session=workout_3)
+    injury_risk_dict_3 = api_processing_3.activity_manager.exercise_assignment_calculator.injury_risk_dict
+
+    total_concentric_volume_3_lower_bound = 0
+    total_concentric_volume_3_observed = 0
+    total_concentric_volume_3_upper_bound = 0
+
+    for body_part_side, body_part_injury_risk in injury_risk_dict_3.items():
+        total_concentric_volume_3_lower_bound += body_part_injury_risk.concentric_volume_today.lower_bound
+        total_concentric_volume_3_observed += body_part_injury_risk.concentric_volume_today.observed_value
+        total_concentric_volume_3_upper_bound += body_part_injury_risk.concentric_volume_today.upper_bound
+
+    assert total_concentric_volume_1_lower_bound < total_concentric_volume_1_observed < total_concentric_volume_1_upper_bound
+    assert total_concentric_volume_2_lower_bound < total_concentric_volume_2_observed < total_concentric_volume_2_upper_bound
+    assert total_concentric_volume_3_lower_bound < total_concentric_volume_3_observed < total_concentric_volume_3_upper_bound
+    assert total_concentric_volume_1_lower_bound < total_concentric_volume_2_lower_bound
+    assert total_concentric_volume_2_lower_bound < total_concentric_volume_3_lower_bound
+    assert total_concentric_volume_1_observed < total_concentric_volume_2_observed
+    assert total_concentric_volume_2_observed < total_concentric_volume_3_observed
+    assert total_concentric_volume_1_upper_bound < total_concentric_volume_2_upper_bound
+    assert total_concentric_volume_2_upper_bound < total_concentric_volume_3_upper_bound
 
 #
 # def test_may2():

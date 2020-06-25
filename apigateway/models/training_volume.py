@@ -464,20 +464,20 @@ class Assignment(object):
 
     def json_serialise(self):
         ret = {
-            'assignment_type': self.assignment_type,
-            'assigned_value': self.assigned_value,
-            'min_value': self.min_value,
-            'max_value': self.max_value
+            'assignment_type': self.assignment_type if self.assignment_type is not None else None,
+            'assigned_value': self.assigned_value if self.assigned_value is not None else None,
+            'min_value': self.min_value if self.min_value is not None else None,
+            'max_value': self.max_value if self.max_value is not None else None
         }
         return ret
 
     @classmethod
     def json_deserialise(cls, input_dict):
         assignment = cls()
-        assignment.assignment_type = input_dict.get('assignment_type')
-        assignment.assigned_value = input_dict.get('assigned_value')
-        assignment.min_value = input_dict.get('min_value')
-        assignment.max_value = input_dict.get('max_value')
+        assignment.assignment_type = input_dict.get('assignment_type') if input_dict.get('assignment_type') is not None else None
+        assignment.assigned_value = input_dict.get('assigned_value') if input_dict.get('assigned_value') is not None else None
+        assignment.min_value = input_dict.get('min_value') if input_dict.get('min_value') is not None else None
+        assignment.max_value = input_dict.get('max_value') if input_dict.get('max_value') is not None else None
 
         return assignment
 

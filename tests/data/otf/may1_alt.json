@@ -8,6 +8,9 @@
                 {
                     "name": "walk",
                     "id": "walk",
+                    "speed": {
+                        "assigned_value": 1.56
+                    },
                     "movement_id": "5873d05eb06dc50011d08796",
                     "duration": {
                         "assigned_value": 60.0,
@@ -41,17 +44,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [],
@@ -90,17 +97,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -127,17 +138,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -164,17 +179,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -201,17 +220,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -237,13 +260,22 @@
                     },
                     "alternate_pace": [
                         {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.34369173399627095,
                             "max_value": 0.2983219390926041
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.29894344313238036
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
                         }
                     ],
                     "alternate_grade": [
@@ -269,12 +301,22 @@
                     },
                     "alternate_pace": [
                         {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
                             "assignment_type": "jogger",
-                            "min_value": 0.2983219390926041
+                            "assigned_value": null,
+                            "min_value": 0.2983219390926041,
+                            "max_value": 0.22374145431945308
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.29894344313238036
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
                         }
                     ],
                     "alternate_grade": [
@@ -294,6 +336,9 @@
                 {
                     "name": "walk",
                     "id": "walk",
+                    "speed": {
+                        "assigned_value": 1.56
+                    },
                     "movement_id": "5873d05eb06dc50011d08796",
                     "duration": {
                         "assigned_value": 60.0,
@@ -318,17 +363,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [],
@@ -354,17 +403,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -391,17 +444,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -428,17 +485,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -465,17 +526,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -501,13 +566,22 @@
                     },
                     "alternate_pace": [
                         {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.34369173399627095,
                             "max_value": 0.2983219390926041
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.29894344313238036
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
                         }
                     ],
                     "alternate_grade": [
@@ -533,12 +607,22 @@
                     },
                     "alternate_pace": [
                         {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
                             "assignment_type": "jogger",
-                            "min_value": 0.2983219390926041
+                            "assigned_value": null,
+                            "min_value": 0.2983219390926041,
+                            "max_value": 0.22374145431945308
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.29894344313238036
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
                         }
                     ],
                     "alternate_grade": [
@@ -558,6 +642,9 @@
                 {
                     "name": "walk",
                     "id": "walk",
+                    "speed": {
+                        "assigned_value": 1.56
+                    },
                     "movement_id": "5873d05eb06dc50011d08796",
                     "duration": {
                         "assigned_value": 60.0,
@@ -582,17 +669,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [],
@@ -618,17 +709,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -655,17 +750,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -692,17 +791,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -729,17 +832,21 @@
                     "alternate_pace": [
                         {
                             "assignment_type": "power_walker",
+                            "assigned_value": null,
                             "min_value": 0.6389061528899938,
                             "max_value": 0.49720323182100684
                         },
                         {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.4978247358607831,
                             "max_value": 0.40708514605344936
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.4077066500932256
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
                         }
                     ],
                     "alternate_grade": [
@@ -765,13 +872,22 @@
                     },
                     "alternate_pace": [
                         {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
                             "assignment_type": "jogger",
+                            "assigned_value": null,
                             "min_value": 0.34369173399627095,
                             "max_value": 0.2983219390926041
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.29894344313238036
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
                         }
                     ],
                     "alternate_grade": [
@@ -797,12 +913,22 @@
                     },
                     "alternate_pace": [
                         {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
                             "assignment_type": "jogger",
-                            "min_value": 0.2983219390926041
+                            "assigned_value": null,
+                            "min_value": 0.2983219390926041,
+                            "max_value": 0.22374145431945308
                         },
                         {
                             "assignment_type": "runner",
-                            "min_value": 0.29894344313238036
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
                         }
                     ],
                     "alternate_grade": [

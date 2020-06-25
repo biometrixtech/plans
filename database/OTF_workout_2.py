@@ -1,6 +1,7 @@
 import os
 import json
 import pandas as pd
+from database.OTF_calculator import OTFCalculator
 
 def is_valid(row, name):
     if row.get(name) is not None and row[name] != "" and row[name] != "none":
@@ -11,6 +12,8 @@ def parse_file(file_name):
     data = pd.read_csv(f'{file_name}.csv')
     data = data.fillna('')
     sections = {}
+
+    otf_calc = OTFCalculator()
 
     for i, row in data.iterrows():
         if is_valid(row, 'movement'):  #row.get('movement') is not None and row['movement'] != "":
@@ -32,7 +35,9 @@ def parse_file(file_name):
                 exercise['name'] = row['activity']
                 exercise['id'] = row['activity']
                 if row['activity'] == 'walk':
-                    exercise['speed'] = 1.56
+                    exercise['speed'] = {
+                        'assigned_value': 1.56
+                    }
                 exercise['movement_id'] = row['movement']
                 if is_valid(row, 'duration_value') or is_valid(row, 'duration_min') or is_valid(row, 'duration_max'):  #if not np.isnan(row['duration']):
                     duration_assignment = {
@@ -58,47 +63,56 @@ def parse_file(file_name):
                 if is_valid(row, 'pace'):  #if not np.isnan(row['pace']):
                     if row['pace'] == 'base':
 
-                        pw_pace = {
-                            'assignment_type': "power_walker",
-                            'min_value': 1028 / 1609,
-                            'max_value': 800 / 1609,
-                        }
-                        jog_pace = {
-                            'assignment_type': "jogger",
-                            'min_value': 801 / 1609,
-                            'max_value': 655 / 1609,
-                        }
-                        run_pace = {
-                            'assignment_type': "runner",
-                            'min_value': 656 / 1609
-                        }
+                        # pw_pace = {
+                        #     'assignment_type': "power_walker",
+                        #     'min_value': 1028 / 1609,
+                        #     'max_value': 800 / 1609,
+                        # }
+                        pw_pace = otf_calc.get_pace("power_walker", "base").json_serialise()
+                        # jog_pace = {
+                        #     'assignment_type': "jogger",
+                        #     'min_value': 801 / 1609,
+                        #     'max_value': 655 / 1609,
+                        # }
+                        jog_pace = otf_calc.get_pace("jogger", "base").json_serialise()
+                        # run_pace = {
+                        #     'assignment_type': "runner",
+                        #     'min_value': 656 / 1609
+                        # }
+                        run_pace = otf_calc.get_pace("runner", "base").json_serialise()
                         pace_alternatives = [pw_pace, jog_pace, run_pace]
                         # pw: 1028 - 800 (3.5 - 4.5)
                         # jog: 801 - 655 (4.5 - 5.5)
                         # run: 656 - x (5.5 +)
                         exercise['alternate_pace'] = pace_alternatives
                     elif row['pace'] == 'push':
-                        jog_pace = {
-                            'assignment_type': "jogger",
-                            'min_value': 553 / 1609,
-                            'max_value': 480 / 1609,
-                        }
+                        pw_pace = otf_calc.get_pace("power_walker", "push").json_serialise()
+                        # jog_pace = {
+                        #     'assignment_type': "jogger",
+                        #     'min_value': 553 / 1609,
+                        #     'max_value': 480 / 1609,
+                        # }
+                        jog_pace = otf_calc.get_pace("jogger", "push").json_serialise()
                         run_pace = {
                             'assignment_type': "runner",
                             'min_value': 481 / 1609
                         }
-                        pace_alternatives = [jog_pace, run_pace]
+                        run_pace = otf_calc.get_pace("runner", "push").json_serialise()
+                        pace_alternatives = [pw_pace, jog_pace, run_pace]
                         exercise['alternate_pace'] = pace_alternatives
                     elif row['pace'] == 'all_out':
-                        jog_pace = {
-                            'assignment_type': "jogger",
-                            'min_value': 480 / 1609
-                        }
-                        run_pace = {
-                            'assignment_type': "runner",
-                            'min_value': 481 / 1609
-                        }
-                        pace_alternatives = [jog_pace, run_pace]
+                        pw_pace = otf_calc.get_pace("power_walker", "all_out").json_serialise()
+                        # jog_pace = {
+                        #     'assignment_type': "jogger",
+                        #     'min_value': 480 / 1609
+                        # }
+                        jog_pace = otf_calc.get_pace("jogger", "all_out").json_serialise()
+                        # run_pace = {
+                        #     'assignment_type': "runner",
+                        #     'min_value': 481 / 1609
+                        # }
+                        run_pace = otf_calc.get_pace("runner", "all_out").json_serialise()
+                        pace_alternatives = [pw_pace, jog_pace, run_pace]
                         exercise['alternate_pace'] = pace_alternatives
                 incline_alternatives = []
 

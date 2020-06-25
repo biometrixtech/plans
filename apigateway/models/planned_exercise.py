@@ -268,7 +268,7 @@ class PlannedExercise(BaseWorkoutExercise):
         if self.duration is not None and self.duration.min_value is not None and isinstance(self.duration.min_value, str):
             self.duration.min_value = None
         else:
-            if self.duration is not None:
+            if self.duration is not None and self.duration.min_value is not None :
                 self.duration.assigned_value = None
 
         if self.duration is not None and self.duration.max_value is not None and isinstance(self.duration.max_value, str):
