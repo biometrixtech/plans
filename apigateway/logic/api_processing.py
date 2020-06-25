@@ -31,8 +31,8 @@ class APIProcessing(object):
         user_weight = 60
 
         if self.user_stats is not None:
-            if self.user_stats.user_weight is not None:
-                user_weight = self.user_stats.user_weight
+            if self.user_stats.athlete_weight is not None:
+                user_weight = self.user_stats.athlete_weight
             if self.user_stats.fitness_provider_profile is not None:
                 WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout,
                                                                                   assignment_type=self.user_stats.fitness_provider_profile)
@@ -92,7 +92,12 @@ class APIProcessing(object):
             session_obj.workout_program_module.user_id = session_obj.user_id
             session_obj.workout_program_module.event_date_time = session_obj.event_date
             hr_workout = self.heart_rate_data[0].hr_workout if len(self.heart_rate_data) > 0 else None
-            session_obj = WorkoutProcessor(hr_data=hr_workout, user_age=self.user_age).process_workout(session_obj)
+            session_obj = WorkoutProcessor(
+                    user_age=self.user_age,
+                    hr_data=hr_workout,
+                    vo2_max=self.user_stats.vo2_max,
+                    gender=self.user_stats.gender
+            ).process_workout(session_obj)
             #session_obj.update_training_loads(session_training_load)
             self.workout_programs.append(session_obj.workout_program_module)
         if len(self.heart_rate_data) > 0:

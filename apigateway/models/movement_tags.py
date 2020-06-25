@@ -133,3 +133,8 @@ class MovementSurfaceStability(Enum):
     stable = 0
     unstable = 1
     very_unstable = 2
+
+
+class Gender(Enum):
+    female = 0
+    male = 1

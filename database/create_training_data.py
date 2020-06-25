@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 from logic.calculators import ftp_from_population, power_running, power_cycling
 
 
-# def ftp_from_population(weight, athletic_level=None, female=True):
+# def ftp_from_population(weight, athletic_level=None, gender=True):
 #     """
 #     from Garmin
 #     https://www8.garmin.com/manuals/webhelp/edge520/EN-US/GUID-1F58FA8E-09FF-4E51-B9B4-C4B83ED1D6CE.html
@@ -17,7 +17,7 @@ from logic.calculators import ftp_from_population, power_running, power_cycling
 #         'untrained': (0, 2.23)
 #      }
 #
-#     female = {
+#     gender = {
 #         'superior': (4.5, None),
 #         'excellent': (3.33, 4.29),
 #         'good': (2.36, 3.32),
@@ -27,7 +27,7 @@ from logic.calculators import ftp_from_population, power_running, power_cycling
 #
 #     :param weight:
 #     :param athletic_level:
-#     :param female:
+#     :param gender:
 #     :return:
 #     """
 #     population_fpt = {
@@ -38,7 +38,7 @@ from logic.calculators import ftp_from_population, power_running, power_cycling
 #             'fair': 2.5,
 #             'untrained': 1.12
 #          },
-#         'female': {
+#         'gender': {
 #             'superior': 4.5,
 #             'excellent': 3.81,
 #             'good': 2.84,
@@ -46,8 +46,8 @@ from logic.calculators import ftp_from_population, power_running, power_cycling
 #             'untrained': .95
 #          }
 #     }
-#     if female:
-#         ftp_per_kg = population_fpt.get('female').get(athletic_level, 2.12)  # use fair as default
+#     if gender:
+#         ftp_per_kg = population_fpt.get('gender').get(athletic_level, 2.12)  # use fair as default
 #     else:
 #         ftp_per_kg = population_fpt.get('male').get(athletic_level, 2.5)  # use fair as default
 #
@@ -105,7 +105,7 @@ def simulate_ftp_data(x, y):
                     "percent_ftp": percent_ftp / 100,
                     "rpe": rpe,
                     "weight": weight,
-                    "female": female,
+                    "gender": female,
                     "watts": watts,
                     "activity": activity
                 }

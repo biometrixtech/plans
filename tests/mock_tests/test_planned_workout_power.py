@@ -15,9 +15,7 @@ def test_planned_power_running_both_assigned():
     exercise.speed = Assignment(assigned_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is None
-    assert exercise.power.upper_bound is None
+    assert exercise.power.observed_value == exercise.power.lower_bound == exercise.power.upper_bound
 
 
 def test_planned_power_running_speed_assigned_grade_min():
@@ -26,10 +24,8 @@ def test_planned_power_running_speed_assigned_grade_min():
     exercise.speed = Assignment(assigned_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is not None
-    assert exercise.power.upper_bound is None
 
+    assert exercise.power.observed_value == exercise.power.upper_bound
     assert exercise.power.lower_bound <= exercise.power.observed_value
 
 
@@ -52,11 +48,7 @@ def test_planned_power_running_speed_min_grade_assigned():
     exercise.speed = Assignment(min_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is not None
-    assert exercise.power.upper_bound is None
-
-    assert exercise.power.lower_bound == exercise.power.observed_value
+    assert exercise.power.observed_value == exercise.power.lower_bound == exercise.power.upper_bound
 
 
 def test_planned_power_running_speed_min_and_max_grade_assigned():
@@ -65,9 +57,6 @@ def test_planned_power_running_speed_min_and_max_grade_assigned():
     exercise.speed = Assignment(min_value=2, max_value=4)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is not None
-    assert exercise.power.upper_bound is not None
 
     assert exercise.power.lower_bound <= exercise.power.observed_value <= exercise.power.upper_bound
 
@@ -90,9 +79,7 @@ def test_planned_power_rowing_speed_assigned():
     exercise.speed = Assignment(assigned_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is None
-    assert exercise.power.upper_bound is None
+    assert exercise.power.observed_value == exercise.power.lower_bound == exercise.power.upper_bound
 
 
 def test_planned_power_rowing_speed_min():
@@ -100,11 +87,7 @@ def test_planned_power_rowing_speed_min():
     exercise.speed = Assignment(min_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is not None
-    assert exercise.power.upper_bound is None
-
-    assert exercise.power.lower_bound == exercise.power.observed_value
+    assert exercise.power.observed_value == exercise.power.lower_bound == exercise.power.upper_bound
 
 
 def test_planned_power_rowing_speed_min_and_max():
@@ -125,9 +108,7 @@ def test_planned_power_cycling_both_assigned():
     exercise.speed = Assignment(assigned_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is None
-    assert exercise.power.upper_bound is None
+    assert exercise.power.observed_value == exercise.power.lower_bound == exercise.power.upper_bound
 
 
 def test_planned_power_cycling_speed_assigned_grade_min():
@@ -136,10 +117,7 @@ def test_planned_power_cycling_speed_assigned_grade_min():
     exercise.speed = Assignment(assigned_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is not None
-    assert exercise.power.upper_bound is None
-
+    assert exercise.power.observed_value == exercise.power.upper_bound
     assert exercise.power.lower_bound <= exercise.power.observed_value
 
 
@@ -162,11 +140,7 @@ def test_planned_power_cycling_speed_min_grade_assigned():
     exercise.speed = Assignment(min_value=2)
     processor = WorkoutProcessor()
     processor.set_planned_power(exercise)
-    assert exercise.power.observed_value is not None
-    assert exercise.power.lower_bound is not None
-    assert exercise.power.upper_bound is None
-
-    assert exercise.power.lower_bound == exercise.power.observed_value
+    assert exercise.power.lower_bound == exercise.power.observed_value == exercise.power.upper_bound
 
 
 def test_planned_power_cycling_speed_min_and_max_grade_assigned():
