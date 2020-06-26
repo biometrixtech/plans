@@ -74,8 +74,12 @@ class ActionLibraryParser(object):
 
             if self.is_valid(row, 'apply_resistance'):
                 action.apply_resistance = row['apply_resistance'].lower() == "true"
-            if self.is_valid(row, 'relative_explosiveness'):
-                action.explosiveness = Explosiveness[row['relative_explosiveness']]
+            if 'speed' in row.index and 'resistance' in row.index:
+                # if self.is_valid(row, 'speed') and self.is_valid(row, 'resistance'):
+                action.explosiveness = self.get_explosiveness_from_speed_resistance(row['speed'], row['resistance'])
+            else:
+                if self.is_valid(row, 'relative_explosiveness'):
+                    action.explosiveness = Explosiveness[row['relative_explosiveness']]
             if self.is_valid(row, 'apply_instability'):
                 action.apply_instability = row['apply_instability'].lower() == "true"
 
@@ -167,6 +171,27 @@ class ActionLibraryParser(object):
         f1.write(json_string)
         f1.close()
 
+    @staticmethod
+    def get_explosiveness_from_speed_resistance(speed, resistance):
+        if speed == 'no_speed':  # TODO this needs to be fixed in spreadsheet
+            speed = 'none'
+        explosiveness_dict = {
+            'none': {'none': 'no_force', 'slow': 'no_force', 'mod': 'no_force', 'fast': 'high_force', 'explosive': 'high_force'},
+            'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
+            'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+            'high': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
+            'max': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
+        }
+        if speed is not None and speed != "" and resistance is not None and resistance != "":
+            resistance_dict = explosiveness_dict.get(resistance)
+            if resistance_dict is not None:
+                explosiveness = resistance_dict.get(speed)
+                if explosiveness == 'no_force':
+                    explosiveness = 'no_speed'  # TODO need to change this and the enum to low_force once all the libraries are updated
+                if explosiveness is None:
+                    print('here')
+                return Explosiveness[explosiveness]
+        return Explosiveness.no_speed
 
 mapping = {
     "shoulder_flexion": "shoulder_flexion_and_scapular_upward_rotation",
@@ -178,10 +203,15 @@ mapping = {
     "shoulder_internal_rotation": "internal_rotation",
     "shoulder_external_rotation": "external_rotation",
     "ankle_inversion": "ankle_dorsiflexion_and_inversion",
-    "ankle_eversion": "ankle_plantar_flexion_and_eversion"
+    "ankle_eversion": "ankle_plantar_flexion_and_eversion",
+    "ankle_dorsi_flexion_and_eversion": "ankle_dorsiflexion_and_eversion",
+    "ankle_dorsi_flexion_and_inversion": "ankle_dorsiflexion_and_inversion"
+
 }
 
 if __name__ == '__main__':
     action_parser = ActionLibraryParser()
     # action_parser.load_data("_demo")
-    action_parser.load_data(["_demo", "_running"])
+    # action_parser.load_data(["_demo", "_running"])
+    action_parser.load_data(["_demo", "_running", "_strength_integrated_resistance"])
+

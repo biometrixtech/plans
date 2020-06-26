@@ -95,6 +95,20 @@ def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='defau
     return planned_session
 
 
+def get_session_2(date, rpe=5, duration=60, file_name=None, assignment_type='default'):
+    session = MixedActivitySession()
+    session.event_date = date
+    session.session_RPE = rpe
+    session.duration_minutes = duration
+    session.sport_name = SportName.high_intensity_interval_training
+
+    workout_json = read_json(file_name)
+    workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
+    session.workout_program_module = workout_program_module
+    WorkoutProcessor(user_weight=60).process_workout(session)
+
+    return session
+
 def get_activity(event_date_time, symptoms, sessions):
     proc = InjuryRiskProcessor(event_date_time, symptoms, sessions, {}, UserStats("tester"), "tester")
     proc.process(aggregate_results=True)
@@ -480,13 +494,22 @@ def test_api_movement_prep_compare_volume_may1_alt():
     assert total_concentric_volume_2_upper_bound < total_concentric_volume_3_upper_bound
 
 #
-# def test_may2():
-#     session = get_session(datetime.datetime.now(), file_name='may2')
-#     movement_prep = get_activity(datetime.datetime.now(), [], [session])
-#     assigned_exercises = {}
-#     for ex_phase in movement_prep[0].exercise_phases:
-#         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
-#     print('here')
+def test_may2():
+    session = get_session_2(datetime.datetime.now(), file_name='may2')
+    movement_prep = get_activity(datetime.datetime.now(), [], [session])
+    assigned_exercises = {}
+    for ex_phase in movement_prep[0].exercise_phases:
+        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+    print('here')
+
+
+def test_may18():
+    session = get_session_2(datetime.datetime.now(), file_name='may18')
+    movement_prep = get_activity(datetime.datetime.now(), [], [session])
+    assigned_exercises = {}
+    for ex_phase in movement_prep[0].exercise_phases:
+        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+    print('here')
 #
 #
 # def test_at_home1():

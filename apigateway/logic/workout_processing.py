@@ -134,6 +134,8 @@ class WorkoutProcessor(object):
                 if action_json is not None:
                     action = ExerciseAction.json_deserialise(action_json)
                     exercise.primary_actions.append(action)
+            exercise = self.update_exercise_details(exercise)
+
             for action_id in movement.secondary_actions:
                 action_json = action_library.get(action_id)
                 if action_json is not None:
@@ -788,12 +790,13 @@ class WorkoutProcessor(object):
                     rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
 
             # given the amount of reps they completed and the n of nRM, find the RPE
-            rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
-            if reps.lower_bound is not None:
+            if reps.observed_value > 0:
+                rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
+            if reps.lower_bound is not None and reps.upper_bound is not None:
                 rpes = []
                 if reps.lower_bound > 0:
-                    rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound))
-                if reps.upper_bound > 0:
+                    rpes.append( self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound))
+                if reps.upper_bound  > 0:
                     rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound))
                 if len(rpes) > 0:
                     rpe.lower_bound = min(rpes)

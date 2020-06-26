@@ -24,8 +24,12 @@ class MovementLibraryParser(object):
         self.write_movements_json()
 
     def parse_row(self, row):
-        if self.is_valid(row, 'id'):
-            movement = Movement(row['id'], row['soflete_name'])
+        if self.is_valid(row, 'id') or self.is_valid(row, 'base_movement_name'):
+            # movement = Movement(row['id'], row['soflete_name'])
+            if self.is_valid(row, 'id'):
+                movement = Movement(row['id'], row['fathom_name'])
+            else:
+                movement = Movement(row['base_movement_name'], row['fathom_name'])
 
             if self.is_valid(row, 'training_type'):
                 movement.training_type = TrainingType[row['training_type']]
@@ -61,13 +65,37 @@ class MovementLibraryParser(object):
                     print('here')
 
             if self.is_valid(row, 'resistance'):
-                movement.resistance = MovementResistance[row['resistance']]
+            # if row.get('resistance') is not None and row['resistance'] != "":
+                movement.resistance = self.get_resistance(row['resistance'])
+                # movement.resistance = MovementResistance[row['resistance']]
             if self.is_valid(row, 'speed'):
-                movement.speed = MovementSpeed[row['speed']]
+            # if row.get('speed') is not None and row['speed'] != "":
+                movement.speed = self.get_speed(row['speed'])
+                # movement.speed = MovementSpeed[row['speed']]
 
             return movement
         else:
             return None
+    @staticmethod
+    def get_resistance(resistance):
+        if 'resistance' not in resistance:
+            resistance += '_resistance'
+        return MovementResistance[resistance]
+
+    @staticmethod
+    def get_speed(speed):
+        speed_conversion_dict = {
+            # 'none': 'no_speed',
+            'speed': 'low_speed',
+            'slow': 'low_speed',
+            'mod': 'mod_speed',
+            'max': 'max_speed',
+            'explosive': 'explosive_speed'
+        }
+        if speed in speed_conversion_dict:
+            speed = speed_conversion_dict[speed]
+        return MovementSpeed[speed]
+
 
     @staticmethod
     def is_valid(row, name):
@@ -88,9 +116,29 @@ class MovementLibraryParser(object):
         f1.write(json_string)
         f1.close()
 
+def read_json(source):
+    file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_{source}.json")
+    with open(file_name, 'r') as f:
+        library = json.load(f)
+    return library
+
+def write_json(json_data):
+    json_string = json.dumps(json_data, indent=4)
+    # file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_soflete.json")
+    file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_demo.json")
+    print(f"writing: {file_name}")
+    f1 = open(file_name, 'w')
+    f1.write(json_string)
+    f1.close()
+
 
 if __name__ == '__main__':
-    sources = ['demo']
+    # sources = ['demo']
+    sources = ['demo', 'strength_integrated_resistance']
     for movements_source in sources:
         mov_parser = MovementLibraryParser(movements_source)
         mov_parser.load_data()
+    all_data = {}
+    for source in sources:
+        all_data.update(read_json(source))
+    write_json(all_data)

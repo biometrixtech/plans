@@ -77,8 +77,9 @@ def parse_file(file_name):
     f1.write(json_string)
     f1.close()
 
-
-# for file_name in ['may1', 'may2']:
-for file_name in ['at_home1', 'at_home2']:
+# files = ['may1', 'may2']
+# files = ['at_home1', 'at_home2']
+files = ['may18']
+for file_name in files:
     parse_file(file_name)
 
