@@ -147,6 +147,11 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.power_load = None
         self.rpe_load = None
 
+        self.total_minutes_at_high_intensity = 0.0
+        self.total_blocks_at_high_intensity = 0  # 5 min or more
+        self.total_minutes_at_moderate_intensity = 0.0
+        self.total_blocks_at_moderate_intensity = 0  # 5 min or more
+
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
             if not isinstance(value, datetime.datetime) and value is not None:
@@ -631,7 +636,6 @@ class PlannedSession(Session):
         super().__init__()
         self.workout = None
         self.event_date = None
-        self.session_RPE = None
 
     def session_type(self):
         return SessionType.planned
@@ -642,7 +646,46 @@ class PlannedSession(Session):
         return new_session
 
     def ultra_high_intensity_session(self):
-        return False
+        if self.ultra_high_intensity is not None:
+            return self.ultra_high_intensity
+        if self.workout_program_module is not None:
+            for section in self.workout_program_module.workout_sections:
+                if section.assess_load:
+                    for exercise in section.exercises:
+                        for action in exercise.primary_actions:
+                            if action.training_type in [TrainingType.power_action_plyometrics,
+                                                        TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                                self.ultra_high_intensity = True
+                                return True
+        self.ultra_high_intensity = False
+
+    def high_intensity_RPE(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5:
+            return True
+        else:
+            return False
+
+    def high_intensity(self):
+
+        if self.session_RPE is not None and self.session_RPE > 5 and self.ultra_high_intensity_session():
+            return True
+        elif self.session_RPE is not None and self.session_RPE >= 7 and not self.ultra_high_intensity_session():
+            return True
+        else:
+            return False
+
+    def contains_high_intensity_blocks(self):
+        if self.total_blocks_at_high_intensity > 0 or self.total_minutes_at_high_intensity >= 10:
+            return True
+        else:
+            return False
+
+    def contains_moderate_intensity_blocks(self):
+        if self.total_blocks_at_moderate_intensity > 0 or self.total_minutes_at_moderate_intensity >= 10:
+            return True
+        else:
+            return False
 
 
 class MixedActivitySession(Session):
@@ -672,7 +715,8 @@ class MixedActivitySession(Session):
                 if section.assess_load:
                     for exercise in section.exercises:
                         for action in exercise.primary_actions:
-                            if action.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                            if action.training_type in [TrainingType.power_action_plyometrics,
+                                                        TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
                                 self.ultra_high_intensity = True
                                 return True
         self.ultra_high_intensity = False
@@ -690,6 +734,18 @@ class MixedActivitySession(Session):
         if self.session_RPE is not None and self.session_RPE > 5 and self.ultra_high_intensity_session():
             return True
         elif self.session_RPE is not None and self.session_RPE >= 7 and not self.ultra_high_intensity_session():
+            return True
+        else:
+            return False
+
+    def contains_high_intensity_blocks(self):
+        if self.total_blocks_at_high_intensity > 0 or self.total_minutes_at_high_intensity >= 10:
+            return True
+        else:
+            return False
+
+    def contains_moderate_intensity_blocks(self):
+        if self.total_blocks_at_moderate_intensity > 0 or self.total_minutes_at_moderate_intensity >= 10:
             return True
         else:
             return False

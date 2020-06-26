@@ -100,6 +100,12 @@ class InjuryRiskProcessor(object):
                 elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
                     self.relative_load_level = min(self.relative_load_level, 2)
 
+            if r.session_type() == SessionType.mixed_activity or r.session_type() == SessionType.planned:
+                if r.contains_high_intensity_blocks():
+                    self.relative_load_level = min(self.relative_load_level, 1)
+                elif r.contains_moderate_intensity_blocks():
+                    self.relative_load_level = min(self.relative_load_level, 2)
+
     @xray_recorder.capture('logic.InjuryRiskProcessor.get_consolidated_dict')
     def get_consolidated_dict(self):
 

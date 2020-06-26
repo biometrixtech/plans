@@ -25,7 +25,7 @@ class TrainingLoadProcessing(object):
         #self.maintenance_loads = {}
         #self.functional_overreaching_loads = {}
         #self.functional_overreaching_NFO_loads = {}
-        self.high_relative_load_session = False
+        #self.high_relative_load_session = False
         self.high_relative_load_sessions = []
         self.high_relative_load_score = 50
         self.last_week_sport_training_loads = {}
@@ -281,6 +281,7 @@ class TrainingLoadProcessing(object):
                     greater_than_50.append(percent)
 
                 percent = self.get_percent(t.power_explosive_action_load,self.adaptation_type_load[AdaptationType.power_explosive_action.value])
+
                 if percent > 80 and percent > max_percent:
                     max_percent = percent
 

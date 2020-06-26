@@ -34,9 +34,10 @@ def create_and_process_workout(session, exercises):
     return workout
 
 
-def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
+def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id="", duration=None):
     exercise = WorkoutExercise()
     exercise.reps_per_set = reps
+    exercise.duration = duration
     exercise.sets = sets
     exercise.unit_of_measure = unit
     exercise.movement_id = movement_id
@@ -79,7 +80,7 @@ def get_max_load(exercise):
 
 
 def test_rowing():
-    exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
+    exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
     exercise.pace = .24
     #workout_program = create_and_process_workout([exercise])
     for action in exercise.primary_actions:
@@ -91,7 +92,7 @@ def test_rowing():
 
 
 def test_rowing_stroke_rate_25():
-    exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
+    exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
     exercise.stroke_rate = 25
     exercise.pace = .24
     #create_and_process_workout([exercise])

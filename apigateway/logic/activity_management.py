@@ -3,6 +3,7 @@ from fathomapi.utils.xray import xray_recorder
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.exercise_assignment import ExerciseAssignment
 from models.athlete_injury_risk import AthleteInjuryRisk
+from models.session import SessionType
 
 
 class ActivityManager(object):
@@ -61,6 +62,9 @@ class ActivityManager(object):
         for session in self.active_training_sessions:
             if session.ultra_high_intensity_session() and session.high_intensity_RPE():
                 return True
+            elif session.session_type() == SessionType.mixed_activity or session.session_type() == SessionType.planned:
+                if session.contains_high_intensity_blocks():
+                    return True
         return False
 
     def get_sport_body_parts(self):

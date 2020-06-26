@@ -471,6 +471,20 @@ class Assignment(object):
         }
         return ret
 
+    def lowest_value(self):
+
+        if self.min_value is not None:
+            return self.min_value
+        else:
+            return self.assigned_value
+
+    def highest_value(self):
+
+        if self.max_value is not None:
+            return self.max_value
+        else:
+            return self.assigned_value
+
     @classmethod
     def json_deserialise(cls, input_dict):
         assignment = cls()
@@ -493,6 +507,22 @@ class Assignment(object):
                 result_assignment.assigned_value = None
             if dividend_assignment.max_value is not None:
                 result_assignment.max_value = divisor_scalar / float(dividend_assignment.max_value)
+                result_assignment.assigned_value = None
+
+        return result_assignment
+
+    @staticmethod
+    def divide_assignment_by_scalar(divisor_assignment, dividend_scalar):
+
+        result_assignment = Assignment()
+        if divisor_assignment.assigned_value is not None:
+            result_assignment.assigned_value = float(divisor_assignment.assigned_value) / dividend_scalar
+        else:
+            if divisor_assignment.min_value is not None:
+                result_assignment.min_value = float(divisor_assignment.min_value) / dividend_scalar
+                result_assignment.assigned_value = None
+            if divisor_assignment.max_value is not None:
+                result_assignment.max_value = float(divisor_assignment.max_value) / dividend_scalar
                 result_assignment.assigned_value = None
 
         return result_assignment
