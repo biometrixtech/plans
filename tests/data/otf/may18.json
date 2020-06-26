@@ -217,7 +217,7 @@
                     "name": "Bicep Curl",
                     "id": "Bicep Curl",
                     "movement_id": "Standing Double Arm Bicep Curl",
-                    "weight": 15,
+                    "weight": 6.8181818181818175,
                     "weight_measure": 2,
                     "reps_per_set": 8.0,
                     "stroke_rate": 24.0
@@ -226,7 +226,7 @@
                     "name": "Alternating Plank Low Row",
                     "id": "Alternating Plank Low Row",
                     "movement_id": "Plank with Single Arm Row",
-                    "weight": 15,
+                    "weight": 6.8181818181818175,
                     "weight_measure": 2,
                     "reps_per_set": 8.0
                 },
@@ -234,7 +234,7 @@
                     "name": "Lateral Raise",
                     "id": "Lateral Raise",
                     "movement_id": "Standing Lateral Raise",
-                    "weight": 15,
+                    "weight": 6.8181818181818175,
                     "weight_measure": 2,
                     "reps_per_set": 8.0
                 },
@@ -242,7 +242,7 @@
                     "name": "ISO Sumo Squat with a Front Raise",
                     "id": "ISO Sumo Squat with a Front Raise",
                     "movement_id": "ISO Sumo Squat with a Front Raise",
-                    "weight": 15,
+                    "weight": 6.8181818181818175,
                     "weight_measure": 2,
                     "reps_per_set": 8.0
                 },
@@ -250,7 +250,7 @@
                     "name": "Squat with Dumbbells at Sides",
                     "id": "Squat with Dumbbells at Sides",
                     "movement_id": "Squat with Dumbbells at Side",
-                    "weight": 15,
+                    "weight": 6.8181818181818175,
                     "weight_measure": 2,
                     "reps_per_set": 8.0,
                     "stroke_rate": 24.0
@@ -259,7 +259,7 @@
                     "name": "Toe Reach",
                     "id": "Toe Reach",
                     "movement_id": "Toe Reach",
-                    "weight": 15,
+                    "weight": 6.8181818181818175,
                     "weight_measure": 2,
                     "reps_per_set": 8.0
                 },
@@ -267,7 +267,7 @@
                     "name": "Double Crunch",
                     "id": "Double Crunch",
                     "movement_id": "Double Crunch",
-                    "weight": 15,
+                    "weight": 6.8181818181818175,
                     "weight_measure": 2,
                     "reps_per_set": 8.0
                 }

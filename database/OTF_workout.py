@@ -33,7 +33,7 @@ def parse_file(file_name):
                     if is_valid(row, 'weight'):
                         exercise['weight'] = row['weight']
                     else:
-                        exercise['weight'] = 15
+                        exercise['weight'] = 15 / 2.2  # 15 lbs
                     exercise['weight_measure'] = 2
                 if is_valid(row, 'reps'):  #if not np.isnan(row['reps']):
                     exercise['reps_per_set'] = row['reps']

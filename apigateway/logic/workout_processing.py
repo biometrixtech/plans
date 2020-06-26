@@ -720,12 +720,13 @@ class WorkoutProcessor(object):
             "fourth_prime_movers": set()
             }
         for action in exercise.primary_actions:
-            self.get_prime_movers_from_joint_actions(action.hip_joint_action, prime_movers)
-            self.get_prime_movers_from_joint_actions(action.knee_joint_action, prime_movers)
-            self.get_prime_movers_from_joint_actions(action.ankle_joint_action, prime_movers)
-            self.get_prime_movers_from_joint_actions(action.trunk_joint_action, prime_movers)
-            self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action, prime_movers)
-            self.get_prime_movers_from_joint_actions(action.elbow_joint_action, prime_movers)
+            if action.primary_muscle_action.name in ['concentric', 'isometric']:
+                self.get_prime_movers_from_joint_actions(action.hip_joint_action, prime_movers)
+                self.get_prime_movers_from_joint_actions(action.knee_joint_action, prime_movers)
+                self.get_prime_movers_from_joint_actions(action.ankle_joint_action, prime_movers)
+                self.get_prime_movers_from_joint_actions(action.trunk_joint_action, prime_movers)
+                self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action, prime_movers)
+                self.get_prime_movers_from_joint_actions(action.elbow_joint_action, prime_movers)
 
         if len(exercise.equipments) > 0:
             equipment = exercise.equipments[0]
