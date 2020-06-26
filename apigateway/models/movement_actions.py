@@ -593,11 +593,16 @@ class MovementSpeed(Enum):
     # no_speed = 0
     # speed = 1
     # max_speed = 2
-    no_speed = 0
-    low_speed = 1
-    mod_speed = 2
-    max_speed = 3
-    explosive_speed =4
+    none = 0
+    slow = 1
+    mod = 2
+    fast = 3
+    explosive_speed = 4
+    # no_speed = 0
+    # low_speed = 1
+    # mod_speed = 2
+    # max_speed = 3
+    # explosive_speed =4
 
 
 class MovementResistance(Enum):

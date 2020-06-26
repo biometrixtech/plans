@@ -84,13 +84,22 @@ class MovementLibraryParser(object):
 
     @staticmethod
     def get_speed(speed):
+        max = 5
+        # speed_conversion_dict = {
+        #     # 'none': 'no_speed',
+        #     'speed': 'low_speed',
+        #     'slow': 'low_speed',
+        #     'mod': 'mod_speed',
+        #     'max': 'max_speed',
+        #     'explosive': 'explosive_speed'
+        # }
         speed_conversion_dict = {
-            # 'none': 'no_speed',
-            'speed': 'low_speed',
-            'slow': 'low_speed',
-            'mod': 'mod_speed',
-            'max': 'max_speed',
-            'explosive': 'explosive_speed'
+            'no_speed': 'none',
+            'speed': 'slow',
+            # 'slow': 'low_speed',
+            # 'mod': 'mod_speed',
+            'max_speed': 'fast',
+            # 'explosive': 'explosive_speed'
         }
         if speed in speed_conversion_dict:
             speed = speed_conversion_dict[speed]
