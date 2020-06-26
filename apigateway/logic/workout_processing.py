@@ -159,7 +159,8 @@ class WorkoutProcessor(object):
             if exercise.hr is not None:
                 exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
             else:
-                exercise.predicted_rpe.observed_value = exercise.shrz or 4
+                #exercise.predicted_rpe.observed_value = exercise.shrz or 4
+                self.set_planned_cardio_rpe(exercise)
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -192,7 +193,7 @@ class WorkoutProcessor(object):
                 exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = Assignment.multiply_assignments(exercise.duration, exercise.speed)
-            # TODO planned exercise predicted RPE?
+
             self.set_planned_cardio_rpe(exercise)
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
