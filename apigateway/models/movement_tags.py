@@ -22,6 +22,26 @@ class AdaptationType(Enum):
     power_explosive_action = 5
 
 
+class DetailedAdaptationType(Enum):
+    mobility = 0
+    corrective = 1
+    base_aerobic_training = 2
+    anaerobic_threshold_training = 3
+    anaerobic_interval_training = 4
+    stabilization_endurance = 5
+    stabilization_strength = 6
+    stabilization_power = 7
+    functional_strength = 8
+    muscular_endurance = 9
+    strength_endurance = 10
+    hypertrophy = 11
+    maximal_strength = 12
+    speed = 13
+    sustained_power = 14
+    power = 15
+    maximal_power = 16
+
+
 class CardioAction(Enum):
     race_walking = 0
     run = 1
