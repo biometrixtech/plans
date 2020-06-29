@@ -546,17 +546,18 @@ class Assignment(object):
                 if dividend_assignment.max_value is not None:
                     result_assignment.max_value = max(combinations)
         else:
-            if dividend_assignment.assigned_value is not None and divisor_assignment.min_value > 0:
+            if dividend_assignment.assigned_value is not None:
                 combinations = []
-                if divisor_assignment.min_value is not None:
+                if divisor_assignment.min_value is not None and divisor_assignment.min_value > 0:
                     combinations.append(dividend_assignment.assigned_value / float(divisor_assignment.min_value))
-                if divisor_assignment.max_value is not None:
+                if divisor_assignment.max_value is not None and divisor_assignment.max_value > 0:
                     combinations.append(dividend_assignment.assigned_value / float(divisor_assignment.max_value))
 
-                if divisor_assignment.min_value is not None:
-                    result_assignment.min_value = min(combinations)
-                if divisor_assignment.max_value is not None:
-                    result_assignment.max_value = max(combinations)
+                if len(combinations) > 0:
+                    if divisor_assignment.min_value is not None:
+                        result_assignment.min_value = min(combinations)
+                    if divisor_assignment.max_value is not None:
+                        result_assignment.max_value = max(combinations)
             else:
                 combinations = []
                 if dividend_assignment.min_value is not None and divisor_assignment.min_value > 0:
