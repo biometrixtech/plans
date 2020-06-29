@@ -54,34 +54,8 @@ class TrainingLoadProcessing(object):
         attribute_20_day = getattr(self, attribute_20_day_name)
 
         if attribute_5_day is not None and attribute_20_day is not None:
-            standard_error_range = StandardErrorRange()
-            combinations = []
-            if attribute_5_day.lower_bound is not None and attribute_20_day.lower_bound is not None:
-               combinations.append(attribute_5_day.lower_bound / attribute_20_day.lower_bound)
-            if attribute_5_day.upper_bound is not None and attribute_20_day.upper_bound is not None:
-                combinations.append(attribute_5_day.upper_bound / attribute_20_day.upper_bound)
-            if attribute_5_day.lower_bound is not None and attribute_20_day.upper_bound is not None:
-                combinations.append(attribute_5_day.lower_bound / attribute_20_day.upper_bound)
-            if attribute_5_day.upper_bound is not None and attribute_20_day.lower_bound is not None:
-                combinations.append(attribute_5_day.upper_bound / attribute_20_day.lower_bound)
-
-            if attribute_5_day.observed_value is not None and attribute_20_day.observed_value is not None:
-                standard_error_range.observed_value = attribute_5_day.observed_value / attribute_20_day.observed_value
-            elif attribute_5_day.observed_value is not None and attribute_20_day.observed_value is None:
-                standard_error_range.observed_value = attribute_5_day.observed_value
-            elif attribute_5_day.observed_value is None and attribute_20_day.observed_value is not None:
-                standard_error_range.observed_value = attribute_20_day.observed_value
-
-            if standard_error_range.observed_value is not None:
-                combinations.append(standard_error_range.observed_value)
-
-            if len(combinations) > 0:
-                standard_error_range.lower_bound = min(combinations)
-            if len(combinations) > 0:
-                standard_error_range.upper_bound = max(combinations)
-
-            standard_error_range.insufficient_data = min(attribute_5_day.insufficient_data,
-                                                         attribute_20_day.insufficient_data)
+            standard_error_range = attribute_5_day.plagiarize()
+            standard_error_range.divide_range(attribute_20_day)
 
             return standard_error_range
 
