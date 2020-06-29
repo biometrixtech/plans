@@ -94,9 +94,10 @@ class APIProcessing(object):
             hr_workout = self.heart_rate_data[0].hr_workout if len(self.heart_rate_data) > 0 else None
             session_obj = WorkoutProcessor(
                     user_age=self.user_age,
+                    user_weight=self.user_stats.athlete_weight,
                     hr_data=hr_workout,
                     vo2_max=self.user_stats.vo2_max,
-                    gender=self.user_stats.gender
+                    gender=self.user_stats.athlete_gender
             ).process_workout(session_obj)
             #session_obj.update_training_loads(session_training_load)
             self.workout_programs.append(session_obj.workout_program_module)

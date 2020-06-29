@@ -129,8 +129,6 @@ class WorkoutProcessor(object):
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
 
-            exercise = self.update_exercise_details(exercise)
-
             for action_id in movement.primary_actions:
                 action_json = action_library.get(action_id)
                 if action_json is not None:
@@ -141,6 +139,8 @@ class WorkoutProcessor(object):
                 if action_json is not None:
                     action = ExerciseAction.json_deserialise(action_json)
                     exercise.secondary_actions.append(action)
+
+            exercise = self.update_exercise_details(exercise)
 
             self.add_action_details_from_exercise(exercise, exercise.primary_actions)
             self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
@@ -153,8 +153,6 @@ class WorkoutProcessor(object):
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
 
-            exercise = self.update_planned_exercise_details(exercise, assignment_type)
-
             for action_id in movement.primary_actions:
                 action_json = action_library.get(action_id)
                 if action_json is not None:
@@ -165,6 +163,8 @@ class WorkoutProcessor(object):
                 if action_json is not None:
                     action = ExerciseAction.json_deserialise(action_json)
                     exercise.secondary_actions.append(action)
+
+            exercise = self.update_planned_exercise_details(exercise, assignment_type)
 
             self.add_action_details_from_exercise(exercise, exercise.primary_actions)
             self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
@@ -757,8 +757,8 @@ class WorkoutProcessor(object):
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
             rpe.observed_value = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
             if reps.lower_bound is not None:
-                rpe1 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
-                rpe2 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
+                rpe1 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.lower_bound)
+                rpe2 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.upper_bound)
                 rpe.lower_bound = min([rpe1, rpe2])
                 rpe.upper_bound = max([rpe1, rpe2])
 
@@ -790,10 +790,14 @@ class WorkoutProcessor(object):
             # given the amount of reps they completed and the n of nRM, find the RPE
             rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
             if reps.lower_bound is not None:
-                rpe1 = self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound)
-                rpe2 = self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound)
-                rpe.lower_bound = min([rpe1, rpe2])
-                rpe.upper_bound = max([rpe1, rpe2])
+                rpes = []
+                if reps.lower_bound > 0:
+                    rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound))
+                if reps.upper_bound > 0:
+                    rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound))
+                if len(rpes) > 0:
+                    rpe.lower_bound = min(rpes)
+                    rpe.upper_bound = max(rpes)
 
         return rpe
 
