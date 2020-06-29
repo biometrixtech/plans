@@ -3,14 +3,15 @@ from datastores.movement_library_datastore import MovementLibraryDatastore
 from datastores.action_library_datastore import ActionLibraryDatastore
 from logic.calculators import Calculators
 from logic.heart_rate_processing import HeartRateProcessing
+from logic.rpe_predictor import RPEPredictor
+from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
-from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction
+from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
-from models.training_load import TrainingLoad
-from models.training_volume import StandardErrorRange
+from models.training_volume import StandardErrorRange, Assignment
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -19,20 +20,48 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 
 
 class WorkoutProcessor(object):
-    def __init__(self, user_age=20, user_weight=60.0, female=True, hr_data=None):
+    def __init__(self, user_age=20, user_weight=60.0, gender=Gender.female, hr_data=None, vo2_max=None):
         self.user_age = user_age
         self.user_weight = user_weight
-        self.female = female
+        self.gender = gender
         self.hr_data = hr_data
+        self.hr_rpe_predictor = RPEPredictor()
+        self.bodyweight_ratio_predictor = BodyWeightRatioPredictor()
+        self.vo2_max = vo2_max or Calculators.vo2_max_estimation_demographics(age=user_age, user_weight=user_weight, gender=gender)
+
+    @xray_recorder.capture('logic.WorkoutProcessor.process_planned_workout')
+    def process_planned_workout(self, session, assignment_type):
+        for workout_section in session.workout.sections:
+            workout_section.should_assess_load(cardio_data['no_load_sections'])
+
+            for workout_exercise in workout_section.exercises:
+                self.add_movement_detail_to_planned_exercise(workout_exercise, assignment_type)
+                if workout_section.assess_load:
+                    session.add_tissue_load(workout_exercise.tissue_load)
+                    session.add_force_load(workout_exercise.force_load)
+                    session.add_power_load(workout_exercise.power_load)
+                    session.add_rpe_load(workout_exercise.rpe_load)
+                    if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+                        session.add_strength_endurance_cardiorespiratory_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.strength_endurance_strength:
+                        session.add_strength_endurance_strength_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.power_drill:
+                        session.add_power_drill_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                        session.add_maximal_strength_hypertrophic_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.power_explosive_action:
+                        session.add_power_explosive_action_load(workout_exercise.power_load)
+
+                    session = self.set_session_intensity_metrics(session, workout_exercise)
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
-    def process_workout(self, workout_program):
+    def process_workout(self, session):
 
         heart_rate_processing = HeartRateProcessing(self.user_age)
-        session_training_load = TrainingLoad()
 
-        for workout_section in workout_program.workout_sections:
+        for workout_section in session.workout_program_module.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
+            section_hr = []
             if self.hr_data is not None and workout_section.start_date_time is not None and workout_section.end_date_time is not None:
                 # assumption here is that all exercises in the section are of similar training/adaptation types
                 # such that a single shrz can be calculated for each section
@@ -41,23 +70,64 @@ class WorkoutProcessor(object):
                     workout_section.shrz = heart_rate_processing.get_shrz(section_hr)
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
+                if len(section_hr) > 0:
+                    hr_values = sorted([hr.value for hr in section_hr])  # TODO: improve this to use eercise specific values, not inherit all from section
+                    top_25_percentile_hr = hr_values[int(len(hr_values) * .75):]
+                    workout_exercise.hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)  # use the average of top 25% ideally this is the end of exercise HR
                 self.add_movement_detail_to_exercise(workout_exercise)
                 if workout_section.assess_load:
-                    session_training_load.add_tissue_load(workout_exercise.tissue_load)
-                    session_training_load.add_force_load(workout_exercise.force_load)
-                    session_training_load.add_power_load(workout_exercise.power_load)
+                    session.add_tissue_load(workout_exercise.tissue_load)
+                    session.add_force_load(workout_exercise.force_load)
+                    session.add_power_load(workout_exercise.power_load)
+                    session.add_rpe_load(workout_exercise.rpe_load)
+                    if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+                        session.add_strength_endurance_cardiorespiratory_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.strength_endurance_strength:
+                        session.add_strength_endurance_strength_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.power_drill:
+                        session.add_power_drill_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                        session.add_maximal_strength_hypertrophic_load(workout_exercise.power_load)
+                    elif workout_exercise.adaptation_type == AdaptationType.power_explosive_action:
+                        session.add_power_explosive_action_load(workout_exercise.power_load)
+
+                session = self.set_session_intensity_metrics(session, workout_exercise)
 
             workout_section.should_assess_shrz()
 
-        return session_training_load
+        return session
+
+    def set_session_intensity_metrics(self, session, workout_exercise):
+        # update high intensity metrics
+        if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and workout_exercise.predicted_rpe is not None:
+            if workout_exercise.predicted_rpe.lowest_value() >= 7.65:
+                if isinstance(workout_exercise.duration, Assignment):
+                    high_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
+                    high_intensity_minutes = high_intensity_minutes_assignment.lowest_value()
+                    session.total_minutes_at_high_intensity += high_intensity_minutes
+                else:
+                    high_intensity_minutes = workout_exercise.duration / float(60)
+                    session.total_minutes_at_high_intensity += high_intensity_minutes
+                if high_intensity_minutes >= 5.0:
+                    session.total_blocks_at_high_intensity += 1
+            elif workout_exercise.predicted_rpe.lowest_value() >= 6.80:
+                if isinstance(workout_exercise.duration, Assignment):
+                    moderate_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
+                    moderate_intensity_minutes = moderate_intensity_minutes_assignment.lowest_value()
+                    session.total_minutes_at_moderate_intensity += moderate_intensity_minutes
+                else:
+                    moderate_intensity_minutes = workout_exercise.duration / float(60)
+                    session.total_minutes_at_moderate_intensity += moderate_intensity_minutes
+                if moderate_intensity_minutes >= 5.0:
+                    session.total_blocks_at_moderate_intensity += 1
+
+        return session
 
     def add_movement_detail_to_exercise(self, exercise):
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
-
-            exercise = self.update_exercise_details(exercise)
 
             for action_id in movement.primary_actions:
                 action_json = action_library.get(action_id)
@@ -70,16 +140,41 @@ class WorkoutProcessor(object):
                     action = ExerciseAction.json_deserialise(action_json)
                     exercise.secondary_actions.append(action)
 
+            exercise = self.update_exercise_details(exercise)
+
             self.add_action_details_from_exercise(exercise, exercise.primary_actions)
             self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
+
+    def add_movement_detail_to_planned_exercise(self, exercise, assignment_type):
+        if exercise.movement_id in movement_library:
+            movement_json = movement_library[exercise.movement_id]
+            movement = Movement.json_deserialise(movement_json)
+            exercise.initialize_from_movement(movement)
+
+            for action_id in movement.primary_actions:
+                action_json = action_library.get(action_id)
+                if action_json is not None:
+                    action = ExerciseAction.json_deserialise(action_json)
+                    exercise.primary_actions.append(action)
+            for action_id in movement.secondary_actions:
+                action_json = action_library.get(action_id)
+                if action_json is not None:
+                    action = ExerciseAction.json_deserialise(action_json)
+                    exercise.secondary_actions.append(action)
+
+            exercise = self.update_planned_exercise_details(exercise, assignment_type)
+
+            self.add_action_details_from_exercise(exercise, exercise.primary_actions)
+            self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
 
     def update_exercise_details(self, exercise):
 
         exercise.set_intensity()
         exercise.set_adaption_type()
         exercise.set_rep_tempo()
+        exercise.set_reps_duration()
 
         if exercise.training_type == TrainingType.strength_cardiorespiratory:
             exercise.set_speed_pace()
@@ -90,6 +185,12 @@ class WorkoutProcessor(object):
                 exercise.duration = exercise.distance / exercise.speed
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
+            exercise.predicted_rpe = StandardErrorRange()
+            if exercise.hr is not None:
+                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
+            else:
+                #exercise.predicted_rpe.observed_value = exercise.shrz or 4
+                self.set_planned_cardio_rpe(exercise)
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -97,10 +198,48 @@ class WorkoutProcessor(object):
             #     exercise.reps_per_set = int(reps_meters / 5)
             # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
-            exercise = self.set_force_weighted(exercise)
+            exercise = self.set_force_power_weighted(exercise)
+            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
 
         exercise = self.set_total_volume(exercise)
         exercise.set_training_loads()
+
+        return exercise
+
+    def update_planned_exercise_details(self, exercise, assignment_type):
+
+        #exercise.set_intensity()
+        exercise.set_adaption_type()
+        #exercise.set_rep_tempo()
+        exercise.update_primary_from_alternates(assignment_type)
+        exercise.set_reps_duration()
+
+        if exercise.training_type == TrainingType.strength_cardiorespiratory:
+            exercise.set_speed_pace()
+            exercise = self.set_planned_power(exercise)
+            # if exercise.reps_per_set is not None and exercise.duration is None:
+            #     exercise.duration = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
+            if exercise.speed is not None and exercise.distance is not None and exercise.duration is None:
+                exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
+            elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
+                exercise.distance = Assignment.multiply_assignments(exercise.duration, exercise.speed)
+
+            self.set_planned_cardio_rpe(exercise)
+        else:
+            # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
+            #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
+            #     reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
+            #     exercise.reps_per_set = int(reps_meters / 5)
+            # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
+            #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
+            exercise = self.set_force_power_weighted(exercise)
+            # TODO this needs to handle planned exercises
+            # exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+
+        exercise = self.set_planned_total_volume(exercise)
+        exercise.set_training_loads()
+
+        # TODO - set detailed adaptation type
 
         return exercise
 
@@ -131,71 +270,32 @@ class WorkoutProcessor(object):
         #     action.set_training_load(total_volume)
 
     def initialize_action_from_exercise(self, action, exercise):
-        # athlete_bodyweight = 100
-        # estimated_rpe = self.get_rpe_from_weight(exercise, action, athlete_bodyweight)
-        # sooooo, now what do we do with this estimated_rpe value !?!?!
 
         action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
         action.training_type = exercise.training_type
         action.adaptation_type = exercise.adaptation_type
 
-        # if action.training_type == TrainingType.strength_cardiorespiratory:
-        #     if exercise.duration is not None:
-        #         action.reps = exercise.duration
-        #     elif exercise.reps_per_set is not None:
-        #         action.reps = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
-        # elif exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
-        #     reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
-        #     action.reps = int(reps_meters / 5)
-        # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
-        #     action.reps = self.convert_seconds_to_reps(exercise.reps_per_set)
-        # else:
-        #     action.reps = exercise.reps_per_set
-
         action.lower_body_stability_rating = self.calculate_lower_body_stability_rating(exercise, action)
         action.upper_body_stability_rating = self.calculate_upper_body_stability_rating(exercise, action)
         action.side = exercise.side
-        action.rpe = exercise.rpe
-        action.shrz = exercise.shrz
-        action.bilateral = exercise.bilateral
+        # action.rpe = exercise.rpe
+        # action.shrz = exercise.shrz
+        #action.bilateral = exercise.bilateral
         action.cardio_action = exercise.cardio_action
         # copy other variables
         action.power = exercise.power  # power for rowing/other cardio in watts
         action.force = exercise.force
-        action.grade = exercise.grade  # for biking/running
-
-        action.rep_tempo = exercise.rep_tempo
-        action.speed = exercise.speed
-        action.pace = exercise.pace
+        # action.grade = exercise.grade  # for biking/running
+        #
+        # action.rep_tempo = exercise.rep_tempo
+        # action.speed = exercise.speed
+        # action.pace = exercise.pace
         # copy over duration and distance from exercise to action
-        action.duration = exercise.duration
-        action.distance = exercise.distance
+        # action.duration = exercise.duration
+        # action.distance = exercise.distance
 
-        # if action.cardio_action is not None:
-        #if action.training_type == TrainingType.strength_cardiorespiratory:
-            #action.rep_tempo = self.get_rep_tempo(exercise)
-            #speed, pace = self.get_speed_pace(exercise)
-            #action.speed = speed
-            #action.pace = pace
-            #self.set_power_force_cardio(exercise)
-
-
-
-
-            # final check if duration was derived, update action reps with duration
-            # if action.duration is not None and action.reps != action.duration:
-            #     action.reps = action.duration
-        #if action.training_type != TrainingType.strength_cardiorespiratory:
-            #self.set_force_weighted(exercise)
-            #action.force = exercise.force
-
-        # not using these for now in action level
-        # action.calories = exercise.calories  # for rowing/other cardio
-
-        # action.get_training_load()
-
-    def set_force_weighted(self, exercise):
+    def set_force_power_weighted(self, exercise):
         if exercise.weight_measure == WeightMeasure.actual_weight:
             weight = exercise.weight
         elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
@@ -203,6 +303,32 @@ class WorkoutProcessor(object):
         else:
             weight = 20  # TODO: need to change this
         exercise.force = StandardErrorRange(observed_value=Calculators.force_resistance_exercise(weight))
+
+        # TODO: still need to differentiate distance traveled by exercise
+        observed_power = Calculators.power_resistance_exercise(
+            weight_used=weight,
+            user_weight=self.user_weight,
+            time_eccentric=exercise.duration_per_rep.observed_value / 2,
+            time_concentric=exercise.duration_per_rep.observed_value / 2
+            )
+        exercise.power = StandardErrorRange(observed_value=observed_power)
+        if exercise.reps_per_set is None:
+            # TODO: still need to differentiate distance traveled by exercise
+            power_1 = Calculators.power_resistance_exercise(
+                weight_used=weight,
+                user_weight=self.user_weight,
+                time_eccentric=exercise.duration_per_rep.lower_bound / 2,
+                time_concentric=exercise.duration_per_rep.lower_bound / 2
+                )
+            power_2 = Calculators.power_resistance_exercise(
+                weight_used=weight,
+                user_weight=self.user_weight,
+                time_eccentric=exercise.duration_per_rep.upper_bound / 2,
+                time_concentric=exercise.duration_per_rep.upper_bound / 2
+                )
+            exercise.power.lower_bound = min([power_1, power_2])
+            exercise.power.upper_bound = max([power_1, power_2])
+
         return exercise
 
     def set_total_volume(self, exercise):
@@ -221,10 +347,53 @@ class WorkoutProcessor(object):
         elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             total_volume = exercise.reps_per_set
         else:
-            # use 1 rep = 4s to get volume in seconds
-            total_volume = exercise.reps_per_set * 4
+            # adaptation_type based volume
+            if exercise.duration is not None:
+                total_volume = exercise.duration
+            elif exercise.reps_per_set is not None:
+                if exercise.duration_per_rep is not None:
+                    duration_per_rep = exercise.duration_per_rep.observed_value
+                else:
+                    duration_per_rep = 3
+                total_volume = exercise.reps_per_set * duration_per_rep
+            else:
+                total_volume = 0
 
         exercise.total_volume = total_volume
+        return exercise
+
+    def set_planned_total_volume(self, exercise):
+
+        total_volume = Assignment()
+
+        if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
+            #total_volume = exercise.reps
+            if exercise.duration is not None:
+                total_volume = exercise.duration
+            elif exercise.reps_per_set is not None:
+                total_volume.assigned_value = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
+            else:
+                total_volume.assigned_value = 0
+        elif exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles, UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
+            reps_meters = self.convert_distance_to_meters(exercise.reps_per_set, exercise.unit_of_measure)
+            total_volume.assigned_value = int(reps_meters / 5) * 4
+        elif exercise.unit_of_measure == UnitOfMeasure.seconds:
+            total_volume.assigned_value = exercise.reps_per_set
+        else:
+            # adaptation_type based volume
+            if exercise.duration is not None:
+                total_volume = exercise.duration
+            elif exercise.reps_per_set is not None:
+                if exercise.duration_per_rep is not None:
+                    duration_per_rep = exercise.duration_per_rep.observed_value
+                else:
+                    duration_per_rep = 3
+                total_volume.assigned_value = exercise.reps_per_set * duration_per_rep
+            else:
+                total_volume.assigned_value = 0
+
+        exercise.total_volume = total_volume
+
         return exercise
 
     def set_power_force_cardio(self, exercise):
@@ -238,9 +407,9 @@ class WorkoutProcessor(object):
                 elif exercise.cardio_action == CardioAction.cycle:
                     exercise.power = StandardErrorRange(observed_value=Calculators.power_cycling(exercise.speed, user_weight=self.user_weight, grade=exercise.grade))
                 else:  # for all other cardio types
-                    exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
+                    exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
             else:
-                exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.female))
+                exercise.power = StandardErrorRange(observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
 
         if exercise.cardio_action == CardioAction.row:
             exercise.force = StandardErrorRange(observed_value=Calculators.force_rowing(exercise.power.observed_value, exercise.speed))
@@ -264,11 +433,195 @@ class WorkoutProcessor(object):
                 exercise.force.upper_bound = Calculators.force_cycling(exercise.power.upper_bound, exercise.speed)
         else:  # for all other cardio types
             exercise.force = StandardErrorRange(
-                observed_value=Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female))
+                observed_value=Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.gender))
             if exercise.power.lower_bound is not None:
-                exercise.force.lower_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
+                exercise.force.lower_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.gender)
             if exercise.power.upper_bound is not None:
-                exercise.force.upper_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.female)
+                exercise.force.upper_bound = Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.gender)
+
+        return exercise
+
+    def set_planned_cardio_rpe(self, exercise):
+        # assume planned power is already in place for some of cardio types
+        work_vo2 = StandardErrorRange()
+        if exercise.cardio_action == CardioAction.run:
+            if exercise.power.lower_bound is not None:
+                work_vo2.lower_bound = Calculators.work_vo2_running_from_power(exercise.power.lower_bound, self.user_weight)
+            if exercise.power.observed_value is not None:
+                work_vo2.observed_value = Calculators.work_vo2_running_from_power(exercise.power.observed_value, self.user_weight)
+            if exercise.power.upper_bound is not None:
+                work_vo2.upper_bound = Calculators.work_vo2_running_from_power(exercise.power.upper_bound, self.user_weight)
+        elif exercise.cardio_action == CardioAction.cycle:
+            if exercise.power.lower_bound is not None:
+                work_vo2.lower_bound = Calculators.work_vo2_cycling_alternate(exercise.power.lower_bound, self.user_weight)
+            if exercise.power.observed_value is not None:
+                work_vo2.observed_value = Calculators.work_vo2_cycling_alternate(exercise.power.observed_value, self.user_weight)
+            if exercise.power.upper_bound is not None:
+                work_vo2.upper_bound = Calculators.work_vo2_cycling_alternate(exercise.power.upper_bound, self.user_weight)
+        elif exercise.cardio_action == CardioAction.row:
+            if exercise.power.lower_bound is not None:
+                work_vo2.lower_bound = Calculators.work_vo2_rowing_from_power(exercise.power.lower_bound, self.user_weight)
+            if exercise.power.observed_value is not None:
+                work_vo2.observed_value = Calculators.work_vo2_rowing_from_power(exercise.power.observed_value, self.user_weight)
+            if exercise.power.upper_bound is not None:
+                work_vo2.upper_bound = Calculators.work_vo2_rowing_from_power(exercise.power.upper_bound, self.user_weight)
+        else:
+            work_vo2.observed_value = Calculators.work_vo2_cardio(exercise.cardio_action, self.gender)
+
+        percent_vo2max = work_vo2.plagiarize()
+        # self.vo2_max = StandardErrorRange(lower_bound=30, observed_value=32, upper_bound=35)
+        percent_vo2max.divide_range(self.vo2_max)
+        percent_vo2max.multiply(100)
+        predicted_rpe = StandardErrorRange()
+        if percent_vo2max.lower_bound is not None:
+            predicted_rpe.lower_bound = Calculators.rpe_from_percent_vo2_max(percent_vo2max.lower_bound)
+        if percent_vo2max.observed_value is not None:
+            predicted_rpe.observed_value = Calculators.rpe_from_percent_vo2_max(percent_vo2max.observed_value)
+        if percent_vo2max.upper_bound is not None:
+            predicted_rpe.upper_bound = Calculators.rpe_from_percent_vo2_max(percent_vo2max.upper_bound)
+
+        exercise.predicted_rpe = predicted_rpe
+
+    def set_planned_power(self, exercise):
+        # if power is not provided, calculate from available dta or estimate
+        if exercise.power is None:
+            if exercise.speed is not None:
+                if exercise.cardio_action == CardioAction.row:
+                    power_ranger = StandardErrorRange()
+                    if exercise.speed.assigned_value is not None:
+                        power_ranger.observed_value = Calculators.power_rowing(exercise.speed.assigned_value)
+                    else:
+                        power_ranger.lower_bound = Calculators.power_rowing(exercise.speed.min_value)
+                        if exercise.speed.max_value is not None:
+                            power_ranger.upper_bound = Calculators.power_rowing(exercise.speed.max_value)
+                            average_speed = (exercise.speed.min_value + exercise.speed.max_value) / float(2)
+                            power_ranger.observed_value = Calculators.power_rowing(average_speed)
+                        else:
+                            # TODO don't like this assumption
+                            power_ranger.observed_value = Calculators.power_rowing(exercise.speed.min_value)
+                    exercise.power = power_ranger
+                elif exercise.cardio_action == CardioAction.run:
+
+                    power_ranger = StandardErrorRange()
+                    if exercise.speed.assigned_value is not None:
+                        if exercise.grade.assigned_value is not None:
+                            power_ranger.observed_value = Calculators.power_running(exercise.speed.assigned_value, exercise.grade.assigned_value, self.user_weight)
+                        else:
+                            power_ranger.lower_bound = Calculators.power_running(exercise.speed.assigned_value,
+                                                                                 exercise.grade.min_value,
+                                                                                 self.user_weight)
+                            if exercise.grade.max_value is not None:
+                                power_ranger.upper_bound = Calculators.power_running(exercise.speed.assigned_value,
+                                                                                     exercise.grade.max_value,
+                                                                                     self.user_weight)
+                                average_grade = (exercise.grade.min_value + exercise.grade.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_running(exercise.speed.assigned_value,
+                                                                                        average_grade, self.user_weight)
+                            else:
+                                # TODO don't like this assumption
+                                power_ranger.observed_value = Calculators.power_running(exercise.speed.assigned_value,
+                                                                                        exercise.grade.min_value,
+                                                                                        self.user_weight)
+                    else:
+                        if exercise.grade.assigned_value is not None:
+                            power_ranger.lower_bound = Calculators.power_running(exercise.speed.min_value, exercise.grade.assigned_value, self.user_weight)
+                            if exercise.speed.max_value is not None:
+                                average_speed = (exercise.speed.min_value + exercise.speed.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_running(average_speed, exercise.grade.assigned_value, self.user_weight)
+                                power_ranger.upper_bound = Calculators.power_running(exercise.speed.max_value, exercise.grade.assigned_value, self.user_weight)
+                            else:
+                                power_ranger.observed_value = power_ranger.lower_bound
+
+                        else:
+                            # means both speed and grade use min/max values
+                            power_ranger.lower_bound = Calculators.power_running(exercise.speed.min_value,
+                                                                                 exercise.grade.min_value,
+                                                                                 self.user_weight)
+                            if exercise.speed.max_value is not None and exercise.grade.max_value is not None:
+                                power_ranger.upper_bound = Calculators.power_running(exercise.speed.max_value,
+                                                                                     exercise.grade.max_value,
+                                                                                     self.user_weight)
+                                average_grade = (exercise.grade.min_value + exercise.grade.max_value) / float(2)
+                                average_speed = (exercise.speed.min_value + exercise.speed.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_running(average_speed,
+                                                                                        average_grade,
+                                                                                        self.user_weight)
+                            else:
+                                # exercise.speed.max_value is None and/or exercise.grade.max_value is None:
+                                power_ranger.upper_bound = None
+                                # TODO don't like this assumption
+                                power_ranger.observed_value = Calculators.power_running(exercise.speed.min_value,
+                                                                                        exercise.grade.min_value,
+                                                                                        self.user_weight)
+                    exercise.power = power_ranger
+                elif exercise.cardio_action == CardioAction.cycle:
+                    power_ranger = StandardErrorRange()
+                    if exercise.speed.assigned_value is not None:
+                        if exercise.grade.assigned_value is not None:
+                            power_ranger.observed_value = Calculators.power_cycling(exercise.speed.assigned_value, grade=exercise.grade.assigned_value, user_weight=self.user_weight)
+                        else:
+                            power_ranger.lower_bound = Calculators.power_cycling(exercise.speed.assigned_value,
+                                                                                 grade=exercise.grade.min_value,
+                                                                                 user_weight=self.user_weight)
+                            if exercise.grade.max_value is not None:
+                                power_ranger.upper_bound = Calculators.power_cycling(exercise.speed.assigned_value,
+                                                                                     grade=exercise.grade.max_value,
+                                                                                     user_weight=self.user_weight)
+                                average_grade = (exercise.grade.min_value + exercise.grade.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_cycling(exercise.speed.assigned_value,
+                                                                                        grade=average_grade,
+                                                                                        user_weight=self.user_weight)
+                            else:
+                                # TODO don't like this assumption
+                                power_ranger.observed_value = Calculators.power_cycling(exercise.speed.assigned_value,
+                                                                                        grade=exercise.grade.min_value,
+                                                                                        user_weight=self.user_weight)
+                    else:
+                        if exercise.grade.assigned_value is not None:
+                            power_ranger.lower_bound = Calculators.power_cycling(exercise.speed.min_value,
+                                                                                 grade=exercise.grade.assigned_value,
+                                                                                 user_weight=self.user_weight)
+                            if exercise.speed.max_value is not None:
+                                average_speed = (exercise.speed.min_value + exercise.speed.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_cycling(average_speed, exercise.grade.assigned_value, self.user_weight)
+                                power_ranger.upper_bound = Calculators.power_cycling(exercise.speed.max_value, exercise.grade.assigned_value, self.user_weight)
+                            else:
+                                power_ranger.observed_value = power_ranger.lower_bound
+
+                        else:
+                            # means both speed and grade use min/max values
+                            power_ranger.lower_bound = Calculators.power_cycling(exercise.speed.min_value,
+                                                                                 grade=exercise.grade.min_value,
+                                                                                 user_weight=self.user_weight)
+                            if exercise.speed.max_value is not None and exercise.grade.max_value is not None:
+                                power_ranger.upper_bound = Calculators.power_cycling(exercise.speed.max_value,
+                                                                                     grade=exercise.grade.max_value,
+                                                                                     user_weight=self.user_weight)
+                                average_grade = (exercise.grade.min_value + exercise.grade.max_value) / float(2)
+                                average_speed = (exercise.speed.min_value + exercise.speed.max_value) / float(2)
+                                power_ranger.observed_value = Calculators.power_cycling(average_speed,
+                                                                                        grade=average_grade,
+                                                                                        user_weight=self.user_weight)
+                            else:
+                                # exercise.speed.max_value is None and/or exercise.grade.max_value is None:
+                                power_ranger.upper_bound = None
+                                # TODO don't like this assumption
+                                power_ranger.observed_value = Calculators.power_cycling(exercise.speed.min_value,
+                                                                                        grade=exercise.grade.min_value,
+                                                                                        user_weight=self.user_weight)
+                    exercise.power = power_ranger
+                else:  # for all other cardio types
+                    exercise.power = StandardErrorRange(
+                        observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
+            else:
+                exercise.power = StandardErrorRange(
+                    observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
+
+        if exercise.power.lower_bound is None:
+            exercise.power.lower_bound = exercise.power.observed_value
+
+        if exercise.power.upper_bound is None:
+            exercise.power.upper_bound = exercise.power.observed_value
 
         return exercise
 
@@ -282,7 +635,7 @@ class WorkoutProcessor(object):
         rep_max_percentage = round(min((float(actual_reps_weight) / one_rep_max_weight) * 96.7, 100), 0)
 
         # even though we base it on 100, math is off by ~ 3.3%
-
+        # TODO: check to see if this is too restrictive
         rpe_lookup_tuples = []
         rpe_lookup_tuples.append((10, 97, 100))
         rpe_lookup_tuples.append((9, 94, 97))
@@ -305,10 +658,10 @@ class WorkoutProcessor(object):
             rpe = rpe_tuple[0][0] + rpe_diff
 
             rpe = min(10, rpe)
-            rpe = max(0, rpe)
+            rpe = max(1, rpe)
 
         else:
-            rpe = 0
+            rpe = 1
 
         return round(rpe, 1)
 
@@ -331,67 +684,38 @@ class WorkoutProcessor(object):
 
         return reps
 
+    def get_max_reps_for_bodyweight_exercises(self, bodyweight_ratio, weight=0):
+        external_weight_ratio = weight / self.user_weight
+        bodyweight_ratio -= external_weight_ratio
+        if bodyweight_ratio <= 1:
+            return 1
+
+        return max(int((bodyweight_ratio - 1) / .033), 1)
+
     @staticmethod
     def get_prime_movers_from_joint_actions(joint_action_list, prime_movers):
 
         functional_movement_factory = FunctionalMovementFactory()
-        # prime_movers = []
-
-        # for prioritized_joint_action in joint_action_list:
-        #     joint_action_type = prioritized_joint_action.joint_action
-        #     functional_movement = functional_movement_factory.get_functional_movement(joint_action_type)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        #     prime_movers.extend(functional_movement.prime_movers)
-        # return prime_movers
 
         for prioritized_joint_action in joint_action_list:
             joint_action_type = prioritized_joint_action.joint_action
             functional_movement = functional_movement_factory.get_functional_movement(joint_action_type)
             if prioritized_joint_action.priority == 1:
-                prime_movers['first_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['first_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 2:
-                prime_movers['second_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['second_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 3:
-                prime_movers['third_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['third_prime_movers'].update(functional_movement.prime_movers)
             elif prioritized_joint_action.priority == 4:
-                prime_movers['fourth_prime_movers'].extend(functional_movement.prime_movers)
+                prime_movers['fourth_prime_movers'].update(functional_movement.prime_movers)
 
-    @staticmethod
-    def get_bodyweight_ratio_from_model(bodyweight, prime_movers, equipment):
-        bodyweight_ratio = bodyweight_coefficients['const']
-        if equipment == Equipment.dumbbells:
-            bodyweight_ratio += bodyweight_coefficients['equipment_dumbbells']
-        elif equipment == Equipment.cable:
-            bodyweight_ratio += bodyweight_coefficients['equipment_cable']
-        elif equipment == Equipment.machine:
-            bodyweight_ratio += bodyweight_coefficients['equipment_machine']
-        bodyweight_ratio += bodyweight * bodyweight_coefficients['bodyweight']
-
-        for prime_mover in prime_movers['first_prime_movers']:
-            var = f'prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients:
-                bodyweight_ratio += bodyweight_coefficients[var]
-        for prime_mover in prime_movers['second_prime_movers']:
-            var = f'second_prime_mover_{prime_mover}'
-            if var in bodyweight_coefficients:
-                bodyweight_ratio += bodyweight_coefficients[var]
-        return bodyweight_ratio
-
-    def get_action_rep_max_bodyweight_ratio(self, athlete_bodyweight, exercise):
-
-        # # if weight_used = 0, assume it's a bodyweight only exercise
-        # # TODO - test this assumption
-        # if weight_used == 0:
-        #     weight_used = athlete_bodyweight
-
+    def get_one_rep_max_bodyweight_ratio(self, exercise):
         # get prime movers from action
         prime_movers = {
-            "first_prime_movers": [],
-            "second_prime_movers": [],
-            "third_prime_movers": [],
-            "fourth_prime_movers": []
+            "first_prime_movers": set(),
+            "second_prime_movers": set(),
+            "third_prime_movers": set(),
+            "fourth_prime_movers": set()
             }
         for action in exercise.primary_actions:
             self.get_prime_movers_from_joint_actions(action.hip_joint_action, prime_movers)
@@ -401,43 +725,79 @@ class WorkoutProcessor(object):
             self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action, prime_movers)
             self.get_prime_movers_from_joint_actions(action.elbow_joint_action, prime_movers)
 
-        bodyweight_ratio = self.get_bodyweight_ratio_from_model(athlete_bodyweight, prime_movers, exercise.equipment)
+        if len(exercise.equipments) > 0:
+            equipment = exercise.equipments[0]
+        else:
+            equipment = Equipment.bodyweight
+        if equipment == Equipment.no_equipment:
+            equipment = Equipment.bodyweight
+        bodyweight_ratio = self.bodyweight_ratio_predictor.predict_bodyweight_ratio(self.user_weight, self.gender, prime_movers, equipment)
 
         return bodyweight_ratio
 
-    def get_rpe_from_weight(self, workout_exercise, athlete_bodyweight):
+    def get_rpe_from_weight(self, workout_exercise):
+        rpe = StandardErrorRange(observed_value=1)
+        # get correct equipment
+        if len(workout_exercise.equipments) > 0:
+            equipment = workout_exercise.equipments[0]
+        else:
+            equipment = Equipment.bodyweight
+        if equipment == Equipment.no_equipment:
+            equipment = Equipment.bodyweight
 
-        rpe = 0
-
-        reps = workout_exercise.reps_per_set * workout_exercise.sets
+        # get reps
+        reps = StandardErrorRange(observed_value=0)
+        if workout_exercise.reps_per_set is not None:
+            reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
+        elif workout_exercise.duration is not None:
+            reps.lower_bound = workout_exercise.duration / workout_exercise.duration_per_rep.upper_bound
+            reps.upper_bound = workout_exercise.duration / workout_exercise.duration_per_rep.lower_bound
+            reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
 
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
-
-            rpe = self.get_rpe_from_rep_max(workout_exercise.weight, reps)
+            rpe.observed_value = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
+            if reps.lower_bound is not None:
+                rpe1 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.lower_bound)
+                rpe2 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.upper_bound)
+                rpe.lower_bound = min([rpe1, rpe2])
+                rpe.upper_bound = max([rpe1, rpe2])
 
         else:
             if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
 
-                weight = workout_exercise.weight * athlete_bodyweight
+                weight = workout_exercise.weight * self.user_weight
 
             elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
 
                 weight = workout_exercise.weight
-
             else:
-                return rpe
+                weight = 0
 
-            bodyweight_ratio = self.get_action_rep_max_bodyweight_ratio(athlete_bodyweight, workout_exercise)
-            one_rep_max_weight = bodyweight_ratio * athlete_bodyweight
+            one_rep_max_bodyweight_ratio = self.get_one_rep_max_bodyweight_ratio(workout_exercise)
+            if equipment == Equipment.bodyweight:
+                rep_max_reps = self.get_max_reps_for_bodyweight_exercises(one_rep_max_bodyweight_ratio, weight)
+            else:
+                if weight == 0:
+                    return rpe
+                else:
+                    one_rep_max_weight = one_rep_max_bodyweight_ratio * self.user_weight
+                    # find the % 1RM value
+                    percent_one_rep_max_weight = min(100, (weight / one_rep_max_weight) * 100)
 
-            # find the % 1RM value
-            percent_one_rep_max_weight = min(100, (weight/one_rep_max_weight) * 100)
-
-            # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
-            rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
+                    # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
+                    rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
 
             # given the amount of reps they completed and the n of nRM, find the RPE
-            rpe = self.get_rpe_from_rep_max(rep_max_reps, reps)
+            rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
+            if reps.lower_bound is not None:
+                rpes = []
+                if reps.lower_bound > 0:
+                    rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound))
+                if reps.upper_bound > 0:
+                    rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound))
+                if len(rpes) > 0:
+                    rpe.lower_bound = min(rpes)
+                    rpe.upper_bound = max(rpes)
 
         return rpe
 

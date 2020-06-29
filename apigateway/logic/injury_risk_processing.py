@@ -25,6 +25,7 @@ class InjuryRiskProcessor(object):
         self.hist_injury_risk_dict = hist_injury_risk_dict
         self.relative_load_level = 3
         self.high_relative_load_sessions = athlete_stats.high_relative_load_sessions
+        self.high_relative_load_score = athlete_stats.high_relative_load_score
         self.aggregated_injury_risk_dict = {}
         self.viz_aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
@@ -61,16 +62,10 @@ class InjuryRiskProcessor(object):
 
         self.relative_load_level = 3
 
-        # if base_date == datetime(2019, 11, 19).date():
-        #     g =0
-        #
-        # if base_date == datetime(2019, 11, 20).date():
-        #     g = 0
-
         # check workload for relative load level
         if len(self.high_relative_load_sessions) > 0:
 
-            max_percent = 49.9
+            max_percent = max(50, self.high_relative_load_score)
 
             relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date() == base_date]
 
@@ -82,7 +77,7 @@ class InjuryRiskProcessor(object):
 
             if max_percent >= 75.0:
                 self.relative_load_level = 1
-            elif max_percent >= 50.0:
+            elif max_percent > 50.0:
                 self.relative_load_level = 2
 
          # check RPE for relative load level
@@ -103,6 +98,12 @@ class InjuryRiskProcessor(object):
                 if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
                     self.relative_load_level = min(self.relative_load_level, 1)
                 elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
+                    self.relative_load_level = min(self.relative_load_level, 2)
+
+            if r.session_type() == SessionType.mixed_activity or r.session_type() == SessionType.planned:
+                if r.contains_high_intensity_blocks():
+                    self.relative_load_level = min(self.relative_load_level, 1)
+                elif r.contains_moderate_intensity_blocks():
                     self.relative_load_level = min(self.relative_load_level, 2)
 
     @xray_recorder.capture('logic.InjuryRiskProcessor.get_consolidated_dict')

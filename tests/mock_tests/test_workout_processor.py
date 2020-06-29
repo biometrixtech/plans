@@ -1,9 +1,10 @@
 from logic.workout_processing import WorkoutProcessor
-from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
+from models.workout_program import WorkoutExercise, CompletedWorkoutSection, WorkoutProgramModule
 from models.movement_tags import AdaptationType, CardioAction, TrainingType
 from models.movement_actions import ExerciseAction, Movement, Explosiveness
 from models.exercise import UnitOfMeasure
 from models.heart_rate import HeartRateData
+from models.session import MixedActivitySession
 import datetime
 from utils import format_datetime
 import random
@@ -64,7 +65,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
 
 
 def get_section(name, exercises, start=None, end=None):
-    section = WorkoutSection()
+    section = CompletedWorkoutSection()
     section.name = name
     section.exercises = exercises
     section.start_date_time = format_datetime(start)
@@ -91,7 +92,9 @@ def test_one_load_section_one_no_load():
     workout.workout_sections = [section1, section2, section3]
 
     processor = WorkoutProcessor()
-    processor.process_workout(workout)
+    session = MixedActivitySession()
+    session.workout_program_module = workout
+    processor.process_workout(session)
     # total_training_load = workout.get_training_load()
 
     # assert workout_exercise1.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory
@@ -159,7 +162,9 @@ def test_shrz():
     workout.workout_sections = [section1, section2, section3]
 
     processor = WorkoutProcessor(hr_data=heart_rate_data)
-    processor.process_workout(workout)
+    session = MixedActivitySession()
+    session.workout_program_module = workout
+    processor.process_workout(session)
 
     assert not section1.assess_shrz  # no shrz for warmup
     assert section2.assess_shrz  # get shrz
@@ -187,5 +192,6 @@ def test_new_actions():
     workout.workout_sections = [section1]
 
     processor = WorkoutProcessor()
-    processor.process_workout(workout)
-    print('here')
+    session = MixedActivitySession()
+    session.workout_program_module = workout
+    processor.process_workout(session)

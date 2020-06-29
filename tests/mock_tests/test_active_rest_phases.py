@@ -199,8 +199,10 @@ def test_check_active_rest_phases_no_soreness_with_mixed_session():
     exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_1.tissue_load_left = StandardErrorRange(observed_value=100)
-    exercise_action_1.tissue_load_right = StandardErrorRange(observed_value=200)
+    #exercise_action_1.tissue_load_left = StandardErrorRange(observed_value=100)
+    #exercise_action_1.tissue_load_right = StandardErrorRange(observed_value=200)
+    exercise_action_1.power_load_left = StandardErrorRange(observed_value=100)
+    exercise_action_1.power_load_right = StandardErrorRange(observed_value=200)
     exercise_action_1.lower_body_stability_rating = 1.1
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
@@ -210,8 +212,10 @@ def test_check_active_rest_phases_no_soreness_with_mixed_session():
     exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_2.tissue_load_left = StandardErrorRange(observed_value=200)
-    exercise_action_2.tissue_load_right = StandardErrorRange(observed_value=100)
+    #exercise_action_2.tissue_load_left = StandardErrorRange(observed_value=200)
+    #exercise_action_2.tissue_load_right = StandardErrorRange(observed_value=100)
+    exercise_action_2.power_load_left = StandardErrorRange(observed_value=200)
+    exercise_action_2.power_load_right = StandardErrorRange(observed_value=100)
     exercise_action_2.lower_body_stability_rating = 1.1
     exercise_action_2.upper_body_stability_rating = 0.6
     exercise_action_2.adaptation_type = AdaptationType.power_explosive_action

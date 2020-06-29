@@ -1,4 +1,6 @@
 import math
+from models.training_volume import StandardErrorRange
+from models.movement_tags import Gender
 
 
 cardio_mets_table = {
@@ -22,6 +24,172 @@ cardio_mets_table = {
 
 
 class Calculators(object):
+
+    @classmethod
+    def vo2_max_estimation_demographics(cls, age, user_weight, user_height=1.7, gender=Gender.female, activity_level=5):
+        """
+
+        :param age:
+        :param user_weight: kg
+        :param user_height: m
+        :param gender:
+        :param activity_level: 1-7 scale based on duration and intensity of activity per week as defined in nhanes
+        :return:
+        """
+        bmi = user_weight / user_height ** 2
+        vo2_max_population = Calculators.vo2max_population(age, gender, activity_level)
+        vo2_max_nhanes = Calculators.vo2max_nhanes(age, bmi, gender, activity_level)
+        vo2_max_schembre = Calculators.vo2max_schembre(age, user_weight, user_height, gender, activity_level)
+        vo2_max_matthews = Calculators.vo2max_matthews(age, user_weight, user_height, gender, activity_level)
+        vo2_max = StandardErrorRange()
+        all_values = [vo2_max_population, vo2_max_nhanes, vo2_max_schembre, vo2_max_matthews]
+        vo2_max.lower_bound = min(all_values)
+        vo2_max.upper_bound = max(all_values)
+        vo2_max.observed_value = round(sum(all_values) / len(all_values), 1)
+
+        return vo2_max
+
+    @classmethod
+    def rpe_from_percent_vo2_max(cls, percent_vo2max):
+        """
+
+        :param percent_vo2max:
+        :return:
+        """
+        if percent_vo2max >= 100:
+            return 10.0
+        rpe_lookup_tuples = list()
+        rpe_lookup_tuples.append((10, 95, 100))
+        rpe_lookup_tuples.append((9, 90, 95))
+        rpe_lookup_tuples.append((8, 85, 90))
+        rpe_lookup_tuples.append((7, 80, 85))
+        rpe_lookup_tuples.append((6, 72.5, 80))
+        rpe_lookup_tuples.append((5, 65, 72.5))
+        rpe_lookup_tuples.append((4, 60, 65))
+        rpe_lookup_tuples.append((3, 55, 60))
+        rpe_lookup_tuples.append((2, 50, 55))
+        rpe_lookup_tuples.append((1, 0, 50))
+
+        rpe_tuple = [r for r in rpe_lookup_tuples if r[1] <= percent_vo2max <= r[2]]
+
+        if len(rpe_tuple) > 0:
+
+            perc_diff = percent_vo2max - rpe_tuple[0][1]
+            rpe_diff = perc_diff / float(rpe_tuple[0][2] - rpe_tuple[0][1])
+            rpe = rpe_tuple[0][0] + rpe_diff
+
+            rpe = min(10.0, rpe)
+            rpe = max(1.0, rpe)
+
+        else:
+            rpe = 1.0
+
+        return round(rpe, 1)
+
+    @classmethod
+    def vo2max_schembre(cls, age, weight, height, gender=Gender.female, activity_level=5):
+        """
+
+        :param age:
+        :param weight:
+        :param height:
+        :param gender:  Gender enum
+        :param activity_level
+        :return:
+        """
+        athletic_level_dict = {
+            0: {'walking': 0, 'moderate': 0, 'vigorous': 0},
+            1: {'walking': 30, 'moderate': 0, 'vigorous': 0},
+            2: {'walking': 0, 'moderate': 30, 'vigorous': 0},
+            3: {'walking': 0, 'moderate': 90, 'vigorous': 0},
+            4: {'walking': 0, 'moderate': 0, 'vigorous': 20},
+            5: {'walking': 0, 'moderate': 0, 'vigorous': 45},
+            6: {'walking': 0, 'moderate': 0, 'vigorous': 120},
+            7: {'walking': 0, 'moderate': 0, 'vigorous': 180}
+        }
+        athletic_level = athletic_level_dict.get(activity_level)
+
+        walking = math.sqrt(3.3 * athletic_level.get('walking'))
+        moderate = math.sqrt(4.0 * athletic_level.get('moderate'))
+        vigorous = math.sqrt(8.0 * athletic_level.get('vigorous'))
+        gender = 2 if gender == Gender.female else 1  # male = 1, female = 2
+        vo2max = round(68.959 - 8.323 * gender + .213 * age - 0.166 * weight - 5.248 * height - 0.096 * walking + .011 * moderate + 0.158 * vigorous, 1)
+        return vo2max
+
+    @classmethod
+    def vo2max_matthews(cls, age, weight, height, gender=Gender.female, activity_level=5.0):
+        """
+
+        :param age:
+        :param height:
+        :param weight:
+        :param gender:
+        :param activity_level: same as NHANES classification
+        :return:
+        """
+        # gender = 0 if female else 1
+        vo2max = round(34.142 + 11.403 * gender.value + .133 * age - .005 * age**2 + 9.17 * height - .254 * weight + 1.463 * activity_level, 1)
+        return vo2max
+
+    @classmethod
+    def vo2max_nhanes(cls, age, bmi=22.0, gender=Gender.female, activity_level=5.0):
+        """
+
+        :param age:
+        :param bmi:
+        :param activity_level: 1-7 scale based on duration and intensity of activity per week
+        :param gender:
+        :return:
+        """
+        # gender = 0 if female else 1
+        vo2_max = round(56.363 + 1.921 * activity_level - 0.381 * age - 0.754 * bmi + 10.987 * gender.value, 1)
+        return vo2_max
+
+    @classmethod
+    def vo2max_population(cls, age, female, activity_level=2):
+        """
+        based on: https://www8.garmin.com/manuals/webhelp/edge520/EN-US/GUID-1FBCCD9E-19E1-4E4C-BD60-1793B5B97EB3.html
+        :param age:
+        :param activity_level: 1-7 scale based on duration and intensity of activity per week same as nhanes, needs to be  converted to
+        :param female:
+        :return:
+        """
+
+        athletic_level_dict = {
+            0: 'untrained',
+            1: 'untrained',
+            2: 'fair',
+            3: 'fair',
+            4: 'good',
+            5: 'good',
+            6: 'excellent',
+            7: 'superior'
+        }
+        athletic_level = athletic_level_dict.get(activity_level)
+
+        population_fpt = {
+            'male': {
+                'superior':  {30: 55.4, 40: 54.0, 50: 52.5, 60: 48.9, 70: 45.7, 200: 42.1},
+                'excellent': {30: 51.1, 40: 48.3, 50: 46.4, 60: 43.4, 70: 39.5, 200: 36.7},
+                'good':      {30: 45.4, 40: 44.0, 50: 42.4, 60: 39.2, 70: 35.5, 200: 32.3},
+                'fair':      {30: 41.7, 40: 40.5, 50: 38.5, 60: 35.6, 70: 32.3, 200: 29.4},
+                'untrained': {30: 37.0, 40: 35.0, 50: 33.0, 60: 30.0, 70: 27.0, 200: 25}
+             },
+            'female': {
+                'superior':  {30: 49.6, 40: 47.4, 50: 45.3, 60: 41.1, 70: 37.8, 200: 36.7},
+                'excellent': {30: 43.9, 40: 43.4, 50: 39.7, 60: 36.7, 70: 33.0, 200: 30.9},
+                'good':      {30: 39.5, 40: 37.8, 50: 36.3, 60: 33.0, 70: 30.0, 200: 28.1},
+                'fair':      {30: 36.1, 40: 34.4, 50: 33.0, 60: 30.1, 70: 27.5, 200: 25.9},
+                'untrained': {30: 33.0, 40: 31.0, 50: 29.0, 60: 26.0, 70: 24.0, 200: 22.0}
+             }
+        }
+        if female:
+            vo2_max_age_dict = population_fpt.get('female').get(athletic_level)  # use fair as default
+        else:
+            vo2_max_age_dict = population_fpt.get('male').get(athletic_level)  # use fair as default
+        vo2_max = max([value for key, value in vo2_max_age_dict.items() if age < key])
+        return vo2_max
+
     @classmethod
     def vo2max_rowing(cls, time_2000m, weight):
         """
@@ -40,18 +208,18 @@ class Calculators(object):
         return vo2_max
 
     @classmethod
-    def vo2max_rowing_c2(cls, time_2000m, weight, female=True, highly_trained=False):
+    def vo2max_rowing_c2(cls, time_2000m, weight, gender=Gender.female, highly_trained=False):
         """
         concept2's formula
 
         :param time_2000m: time taken for best 2000mrow
         :param weight: in kg
-        :param female: bool
+        :param gender: Gender enum
         :param highly_trained: bool
         :return: vo2_max float
         """
 
-        if female:
+        if gender.name == 'female':
             if highly_trained:
                 if weight <= 61.36:
                     y = 14.6 - 1.5 * time_2000m
@@ -125,7 +293,7 @@ class Calculators(object):
         :param grade: float ( 0-1)
         :return:
         """
-        speed /= 60
+        speed *= 60  # convert to m/min
         work_vo2 = 0.2 * speed + 0.9 * speed * grade + 3.5
         return work_vo2
 
@@ -139,8 +307,20 @@ class Calculators(object):
         :param grade: float (0-1)
         :return:
         """
-        speed /= 60
+        speed *= 60  # convert to m/min
         work_vo2 = speed * (0.17 + grade * 0.79) + 3.5
+        return work_vo2
+
+    @classmethod
+    def work_vo2_running_from_power(cls, power, user_weight):
+        """
+
+        :param power:
+        :param user_weight:
+        :return:
+        """
+        mets = cls.watts_to_mets(power, user_weight, efficiency=.22)
+        work_vo2 = round(mets * 3.5, 1)
         return work_vo2
 
     @classmethod
@@ -167,6 +347,29 @@ class Calculators(object):
         :return:
         """
         work_vo2 = 1.74 * (power * 6.12 / weight) + 3.5
+        return work_vo2
+
+    @classmethod
+    def work_vo2_rowing_from_power(cls, power, weight):
+        """
+
+        :param power: watts
+        :param weight: kg
+        :return:
+        """
+        work_vo2 = (power * 14.4 + 65) / weight
+        return work_vo2
+
+    @classmethod
+    def work_vo2_cardio(cls, cardio_type, gender=Gender.female):
+        """
+
+        :param cardio_type:
+        :param gender:
+        :return:
+        """
+        mets = cls.mets_cardio(cardio_type, gender)
+        work_vo2 = mets * 3.5
         return work_vo2
 
     @classmethod
@@ -218,23 +421,23 @@ class Calculators(object):
         return vo2_max
 
     @classmethod
-    def get_ftp_age_weight(cls, age, weight, female=True):
+    def get_ftp_age_weight(cls, age, weight, gender=Gender.female):
         """
         This seems to be what you should be striving for after proper training.
         :param age:
         :param weight: kg
-        :param female:
+        :param gender:
         :return:
         """
         ftp = weight * 2.2 * 2
         age_based_adjustment = (1 - .005 * max([0, age - 35]))
         ftp *= age_based_adjustment
-        if female:
+        if gender.name == 'female':
             ftp *= .9
         return round(ftp, 1)
 
     @classmethod
-    def ftp_from_population(cls, weight, athletic_level=None, female=True):
+    def ftp_from_population(cls, weight, athletic_level=None, gender=Gender.female):
         """
         from Garmin
         https://www8.garmin.com/manuals/webhelp/edge520/EN-US/GUID-1F58FA8E-09FF-4E51-B9B4-C4B83ED1D6CE.html
@@ -256,7 +459,7 @@ class Calculators(object):
 
         :param weight:
         :param athletic_level:
-        :param female:
+        :param gender:
         :return:
         """
         population_fpt = {
@@ -275,7 +478,7 @@ class Calculators(object):
                 'untrained': .95
              }
         }
-        if female:
+        if gender.name == 'female':
             ftp_per_kg = population_fpt.get('female').get(athletic_level, 2.12)  # use fair as default
         else:
             ftp_per_kg = population_fpt.get('male').get(athletic_level, 2.5)  # use fair as default
@@ -351,7 +554,6 @@ class Calculators(object):
         """
         user_weight = 60.0 if user_weight is None else user_weight
         grade = .01 if grade is None else grade
-        speed /= 60  # convert m/s to m/min
         efficiency = .22
         work_vo2 = cls.work_vo2_running_alternate(speed, grade)
         mets = work_vo2 / 3.5
@@ -370,8 +572,30 @@ class Calculators(object):
         return power
 
     @classmethod
-    def power_resistance_exercise(cls):
-        pass
+    def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_eccentric=None, time_concentric=None):
+        """
+
+        :param weight_used: kg, weight of equipment used
+        :param user_weight: kg
+        :param distance_moved: m, expected distance moved in each concentric and eccentric direction, default of .5m is used (about halfway between squat and bench press)
+        :param time_eccentric: s, time taken for eccentric movement, default of 1.5s
+        :param time_concentric: s, time taken for concentric movement, default of 1.5s
+        :return:
+        """
+        total_weight = weight_used + user_weight
+        distance_moved = distance_moved or .5
+        time_concentric = time_concentric or 1.5
+        time_eccentric = time_eccentric or 1.5
+        accel_concentric = cls.get_accel(distance_moved, time_concentric)
+        accel_eccentric = cls.get_accel(distance_moved, time_eccentric)
+        force_concentric = cls.get_force(total_weight, accel_concentric)
+        force_eccentric = cls.get_force(total_weight, -accel_eccentric)
+        velocity_concentric = distance_moved / time_concentric
+        velocity_eccentric = distance_moved / time_eccentric
+        power_concentric = force_concentric * velocity_concentric
+        power_eccentric = force_eccentric * velocity_eccentric
+        average_power = round((power_concentric * time_concentric + power_eccentric * time_eccentric) / (time_concentric + time_eccentric), 1)
+        return average_power
 
     @classmethod
     def force_resistance_exercise(cls, weight, distance_moved=None, time_down=None, time_up=None):
@@ -388,23 +612,23 @@ class Calculators(object):
             accel_up = cls.get_accel(distance_moved, time_up)
             force_down = cls.get_force(weight, -accel_down)
             force_up = cls.get_force(weight, accel_up)
-            average_force = round((force_down + force_up) / 2, 1)
+            average_force = round((force_down * time_down + force_up * time_up) / (time_down + time_up), 1)
         else:
             average_force = cls.get_force(weight)
         return average_force
 
     @classmethod
-    def power_cardio(cls, cardio_type, user_weight, female=True):
+    def power_cardio(cls, cardio_type, user_weight, gender=Gender.female):
         """
 
         :param cardio_type: string
         :param user_weight: kg
-        :param female: bool
+        :param gender: Gender enum
         :return:
         """
         cardio_name = cardio_type.name if cardio_type is not None else None
         # cardio_name = cardio_type.name or None
-        mets = cls.mets_cardio(cardio_name, female)
+        mets = cls.mets_cardio(cardio_name, gender)
         power = cls.mets_to_watts(mets, user_weight, efficiency=.21)
         return power
 
@@ -448,16 +672,16 @@ class Calculators(object):
         return force
 
     @classmethod
-    def force_cardio(cls, cardio_type, user_weight=60.0, female=True):
+    def force_cardio(cls, cardio_type, user_weight=60.0, gender=Gender.female):
         """
 
         :param cardio_type:
         :param user_weight:
-        :param female:
+        :param gender:
         :return:
         """
         cardio_name = cardio_type.name if cardio_type is not None else None
-        mets = cls.mets_cardio(cardio_name, female)
+        mets = cls.mets_cardio(cardio_name, gender)
         force = round(mets * 3.5 * user_weight * 427 / (200 * 60), 2)
         return force
 
@@ -486,14 +710,14 @@ class Calculators(object):
         return accel
 
     @classmethod
-    def mets_cardio(cls, cardio_type, female=True):
+    def mets_cardio(cls, cardio_type, gender=Gender.female):
         """
 
         :param cardio_type:
-        :param female:
+        :param gender:
         :return:
         """
         mets = cardio_mets_table.get(cardio_type, 5)  # default to 5
-        if female:
+        if gender.name == 'female':
             mets -= 1
         return mets

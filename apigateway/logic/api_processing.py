@@ -2,6 +2,7 @@ from models.session import SessionType, SessionFactory
 from models.sport import SportName
 from models.symptom import Symptom
 from models.heart_rate import SessionHeartRate, HeartRateData
+from models.planned_exercise import PlannedWorkout
 from logic.user_stats_processing import UserStatsProcessing
 from logic.activity_management import ActivityManager
 from logic.heart_rate_processing import HeartRateProcessing
@@ -22,6 +23,26 @@ class APIProcessing(object):
         self.workout_programs = []
         self.symptoms = []
         self.user_stats_processor = None
+        self.activity_manager = None
+
+    def create_planned_workout_from_id(self, program_id):
+
+        planned_workout = self.datastore_collection.workout_datastore.get(program_id)
+        user_weight = 60
+
+        if self.user_stats is not None:
+            if self.user_stats.athlete_weight is not None:
+                user_weight = self.user_stats.athlete_weight
+            if self.user_stats.fitness_provider_cardio_profile is not None:
+                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout,
+                                                                                  assignment_type=self.user_stats.fitness_provider_cardio_profile)
+            else:
+                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout)
+
+        if planned_workout is not None:
+            self.sessions.append(planned_workout)
+        else:
+            raise ValueError("invalid program_id")
 
     def create_session_from_survey(self, session):
         session_obj = self.convert_session(session)
@@ -71,7 +92,14 @@ class APIProcessing(object):
             session_obj.workout_program_module.user_id = session_obj.user_id
             session_obj.workout_program_module.event_date_time = session_obj.event_date
             hr_workout = self.heart_rate_data[0].hr_workout if len(self.heart_rate_data) > 0 else None
-            WorkoutProcessor().process_workout(session_obj.workout_program_module, hr_workout, self.user_age)
+            session_obj = WorkoutProcessor(
+                    user_age=self.user_age,
+                    user_weight=self.user_stats.athlete_weight,
+                    hr_data=hr_workout,
+                    vo2_max=self.user_stats.vo2_max,
+                    gender=self.user_stats.athlete_gender
+            ).process_workout(session_obj)
+            #session_obj.update_training_loads(session_training_load)
             self.workout_programs.append(session_obj.workout_program_module)
         if len(self.heart_rate_data) > 0:
             if session_obj.workout_program_module is not None:
@@ -94,7 +122,7 @@ class APIProcessing(object):
         symptom = Symptom.json_deserialise(symptom)
         self.symptoms.append(symptom)
 
-    def create_activity(self, activity_type, update_stats=True, activity_id=None, training_session_id=None):
+    def create_activity(self, activity_type, update_stats=True, activity_id=None, training_session_id=None, planned_session=None):
         if update_stats:
             # update stats
             if self.user_stats_processor is None:
@@ -109,20 +137,21 @@ class APIProcessing(object):
             user_stats_datastore.put(user_stats)
 
         # create activity
-        activity_manager = ActivityManager(
+        self.activity_manager = ActivityManager(
                 self.user_id,
                 self.datastore_collection,
                 self.event_date_time,
                 training_sessions=self.sessions,
                 symptoms=self.symptoms,
-                user_stats=self.user_stats
+                user_stats=self.user_stats,
+                planned_workout=planned_session
         )
         if activity_type == 'mobility_wod':
-            activity = activity_manager.create_mobility_wod()
+            activity = self.activity_manager.create_mobility_wod()
         elif activity_type == 'movement_prep':
-            activity = activity_manager.create_movement_prep()
+            activity = self.activity_manager.create_movement_prep()
         elif activity_type == 'responsive_recovery':
-            activity = activity_manager.create_responsive_recovery(responsive_recovery_id=activity_id, training_session_id=training_session_id)
+            activity = self.activity_manager.create_responsive_recovery(responsive_recovery_id=activity_id, training_session_id=training_session_id)
         else:
             raise ValueError("invalid activity type")
         return activity

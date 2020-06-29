@@ -1,22 +1,25 @@
 from models.functional_movement import FunctionalMovementActionMapping, FunctionalMovementFactory
 from logic.workout_processing import WorkoutProcessor
-from models.workout_program import WorkoutExercise, WorkoutSection, WorkoutProgramModule
+from models.workout_program import WorkoutExercise, CompletedWorkoutSection, WorkoutProgramModule
 from models.movement_tags import TrainingType
 from models.movement_actions import ExerciseAction
 from models.exercise import UnitOfMeasure
+from models.session import MixedActivitySession
 from utils import none_max
 import datetime
 
 
 def create_and_process_wokout(exercises):
-    section = WorkoutSection()
+    section = CompletedWorkoutSection()
     section.name = 'stamina'
     section.exercises = exercises
 
     workout = WorkoutProgramModule()
     workout.workout_sections = [section]
+    session = MixedActivitySession()
     processor = WorkoutProcessor()
-    processor.process_workout(workout)
+    session.workout_program_module = workout
+    processor.process_workout(session)
 
 
 def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):

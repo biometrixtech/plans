@@ -124,6 +124,7 @@ class AthleteStats(Serialisable):
         self.longitudinal_trends = []
         self.load_stats = LoadStats()
         self.high_relative_load_sessions = []
+        self.high_relative_load_score = 50
         self.training_volume_chart_data = []
 
         self.soreness_chart_data = {}
@@ -520,7 +521,8 @@ class AthleteStats(Serialisable):
             'api_version': self.api_version,
             'timezone': self.timezone,
             'historic_asymmetry': {str(asymmetry_type): historic_asymmetry.json_serialise() for (asymmetry_type, historic_asymmetry) in self.historic_asymmetry.items()},
-            'has_three_sensor_data': self.has_three_sensor_data
+            'has_three_sensor_data': self.has_three_sensor_data,
+            'high_relative_load_score': self.high_relative_load_score
         }
         return ret
 
@@ -585,6 +587,7 @@ class AthleteStats(Serialisable):
         athlete_stats.historic_asymmetry = {int(asymmetry_type): HistoricAsymmetry.json_deserialise(historic_asymmetry)
                                             for (asymmetry_type, historic_asymmetry) in input_dict.get('historic_asymmetry', {}).items()}
         athlete_stats.has_three_sensor_data = input_dict.get('has_three_sensor_data', False)
+        athlete_stats.high_relative_load_score = input_dict.get('high_relative_load_score', 50)
         return athlete_stats
 
     @classmethod

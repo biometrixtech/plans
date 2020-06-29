@@ -1,8 +1,9 @@
+from models.movement_tags import Gender
 from serialisable import Serialisable
 from models.load_stats import LoadStats
 from models.session import HighLoadSession, HighDetailedLoadSession
 from models.stats import StandardErrorRange
-from utils import format_date, parse_date, format_datetime, parse_datetime
+from utils import parse_date, format_datetime, parse_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
 
@@ -16,26 +17,32 @@ class UserStats(Serialisable):
         self.load_stats = LoadStats()
         self.sport_max_load = {}
         self.high_relative_load_sessions = []
+        self.high_relative_load_score = 50
         self.eligible_for_high_load_trigger = False
+        self.athlete_age = 25
+        self.athlete_weight = 60.0
+        self.athlete_height = 1.7
+        self.athlete_gender = Gender.female
 
         self.expected_weekly_workouts = 3
 
         self.vo2_max = None
+        self.vo2_max_date_time = None
         self.functional_threshold_power = None
 
-        self.average_newtons_5_day = None
-        self.average_newtons_20_day = None
-        self.average_watts_5_day = None
-        self.average_watts_20_day = None
+        self.average_force_5_day = None
+        self.average_force_20_day = None
+        self.average_power_5_day = None
+        self.average_power_20_day = None
         self.average_work_vo2_5_day = None
         self.average_work_vo2_20_day = None
         self.average_rpe_5_day = None
         self.average_rpe_20_day = None
 
-        self.average_newtons_load_5_day = None
-        self.average_newtons_load_20_day = None
-        self.average_watts_load_5_day = None
-        self.average_watts_load_20_day = None
+        self.average_tissue_load_5_day = None
+        self.average_tissue_load_20_day = None
+        self.average_power_load_5_day = None
+        self.average_power_load_20_day = None
         self.average_work_vo2_load_5_day = None
         self.average_work_vo2_load_20_day = None
         self.average_rpe_load_5_day = None
@@ -43,6 +50,8 @@ class UserStats(Serialisable):
 
         self.average_trimp_5_day = None
         self.average_trimp_20_day = None
+
+        self.fitness_provider_cardio_profile = None
 
     def __setattr__(self, name, value):
         if name == 'event_date' and value is not None:
@@ -52,45 +61,6 @@ class UserStats(Serialisable):
                 except InvalidSchemaException:
                     value = parse_date(value)
         super().__setattr__(name, value)
-
-    def get_load_5_20(self, attribute_5_day_name, attribute_20_day_name):
-
-        attribute_5_day = getattr(self, attribute_5_day_name)
-        attribute_20_day = getattr(self, attribute_20_day_name)
-
-        if attribute_5_day is not None and attribute_20_day is not None:
-            standard_error_range = StandardErrorRange()
-            standard_error_range.lower_bound = attribute_5_day.lower_bound / attribute_20_day.lower_bound
-            standard_error_range.upper_bound = attribute_5_day.upper_bound / attribute_20_day.upper_bound
-            standard_error_range.observed_value = attribute_5_day.observed_value / attribute_20_day.observed_value
-            standard_error_range.insufficient_data = min(attribute_5_day.insufficient_data,
-                                                         attribute_20_day.insufficient_data)
-
-            return standard_error_range
-
-        else:
-
-            return None
-
-    def newtons_load_5_20(self):
-
-        return self.get_load_5_20("average_newtons_load_5_day", "average_newtons_load_20_day")
-
-    def rpe_load_5_20(self):
-
-        return self.get_load_5_20("average_rpe_load_5_day", "average_rpe_load_20_day")
-
-    def trimp_5_20(self):
-
-        return self.get_load_5_20("average_trimp_load_5_day", "average_trimp_load_20_day")
-
-    def watts_load_5_20(self):
-
-        return self.get_load_5_20("average_watts_load_5_day", "average_watts_load_20_day")
-
-    def work_vo2_load_5_20(self):
-
-        return self.get_load_5_20("average_work_vo2_load_5_day", "average_work_vo2_load_20_day")
 
     def json_serialise(self):
         ret = {
@@ -103,25 +73,33 @@ class UserStats(Serialisable):
             'api_version': self.api_version,
             'timezone': self.timezone,
             'vo2_max': self.vo2_max,
+            'vo2_max_date_time': format_datetime(self.vo2_max_date_time),
+            'athlete_age': self.athlete_age,
+            'athlete_weight': self.athlete_weight,
+            'athlete_height': self.athlete_height,
+            'athlete_gender': self.athlete_gender.value if self.athlete_gender is not None else None,
             'functional_threshold_power': self.functional_threshold_power,
-            'average_newtons_5_day': self.average_newtons_5_day.json_serialise() if self.average_newtons_5_day is not None else None,
-            'average_newtons_20_day': self.average_newtons_20_day.json_serialise() if self.average_newtons_20_day is not None else None,
-            'average_watts_5_day': self.average_watts_5_day.json_serialise() if self.average_watts_5_day is not None else None,
-            'average_watts_20_day': self.average_watts_20_day.json_serialise() if self.average_watts_20_day is not None else None,
+            'average_force_5_day': self.average_force_5_day.json_serialise() if self.average_force_5_day is not None else None,
+            'average_force_20_day': self.average_force_20_day.json_serialise() if self.average_force_20_day is not None else None,
+            'average_power_5_day': self.average_power_5_day.json_serialise() if self.average_power_5_day is not None else None,
+            'average_power_20_day': self.average_power_20_day.json_serialise() if self.average_power_20_day is not None else None,
             'average_work_vo2_5_day': self.average_work_vo2_5_day.json_serialise() if self.average_work_vo2_5_day is not None else None,
             'average_work_vo2_20_day': self.average_work_vo2_20_day.json_serialise() if self.average_work_vo2_20_day is not None else None,
             'average_rpe_5_day': self.average_rpe_5_day.json_serialise() if self.average_rpe_5_day is not None else None,
             'average_rpe_20_day': self.average_rpe_20_day.json_serialise() if self.average_rpe_20_day is not None else None,
-            'average_newtons_load_5_day': self.average_newtons_load_5_day.json_serialise() if self.average_newtons_load_5_day is not None else None,
-            'average_newtons_load_20_day': self.average_newtons_load_20_day.json_serialise() if self.average_newtons_load_20_day is not None else None,
-            'average_watts_load_5_day': self.average_watts_load_5_day.json_serialise() if self.average_watts_load_5_day is not None else None,
-            'average_watts_load_20_day': self.average_watts_load_20_day.json_serialise() if self.average_watts_load_20_day is not None else None,
+            'average_tissue_load_5_day': self.average_tissue_load_5_day.json_serialise() if self.average_tissue_load_5_day is not None else None,
+            'average_tissue_load_20_day': self.average_tissue_load_20_day.json_serialise() if self.average_tissue_load_20_day is not None else None,
+            'average_power_load_5_day': self.average_power_load_5_day.json_serialise() if self.average_power_load_5_day is not None else None,
+            'average_power_load_20_day': self.average_power_load_20_day.json_serialise() if self.average_power_load_20_day is not None else None,
             'average_work_vo2_load_5_day': self.average_work_vo2_load_5_day.json_serialise() if self.average_work_vo2_load_5_day is not None else None,
             'average_work_vo2_load_20_day': self.average_work_vo2_load_20_day.json_serialise() if self.average_work_vo2_load_20_day is not None else None,
             'average_rpe_load_5_day': self.average_rpe_load_5_day.json_serialise() if self.average_rpe_load_5_day is not None else None,
             'average_rpe_load_20_day': self.average_rpe_load_20_day.json_serialise() if self.average_rpe_load_20_day is not None else None,
             'average_trimp_5_day': self.average_trimp_5_day.json_serialise() if self.average_trimp_5_day is not None else None,
-            'average_trimp_20_day': self.average_trimp_20_day.json_serialise() if self.average_trimp_20_day is not None else None
+            'average_trimp_20_day': self.average_trimp_20_day.json_serialise() if self.average_trimp_20_day is not None else None,
+            'high_relative_load_score': self.high_relative_load_score,
+            'fitness_provider_cardio_profile': self.fitness_provider_cardio_profile if self.fitness_provider_cardio_profile is not None else None,
+
         }
         return ret
 
@@ -137,24 +115,33 @@ class UserStats(Serialisable):
         user_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         user_stats.vo2_max = input_dict.get('vo2_max')
         user_stats.functional_threshold_power = input_dict.get('functional_threshold_power')
-        user_stats.average_newtons_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_newtons_5_day') is not None else None
-        user_stats.average_newtons_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_newtons_20_day') is not None else None
-        user_stats.average_watts_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_watts_5_day') is not None else None
-        user_stats.average_watts_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_watts_20_day') is not None else None
+        user_stats.average_force_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_5_day') is not None else None
+        user_stats.average_force_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_20_day') is not None else None
+        user_stats.average_power_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_power_5_day') is not None else None
+        user_stats.average_power_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_power_20_day') is not None else None
         user_stats.average_work_vo2_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_work_vo2_5_day') is not None else None
         user_stats.average_work_vo2_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_work_vo2_20_day') is not None else None
         user_stats.average_rpe_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_rpe_5_day') is not None else None
         user_stats.average_rpe_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_rpe_20_day') is not None else None
-        user_stats.average_newtons_load_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_newtons_load_5_day') is not None else None
-        user_stats.average_newtons_load_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_newtons_load_20_day') is not None else None
-        user_stats.average_watts_load_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_watts_load_5_day') is not None else None
-        user_stats.average_watts_load_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_watts_load_20_day') is not None else None
+        user_stats.average_force_load_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_load_5_day') is not None else None
+        user_stats.average_force_load_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_load_20_day') is not None else None
+        user_stats.average_power_load_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_power_load_5_day') is not None else None
+        user_stats.average_power_load_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_power_load_20_day') is not None else None
         user_stats.average_work_vo2_load_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_work_vo2_load_5_day') is not None else None
         user_stats.average_work_vo2_load_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_work_vo2_load_20_day') is not None else None
         user_stats.average_rpe_load_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_rpe_load_5_day') is not None else None
         user_stats.average_rpe_load_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_rpe_load_20_day') is not None else None
         user_stats.average_trimp_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_trimp_5_day') is not None else None
         user_stats.average_trimp_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_trimp_20_day') is not None else None
+        user_stats.high_relative_load_score = input_dict.get('high_relative_load_score', 50)
+
+        user_stats.fitness_provider_cardio_profile = input_dict.get('fitness_provider_cardio_profile')
+
+        user_stats.vo2_max_date_time = input_dict.get('vo2_max_date_time')
+        user_stats.athlete_age = input_dict.get('athlete_age', 25)
+        user_stats.athlete_weight = input_dict.get('athlete_weight', 60.0)
+        user_stats.athlete_height = input_dict.get('athlete_height', 1.7)
+        user_stats.athlete_gender = input_dict.get('athlete_gender') or Gender.female
 
         return user_stats
 
