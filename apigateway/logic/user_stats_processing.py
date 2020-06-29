@@ -279,13 +279,13 @@ class UserStatsProcessing(object):
                                  current_user_stats.vo2_max.observed_value is not None and
                                  current_user_stats.vo2_max.lower_bound is None and
                                  current_user_stats.vo2_max.upper_bound is None)
-        if not user_provided_vo2_max:  # TODO: maybe add date check to see if it was recently calculated
+        if not user_provided_vo2_max:  # TODO: https://app.asana.com/0/1157098685993091/1182437140766011
             current_user_stats.vo2_max = Calculators.vo2_max_estimation_demographics(
                     age=current_user_stats.athlete_age,
                     user_weight=current_user_stats.athlete_weight,
                     user_height=current_user_stats.athlete_height,
                     gender=current_user_stats.athlete_gender,
-                    activity_level=5.0 # need to change
+                    activity_level=5.0 # TODO: https://app.asana.com/0/1157098685993091/1182437140766009
             )
             current_user_stats.vo2_max_date_time = self.event_date
 
