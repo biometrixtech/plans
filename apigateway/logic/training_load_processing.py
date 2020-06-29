@@ -345,9 +345,9 @@ class TrainingLoadProcessing(object):
 
         self.high_relative_load_score = max(tissue_load_percent, power_load_percent)
 
-    def get_average_error_range(self, atrribute_name, session_list):
-
-        error_range_values = [getattr(s, atrribute_name) for s in session_list]
+    # def get_average_error_range(self, atrribute_name, session_list):
+    #
+    #     error_range_values = [getattr(s, atrribute_name) for s in session_list]
 
 
     def get_percent(self, test_value, base_value):
