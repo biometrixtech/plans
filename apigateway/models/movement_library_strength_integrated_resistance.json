@@ -2,7 +2,7 @@
     "Supine Chest Press": {
         "id": "Supine Chest Press",
         "name": "Dumbbell Chest Press",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -109,7 +109,7 @@
         "external_weight_implement": [
             7
         ],
-        "speed": 3,
+        "speed": 4,
         "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
@@ -154,7 +154,7 @@
     "Standing Double Arm Bicep Curl": {
         "id": "Standing Double Arm Bicep Curl",
         "name": "Bicep Curl",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -178,7 +178,7 @@
     "Plank with Single Arm Row": {
         "id": "Plank with Single Arm Row",
         "name": "Alternating Plank Low Row",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -203,7 +203,7 @@
     "Plank from Knees with Single Arm Row": {
         "id": "Plank from Knees with Single Arm Row",
         "name": "Alternating Plank Low Row Variation, On Knees",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -228,7 +228,7 @@
     "Standing Lateral Raise": {
         "id": "Standing Lateral Raise",
         "name": "Lateral Raise",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -251,7 +251,7 @@
     "Stranding Lateral Raise with Neutral Grip": {
         "id": "Stranding Lateral Raise with Neutral Grip",
         "name": "Lateral Raise Variation, Neutral Grip",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -275,7 +275,7 @@
     "ISO Sumo Squat with a Front Raise": {
         "id": "ISO Sumo Squat with a Front Raise",
         "name": "ISO Sumo Squat with a Front Raise",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -299,7 +299,7 @@
     "ISO Sumo Squat with a Front Raise Variation, Neutral Grip": {
         "id": "ISO Sumo Squat with a Front Raise Variation, Neutral Grip",
         "name": "ISO Sumo Squat with a Front Raise Variation, Neutral Grip",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -324,7 +324,7 @@
     "Squat with Dumbbells at Side": {
         "id": "Squat with Dumbbells at Side",
         "name": "Squat with Dumbbells at Sides",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -347,17 +347,15 @@
     "Toe Reach": {
         "id": "Toe Reach",
         "name": "Toe Reach",
-        "training_type": null,
+        "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [
-            8
-        ],
+        "external_weight_implement": [],
         "speed": 2,
-        "resistance": 1,
+        "resistance": null,
         "surface_stability": 0,
         "primary_actions": [
             "1010",
@@ -370,17 +368,15 @@
     "Toe Reach, bent knees": {
         "id": "Toe Reach, bent knees",
         "name": "Toe Reach Variation, Knees bent",
-        "training_type": null,
+        "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [
-            8
-        ],
+        "external_weight_implement": [],
         "speed": 2,
-        "resistance": 1,
+        "resistance": null,
         "surface_stability": 0,
         "primary_actions": [
             "1010.1_a",
@@ -394,7 +390,7 @@
     "Double Crunch": {
         "id": "Double Crunch",
         "name": "Double Crunch",
-        "training_type": null,
+        "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -418,7 +414,7 @@
     "Double Crunch with Dumbbell Overhead": {
         "id": "Double Crunch with Dumbbell Overhead",
         "name": "Double Crunch with Dumbbell Overhead",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -443,10 +439,33 @@
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
+    "Pop Jack Variation, Walking to Plank": {
+        "id": "Pop Jack Variation, Walking to Plank",
+        "name": "Pop Jack Variation, Walking to Plank",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1004",
+            "plank\n1210.1_a",
+            "1210.1_b walk out of plank\n1210_a",
+            "1210_b",
+            "walk into plank"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
     "Sumo Squat with Everted Calf Raise": {
         "id": "Sumo Squat with Everted Calf Raise",
         "name": "Frogger Variation, no jump, instead squat with calf raise",
-        "training_type": null,
+        "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -470,7 +489,7 @@
     "TRX Chest Press": {
         "id": "TRX Chest Press",
         "name": "Strap Chest Press",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -491,7 +510,7 @@
     "Push Up": {
         "id": "Push Up",
         "name": "Push-Up Variation, hands on the bench",
-        "training_type": null,
+        "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -514,7 +533,7 @@
     "Push Up on Knees": {
         "id": "Push Up on Knees",
         "name": "Push-Up Variation, knees on the ground",
-        "training_type": null,
+        "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -537,7 +556,7 @@
     "Standing Overhead Tricep Extension": {
         "id": "Standing Overhead Tricep Extension",
         "name": "Dumbbell Overhead Tricep Extension",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -561,7 +580,7 @@
     "TRX Overhead Tricep Extension": {
         "id": "TRX Overhead Tricep Extension",
         "name": "Strap Tricep Extension Variation,  stagger step",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -583,7 +602,7 @@
     "Banded Neutral Front Raise": {
         "id": "Banded Neutral Front Raise",
         "name": "Front Raise",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -605,7 +624,7 @@
     "Standing Weight Neutral Front Raise": {
         "id": "Standing Weight Neutral Front Raise",
         "name": "Low Band Neutral Front Raise Variation, with Dumbbell",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -629,7 +648,7 @@
     "Quadruped with mini band shoulder horizontal abduction": {
         "id": "Quadruped with mini band shoulder horizontal abduction",
         "name": "4 Point Glide",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -650,7 +669,7 @@
     "Banded Upper Cut": {
         "id": "Banded Upper Cut",
         "name": "Upper Cut",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -672,7 +691,7 @@
     "Odd Exericise, with these actions receiving proper target loads": {
         "id": "Odd Exericise, with these actions receiving proper target loads",
         "name": "Hip Hinge Low Row to Bicep Curl",
-        "training_type": null,
+        "training_type": 3,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,

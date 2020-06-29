@@ -98,6 +98,7 @@ class MovementLibraryParser(object):
             'speed': 'slow',
             # 'slow': 'low_speed',
             # 'mod': 'mod_speed',
+            'normal': 'mod',
             'max_speed': 'fast',
             # 'explosive': 'explosive_speed'
         }

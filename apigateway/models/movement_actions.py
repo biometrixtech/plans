@@ -597,7 +597,7 @@ class MovementSpeed(Enum):
     slow = 1
     mod = 2
     fast = 3
-    explosive_speed = 4
+    explosive = 4
     # no_speed = 0
     # low_speed = 1
     # mod_speed = 2
