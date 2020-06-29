@@ -196,7 +196,7 @@ def test_very_sparse_sessions_high_load():
     start_date = format_date(datetime.now().date())
     end_date = format_date(datetime.now().date())
     time_deltas = [0,8,10,17]
-    tissue_loads = [225,130,140,90]
+    tissue_loads = [375,130,140,90]
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
@@ -219,7 +219,7 @@ def test_very_sparse_sessions_high_load_no_workout_last_day():
     start_date = format_date(datetime.now().date())
     end_date = format_date(datetime.now().date())
     time_deltas = [1,8,10,17]
-    tissue_loads = [225,130,140,90]
+    tissue_loads = [375,130,140,90]
     sessions = []
     for t in range(0,len(time_deltas)):
         session_event_date = (datetime.now()-timedelta(days=time_deltas[t])).replace(tzinfo=pytz.utc)
