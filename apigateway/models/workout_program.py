@@ -280,7 +280,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
             'bilateral': self.bilateral,
             'movement_id': self.movement_id,
             'hr': self.hr,
-            'predicted_rpe':self.predicted_rpe,
+            'predicted_rpe':self.predicted_rpe.json_serialise() if self.predicted_rpe is not None else None,
             'duration': self.duration,
             'distance': self.distance,
             'speed': self.speed,
@@ -326,7 +326,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
         exercise.movement_id = input_dict.get('movement_id')
         exercise.hr = input_dict.get('hr')
-        exercise.predicted_rpe = input_dict.get('predicted_rpe')
+        exercise.predicted_rpe = StandardErrorRange.json_deserialise(input_dict.get('predicted_rpe')) if input_dict.get('predicted_rpe') is not None else None
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
             'adaptation_type') is not None else None

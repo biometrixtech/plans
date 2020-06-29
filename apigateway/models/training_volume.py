@@ -535,19 +535,43 @@ class Assignment(object):
             if divisor_assignment.assigned_value is not None:
                 result_assignment.assigned_value = divisor_assignment.assigned_value / float(dividend_assignment.assigned_value)
             else:
-                result_assignment.min_value = divisor_assignment.min_value / float(dividend_assignment.assigned_value)
+                combinations = []
+                if divisor_assignment.min_value is not None:
+                    combinations.append(divisor_assignment.min_value / float(dividend_assignment.assigned_value))
                 if divisor_assignment.max_value is not None:
-                    result_assignment.max_value = divisor_assignment.max_value / float(dividend_assignment.assigned_value)
+                    combinations.append(divisor_assignment.max_value / float(dividend_assignment.assigned_value))
+
+                if divisor_assignment.min_value is not None:
+                    result_assignment.min_value = min(combinations)
+                if divisor_assignment.max_value is not None:
+                    result_assignment.max_value = max(combinations)
         else:
             if divisor_assignment.assigned_value is not None:
-                result_assignment.min_value = divisor_assignment.assigned_value / float(dividend_assignment.min_value)
+                combinations = []
+                if dividend_assignment.min_value is not None:
+                    combinations.append(divisor_assignment.assigned_value / float(dividend_assignment.min_value))
                 if dividend_assignment.max_value is not None:
-                    result_assignment.max_value = divisor_assignment.assigned_value / float(dividend_assignment.max_value)
+                    combinations.append(divisor_assignment.assigned_value / float(dividend_assignment.max_value))
+
+                if dividend_assignment.min_value is not None:
+                    result_assignment.min_value = min(combinations)
+                if dividend_assignment.max_value is not None:
+                    result_assignment.max_value = max(combinations)
             else:
+                combinations = []
                 if divisor_assignment.min_value is not None:
-                    result_assignment.min_value = divisor_assignment.min_value / float(dividend_assignment.min_value)
+                    combinations.append(divisor_assignment.min_value / float(dividend_assignment.min_value))
+                    if dividend_assignment.max_value is not None:
+                        combinations.append(divisor_assignment.min_value / float(dividend_assignment.max_value))
                 if dividend_assignment.max_value is not None:
-                    result_assignment.max_value = divisor_assignment.max_value / float(dividend_assignment.max_value)
+                    combinations.append(divisor_assignment.max_value / float(dividend_assignment.max_value))
+                    if dividend_assignment.min_value is not None:
+                        combinations.append(divisor_assignment.max_value / float(dividend_assignment.min_value))
+
+                if divisor_assignment.min_value is not None or dividend_assignment.min_value is not None:
+                    result_assignment.min_value = min(combinations)
+                if divisor_assignment.max_value is not None or dividend_assignment.max_value is not None:
+                    result_assignment.max_value = max(combinations)
 
         return result_assignment
 
