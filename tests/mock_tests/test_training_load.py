@@ -2,6 +2,8 @@ from models.training_load import DetailedTrainingLoad, MuscleDetailedLoad, Muscl
 from models.soreness import BodyPartSide, BodyPartLocation
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
+from logic.periodization_processor import PeriodizationPlanProcessor
+from scipy.optimize import optimize
 
 def get_load_dictionary(load_type_list, load_list):
 
@@ -102,6 +104,24 @@ def sum_load(program_load_dict):
     return summed_load
 
 
+class SimpleWorkout(object):
+    def __init__(self, session_load):
+        self.session_load = session_load
+
+
+def get_list_of_load_workouts(number_workouts):
+
+    load = 10
+    workouts = []
+
+    for n in range(0, number_workouts):
+        workout = SimpleWorkout(load)
+        workouts.append(workout)
+        load += 10
+
+    return workouts
+
+
 def test_sum_parts():
 
     program_a = get_program_a()
@@ -123,6 +143,30 @@ def test_sum_parts():
 
     # create three sessions that should be reasonably different (or perhaps somewhat similar?) and given a client's background, we should get a different ranking.
     # 3 diff clients should yield different rankings
+
+def test_find_workout_combinations():
+
+    twenty_workouts = get_list_of_load_workouts(20)
+
+    min_workouts_week = 3
+    max_workouts_week = 5
+
+    proc = PeriodizationPlanProcessor(None)
+
+    combinations = proc.get_acceptable_combinations(twenty_workouts, 250, 350, min_workouts_week, max_workouts_week)
+    total_combinations = 0
+    for workout_count, load_list in combinations.items():
+        for loads in load_list:
+            load_vals = [l.session_load for l in loads]
+            print(load_vals)
+            total_combinations += 1
+
+    print("total=" + str(total_combinations))
+
+    assert len(combinations) > 0
+
+
+
 
 
 
