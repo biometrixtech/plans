@@ -38,7 +38,7 @@ class PeriodizationPlanProcessor(object):
 
         return periodization_plan_week
 
-    def get_workouts_for_target_week(self, week_number, workouts):
+    def get_acceptable_workouts(self, week_number, workouts, min_week_load, max_week_load, completed_sessions):
 
         current_week_characterstics = self.week_characteristics[week_number]
 
@@ -49,14 +49,24 @@ class PeriodizationPlanProcessor(object):
         shortest_acceptable_duration = current_week_characterstics.target_shortest_session_duration
         longest_acceptable_duration = current_week_characterstics.target_longest_session_duration
 
+        min_workouts_week = self.athlete_training_history.min_number_sessions_per_week - len(completed_sessions)
+        max_workouts_week = self.athlete_training_history.max_number_sessions_per_week - len(completed_sessions)
+
+        workouts = [w for w in workouts if w.id not in [c.id for c in completed_sessions]]
+
         acceptable_workouts = [w for w in workouts if
                                lowest_acceptable_load <= w.session_rpe * w.duration <= highest_acceptable_load and
                                lowest_acceptable_rpe <= w.session_rpe <= highest_acceptable_rpe and
                                shortest_acceptable_duration <= w.duration <= longest_acceptable_duration]
 
-        # TODO: new challenge = we need to get a combination of loads that satisfy the target progression
+        load_this_week = sum([c.session_load for c in completed_sessions])
+        min_week_load = min_week_load - load_this_week
+        max_week_load = max_week_load - load_this_week
 
-        return acceptable_workouts
+        combinations = self.get_acceptable_workouts_from_combinations(acceptable_workouts, min_week_load, max_week_load,
+                                                                      min_workouts_week, max_workouts_week)
+
+        return combinations
 
     def combinations_without_repetition(self, r, iterable=None, values=None, counts=None):
         if iterable:
@@ -78,23 +88,24 @@ class PeriodizationPlanProcessor(object):
             for i, j in zip(range(i, r), f(count(j), islice(counts, j, None))):
                 indices[i] = j
 
-    def get_acceptable_combinations(self, workouts, lowest_weekly_load_target, highest_weekly_load_target,
-                                    lowest_workouts_week, highest_workouts_week):
+    def get_acceptable_workouts_from_combinations(self, workouts, lowest_weekly_load_target, highest_weekly_load_target,
+                                                  lowest_workouts_week, highest_workouts_week):
 
         # returns the combinations for each number of workouts that week that targets the desired range of load
 
         workouts_per_week = list(range(lowest_workouts_week, highest_workouts_week + 1))
-        workout_combinations = {}
+        workout_combinations = []
 
         for w in workouts_per_week:
-            workout_combinations[w] = []  # this will be a list of lists
             for k in self.combinations_without_repetition(w, iterable=workouts):
                 k = list(k)
                 weekly_load = sum(t.session_load for t in k)
                 if lowest_weekly_load_target <= weekly_load <= highest_weekly_load_target:
-                    workout_combinations[w].append(k)
+                    workout_combinations.append(k)
 
-        return workout_combinations
+        unique_workouts = set(x for l in workout_combinations for x in l)
+
+        return unique_workouts
 
 
 

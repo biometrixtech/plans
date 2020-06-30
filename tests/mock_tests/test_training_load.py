@@ -3,6 +3,7 @@ from models.soreness import BodyPartSide, BodyPartLocation
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor
+from models.periodization import AthleteTrainingHistory
 from scipy.optimize import optimize
 
 def get_load_dictionary(load_type_list, load_list):
@@ -105,19 +106,23 @@ def sum_load(program_load_dict):
 
 
 class SimpleWorkout(object):
-    def __init__(self, session_load):
-        self.session_load = session_load
+    def __init__(self, id, rpe, duration):
+        self.id = id
+        self.session_rpe = rpe
+        self.duration = duration
+        self.session_load = rpe * duration
 
 
-def get_list_of_load_workouts(number_workouts):
+def get_list_of_load_workouts(rpe_list, duration_list):
 
-    load = 10
     workouts = []
+    id = 1
 
-    for n in range(0, number_workouts):
-        workout = SimpleWorkout(load)
-        workouts.append(workout)
-        load += 10
+    for r in rpe_list:
+        for d in duration_list:
+            workout = SimpleWorkout(id, r, d)
+            workouts.append(workout)
+            id += 1
 
     return workouts
 
@@ -146,24 +151,42 @@ def test_sum_parts():
 
 def test_find_workout_combinations():
 
-    twenty_workouts = get_list_of_load_workouts(20)
+    rpe_list = list(range(1,11,1))
+    duration_list = list(range(30, 90, 5))
+    workouts = get_list_of_load_workouts(rpe_list, duration_list)
 
-    min_workouts_week = 3
-    max_workouts_week = 5
+    athlete_training_history = AthleteTrainingHistory()
+    athlete_training_history.highest_load_session = 225
+    athlete_training_history.lowest_load_session = 120
+    athlete_training_history.highest_session_rpe = 7
+    athlete_training_history.lowest_session_rpe = 4
+    athlete_training_history.longest_session_duration = 75
+    athlete_training_history.shortest_session_duration = 30
+    athlete_training_history.min_number_sessions_per_week = 3
+    athlete_training_history.max_number_sessions_per_week = 5
 
-    proc = PeriodizationPlanProcessor(None)
+    proc = PeriodizationPlanProcessor(athlete_training_history)
+    proc.set_mesocycle_volume_intensity(4)
 
-    combinations = proc.get_acceptable_combinations(twenty_workouts, 250, 350, min_workouts_week, max_workouts_week)
-    total_combinations = 0
-    for workout_count, load_list in combinations.items():
-        for loads in load_list:
-            load_vals = [l.session_load for l in loads]
-            print(load_vals)
-            total_combinations += 1
+    completed_workouts = []
 
-    print("total=" + str(total_combinations))
+    acceptable_workouts_1 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
 
-    assert len(combinations) > 0
+    acceptable_workouts_1_copy = [a for a in acceptable_workouts_1]
+
+    completed_workout_1 = acceptable_workouts_1_copy.pop(0)
+    completed_workouts.append(completed_workout_1)
+
+    acceptable_workouts_2 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
+
+    acceptable_workouts_2_copy = [a for a in acceptable_workouts_2]
+
+    completed_workout_2 = acceptable_workouts_2_copy.pop(0)
+    completed_workouts.append(completed_workout_2)
+
+    acceptable_workouts_3 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
+
+    assert len(acceptable_workouts_3) > 0
 
 
 

@@ -5,7 +5,7 @@ from models.training_volume import StandardErrorRange
 class AthleteTrainingHistory(object):
     def __init__(self):
         self.longest_session_duration = None
-        self.week_average_session_duration = None
+        self.average_session_duration = None
         self.shortest_session_duration = None
         self.highest_session_rpe = None
         self.average_session_rpe = None
@@ -13,7 +13,10 @@ class AthleteTrainingHistory(object):
         self.highest_load_day = None
         self.average_load_session = None
         self.average_load_day = None
+
+        self.min_number_sessions_per_week = None
         self.average_number_sessions_per_week = None
+        self.max_number_sessions_per_week = None
 
         self.lowest_session_rpe = None
         self.lowest_load_session = None
