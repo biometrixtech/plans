@@ -42,4 +42,5 @@ class FunctionalMovementType(Enum):
     scapular_depression = 37
     ankle_dorsiflexion_and_eversion = 38
     ankle_plantar_flexion_and_inversion = 39
-
+    wrist_flexion = 40
+    wrist_extension = 41

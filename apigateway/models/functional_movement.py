@@ -59,6 +59,10 @@ class FunctionalMovementPairs(object):
                                                  FunctionalMovementType.external_rotation))
         self.pairs.append(FunctionalMovementPair(FunctionalMovementType.scapular_elevation,
                                                  FunctionalMovementType.scapular_depression))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.ankle_dorsiflexion_and_eversion,
+                                                 FunctionalMovementType.ankle_plantar_flexion_and_inversion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.wrist_flexion,
+                                                 FunctionalMovementType.wrist_extension))
 
     def get_functional_movement_for_muscle_action(self, muscle_action, functional_movement_type):
 
@@ -1111,6 +1115,10 @@ class FunctionalMovementFactory(object):
             return self.get_inversion_of_the_foot()
         elif movement_type == FunctionalMovementType.eversion_of_the_foot:
             return self.get_eversion_of_the_foot()
+        elif movement_type == FunctionalMovementType.ankle_dorsiflexion_and_eversion:
+            return self.get_ankle_dorsiflexion_and_eversion()
+        elif movement_type == FunctionalMovementType.ankle_plantar_flexion_and_inversion:
+            return self.get_ankle_plantar_flexion_and_inversion()
 
         elif movement_type == FunctionalMovementType.knee_flexion:
             return self.get_knee_flexion()
@@ -1182,6 +1190,11 @@ class FunctionalMovementFactory(object):
         elif movement_type == FunctionalMovementType.scapular_depression:
             return self.get_scapular_depression()
 
+        elif movement_type == FunctionalMovementType.wrist_flexion:
+            return self.get_wrist_extension()
+        elif movement_type == FunctionalMovementType.wrist_extension:
+            return self.get_wrist_extension()
+
     def get_ankle_fixators(self):
 
         return [44, 68, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66, 57, 58]
@@ -1252,6 +1265,26 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [41, 42]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [41]
+        return functional_movement
+
+    def get_ankle_dorsiflexion_and_eversion(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion_and_eversion)
+        functional_movement.prime_movers = []
+        functional_movement.synergists = []
+        functional_movement.antagonists = []
+        functional_movement.stabilizers = []
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = []
+        return functional_movement
+
+    def get_ankle_plantar_flexion_and_inversion(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion_and_inversion)
+        functional_movement.prime_movers = []
+        functional_movement.synergists = []
+        functional_movement.antagonists = []
+        functional_movement.stabilizers = []
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = []
         return functional_movement
 
     def get_inversion_of_the_foot(self):
@@ -1621,4 +1654,24 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_2()
         functional_movement.parts_receiving_compensation = [81]
+        return functional_movement
+
+    def get_wrist_flexion(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.wrist_flexion)
+        functional_movement.prime_movers = []
+        functional_movement.synergists = []
+        functional_movement.antagonists = []
+        functional_movement.stabilizers = []
+        functional_movement.fixators = []
+        functional_movement.parts_receiving_compensation = []
+        return functional_movement
+
+    def get_wrist_extension(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.wrist_extension)
+        functional_movement.prime_movers = []
+        functional_movement.synergists = []
+        functional_movement.antagonists = []
+        functional_movement.stabilizers = []
+        functional_movement.fixators = []
+        functional_movement.parts_receiving_compensation = []
         return functional_movement
