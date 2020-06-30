@@ -24,7 +24,7 @@ class AthleteTrainingHistory(object):
 
 class PeriodizationPlanWeek(object):
     def __init__(self):
-        self.total_weeks_load = 0
+        self.target_weeks_load = StandardErrorRange()
         self.start_date = None
         self.end_date = None
         self.target_longest_session_duration = None
@@ -73,4 +73,15 @@ class PeriodizationPlan(object):
         self.training_phase = None
         self.weeks = []
 
+
+class PeriodizationModel(object):
+    def __init__(self):
+        self.progressions = []
+
+
+class PeriodizationProgression(object):
+    def __init__(self, week_number, rpe_load_contribution, volume_load_contribution):
+        self.week_number = week_number
+        self.rpe_load_contribution = rpe_load_contribution
+        self.volume_load_contribution = volume_load_contribution
 

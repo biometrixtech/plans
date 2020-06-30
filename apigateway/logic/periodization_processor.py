@@ -1,6 +1,7 @@
 from models.periodization import AthleteTrainingHistory, PeriodizationPlan, PeriodizationPlanWeek
 from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
+from models.training_volume import StandardErrorRange
 
 
 class PeriodizationPlanProcessor(object):
@@ -8,21 +9,29 @@ class PeriodizationPlanProcessor(object):
         self.athlete_training_history = athlete_training_history
         self.week_characteristics = []
 
-    def set_mesocycle_volume_intensity(self, number_of_weeks):
+    def set_mesocycle_volume_intensity(self, periodization_model):
         # sets procession from high volume-low intensity to low volume-high intensity over the course of the
         # mesocyle (length defined as number_of_weeks)
 
-        first_week = self.get_first_week_load_characteristics()
+        first_week = self.get_first_week_load_characteristics(periodization_model.progressions[0])
         self.week_characteristics = [first_week]
 
-
-        for t in range(1, number_of_weeks):
+        for t in range(1, len(periodization_model.progressions)):
             pass
         pass
 
-    def get_first_week_load_characteristics(self):
-        # TODO - should we do more than just copy over athlete's history here?
+    def decompose_load(self, rpe_standard_range, volume_standard_range, load_increase_standard_range):
+
+        pass
+
+    def get_first_week_load_characteristics(self, progression):
+
         periodization_plan_week = PeriodizationPlanWeek()
+        periodization_plan_week.target_weeks_load = StandardErrorRange(
+            lower_bound=self.athlete_training_history.average_load_session*self.athlete_training_history.min_number_sessions_per_week,
+            upper_bound=self.athlete_training_history.average_load_session * self.athlete_training_history.max_number_sessions_per_week,
+        )
+
         periodization_plan_week.target_longest_session_duration = self.athlete_training_history.longest_session_duration
         periodization_plan_week.target_week_average_session_duration = self.athlete_training_history.average_session_duration
         periodization_plan_week.target_shortest_session_duration = self.athlete_training_history.shortest_session_duration

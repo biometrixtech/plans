@@ -3,8 +3,7 @@ from models.soreness import BodyPartSide, BodyPartLocation
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor
-from models.periodization import AthleteTrainingHistory
-from scipy.optimize import optimize
+from models.periodization import AthleteTrainingHistory, PeriodizationModel, PeriodizationProgression
 
 def get_load_dictionary(load_type_list, load_list):
 
@@ -105,6 +104,23 @@ def sum_load(program_load_dict):
     return summed_load
 
 
+def get_periodization_model():
+
+    periodization_model = PeriodizationModel()
+
+    periodization_progression_1 = PeriodizationProgression(0, 0.20, 0.80)
+    periodization_progression_2 = PeriodizationProgression(1, 0.40, 0.60)
+    periodization_progression_3 = PeriodizationProgression(2, 0.60, 0.40)
+    periodization_progression_4 = PeriodizationProgression(3, 0.80, 0.20)
+
+    progressions = [periodization_progression_1, periodization_progression_2, periodization_progression_3,
+                    periodization_progression_4]
+
+    periodization_model.progressions = progressions
+
+    return periodization_model
+
+
 class SimpleWorkout(object):
     def __init__(self, id, rpe, duration):
         self.id = id
@@ -152,7 +168,7 @@ def test_sum_parts():
 def test_find_workout_combinations():
 
     rpe_list = list(range(1,11,1))
-    duration_list = list(range(30, 90, 5))
+    duration_list = list(range(30, 95, 5))
     workouts = get_list_of_load_workouts(rpe_list, duration_list)
 
     athlete_training_history = AthleteTrainingHistory()
@@ -165,8 +181,10 @@ def test_find_workout_combinations():
     athlete_training_history.min_number_sessions_per_week = 3
     athlete_training_history.max_number_sessions_per_week = 5
 
+    periodization_model = get_periodization_model()
+
     proc = PeriodizationPlanProcessor(athlete_training_history)
-    proc.set_mesocycle_volume_intensity(4)
+    proc.set_mesocycle_volume_intensity(periodization_model)
 
     completed_workouts = []
 
