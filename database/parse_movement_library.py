@@ -58,11 +58,11 @@ class MovementLibraryParser(object):
                 movement.surface_stability = MovementSurfaceStability[row['surface_stability']]
             if self.is_valid(row, 'external_weight_implement'):
                 row['external_weight_implement'].replace(", ", ",")
-                external_weight_implement = row['external_weight_implement'].split(",")
+                external_weight_implement = row['external_weight_implement'].lower().split(",")
                 try:
                     movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
                 except:
-                    print('here')
+                    print('here', external_weight_implement)
 
             if self.is_valid(row, 'resistance'):
             # if row.get('resistance') is not None and row['resistance'] != "":
@@ -78,29 +78,17 @@ class MovementLibraryParser(object):
             return None
     @staticmethod
     def get_resistance(resistance):
-        if 'resistance' not in resistance:
-            resistance += '_resistance'
+        if 'resistance' in resistance:
+            resistance = resistance.split('_')[0]
         return MovementResistance[resistance]
 
     @staticmethod
     def get_speed(speed):
-        max = 5
-        # speed_conversion_dict = {
-        #     # 'none': 'no_speed',
-        #     'speed': 'low_speed',
-        #     'slow': 'low_speed',
-        #     'mod': 'mod_speed',
-        #     'max': 'max_speed',
-        #     'explosive': 'explosive_speed'
-        # }
         speed_conversion_dict = {
             'no_speed': 'none',
             'speed': 'slow',
-            # 'slow': 'low_speed',
-            # 'mod': 'mod_speed',
             'normal': 'mod',
-            'max_speed': 'fast',
-            # 'explosive': 'explosive_speed'
+            'max_speed': 'fast'
         }
         if speed in speed_conversion_dict:
             speed = speed_conversion_dict[speed]

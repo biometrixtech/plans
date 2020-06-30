@@ -10,7 +10,7 @@
         "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "2_a",
@@ -33,7 +33,7 @@
         "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1_a",
@@ -56,7 +56,7 @@
             1
         ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "200_a",
@@ -76,7 +76,7 @@
         "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 0,
-        "resistance": 0,
+        "resistance": 1,
         "surface_stability": 0,
         "primary_actions": [
             "300_a",
@@ -102,7 +102,7 @@
             2
         ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "100_a",
@@ -124,7 +124,7 @@
             6
         ],
         "speed": 0,
-        "resistance": 0,
+        "resistance": 1,
         "surface_stability": 1,
         "primary_actions": [
             "0_a",
@@ -147,7 +147,7 @@
             4
         ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "201_a",
@@ -167,7 +167,7 @@
         "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1_a",
@@ -192,7 +192,7 @@
             15
         ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "3100_a",
@@ -214,7 +214,7 @@
             15
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "3103"
@@ -237,7 +237,7 @@
             15
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "3103"
@@ -258,7 +258,7 @@
         "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "3001_a",
@@ -284,7 +284,7 @@
         "strength_endurance_action": null,
         "external_weight_implement": [],
         "speed": 3,
-        "resistance": 0,
+        "resistance": 1,
         "surface_stability": 0,
         "primary_actions": [
             "3021_a",
@@ -404,7 +404,7 @@
             7
         ],
         "speed": 3,
-        "resistance": 2,
+        "resistance": 3,
         "surface_stability": 0,
         "primary_actions": [
             "2405_a",
@@ -441,6 +441,838 @@
             "2404_a",
             "2404_b",
             "2404_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Supine Chest Press": {
+        "id": "Supine Chest Press",
+        "name": "Dumbbell Chest Press",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1003",
+            "2400_a",
+            "2400_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Incline Chest Press": {
+        "id": "Incline Chest Press",
+        "name": "Incline Bench Press",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": 0,
+        "external_weight_implement": [
+            7
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1003",
+            "2401_a",
+            "2401_b",
+            "2401_c",
+            "2401_d"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Bent Over Double Arm Row": {
+        "id": "Bent Over Double Arm Row",
+        "name": "Bent Over Row",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": 8,
+        "external_weight_implement": [
+            7
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000.1",
+            "2402_a",
+            "2402_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Dips": {
+        "id": "Dips",
+        "name": "Dips",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": 8,
+        "external_weight_implement": [
+            14
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2403_a",
+            "2403_b",
+            "2403_c",
+            "2403_d",
+            "2403_e",
+            "2403_f",
+            "2403_g"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Clean and Jerk": {
+        "id": "Clean and Jerk",
+        "name": "Clean and Jerk",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": 0,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            7
+        ],
+        "speed": 4,
+        "resistance": 3,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2405_a",
+            "2405_b",
+            "2405_c",
+            "2405_d",
+            "2405_e",
+            "2405_f",
+            "2405_g",
+            "2405_g",
+            "2405_i",
+            "2405_j",
+            "2405_k"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Lunge with Weight at Sides": {
+        "id": "Lunge with Weight at Sides",
+        "name": "Lunge with Dumbbells at Sides",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": 9,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2001_a",
+            "2001_b",
+            "2300"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Standing Double Arm Bicep Curl": {
+        "id": "Standing Double Arm Bicep Curl",
+        "name": "Bicep Curl",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000",
+            "2404_a",
+            "2404_b",
+            "2404_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Plank with Single Arm Row": {
+        "id": "Plank with Single Arm Row",
+        "name": "Alternating Plank Low Row",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2402.1_a",
+            "2402.1_b",
+            "1004",
+            "1004.1_a",
+            "1004.1_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Plank from Knees with Single Arm Row": {
+        "id": "Plank from Knees with Single Arm Row",
+        "name": "Alternating Plank Low Row Variation, On Knees",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2402.1_a",
+            "2402.1_b",
+            "1004.2",
+            "1004.3_a",
+            "1004.3_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Standing Lateral Raise": {
+        "id": "Standing Lateral Raise",
+        "name": "Lateral Raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1001",
+            "2405_a",
+            "2405_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Stranding Lateral Raise with Neutral Grip": {
+        "id": "Stranding Lateral Raise with Neutral Grip",
+        "name": "Lateral Raise Variation, Neutral Grip",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1001",
+            "2405.1_a",
+            "2405.1_b",
+            "2405.1_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "ISO Sumo Squat with a Front Raise": {
+        "id": "ISO Sumo Squat with a Front Raise",
+        "name": "ISO Sumo Squat with a Front Raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1002",
+            "1002.1_b",
+            "2406_a",
+            "2406_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "ISO Sumo Squat with a Front Raise Variation, Neutral Grip": {
+        "id": "ISO Sumo Squat with a Front Raise Variation, Neutral Grip",
+        "name": "ISO Sumo Squat with a Front Raise Variation, Neutral Grip",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1002",
+            "1002.1_b",
+            "2406.1_a",
+            "2406.1_b",
+            "2406.1_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Squat with Dumbbells at Side": {
+        "id": "Squat with Dumbbells at Side",
+        "name": "Squat with Dumbbells at Sides",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2000_a",
+            "2000_b",
+            "2300"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Toe Reach": {
+        "id": "Toe Reach",
+        "name": "Toe Reach",
+        "training_type": 2,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1010",
+            "1100_a",
+            "1100_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Toe Reach, bent knees": {
+        "id": "Toe Reach, bent knees",
+        "name": "Toe Reach Variation, Knees bent",
+        "training_type": 2,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1010.1_a",
+            "1010.1_b",
+            "1100_a",
+            "1100_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Double Crunch": {
+        "id": "Double Crunch",
+        "name": "Double Crunch",
+        "training_type": 2,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1011.1_a",
+            "1011.1_b",
+            "1100_a",
+            "1100_b",
+            "1101.1_a",
+            "1101.1_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Double Crunch with Dumbbell Overhead": {
+        "id": "Double Crunch with Dumbbell Overhead",
+        "name": "Double Crunch with Dumbbell Overhead",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1011.1_a",
+            "1011.1_b",
+            "2407_a",
+            "2407_b",
+            "1100_a",
+            "1100_b",
+            "1101.1_a",
+            "1101.1_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Pop Jack Variation, Walking to Plank": {
+        "id": "Pop Jack Variation, Walking to Plank",
+        "name": "Pop Jack Variation, Walking to Plank",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1004",
+            "plank\n1210.1_a",
+            "1210.1_b walk out of plank\n1210_a",
+            "1210_b",
+            "walk into plank"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Sumo Squat with Everted Calf Raise": {
+        "id": "Sumo Squat with Everted Calf Raise",
+        "name": "Frogger Variation, no jump, instead squat with calf raise",
+        "training_type": 2,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2000_a",
+            "2000_b",
+            "2000.1_c",
+            "2000.1_d",
+            "2002.1_a",
+            "2002.1_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "TRX Chest Press": {
+        "id": "TRX Chest Press",
+        "name": "Strap Chest Press",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            27
+        ],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1004",
+            "2400_a",
+            "2400_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Push Up": {
+        "id": "Push Up",
+        "name": "Push-Up Variation, hands on the bench",
+        "training_type": 2,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1004",
+            "1200_a",
+            "1200_b",
+            "1200_c",
+            "1200_d"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Push Up on Knees": {
+        "id": "Push Up on Knees",
+        "name": "Push-Up Variation, knees on the ground",
+        "training_type": 2,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1004.2",
+            "1200_a",
+            "1200_b",
+            "1200_c",
+            "1200_d"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Standing Overhead Tricep Extension": {
+        "id": "Standing Overhead Tricep Extension",
+        "name": "Dumbbell Overhead Tricep Extension",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000",
+            "2403.1_a",
+            "2403.1_b",
+            "2403.2_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "TRX Overhead Tricep Extension": {
+        "id": "TRX Overhead Tricep Extension",
+        "name": "Strap Tricep Extension Variation,  stagger step",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            27
+        ],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 1,
+        "primary_actions": [
+            "1004",
+            "2403.1_a",
+            "2403.1_b",
+            "2403.1_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Banded Neutral Front Raise": {
+        "id": "Banded Neutral Front Raise",
+        "name": "Front Raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            28
+        ],
+        "speed": 1,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000",
+            "2406.2_a",
+            "2406.2_b",
+            "2406.2_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Standing Weight Neutral Front Raise": {
+        "id": "Standing Weight Neutral Front Raise",
+        "name": "Low Band Neutral Front Raise Variation, with Dumbbell",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 1,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000",
+            "2406.1_a",
+            "2406.1_b",
+            "2406.1_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Quadruped with mini band shoulder horizontal abduction": {
+        "id": "Quadruped with mini band shoulder horizontal abduction",
+        "name": "4 Point Glide",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            28
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2408_a",
+            "2408_b",
+            "2408_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Bench Sit-up to Jump Squat": {
+        "id": "Bench Sit-up to Jump Squat",
+        "name": "Bench Sit-up to Jump Squat",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 4,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1100.1_a",
+            "1100.1_b",
+            "1100.1_c",
+            "3001_a",
+            "3001_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Seated, Single Arm Alternating Hammer Curl": {
+        "id": "Seated, Single Arm Alternating Hammer Curl",
+        "name": "Seated Hammer Curl",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1008",
+            "2404.2_a",
+            "2404.2_b",
+            "2404.2_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Standing Tricep Extension": {
+        "id": "Standing Tricep Extension",
+        "name": "Tricep Extension",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000",
+            "2403.1_a",
+            "2403.1_b",
+            "2403.2_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "single leg prone plank\nknees to chest": {
+        "id": "single leg prone plank\nknees to chest",
+        "name": "Decline Mountain Climber",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": null,
+        "primary_actions": [],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Banded Upper Cut": {
+        "id": "Banded Upper Cut",
+        "name": "Upper Cut",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            28
+        ],
+        "speed": 1,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000",
+            "2406.3_a",
+            "2406.3_b",
+            "2406.3_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Odd Exericise, with these actions receiving proper target loads": {
+        "id": "Odd Exericise, with these actions receiving proper target loads",
+        "name": "Hip Hinge Low Row to Bicep Curl",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            28
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000.1",
+            "2406.3_a",
+            "2406.3_b",
+            "2406.3_c",
+            "2406.2_a",
+            "2406.2_b",
+            "2406.2_c"
         ],
         "secondary_actions": [],
         "explosiveness_rating": 0

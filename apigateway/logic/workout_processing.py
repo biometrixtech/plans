@@ -865,7 +865,7 @@ class WorkoutProcessor(object):
                 return 0.0
             elif action.upper_body_stance == UpperBodyStance.alternating_arms:
                 return 0.1
-            elif action.upper_body_stance == UpperBodyStance.single_arm:
+            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
                 return 0.2
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 0.3
@@ -880,7 +880,7 @@ class WorkoutProcessor(object):
             # these were all improvised/estimated based on logic gaps
             elif action.upper_body_stance == UpperBodyStance.alternating_arms:
                 return 0.6
-            elif action.upper_body_stance == UpperBodyStance.single_arm:
+            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
                 return 0.7
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 0.8
@@ -892,7 +892,7 @@ class WorkoutProcessor(object):
                 return 0.8
             elif action.upper_body_stance == UpperBodyStance.alternating_arms:
                 return 1.0
-            elif action.upper_body_stance == UpperBodyStance.single_arm:
+            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
                 return 1.3
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 1.5
@@ -904,7 +904,7 @@ class WorkoutProcessor(object):
                 return 1.3
             elif action.upper_body_stance == UpperBodyStance.alternating_arms:
                 return 1.5
-            elif action.upper_body_stance == UpperBodyStance.single_arm:
+            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
                 return 1.8
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 2.0

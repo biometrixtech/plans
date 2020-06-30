@@ -25,12 +25,16 @@ class LowerBodyStance(Enum):
     kneeling = 9
     half_kneeling = 10
     seated = 11
+    contralateral_single_leg = 12
+    alternating_single_leg = 13
+
 
 class UpperBodyStance(Enum):
     double_arm = 0
     alternating_arms = 1
     single_arm = 2
     single_arm_with_trunk_rotation = 3
+    contralateral_single_arm = 4
 
 
 class ExerciseAction(object):
@@ -590,30 +594,22 @@ class ExerciseCompoundAction(object):
 
 
 class MovementSpeed(Enum):
-    # no_speed = 0
-    # speed = 1
-    # max_speed = 2
     none = 0
     slow = 1
     mod = 2
     fast = 3
     explosive = 4
-    # no_speed = 0
-    # low_speed = 1
-    # mod_speed = 2
-    # max_speed = 3
-    # explosive_speed =4
-
 
 class MovementResistance(Enum):
-    low_resistance = 0
-    mod_resistance = 1
-    high_resistance = 2
-    max_resistance = 3
+    none = 0
+    low = 1
+    mod = 2
+    high = 3
+    max = 4
 
 
 class Explosiveness(IntEnum):
-    no_speed = 0
+    no_force = 0
     low_force = 1
     mod_force = 2
     high_force = 3

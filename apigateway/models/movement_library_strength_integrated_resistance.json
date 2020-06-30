@@ -12,7 +12,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1003",
@@ -35,7 +35,7 @@
             7
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1003",
@@ -60,7 +60,7 @@
             7
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1000.1",
@@ -83,7 +83,7 @@
             14
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "2403_a",
@@ -110,7 +110,7 @@
             7
         ],
         "speed": 4,
-        "resistance": 2,
+        "resistance": 3,
         "surface_stability": 0,
         "primary_actions": [
             "2405_a",
@@ -141,7 +141,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "2001_a",
@@ -164,7 +164,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1000",
@@ -188,7 +188,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "2402.1_a",
@@ -213,7 +213,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "2402.1_a",
@@ -238,7 +238,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1001",
@@ -261,7 +261,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1001",
@@ -285,7 +285,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1002",
@@ -309,7 +309,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1002",
@@ -334,7 +334,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "2000_a",
@@ -353,7 +353,9 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            0
+        ],
         "speed": 2,
         "resistance": null,
         "surface_stability": 0,
@@ -374,7 +376,9 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            0
+        ],
         "speed": 2,
         "resistance": null,
         "surface_stability": 0,
@@ -396,7 +400,9 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            0
+        ],
         "speed": 2,
         "resistance": null,
         "surface_stability": 0,
@@ -424,7 +430,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1011.1_a",
@@ -448,9 +454,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            0
+        ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1004",
@@ -471,7 +479,9 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            0
+        ],
         "speed": 2,
         "resistance": null,
         "surface_stability": 0,
@@ -495,9 +505,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            27
+        ],
         "speed": 2,
-        "resistance": 0,
+        "resistance": 1,
         "surface_stability": 0,
         "primary_actions": [
             "1004",
@@ -516,9 +528,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            0
+        ],
         "speed": 2,
-        "resistance": 0,
+        "resistance": 1,
         "surface_stability": 0,
         "primary_actions": [
             "1004",
@@ -539,9 +553,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            0
+        ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1004.2",
@@ -566,7 +582,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1000",
@@ -586,9 +602,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            27
+        ],
         "speed": 2,
-        "resistance": 0,
+        "resistance": 1,
         "surface_stability": 1,
         "primary_actions": [
             "1004",
@@ -608,9 +626,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            28
+        ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1000",
@@ -634,7 +654,7 @@
             8
         ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1000",
@@ -654,15 +674,109 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            28
+        ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "2408_a",
             "2408_b",
             "2408_c"
         ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Bench Sit-up to Jump Squat": {
+        "id": "Bench Sit-up to Jump Squat",
+        "name": "Bench Sit-up to Jump Squat",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 4,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1100.1_a",
+            "1100.1_b",
+            "1100.1_c",
+            "3001_a",
+            "3001_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Seated, Single Arm Alternating Hammer Curl": {
+        "id": "Seated, Single Arm Alternating Hammer Curl",
+        "name": "Seated Hammer Curl",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1008",
+            "2404.2_a",
+            "2404.2_b",
+            "2404.2_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Standing Tricep Extension": {
+        "id": "Standing Tricep Extension",
+        "name": "Tricep Extension",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1000",
+            "2403.1_a",
+            "2403.1_b",
+            "2403.2_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "single leg prone plank\nknees to chest": {
+        "id": "single leg prone plank\nknees to chest",
+        "name": "Decline Mountain Climber",
+        "training_type": null,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": null,
+        "resistance": null,
+        "surface_stability": null,
+        "primary_actions": [],
         "secondary_actions": [],
         "explosiveness_rating": 0
     },
@@ -675,9 +789,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            28
+        ],
         "speed": 1,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1000",
@@ -697,9 +813,11 @@
         "power_action": null,
         "strength_resistance_action": null,
         "strength_endurance_action": null,
-        "external_weight_implement": [],
+        "external_weight_implement": [
+            28
+        ],
         "speed": 2,
-        "resistance": 1,
+        "resistance": 2,
         "surface_stability": 0,
         "primary_actions": [
             "1000.1",

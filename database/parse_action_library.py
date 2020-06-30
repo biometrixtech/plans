@@ -1,4 +1,4 @@
-from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness, MuscleAction, PrioritizedJointAction
+from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness, MuscleAction, PrioritizedJointAction, MovementSpeed
 from movement_tags import TrainingType, Equipment, WeightDistribution
 from models.functional_movement_type import FunctionalMovementType
 import os
@@ -45,7 +45,7 @@ class ActionLibraryParser(object):
             # TODO: Read in categorization as well
             if self.is_valid(row, 'eligible_external_resistance'):
                 row['eligible_external_resistance'] = row['eligible_external_resistance'].replace(", ", ",")
-                resistances = row.get('eligible_external_resistance').split(",")
+                resistances = row.get('eligible_external_resistance').lower().split(",")
                 try:
                     action.eligible_external_resistance = [Equipment[ex_res] for ex_res in resistances]
                 except:
@@ -79,6 +79,8 @@ class ActionLibraryParser(object):
                 action.explosiveness = self.get_explosiveness_from_speed_resistance(row['speed'], row['resistance'])
             else:
                 if self.is_valid(row, 'relative_explosiveness'):
+                    if row['relative_explosiveness'] == 'no_speed':
+                        row['relative_explosiveness'] = 'no_force'
                     action.explosiveness = Explosiveness[row['relative_explosiveness']]
             if self.is_valid(row, 'apply_instability'):
                 action.apply_instability = row['apply_instability'].lower() == "true"
@@ -160,6 +162,19 @@ class ActionLibraryParser(object):
             actions_json[action.id] = action.json_serialise(initial_read=True)
         return actions_json
 
+    # @staticmethod
+    # def get_speed(speed):
+    #     speed_conversion_dict = {
+    #         'no_speed': 'none',
+    #         'speed': 'slow',
+    #         'normal': 'mod',
+    #         'max_speed': 'fast'
+    #     }
+    #     if speed in speed_conversion_dict:
+    #         speed = speed_conversion_dict[speed]
+    #     return MovementSpeed[speed]
+
+
     @staticmethod
     def write_actions_json(actions_json):
         # actions_json = sorted(actions_json.items())
@@ -186,12 +201,12 @@ class ActionLibraryParser(object):
             resistance_dict = explosiveness_dict.get(resistance)
             if resistance_dict is not None:
                 explosiveness = resistance_dict.get(speed)
-                if explosiveness == 'no_force':
-                    explosiveness = 'no_speed'  # TODO need to change this and the enum to low_force once all the libraries are updated
+                # if explosiveness == 'no_force':
+                #     explosiveness = 'no_speed'  # TODO need to change this and the enum to low_force once all the libraries are updated
                 if explosiveness is None:
                     print('here')
                 return Explosiveness[explosiveness]
-        return Explosiveness.no_speed
+        return Explosiveness.no_force
 
 mapping = {
     "shoulder_flexion": "shoulder_flexion_and_scapular_upward_rotation",
