@@ -121,7 +121,6 @@ class PeriodizationPlanWeek(object):
         self.target_session_load = TrainingLoad()
         self.target_day_load = StandardErrorRange()
         self.target_sessions_per_week = StandardErrorRange()
-        self.exercises = []
 
 
 class PeriodizationModel(object):
