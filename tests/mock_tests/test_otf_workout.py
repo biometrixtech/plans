@@ -77,7 +77,7 @@ def get_workout(date, file_name):
 
     return planned_session
 
-def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default', variation=None):
+def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default', movement_option=None):
     # session = MixedActivitySession()
     # session.event_date = date
     # session.session_RPE = rpe
@@ -90,7 +90,7 @@ def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='defau
     #workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
     planned_workout = PlannedWorkout.json_deserialise(workout_json)
     planned_session.workout = planned_workout
-    WorkoutProcessor(user_weight=60).process_planned_workout(planned_session, assignment_type, variation)
+    WorkoutProcessor(user_weight=60).process_planned_workout(planned_session, assignment_type, movement_option)
 
     return planned_session
 
@@ -513,8 +513,13 @@ def test_may18():
 
 
 def test_may1_alt2():
-    session = get_session(datetime.datetime.now(), file_name='may1_alt2', variation='alt_low')
-    print('here')
+    session_default = get_session(datetime.datetime.now(), file_name='may1_alt2')
+    session_variation = get_session(datetime.datetime.now(), file_name='may1_alt2', movement_option='variation')
+    ex_default = session_default.workout.sections[6].exercises[1]
+    ex_variation = session_variation.workout.sections[6].exercises[1]
+    assert ex_default.name == ex_variation.name
+    assert ex_default.movement_id != ex_variation.movement_id
+
 
 #
 # def test_at_home1():

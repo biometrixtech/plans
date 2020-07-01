@@ -1,4 +1,4 @@
-section,movement,movement_alt_low,movement_alt_high,activity,duration_value,duration_min,duration_max,pace,incline,distance,reps,equipment,weight,stroke_rate,pw_incline_min,pw_incline_max,pw_distance,jog_distance,run_distance,bike_distance,strider_distance
+section,movement,movement_alt_variation,movement_alt_challenge,activity,duration_value,duration_min,duration_max,pace,incline,distance,reps,equipment,weight,stroke_rate,pw_incline_min,pw_incline_max,pw_distance,jog_distance,run_distance,bike_distance,strider_distance
 warmup,5823768d473c06100052ed9a,,,walk,60,,,,1,,,,,,1,3,,,,,
 warmup,5823768d473c06100052ed9a,,,run,240,,,base,0,,,,,,,,,,,,
 warmup,58459d9ddc2ce90011f93d84,,,row,180,,,,,,,,,24,,,,,,,

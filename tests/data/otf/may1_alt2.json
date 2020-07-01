@@ -989,8 +989,8 @@
                     "movement_id": "Plank with Single Arm Row",
                     "alternate_movement_ids": [
                         {
-                            "assignment_type": "alt_low",
-                            "assigned_value": "Plank from Knees with Single Arm Row"
+                            "option_type": "variation",
+                            "movement_id": "Plank from Knees with Single Arm Row"
                         }
                     ],
                     "weight": 15,

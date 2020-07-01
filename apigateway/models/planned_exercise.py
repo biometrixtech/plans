@@ -1,7 +1,7 @@
 from utils import format_date, parse_date
 from models.movement_tags import CardioAction, Equipment
 from models.workout_program import WorkoutSection, BaseWorkoutExercise, ExerciseAction
-from models.training_volume import StandardErrorRange, Assignment
+from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 
@@ -219,7 +219,7 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise.alternate_cadence = [Assignment.json_deserialise(a) for a in input_dict.get('alternate_cadence', [])]   # will be a list of Assignment objects
         exercise.alternate_stroke_rate = [Assignment.json_deserialise(a) for a in input_dict.get('alternate_stroke_rate', [])]   # will be a list of Assignment objects
 
-        exercise.alternate_movement_ids = [Assignment.json_deserialise(a) for a in input_dict.get('alternate_movement_ids', [])]
+        exercise.alternate_movement_ids = [MovementOption.json_deserialise(a) for a in input_dict.get('alternate_movement_ids', [])]
 
         exercise.stroke_adjustment = input_dict.get('stroke_adjustment', 0)  # how much lower than your base stroke rate
         exercise.power_goal = input_dict.get('power_goal')  # average power goal for exercise
@@ -279,9 +279,9 @@ class PlannedExercise(BaseWorkoutExercise):
         if self.duration is not None and self.duration.max_value is not None and isinstance(self.duration.max_value, str):
             self.duration.max_value = None
 
-    def update_movement_id(self, variation):
-        if variation is not None:
-            self.movement_id = next((movement.assigned_value for movement in self.alternate_movement_ids if movement.assignment_type == variation), self.movement_id)
+    def update_movement_id(self, movement_option):
+        if movement_option is not None:
+            self.movement_id = next((option.movement_id for option in self.alternate_movement_ids if option.option_type == movement_option), self.movement_id)
 
     def set_speed_pace(self):
         speed = None

@@ -40,19 +40,19 @@ def parse_file(file_name):
                     }
                 exercise['movement_id'] = row['movement']
                 exercise['alternate_movement_ids'] = []
-                if is_valid(row, 'movement_alt_low'):
-                    alt_movement_assignment = {
-                        'assignment_type': 'alt_low',
-                        'assigned_value': row['movement_alt_low']
+                if is_valid(row, 'movement_alt_variation'):
+                    alt_movement = {
+                        'option_type': 'variation',
+                        'movement_id': row['movement_alt_variation']
                     }
-                    exercise['alternate_movement_ids'].append(alt_movement_assignment)
+                    exercise['alternate_movement_ids'].append(alt_movement)
 
-                if is_valid(row, 'movement_alt_high'):
-                    alt_movement_assignment = {
-                        'assignment_type': 'alt_high',
-                        'assigned_value': row['movement_alt_high']
+                if is_valid(row, 'movement_alt_challenge'):
+                    alt_movement = {
+                        'option_type': 'challenge',
+                        'movement_id': row['movement_alt_challenge']
                     }
-                    exercise['alternate_movement_ids'].append(alt_movement_assignment)
+                    exercise['alternate_movement_ids'].append(alt_movement)
                 if is_valid(row, 'duration_value') or is_valid(row, 'duration_min') or is_valid(row, 'duration_max'):  #if not np.isnan(row['duration']):
                     duration_assignment = {
                         'assigned_value': row['duration_value'],
@@ -204,6 +204,6 @@ def parse_file(file_name):
 
 # for file_name in ['may1', 'may2']:
 #for file_name in ['at_home1', 'at_home2']:
-for file_name in ['may1_alt2']:
+for file_name in ['may1_alt']:
     parse_file(file_name)
 

@@ -30,12 +30,12 @@ class WorkoutProcessor(object):
         self.vo2_max = vo2_max or Calculators.vo2_max_estimation_demographics(age=user_age, user_weight=user_weight, gender=gender)
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_planned_workout')
-    def process_planned_workout(self, session, assignment_type, variation=None):
+    def process_planned_workout(self, session, assignment_type, movement_option=None):
         for workout_section in session.workout.sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
 
             for workout_exercise in workout_section.exercises:
-                self.add_movement_detail_to_planned_exercise(workout_exercise, assignment_type, variation)
+                self.add_movement_detail_to_planned_exercise(workout_exercise, assignment_type, movement_option)
                 if workout_section.assess_load:
                     session.add_tissue_load(workout_exercise.tissue_load)
                     session.add_force_load(workout_exercise.force_load)
@@ -149,8 +149,8 @@ class WorkoutProcessor(object):
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
 
-    def add_movement_detail_to_planned_exercise(self, exercise, assignment_type, variation=None):
-        exercise.update_movement_id(variation)
+    def add_movement_detail_to_planned_exercise(self, exercise, assignment_type, movement_option=None):
+        exercise.update_movement_id(movement_option)
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
