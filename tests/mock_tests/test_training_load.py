@@ -3,7 +3,7 @@ from models.soreness import BodyPartSide, BodyPartLocation
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor
-from models.periodization import AthleteTrainingHistory, PeriodizationModel, PeriodizationProgression
+from models.periodization import AthleteTrainingHistory, PeriodizationModel, PeriodizationProgression, PeriodizationModelFactory, PeriodizationPersona, PeriodizationGoal, TrainingPhaseType
 
 def get_load_dictionary(load_type_list, load_list):
 
@@ -104,23 +104,6 @@ def sum_load(program_load_dict):
     return summed_load
 
 
-def get_periodization_model():
-
-    periodization_model = PeriodizationModel()
-
-    periodization_progression_1 = PeriodizationProgression(0, 0.20, 0.80)
-    periodization_progression_2 = PeriodizationProgression(1, 0.40, 0.60)
-    periodization_progression_3 = PeriodizationProgression(2, 0.60, 0.40)
-    periodization_progression_4 = PeriodizationProgression(3, 0.80, 0.20)
-
-    progressions = [periodization_progression_1, periodization_progression_2, periodization_progression_3,
-                    periodization_progression_4]
-
-    periodization_model.progressions = progressions
-
-    return periodization_model
-
-
 class SimpleWorkout(object):
     def __init__(self, id, rpe, duration):
         self.id = id
@@ -165,46 +148,44 @@ def test_sum_parts():
     # create three sessions that should be reasonably different (or perhaps somewhat similar?) and given a client's background, we should get a different ranking.
     # 3 diff clients should yield different rankings
 
-def test_find_workout_combinations():
-
-    rpe_list = list(range(1,11,1))
-    duration_list = list(range(30, 95, 5))
-    workouts = get_list_of_load_workouts(rpe_list, duration_list)
-
-    athlete_training_history = AthleteTrainingHistory()
-    athlete_training_history.highest_load_session = 225
-    athlete_training_history.lowest_load_session = 120
-    athlete_training_history.highest_session_rpe = 7
-    athlete_training_history.lowest_session_rpe = 4
-    athlete_training_history.longest_session_duration = 75
-    athlete_training_history.shortest_session_duration = 30
-    athlete_training_history.min_number_sessions_per_week = 3
-    athlete_training_history.max_number_sessions_per_week = 5
-
-    periodization_model = get_periodization_model()
-
-    proc = PeriodizationPlanProcessor(athlete_training_history)
-    proc.set_mesocycle_volume_intensity(periodization_model)
-
-    completed_workouts = []
-
-    acceptable_workouts_1 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
-
-    acceptable_workouts_1_copy = [a for a in acceptable_workouts_1]
-
-    completed_workout_1 = acceptable_workouts_1_copy.pop(0)
-    completed_workouts.append(completed_workout_1)
-
-    acceptable_workouts_2 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
-
-    acceptable_workouts_2_copy = [a for a in acceptable_workouts_2]
-
-    completed_workout_2 = acceptable_workouts_2_copy.pop(0)
-    completed_workouts.append(completed_workout_2)
-
-    acceptable_workouts_3 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
-
-    assert len(acceptable_workouts_3) > 0
+# def test_find_workout_combinations():
+#
+#     rpe_list = list(range(1,11,1))
+#     duration_list = list(range(30, 95, 5))
+#     workouts = get_list_of_load_workouts(rpe_list, duration_list)
+#
+#     athlete_training_history = AthleteTrainingHistory()
+#     athlete_training_history.session_load = StandardErrorRange(lower_bound=120, upper_bound=225)
+#     athlete_training_history.session_rpe = StandardErrorRange(lower_bound=4, upper_bound=7)
+#     athlete_training_history.session_duration = StandardErrorRange(lower_bound=30, upper_bound=75)
+#     athlete_training_history.sessions_per_week = StandardErrorRange(lower_bound=3, upper_bound=5)
+#
+#     # TODO - add training load for last 4-5 weeks
+#
+#     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
+#
+#     proc = PeriodizationPlanProcessor(athlete_training_goal, athlete_training_history, PeriodizationPersona.well_trained,TrainingPhaseType.increase)
+#     proc.set_weekly_targets()
+#
+#     completed_workouts = []
+#
+#     acceptable_workouts_1 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
+#
+#     acceptable_workouts_1_copy = [a for a in acceptable_workouts_1]
+#
+#     completed_workout_1 = acceptable_workouts_1_copy.pop(0)
+#     completed_workouts.append(completed_workout_1)
+#
+#     acceptable_workouts_2 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
+#
+#     acceptable_workouts_2_copy = [a for a in acceptable_workouts_2]
+#
+#     completed_workout_2 = acceptable_workouts_2_copy.pop(0)
+#     completed_workouts.append(completed_workout_2)
+#
+#     acceptable_workouts_3 = proc.get_acceptable_workouts(0, workouts, 350, 500, completed_workouts)
+#
+#     assert len(acceptable_workouts_3) > 0
 
 
 

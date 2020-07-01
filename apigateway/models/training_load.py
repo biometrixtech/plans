@@ -4,6 +4,12 @@ from serialisable import Serialisable
 from models.training_volume import StandardErrorRange
 
 
+class TrainingLoad(object):
+    def __init__(self):
+        self.power_load = StandardErrorRange()
+        self.rpe_load = StandardErrorRange()
+
+
 class DetailedTrainingLoad(Serialisable):
     def __init__(self):
         self.mobility = None

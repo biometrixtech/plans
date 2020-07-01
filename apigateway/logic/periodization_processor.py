@@ -1,65 +1,130 @@
-from models.periodization import AthleteTrainingHistory, PeriodizationPlan, PeriodizationPlanWeek
+from models.periodization import AthleteTrainingHistory, PeriodizationPlan, PeriodizationPlanWeek, PeriodizationModelFactory
 from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
 from models.training_volume import StandardErrorRange
+from statistics import mean
 
 
 class PeriodizationPlanProcessor(object):
-    def __init__(self, athlete_training_history):
+    def __init__(self, athlete_periodization_goal, athlete_training_history, athlete_persona, training_phase_type):
+        self.persona = athlete_persona
+        self.goal = athlete_periodization_goal
         self.athlete_training_history = athlete_training_history
-        self.week_characteristics = []
+        self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type)
+        self.weekly_targets = []
 
-    def set_mesocycle_volume_intensity(self, periodization_model):
+    def set_weekly_targets(self):
         # sets procession from high volume-low intensity to low volume-high intensity over the course of the
         # mesocyle (length defined as number_of_weeks)
 
-        first_week = self.get_first_week_load_characteristics(periodization_model.progressions[0])
-        self.week_characteristics = [first_week]
+        for t in range(0, len(self.model.progressions)):
+            weekly_targets = self.get_weekly_targets(self.model.progressions[t])
+            self.weekly_targets.append(weekly_targets)
 
-        for t in range(1, len(periodization_model.progressions)):
-            pass
-        pass
+    def get_load_target(self, progression):
 
-    def decompose_load(self, rpe_standard_range, volume_standard_range, load_increase_standard_range):
+        # acwr
+        last_four_weeks_rpe_load = self.athlete_training_history.get_last_four_weeks_rpe_load()
+        lower_bounds = [w.lower_bound for w in last_four_weeks_rpe_load if w.lower_bound is not None]
+        upper_bounds = [w.upper_bound for w in last_four_weeks_rpe_load if w.upper_bound is not None]
 
-        pass
+        lower_bound_average = mean(lower_bounds)
+        upper_bound_average = mean(upper_bounds)
 
-    def get_first_week_load_characteristics(self, progression):
+        lower_acwr = progression.training_phase.acwr.lower_bound
+        upper_acwr = progression.training_phase.acwr.upper_bound
+
+        load_calcs = [lower_bound_average * lower_acwr,
+                      lower_bound_average * upper_acwr,
+                      upper_bound_average * lower_acwr,
+                      upper_bound_average * upper_acwr]
+
+        load_target = StandardErrorRange()
+        load_target.lower_bound = min(load_calcs)
+        load_target.upper_bound = max(load_calcs)
+        load_target.observed_value = (load_target.upper_bound + load_target.lower_bound) / float(2)
+
+        return load_target
+
+    def get_weekly_targets(self, progression):
+
+        current_rpe_load_lower = self.athlete_training_history.current_weeks_load.rpe_load.lower_bound
+        current_rpe_load_upper = self.athlete_training_history.current_weeks_load.rpe_load.upper_bound
+
+        current_rpe_average_load_lower = self.athlete_training_history.average_session_load.rpe_load.lower_bound
+        current_rpe_average_load_upper = self.athlete_training_history.average_session_load.rpe_load.upper_bound
+
+        rpe_load_target = self.get_load_target(progression)
+
+        rpe_load_increase_lower = rpe_load_target.lower_bound - current_rpe_load_lower.lower_bound
+        rpe_load_increase_upper = rpe_load_target.upper_bound - current_rpe_load_lower.upper_bound
+
+        rpe_load_rate_increase_lower = (current_rpe_load_lower - rpe_load_increase_lower) / float(current_rpe_load_lower)
+        rpe_load_rate_increase_upper = (current_rpe_load_upper - rpe_load_increase_upper) / float(
+            current_rpe_load_upper)
+
+        target_session_loads = [(1 + rpe_load_rate_increase_lower) * current_rpe_average_load_lower,
+                                (1 + rpe_load_rate_increase_lower) * current_rpe_average_load_upper,
+                                (1 + rpe_load_rate_increase_upper) * current_rpe_average_load_lower,
+                                (1 + rpe_load_rate_increase_upper) * current_rpe_average_load_upper]
+
+        target_session_load_lower = min(target_session_loads)
+        target_session_load_upper = max(target_session_loads)
+
+        target_rpe_rates = [1 + (rpe_load_rate_increase_lower * progression.rpe_load_contribution.lower_bound),
+                       1 + (rpe_load_rate_increase_lower * progression.rpe_load_contribution.upper_bound),
+                       1 + (rpe_load_rate_increase_upper * progression.rpe_load_contribution.lower_bound),
+                       1 + (rpe_load_rate_increase_upper * progression.rpe_load_contribution.upper_bound)]
+
+        target_rpe_increase_lower = min(target_rpe_rates)
+        target_rpe_increase_upper = max(target_rpe_rates)
+
+        target_rpes = [target_rpe_increase_lower * self.athlete_training_history.current_weeks_average_session_rpe.lower_bound,
+                       target_rpe_increase_lower * self.athlete_training_history.current_weeks_average_session_rpe.upper_bound,
+                       target_rpe_increase_upper * self.athlete_training_history.current_weeks_average_session_rpe.lower_bound,
+                       target_rpe_increase_upper * self.athlete_training_history.current_weeks_average_session_rpe.upper_bound,
+
+        ]
+
+        target_rpe_lower = min(target_rpes)
+        target_rpe_upper = max(target_rpes)
+
+        target_volumes = [rpe_load_target.lower_bound / float(target_rpe_lower),
+                          rpe_load_target.lower_bound / float(target_rpe_upper),
+                          rpe_load_target.upper_bound / float(target_rpe_lower),
+                          rpe_load_target.upper_bound / float(target_rpe_upper),
+
+        ]
+
+        target_volume_lower = min(target_volumes)
+        target_volume_upper = max(target_volumes)
 
         periodization_plan_week = PeriodizationPlanWeek()
-        periodization_plan_week.target_weeks_load = StandardErrorRange(
-            lower_bound=self.athlete_training_history.average_load_session*self.athlete_training_history.min_number_sessions_per_week,
-            upper_bound=self.athlete_training_history.average_load_session * self.athlete_training_history.max_number_sessions_per_week,
-        )
+        periodization_plan_week.target_weekly_load = rpe_load_target
+        periodization_plan_week.target_session_load = StandardErrorRange(lower_bound=target_session_load_lower,
+                                                                         upper_bound=target_session_load_upper)
 
-        periodization_plan_week.target_longest_session_duration = self.athlete_training_history.longest_session_duration
-        periodization_plan_week.target_week_average_session_duration = self.athlete_training_history.average_session_duration
-        periodization_plan_week.target_shortest_session_duration = self.athlete_training_history.shortest_session_duration
-        periodization_plan_week.target_highest_session_rpe = self.athlete_training_history.highest_session_rpe
-        periodization_plan_week.target_average_session_rpe = self.athlete_training_history.average_session_rpe
-        periodization_plan_week.target_highest_load_session = self.athlete_training_history.highest_load_session
-        periodization_plan_week.target_highest_load_day = self.athlete_training_history.highest_load_day
-        periodization_plan_week.target_average_load_session = self.athlete_training_history.average_load_session
-        periodization_plan_week.target_average_load_day = self.athlete_training_history.average_load_day
-        periodization_plan_week.target_lowest_session_rpe = self.athlete_training_history.lowest_session_rpe # TODO: how to determine this? do we need to?
-        periodization_plan_week.target_lowest_load_session = self.athlete_training_history.lowest_load_session  # TODO: how to determine this? do we need to?
-        periodization_plan_week.target_average_number_sessions_per_microcycle = self.athlete_training_history.average_number_sessions_per_week
+        periodization_plan_week.target_session_duration = StandardErrorRange(lower_bound=target_volume_lower,
+                                                                             upper_bound=target_volume_upper)
+        periodization_plan_week.target_session_rpe = StandardErrorRange(lower_bound=target_rpe_lower,
+                                                                        upper_bound=target_rpe_upper)
 
         return periodization_plan_week
 
     def get_acceptable_workouts(self, week_number, workouts, min_week_load, max_week_load, completed_sessions):
 
-        current_week_characterstics = self.week_characteristics[week_number]
+        current_week_target = self.weekly_targets[week_number]
 
-        lowest_acceptable_load = current_week_characterstics.target_lowest_load_session
-        highest_acceptable_load = current_week_characterstics.target_highest_load_session
-        lowest_acceptable_rpe = current_week_characterstics.target_lowest_session_rpe
-        highest_acceptable_rpe = current_week_characterstics.target_highest_session_rpe
-        shortest_acceptable_duration = current_week_characterstics.target_shortest_session_duration
-        longest_acceptable_duration = current_week_characterstics.target_longest_session_duration
+        lowest_acceptable_load = current_week_target.target_session_load.lower_bound
+        highest_acceptable_load = current_week_target.target_session_load.upper_bound
 
-        min_workouts_week = self.athlete_training_history.min_number_sessions_per_week - len(completed_sessions)
-        max_workouts_week = self.athlete_training_history.max_number_sessions_per_week - len(completed_sessions)
+        lowest_acceptable_rpe = current_week_target.target_session_rpe.lower_bound
+        highest_acceptable_rpe = current_week_target.target_session_rpe.upper_bound
+        shortest_acceptable_duration = current_week_target.target_session_duration.lower_bound
+        longest_acceptable_duration = current_week_target.target_session_duration.upper_bound
+
+        min_workouts_week = self.athlete_training_history.average_sessions_per_week.lower_bound - len(completed_sessions)
+        max_workouts_week = self.athlete_training_history.average_sessions_per_week.upper_bound - len(completed_sessions)
 
         workouts = [w for w in workouts if w.id not in [c.id for c in completed_sessions]]
 
