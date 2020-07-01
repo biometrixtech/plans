@@ -9,7 +9,7 @@ from utils import none_max
 import datetime
 
 
-def create_and_process_wokout(exercises):
+def create_and_process_workout(exercises):
     section = CompletedWorkoutSection()
     section.name = 'stamina'
     section.exercises = exercises
@@ -60,14 +60,14 @@ def get_max_load(exercise):
 
 def test_run():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="5823768d473c06100052ed9a")  # run
-    create_and_process_wokout([exercise])
+    create_and_process_workout([exercise])
     max_loads = get_max_load(exercise)
     assert max_loads['1_a'] > max_loads['1_b'] > max_loads['1_c']
 
 
 def test_sprint():
     exercise = get_exercise(reps=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459de6dc2ce90011f93d86")  # sprint
-    create_and_process_wokout([exercise])
+    create_and_process_workout([exercise])
     max_loads = get_max_load(exercise)
 
     assert max_loads['2_a'] > max_loads['2_b'] > max_loads['2_c']

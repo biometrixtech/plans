@@ -85,6 +85,7 @@ class BodyPosition(Enum):
     non_stationary_other = 15
     hanging = 16
     upright_torso = 17
+    staggered_leg_moving = 18
 
 
 class Equipment(Enum):
@@ -117,6 +118,7 @@ class Equipment(Enum):
     hex_bar = 26
     trx = 27
     mini_bands = 28
+    single_dumbbells = 29
 
     def distribute_weights(self):
         if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells',

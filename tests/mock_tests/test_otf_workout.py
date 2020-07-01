@@ -77,7 +77,7 @@ def get_workout(date, file_name):
 
     return planned_session
 
-def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default'):
+def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default', variation=None):
     # session = MixedActivitySession()
     # session.event_date = date
     # session.session_RPE = rpe
@@ -90,7 +90,7 @@ def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='defau
     #workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
     planned_workout = PlannedWorkout.json_deserialise(workout_json)
     planned_session.workout = planned_workout
-    WorkoutProcessor(user_weight=60).process_planned_workout(planned_session, assignment_type)
+    WorkoutProcessor(user_weight=60).process_planned_workout(planned_session, assignment_type, variation)
 
     return planned_session
 
@@ -510,7 +510,12 @@ def test_may18():
     for ex_phase in movement_prep[0].exercise_phases:
         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
     print('here')
-#
+
+
+def test_may1_alt2():
+    session = get_session(datetime.datetime.now(), file_name='may1_alt2', variation='alt_low')
+    print('here')
+
 #
 # def test_at_home1():
 #     session = get_session(datetime.datetime.now(), file_name='at_home1')

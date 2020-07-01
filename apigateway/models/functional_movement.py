@@ -1269,22 +1269,22 @@ class FunctionalMovementFactory(object):
 
     def get_ankle_dorsiflexion_and_eversion(self):
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion_and_eversion)
-        functional_movement.prime_movers = []
-        functional_movement.synergists = []
-        functional_movement.antagonists = []
-        functional_movement.stabilizers = []
+        functional_movement.prime_movers = [40]
+        functional_movement.synergists = [41]
+        functional_movement.antagonists = [43, 44, 42]
+        functional_movement.stabilizers = [41]
         functional_movement.fixators = self.get_ankle_fixators()
-        functional_movement.parts_receiving_compensation = []
+        functional_movement.parts_receiving_compensation = [41]
         return functional_movement
 
     def get_ankle_plantar_flexion_and_inversion(self):
         functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion_and_inversion)
-        functional_movement.prime_movers = []
-        functional_movement.synergists = []
-        functional_movement.antagonists = []
-        functional_movement.stabilizers = []
+        functional_movement.prime_movers = [43, 44]
+        functional_movement.synergists = [42]
+        functional_movement.antagonists = [40]
+        functional_movement.stabilizers = [41, 42]
         functional_movement.fixators = self.get_ankle_fixators()
-        functional_movement.parts_receiving_compensation = []
+        functional_movement.parts_receiving_compensation = [42]
         return functional_movement
 
     def get_inversion_of_the_foot(self):
@@ -1658,20 +1658,20 @@ class FunctionalMovementFactory(object):
 
     def get_wrist_flexion(self):
         functional_movement = FunctionalMovement(FunctionalMovementType.wrist_flexion)
-        functional_movement.prime_movers = []
-        functional_movement.synergists = []
+        functional_movement.prime_movers = [33]
+        functional_movement.synergists = [32]
         functional_movement.antagonists = []
-        functional_movement.stabilizers = []
-        functional_movement.fixators = []
-        functional_movement.parts_receiving_compensation = []
+        functional_movement.stabilizers = [32, 126, 127, 128]
+        functional_movement.fixators = [32, 126, 127, 128, 130, 131, 132]
+        functional_movement.parts_receiving_compensation = [32]
         return functional_movement
 
     def get_wrist_extension(self):
         functional_movement = FunctionalMovement(FunctionalMovementType.wrist_extension)
-        functional_movement.prime_movers = []
-        functional_movement.synergists = []
+        functional_movement.prime_movers = [33]
+        functional_movement.synergists = [32]
         functional_movement.antagonists = []
-        functional_movement.stabilizers = []
-        functional_movement.fixators = []
-        functional_movement.parts_receiving_compensation = []
+        functional_movement.stabilizers = [32, 126, 127, 128, 130, 131, 132]
+        functional_movement.fixators = [32, 126, 127, 128, 130, 131, 132]
+        functional_movement.parts_receiving_compensation = [32]
         return functional_movement

@@ -1,0 +1,182 @@
+{
+    "Run": {
+        "id": "Run",
+        "name": "Run",
+        "training_type": 1,
+        "cardio_action": 1,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [],
+        "speed": 2,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1_a",
+            "1_b",
+            "1_c",
+            "1_d",
+            "1_e"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "400m to 1600m Race pace": {
+        "id": "400m to 1600m Race pace",
+        "name": "400m to 1600m Race pace",
+        "training_type": 1,
+        "cardio_action": 1,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [],
+        "speed": 3,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "1_a",
+            "1_b",
+            "1_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Max Sprint": {
+        "id": "Max Sprint",
+        "name": "Max Sprint",
+        "training_type": 1,
+        "cardio_action": 1,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [],
+        "speed": 4,
+        "resistance": null,
+        "surface_stability": 0,
+        "primary_actions": [
+            "2_a",
+            "2_b",
+            "2_c",
+            "2_d",
+            "2_e"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Ruck": {
+        "id": "Ruck",
+        "name": "Ruck",
+        "training_type": 1,
+        "cardio_action": 7,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            6
+        ],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 1,
+        "primary_actions": [
+            "0_a",
+            "0_b",
+            "0_c"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Row": {
+        "id": "Row",
+        "name": "Row",
+        "training_type": 1,
+        "cardio_action": 3,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            1
+        ],
+        "speed": 3,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "200_a",
+            "200_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Indoor Cycle": {
+        "id": "Indoor Cycle",
+        "name": "Indoor Cycle",
+        "training_type": 1,
+        "cardio_action": 4,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            2
+        ],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "100_a",
+            "100_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Ski Erg": {
+        "id": "Ski Erg",
+        "name": "Ski Erg",
+        "training_type": 1,
+        "cardio_action": 5,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            4
+        ],
+        "speed": 3,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "201_a",
+            "201_b"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    },
+    "Freestyle Swim": {
+        "id": "Freestyle Swim",
+        "name": "Freestyle Swim",
+        "training_type": 1,
+        "cardio_action": 6,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [],
+        "speed": 2,
+        "resistance": 1,
+        "surface_stability": 0,
+        "primary_actions": [
+            "300_a",
+            "300_b",
+            "303_a",
+            "303_b",
+            "303_c",
+            "303_d"
+        ],
+        "secondary_actions": [],
+        "explosiveness_rating": 0
+    }
+}

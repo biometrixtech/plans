@@ -1,5 +1,5 @@
 from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodyStance, Explosiveness, MuscleAction, PrioritizedJointAction, MovementSpeed
-from movement_tags import TrainingType, Equipment, WeightDistribution
+from movement_tags import TrainingType, Equipment, WeightDistribution, BodyPosition
 from models.functional_movement_type import FunctionalMovementType
 import os
 import json
@@ -54,6 +54,16 @@ class ActionLibraryParser(object):
                 action.lower_body_stance = LowerBodyStance[row['stance_lower_body']]
             if self.is_valid(row, 'stance_upper_body'):
                 action.upper_body_stance = UpperBodyStance[row['stance_upper_body']]
+
+            if self.is_valid(row, 'body_position'):
+                action.body_position = BodyPosition[row['body_position']]
+            # TODO: Remove this once importing from all new sheets that have body_position defined
+            elif action.lower_body_stance is not None:
+                if action.lower_body_stance == LowerBodyStance.single_leg:
+                    action.body_position = BodyPosition.single_leg_moving
+                elif action.lower_body_stance == LowerBodyStance.double_leg:
+                    action.body_position = BodyPosition.double_leg_moving
+
             if self.is_valid(row, 'lateral_distribution_pattern'):
                 action.lateral_distribution_pattern = WeightDistribution[row['lateral_distribution_pattern']]
             if self.is_valid(row, 'percent_bodyweight'):
@@ -74,8 +84,7 @@ class ActionLibraryParser(object):
 
             if self.is_valid(row, 'apply_resistance'):
                 action.apply_resistance = row['apply_resistance'].lower() == "true"
-            if 'speed' in row.index and 'resistance' in row.index:
-                # if self.is_valid(row, 'speed') and self.is_valid(row, 'resistance'):
+            if 'speed' in row.index and 'resistance' in row.index and self.is_valid(row, 'speed', False) and self.is_valid(row, 'resistance', False):
                 action.explosiveness = self.get_explosiveness_from_speed_resistance(row['speed'], row['resistance'])
             else:
                 if self.is_valid(row, 'relative_explosiveness'):
@@ -151,9 +160,13 @@ class ActionLibraryParser(object):
         return res
 
     @staticmethod
-    def is_valid(row, name):
-        if row.get(name) is not None and row[name] != "" and row[name] != "none":
-            return True
+    def is_valid(row, name, check_none=True):
+        if row.get(name) is not None and row[name] != "":
+            if check_none:
+                if row[name] != "none":
+                    return True
+            else:
+                return True
         return False
 
     def get_actions_json(self):
@@ -228,5 +241,6 @@ if __name__ == '__main__':
     action_parser = ActionLibraryParser()
     # action_parser.load_data("_demo")
     # action_parser.load_data(["_demo", "_running"])
-    action_parser.load_data(["_demo", "_running", "_strength_integrated_resistance"])
+    # TODO: cardio sheet is incomplete, use the old _running sheet for now
+    action_parser.load_data(["_running", "_strength_integrated_resistance", "_power_action_plyometrics"])
 

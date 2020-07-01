@@ -39,6 +39,20 @@ def parse_file(file_name):
                         'assigned_value': 1.56
                     }
                 exercise['movement_id'] = row['movement']
+                exercise['alternate_movement_ids'] = []
+                if is_valid(row, 'movement_alt_low'):
+                    alt_movement_assignment = {
+                        'assignment_type': 'alt_low',
+                        'assigned_value': row['movement_alt_low']
+                    }
+                    exercise['alternate_movement_ids'].append(alt_movement_assignment)
+
+                if is_valid(row, 'movement_alt_high'):
+                    alt_movement_assignment = {
+                        'assignment_type': 'alt_high',
+                        'assigned_value': row['movement_alt_high']
+                    }
+                    exercise['alternate_movement_ids'].append(alt_movement_assignment)
                 if is_valid(row, 'duration_value') or is_valid(row, 'duration_min') or is_valid(row, 'duration_max'):  #if not np.isnan(row['duration']):
                     duration_assignment = {
                         'assigned_value': row['duration_value'],
@@ -190,6 +204,6 @@ def parse_file(file_name):
 
 # for file_name in ['may1', 'may2']:
 #for file_name in ['at_home1', 'at_home2']:
-for file_name in ['may1_alt']:
+for file_name in ['may1_alt2']:
     parse_file(file_name)
 

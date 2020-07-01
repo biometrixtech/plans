@@ -7,7 +7,7 @@ from logic.rpe_predictor import RPEPredictor
 from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
-from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender
+from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
@@ -30,12 +30,12 @@ class WorkoutProcessor(object):
         self.vo2_max = vo2_max or Calculators.vo2_max_estimation_demographics(age=user_age, user_weight=user_weight, gender=gender)
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_planned_workout')
-    def process_planned_workout(self, session, assignment_type):
+    def process_planned_workout(self, session, assignment_type, variation=None):
         for workout_section in session.workout.sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
 
             for workout_exercise in workout_section.exercises:
-                self.add_movement_detail_to_planned_exercise(workout_exercise, assignment_type)
+                self.add_movement_detail_to_planned_exercise(workout_exercise, assignment_type, variation)
                 if workout_section.assess_load:
                     session.add_tissue_load(workout_exercise.tissue_load)
                     session.add_force_load(workout_exercise.force_load)
@@ -149,7 +149,8 @@ class WorkoutProcessor(object):
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
 
-    def add_movement_detail_to_planned_exercise(self, exercise, assignment_type):
+    def add_movement_detail_to_planned_exercise(self, exercise, assignment_type, variation=None):
+        exercise.update_movement_id(variation)
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
@@ -829,31 +830,40 @@ class WorkoutProcessor(object):
     @staticmethod
     def calculate_lower_body_stability_rating(exercise, action):
 
-        if exercise.surface_stability is None or action.lower_body_stance is None:
+        if exercise.surface_stability is None or action.body_position is None:
             return 0.0
 
         if exercise.surface_stability == MovementSurfaceStability.stable:
-            if action.lower_body_stance == LowerBodyStance.double_leg:
+            # if action.lower_body_stance == LowerBodyStance.double_leg:
+            if action.body_position in [BodyPosition.double_leg_standing, BodyPosition.double_leg_moving]:
                 return 0.0
-            elif action.lower_body_stance == LowerBodyStance.staggered_leg:
+            # elif action.lower_body_stance == LowerBodyStance.staggered_leg:
+            elif action.body_position in [BodyPosition.staggered_leg_standing, BodyPosition.staggered_leg_moving]:
                 return 0.3
-            elif action.lower_body_stance == LowerBodyStance.split_leg:
+            # elif action.lower_body_stance == LowerBodyStance.split_leg:
+            elif action.body_position in [BodyPosition.split_leg_standing, BodyPosition.split_leg_moving]:
                 return 0.8
-            elif action.lower_body_stance == LowerBodyStance.single_leg:
+            # elif action.lower_body_stance == LowerBodyStance.single_leg:
+            elif action.body_position in [BodyPosition.single_leg_standing, BodyPosition.single_leg_moving]:
                 return 1.0
             else:
                 return 0.0
         elif exercise.surface_stability == MovementSurfaceStability.unstable or exercise.surface_stability == MovementSurfaceStability.very_unstable:
-            if action.lower_body_stance == LowerBodyStance.double_leg:
+            # if action.lower_body_stance == LowerBodyStance.double_leg:
+            if action.body_position in [BodyPosition.double_leg_standing, BodyPosition.double_leg_moving]:
                 return 1.2
-            elif action.lower_body_stance == LowerBodyStance.staggered_leg:
+            # elif action.lower_body_stance == LowerBodyStance.staggered_leg:
+            elif action.body_position in [BodyPosition.staggered_leg_standing, BodyPosition.staggered_leg_moving]:
                 return 1.3
-            elif action.lower_body_stance == LowerBodyStance.split_leg:
+            # elif action.lower_body_stance == LowerBodyStance.split_leg:
+            elif action.body_position in [BodyPosition.split_leg_standing, BodyPosition.split_leg_moving]:
                 return 1.5
-            elif action.lower_body_stance == LowerBodyStance.single_leg:
+            # elif action.lower_body_stance == LowerBodyStance.single_leg:
+            elif action.body_position in [BodyPosition.single_leg_standing, BodyPosition.single_leg_moving]:
                 return 2.0
             else:
                 return 0.0
+        return 0.0
 
     @staticmethod
     def calculate_upper_body_stability_rating(exercise, action):
@@ -863,9 +873,9 @@ class WorkoutProcessor(object):
         if equipment in [Equipment.machine, Equipment.assistance_resistence_bands, Equipment.sled]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.0
-            elif action.upper_body_stance == UpperBodyStance.alternating_arms:
+            elif action.upper_body_stance in [UpperBodyStance.alternating_arms, UpperBodyStance.contralateral_alternating_single_arm]:
                 return 0.1
-            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
+            elif action.upper_body_stance in [UpperBodyStance.single_arm, UpperBodyStance.contralateral_single_arm]:
                 return 0.2
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 0.3
@@ -878,9 +888,9 @@ class WorkoutProcessor(object):
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.5
             # these were all improvised/estimated based on logic gaps
-            elif action.upper_body_stance == UpperBodyStance.alternating_arms:
+            elif action.upper_body_stance in [UpperBodyStance.alternating_arms, UpperBodyStance.contralateral_alternating_single_arm]:
                 return 0.6
-            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
+            elif action.upper_body_stance in [UpperBodyStance.single_arm, UpperBodyStance.contralateral_single_arm]:
                 return 0.7
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 0.8
@@ -890,9 +900,9 @@ class WorkoutProcessor(object):
                            Equipment.swimming]:
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 0.8
-            elif action.upper_body_stance == UpperBodyStance.alternating_arms:
+            elif action.upper_body_stance in [UpperBodyStance.alternating_arms, UpperBodyStance.contralateral_alternating_single_arm]:
                 return 1.0
-            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
+            elif action.upper_body_stance in [UpperBodyStance.single_arm, UpperBodyStance.contralateral_single_arm]:
                 return 1.3
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 1.5
@@ -902,14 +912,15 @@ class WorkoutProcessor(object):
             # this first action is improvised/estimated based on logic gaps
             if action.upper_body_stance == UpperBodyStance.double_arm:
                 return 1.3
-            elif action.upper_body_stance == UpperBodyStance.alternating_arms:
+            elif action.upper_body_stance in [UpperBodyStance.alternating_arms, UpperBodyStance.contralateral_alternating_single_arm]:
                 return 1.5
-            elif action.upper_body_stance == UpperBodyStance.single_arm or action.upper_body_stance == UpperBodyStance.contralateral_single_arm:
+            elif action.upper_body_stance in [UpperBodyStance.single_arm, UpperBodyStance.contralateral_single_arm]:
                 return 1.8
             elif action.upper_body_stance == UpperBodyStance.single_arm_with_trunk_rotation:
                 return 2.0
             else:
                 return 0.0
+        return 0.0
 
     def set_action_explosiveness_from_exercise(self, exercise, action_list):
 

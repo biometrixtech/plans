@@ -24,12 +24,15 @@ class MovementLibraryParser(object):
         self.write_movements_json()
 
     def parse_row(self, row):
-        if self.is_valid(row, 'id') or self.is_valid(row, 'base_movement_name'):
+        if self.is_valid(row, 'id') or self.is_valid(row, 'base_movement_name') or self.is_valid(row, 'fathom_name'):
             # movement = Movement(row['id'], row['soflete_name'])
             if self.is_valid(row, 'id'):
                 movement = Movement(row['id'], row['fathom_name'])
-            else:
+            elif self.is_valid(row, 'base_movement_name'):
                 movement = Movement(row['base_movement_name'], row['fathom_name'])
+            else:
+                movement = Movement(row['fathom_name'], row['fathom_name'])
+
 
             if self.is_valid(row, 'training_type'):
                 movement.training_type = TrainingType[row['training_type']]
