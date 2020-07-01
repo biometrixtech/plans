@@ -103,12 +103,12 @@ class PeriodizationPlan(object):
 
 class PeriodizationPlanWeek(object):
     def __init__(self):
-        self.target_weekly_load = StandardErrorRange()
+        self.target_weekly_load = TrainingLoad()
         self.start_date = None
         self.end_date = None
         self.target_session_duration = StandardErrorRange()
         self.target_session_rpe = StandardErrorRange()
-        self.target_session_load = StandardErrorRange()
+        self.target_session_load = TrainingLoad()
         self.target_day_load = StandardErrorRange()
         self.target_sessions_per_week = StandardErrorRange()
 
