@@ -1,6 +1,7 @@
 from enum import Enum
 from models.training_volume import StandardErrorRange
 from models.training_load import DetailedTrainingLoad, TrainingLoad
+from models.movement_tags import DetailedAdaptationType, SubAdaptationType
 
 
 class AthleteTrainingHistory(object):
@@ -87,6 +88,15 @@ class PeriodizationGoal(Enum):
     improve_cardiovascular_health = 10
 
 
+class PeriodizedExercise(object):
+    def __init__(self, detailed_adaptation_type, sub_adaptation_type, times_per_week_range, duration_range, rpe_range):
+        self.detailed_adaptation_type = detailed_adaptation_type
+        self.sub_adaptation_type = sub_adaptation_type
+        self.times_per_week = times_per_week_range
+        self.duration = duration_range
+        self.rpe = rpe_range
+
+
 class TrainingPhase(object):
     def __init__(self, training_phase_type, lower_progression_bound, upper_progression_bound):
         self.training_phase_type = training_phase_type  # indicates max rate of progressions
@@ -111,12 +121,28 @@ class PeriodizationPlanWeek(object):
         self.target_session_load = TrainingLoad()
         self.target_day_load = StandardErrorRange()
         self.target_sessions_per_week = StandardErrorRange()
+        self.exercises = []
 
 
 class PeriodizationModel(object):
     def __init__(self):
         self.progression_persona = None
         self.progressions = []
+        self.required_exercises = []
+        self.one_required_exercises = []
+        self.one_required_combination = StandardErrorRange()
+
+#     def get_available_workouts(self, workout_library, completed_workouts):
+#         pass
+#
+#
+# class ImproveCardiovascularPeriodizationModel(PeriodizationModel):
+#     def __init__(self):
+#         super().__init__()
+#
+#     def get_available_workouts(self, workout_library, completed_workouts):
+#         pass
+#
 
 
 class PeriodizationProgression(object):
@@ -127,14 +153,54 @@ class PeriodizationProgression(object):
         self.volume_load_contribution = volume_load_contribution
 
 
+class RequiredExerciseFactory(object):
+
+    def get_required_exercises(self, periodization_goal):
+
+        if periodization_goal == PeriodizationGoal.improve_cardiovascular_health:
+
+            return [PeriodizedExercise(None, SubAdaptationType.strength, 2, None, None)]
+
+    def get_one_required_exercises(self, periodization_goal):
+
+        if periodization_goal == PeriodizationGoal.improve_cardiovascular_health:
+
+            mod_intensity = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+                                               times_per_week_range=StandardErrorRange(lower_bound=5),
+                                               duration_range=StandardErrorRange(lower_bound=30*60, upper_bound=60*60),
+                                               rpe_range=StandardErrorRange(lower_bound=3, upper_bound=5))
+
+            vigorous_intensity = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+                                                    times_per_week_range=StandardErrorRange(lower_bound=3),
+                                                    duration_range=StandardErrorRange(lower_bound=20 * 60,
+                                                                                      upper_bound=60 * 60),
+                                                    rpe_range=StandardErrorRange(lower_bound=6, upper_bound=10))
+
+            exercises = [mod_intensity, vigorous_intensity]
+
+            return exercises
+
+    def get_one_required_combination(self, periodization_goal):
+
+        if periodization_goal == PeriodizationGoal.improve_cardiovascular_health:
+
+            return StandardErrorRange(lower_bound=3, upper_bound=5)
+
+
 class PeriodizationModelFactory(object):
 
-    def create(self, persona, training_phase_type):
+    def create(self, persona, training_phase_type, periodization_goal):
 
         if persona == PeriodizationPersona.well_trained:
 
             periodization_model = PeriodizationModel()
             periodization_model.progression_persona = PeriodizationPersona.well_trained
+
+            periodization_model.required_exercises = RequiredExerciseFactory().get_required_exercises(periodization_goal)
+            periodization_model.one_required_exercises = RequiredExerciseFactory().get_one_required_exercises(
+                periodization_goal)
+            periodization_model.one_required_combination = RequiredExerciseFactory().get_one_required_combination(
+                periodization_goal)
 
             training_phase = TrainingPhaseFactory().create(training_phase_type)
 

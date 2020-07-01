@@ -11,7 +11,7 @@ class PeriodizationPlanProcessor(object):
         self.persona = athlete_persona
         self.goal = athlete_periodization_goal
         self.athlete_training_history = athlete_training_history
-        self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type)
+        self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type, periodization_goal=athlete_periodization_goal)
         self.weekly_targets = []
 
     def set_weekly_targets(self):

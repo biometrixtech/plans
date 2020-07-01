@@ -42,6 +42,14 @@ class DetailedAdaptationType(Enum):
     maximal_power = 16
 
 
+class SubAdaptationType(Enum):
+    movement_efficiency = 0
+    cardiorespiratory_training = 1
+    core_strength = 2
+    strength = 3
+    power = 4
+
+
 class CardioAction(Enum):
     race_walking = 0
     run = 1
