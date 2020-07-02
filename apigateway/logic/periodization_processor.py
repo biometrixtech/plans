@@ -4,6 +4,7 @@ from collections import Counter
 from models.training_volume import StandardErrorRange
 from statistics import mean
 from models.training_load import TrainingLoad
+from models.movement_tags import AdaptationDictionary
 
 
 class PeriodizationPlanProcessor(object):
@@ -22,7 +23,7 @@ class PeriodizationPlanProcessor(object):
             weekly_targets = self.get_weekly_targets(self.model.progressions[t])
             self.weekly_targets.append(weekly_targets)
 
-    def get_load_target(self, progression):
+    def get_weekly_load_target(self, progression):
 
         # acwr
         last_four_weeks_rpe_load = self.athlete_training_history.get_last_four_weeks_rpe_load()
@@ -61,12 +62,15 @@ class PeriodizationPlanProcessor(object):
         min_workouts_week = self.athlete_training_history.average_sessions_per_week.lower_bound
         max_workouts_week = self.athlete_training_history.average_sessions_per_week.upper_bound
 
-        weekly_rpe_load_target = self.get_load_target(progression)
+        # determine the weekly load increase and determine the RPE/volume contributions according the the progression
+
+        weekly_rpe_load_target = self.get_weekly_load_target(progression)
 
         net_weeks_rpe_load_increase_lower = weekly_rpe_load_target.rpe_load.lower_bound - current_weeks_rpe_load_lower
         net_weeks_rpe_load_increase_upper = weekly_rpe_load_target.rpe_load.upper_bound - current_weeks_rpe_load_upper
 
-        rpe_load_rate_increase_lower = (current_weeks_rpe_load_lower - net_weeks_rpe_load_increase_lower) / float(current_weeks_rpe_load_lower)
+        rpe_load_rate_increase_lower = (current_weeks_rpe_load_lower - net_weeks_rpe_load_increase_lower) / float(
+            current_weeks_rpe_load_lower)
         rpe_load_rate_increase_upper = (current_weeks_rpe_load_upper - net_weeks_rpe_load_increase_upper) / float(
             current_weeks_rpe_load_upper)
 
@@ -78,11 +82,15 @@ class PeriodizationPlanProcessor(object):
         target_session_load_lower = min(target_session_loads)
         target_session_load_upper = max(target_session_loads)
 
+        # given load rate of increase, determine the RPE's share of that increase
+
         target_rpe_rates = [1 + (rpe_load_rate_increase_lower * progression.rpe_load_contribution),
                        1 + (rpe_load_rate_increase_upper * progression.rpe_load_contribution)]
 
         target_rpe_increase_lower = min(target_rpe_rates)
         target_rpe_increase_upper = max(target_rpe_rates)
+
+        # apply adjusted RPE rate of increase
 
         target_rpes = [target_rpe_increase_lower * current_average_session_rpe_lower,
                        target_rpe_increase_lower * current_average_session_rpe_upper,
@@ -93,6 +101,8 @@ class PeriodizationPlanProcessor(object):
 
         target_rpe_lower = min(target_rpes)
         target_rpe_upper = max(target_rpes)
+
+        # now reverse engineer the volume's contribution of increase given load and RPE
 
         target_weekly_volumes = [weekly_rpe_load_target.rpe_load.lower_bound / float(target_rpe_lower),
                           weekly_rpe_load_target.rpe_load.lower_bound / float(target_rpe_upper),
@@ -148,6 +158,15 @@ class PeriodizationPlanProcessor(object):
         if exclude_completed:
             workouts = [w for w in workouts if w.id not in [c.id for c in completed_sessions]]
 
+        # with the broader guidelines of weekly load/RPE, let's select workouts that match the athlete's goals
+
+        # first how many of the plan's workouts have not been completed?
+        required_exercises = self.get_non_completed_required_exercises(self.model.required_exercises, completed_sessions)
+        one_required_exercises = []
+        one_required_combination = []
+
+        # now, which ones remain? let's adjust these based on goals
+
         load_this_week = sum([c.session_load for c in completed_sessions])
         min_week_load = max(current_week_target.target_weekly_load.rpe_load.lower_bound - load_this_week, 0)
         max_week_load = current_week_target.target_weekly_load.rpe_load.upper_bound - load_this_week
@@ -165,6 +184,49 @@ class PeriodizationPlanProcessor(object):
                                                                       min_workouts_week, max_workouts_week)
 
         return combinations
+
+    def get_non_completed_required_exercises(self, required_exercises, completed_exercises):
+
+        # first, they may be at two different levels of detail: detailed adaptation type or sub-adaptation type.
+        # if required at sub, but completed at detail, let's aggregate
+        use_sub_adaptation_type = False
+
+        if len(required_exercises) > 0 and required_exercises[0].uses_sub_adaptation_type():
+            use_sub_adaptation_type = True
+
+        if use_sub_adaptation_type:
+            adaptation_dictionary = AdaptationDictionary()
+            for c in completed_exercises:
+                if c.sub_adaptation_type is None:
+                    c.sub_adaptation_type = adaptation_dictionary.detailed_types[c.detailed_adaptation_type]
+
+        for r in required_exercises:
+            for c in completed_exercises:
+                found = False
+                if c.sub_adaptation_type == r.sub_adaptation_type:
+                    if r.rpe is not None:
+                        if r.rpe.lower_bound <= c.rpe <= r.rpe.upper_bound:
+                            found = True
+                        else:
+                            found = False
+                    else:
+                        found = True
+                    if r.duration is not None:
+                        if found and r.duration.lower_bound <= c.duration <= r.duration.upper_bound:
+                            found = True
+                        else:
+                            found = False
+                    if found:
+                        if r.times_per_week.lower_bound is not None:
+                            r.times_per_week.lower_bound = max(0, r.times_per_week.lower_bound - 1)
+                        if r.times_per_week.upper_bound is not None:
+                            r.times_per_week.upper_bound = max(0, r.times_per_week.upper_bound - 1)
+
+        cleaned_required = [r for r in required_exercises if
+                            (r.times_per_week.lower_bound is not None and r.times_per_week.lower_bound > 0) or
+                            (r.times_per_week.upper_bound is not None and r.times_per_week.upper_bound > 0)]
+
+        return cleaned_required
 
     def combinations_without_repetition(self, r, iterable=None, values=None, counts=None):
         if iterable:

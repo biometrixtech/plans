@@ -96,6 +96,20 @@ class PeriodizedExercise(object):
         self.duration = duration_range
         self.rpe = rpe_range
 
+    def uses_detailed_adapatation_type(self):
+
+        if self.detailed_adaptation_type is not None:
+            return True
+        else:
+            return False
+
+    def uses_sub_adaptation_type(self):
+
+        if self.sub_adaptation_type is not None:
+            return True
+        else:
+            return False
+
 
 class TrainingPhase(object):
     def __init__(self, training_phase_type, lower_progression_bound, upper_progression_bound):
@@ -158,7 +172,9 @@ class RequiredExerciseFactory(object):
 
         if periodization_goal == PeriodizationGoal.improve_cardiovascular_health:
 
-            return [PeriodizedExercise(None, SubAdaptationType.strength, 2, None, None)]
+            return [PeriodizedExercise(None, SubAdaptationType.strength,
+                                       times_per_week_range=StandardErrorRange(lower_bound=2), duration_range=None,
+                                       rpe_range=None)]
 
     def get_one_required_exercises(self, periodization_goal):
 

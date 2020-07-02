@@ -50,6 +50,23 @@ class SubAdaptationType(Enum):
     power = 4
 
 
+class AdaptationDictionary(object):
+
+    def __init__(self):
+        self.detailed_types = {}
+        self.initialize()
+
+    def initialize(self):
+        self.detailed_types[DetailedAdaptationType.base_aerobic_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.anaerobic_threshold_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.anaerobic_interval_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.functional_strength] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.muscular_endurance] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.strength_endurance] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.hypertrophy] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.maximal_strength] = SubAdaptationType.strength
+
+
 class CardioAction(Enum):
     race_walking = 0
     run = 1

@@ -113,6 +113,8 @@ class SimpleWorkout(object):
         self.session_rpe = rpe
         self.duration = duration
         self.session_load = rpe * duration
+        self.detailed_adaptation_type = DetailedAdaptationType.functional_strength
+        self.sub_adaptation_type = None
 
 
 def get_list_of_load_workouts(rpe_list, duration_list):
