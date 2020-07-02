@@ -6,6 +6,7 @@ from logic.periodization_processor import PeriodizationPlanProcessor
 from models.periodization import AthleteTrainingHistory, PeriodizationModel, PeriodizationProgression, PeriodizationModelFactory, PeriodizationPersona, PeriodizationGoal, TrainingPhaseType
 from models.training_load import TrainingLoad
 from statistics import mean
+from models.movement_tags import RankedAdaptationType
 
 
 def get_load_dictionary(load_type_list, load_list):
@@ -108,13 +109,13 @@ def sum_load(program_load_dict):
 
 
 class SimpleWorkout(object):
-    def __init__(self, id, rpe, duration):
+    def __init__(self, id, rpe, duration, ranked_detailed_adaptation_types, ranked_sub_adaptation_types):
         self.id = id
         self.session_rpe = rpe
         self.duration = duration
         self.session_load = rpe * duration
-        self.detailed_adaptation_type = DetailedAdaptationType.functional_strength
-        self.sub_adaptation_type = None
+        self.detailed_adaptation_types = ranked_detailed_adaptation_types
+        self.sub_adaptation_types = ranked_sub_adaptation_types
 
 
 def get_list_of_load_workouts(rpe_list, duration_list):
@@ -124,7 +125,9 @@ def get_list_of_load_workouts(rpe_list, duration_list):
 
     for r in rpe_list:
         for d in duration_list:
-            workout = SimpleWorkout(id, r, d)
+            ranked_detailed_adaptation_types = [RankedAdaptationType(DetailedAdaptationType.functional_strength, 1),
+                                                RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 2)]
+            workout = SimpleWorkout(id, r, d, ranked_detailed_adaptation_types, [])
             workouts.append(workout)
             id += 1
 
@@ -240,6 +243,29 @@ def test_find_workout_combinations():
     assert len(acceptable_workouts_5) > 0
 
 
+def test_cosine_similarity_prioritized_adaptation_types_equal():
+
+    list_a = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1), RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
+    list_b = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
+
+    proc = PeriodizationPlanProcessor(None, None, None, None)
+
+    val = proc.cosine_similarity(list_a, list_b)
+
+    assert 1.0 == round(val, 5)
+
+def test_cosine_similarity_prioritized_adaptation_types_half_equal():
+
+    list_a = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1), RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
+    list_b = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(DetailedAdaptationType.hypertrophy, 2)]
+
+    proc = PeriodizationPlanProcessor(None, None, None, None)
+
+    val = proc.cosine_similarity(list_a, list_b)
+
+    assert 0.5 == round(val, 5)
 
 
 
