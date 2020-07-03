@@ -1,7 +1,7 @@
 from enum import Enum
 from models.training_volume import StandardErrorRange
 from models.training_load import DetailedTrainingLoad, TrainingLoad
-from models.movement_tags import DetailedAdaptationType, SubAdaptationType
+from models.movement_tags import DetailedAdaptationType, SubAdaptationType, AdaptationDictionary
 
 
 class AthleteTrainingHistory(object):
@@ -95,6 +95,13 @@ class PeriodizedExercise(object):
         self.times_per_week = times_per_week_range
         self.duration = duration_range
         self.rpe = rpe_range
+        self.update_adaptation_types()
+
+    def update_adaptation_types(self):
+
+        adaptation_dictionary = AdaptationDictionary()
+        if self.uses_detailed_adapatation_type():
+            self.sub_adaptation_type = adaptation_dictionary.detailed_types[self.detailed_adaptation_type]
 
     def uses_detailed_adapatation_type(self):
 
