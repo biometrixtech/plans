@@ -267,6 +267,19 @@ def test_cosine_similarity_prioritized_adaptation_types_half_equal():
 
     assert 0.5 == round(val, 5)
 
+def test_cosine_similarity_prioritized_adaptation_types_partial_credit():
+
+    list_a = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
+    list_b = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 2),
+              RankedAdaptationType(DetailedAdaptationType.strength_endurance, 1)]
+
+    proc = PeriodizationPlanProcessor(None, None, None, None)
+
+    val = proc.cosine_similarity(list_a, list_b)
+
+    assert 0.5 == round(val, 5)
+
 
 
 

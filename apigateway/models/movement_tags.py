@@ -50,6 +50,20 @@ class SubAdaptationType(Enum):
     power = 4
 
 
+class RankedAdaptationType(object):
+    def __init__(self, adaptation_type, ranking):
+        self.adaptation_type = adaptation_type
+        self.ranking = ranking
+
+    def __hash__(self):
+        return hash((self.adaptation_type.value, self.ranking))
+
+    def __eq__(self, other):
+        val = (self.adaptation_type.value == other.adaptation_type.value and self.ranking == other.ranking)
+
+        return val
+
+
 class AdaptationDictionary(object):
 
     def __init__(self):

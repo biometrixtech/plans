@@ -4,7 +4,8 @@ from collections import Counter
 from models.training_volume import StandardErrorRange
 from statistics import mean
 from models.training_load import TrainingLoad
-from models.movement_tags import AdaptationDictionary
+from models.movement_tags import AdaptationDictionary, RankedAdaptationType
+from math import sqrt
 
 
 class PeriodizationPlanProcessor(object):
@@ -161,9 +162,17 @@ class PeriodizationPlanProcessor(object):
         # with the broader guidelines of weekly load/RPE, let's select workouts that match the athlete's goals
 
         # first how many of the plan's workouts have not been completed?
-        required_exercises = self.get_non_completed_required_exercises(self.model.required_exercises, completed_sessions)
-        one_required_exercises = []
-        one_required_combination = []
+        required_exercises = self.get_non_completed_required_exercises(self.model.required_exercises,
+                                                                       completed_sessions)
+
+        one_required_exercises = self.get_non_completed_required_exercises(self.model.one_required_exercises,
+                                                                           completed_sessions)
+        scores = []
+        for r in one_required_exercises:
+            for w in workouts:
+                score = self.get_workout_score(w, r)
+                scores.append(score)
+
 
         # now, which ones remain? let's adjust these based on goals
 
@@ -197,13 +206,22 @@ class PeriodizationPlanProcessor(object):
         if use_sub_adaptation_type:
             adaptation_dictionary = AdaptationDictionary()
             for c in completed_exercises:
-                if c.sub_adaptation_type is None:
-                    c.sub_adaptation_type = adaptation_dictionary.detailed_types[c.detailed_adaptation_type]
+                if len(c.sub_adaptation_types) == 0:
+                    c.sub_adaptation_types = [RankedAdaptationType(adaptation_dictionary.detailed_types[d.adaptation_type], d.ranking) for d in c.detailed_adaptation_types]
+                    adapt_dict = {}
+                    for a in c.sub_adaptation_types:
+                        if a.adaptation_type not in adapt_dict.keys():
+                            adapt_dict[a.adaptation_type] = a.ranking
+                        else:
+                            adapt_dict[a.adaptation_type] = min(a.ranking, adapt_dict[a.adaptation_type])
+                    sub_types = []
+                    for a, r in adapt_dict.items():
+                        sub_types.append(RankedAdaptationType(a, r))
+                    c.sub_adaptation_types = sub_types
 
         for r in required_exercises:
             for c in completed_exercises:
-                found = False
-                if c.sub_adaptation_type == r.sub_adaptation_type:
+                if r.sub_adaptation_type in [d.adaptation_type for d in c.sub_adaptation_types]:
                     if r.rpe is not None:
                         if r.rpe.lower_bound <= c.rpe <= r.rpe.upper_bound:
                             found = True
@@ -222,11 +240,13 @@ class PeriodizationPlanProcessor(object):
                         if r.times_per_week.upper_bound is not None:
                             r.times_per_week.upper_bound = max(0, r.times_per_week.upper_bound - 1)
 
-        cleaned_required = [r for r in required_exercises if
-                            (r.times_per_week.lower_bound is not None and r.times_per_week.lower_bound > 0) or
-                            (r.times_per_week.upper_bound is not None and r.times_per_week.upper_bound > 0)]
+        # cleaned_required = [r for r in required_exercises if
+        #                     (r.times_per_week.lower_bound is not None and r.times_per_week.lower_bound > 0) or
+        #                     (r.times_per_week.upper_bound is not None and r.times_per_week.upper_bound > 0)]
+        #
+        # return cleaned_required
 
-        return cleaned_required
+        return required_exercises
 
     def combinations_without_repetition(self, r, iterable=None, values=None, counts=None):
         if iterable:
@@ -269,7 +289,52 @@ class PeriodizationPlanProcessor(object):
 
         return unique_workouts
 
+    def get_workout_score(self, test_workout, source_workout):
 
+        if source_workout.rpe.upper_bound is not None and (source_workout.rpe.lower_bound <= test_workout.session_rpe <= source_workout.rpe.upper_bound):
+            rpe_score = 1.0
+        elif source_workout.rpe.lower_bound <= test_workout.session_rpe:
+            rpe_score = 1.0
+        elif test_workout.session_rpe > source_workout.rpe.upper_bound:
+            rpe_score = 0.0
+        else:
+            rpe_score = test_workout.session_rpe/source_workout.rpe.lower_bound
+
+        if source_workout.duration.lower_bound <= test_workout.duration <= source_workout.duration.upper_bound:
+            duration_score = 1.0
+        elif test_workout.duration > source_workout.duration.upper_bound:
+            duration_score = source_workout.duration.upper_bound / test_workout.duration
+
+        else:
+            duration_score = test_workout.duration/source_workout.duration.lower_bound
+
+        #cosine_similarity = self.cosine_similarity(test_workout.sub_adaptation_types, source_workout.sub_adaptation_types)
+
+        return rpe_score * duration_score
+
+    def cosine_similarity(self, candidate_exercise_priorities, recommended_exercise_priorities):
+
+        # get the adaptation types separately so we can look for matches of type (but not necessarily ranking)
+        candidate_adaptation_types = [c.adaptation_type for c in candidate_exercise_priorities]
+        recommended_adaptation_types = [r.adaptation_type for r in recommended_exercise_priorities]
+        all_adaptation_types = set(candidate_adaptation_types).union(recommended_adaptation_types)
+
+        all_exercise_priorities = set(candidate_exercise_priorities).union(recommended_exercise_priorities)
+        dotprod_1 = sum((1 if k in candidate_exercise_priorities else 0) * (1 if k in recommended_exercise_priorities else 0) for k in all_exercise_priorities)
+        magA_1 = sqrt(sum((1 if k in candidate_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
+        magB_1 = sqrt(sum((1 if k in recommended_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
+        cosine_similarity_1 = dotprod_1 / (magA_1 * magB_1)
+
+        dotprod_2 = sum(
+            (1 if k in candidate_adaptation_types else 0) * (1 if k in recommended_adaptation_types else 0) for k
+            in all_adaptation_types)
+        magA_2 = sqrt(sum((1 if k in candidate_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        magB_2 = sqrt(sum((1 if k in recommended_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
+
+        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2) / 2
+
+        return average_cosine_similarity
 
 
 
