@@ -137,13 +137,14 @@ class BodyPosition(Enum):
     split_leg_standing = 8
     staggered_leg_standing = 9
     single_leg_standing = 10
-    non_stationary_single_leg = 11
+    single_leg_moving = 11
     seated = 12
-    non_stationary_double_leg = 13
-    non_stationary_lunge = 14
+    double_leg_moving = 13
+    split_leg_moving = 14
     non_stationary_other = 15
-    two_arms = 16
-    single_arm = 17
+    hanging = 16
+    upright_torso = 17
+    staggered_leg_moving = 18
 
 
 class Equipment(Enum):
@@ -173,9 +174,14 @@ class Equipment(Enum):
     barbell_without_plates = 23
     step = 24
     bodyweight = 25
+    hex_bar = 26
+    trx = 27
+    mini_bands = 28
+    single_dumbbells = 29
 
     def distribute_weights(self):
-        if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells', 'double_kettlebells']:
+        if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells',
+                         'double_kettlebells', 'bodyweight', 'mini_bands']:
             return False
         else:
             return True
@@ -186,6 +192,7 @@ class WeightDistribution(Enum):
     bilateral_uneven = 1
     unilateral = 2
     unilateral_alternating = 3
+    contralateral = 4
 
 
 class MovementSurfaceStability(Enum):

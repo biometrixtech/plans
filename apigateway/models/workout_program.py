@@ -321,7 +321,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise.weight = input_dict.get('weight')
         exercise.equipments = [Equipment(equipment) for equipment in input_dict.get('equipments', [])]
         exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get('weight_measure') is not None else None
-        exercise.sets = input_dict.get('sets', 0)
+        exercise.sets = input_dict.get('sets', 1)
         exercise.reps_per_set = input_dict.get('reps_per_set')
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
         exercise.movement_id = input_dict.get('movement_id')

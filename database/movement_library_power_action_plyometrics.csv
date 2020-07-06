@@ -1,0 +1,29 @@
+,,,,,quantity of stabilization intensity,,,quantity of power intensity,,,,,,selected actions to define load quantification parameters and muscle groups to apply loads,,,movement characterization to select action,,
+movement_id,fathom_name,description,youtube_link,,surface_stability,external_weight_implement,,resistance,speed,,base_movement_id,base_movement_name,compound_actions,primary_actions,bilateral_distribution_of_resistance,,training_type,power_drill_action,power_action
+,Med Ball Chest Pass,,https://www.youtube.com/watch?v=vCYQQb0AzQg,,stable,medicine_balls,,mod,explosive,,,,,"3100_a, 3100_b",bilateral,,power_action_plyometrics,,throw
+,"Med Ball Slams, lift with rotation (Around the World Ball Slams)","med ball from overhead to slam, raise ball on side (rotate trunk, lift usin",https://youtu.be/AyF-bh__iEA,,stable,medicine_balls,,mod,explosive,,,,,"2304_a, 3103",bilateral,,power_action_plyometrics,,throw
+,Med Ball Slam,,https://youtu.be/33InwTVwVc8,,stable,medicine_balls,,mod,explosive,,,,,"2305_a, 3103",bilateral,,power_action_plyometrics,,throw
+,Explosive Burpee,burpee,https://youtu.be/bJ_fogiPvnU,,stable,no_equipment,,none,explosive,,,,"1004, 3021, plank+pushup
+3020.1, jump out of plank
+3001, jump squat
+3020, jump into plank","1004, 3021_a, 3021_b, +pushup
+3020.1_a, 3020.1_b jump out of plank
+3001_a, 3001_b, jump squat
+3020_a, 3020_b, jump into plank",bilateral,,power_action_plyometrics,,jump
+,Clapping Push Ups,,https://www.youtube.com/watch?v=EYwWCgM198U,,stable,,,none,explosive,,,,,"1004, 3021_a, 3021_b",bilateral,,power_action_plyometrics,,jump
+,,,,,,,,,,,,,,,,,,,
+,May 18 Instudio OTF Workout,,,,,,,,,,,,,,,,,,
+,Pop Jack,burpee without the jump squat or pushup,https://www.youtube.com/watch?v=LhqECfiJ9MY,,stable,no_equipment,,mod,fast,,,Pop Jack,"1004, plank
+3020.1, jump out of plank
+3020, jump into plank","1004, plank
+3020.1_a, 3020.1_b jump out of plank
+3020_a, 3020_b, jump into plank",bilateral,,power_action_plyometrics,,
+,"Pop Jack Variation, Walking to Plank",,,,,,,,,,,,,,,,strength_endurance,,
+,"Pop Jack Challenge Variation, add Push Up",burpee without the jump squat,https://www.youtube.com/watch?v=LhqECfiJ9MY,,stable,no_equipment,,mod,fast,,,"Pop Jack Variation, add Push Up","1004, 1200, plank+pushup
+3020.1, jump out of plank
+3020, jump into plank","1004, 1200_a, 1200_b, plank+pushup
+3020.1_a, 3020.1_b jump out of plank
+3020_a, 3020_b, jump into plank",bilateral,,power_action_plyometrics,,
+,,,,,,,,,,,,,,,,,,,
+,May 19 Instudio OTF Workout,,,,,,,,,,,,,,,,,,
+,Frogger,sumo squat jump,,,stable,no_equipment,,none,explosive,,,Sumo Squat Jump,3000.1,"3001_a, 3001_b, 3000.1_c, 3000.1_d",bilateral,,power_action_plyometrics,,

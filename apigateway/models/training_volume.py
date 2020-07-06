@@ -628,3 +628,23 @@ class Assignment(object):
                 new_range.upper_bound = range.upper_bound * assignment.max_value
 
         return new_range
+
+
+class MovementOption(object):
+    def __init__(self, option_type='default', movement_id=None):
+        self.option_type = option_type
+        self.movement_id = movement_id
+
+    def json_serialise(self):
+        ret = {
+            'option_type': self.option_type,
+            'movement_id': self.movement_id
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        option = cls()
+        option.option_type = input_dict.get('option_type', 'default')
+        option.movement_id = input_dict.get('movement_id')
+        return option

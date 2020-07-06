@@ -39,6 +39,20 @@ def parse_file(file_name):
                         'assigned_value': 1.56
                     }
                 exercise['movement_id'] = row['movement']
+                exercise['alternate_movement_ids'] = []
+                if is_valid(row, 'movement_alt_variation'):
+                    alt_movement = {
+                        'option_type': 'variation',
+                        'movement_id': row['movement_alt_variation']
+                    }
+                    exercise['alternate_movement_ids'].append(alt_movement)
+
+                if is_valid(row, 'movement_alt_challenge'):
+                    alt_movement = {
+                        'option_type': 'challenge',
+                        'movement_id': row['movement_alt_challenge']
+                    }
+                    exercise['alternate_movement_ids'].append(alt_movement)
                 if is_valid(row, 'duration_value') or is_valid(row, 'duration_min') or is_valid(row, 'duration_max'):  #if not np.isnan(row['duration']):
                     duration_assignment = {
                         'assigned_value': row['duration_value'],

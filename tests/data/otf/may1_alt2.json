@@ -1,0 +1,1241 @@
+{
+    "program_id": "may",
+    "workout_sections": [
+        {
+            "name": "warmup",
+            "exercises": [
+                {
+                    "name": "walk",
+                    "id": "walk",
+                    "speed": {
+                        "assigned_value": 1.56
+                    },
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.01
+                    },
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.01,
+                            "max_value": 0.03
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 240.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "row",
+                    "id": "row",
+                    "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 180.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "stroke_rate": 24.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "tread1",
+            "exercises": [
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 90.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.06
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.08,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.01,
+                            "max_value": 0.03
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 90.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.06
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.08,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.01,
+                            "max_value": 0.03
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.34369173399627095,
+                            "max_value": 0.2983219390926041
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.06,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 30.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.06
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.2983219390926041,
+                            "max_value": 0.22374145431945308
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.1,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "recovery1",
+            "exercises": [
+                {
+                    "name": "walk",
+                    "id": "walk",
+                    "speed": {
+                        "assigned_value": 1.56
+                    },
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 30.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "tread2",
+            "exercises": [
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 90.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.07
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.09,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 75.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.01,
+                            "max_value": 0.03
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 90.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.07
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.09,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 75.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.01,
+                            "max_value": 0.03
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.34369173399627095,
+                            "max_value": 0.2983219390926041
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.06,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 30.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.07
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.2983219390926041,
+                            "max_value": 0.22374145431945308
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.1,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "recovery2",
+            "exercises": [
+                {
+                    "name": "walk",
+                    "id": "walk",
+                    "speed": {
+                        "assigned_value": 1.56
+                    },
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 30.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "tread3",
+            "exercises": [
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 90.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.06
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.08,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.01,
+                            "max_value": 0.03
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 90.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.06
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.08,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.4978247358607831,
+                            "max_value": 0.40708514605344936
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.4077066500932256,
+                            "max_value": 0.2995649471721566
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.01,
+                            "max_value": 0.03
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 60.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.0
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.34369173399627095,
+                            "max_value": 0.2983219390926041
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.06,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "run",
+                    "id": "run",
+                    "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": 30.0,
+                        "min_value": "",
+                        "max_value": ""
+                    },
+                    "grade": {
+                        "assigned_value": 0.06
+                    },
+                    "alternate_pace": [
+                        {
+                            "assignment_type": "power_walker",
+                            "assigned_value": null,
+                            "min_value": 0.6389061528899938,
+                            "max_value": 0.49720323182100684
+                        },
+                        {
+                            "assignment_type": "jogger",
+                            "assigned_value": null,
+                            "min_value": 0.2983219390926041,
+                            "max_value": 0.22374145431945308
+                        },
+                        {
+                            "assignment_type": "runner",
+                            "assigned_value": null,
+                            "min_value": 0.29894344313238036,
+                            "max_value": 0.22374145431945308
+                        }
+                    ],
+                    "alternate_grade": [
+                        {
+                            "assignment_type": "power_walker",
+                            "min_value": 0.1,
+                            "max_value": ""
+                        }
+                    ],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "floor1",
+            "exercises": [
+                {
+                    "name": "row",
+                    "id": "row",
+                    "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": "",
+                        "min_value": 15.0,
+                        "max_value": 30.0
+                    },
+                    "stroke_rate": 24.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "plank_alt_leg_lift",
+                    "id": "plank_alt_leg_lift",
+                    "movement_id": "Plank with Single Arm Row",
+                    "alternate_movement_ids": [
+                        {
+                            "option_type": "variation",
+                            "movement_id": "Plank from Knees with Single Arm Row"
+                        }
+                    ],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "squat",
+                    "id": "squat",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "plank_alt_leg_lift",
+                    "id": "plank_alt_leg_lift",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "squat",
+                    "id": "squat",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 8.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "plank_alt_leg_lift",
+                    "id": "plank_alt_leg_lift",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "squat",
+                    "id": "squat",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 6.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "floor2",
+            "exercises": [
+                {
+                    "name": "row",
+                    "id": "row",
+                    "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": "",
+                        "min_value": 15.0,
+                        "max_value": 30.0
+                    },
+                    "stroke_rate": 22.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "hamstring curl",
+                    "id": "hamstring curl",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "static lunge",
+                    "id": "static lunge",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 12.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "hamstring curl",
+                    "id": "hamstring curl",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "static lunge",
+                    "id": "static lunge",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 12.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "hamstring curl",
+                    "id": "hamstring curl",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "static lunge",
+                    "id": "static lunge",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 12.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                }
+            ]
+        },
+        {
+            "name": "floor3",
+            "exercises": [
+                {
+                    "name": "row",
+                    "id": "row",
+                    "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
+                    "duration": {
+                        "assigned_value": "",
+                        "min_value": 15.0,
+                        "max_value": 30.0
+                    },
+                    "stroke_rate": 20.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "hip bridge",
+                    "id": "hip bridge",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "front squat",
+                    "id": "front squat",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 6.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "hip bridge",
+                    "id": "hip bridge",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "front squat",
+                    "id": "front squat",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 8.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "hip bridge",
+                    "id": "hip bridge",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "front squat",
+                    "id": "front squat",
+                    "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                },
+                {
+                    "name": "rollout",
+                    "id": "rollout",
+                    "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
+                    "weight": 15,
+                    "weight_measure": 2,
+                    "reps_per_set": 10.0,
+                    "alternate_grade": [],
+                    "alternate_distance": []
+                }
+            ]
+        }
+    ]
+}

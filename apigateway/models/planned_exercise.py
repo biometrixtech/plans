@@ -1,7 +1,7 @@
 from utils import format_date, parse_date
 from models.movement_tags import CardioAction, Equipment
 from models.workout_program import WorkoutSection, BaseWorkoutExercise, ExerciseAction
-from models.training_volume import StandardErrorRange, Assignment
+from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 
@@ -102,6 +102,8 @@ class PlannedExercise(BaseWorkoutExercise):
         self.alternate_cadence = []  # will be a list of Assignment objects
         self.alternate_stroke_rate = []  # will be a list of Assignment objects
 
+        self.alternate_movement_ids = []
+
         self.stroke_adjustment = 0  # how much lower than your base stroke rate
 
         self.force = None
@@ -151,12 +153,13 @@ class PlannedExercise(BaseWorkoutExercise):
             'stroke_rate': self.stroke_rate if self.stroke_rate is not None else None,
 
             'alternate_duration': [duration.json_serialise() for duration in self.alternate_duration],
-            'alternate_distance': [distance.json_serialise() for distance in self.alternate_duration],
-            'alternate_pace': [pace.json_serialise() for pace in self.alternate_duration],
-            'alternate_speed': [speed.json_serialise() for speed in self.alternate_duration],
-            'alternate_grade': [grade.json_serialise() for grade in self.alternate_duration],
-            'alternate_cadence': [cadence.json_serialise() for cadence in self.alternate_duration],
-            'alternate_stroke_rate': [stroke_rate.json_serialise() for stroke_rate in self.alternate_duration],
+            'alternate_distance': [distance.json_serialise() for distance in self.alternate_distance],
+            'alternate_pace': [pace.json_serialise() for pace in self.alternate_pace],
+            'alternate_speed': [speed.json_serialise() for speed in self.alternate_speed],
+            'alternate_grade': [grade.json_serialise() for grade in self.alternate_grade],
+            'alternate_cadence': [cadence.json_serialise() for cadence in self.alternate_cadence],
+            'alternate_stroke_rate': [stroke_rate.json_serialise() for stroke_rate in self.alternate_stroke_rate],
+            'alternate_movement_ids': [movement_id.json_serialise() for movement_id in self.alternate_movement_ids],
 
             'stroke_adjustment': self.stroke_adjustment,
             'power_goal': self.power_goal,
@@ -218,6 +221,8 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise.alternate_cadence = [Assignment.json_deserialise(a) for a in input_dict.get('alternate_cadence', [])]   # will be a list of Assignment objects
         exercise.alternate_stroke_rate = [Assignment.json_deserialise(a) for a in input_dict.get('alternate_stroke_rate', [])]   # will be a list of Assignment objects
 
+        exercise.alternate_movement_ids = [MovementOption.json_deserialise(a) for a in input_dict.get('alternate_movement_ids', [])]
+
         exercise.stroke_adjustment = input_dict.get('stroke_adjustment', 0)  # how much lower than your base stroke rate
         exercise.power_goal = input_dict.get('power_goal')  # average power goal for exercise
         exercise.force = StandardErrorRange.json_deserialise(input_dict['force']) if input_dict.get('force') is not None else None
@@ -275,6 +280,10 @@ class PlannedExercise(BaseWorkoutExercise):
 
         if self.duration is not None and self.duration.max_value is not None and isinstance(self.duration.max_value, str):
             self.duration.max_value = None
+
+    def update_movement_id(self, movement_option):
+        if movement_option is not None:
+            self.movement_id = next((option.movement_id for option in self.alternate_movement_ids if option.option_type == movement_option), self.movement_id)
 
     def set_speed_pace(self):
         speed = None

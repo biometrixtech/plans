@@ -25,12 +25,18 @@ class LowerBodyStance(Enum):
     kneeling = 9
     half_kneeling = 10
     seated = 11
+    contralateral_single_leg = 12
+    alternating_single_leg = 13
+    contralateral_alternating_single_leg = 14
+
 
 class UpperBodyStance(Enum):
     double_arm = 0
     alternating_arms = 1
     single_arm = 2
     single_arm_with_trunk_rotation = 3
+    contralateral_single_arm = 4
+    contralateral_alternating_single_arm = 5
 
 
 class ExerciseAction(object):
@@ -43,6 +49,7 @@ class ExerciseAction(object):
         self.eligible_external_resistance = []
         self.lower_body_stance = None
         self.upper_body_stance = None
+        self.body_position = None
         self.lateral_distribution_pattern = WeightDistribution.bilateral
         self.percent_bodyweight = 0.0
         self.lateral_distribution = [0, 0]
@@ -118,6 +125,7 @@ class ExerciseAction(object):
             "name": self.name,
             "training_type": self.training_type.value if self.training_type is not None else None,
             "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
+            "body_position": self.body_position.value if self.body_position is not None else None,
             "lower_body_stance": self.lower_body_stance.value if self.lower_body_stance is not None else None,
             "upper_body_stance": self.upper_body_stance.value if self.upper_body_stance is not None else None,
             "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
@@ -187,6 +195,7 @@ class ExerciseAction(object):
         # defined per action
         action.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
         action.eligible_external_resistance = [Equipment(equip) for equip in input_dict.get('eligible_external_resistance', [])]
+        action.body_position = BodyPosition(input_dict['body_position']) if input_dict.get('body_position') is not None else None
         action.lower_body_stance = LowerBodyStance(input_dict['lower_body_stance']) if input_dict.get('lower_body_stance') is not None else None
         action.upper_body_stance = UpperBodyStance(input_dict['upper_body_stance']) if input_dict.get('upper_body_stance') is not None else None
         action.lateral_distribution_pattern = WeightDistribution(input_dict['lateral_distribution_pattern']) if input_dict.get('lateral_distribution_pattern') is not None else WeightDistribution.bilateral
@@ -544,8 +553,14 @@ class ExerciseAction(object):
                 elif self.side == 2:
                     self.training_volume_right = total_volume
                 else:
-                    self.training_volume_left = total_volume / 2
-                    self.training_volume_right = total_volume / 2
+                    if isinstance(total_volume, Assignment):
+                        self.training_volume_left = Assignment.divide_assignment_by_scalar(total_volume, 2)
+                    else:
+                        self.training_volume_left = total_volume / 2
+                    if isinstance(total_volume, Assignment):
+                        self.training_volume_right = Assignment.divide_assignment_by_scalar(total_volume, 2)
+                    else:
+                        self.training_volume_right = total_volume / 2
             elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:
                 if self.side == 1:
                     if self.lateral_distribution[0] != 0:
@@ -590,20 +605,22 @@ class ExerciseCompoundAction(object):
 
 
 class MovementSpeed(Enum):
-    no_speed = 0
-    speed = 1
-    max_speed = 2
-
+    none = 0
+    slow = 1
+    mod = 2
+    fast = 3
+    explosive = 4
 
 class MovementResistance(Enum):
-    low_resistance = 0
-    mod_resistance = 1
-    high_resistance = 2
-    max_resistance = 3
+    none = 0
+    low = 1
+    mod = 2
+    high = 3
+    max = 4
 
 
 class Explosiveness(IntEnum):
-    no_speed = 0
+    no_force = 0
     low_force = 1
     mod_force = 2
     high_force = 3
@@ -682,23 +699,23 @@ class Movement(Serialisable):
         self.explosiveness_rating = 0
 
         if self.speed is not None and self.resistance is not None:
-            if self.resistance == MovementResistance.low_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            if self.resistance == MovementResistance.low:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 4
                 else:
                     self.explosiveness_rating = 3
-            elif self.resistance == MovementResistance.mod_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            elif self.resistance == MovementResistance.mod:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 6
                 else:
                     self.explosiveness_rating = 5
-            elif self.resistance == MovementResistance.high_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            elif self.resistance == MovementResistance.high:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 8
                 else:
                     self.explosiveness_rating = 7
-            elif self.resistance == MovementResistance.max_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            elif self.resistance == MovementResistance.max:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 10
                 else:
                     self.explosiveness_rating = 9
