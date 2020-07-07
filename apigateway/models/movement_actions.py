@@ -56,6 +56,8 @@ class ExerciseAction(object):
         self.apply_resistance = False
         self.explosiveness = None
         self.apply_instability = False
+        self.speed = None
+        self.resistance = None
 
         self.primary_muscle_action = None
         self.hip_joint_action = []
@@ -134,6 +136,8 @@ class ExerciseAction(object):
             "apply_resistance": self.apply_resistance,
             "explosiveness": self.explosiveness.value if self.explosiveness is not None else None,
             "apply_instability": self.apply_instability,
+            'speed': self.speed.value if self.speed is not None else None,
+            'resistance': self.resistance.value if self.resistance is not None else None,
 
             "primary_muscle_action": self.primary_muscle_action.value if self.primary_muscle_action is not None else None,
             "hip_joint_action": [ac.json_serialise() for ac in self.hip_joint_action],
