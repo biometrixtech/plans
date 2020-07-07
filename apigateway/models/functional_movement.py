@@ -264,9 +264,11 @@ class FunctionalMovementActionMapping(object):
         self.hip_joint_functional_movements = []
         self.knee_joint_functional_movements = []
         self.ankle_joint_functional_movements = []
+        self.pelvic_tilt_joint_functional_movements = []
         self.trunk_joint_functional_movements = []
         self.shoulder_scapula_joint_functional_movements = []
         self.elbow_joint_functional_movements = []
+        self.wrist_joint_functional_movements = []
         self.muscle_load = {}
         self.functional_movement_dict = functional_movement_dict
         #self.injury_risk_dict = injury_risk_dict
@@ -330,9 +332,11 @@ class FunctionalMovementActionMapping(object):
             self.hip_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.hip_joint_action)
             self.knee_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.knee_joint_action)
             self.ankle_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.ankle_joint_action)
+            self.pelvic_tilt_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.pelvic_tilt_joint_action)
             self.trunk_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.trunk_joint_action)
             self.shoulder_scapula_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
             self.elbow_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.elbow_joint_action)
+            self.wrist_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.wrist_joint_action)
 
     def get_functional_movements_for_joint_action(self, target_joint_action_list):
 
@@ -399,9 +403,11 @@ class FunctionalMovementActionMapping(object):
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.hip_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.knee_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.ankle_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.pelvic_tilt_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.trunk_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.wrist_joint_functional_movements, self.exercise_action, left_load, right_load)
 
 
     def get_matching_stability_rating(self, functional_movement_load, exercise_action):
