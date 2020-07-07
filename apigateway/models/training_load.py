@@ -2,6 +2,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
 from models.training_volume import StandardErrorRange
+from models.movement_tags import DetailedAdaptationType
 
 
 class TrainingLoad(object):
@@ -93,6 +94,15 @@ class DetailedTrainingLoad(Serialisable):
             'maximal_power') is not None else None
 
         return load
+
+    def add_load(self, detailed_adaptation_type: DetailedAdaptationType, load_range):
+
+        attribute_name = detailed_adaptation_type.name
+
+        if getattr(self, attribute_name) is None:
+            setattr(self, attribute_name, StandardErrorRange())
+        self_load_range = getattr(self, attribute_name)
+        self_load_range.add(load_range)
 
 
 # TODO need some easy way to see the summary so we can easily rank the workouts

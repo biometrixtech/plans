@@ -336,6 +336,169 @@ class BodyPartLocation(Enum):
         return grouped_muscles
 
 
+class BodyPartGeneralLocation(object):
+    def __init__(self):
+        self.upper_body_muscles = [
+            BodyPartLocation.forearm_intrinsic_muscles,
+            BodyPartLocation.forearm_extrinsic_muscles,
+            BodyPartLocation.brachialis,
+            BodyPartLocation.biceps_brachii,
+            BodyPartLocation.brachioradialis,
+            BodyPartLocation.coracobrachialis,
+            BodyPartLocation.tricep_brachii_medial_head,
+            BodyPartLocation.tricep_brachii_lateral_head,
+            BodyPartLocation.tricep_brachii_long_head,
+            BodyPartLocation.anterior_deltoid,
+            BodyPartLocation.medial_deltoid,
+            BodyPartLocation.posterior_deltoid,
+            BodyPartLocation.pectoralis_major,
+            BodyPartLocation.pectoralis_minor,
+            BodyPartLocation.upper_trapezius,
+            BodyPartLocation.levator_scapulae,
+            BodyPartLocation.middle_trapezius,
+            BodyPartLocation.rhomboids,
+            BodyPartLocation.lower_trapezius,
+            BodyPartLocation.supraspinatus,
+            BodyPartLocation.subscapularis,
+            BodyPartLocation.infraspinatus,
+            BodyPartLocation.teres_minor,
+            BodyPartLocation.erector_spinae,
+            BodyPartLocation.quadratus_lumorum,
+            BodyPartLocation.latissmus_dorsi,
+            BodyPartLocation.teres_major,
+            BodyPartLocation.rectus_abdominis,
+            BodyPartLocation.transverse_abdominis,
+            BodyPartLocation.intrinsic_muscles_of_spine,
+            BodyPartLocation.diaphragm,
+            BodyPartLocation.pelvic_floor,
+            BodyPartLocation.external_obliques,
+            BodyPartLocation.internal_obliques
+        ]
+        self.lower_body_muscles = [
+            BodyPartLocation.gluteus_maximus,
+            BodyPartLocation.gluteus_medius_anterior_fibers,
+            BodyPartLocation.gluteus_medius_posterior_fibers,
+            BodyPartLocation.gluteus_minimus,
+            BodyPartLocation.quadratus_femoris,
+            BodyPartLocation.piriformis,
+            BodyPartLocation.psoas,
+            BodyPartLocation.iliacus,
+            BodyPartLocation.tensor_fascia_latae,
+            BodyPartLocation.vastus_lateralis,
+            BodyPartLocation.vastus_medialis,
+            BodyPartLocation.rectus_femoris,
+            BodyPartLocation.gracilis,
+            BodyPartLocation.pectineus,
+            BodyPartLocation.sartorius,
+            BodyPartLocation.adductor_longus,
+            BodyPartLocation.adductor_magnus_anterior_fibers,
+            BodyPartLocation.adductor_magnus_posterior_fibers,
+            BodyPartLocation.adductor_brevis,
+            BodyPartLocation.bicep_femoris_long_head,
+            BodyPartLocation.bicep_femoris_short_head,
+            BodyPartLocation.semimembranosus,
+            BodyPartLocation.semitendinosus,
+            BodyPartLocation.posterior_tibialis,
+            BodyPartLocation.soleus,
+            BodyPartLocation.gastrocnemius_medial,
+            BodyPartLocation.gastrocnemius_lateral,
+            BodyPartLocation.popliteus,
+            BodyPartLocation.peroneals_longus,
+            BodyPartLocation.anterior_tibialis
+        ]
+        self.upper_body_joints = [
+            BodyPartLocation.elbow,
+            BodyPartLocation.wrist,
+            BodyPartLocation.shoulder
+        ]
+        self.lower_body_joints = [
+            BodyPartLocation.hip,
+            BodyPartLocation.knee,
+            BodyPartLocation.ankle,
+            BodyPartLocation.foot
+        ]
+        self.lower_body_ligaments = [
+            BodyPartLocation.it_band,
+            BodyPartLocation.it_band_lateral_knee,
+            BodyPartLocation.achilles
+        ]
+
+    def is_lower_body(self, body_part_location):
+
+        if body_part_location in self.lower_body_joints or body_part_location in self.lower_body_ligaments or body_part_location in self.lower_body_muscles:
+            return True
+        else:
+            return False
+
+    def is_upper_body(self, body_part_location):
+
+        if body_part_location in self.upper_body_joints or body_part_location in self.upper_body_muscles:
+            return True
+        else:
+            return False
+
+
+class BodyPartSystems(object):
+    def __init__(self):
+        self.local_stabilizer_system = [
+            BodyPartLocation.transverse_abdominis,
+            BodyPartLocation.internal_obliques,
+            BodyPartLocation.intrinsic_muscles_of_spine,
+            BodyPartLocation.diaphragm,
+            BodyPartLocation.pelvic_floor,
+            BodyPartLocation.quadratus_lumorum,
+            BodyPartLocation.psoas
+        ]
+        self.global_stabilization_system = [
+            BodyPartLocation.quadratus_lumorum,
+            BodyPartLocation.psoas,
+            BodyPartLocation.piriformis,
+            BodyPartLocation.gluteus_medius_anterior_fibers,
+            BodyPartLocation.gluteus_medius_posterior_fibers,
+            BodyPartLocation.gluteus_minimus,
+            BodyPartLocation.rectus_abdominis,
+            BodyPartLocation.external_obliques,
+            BodyPartLocation.erector_spinae
+        ]
+        self.deep_longitudinal_subsystem = [
+            BodyPartLocation.erector_spinae,
+            BodyPartLocation.rhomboids,
+            BodyPartLocation.adductor_magnus_anterior_fibers,
+            BodyPartLocation.adductor_magnus_posterior_fibers,
+            BodyPartLocation.bicep_femoris_long_head,
+            BodyPartLocation.bicep_femoris_short_head,
+            BodyPartLocation.piriformis,
+            BodyPartLocation.deep_rotators_hip,
+            BodyPartLocation.peroneals_longus
+        ]
+        self.posterior_oblique_subsystem = [
+            BodyPartLocation.latissmus_dorsi,
+            BodyPartLocation.lower_trapezius,
+            BodyPartLocation.gluteus_maximus,
+            BodyPartLocation.gluteus_medius_anterior_fibers,
+            BodyPartLocation.gluteus_medius_posterior_fibers
+        ]
+        self.anterior_oblique_subsystem = [
+            BodyPartLocation.rectus_abdominis,
+            BodyPartLocation.external_obliques,
+            #BodyPartLocation.anterior_adductors,
+            BodyPartLocation.pectineus,
+            BodyPartLocation.adductor_longus,
+            BodyPartLocation.adductor_magnus_anterior_fibers,
+            BodyPartLocation.serratus_anterior,
+            BodyPartLocation.pectoralis_major
+        ]
+        self.intrinsic_stabilization_subsystem = [
+            BodyPartLocation.transverse_abdominis,
+            BodyPartLocation.internal_obliques,
+            BodyPartLocation.intrinsic_muscles_of_spine,
+            BodyPartLocation.diaphragm,
+            BodyPartLocation.pelvic_floor,
+            BodyPartLocation.quadratus_lumorum,
+            BodyPartLocation.psoas
+        ]
+
+
 class BodyPartLocationText(object):
     def __init__(self, body_part_location):
         self.body_part_location = body_part_location
