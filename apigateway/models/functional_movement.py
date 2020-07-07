@@ -61,6 +61,8 @@ class FunctionalMovementPairs(object):
                                                  FunctionalMovementType.scapular_depression))
         self.pairs.append(FunctionalMovementPair(FunctionalMovementType.ankle_dorsiflexion_and_eversion,
                                                  FunctionalMovementType.ankle_plantar_flexion_and_inversion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.ankle_dorsiflexion_and_inversion,
+                                                 FunctionalMovementType.ankle_plantar_flexion_and_eversion))
         self.pairs.append(FunctionalMovementPair(FunctionalMovementType.wrist_flexion,
                                                  FunctionalMovementType.wrist_extension))
 
@@ -301,28 +303,28 @@ class FunctionalMovementActionMapping(object):
         planes = set()
 
         for h in self.hip_joint_functional_movements:
-            if h.priority == 1:
-                planes.update(h.planes)
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
 
         for h in self.knee_joint_functional_movements:
-            if h.priority == 1:
-                planes.update(h.planes)
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
 
         for h in self.ankle_joint_functional_movements:
-            if h.priority == 1:
-                planes.update(h.planes)
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
 
         for h in self.trunk_joint_functional_movements:
-            if h.priority == 1:
-                planes.update(h.planes)
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
 
         for h in self.shoulder_scapula_joint_functional_movements:
-            if h.priority == 1:
-                planes.update(h.planes)
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
 
         for h in self.elbow_joint_functional_movements:
-            if h.priority == 1:
-                planes.update(h.planes)
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
 
         return list(planes)
 
@@ -1098,6 +1100,8 @@ class FunctionalMovementFactory(object):
         dict[FunctionalMovementType.ankle_dorsiflexion_and_inversion.value] = self.convert_ints_to_objects(self.get_ankle_dorsiflexion_and_inversion())
         dict[FunctionalMovementType.ankle_plantar_flexion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion())
         dict[FunctionalMovementType.ankle_plantar_flexion_and_eversion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion_and_eversion())
+        dict[FunctionalMovementType.ankle_dorsiflexion_and_eversion.value] = self.convert_ints_to_objects(self.get_ankle_dorsiflexion_and_eversion())
+        dict[FunctionalMovementType.ankle_plantar_flexion_and_inversion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion_and_inversion())
         dict[FunctionalMovementType.inversion_of_the_foot.value] = self.convert_ints_to_objects(self.get_inversion_of_the_foot())
         dict[FunctionalMovementType.eversion_of_the_foot.value] = self.convert_ints_to_objects(self.get_eversion_of_the_foot())
         dict[FunctionalMovementType.knee_flexion.value] = self.convert_ints_to_objects(self.get_knee_flexion())

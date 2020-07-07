@@ -24,9 +24,12 @@ class DetailedLoadProcessor(object):
         planes_of_movement = set()
         types_of_actions = set()
 
-        for muscle, body_part_functional_movement in functional_movement_action_mapping.muscle_load:
+        for muscle_string, body_part_functional_movement in functional_movement_action_mapping.muscle_load.items():
 
-            if body_part_functional_movement.total_load() > 0:  # TODO - this might be temporary and not a detailed enough condition (it's essentially any concentric or eccentric load)
+            muscle = BodyPartSide.from_string(muscle_string)
+
+            total_load = body_part_functional_movement.total_load()
+            if total_load is not None and total_load.lowest_value() > 0:  # TODO - this might be temporary and not a detailed enough condition (it's essentially any concentric or eccentric load)
 
                 # only interested in body part regions with both lower / upper load assigned (concentric and eccentric)
 
@@ -105,7 +108,6 @@ class DetailedLoadProcessor(object):
                             self.add_muscle_load(muscle, DetailedAdaptationType.maximal_strength,
                                                  training_load_range)
 
-
                 if adaptation_type == AdaptationType.power_drill or adaptation_type == AdaptationType.power_explosive_action:
                     # speed
                     if ((movement_action.speed == MovementSpeed.fast or movement_action.speed == MovementSpeed.explosive) and
@@ -137,9 +139,14 @@ class DetailedLoadProcessor(object):
                         self.add_muscle_load(muscle, DetailedAdaptationType.maximal_power, training_load_range)
 
         # Functional Strength (requires comprehensive look at all actions within functional movement action mapping
-        for muscle, body_part_functional_movement in functional_movement_action_mapping.muscle_load:
+        for muscle_string, body_part_functional_movement in functional_movement_action_mapping.muscle_load.items():
 
-            if body_part_functional_movement.total_load() > 0:
+            muscle = BodyPartSide.from_string(muscle_string)
+
+            # TODO - likely flawed as in it probably doesnt apply to ALL muscles here, but not sure
+
+            total_load = body_part_functional_movement.total_load()
+            if total_load is not None and total_load.lowest_value() > 0:
                 if includes_lower_body and includes_upper_body and len(planes_of_movement) > 1 and len(types_of_actions) > 1:
                     if adaptation_type in [AdaptationType.strength_endurance_strength,
                                            AdaptationType.maximal_strength_hypertrophic]:
