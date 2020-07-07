@@ -1132,6 +1132,8 @@ class FunctionalMovementFactory(object):
         dict[FunctionalMovementType.external_rotation.value] = self.convert_ints_to_objects(self.get_external_rotation())
         dict[FunctionalMovementType.scapular_elevation.value] = self.convert_ints_to_objects(self.get_scapular_elevation())
         dict[FunctionalMovementType.scapular_depression.value] = self.convert_ints_to_objects(self.get_scapular_depression())
+        dict[FunctionalMovementType.wrist_extension.value] = self.convert_ints_to_objects(self.get_wrist_extension())
+        dict[FunctionalMovementType.wrist_flexion.value] = self.convert_ints_to_objects(self.get_wrist_flexion())
 
         return dict
 
