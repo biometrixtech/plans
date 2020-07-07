@@ -109,9 +109,11 @@ class ActionLibraryParser(object):
             action.hip_joint_action = self.get_prioritized_joint_actions(row, 'hip_joint')
             action.knee_joint_action = self.get_prioritized_joint_actions(row, 'knee_joint')
             action.ankle_joint_action = self.get_prioritized_joint_actions(row, 'ankle_joint')
+            action.pelvic_tilt_joint_action = self.get_prioritized_joint_actions(row, 'pelvic_tilt_joint')
             action.trunk_joint_action = self.get_prioritized_joint_actions(row, 'trunk_joint')
             action.shoulder_scapula_joint_action = self.get_prioritized_joint_actions(row, 'shoulder_scapula_joint')
             action.elbow_joint_action = self.get_prioritized_joint_actions(row, 'elbow_joint')
+            action.wrist_joint_action = self.get_prioritized_joint_actions(row, 'wrist_joint')
 
             # TODO: ignore secondary for now. Maybe relevant later
             # secondary
@@ -239,7 +241,9 @@ mapping = {
     "ankle_inversion": "ankle_dorsiflexion_and_inversion",
     "ankle_eversion": "ankle_plantar_flexion_and_eversion",
     "ankle_dorsi_flexion_and_eversion": "ankle_dorsiflexion_and_eversion",
-    "ankle_dorsi_flexion_and_inversion": "ankle_dorsiflexion_and_inversion"
+    "ankle_dorsi_flexion_and_inversion": "ankle_dorsiflexion_and_inversion",
+    "posterior_pelvic_tilt": "pelvic_posterior_tilt",
+    "anterior_pelvic_tilt": "pelvic_anterior_tilt"
 
 }
 
