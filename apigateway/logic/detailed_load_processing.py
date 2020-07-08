@@ -43,7 +43,11 @@ class DetailedLoadProcessor(object):
                 types_of_actions.update(functional_movement_action_mapping.get_types_of_joint_actions())
 
                 if (muscle.body_part_location in BodyPartSystems().local_stabilizer_system or
-                        muscle.body_part_location in BodyPartSystems().global_stabilization_system):
+                        muscle.body_part_location in BodyPartSystems().deep_longitudinal_subsystem or
+                        muscle.body_part_location in BodyPartSystems().posterior_oblique_subsystem or
+                        muscle.body_part_location in BodyPartSystems().anterior_oblique_subsystem or
+                        muscle.body_part_location in BodyPartSystems().intrinsic_stabilization_subsystem or
+                        muscle.body_part_location in BodyPartSystems().core_stabilizers):
 
                     if reps is not None and rpe is not None:
                         # stabilization endurance
@@ -94,8 +98,9 @@ class DetailedLoadProcessor(object):
                             self.add_muscle_load(muscle, DetailedAdaptationType.anaerobic_interval_training,
                                                  training_load_range)
                     # muscular endurance
-                    if rpe is not None and duration is not None:
-                        if 5 <= rpe <= 7 and duration >= 240:
+                    if rpe is not None:
+                        if 5 <= rpe <= 7 and ((reps is not None and 12 <= reps <= 20 and movement_action.speed == MovementSpeed.slow)
+                                              or (duration is not None and duration >= 240)):
                             self.session_detailed_load.add_load(DetailedAdaptationType.muscular_endurance,
                                                                 training_load_range)
                             self.add_muscle_load(muscle, DetailedAdaptationType.muscular_endurance,

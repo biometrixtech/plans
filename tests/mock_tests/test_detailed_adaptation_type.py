@@ -286,7 +286,7 @@ def test_functional_strength_from_strength_endurance_strength_detection():
     assert detailed_load_processor.session_detailed_load.functional_strength is not None
 
 
-def test_muscular_endurance_detection():
+def test_muscular_endurance_cardio_detection():
     # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
     action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
 
@@ -302,6 +302,27 @@ def test_muscular_endurance_detection():
     no_resistance_length = len(no_resistance_list)
 
     assert detailed_load_processor.session_detailed_load.muscular_endurance is not None
+
+
+# def test_muscular_endurance_strength_detection():
+#     # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+#     action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
+#
+#     no_speed_list = [a for a in action_list if a.speed is None]
+#     no_resistance_list = [a for a in action_list if a.resistance is None]
+#     slow_tempo_list = [a for a in action_list if a.speed == MovementSpeed.slow]
+#
+#     rpes = [6]
+#     reps = [15]
+#
+#     detailed_load_processor = process_adaptation_types(action_list, reps_list=reps, rpe_list=rpes)
+#
+#     action_list_length = len(action_list)
+#     no_speed_length = len(no_speed_list)
+#     no_resistance_length = len(no_resistance_list)
+#
+#     assert 0 < len(slow_tempo_list)
+#     assert detailed_load_processor.session_detailed_load.muscular_endurance is not None
 
 
 def test_strength_endurance_detection():

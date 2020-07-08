@@ -497,6 +497,16 @@ class BodyPartSystems(object):
             BodyPartLocation.quadratus_lumorum,
             BodyPartLocation.psoas
         ]
+        self.core_stabilizers = [
+            BodyPartLocation.intrinsic_muscles_of_spine,
+            BodyPartLocation.diaphragm,
+            BodyPartLocation.transverse_abdominis,
+            BodyPartLocation.pelvic_floor,
+            BodyPartLocation.internal_obliques,
+            BodyPartLocation.external_obliques,
+            BodyPartLocation.rectus_abdominis,
+            BodyPartLocation.erector_spinae
+        ]
 
 
 class BodyPartLocationText(object):
