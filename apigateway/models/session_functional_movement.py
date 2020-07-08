@@ -91,8 +91,11 @@ class SessionFunctionalMovement(object):
 
                 session_load_dict[body_part_side].body_part_function = BodyPartFunction.merge(body_part_functional_movement.body_part_function, session_load_dict[body_part_side].body_part_function)
                 session_load_dict[body_part_side].concentric_load.add(body_part_functional_movement.concentric_load)
+                session_load_dict[body_part_side].isometric_load.add(body_part_functional_movement.isometric_load)
                 session_load_dict[body_part_side].eccentric_load.add(body_part_functional_movement.eccentric_load)
                 session_load_dict[body_part_side].compensated_concentric_load.add(body_part_functional_movement.compensated_concentric_load)
+                session_load_dict[body_part_side].compensated_isometric_load.add(
+                    body_part_functional_movement.compensated_isometric_load)
                 session_load_dict[
                     body_part_side].compensated_eccentric_load.add(body_part_functional_movement.compensated_eccentric_load)
 
