@@ -212,7 +212,8 @@ class ExerciseAction(object):
         action.apply_resistance = input_dict.get('apply_resistance', False)
         action.explosiveness = Explosiveness(input_dict['explosiveness']) if input_dict.get('explosiveness') is not None else None
         action.apply_instability = input_dict.get('apply_instability', False)
-
+        action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
+        action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
         action.primary_muscle_action = MuscleAction(input_dict['primary_muscle_action']) if input_dict.get('primary_muscle_action') is not None else None
         action.hip_joint_rating = None
         action.hip_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('hip_joint_action', [])]

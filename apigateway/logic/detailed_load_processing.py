@@ -133,7 +133,7 @@ class DetailedLoadProcessor(object):
                 if adaptation_type == AdaptationType.power_explosive_action and rpe is not None:
 
                     # maximal power
-                    if 3 <= rpe <= 4.5 and (movement_action.speed == MovementSpeed.fast and movement_action.speed == MovementSpeed.explosive):
+                    if 3 <= rpe <= 4.5 and (movement_action.speed == MovementSpeed.fast or movement_action.speed == MovementSpeed.explosive):
                         self.session_detailed_load.add_load(DetailedAdaptationType.maximal_power,
                                                             training_load_range)
                         self.add_muscle_load(muscle, DetailedAdaptationType.maximal_power, training_load_range)

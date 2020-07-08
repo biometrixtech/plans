@@ -5,66 +5,386 @@ from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
 from datetime import datetime
 from logic.detailed_load_processing import DetailedLoadProcessor
 from models.training_volume import StandardErrorRange
-from models.movement_tags import AdaptationType
+from models.movement_tags import AdaptationType, TrainingType
+from models.movement_actions import MovementSpeed
 
-def get_actions():
-    datastore = ActionLibraryDatastore()
-    actions = datastore.get()
-    return actions
 
-# def test_actions():
-#     functional_movement_factory = FunctionalMovementFactory()
-#     functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
-#     event_date = datetime.now()
-#     action_list = get_actions()
+action_dictionary = ActionLibraryDatastore().get()
+
+# def get_actions():
+#     datastore = ActionLibraryDatastore()
+#     actions = datastore.get()
+#     return actions
 #
-#     detailed_load_processor = DetailedLoadProcessor()
+
+def get_filtered_actions(training_type_list):
+
+    #action_dictionary = get_actions()
+
+    action_list = list(action_dictionary.values())
+
+    filtered_list = [a for a in action_list if a.training_type in training_type_list]
+
+    return filtered_list
+
+def process_adaptation_types(action_list, reps_list, rpe_list, duration=None):
+
+    detailed_load_processor = DetailedLoadProcessor()
+
+    functional_movement_factory = FunctionalMovementFactory()
+    functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+    event_date = datetime.now()
+
+    for action in action_list:
+        for reps in reps_list:
+            for rpe in rpe_list:
+                duration = duration
+
+                base_exercise = BaseWorkoutExercise()
+                base_exercise.training_type = action.training_type
+                base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
+                base_exercise.set_adaption_type()
+
+                action.power_load_left = base_exercise.power_load
+                action.power_load_right = base_exercise.power_load
+
+                functional_movement_action_mapping = FunctionalMovementActionMapping(action,
+                                                                                     {},
+                                                                                     event_date, functional_movement_dict)
+                #for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
+                detailed_load_processor.add_load(functional_movement_action_mapping,
+                                                 adaptation_type=base_exercise.adaptation_type,
+                                                 movement_action=action,
+                                                 training_load_range=base_exercise.power_load,
+                                                 reps=reps,
+                                                 duration=duration,
+                                                 rpe=rpe)
+
+    return detailed_load_processor
+
+def process_adaptation_types_no_reps(action_list, rpe_list, duration=None):
+
+    detailed_load_processor = DetailedLoadProcessor()
+
+    functional_movement_factory = FunctionalMovementFactory()
+    functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+    event_date = datetime.now()
+
+    for action in action_list:
+        reps = None
+        for rpe in rpe_list:
+            duration = duration
+
+            base_exercise = BaseWorkoutExercise()
+            base_exercise.training_type = action.training_type
+            base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
+            base_exercise.set_adaption_type()
+
+            action.power_load_left = base_exercise.power_load
+            action.power_load_right = base_exercise.power_load
+
+            functional_movement_action_mapping = FunctionalMovementActionMapping(action,
+                                                                                 {},
+                                                                                 event_date, functional_movement_dict)
+            #for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
+            detailed_load_processor.add_load(functional_movement_action_mapping,
+                                             adaptation_type=base_exercise.adaptation_type,
+                                             movement_action=action,
+                                             training_load_range=base_exercise.power_load,
+                                             reps=reps,
+                                             duration=duration,
+                                             rpe=rpe)
+
+    return detailed_load_processor
+
 #
-#     no_speed_list = []
-#     no_resistance_list = []
+# def test_stabilization_endurance_detection():
+#     # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+#     action_list = get_filtered_actions([TrainingType.strength_integrated_resistance, TrainingType.strength_endurance])
 #
-#     for id, action in action_list.items():
+#     no_speed_list = [a for a in action_list if a.speed is None]
+#     no_resistance_list = [a for a in action_list if a.resistance is None]
+#     slow_tempo_list = [a for a in action_list if a.speed == MovementSpeed.slow]
 #
-#         reps = None
-#         duration = None
-#         rpe = None
+#     reps_list = [15]
+#     rpes = [6]
 #
-#         base_exercise = BaseWorkoutExercise()
-#         base_exercise.training_type = action.training_type
-#         base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-#         base_exercise.set_adaption_type()
+#     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
 #
-#         action.power_load_left = base_exercise.power_load
-#         action.power_load_right = base_exercise.power_load
-#
-#         if action.resistance is None:
-#             no_resistance_list.append(action)
-#
-#         if action.speed is None:
-#             no_speed_list.append(action)
-#
-#         if base_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
-#             duration = 600
-#             rpe = 5
-#         else:
-#             reps = 10
-#             rpe = 6
-#
-#         functional_movement_action_mapping = FunctionalMovementActionMapping(action,
-#                                                                              {},
-#                                                                              event_date, functional_movement_dict)
-#         for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
-#
-#
-#             detailed_load_processor.add_load(functional_movement_action_mapping,
-#                                              adaptation_type=base_exercise.adaptation_type,
-#                                              movement_action=action,
-#                                              training_load_range=base_exercise.power_load,
-#                                              reps=reps,
-#                                              duration=duration,
-#                                              rpe=rpe)
 #     action_list_length = len(action_list)
 #     no_speed_length = len(no_speed_list)
 #     no_resistance_length = len(no_resistance_list)
 #
-#     assert 1==1
+#     assert 0 < len(slow_tempo_list)
+#     assert detailed_load_processor.session_detailed_load.stabilization_endurance is not None
+
+
+def test_stabilization_strength_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_integrated_resistance, TrainingType.strength_endurance])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+
+    reps_list = [10]
+    rpes = [7.5]
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.stabilization_strength is not None
+
+
+def test_stabilization_power_detection():
+    # should go to power_explosive_action => Maximal Power, Power, Sustained_power, Speed, Stabilization Power
+    action_list = get_filtered_actions([TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+    fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+    explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+
+    reps_list = [10]
+    rpes = [4]
+    #duration = 60
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.stabilization_power is not None
+
+#
+# def test_stabilization_power_from_power_drills_plyometrics():
+#
+#     action_list = get_filtered_actions([TrainingType.power_drills_plyometrics])
+#
+#     no_speed_list = [a for a in action_list if a.speed is None]
+#     no_resistance_list = [a for a in action_list if a.resistance is None]
+#     fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+#     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+#
+#     reps_list = [10]
+#     rpes = [4]
+#     #duration = 60
+#
+#     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+#
+#     action_list_length = len(action_list)
+#     no_speed_length = len(no_speed_list)
+#     no_resistance_length = len(no_resistance_list)
+#
+#     assert detailed_load_processor.session_detailed_load.stabilization_power is not None
+
+
+def test_functional_strength_from_strength_endurance_strength_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_integrated_resistance, TrainingType.strength_endurance])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+
+    reps_list = [10]
+    rpes = [7.5]
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.functional_strength is not None
+
+
+def test_muscular_endurance_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+
+    rpes = [6]
+
+    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=300)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.muscular_endurance is not None
+
+
+def test_strength_endurance_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_integrated_resistance, TrainingType.strength_endurance])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+
+    reps_list = [10]
+    rpes = [7.5]
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.strength_endurance is not None
+
+
+def test_speed_detection():
+    # should go to power_explosive_action => Maximal Power, Power, Sustained_power, Speed, Stabilization Power
+    action_list = get_filtered_actions([TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+    fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+    explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+
+    reps_list = [15]
+    rpes = [4]
+    # duration = 60
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.speed is not None
+
+#
+# def test_speed_from_power_drills_plyometrics():
+#     action_list = get_filtered_actions([TrainingType.power_drills_plyometrics])
+#
+#     no_speed_list = [a for a in action_list if a.speed is None]
+#     no_resistance_list = [a for a in action_list if a.resistance is None]
+#     fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+#     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+#
+#     reps_list = [10]
+#     rpes = [4]
+#     # duration = 60
+#
+#     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+#
+#     action_list_length = len(action_list)
+#     no_speed_length = len(no_speed_list)
+#     no_resistance_length = len(no_resistance_list)
+#
+#     assert detailed_load_processor.session_detailed_load.speed is not None
+
+
+def test_sustained_power_detection():
+    # should go to power_explosive_action => Maximal Power, Power, Sustained_power, Speed, Stabilization Power
+    action_list = get_filtered_actions([TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+    fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+    explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+
+    reps_list = [15]
+    rpes = [4]
+    duration = 60
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes, duration=60)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.sustained_power is not None
+
+#
+# def test_sustained_power_from_power_drills_plyometrics():
+#
+#     action_list = get_filtered_actions([TrainingType.power_drills_plyometrics])
+#
+#     no_speed_list = [a for a in action_list if a.speed is None]
+#     no_resistance_list = [a for a in action_list if a.resistance is None]
+#     fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+#     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+#
+#     reps_list = [10]
+#     rpes = [4]
+#     #duration = 60
+#
+#     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+#
+#     action_list_length = len(action_list)
+#     no_speed_length = len(no_speed_list)
+#     no_resistance_length = len(no_resistance_list)
+#
+#     assert detailed_load_processor.session_detailed_load.sustained_power is not None
+
+
+def test_power_detection():
+    # should go to power_explosive_action => Maximal Power, Power, Sustained_power, Speed, Stabilization Power
+    action_list = get_filtered_actions([TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+    fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+    explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+
+    reps_list = [15]
+    rpes = [4]
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.power is not None
+
+
+# def test_power_from_power_drills_plyometrics():
+#
+#     action_list = get_filtered_actions([TrainingType.power_drills_plyometrics])
+#
+#     no_speed_list = [a for a in action_list if a.speed is None]
+#     no_resistance_list = [a for a in action_list if a.resistance is None]
+#     fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+#     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+#
+#     reps_list = [10]
+#     rpes = [4]
+#     #duration = 60
+#
+#     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+#
+#     action_list_length = len(action_list)
+#     no_speed_length = len(no_speed_list)
+#     no_resistance_length = len(no_resistance_list)
+#
+#     assert detailed_load_processor.session_detailed_load.power is not None
+
+
+def test_maximal_power_detection():
+    # should go to power_explosive_action => Maximal Power, Power, Sustained_power, Speed, Stabilization Power
+    action_list = get_filtered_actions([TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+    fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+    explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+
+    reps_list = [15]
+    rpes = [4]
+
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.maximal_power is not None
+
