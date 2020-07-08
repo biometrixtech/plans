@@ -71,7 +71,6 @@ def process_adaptation_types_no_reps(action_list, rpe_list, duration=None):
     event_date = datetime.now()
 
     for action in action_list:
-        reps = None
         for rpe in rpe_list:
             duration = duration
 
@@ -91,12 +90,98 @@ def process_adaptation_types_no_reps(action_list, rpe_list, duration=None):
                                              adaptation_type=base_exercise.adaptation_type,
                                              movement_action=action,
                                              training_load_range=base_exercise.power_load,
-                                             reps=reps,
                                              duration=duration,
                                              rpe=rpe)
 
     return detailed_load_processor
 
+
+def process_adaptation_types_percent_max_hr(action_list, percent_max_hr_list, duration=None):
+
+    detailed_load_processor = DetailedLoadProcessor()
+
+    functional_movement_factory = FunctionalMovementFactory()
+    functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+    event_date = datetime.now()
+
+    for action in action_list:
+        for percent_max_hr in percent_max_hr_list:
+            duration = duration
+
+            base_exercise = BaseWorkoutExercise()
+            base_exercise.training_type = action.training_type
+            base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
+            base_exercise.set_adaption_type()
+
+            action.power_load_left = base_exercise.power_load
+            action.power_load_right = base_exercise.power_load
+
+            functional_movement_action_mapping = FunctionalMovementActionMapping(action,
+                                                                                 {},
+                                                                                 event_date, functional_movement_dict)
+            #for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
+            detailed_load_processor.add_load(functional_movement_action_mapping,
+                                             adaptation_type=base_exercise.adaptation_type,
+                                             movement_action=action,
+                                             training_load_range=base_exercise.power_load,
+                                             duration=duration,
+                                             percent_max_hr=percent_max_hr)
+
+    return detailed_load_processor
+
+
+def test_basic_aerobic_training_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+
+    percent_max_hr_list = [70]
+
+    detailed_load_processor = process_adaptation_types_percent_max_hr(action_list, percent_max_hr_list)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.base_aerobic_training is not None
+
+
+def test_anaerobic_threshold_training_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+
+    percent_max_hr_list = [82]
+
+    detailed_load_processor = process_adaptation_types_percent_max_hr(action_list, percent_max_hr_list)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.anaerobic_threshold_training is not None
+
+
+def test_anaerobic_interval_training_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+
+    percent_max_hr_list = [90]
+
+    detailed_load_processor = process_adaptation_types_percent_max_hr(action_list, percent_max_hr_list)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.anaerobic_interval_training is not None
 #
 # def test_stabilization_endurance_detection():
 #     # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
