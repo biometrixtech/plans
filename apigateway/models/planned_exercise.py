@@ -34,7 +34,7 @@ class PlannedWorkout(object):
         workout.program_id = input_dict.get('program_id')
         workout.program_module_id = input_dict.get('program_module_id')
         workout.duration = input_dict.get('duration')
-        workout.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('workout_sections', [])]
+        workout.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('sections', [])]
 
         return workout
 
