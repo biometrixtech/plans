@@ -56,14 +56,18 @@ class ExerciseAction(object):
         self.apply_resistance = False
         self.explosiveness = None
         self.apply_instability = False
+        self.speed = None
+        self.resistance = None
 
         self.primary_muscle_action = None
         self.hip_joint_action = []
         self.knee_joint_action = []
         self.ankle_joint_action = []
+        self.pelvic_tilt_joint_action = []
         self.trunk_joint_action = []
         self.shoulder_scapula_joint_action = []
         self.elbow_joint_action = []
+        self.wrist_joint_action = []
 
         # self.ancillary_muscle_action = None
         # self.hip_stability_action = []
@@ -134,14 +138,18 @@ class ExerciseAction(object):
             "apply_resistance": self.apply_resistance,
             "explosiveness": self.explosiveness.value if self.explosiveness is not None else None,
             "apply_instability": self.apply_instability,
+            'speed': self.speed.value if self.speed is not None else None,
+            'resistance': self.resistance.value if self.resistance is not None else None,
 
             "primary_muscle_action": self.primary_muscle_action.value if self.primary_muscle_action is not None else None,
             "hip_joint_action": [ac.json_serialise() for ac in self.hip_joint_action],
             "knee_joint_action": [ac.json_serialise() for ac in self.knee_joint_action],
             "ankle_joint_action": [ac.json_serialise() for ac in self.ankle_joint_action],
+            "pelvic_tilt_joint_action": [ac.json_serialise() for ac in self.pelvic_tilt_joint_action],
             "trunk_joint_action": [ac.json_serialise() for ac in self.trunk_joint_action],
             "shoulder_scapula_joint_action": [ac.json_serialise() for ac in self.shoulder_scapula_joint_action],
             "elbow_joint_action": [ac.json_serialise() for ac in self.elbow_joint_action],
+            "wrist_joint_action": [ac.json_serialise() for ac in self.wrist_joint_action],
 
             # "ancillary_muscle_action": self.ancillary_muscle_action,
             # "hip_stability_action": self.hip_stability_action,
@@ -204,15 +212,18 @@ class ExerciseAction(object):
         action.apply_resistance = input_dict.get('apply_resistance', False)
         action.explosiveness = Explosiveness(input_dict['explosiveness']) if input_dict.get('explosiveness') is not None else None
         action.apply_instability = input_dict.get('apply_instability', False)
-
+        action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
+        action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
         action.primary_muscle_action = MuscleAction(input_dict['primary_muscle_action']) if input_dict.get('primary_muscle_action') is not None else None
         action.hip_joint_rating = None
         action.hip_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('hip_joint_action', [])]
         action.knee_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('knee_joint_action', [])]
         action.ankle_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('ankle_joint_action', [])]
+        action.pelvic_tilt_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('pelvic_tilt_joint_action', [])]
         action.trunk_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('trunk_joint_action', [])]
         action.shoulder_scapula_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('shoulder_scapula_joint_action', [])]
         action.elbow_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('elbow_joint_action', [])]
+        action.wrist_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('wrist_joint_action', [])]
 
         # action.ancillary_muscle_action = MuscleAction(input_dict['ancillary_muscle_action']) if input_dict.get('ancillary_muscle_action') is not None else None
         # action.hip_stability_action = []

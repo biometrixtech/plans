@@ -374,7 +374,7 @@
             0
         ],
         "speed": 2,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "1010",
@@ -397,7 +397,7 @@
             0
         ],
         "speed": 2,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "1010.1_a",
@@ -421,7 +421,7 @@
             0
         ],
         "speed": 2,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "1011.1_a",
@@ -533,8 +533,8 @@
         "external_weight_implement": [
             0
         ],
-        "speed": null,
-        "resistance": null,
+        "speed": 0,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "1002"
@@ -554,8 +554,8 @@
         "external_weight_implement": [
             0
         ],
-        "speed": null,
-        "resistance": null,
+        "speed": 0,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "1004"
@@ -610,7 +610,7 @@
             0
         ],
         "speed": 2,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "2000_a",
@@ -845,7 +845,7 @@
             0
         ],
         "speed": 4,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "1100.1_a",
@@ -1002,8 +1002,8 @@
         "external_weight_implement": [
             0
         ],
-        "speed": null,
-        "resistance": null,
+        "speed": 0,
+        "resistance": 0,
         "surface_stability": 1,
         "primary_actions": [
             "1006.1_a",
@@ -1028,7 +1028,7 @@
             0
         ],
         "speed": 2,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 1,
         "primary_actions": [
             "1006.4_a",
@@ -1050,7 +1050,7 @@
             0
         ],
         "speed": 2,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [
             "1006.2_a",
@@ -1123,7 +1123,7 @@
             0
         ],
         "speed": 2,
-        "resistance": null,
+        "resistance": 0,
         "surface_stability": 0,
         "primary_actions": [],
         "secondary_actions": [],

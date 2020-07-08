@@ -22,6 +22,65 @@ class AdaptationType(Enum):
     power_explosive_action = 5
 
 
+class DetailedAdaptationType(Enum):
+    mobility = 0
+    corrective = 1
+    base_aerobic_training = 2
+    anaerobic_threshold_training = 3
+    anaerobic_interval_training = 4
+    stabilization_endurance = 5
+    stabilization_strength = 6
+    stabilization_power = 7
+    functional_strength = 8
+    muscular_endurance = 9
+    strength_endurance = 10
+    hypertrophy = 11
+    maximal_strength = 12
+    speed = 13
+    sustained_power = 14
+    power = 15
+    maximal_power = 16
+
+
+class SubAdaptationType(Enum):
+    movement_efficiency = 0
+    cardiorespiratory_training = 1
+    core_strength = 2
+    strength = 3
+    power = 4
+
+
+class RankedAdaptationType(object):
+    def __init__(self, adaptation_type, ranking):
+        self.adaptation_type = adaptation_type
+        self.ranking = ranking
+
+    def __hash__(self):
+        return hash((self.adaptation_type.value, self.ranking))
+
+    def __eq__(self, other):
+        val = (self.adaptation_type.value == other.adaptation_type.value and self.ranking == other.ranking)
+
+        return val
+
+
+class AdaptationDictionary(object):
+
+    def __init__(self):
+        self.detailed_types = {}
+        self.initialize()
+
+    def initialize(self):
+        self.detailed_types[DetailedAdaptationType.base_aerobic_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.anaerobic_threshold_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.anaerobic_interval_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.functional_strength] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.muscular_endurance] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.strength_endurance] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.hypertrophy] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.maximal_strength] = SubAdaptationType.strength
+
+
 class CardioAction(Enum):
     race_walking = 0
     run = 1

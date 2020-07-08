@@ -67,11 +67,11 @@ class MovementLibraryParser(object):
                 except:
                     print('here', external_weight_implement)
 
-            if self.is_valid(row, 'resistance'):
+            if self.is_valid(row, 'resistance', False):
             # if row.get('resistance') is not None and row['resistance'] != "":
                 movement.resistance = self.get_resistance(row['resistance'])
                 # movement.resistance = MovementResistance[row['resistance']]
-            if self.is_valid(row, 'speed'):
+            if self.is_valid(row, 'speed', False):
             # if row.get('speed') is not None and row['speed'] != "":
                 movement.speed = self.get_speed(row['speed'])
                 # movement.speed = MovementSpeed[row['speed']]
@@ -99,9 +99,13 @@ class MovementLibraryParser(object):
 
 
     @staticmethod
-    def is_valid(row, name):
-        if row.get(name) is not None and row[name] != "" and row[name] != "none":
-            return True
+    def is_valid(row, name, check_none=True):
+        if row.get(name) is not None and row[name] != "":
+            if check_none:
+                if row[name] != "none":
+                    return True
+            else:
+                return True
         return False
 
     def write_movements_json(self):

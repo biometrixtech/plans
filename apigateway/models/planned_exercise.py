@@ -117,6 +117,8 @@ class PlannedExercise(BaseWorkoutExercise):
         self.maximal_intensity = False  # Potentially use this in calculating HRMax, VO2Max etc
 
         self.total_volume = None
+
+        self.detailed_power_load = None
         # only need this to set default values. So, possibly need it in spreadsheet but not stored
         # self.intensity = None  # e.g. base/push/all_out for OTF, potentially used to determine pace,watts etc e.g. rowing all out power is base + 50 or more
 

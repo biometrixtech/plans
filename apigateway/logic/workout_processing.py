@@ -725,9 +725,11 @@ class WorkoutProcessor(object):
                 self.get_prime_movers_from_joint_actions(action.hip_joint_action, prime_movers)
                 self.get_prime_movers_from_joint_actions(action.knee_joint_action, prime_movers)
                 self.get_prime_movers_from_joint_actions(action.ankle_joint_action, prime_movers)
+                self.get_prime_movers_from_joint_actions(action.pelvic_tilt_joint_action, prime_movers)
                 self.get_prime_movers_from_joint_actions(action.trunk_joint_action, prime_movers)
                 self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action, prime_movers)
                 self.get_prime_movers_from_joint_actions(action.elbow_joint_action, prime_movers)
+                self.get_prime_movers_from_joint_actions(action.wrist_joint_action, prime_movers)
 
         if len(exercise.equipments) > 0:
             equipment = exercise.equipments[0]
