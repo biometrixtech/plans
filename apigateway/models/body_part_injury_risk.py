@@ -10,6 +10,7 @@ class BodyPartInjuryRisk(object):
     def __init__(self):
         # volume
         self.concentric_volume_today = StandardErrorRange(observed_value=0)
+        self.isometric_volume_today = StandardErrorRange(observed_value=0)
         self.eccentric_volume_today = StandardErrorRange(observed_value=0)
         #self.concentric_volume_last_week = 0
         #self.concentric_volume_this_week = 0
@@ -18,6 +19,7 @@ class BodyPartInjuryRisk(object):
         #self.eccentric_volume_this_week = 0
 
         self.compensating_concentric_volume_today = StandardErrorRange(observed_value=0)
+        self.compensating_isometric_volume_today = StandardErrorRange(observed_value=0)
         self.compensating_eccentric_volume_today = StandardErrorRange(observed_value=0)
 
         self.total_compensation_percent = StandardErrorRange(observed_value=0)
@@ -136,10 +138,11 @@ class BodyPartInjuryRisk(object):
     def json_serialise(self):
         return {
                 "concentric_volume_today": self.concentric_volume_today.json_serialise(),
-
+                "isometric_volume_today": self.isometric_volume_today.json_serialise(),
                 "eccentric_volume_today": self.eccentric_volume_today.json_serialise(),
 
                 "compensating_concentric_volume_today": self.compensating_concentric_volume_today.json_serialise(),
+                "compensating_isometric_volume_today": self.compensating_isometric_volume_today.json_serialise(),
                 "compensating_eccentric_volume_today": self.compensating_eccentric_volume_today.json_serialise(),
 
                 "total_compensation_percent": self.total_compensation_percent.json_serialise(),
@@ -265,6 +268,8 @@ class BodyPartInjuryRisk(object):
         injury_risk.concentric_volume_today.observed_value += input_dict.get('prime_mover_concentric_volume_today', 0)
         injury_risk.concentric_volume_today.observed_value += input_dict.get('synergist_concentric_volume_today', 0)
 
+        injury_risk.isometric_volume_today = StandardErrorRange.json_deserialise(input_dict.get('isometric_volume_today', 0))
+
         injury_risk.eccentric_volume_today = StandardErrorRange.json_deserialise(input_dict.get('eccentric_volume_today', 0))
         injury_risk.eccentric_volume_today.observed_value += input_dict.get('prime_mover_eccentric_volume_today', 0)
         injury_risk.eccentric_volume_today.observed_value += input_dict.get('synergist_eccentric_volume_today', 0)
@@ -272,6 +277,9 @@ class BodyPartInjuryRisk(object):
         injury_risk.compensating_concentric_volume_today = StandardErrorRange.json_deserialise(
             input_dict.get('compensating_concentric_volume_today', 0))
         injury_risk.compensating_concentric_volume_today.observed_value += input_dict.get('synergist_compensating_concentric_volume_today', 0)
+
+        injury_risk.compensating_isometric_volume_today = StandardErrorRange.json_deserialise(
+            input_dict.get('compensating_isometric_volume_today', 0))
 
         injury_risk.compensating_eccentric_volume_today = StandardErrorRange.json_deserialise(
             input_dict.get('compensating_eccentric_volume_today', 0))
@@ -410,6 +418,7 @@ class BodyPartInjuryRisk(object):
         #self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_injury_risk.concentric_volume_last_week)
         #self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_injury_risk.concentric_volume_this_week)
         self.concentric_volume_today.max(body_part_injury_risk.concentric_volume_today)
+        self.isometric_volume_today.max(body_part_injury_risk.isometric_volume_today)
         #self.eccentric_volume_last_week = max(self.eccentric_volume_last_week, body_part_injury_risk.eccentric_volume_last_week)
         #self.eccentric_volume_this_week = max(self.eccentric_volume_this_week, body_part_injury_risk.eccentric_volume_this_week)
         self.eccentric_volume_today.max(body_part_injury_risk.eccentric_volume_today)
@@ -661,8 +670,10 @@ class BodyPartInjuryRisk(object):
 
         #if total_volume_today is not None and total_volume_today.observed_value > 0 and self.compensating_eccentric_volume_today is not None and self.compensating_concentric_volume_today is not None:
         compensating_eccentric_volume_today = self.compensating_eccentric_volume_today.plagiarize()
+        compensating_isometric_volume_today = self.compensating_isometric_volume_today.plagiarize()
         compensating_concentric_volume_today = self.compensating_concentric_volume_today.plagiarize()
         compensating_concentric_volume_today.add(compensating_eccentric_volume_today)
+        compensating_concentric_volume_today.add(compensating_isometric_volume_today)
         compensating_concentric_volume_today.divide_range(total_volume_today)
         compensating_concentric_volume_today.multiply(100)
         #percentage = compensating_concentric_volume_today
@@ -677,6 +688,8 @@ class BodyPartInjuryRisk(object):
         volume.add(self.compensating_eccentric_volume_today)
 
         #if self.compensating_concentric_volume_today is not None:
+        volume.add(self.compensating_isometric_volume_today)
+
         volume.add(self.compensating_concentric_volume_today)
 
         return volume
@@ -684,8 +697,10 @@ class BodyPartInjuryRisk(object):
     def total_volume_today(self):
 
         concentric_volume = self.concentric_volume_today.plagiarize()
+        isometric_volume = self.isometric_volume_today.plagiarize()
         eccentric_volume = self.eccentric_volume_today.plagiarize()
         concentric_volume.add(eccentric_volume)
+        concentric_volume.add(isometric_volume)
         return concentric_volume
 
     # def total_volume_last_week(self):
@@ -719,6 +734,7 @@ class BodyPartHistInjuryRisk(object):
     def __init__(self):
         #self.concentric_volume_last_week = 0
         self.concentric_volume_this_week = 0
+        self.isometric_volume_this_week = 0
         # self.prime_mover_concentric_volume_last_week = 0
         # self.prime_mover_concentric_volume_this_week = 0
         # self.synergist_concentric_volume_last_week = 0
@@ -738,6 +754,7 @@ class BodyPartHistInjuryRisk(object):
         # intensity
         #self.concentric_intensity_last_week = 0
         self.concentric_intensity_this_week = 0
+        self.isometric_intensity_this_week = 0
         # self.prime_mover_concentric_intensity_last_week = 0
         # self.prime_mover_concentric_intensity_this_week = 0
         # self.synergist_concentric_intensity_last_week = 0
@@ -758,6 +775,7 @@ class BodyPartHistInjuryRisk(object):
         return {
             #"concentric_volume_last_week": self.concentric_volume_last_week,
             "concentric_volume_this_week": self.concentric_volume_this_week,
+            "isometric_volume_this_week": self.isometric_volume_this_week,
             # "prime_mover_concentric_volume_last_week": self.prime_mover_concentric_volume_last_week,
             # "prime_mover_concentric_volume_this_week": self.prime_mover_concentric_volume_this_week,
             # "synergist_concentric_volume_last_week": self.synergist_concentric_volume_last_week,
@@ -772,6 +790,7 @@ class BodyPartHistInjuryRisk(object):
             # "synergist_compensating_eccentric_volume_this_week": self.synergist_compensating_eccentric_volume_this_week,
             #"concentric_intensity_last_week": self.concentric_intensity_last_week,
             "concentric_intensity_this_week": self.concentric_intensity_this_week,
+            "isometric_intensity_this_week": self.isometric_intensity_this_week,
             #"eccentric_intensity_last_week": self.eccentric_intensity_last_week,
             "eccentric_intensity_this_week": self.eccentric_intensity_this_week,
             # "prime_mover_concentric_intensity_last_week": self.prime_mover_concentric_intensity_last_week,
@@ -794,6 +813,7 @@ class BodyPartHistInjuryRisk(object):
         injury_risk = cls()
         #injury_risk.concentric_volume_last_week = input_dict.get('concentric_volume_last_week', 0)
         injury_risk.concentric_volume_this_week = input_dict.get('concentric_volume_this_week', 0)
+        injury_risk.isometric_volume_this_week = input_dict.get('isometric_volume_this_week', 0)
         #injury_risk.eccentric_volume_last_week = input_dict.get('eccentric_volume_last_week', 0)
         injury_risk.eccentric_volume_this_week = input_dict.get('eccentric_volume_this_week', 0)
 
@@ -813,6 +833,7 @@ class BodyPartHistInjuryRisk(object):
 
         #injury_risk.concentric_intensity_last_week = input_dict.get('concentric_intensity_last_week', 0)
         injury_risk.concentric_intensity_this_week = input_dict.get('concentric_intensity_this_week', 0)
+        injury_risk.isometric_intensity_this_week = input_dict.get('isometric_intensity_this_week', 0)
         #injury_risk.eccentric_intensity_last_week = input_dict.get('eccentric_intensity_last_week', 0)
         injury_risk.eccentric_intensity_this_week = input_dict.get('eccentric_intensity_this_week', 0)
 
@@ -845,6 +866,8 @@ class BodyPartHistInjuryRisk(object):
 
         #self.concentric_volume_last_week = max(self.concentric_volume_last_week, body_part_hist_injury_risk.concentric_volume_last_week)
         self.concentric_volume_this_week = max(self.concentric_volume_this_week, body_part_hist_injury_risk.concentric_volume_this_week)
+        self.isometric_volume_this_week = max(self.isometric_volume_this_week,
+                                               body_part_hist_injury_risk.isometric_volume_this_week)
         #self.eccentric_volume_last_week = max(self.eccentric_volume_last_week, body_part_hist_injury_risk.eccentric_volume_last_week)
         self.eccentric_volume_this_week = max(self.eccentric_volume_this_week, body_part_hist_injury_risk.eccentric_volume_this_week)
 

@@ -137,8 +137,10 @@ class BodyPartFunctionalMovement(Serialisable):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
         self.concentric_load = StandardErrorRange()
+        self.isometric_load = StandardErrorRange()
         self.eccentric_load = StandardErrorRange()
         self.compensated_concentric_load = StandardErrorRange()
+        self.compensated_isometric_load = StandardErrorRange()
         self.compensated_eccentric_load = StandardErrorRange()
         self.compensating_causes_load = []
         self.is_compensating = False
@@ -156,8 +158,10 @@ class BodyPartFunctionalMovement(Serialisable):
 
         total_load = StandardErrorRange(observed_value=0)
         total_load.add(self.concentric_load)
+        total_load.add(self.isometric_load)
         total_load.add(self.eccentric_load)
         total_load.add(self.compensated_concentric_load)
+        total_load.add(self.compensated_isometric_load)
         total_load.add(self.compensated_eccentric_load)
 
         return total_load
@@ -167,6 +171,14 @@ class BodyPartFunctionalMovement(Serialisable):
         total_load = StandardErrorRange(observed_value=0)
         total_load.add(self.concentric_load)
         total_load.add(self.compensated_concentric_load)
+
+        return total_load
+
+    def total_isometric_load(self):
+
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.isometric_load)
+        total_load.add(self.compensated_isometric_load)
 
         return total_load
 
@@ -193,8 +205,10 @@ class BodyPartFunctionalMovement(Serialisable):
         return {
                 'body_part_side': self.body_part_side.json_serialise(),
                 'concentric_load': self.concentric_load.json_serialise(),
+                'isometric_load': self.isometric_load.json_serialise(),
                 'eccentric_load': self.eccentric_load.json_serialise(),
                 'compensated_concentric_load': self.compensated_concentric_load.json_serialise(),
+                'compensated_isometric_load': self.compensated_isometric_load.json_serialise(),
                 'compensated_eccentric_load': self.compensated_eccentric_load.json_serialise(),
                 'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
                 'is_compensating': self.is_compensating,
@@ -212,8 +226,13 @@ class BodyPartFunctionalMovement(Serialisable):
     def json_deserialise(cls, input_dict):
         movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
         movement.concentric_load = StandardErrorRange.json_deserialise(input_dict.get('concentric_load')) if input_dict.get('concentric_load') is not None else StandardErrorRange()
+        movement.isometric_load = StandardErrorRange.json_deserialise(
+            input_dict.get('isometric_load')) if input_dict.get('isometric_load') is not None else StandardErrorRange()
         movement.eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('eccentric_load')) if input_dict.get('eccentric_load') is not None else StandardErrorRange()
         movement.compensated_concentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_concentric_load')) if input_dict.get('compensated_concentric_load') is not None else StandardErrorRange()
+        movement.compensated_isometric_load = StandardErrorRange.json_deserialise(
+            input_dict.get('compensated_isometric_load')) if input_dict.get(
+            'compensated_isometric_load') is not None else StandardErrorRange()
         movement.compensated_eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_eccentric_load')) if input_dict.get('compensated_eccentric_load') is not None else StandardErrorRange()
         movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
         movement.is_compensating = input_dict.get('is_compensating', False)
@@ -232,8 +251,10 @@ class BodyPartFunctionalMovement(Serialisable):
         if self.body_part_side == target.body_part_side:
 
             self.concentric_load.add(target.concentric_load)
+            self.isometric_load.add(target.isometric_load)
             self.eccentric_load.add(target.eccentric_load)
             self.compensated_concentric_load.add(target.compensated_concentric_load)
+            self.compensated_isometric_load.add(target.compensated_isometric_load)
             self.compensated_eccentric_load.add(target.compensated_eccentric_load)
             self.compensating_causes_load.extend(target.compensating_causes_load)
             self.compensating_causes_load = list(set(self.compensating_causes_load))
@@ -651,19 +672,27 @@ class FunctionalMovementActionMapping(object):
                     if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
                         if body_part_side_string in self.muscle_load:
                             concentric_load = self.muscle_load[body_part_side_string].concentric_load
+                            isometric_load = self.muscle_load[body_part_side_string].isometric_load
                             eccentric_load = self.muscle_load[body_part_side_string].eccentric_load
                         else:
                             concentric_load = StandardErrorRange(observed_value=0)
+                            isometric_load = StandardErrorRange(observed_value=0)
                             eccentric_load = StandardErrorRange(observed_value=0)
 
-                        if functional_movement_load.muscle_action == MuscleAction.concentric or functional_movement_load.muscle_action == MuscleAction.isometric:
+                        if functional_movement_load.muscle_action == MuscleAction.concentric:
                             concentric_load.multiply(factor)
                             compensated_concentric_load = concentric_load
+                            compensated_isometric_load = StandardErrorRange(observed_value=0)
                             compensated_eccentric_load = StandardErrorRange(observed_value=0)
-
+                        elif functional_movement_load.muscle_action == MuscleAction.isometric:
+                            isometric_load.multiply(factor)
+                            compensated_isometric_load = isometric_load
+                            compensated_concentric_load = StandardErrorRange(observed_value=0)
+                            compensated_eccentric_load = StandardErrorRange(observed_value=0)
                         else:
                             eccentric_load.multiply(factor)
                             compensated_concentric_load = StandardErrorRange(observed_value=0)
+                            compensated_isometric_load = StandardErrorRange(observed_value=0)
                             compensated_eccentric_load = eccentric_load
 
                         functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
@@ -672,11 +701,15 @@ class FunctionalMovementActionMapping(object):
                         compensated_concentric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
                         synergist_compensated_concentric_load = compensated_concentric_load
 
+                        compensated_isometric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
+                        synergist_compensated_isometric_load = compensated_isometric_load
+
                         compensated_eccentric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
                         synergist_compensated_eccentric_load = compensated_eccentric_load
 
                         functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
                         functional_movement_body_part_side.compensated_concentric_load.add(synergist_compensated_concentric_load)
+                        functional_movement_body_part_side.compensated_isometric_load.add(synergist_compensated_isometric_load)
                         functional_movement_body_part_side.compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                         functional_movement_body_part_side.compensating_causes_load.append(c)
                         #functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
@@ -685,6 +718,9 @@ class FunctionalMovementActionMapping(object):
                         else:
                             self.muscle_load[
                                 body_part_side_string].compensated_concentric_load.add(synergist_compensated_concentric_load)
+                            self.muscle_load[
+                                body_part_side_string].compensated_isometric_load.add(
+                                synergist_compensated_isometric_load)
                             self.muscle_load[
                                 body_part_side_string].compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                             self.muscle_load[body_part_side_string].compensating_causes_load.append(c)
@@ -737,14 +773,18 @@ class FunctionalMovementActionMapping(object):
             if attributed_muscle_load.observed_value is not None and attributed_muscle_load.observed_value > 0:
                 body_part_side_string = body_part_side.to_string()
                 if body_part_side_string in self.muscle_load:
-                    if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
+                    if functional_movement_muscle_action == MuscleAction.concentric:
                         self.muscle_load[body_part_side_string].concentric_load.add(attributed_muscle_load)
+                    elif functional_movement_muscle_action == MuscleAction.isometric:
+                        self.muscle_load[body_part_side_string].isometric_load.add(attributed_muscle_load)
                     else:
                         self.muscle_load[body_part_side_string].eccentric_load.add(attributed_muscle_load)
                 else:
                     self.muscle_load[body_part_side_string] = functional_movement_body_part_side
-                    if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
+                    if functional_movement_muscle_action == MuscleAction.concentric:
                         self.muscle_load[body_part_side_string].concentric_load.add(attributed_muscle_load)
+                    elif functional_movement_muscle_action == MuscleAction.isometric:
+                        self.muscle_load[body_part_side_string].isometric_load.add(attributed_muscle_load)
                     else:
                         self.muscle_load[body_part_side_string].eccentric_load.add(attributed_muscle_load)
             # if body_part_side.side == 2 or body_part_side.side == 0:
