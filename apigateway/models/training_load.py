@@ -17,7 +17,7 @@ class DetailedTrainingLoad(Serialisable):
         self.corrective = None
         self.base_aerobic_training = None
         self.anaerobic_threshold_training = None
-        self.anaerobic_interval_training = None
+        self.high_intensity_anaerobic_training = None
         self.stabilization_endurance = None
         self.stabilization_strength = None
         self.stabilization_power = None
@@ -37,7 +37,7 @@ class DetailedTrainingLoad(Serialisable):
             'corrective': self.corrective.json_serialise() if self.corrective is not None else None,
             'base_aerobic_training': self.base_aerobic_training.json_serialise() if self.base_aerobic_training is not None else None,
             'anaerobic_threshold_training': self.anaerobic_threshold_training.json_serialise() if self.anaerobic_threshold_training is not None else None,
-            'anaerobic_interval_training': self.anaerobic_interval_training.json_serialise() if self.anaerobic_interval_training is not None else None,
+            'high_intensity_anaerobic_training': self.high_intensity_anaerobic_training.json_serialise() if self.high_intensity_anaerobic_training is not None else None,
             'stabilization_endurance': self.stabilization_endurance.json_serialise() if self.stabilization_endurance is not None else None,
             'stabilization_strength': self.stabilization_strength.json_serialise() if self.stabilization_strength is not None else None,
             'stabilization_power': self.stabilization_power.json_serialise() if self.stabilization_power is not None else None,
@@ -66,8 +66,8 @@ class DetailedTrainingLoad(Serialisable):
             'base_aerobic_training') is not None else None
         load.anaerobic_threshold_training = StandardErrorRange.json_deserialise(input_dict['anaerobic_threshold_training']) if input_dict.get(
             'anaerobic_threshold_training') is not None else None
-        load.anaerobic_interval_training = StandardErrorRange.json_deserialise(input_dict['anaerobic_interval_training']) if input_dict.get(
-            'anaerobic_interval_training') is not None else None
+        load.high_intensity_anaerobic_training = StandardErrorRange.json_deserialise(input_dict['high_intensity_anaerobic_training']) if input_dict.get(
+            'high_intensity_anaerobic_training') is not None else None
         load.stabilization_endurance = StandardErrorRange.json_deserialise(input_dict['stabilization_endurance']) if input_dict.get(
             'stabilization_endurance') is not None else None
         load.stabilization_strength = StandardErrorRange.json_deserialise(input_dict['stabilization_strength']) if input_dict.get(

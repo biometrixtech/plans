@@ -23,7 +23,7 @@ def get_program_a():
     muscle_load = MuscleDetailedLoad("test_provider", "test_program_a")
 
     load_type_list = [DetailedAdaptationType.mobility, DetailedAdaptationType.speed,
-                      DetailedAdaptationType.muscular_endurance, DetailedAdaptationType.anaerobic_interval_training]
+                      DetailedAdaptationType.muscular_endurance, DetailedAdaptationType.high_intensity_anaerobic_training]
 
     quad_loads = [50, 40, 30, 20]
     bicep_loads = [45, 35, 25, 15]
@@ -49,7 +49,7 @@ def get_program_b():
     muscle_load = MuscleDetailedLoad("test_provider", "test_program_b")
 
     load_type_list = [DetailedAdaptationType.stabilization_endurance, DetailedAdaptationType.base_aerobic_training,
-                      DetailedAdaptationType.muscular_endurance, DetailedAdaptationType.anaerobic_interval_training]
+                      DetailedAdaptationType.muscular_endurance, DetailedAdaptationType.high_intensity_anaerobic_training]
 
     quad_loads = [50, 40, 30, 20]
     bicep_loads = [45, 35, 25, 15]
@@ -155,7 +155,7 @@ def get_list_of_load_workouts(rpe_list, duration_list):
 
     for r in rpe_list:
         for d in duration_list:
-            ranked_detailed_adaptation_types = [RankedAdaptationType(DetailedAdaptationType.anaerobic_interval_training, 1),
+            ranked_detailed_adaptation_types = [RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 1),
                                                 RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 2)]
             workout = SimpleWorkout(id, r, d, ranked_detailed_adaptation_types, [])
             workouts.append(workout)
@@ -318,7 +318,7 @@ def test_acceptable_strength_cardio_same_score_both_required():
     strength_list = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
                     RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
     cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
-                     RankedAdaptationType(DetailedAdaptationType.anaerobic_interval_training, 2)]
+                   RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
     periodized_strength_exercise = PeriodizedExercise(None, SubAdaptationType.strength,
                                                       times_per_week_range=StandardErrorRange(lower_bound=2),
                                                       duration_range=None,
@@ -343,7 +343,7 @@ def test_completing_combo_required_reduces_score():
 
     proc = PeriodizationPlanProcessor(None, None, None, None)
     cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
-                     RankedAdaptationType(DetailedAdaptationType.anaerobic_interval_training, 2)]
+                   RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
 
     vigorous_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
                                                     times_per_week_range=StandardErrorRange(lower_bound=2),

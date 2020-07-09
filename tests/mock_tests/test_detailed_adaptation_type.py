@@ -6,7 +6,7 @@ from datetime import datetime
 from logic.detailed_load_processing import DetailedLoadProcessor
 from models.training_volume import StandardErrorRange
 from models.movement_tags import AdaptationType, TrainingType
-from models.movement_actions import MovementSpeed
+from models.movement_actions import MovementSpeed, MovementResistance
 
 
 action_dictionary = ActionLibraryDatastore().get()
@@ -32,7 +32,7 @@ def process_adaptation_types(action_list, reps_list, rpe_list, duration=None):
     detailed_load_processor = DetailedLoadProcessor()
 
     functional_movement_factory = FunctionalMovementFactory()
-    functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+    functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
     event_date = datetime.now()
 
     for action in action_list:
@@ -67,7 +67,7 @@ def process_adaptation_types_no_reps(action_list, rpe_list, duration=None):
     detailed_load_processor = DetailedLoadProcessor()
 
     functional_movement_factory = FunctionalMovementFactory()
-    functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+    functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
     event_date = datetime.now()
 
     for action in action_list:
@@ -132,7 +132,7 @@ def process_adaptation_types_percent_max_hr(action_list, percent_max_hr_list, du
     detailed_load_processor = DetailedLoadProcessor()
 
     functional_movement_factory = FunctionalMovementFactory()
-    functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+    functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
     event_date = datetime.now()
 
     for action in action_list:
@@ -176,7 +176,7 @@ def test_basic_aerobic_training_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.base_aerobic_training is not None
+    assert detailed_load_processor.session_detailed_load.base_aerobic_training.lowest_value() > 0
 
 
 def test_anaerobic_threshold_training_detection():
@@ -194,10 +194,10 @@ def test_anaerobic_threshold_training_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.anaerobic_threshold_training is not None
+    assert detailed_load_processor.session_detailed_load.anaerobic_threshold_training.lowest_value() > 0
 
 
-def test_anaerobic_interval_training_detection():
+def test_high_intensity_anaerobic_training_detection():
     # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
     action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
 
@@ -212,9 +212,9 @@ def test_anaerobic_interval_training_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.anaerobic_interval_training is not None
+    assert detailed_load_processor.session_detailed_load.high_intensity_anaerobic_training.lowest_value() > 0
 
-def test_stabilization_endurance_detection():
+def test_stabilization_endurance_from_strength_detection():
     # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
     action_list = get_filtered_actions([TrainingType.strength_integrated_resistance, TrainingType.strength_endurance])
 
@@ -232,7 +232,28 @@ def test_stabilization_endurance_detection():
     no_resistance_length = len(no_resistance_list)
 
     #assert 0 < len(slow_tempo_list)
-    assert detailed_load_processor.session_detailed_load.stabilization_endurance is not None
+    assert detailed_load_processor.session_detailed_load.stabilization_endurance.lowest_value() > 0
+
+
+def test_stabilization_endurance_from_cardio_detection():
+    # should go to Stabilization Endurance, Stabilization Strength, Functional Strength, Strength Endurance
+    action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+    slow_tempo_list = [a for a in action_list if a.speed == MovementSpeed.slow]
+
+    reps_list = [15]
+    rpes = [6]
+
+    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=15)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    #assert 0 < len(slow_tempo_list)
+    assert detailed_load_processor.session_detailed_load.stabilization_endurance.lowest_value() > 0
 
 
 def test_stabilization_strength_detection():
@@ -251,7 +272,7 @@ def test_stabilization_strength_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.stabilization_strength is not None
+    assert detailed_load_processor.session_detailed_load.stabilization_strength.lowest_value() > 0
 
 
 def test_stabilization_power_detection():
@@ -273,7 +294,7 @@ def test_stabilization_power_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.stabilization_power is not None
+    assert detailed_load_processor.session_detailed_load.stabilization_power.lowest_value() > 0
 
 #
 # def test_stabilization_power_from_power_drills_plyometrics():
@@ -314,7 +335,7 @@ def test_functional_strength_from_strength_endurance_strength_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.functional_strength is not None
+    assert detailed_load_processor.session_detailed_load.functional_strength.lowest_value() > 0
 
 
 def test_muscular_endurance_cardio_detection():
@@ -332,7 +353,7 @@ def test_muscular_endurance_cardio_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.muscular_endurance is not None
+    assert detailed_load_processor.session_detailed_load.muscular_endurance.lowest_value() > 0
 
 
 def test_muscular_endurance_strength_detection():
@@ -353,7 +374,7 @@ def test_muscular_endurance_strength_detection():
     no_resistance_length = len(no_resistance_list)
 
     #assert 0 < len(slow_tempo_list)
-    assert detailed_load_processor.session_detailed_load.muscular_endurance is not None
+    assert detailed_load_processor.session_detailed_load.muscular_endurance.lowest_value() > 0
 
 
 def test_strength_endurance_detection():
@@ -372,7 +393,7 @@ def test_strength_endurance_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.strength_endurance is not None
+    assert detailed_load_processor.session_detailed_load.strength_endurance.lowest_value() > 0
 
 
 def test_speed_detection():
@@ -394,7 +415,7 @@ def test_speed_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.speed is not None
+    assert detailed_load_processor.session_detailed_load.speed.lowest_value() > 0
 
 #
 # def test_speed_from_power_drills_plyometrics():
@@ -418,7 +439,7 @@ def test_speed_detection():
 #     assert detailed_load_processor.session_detailed_load.speed is not None
 
 
-def test_sustained_power_detection():
+def test_sustained_power_from_power_detection():
     # should go to power_explosive_action => Maximal Power, Power, Sustained_power, Speed, Stabilization Power
     action_list = get_filtered_actions([TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics])
 
@@ -437,7 +458,30 @@ def test_sustained_power_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.sustained_power is not None
+    assert detailed_load_processor.session_detailed_load.sustained_power.lowest_value() > 0
+
+
+def test_sustained_power_from_caridio_detection():
+    # should go to power_explosive_action => Maximal Power, Power, Sustained_power, Speed, Stabilization Power
+    action_list = get_filtered_actions([TrainingType.strength_cardiorespiratory])
+
+    no_speed_list = [a for a in action_list if a.speed is None]
+    no_resistance_list = [a for a in action_list if a.resistance is None]
+    fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
+    explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
+
+    reps_list = [15]
+    rpes = [8]
+    duration = 60
+
+    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=60)
+
+    action_list_length = len(action_list)
+    no_speed_length = len(no_speed_list)
+    no_resistance_length = len(no_resistance_list)
+
+    assert detailed_load_processor.session_detailed_load.sustained_power.lowest_value() > 0
+
 
 #
 # def test_sustained_power_from_power_drills_plyometrics():
@@ -480,7 +524,7 @@ def test_power_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.power is not None
+    assert detailed_load_processor.session_detailed_load.power.lowest_value() > 0
 
 
 # def test_power_from_power_drills_plyometrics():
@@ -510,7 +554,7 @@ def test_maximal_power_detection():
     action_list = get_filtered_actions([TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics])
 
     no_speed_list = [a for a in action_list if a.speed is None]
-    no_resistance_list = [a for a in action_list if a.resistance is None]
+    high_resistance_list = [a for a in action_list if a.resistance in [MovementResistance.high, MovementResistance.max]]
     fast_speed_list = [a for a in action_list if a.speed == MovementSpeed.fast]
     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
 
@@ -521,7 +565,7 @@ def test_maximal_power_detection():
 
     action_list_length = len(action_list)
     no_speed_length = len(no_speed_list)
-    no_resistance_length = len(no_resistance_list)
+    no_resistance_length = len(high_resistance_list)
 
-    assert detailed_load_processor.session_detailed_load.maximal_power is not None
+    assert detailed_load_processor.session_detailed_load.maximal_power.lowest_value() > 0
 

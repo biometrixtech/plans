@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 
 class TrainingType(Enum):
@@ -22,12 +22,12 @@ class AdaptationType(Enum):
     power_explosive_action = 5
 
 
-class DetailedAdaptationType(Enum):
+class DetailedAdaptationType(IntEnum):
     mobility = 0
     corrective = 1
     base_aerobic_training = 2
     anaerobic_threshold_training = 3
-    anaerobic_interval_training = 4
+    high_intensity_anaerobic_training = 4
     stabilization_endurance = 5
     stabilization_strength = 6
     stabilization_power = 7
@@ -73,7 +73,7 @@ class AdaptationDictionary(object):
     def initialize(self):
         self.detailed_types[DetailedAdaptationType.base_aerobic_training] = SubAdaptationType.cardiorespiratory_training
         self.detailed_types[DetailedAdaptationType.anaerobic_threshold_training] = SubAdaptationType.cardiorespiratory_training
-        self.detailed_types[DetailedAdaptationType.anaerobic_interval_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.high_intensity_anaerobic_training] = SubAdaptationType.cardiorespiratory_training
         self.detailed_types[DetailedAdaptationType.functional_strength] = SubAdaptationType.strength
         self.detailed_types[DetailedAdaptationType.muscular_endurance] = SubAdaptationType.strength
         self.detailed_types[DetailedAdaptationType.strength_endurance] = SubAdaptationType.strength
