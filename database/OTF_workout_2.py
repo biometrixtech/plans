@@ -8,7 +8,7 @@ def is_valid(row, name):
         return True
     return False
 
-def parse_file(file_name):
+def parse_file(file_name, write=True):
     data = pd.read_csv(f'{file_name}.csv')
     data = data.fillna('')
     sections = {}
@@ -29,6 +29,8 @@ def parse_file(file_name):
                     'duration_seconds': new_duration_assignment,
                     'exercises': []
                 }
+                new_section['planned_start_time_run_first'] = row.get('planned_start_time_run_first')
+                new_section['planned_start_time_rower_first'] = row.get('planned_start_time_rower_first')
                 sections[section_name] = new_section
             else:
                 exercise = {}
@@ -193,17 +195,21 @@ def parse_file(file_name):
     elif file_name == 'at_home2':
         workout['program_module_id'] = 'at_home2'
 
-    workout['workout_sections'] = list(sections.values())
-    json_string = json.dumps(workout, indent=4)
-    file_name = os.path.join(os.path.realpath('..'), f"tests/data/otf/{file_name}.json")
-    print(f"writing: {file_name}")
-    f1 = open(file_name, 'w')
-    f1.write(json_string)
-    f1.close()
+    workout['sections'] = list(sections.values())
+    if write:
+        json_string = json.dumps(workout, indent=4)
+        file_name = os.path.join(os.path.realpath('..'), f"tests/data/otf/{file_name}.json")
+        print(f"writing: {file_name}")
+        f1 = open(file_name, 'w')
+        f1.write(json_string)
+        f1.close()
+    else:
+        return workout
 
+if __name__ == '__main__':
 
-# for file_name in ['may1', 'may2']:
-#for file_name in ['at_home1', 'at_home2']:
-for file_name in ['may1_alt']:
-    parse_file(file_name)
+    # for file_name in ['may1', 'may2']:
+    #for file_name in ['at_home1', 'at_home2']:
+    for file_name in ['may1_alt']:
+        parse_file(file_name)
 

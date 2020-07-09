@@ -1,7 +1,7 @@
 {
     "program_id": "may",
     "program_module_id": "may_first_alt",
-    "workout_sections": [
+    "sections": [
         {
             "name": "warmup",
             "exercises": [
@@ -12,6 +12,7 @@
                         "assigned_value": 1.56
                     },
                     "movement_id": "5873d05eb06dc50011d08796",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -33,6 +34,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 240.0,
                         "min_value": "",
@@ -68,6 +70,7 @@
                     "name": "row",
                     "id": "row",
                     "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 180.0,
                         "min_value": "",
@@ -86,6 +89,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 90.0,
                         "min_value": "",
@@ -127,6 +131,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -168,6 +173,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 90.0,
                         "min_value": "",
@@ -209,6 +215,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -250,6 +257,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -291,6 +299,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 30.0,
                         "min_value": "",
@@ -340,6 +349,7 @@
                         "assigned_value": 1.56
                     },
                     "movement_id": "5873d05eb06dc50011d08796",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -352,6 +362,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 30.0,
                         "min_value": "",
@@ -392,6 +403,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 90.0,
                         "min_value": "",
@@ -433,6 +445,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 75.0,
                         "min_value": "",
@@ -474,6 +487,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 90.0,
                         "min_value": "",
@@ -515,6 +529,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 75.0,
                         "min_value": "",
@@ -556,6 +571,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -597,6 +613,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 30.0,
                         "min_value": "",
@@ -646,6 +663,7 @@
                         "assigned_value": 1.56
                     },
                     "movement_id": "5873d05eb06dc50011d08796",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -658,6 +676,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 30.0,
                         "min_value": "",
@@ -698,6 +717,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 90.0,
                         "min_value": "",
@@ -739,6 +759,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -780,6 +801,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 90.0,
                         "min_value": "",
@@ -821,6 +843,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -862,6 +885,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 60.0,
                         "min_value": "",
@@ -903,6 +927,7 @@
                     "name": "run",
                     "id": "run",
                     "movement_id": "5823768d473c06100052ed9a",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": 30.0,
                         "min_value": "",
@@ -949,6 +974,7 @@
                     "name": "row",
                     "id": "row",
                     "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": "",
                         "min_value": 15.0,
@@ -962,6 +988,7 @@
                     "name": "plank_alt_leg_lift",
                     "id": "plank_alt_leg_lift",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -972,6 +999,7 @@
                     "name": "squat",
                     "id": "squat",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -982,6 +1010,7 @@
                     "name": "plank_alt_leg_lift",
                     "id": "plank_alt_leg_lift",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -992,6 +1021,7 @@
                     "name": "squat",
                     "id": "squat",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 8.0,
@@ -1002,6 +1032,7 @@
                     "name": "plank_alt_leg_lift",
                     "id": "plank_alt_leg_lift",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1012,6 +1043,7 @@
                     "name": "squat",
                     "id": "squat",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 6.0,
@@ -1027,6 +1059,7 @@
                     "name": "row",
                     "id": "row",
                     "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": "",
                         "min_value": 15.0,
@@ -1040,6 +1073,7 @@
                     "name": "hamstring curl",
                     "id": "hamstring curl",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1050,6 +1084,7 @@
                     "name": "static lunge",
                     "id": "static lunge",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 12.0,
@@ -1060,6 +1095,7 @@
                     "name": "hamstring curl",
                     "id": "hamstring curl",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1070,6 +1106,7 @@
                     "name": "static lunge",
                     "id": "static lunge",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 12.0,
@@ -1080,6 +1117,7 @@
                     "name": "hamstring curl",
                     "id": "hamstring curl",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1090,6 +1128,7 @@
                     "name": "static lunge",
                     "id": "static lunge",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 12.0,
@@ -1105,6 +1144,7 @@
                     "name": "row",
                     "id": "row",
                     "movement_id": "58459d9ddc2ce90011f93d84",
+                    "alternate_movement_ids": [],
                     "duration": {
                         "assigned_value": "",
                         "min_value": 15.0,
@@ -1118,6 +1158,7 @@
                     "name": "hip bridge",
                     "id": "hip bridge",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1128,6 +1169,7 @@
                     "name": "front squat",
                     "id": "front squat",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 6.0,
@@ -1138,6 +1180,7 @@
                     "name": "hip bridge",
                     "id": "hip bridge",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1148,6 +1191,7 @@
                     "name": "front squat",
                     "id": "front squat",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 8.0,
@@ -1158,6 +1202,7 @@
                     "name": "hip bridge",
                     "id": "hip bridge",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1168,6 +1213,7 @@
                     "name": "front squat",
                     "id": "front squat",
                     "movement_id": "5c9cefebcc3ad8000f18e06b",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,
@@ -1178,6 +1224,7 @@
                     "name": "rollout",
                     "id": "rollout",
                     "movement_id": "59271bd3d8d39b000f703a5a",
+                    "alternate_movement_ids": [],
                     "weight": 15,
                     "weight_measure": 2,
                     "reps_per_set": 10.0,

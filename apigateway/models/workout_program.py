@@ -244,6 +244,8 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
 
         self.bilateral = True
         self.hr = None
+        self.start_date_time = None
+        self.end_date_time = None
 
         # for cardio exercises
         self.duration = None  # duration in seconds for cardio exercises

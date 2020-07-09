@@ -70,8 +70,8 @@ class WorkoutProcessor(object):
                     workout_section.shrz = heart_rate_processing.get_shrz(section_hr)
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
-                if len(section_hr) > 0:
-                    hr_values = sorted([hr.value for hr in section_hr])  # TODO: improve this to use eercise specific values, not inherit all from section
+                if workout_exercise.hr is None and len(section_hr) > 0:
+                    hr_values = sorted([hr.value for hr in section_hr])  # TODO: improve this to use exercise specific values, not inherit all from section
                     top_25_percentile_hr = hr_values[int(len(hr_values) * .75):]
                     workout_exercise.hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)  # use the average of top 25% ideally this is the end of exercise HR
                 self.add_movement_detail_to_exercise(workout_exercise)
