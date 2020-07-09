@@ -18,7 +18,10 @@ class ActionLibraryDatastore(object):
             file_name = 'actions_library.json'
         try:
             curpath = os.path.abspath(os.curdir)
-            file_path = os.path.join(curpath, '../../apigateway/models', file_name)
+            if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
+                file_path = os.path.join(curpath, 'apigateway/models', file_name)
+            else:
+                file_path = os.path.join(curpath, '../../apigateway/models', file_name)
             with open(file_path, 'r') as f:
                 all_actions = json.load(f)
             for action_id, action_dict in all_actions.items():
