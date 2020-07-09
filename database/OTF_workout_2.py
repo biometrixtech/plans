@@ -206,7 +206,7 @@ def parse_file(file_name, write=True):
     else:
         return workout
 
-if __name__ == '_main':
+if __name__ == '__main__':
 
     # for file_name in ['may1', 'may2']:
     #for file_name in ['at_home1', 'at_home2']:

@@ -1,6 +1,6 @@
 {
     "program_id": "may",
-    "workout_sections": [
+    "sections": [
         {
             "name": "warmup",
             "exercises": [
