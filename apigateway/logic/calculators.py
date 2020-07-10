@@ -87,6 +87,41 @@ class Calculators(object):
         return round(rpe, 1)
 
     @classmethod
+    def get_percent_max_hr_from_rpe(cls, rpe):
+        """
+        Using the table from ACSM
+
+        :param rpe:
+        :return:
+        """
+        percent_max_hr_lookup = list()
+        percent_max_hr_lookup.append(((0, 1), (35, 35)))
+        percent_max_hr_lookup.append(((1, 2), (35, 55)))
+        percent_max_hr_lookup.append(((2, 3), (55, 70)))
+        percent_max_hr_lookup.append(((3, 6), (70, 90)))
+        percent_max_hr_lookup.append(((6, 9), (90, 100)))
+        percent_max_hr_lookup.append(((9, 10), (100, 100)))
+
+        rpe_tuple = [r for r in percent_max_hr_lookup if r[0][0] <= rpe <= r[0][1]]
+        if len(rpe_tuple) > 0:
+            rpe_range = rpe_tuple[0][0]
+            perc_max_hr_range = rpe_tuple[0][1]
+            rpe_diff = rpe - rpe_range[0]
+            rpe_range_min_max_diff = float(rpe_range[1] - rpe_range[0])
+            perc_range = float(perc_max_hr_range[1] - perc_max_hr_range[0])
+            perc_diff = 0
+            if rpe_range_min_max_diff > 0:
+                perc_diff = round(rpe_diff / rpe_range_min_max_diff * perc_range, 2)
+
+            perc = perc_max_hr_range[0] + perc_diff
+            perc = min(100, perc)
+            perc = max(35, perc)
+
+        else:
+            perc = 35
+        return perc / 100
+
+    @classmethod
     def vo2max_schembre(cls, age, weight, height, gender=Gender.female, activity_level=5):
         """
 
@@ -352,12 +387,16 @@ class Calculators(object):
     @classmethod
     def work_vo2_rowing_from_power(cls, power, weight):
         """
-
+        TODO: This is way overestimating work_vo2, check/find better solution
         :param power: watts
         :param weight: kg
         :return:
         """
-        work_vo2 = (power * 14.4 + 65) / weight
+        # work_vo2 = (power * 14.4 + 65) / weight
+        # return work_vo2
+        # TODO: alternate approach which still seems a litle too high, getting work_vo2 of > 75 using actual OTF data
+        mets = cls.watts_to_mets(power, weight, efficiency=.22)
+        work_vo2 = round(mets * 3.5, 1)
         return work_vo2
 
     @classmethod

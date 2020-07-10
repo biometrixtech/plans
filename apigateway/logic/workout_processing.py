@@ -70,10 +70,14 @@ class WorkoutProcessor(object):
                     workout_section.shrz = heart_rate_processing.get_shrz(section_hr)
             for workout_exercise in workout_section.exercises:
                 workout_exercise.shrz = workout_section.shrz
-                if workout_exercise.hr is None and len(section_hr) > 0:
+                if len(workout_exercise.hr) > 0:
+                    hr_values = sorted(workout_exercise.hr)
+                    top_25_percentile_hr = hr_values[int(len(hr_values) * .75):]
+                    workout_exercise.end_of_workout_hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)
+                elif len(section_hr) > 0:
                     hr_values = sorted([hr.value for hr in section_hr])  # TODO: improve this to use exercise specific values, not inherit all from section
                     top_25_percentile_hr = hr_values[int(len(hr_values) * .75):]
-                    workout_exercise.hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)  # use the average of top 25% ideally this is the end of exercise HR
+                    workout_exercise.end_of_workout_hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)  # use the average of top 25% ideally this is the end of exercise HR
                 self.add_movement_detail_to_exercise(workout_exercise)
                 if workout_section.assess_load:
                     session.add_tissue_load(workout_exercise.tissue_load)
@@ -134,7 +138,6 @@ class WorkoutProcessor(object):
                 if action_json is not None:
                     action = ExerciseAction.json_deserialise(action_json)
                     exercise.primary_actions.append(action)
-            exercise = self.update_exercise_details(exercise)
 
             for action_id in movement.secondary_actions:
                 action_json = action_library.get(action_id)
@@ -189,11 +192,13 @@ class WorkoutProcessor(object):
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
             exercise.predicted_rpe = StandardErrorRange()
-            if exercise.hr is not None:
-                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.hr)
+            if exercise.end_of_workout_hr is not None:
+                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr)
             else:
                 #exercise.predicted_rpe.observed_value = exercise.shrz or 4
                 self.set_planned_cardio_rpe(exercise)
+
+            exercise.set_hr_zones(self.user_age)
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:

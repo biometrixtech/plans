@@ -3,6 +3,7 @@ from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equ
 from models.movement_actions import ExerciseAction
 from utils import format_datetime, parse_datetime
 from models.training_volume import StandardErrorRange
+from logic.calculators import Calculators
 
 import re
 import datetime
@@ -243,7 +244,8 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         super().__init__()
 
         self.bilateral = True
-        self.hr = None
+        self.end_of_workout_hr = None
+        self.hr = []
         self.start_date_time = None
         self.end_date_time = None
 
@@ -267,6 +269,9 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         self.work_vo2 = None
 
         self.total_volume = None
+        self.percent_time_at_65_80_max_hr = 0.0
+        self.percent_time_at_80_85_max_hr = 0.0
+        self.percent_time_at_85_above_max_hr = 0.0
 
     def json_serialise(self):
         ret = {
@@ -327,7 +332,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise.reps_per_set = input_dict.get('reps_per_set')
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
         exercise.movement_id = input_dict.get('movement_id')
-        exercise.hr = input_dict.get('hr')
+        exercise.hr = input_dict.get('hr', [])
         exercise.predicted_rpe = StandardErrorRange.json_deserialise(input_dict.get('predicted_rpe')) if input_dict.get('predicted_rpe') is not None else None
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
@@ -452,7 +457,8 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
                 pace = (2.8 / self.power.observed_value) ** (1 / 3)
         elif self.calories is not None and self.duration is not None:
             if self.cardio_action == CardioAction.row:
-                self.power = (4200 * self.calories - .35 * self.duration) / (4 * self.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
+                self.power = StandardErrorRange()
+                self.power.observed_value = (4200 * self.calories - .35 * self.duration) / (4 * self.duration)  # based on formula used by concept2 rower; reps is assumed to be in seconds
                 # watts = exercise.calories / exercise.duration * 1000  # approx calculation; reps is assumed to be in seconds
                 pace = (2.8 / self.power.observed_value) ** (1 / 3)
 
@@ -467,6 +473,39 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         self.pace = pace
         #return speed, pace
 
+    def set_hr_zones(self, user_age):
+        if len(self.hr) > 0:
+            max_hr = 207 - .7 * user_age
+            percent_max_hr = [round(hr / max_hr, 2) for hr in self.hr]
+            zone1 = [perc_hr for perc_hr in percent_max_hr if .65 < perc_hr <=.8]
+            zone2 = [perc_hr for perc_hr in percent_max_hr if .8 < perc_hr <=.85]
+            zone3 = [perc_hr for perc_hr in percent_max_hr if .85 < perc_hr]
+            self.percent_time_at_65_80_max_hr = round(len(zone1) / len(self.hr), 2)
+            self.percent_time_at_80_85_max_hr = round(len(zone2) / len(self.hr), 2)
+            self.percent_time_at_85_above_max_hr = round(len(zone3) / len(self.hr), 2)
+
+            below_vo2max = [perc_hr for perc_hr in percent_max_hr if .5 < perc_hr < .8]
+            above_vo2max = [perc_hr for perc_hr in percent_max_hr if perc_hr >=.8]
+
+            self.percent_time_below_vo2max = round(len(below_vo2max) / len(self.hr), 2)
+            self.percent_time_above_vo2max = round(len(above_vo2max) / len(self.hr), 2)
+
+        else:
+            if self.predicted_rpe is None:  # this should never be the case as we should always have predicted_rpe (here just in case)
+                rpe = 4.0
+            else:
+                rpe = self.predicted_rpe.observed_value
+            percent_max_hr = Calculators.get_percent_max_hr_from_rpe(rpe)
+            if .65 < percent_max_hr <= .8:
+                self.percent_time_at_65_80_max_hr = 1.0
+            elif .8 < percent_max_hr <= .85:
+                self.percent_time_at_80_85_max_hr = 1.0
+            elif .85 < percent_max_hr:
+                self.percent_time_at_85_above_max_hr = 1.0
+            if .5 < percent_max_hr < .8:
+                self.percent_time_below_vo2max = 1.0
+            elif percent_max_hr > .8:
+                self.percent_time_above_vo2max = 1.0
 
 
     # def set_adaption_type(self, movement):

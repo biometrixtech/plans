@@ -20,6 +20,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from models.workout_program import WorkoutProgramModule
+from models.movement_tags import Gender
 from database.OTF_workout_2 import parse_file
 import datetime
 from logic.workout_processing import WorkoutProcessor
@@ -101,7 +102,8 @@ def get_rowing_floor_sections(user):
         ex['speed'] = round(row['speed']['mean'], 2)
         ex['power'] = round(row['powerperstroke']['mean'], 3)
         ex['pace'] = round(1 / ex['speed'], 2)
-        ex['hr'] = int(row['heartrate']['mean'])
+        # ex['hr'] = int(row['heartrate']['mean'])
+        ex['hr'] = list(rower_data.heartrate[(rower_data.timestamp > row['timestamp']['min']) & (rower_data.timestamp < row['timestamp']['max'])])
 
         ex['distance'] = row['distance']['max'] - row['distance']['min']
         ex['duration'] = row['movingtime']['max'] - row['movingtime']['min']
@@ -157,7 +159,8 @@ def get_treadmill_section(user):
         ex['speed'] = round(row['speed']['mean'], 2)
         ex['grade'] = round(row['incline']['mean'] / 100, 3)
         ex['pace'] = round(1 / ex['speed'], 2)
-        ex['hr'] = int(row['heartrate']['mean'])
+        # ex['hr'] = int(row['heartrate']['mean'])
+        ex['hr'] = list(treadmill_data.heartrate[(treadmill_data.timestamp > row['timestamp']['min']) & (treadmill_data.timestamp < row['timestamp']['max'])])
 
         ex['distance'] = row['distance']['max'] - row['distance']['min']
         ex['duration'] = row['incline']['count']
@@ -359,6 +362,6 @@ if __name__ == '__main__':
         workout_program = WorkoutProgramModule.json_deserialise(workout)
         session = MixedActivitySession()
         session.workout_program_module = workout_program
-        WorkoutProcessor().process_workout(session)
+        WorkoutProcessor(user_weight=70, gender=Gender.male).process_workout(session)
         print(user, session.power_load.json_serialise())
     print(time.time() - st)
