@@ -10,7 +10,9 @@ class TrainingLoadCalculator(object):
                  previous_week_1_load_list: [StandardErrorRange],
                  previous_week_2_load_list: [StandardErrorRange],
                  previous_week_3_load_list: [StandardErrorRange],
-                 previous_week_4_load_list: [StandardErrorRange]):
+                 previous_week_4_load_list: [StandardErrorRange],
+                 calculate_averages=True,
+                 calculate_detailes=False):
 
         self.current_week_load_list = current_week_load_list
         self.previous_week_1_load_list = previous_week_1_load_list
@@ -62,9 +64,11 @@ class TrainingLoadCalculator(object):
 
         self.populate_values()
         self.sum_weeks()
-        self.calculate_averages()
+        if calculate_averages:
+            self.calculate_averages()
 
-        self.calculate_weekly_detailed_training_load()
+        if calculate_detailes:
+            self.calculate_weekly_detailed_training_load()
 
     def populate_values(self):
 
