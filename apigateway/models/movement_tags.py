@@ -71,6 +71,11 @@ class AdaptationDictionary(object):
         self.initialize()
 
     def initialize(self):
+        self.detailed_types[DetailedAdaptationType.mobility] = SubAdaptationType.movement_efficiency
+        self.detailed_types[DetailedAdaptationType.corrective] = SubAdaptationType.movement_efficiency
+        self.detailed_types[DetailedAdaptationType.stabilization_endurance] = SubAdaptationType.core_strength
+        self.detailed_types[DetailedAdaptationType.stabilization_strength] = SubAdaptationType.core_strength
+        self.detailed_types[DetailedAdaptationType.stabilization_power] = SubAdaptationType.core_strength
         self.detailed_types[DetailedAdaptationType.base_aerobic_training] = SubAdaptationType.cardiorespiratory_training
         self.detailed_types[DetailedAdaptationType.anaerobic_threshold_training] = SubAdaptationType.cardiorespiratory_training
         self.detailed_types[DetailedAdaptationType.high_intensity_anaerobic_training] = SubAdaptationType.cardiorespiratory_training
@@ -79,6 +84,10 @@ class AdaptationDictionary(object):
         self.detailed_types[DetailedAdaptationType.strength_endurance] = SubAdaptationType.strength
         self.detailed_types[DetailedAdaptationType.hypertrophy] = SubAdaptationType.strength
         self.detailed_types[DetailedAdaptationType.maximal_strength] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.speed] = SubAdaptationType.power
+        self.detailed_types[DetailedAdaptationType.sustained_power] = SubAdaptationType.power
+        self.detailed_types[DetailedAdaptationType.power] = SubAdaptationType.power
+        self.detailed_types[DetailedAdaptationType.maximal_power] = SubAdaptationType.power
 
 
 class CardioAction(Enum):

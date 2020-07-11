@@ -567,5 +567,7 @@ def test_maximal_power_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(high_resistance_list)
 
+    detailed_load_processor.rank_types()
+
     assert detailed_load_processor.session_detailed_load.maximal_power.lowest_value() > 0
 

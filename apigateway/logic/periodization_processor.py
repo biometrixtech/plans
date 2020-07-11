@@ -335,17 +335,17 @@ class PeriodizationPlanProcessor(object):
     def get_workout_score(self, test_workout, recommended_exercise, target_load_range, one_required_combination=None):
 
         if recommended_exercise.rpe is not None:
-            if recommended_exercise.rpe.upper_bound is not None and (recommended_exercise.rpe.lower_bound <= test_workout.session_rpe <= recommended_exercise.rpe.upper_bound):
+            if recommended_exercise.rpe.upper_bound is not None and (recommended_exercise.rpe.lower_bound <= test_workout.projected_session_rpe.lower_bound and test_workout.projected_rpe_load.upper_bound <= recommended_exercise.rpe.upper_bound):
                 rpe_score = 1.0
             elif recommended_exercise.rpe.upper_bound is not None and (
-                    test_workout.session_rpe > recommended_exercise.rpe.upper_bound):
+                    test_workout.projected_session_rpe.upper_bound > recommended_exercise.rpe.upper_bound):
                 rpe_score = 0.0
-            elif recommended_exercise.rpe.lower_bound <= test_workout.session_rpe:
+            elif recommended_exercise.rpe.lower_bound <= test_workout.projected_session_rpe.lower_bound:
                 rpe_score = 1.0
-            elif test_workout.session_rpe > recommended_exercise.rpe.upper_bound:
+            elif test_workout.projected_session_rpe.upper_bound > recommended_exercise.rpe.upper_bound:
                 rpe_score = 0.0
             else:
-                rpe_score = test_workout.session_rpe / recommended_exercise.rpe.lower_bound
+                rpe_score = test_workout.projected_session_rpe.lower_bound / recommended_exercise.rpe.lower_bound
         else:
             rpe_score = 1.0
 
@@ -361,18 +361,18 @@ class PeriodizationPlanProcessor(object):
             duration_score = 1.0
 
         if target_load_range.upper_bound is not None and (
-                target_load_range.lower_bound <= test_workout.session_load <= target_load_range.upper_bound):
+                target_load_range.lower_bound <= test_workout.projected_rpe_load.lower_bound and test_workout.projected_rpe_load.upper_bound <= target_load_range.upper_bound):
             load_score = 1.0
-        elif target_load_range.upper_bound is not None and (test_workout.session_load > target_load_range.upper_bound):
+        elif target_load_range.upper_bound is not None and (test_workout.projected_rpe_load.upper_bound > target_load_range.upper_bound):
             load_score = 0.0
-        elif target_load_range.lower_bound <= test_workout.session_load:
+        elif target_load_range.lower_bound <= test_workout.projected_rpe_load.lower_bound:
             load_score = 1.0
-        elif test_workout.session_load > target_load_range.upper_bound:
+        elif test_workout.projected_rpe_load.upper_bound > target_load_range.upper_bound:
             load_score = 0.0
         else:
-            load_score = test_workout.session_load / target_load_range.lower_bound
+            load_score = test_workout.projected_rpe_load.lower_bound / target_load_range.lower_bound
 
-        cosine_similarity = self.cosine_similarity(test_workout.sub_adaptation_types, [RankedAdaptationType(recommended_exercise.sub_adaptation_type, 1)])
+        cosine_similarity = self.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(recommended_exercise.sub_adaptation_type, 1)])
 
         if cosine_similarity > 0:
             if one_required_combination is None:

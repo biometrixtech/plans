@@ -2,6 +2,7 @@ from utils import format_date, parse_date
 from models.movement_tags import CardioAction, Equipment
 from models.workout_program import WorkoutSection, BaseWorkoutExercise, ExerciseAction
 from models.training_volume import StandardErrorRange, Assignment, MovementOption
+from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 
@@ -45,6 +46,37 @@ class PlannedWorkout(object):
 #         self.start_time = None  # relative time in seconds from start of the workout
 #         self.duration = None
 #         self.exercises = []
+
+
+class PlannedWorkoutLoad(PlannedWorkout):
+    def __init__(self, id):
+        super().__init__()
+        self.program_id = id
+        # not yet certain these need to be serialised/deserialised
+        self.session_detailed_load = DetailedTrainingLoad()
+        self.session_training_type_load = TrainingTypeLoad()
+        self.muscle_detailed_load = {}
+
+        self.projected_rpe_load = StandardErrorRange()
+        self.projected_power_load = StandardErrorRange()
+        self.projected_session_rpe = StandardErrorRange()
+
+        self.projected_ramp = StandardErrorRange()
+        self.projected_acwr = StandardErrorRange()
+        self.projected_freshness = StandardErrorRange()
+        self.projected_fit_fatigue = StandardErrorRange()
+        self.projected_strain = StandardErrorRange()
+        self.projected_monotony = StandardErrorRange()
+        self.projected_strain_event_level = StandardErrorRange()
+
+        self.ranking = 0
+        self.score = 0
+
+    def rank_muscle_load(self):
+
+        for muscle in self.muscle_detailed_load.keys():
+            self.muscle_detailed_load[muscle].rank_adaptation_types()
+
 
 class PlannedWorkoutSection(WorkoutSection, Serialisable):
     def __init__(self):

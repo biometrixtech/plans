@@ -2,13 +2,36 @@ from fathomapi.utils.xray import xray_recorder
 from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
 from models.training_volume import StandardErrorRange
-from models.movement_tags import DetailedAdaptationType
+from models.movement_tags import DetailedAdaptationType, RankedAdaptationType, AdaptationDictionary, SubAdaptationType
 
 
 class TrainingLoad(object):
     def __init__(self):
         self.power_load = StandardErrorRange()
         self.rpe_load = StandardErrorRange()
+
+
+class TrainingTypeLoad(object):
+    def __init__(self):
+        self.load = {}
+        self.training_types = []
+
+    def add_load(self, training_type, load_range):
+
+        if training_type not in self.load:
+            self.load[training_type] = load_range
+        else:
+            self.load[training_type].add(load_range)
+
+    def rank_types(self):
+        sorted_training = {k: v for k, v in
+                           sorted(self.load.items(), key=lambda item: item[1].lowest_value(),
+                                  reverse=True)}
+        training_rank = 1
+
+        for training_type, load in sorted_training.items():
+            self.training_types.append(RankedAdaptationType(training_type, training_rank))
+            training_rank += 1
 
 
 class DetailedTrainingLoad(Serialisable):
@@ -30,6 +53,9 @@ class DetailedTrainingLoad(Serialisable):
         self.sustained_power = None
         self.power = None
         self.maximal_power = None
+
+        self.detailed_adaptation_types = []
+        self.sub_adaptation_types = []
 
     def json_serialise(self):
         ret = {
@@ -103,6 +129,41 @@ class DetailedTrainingLoad(Serialisable):
             setattr(self, attribute_name, StandardErrorRange())
         self_load_range = getattr(self, attribute_name)
         self_load_range.add(load_range)
+
+
+    def rank_adaptation_types(self):
+
+        adaptation_dictionary = AdaptationDictionary()
+        detailed_types = list(DetailedAdaptationType)
+
+        detailed_rank = {}
+        sub_adaptation_rank = {}
+
+        for detailed_type in detailed_types:
+            load_value = getattr(self, detailed_type.name)
+            if load_value is not None and load_value.lowest_value() > 0:
+                detailed_rank[detailed_type] = load_value
+                sub_adaptation_type = adaptation_dictionary.detailed_types[detailed_type]
+                if sub_adaptation_type not in sub_adaptation_rank:
+                    sub_adaptation_rank[sub_adaptation_type] = load_value
+                else:
+                    sub_adaptation_rank[sub_adaptation_type].add(load_value)
+
+        sorted_details = {k: v for k, v in sorted(detailed_rank.items(), key=lambda item: item[1].lowest_value(), reverse=True)}
+        sorted_subs = {k: v for k, v in sorted(sub_adaptation_rank.items(), key=lambda item: item[1].lowest_value(), reverse=True)}
+
+        rank = 1
+
+        for detailed_type, load in sorted_details.items():
+            self.detailed_adaptation_types.append(RankedAdaptationType(detailed_type, rank))
+            rank += 1
+
+        sub_rank = 1
+
+        for sub_type, load in sorted_subs.items():
+            self.sub_adaptation_types.append(RankedAdaptationType(sub_type, sub_rank))
+            sub_rank += 1
+
 
 
 # TODO need some easy way to see the summary so we can easily rank the workouts

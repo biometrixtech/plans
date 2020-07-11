@@ -1,5 +1,5 @@
-from models.movement_tags import DetailedAdaptationType, AdaptationType
-from models.training_load import DetailedTrainingLoad
+from models.movement_tags import DetailedAdaptationType, AdaptationType, TrainingType
+from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.movement_actions import MovementSpeed, ExerciseAction, MovementResistance
 from models.soreness_base import BodyPartSystems, BodyPartSide, BodyPartGeneralLocation
 from models.functional_movement import BodyPartFunctionalMovement, FunctionalMovementActionMapping
@@ -9,7 +9,12 @@ from models.training_volume import StandardErrorRange
 class DetailedLoadProcessor(object):
     def __init__(self):
         self.session_detailed_load = DetailedTrainingLoad()
+        self.session_training_type_load = TrainingTypeLoad()
         self.muscle_detailed_load = {}
+
+    def rank_types(self):
+        self.session_detailed_load.rank_adaptation_types()
+        self.session_training_type_load.rank_types()
 
     def add_muscle_load(self, muscle, detailed_adaptation_type, load_range):
 
@@ -28,10 +33,15 @@ class DetailedLoadProcessor(object):
         total_muscle_load = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
         adaptation_type_load = {}
-        detailed_adaptation_types = [detailed_type for detailed_type in DetailedAdaptationType]
+        training_type_load = {}
+        detailed_adaptation_types = list(DetailedAdaptationType)
+        training_types = list(TrainingType)
 
         for detailed_adaptation_type in detailed_adaptation_types:
             adaptation_type_load[detailed_adaptation_type] = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
+
+        for training_type in training_types:
+            training_type_load[training_type] = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
         for muscle_string, body_part_functional_movement in functional_movement_action_mapping.muscle_load.items():
 
@@ -71,6 +81,7 @@ class DetailedLoadProcessor(object):
                     # stabilization endurance - cardio
                     if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
                         adaptation_type_load[DetailedAdaptationType.stabilization_endurance].add(muscle_load)
+                        training_type_load[movement_action.training_type].add(muscle_load)
                         self.add_muscle_load(muscle, DetailedAdaptationType.stabilization_endurance,
                                              muscle_load)
 
@@ -80,6 +91,7 @@ class DetailedLoadProcessor(object):
                             if adaptation_type in [AdaptationType.strength_endurance_strength,
                                                    AdaptationType.maximal_strength_hypertrophic]:
                                 adaptation_type_load[DetailedAdaptationType.stabilization_endurance].add(muscle_load)
+                                training_type_load[movement_action.training_type].add(muscle_load)
                                 self.add_muscle_load(muscle, DetailedAdaptationType.stabilization_endurance,
                                                      muscle_load)
 
@@ -88,6 +100,7 @@ class DetailedLoadProcessor(object):
                             if adaptation_type in [AdaptationType.strength_endurance_strength,
                                                    AdaptationType.maximal_strength_hypertrophic]:
                                 adaptation_type_load[DetailedAdaptationType.stabilization_strength].add(muscle_load)
+                                training_type_load[movement_action.training_type].add(muscle_load)
                                 self.add_muscle_load(muscle, DetailedAdaptationType.stabilization_strength,
                                                      muscle_load)
 
@@ -96,6 +109,7 @@ class DetailedLoadProcessor(object):
                         if 8 <= reps <= 12 and movement_action.speed == MovementSpeed.fast:
                             if adaptation_type in [AdaptationType.power_drill, AdaptationType.power_explosive_action]:
                                 adaptation_type_load[DetailedAdaptationType.stabilization_power].add(muscle_load)
+                                training_type_load[movement_action.training_type].add(muscle_load)
                                 self.add_muscle_load(muscle, DetailedAdaptationType.stabilization_power,
                                                      muscle_load)
 
@@ -105,11 +119,13 @@ class DetailedLoadProcessor(object):
                         # TODO make this less than VO2Max
                         if rpe <= 7 and duration >= 240:
                             adaptation_type_load[DetailedAdaptationType.muscular_endurance].add(muscle_load)
+                            training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.muscular_endurance,
                                                  body_part_total_load)
                         # sustained power
                         elif rpe > 7 and duration >= 15:
                             adaptation_type_load[DetailedAdaptationType.sustained_power].add(muscle_load)
+                            training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.sustained_power,
                                                  body_part_total_load)
 
@@ -118,11 +134,13 @@ class DetailedLoadProcessor(object):
                         # strength endurance
                         if 8 <= reps <= 12 and 7 <= rpe <= 8 and movement_action.speed == MovementSpeed.mod:
                             adaptation_type_load[DetailedAdaptationType.strength_endurance].add(muscle_load)
+                            training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.strength_endurance,
                                                  body_part_total_load)
                         # muscular endurance
                         if 5 <= rpe <= 7 and 12 <= reps <= 20 and movement_action.speed in [MovementSpeed.slow, MovementSpeed.none]:
                             adaptation_type_load[DetailedAdaptationType.muscular_endurance].add(muscle_load)
+                            training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.muscular_endurance,
                                                  body_part_total_load)
                 # hypertrophy
@@ -130,6 +148,7 @@ class DetailedLoadProcessor(object):
                     if rpe is not None and reps is not None:
                         if 6 <= reps <= 12 and 7.5 <= rpe <= 8.5 and movement_action.speed == MovementSpeed.mod:
                             adaptation_type_load[DetailedAdaptationType.hypertrophy].add(muscle_load)
+                            training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.hypertrophy,
                                                  body_part_total_load)
 
@@ -138,6 +157,7 @@ class DetailedLoadProcessor(object):
                     if rpe is not None and reps is not None:
                         if 1 <= reps <= 5 and 8.5 <= rpe <= 10.0 and movement_action.speed == MovementSpeed.fast:
                             adaptation_type_load[DetailedAdaptationType.maximal_strength].add(muscle_load)
+                            training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.maximal_strength,
                                                  body_part_total_load)
 
@@ -146,18 +166,21 @@ class DetailedLoadProcessor(object):
                     if ((movement_action.speed == MovementSpeed.fast or movement_action.speed == MovementSpeed.explosive) and
                             (movement_action.resistance == MovementResistance.none or movement_action.resistance == MovementResistance.low)):
                         adaptation_type_load[DetailedAdaptationType.speed].add(muscle_load)
+                        training_type_load[movement_action.training_type].add(muscle_load)
                         self.add_muscle_load(muscle, DetailedAdaptationType.speed, body_part_total_load)
 
                     # sustained power
                     if (duration is not None and duration >= 45 and
                             (movement_action.speed == MovementSpeed.fast or movement_action.speed == MovementSpeed.explosive)):
                         adaptation_type_load[DetailedAdaptationType.sustained_power].add(muscle_load)
+                        training_type_load[movement_action.training_type].add(muscle_load)
                         self.add_muscle_load(muscle, DetailedAdaptationType.sustained_power, body_part_total_load)
 
                     # power
                     if ((movement_action.speed == MovementSpeed.fast or movement_action.speed == MovementSpeed.explosive) and
                             movement_action.resistance == MovementResistance.mod):
                         adaptation_type_load[DetailedAdaptationType.power].add(muscle_load)
+                        training_type_load[movement_action.training_type].add(muscle_load)
                         self.add_muscle_load(muscle, DetailedAdaptationType.power, body_part_total_load)
 
                 if adaptation_type == AdaptationType.power_explosive_action and rpe is not None:
@@ -166,6 +189,7 @@ class DetailedLoadProcessor(object):
                     if (3 <= rpe <= 4.5 and (movement_action.speed == MovementSpeed.fast or movement_action.speed == MovementSpeed.explosive)
                             and (movement_action.resistance == MovementResistance.high or movement_action.resistance == MovementResistance.max)):
                         adaptation_type_load[DetailedAdaptationType.maximal_power].add(muscle_load)
+                        training_type_load[movement_action.training_type].add(muscle_load)
                         self.add_muscle_load(muscle, DetailedAdaptationType.maximal_power, body_part_total_load)
 
         # Functional Strength (requires comprehensive look at all actions within functional movement action mapping
@@ -181,6 +205,7 @@ class DetailedLoadProcessor(object):
                     if adaptation_type in [AdaptationType.strength_endurance_strength,
                                            AdaptationType.maximal_strength_hypertrophic]:
                         adaptation_type_load[DetailedAdaptationType.functional_strength].add(body_part_total_load)
+                        training_type_load[movement_action.training_type].add(body_part_total_load)
                         self.add_muscle_load(muscle, DetailedAdaptationType.functional_strength,
                                              body_part_total_load)
 
@@ -190,14 +215,17 @@ class DetailedLoadProcessor(object):
             if percent_max_hr is not None:
                 # base aerobic
                 if 65 <= percent_max_hr < 80:
+                    training_type_load[movement_action.training_type].add(training_load_range)
                     self.session_detailed_load.add_load(DetailedAdaptationType.base_aerobic_training,
                                                         training_load_range)
                 # anaerobic threshold
                 if 80 <= percent_max_hr < 86:
+                    training_type_load[movement_action.training_type].add(training_load_range)
                     self.session_detailed_load.add_load(DetailedAdaptationType.anaerobic_threshold_training,
                                                         training_load_range)
                 # anaerobic interval
                 if 86 <= percent_max_hr:
+                    training_type_load[movement_action.training_type].add(training_load_range)
                     self.session_detailed_load.add_load(DetailedAdaptationType.high_intensity_anaerobic_training,
                                                         training_load_range)
 
@@ -212,3 +240,13 @@ class DetailedLoadProcessor(object):
                     adjusted_load.divide_range_simple(total_muscle_load)
                     adjusted_load.multiply_range(training_load_range)
                     self.session_detailed_load.add_load(detailed_adaptation_type, adjusted_load)
+
+            for training_type, training_type_load in training_type_load.items():
+                if training_type_load.lowest_value() > 0:
+                    if training_type != TrainingType.strength_cardiorespiratory:
+                        adjusted_training_type_load = training_type_load.plagiarize()
+                        adjusted_training_type_load.divide_range_simple(total_muscle_load)
+                        adjusted_training_type_load.multiply_range(training_load_range)
+                        self.session_training_type_load.add_load(training_type, adjusted_training_type_load)
+                    else:
+                        self.session_training_type_load.add_load(training_type, training_type_load)
