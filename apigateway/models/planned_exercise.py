@@ -49,9 +49,9 @@ class PlannedWorkout(object):
 
 
 class PlannedWorkoutLoad(PlannedWorkout):
-    def __init__(self, id):
+    def __init__(self, workout_id):
         super().__init__()
-        self.program_id = id
+        self.workout_id = workout_id
         # not yet certain these need to be serialised/deserialised
         self.session_detailed_load = DetailedTrainingLoad()
         self.session_training_type_load = TrainingTypeLoad()

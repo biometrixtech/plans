@@ -1,4 +1,4 @@
-from models.training_load import DetailedTrainingLoad, MuscleDetailedLoad, MuscleDetailedLoadSummary
+from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
 from models.soreness import BodyPartSide, BodyPartLocation
 from models.functional_movement import FunctionalMovementActionMapping, FunctionalMovementFactory
 from models.workout_program import BaseWorkoutExercise
@@ -12,14 +12,14 @@ from statistics import mean
 from models.movement_tags import RankedAdaptationType, AdaptationDictionary, SubAdaptationType, TrainingType
 from models.planned_exercise import PlannedWorkoutLoad
 from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
-from datetime import datetime
+from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
+from datetime import datetime, timedelta
 
 
 action_dictionary = ActionLibraryDatastore().get()
 
-def get_filtered_actions(training_type_list):
 
-    #action_dictionary = get_actions()
+def get_filtered_actions(training_type_list):
 
     action_list = list(action_dictionary.values())
 
@@ -27,7 +27,8 @@ def get_filtered_actions(training_type_list):
 
     return filtered_list
 
-def process_adaptation_types(action_list, reps_list, rpe_list, duration=None):
+
+def process_adaptation_types(action_list, reps, rpe, duration=None, percent_max_hr=None):
 
     detailed_load_processor = DetailedLoadProcessor()
 
@@ -36,154 +37,56 @@ def process_adaptation_types(action_list, reps_list, rpe_list, duration=None):
     event_date = datetime.now()
 
     for action in action_list:
-        for reps in reps_list:
-            for rpe in rpe_list:
-                duration = duration
+        duration = duration
 
-                base_exercise = BaseWorkoutExercise()
-                base_exercise.training_type = action.training_type
-                base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-                base_exercise.set_adaption_type()
+        base_exercise = BaseWorkoutExercise()
+        base_exercise.training_type = action.training_type
+        base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
+        base_exercise.set_adaption_type()
 
-                action.power_load_left = base_exercise.power_load
-                action.power_load_right = base_exercise.power_load
+        action.power_load_left = base_exercise.power_load
+        action.power_load_right = base_exercise.power_load
 
-                functional_movement_action_mapping = FunctionalMovementActionMapping(action,
-                                                                                     {},
-                                                                                     event_date, functional_movement_dict)
-                #for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
-                detailed_load_processor.add_load(functional_movement_action_mapping,
-                                                 adaptation_type=base_exercise.adaptation_type,
-                                                 movement_action=action,
-                                                 training_load_range=base_exercise.power_load,
-                                                 reps=reps,
-                                                 duration=duration,
-                                                 rpe=rpe)
+        functional_movement_action_mapping = FunctionalMovementActionMapping(action,
+                                                                             {},
+                                                                             event_date, functional_movement_dict)
+
+        detailed_load_processor.add_load(functional_movement_action_mapping,
+                                         adaptation_type=base_exercise.adaptation_type,
+                                         movement_action=action,
+                                         training_load_range=base_exercise.power_load,
+                                         reps=reps,
+                                         duration=duration,
+                                         rpe=rpe,
+                                         percent_max_hr=percent_max_hr)
     detailed_load_processor.rank_types()
 
     return detailed_load_processor
 
-def get_load_dictionary(load_type_list, load_list):
-
-    load = {}
-    for t in range(0, len(load_type_list)):
-        load[load_type_list[t]] = StandardErrorRange(None, None, load_list[t])
-
-    return load
-
-
-def get_program_a():
-
-    muscle_load = MuscleDetailedLoad("test_provider", "test_program_a")
-
-    load_type_list = [DetailedAdaptationType.mobility, DetailedAdaptationType.speed,
-                      DetailedAdaptationType.muscular_endurance, DetailedAdaptationType.high_intensity_anaerobic_training]
-
-    quad_loads = [50, 40, 30, 20]
-    bicep_loads = [45, 35, 25, 15]
-
-    r_quad_load = get_load_dictionary(load_type_list, quad_loads)
-
-    l_quad_load = get_load_dictionary(load_type_list, quad_loads)
-
-    r_bicep_load = get_load_dictionary(load_type_list, bicep_loads)
-
-    l_bicep_load = get_load_dictionary(load_type_list, bicep_loads)
-
-    muscle_load.items[BodyPartSide(BodyPartLocation.quads, 1)] = l_quad_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.quads, 2)] = r_quad_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.biceps, 1)] = l_bicep_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.biceps, 2)] = r_bicep_load
-
-    return muscle_load
-
-
-def get_program_b():
-
-    muscle_load = MuscleDetailedLoad("test_provider", "test_program_b")
-
-    load_type_list = [DetailedAdaptationType.stabilization_endurance, DetailedAdaptationType.base_aerobic_training,
-                      DetailedAdaptationType.muscular_endurance, DetailedAdaptationType.high_intensity_anaerobic_training]
-
-    quad_loads = [50, 40, 30, 20]
-    bicep_loads = [45, 35, 25, 15]
-
-    r_quad_load = get_load_dictionary(load_type_list, quad_loads)
-
-    l_quad_load = get_load_dictionary(load_type_list, quad_loads)
-
-    r_bicep_load = get_load_dictionary(load_type_list, bicep_loads)
-
-    l_bicep_load = get_load_dictionary(load_type_list, bicep_loads)
-
-    muscle_load.items[BodyPartSide(BodyPartLocation.quads, 1)] = l_quad_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.quads, 2)] = r_quad_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.biceps, 1)] = l_bicep_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.biceps, 2)] = r_bicep_load
-
-    return muscle_load
-
-def get_program_c():
-
-    muscle_load = MuscleDetailedLoad("test_provider", "test_program_c")
-
-    load_type_list = [DetailedAdaptationType.stabilization_endurance, DetailedAdaptationType.base_aerobic_training,
-                      DetailedAdaptationType.sustained_power, DetailedAdaptationType.stabilization_power]
-
-    quad_loads = [50, 40, 30, 20]
-    bicep_loads = [45, 35, 25, 15]
-
-    r_quad_load = get_load_dictionary(load_type_list, quad_loads)
-
-    l_quad_load = get_load_dictionary(load_type_list, quad_loads)
-
-    r_bicep_load = get_load_dictionary(load_type_list, bicep_loads)
-
-    l_bicep_load = get_load_dictionary(load_type_list, bicep_loads)
-
-    muscle_load.items[BodyPartSide(BodyPartLocation.quads, 1)] = l_quad_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.quads, 2)] = r_quad_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.biceps, 1)] = l_bicep_load
-    muscle_load.items[BodyPartSide(BodyPartLocation.biceps, 2)] = r_bicep_load
-
-    return muscle_load
-
-
-def sum_load(program_load_dict):
-
-    summed_load = {}
-
-    for body_part_side, load_dict in program_load_dict.items.items():
-        for load_type, load in load_dict.items():
-            if load_type not in summed_load.keys():
-                summed_load[load_type] = StandardErrorRange()
-                summed_load[load_type].add(load)
-
-    return summed_load
-
 
 class SimpleWorkout(object):
-    def __init__(self, id, rpe, duration, ranked_detailed_adaptation_types, ranked_sub_adaptation_types, session_load=None):
+    def __init__(self, id, rpe, duration, ranked_detailed_adaptation_types, ranked_sub_adaptation_types, session_rpe_load=None):
         self.id = id
-        self.session_rpe = rpe
+        self.projected_session_rpe = rpe
         self.duration = duration
-        self.session_load = rpe * duration if rpe is not None and duration is not None else session_load
+        self.projected_rpe_load = session_rpe_load
         self.ranking = 0
         self.score = 0
-        self.detailed_adaptation_types = ranked_detailed_adaptation_types
-        self.sub_adaptation_types = ranked_sub_adaptation_types
+        self.session_detailed_load = DetailedTrainingLoad()
+        self.session_detailed_load.detailed_adaptation_types = ranked_detailed_adaptation_types
+        self.session_detailed_load.sub_adaptation_types = ranked_sub_adaptation_types
         self.update_adaptation_types()
 
     def update_adaptation_types(self):
 
         adaptation_dictionary = AdaptationDictionary()
 
-        if len(self.sub_adaptation_types) == 0:
-            self.sub_adaptation_types = [
+        if len(self.session_detailed_load.sub_adaptation_types) == 0:
+            self.session_detailed_load.sub_adaptation_types = [
                 RankedAdaptationType(adaptation_dictionary.detailed_types[d.adaptation_type], d.ranking) for d in
-                self.detailed_adaptation_types]
+                self.session_detailed_load.detailed_adaptation_types]
             adapt_dict = {}
-            for a in self.sub_adaptation_types:
+            for a in self.session_detailed_load.sub_adaptation_types:
                 if a.adaptation_type not in adapt_dict.keys():
                     adapt_dict[a.adaptation_type] = a.ranking
                 else:
@@ -191,104 +94,75 @@ class SimpleWorkout(object):
             sub_types = []
             for a, r in adapt_dict.items():
                 sub_types.append(RankedAdaptationType(a, r))
-            self.sub_adaptation_types = sub_types
+            self.session_detailed_load.sub_adaptation_types = sub_types
 
 
-def get_list_of_load_workouts(rpe_list, duration_list):
+def get_workout_library(rpe_list, duration_list):
 
     workouts = []
     id = 1
 
+    training_type_list_1 = [TrainingType.strength_cardiorespiratory]
+    training_type_list_2 = [TrainingType.strength_integrated_resistance, TrainingType.strength_endurance]
+
     for r in rpe_list:
         for d in duration_list:
-            ranked_detailed_adaptation_types = [RankedAdaptationType(DetailedAdaptationType.functional_strength, 1),
-                                                RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 2)]
-            workout = SimpleWorkout(id, r, d, ranked_detailed_adaptation_types, [])
-            workouts.append(workout)
+
+            projected_rpe_load = StandardErrorRange(lower_bound=r*d, upper_bound=r*d, observed_value=r*d)
+            projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
+            planned_workout = get_planned_workout(id, training_type_list_1,projected_rpe,projected_rpe_load,reps=None,
+                                                  rpe=r,duration=d,percent_max_hr=70)
+            workouts.append(planned_workout)
             id += 1
 
     for r in rpe_list:
         for d in duration_list:
-            ranked_detailed_adaptation_types = [RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 1),
-                                                RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 2)]
-            workout = SimpleWorkout(id, r, d, ranked_detailed_adaptation_types, [])
-            workouts.append(workout)
+            projected_rpe_load = StandardErrorRange(lower_bound=r * d, upper_bound=r * d, observed_value=r * d)
+            projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
+            planned_workout = get_planned_workout(id, training_type_list_2, projected_rpe, projected_rpe_load, reps=10, rpe=r)
+            workouts.append(planned_workout)
             id += 1
 
     return workouts
 
 
-def test_sum_parts():
-
-    program_a = get_program_a()
-    summed_load_a = sum_load(program_a)
-
-    program_b = get_program_b()
-    summed_load_b = sum_load(program_b)
-
-    program_c = get_program_c()
-    summed_load_c = sum_load(program_c)
-
-    assert 4 == len(summed_load_a)
-    assert 4 == len(summed_load_b)
-    assert 4 == len(summed_load_c)
-
-    # get the load by muscle
-    # aggregate to the session by type of load
-    # should also look at the session load (non aggregated from muscle)
-
-    # create three sessions that should be reasonably different (or perhaps somewhat similar?) and given a client's background, we should get a different ranking.
-    # 3 diff clients should yield different rankings
-
-def get_fake_training_history():
-
-    rpes = [3, 4, 5, 6, 7, 6, 5, 4, 3]
-    durations = [90, 45, 60, 75, 30, 75, 60, 45, 90]
+def get_fake_training_history(start_date_time, rpe_list, watts_list, durations_list, workout_ids):
 
     load_list = []
 
-    for r in range(len(rpes)):
-        load_list.append(rpes[r] * durations[r])
+    for r in range(len(rpe_list)):
+        if rpe_list[r] > 0:
+            session_parameters = SessionParameters(start_date_time + timedelta(days=r), workout_ids[r])
+            session_parameters.power_load = StandardErrorRange(lower_bound=watts_list[r]*durations_list[r]*.9,
+                                                               observed_value=watts_list[r]*durations_list[r],
+                                                               upper_bound=watts_list[r] * durations_list[r] * 1.15)
+            session_parameters.rpe_load = StandardErrorRange(lower_bound=rpe_list[r]*durations_list[r]*.9,
+                                                             observed_value=rpe_list[r]*durations_list[r],
+                                                             upper_bound=rpe_list[r] * durations_list[r] * 1.15)
+            session_parameters.session_rpe = StandardErrorRange(lower_bound=rpe_list[r]-1,
+                                                                observed_value=rpe_list[r],
+                                                                upper_bound=rpe_list[r]+1)
+            session_parameters.duration = durations_list[r]
 
-    average_load = mean(load_list)
-    weekly_load = sum(load_list) / float(2)
-    average_rpes = mean(rpes)
-    average_durations = mean(durations)
+            completed_workout = get_completed_workout(session_parameters)
 
-    average_training_load = TrainingLoad()
-    average_training_load.rpe_load = StandardErrorRange(lower_bound=average_load-10, upper_bound=average_load+10)
+            load_list.append(completed_workout)
 
-    athlete_training_history = AthleteTrainingHistory()
-    athlete_training_history.average_session_load = average_training_load
-
-    athlete_training_history.average_session_rpe = StandardErrorRange(lower_bound=average_rpes-1, upper_bound=average_rpes+1)
-    athlete_training_history.average_session_duration = StandardErrorRange(lower_bound=average_durations-10, upper_bound=average_durations+10)
-    athlete_training_history.average_sessions_per_week = StandardErrorRange(lower_bound=3, upper_bound=5)
-
-    weekly_training_load = TrainingLoad()
-    weekly_training_load.rpe_load = StandardErrorRange(lower_bound=weekly_load-100, upper_bound=weekly_load+100)
-
-    athlete_training_history.current_weeks_load = weekly_training_load
-    athlete_training_history.previous_1_weeks_load = weekly_training_load
-    athlete_training_history.previous_2_weeks_load = weekly_training_load
-    athlete_training_history.previous_3_weeks_load = weekly_training_load
-    athlete_training_history.previous_4_weeks_load = weekly_training_load
-
-    athlete_training_history.current_weeks_average_session_rpe = StandardErrorRange(lower_bound=average_rpes-1, upper_bound=average_rpes+1)
-
-    return athlete_training_history
+    return load_list
 
 
-def get_planned_workout(training_type_list, session_rpe, projected_rpe_load, exercise_reps_list, exercise_rpe_list, duration):
+def get_planned_workout(workout_id, training_type_list, session_rpe, projected_rpe_load, reps, rpe, duration=None,
+                        percent_max_hr=None):
 
-    workout = PlannedWorkoutLoad(id=1)
+    workout = PlannedWorkoutLoad(workout_id=workout_id)
     workout.projected_session_rpe = session_rpe
     workout.duration = 75
     workout.projected_rpe_load = projected_rpe_load
 
     action_list = get_filtered_actions(training_type_list)
 
-    detailed_load_processor = process_adaptation_types(action_list, reps_list=exercise_reps_list, rpe_list=exercise_rpe_list, duration=duration)
+    detailed_load_processor = process_adaptation_types(action_list, reps=reps, rpe=rpe, duration=duration,
+                                                       percent_max_hr=percent_max_hr)
 
     workout.session_detailed_load = detailed_load_processor.session_detailed_load
     workout.session_training_type_load = detailed_load_processor.session_training_type_load
@@ -301,6 +175,47 @@ def get_planned_workout(training_type_list, session_rpe, projected_rpe_load, exe
     workout.projected_power_load = session_load
 
     return workout
+
+
+class SessionParameters(object):
+    def __init__(self, event_date_time, workout_id):
+        self.event_date_time = event_date_time
+        self.provider_id = 1
+        self.workout_id = workout_id
+        self.duration = None
+        self.session_rpe=None
+        self.rpe_load=None
+        self.power_load=None
+        self.session_detailed_load = None
+        self.muscle_detailed_load = None
+
+
+def get_completed_workout(session_parameters: SessionParameters):
+
+    session = CompletedSessionDetails(session_parameters.event_date_time, session_parameters.provider_id,
+                                      session_parameters.workout_id)
+    session.duration = session_parameters.duration
+    session.session_RPE = session_parameters.session_rpe
+    session.rpe_load = session_parameters.rpe_load
+    session.power_load = session_parameters.power_load
+    session.session_detailed_load = session_parameters.session_detailed_load
+    session.muscle_detailed_load = session_parameters.muscle_detailed_load
+
+    return session
+
+
+def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutLoad):
+
+    session = CompletedSessionDetails(event_date_time, 1, planned_workout.workout_id)
+    session.duration = planned_workout.duration
+    session.session_RPE = planned_workout.projected_session_rpe
+    session.rpe_load = planned_workout.projected_rpe_load
+    session.power_load = planned_workout.projected_power_load
+    session.session_detailed_load = planned_workout.session_detailed_load
+    session.muscle_detailed_load = planned_workout.muscle_detailed_load
+
+    return session
+
 
 # def test_find_workout_combinations():
 #
@@ -348,19 +263,22 @@ def get_planned_workout(training_type_list, session_rpe, projected_rpe_load, exe
 #     acceptable_workouts_5 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
 #
 #     assert len(acceptable_workouts_5) > 0
-#
-#
+
+
 # def test_top_rec_should_be_greatest_need_day_3_cardio():
 #
 #     rpe_list = list(range(1,11,1))
 #     duration_list = list(range(30, 150, 5))
-#     workouts = get_list_of_load_workouts(rpe_list, duration_list)
+#     workouts = get_workout_library(rpe_list, duration_list)
+#
+#     start_date_time = datetime.now()
 #
 #     athlete_training_history = get_fake_training_history()
 #
 #     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
+#     completed_session_details_datastore = CompletedSessionDetailsDatastore()
 #
-#     proc = PeriodizationPlanProcessor(athlete_training_goal, athlete_training_history, PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
+#     proc = PeriodizationPlanProcessor(start_date_time,completed_session_details_datastore,athlete_training_goal, PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
 #     proc.set_weekly_targets()
 #
 #     completed_workouts = []
@@ -369,127 +287,136 @@ def get_planned_workout(training_type_list, session_rpe, projected_rpe_load, exe
 #
 #     acceptable_workouts_1_copy = [a for a in acceptable_workouts_1]
 #
-#     completed_workout_1 = next(a for a in acceptable_workouts_1_copy if a.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
+#     acceptable_workout_1 = next(a for a in acceptable_workouts_1_copy if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
+#
+#     completed_workout_1 = complete_a_planned_workout(start_date_time+timedelta(days=1),acceptable_workout_1)
 #
 #     completed_workouts.append(completed_workout_1)
 #
 #     # refresh list of workouts
-#     workouts = get_list_of_load_workouts(rpe_list, duration_list)
+#     workouts = get_workout_library(rpe_list, duration_list)
 #     acceptable_workouts_2 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
 #
 #     acceptable_workouts_2_copy = [a for a in acceptable_workouts_2]
 #
-#     completed_workout_2 = next(a for a in acceptable_workouts_2_copy if a.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
+#     acceptable_workout_2 = next(a for a in acceptable_workouts_2_copy if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
+#
+#     completed_workout_2 = complete_a_planned_workout(start_date_time + timedelta(days=2), acceptable_workout_2)
+#
 #     completed_workouts.append(completed_workout_2)
 #
 #     # refresh list of workouts
-#     workouts = get_list_of_load_workouts(rpe_list, duration_list)
+#     workouts = get_workout_library(rpe_list, duration_list)
 #     acceptable_workouts_3 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
 #
 #     assert acceptable_workouts_3[0].sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
-#
-#
-# def test_acceptable_strength_cardio_same_score_both_required():
-#
-#     proc = PeriodizationPlanProcessor(None, None, None, None)
-#     strength_list = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
-#                     RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
-#     cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
-#                    RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
-#     periodized_strength_exercise = PeriodizedExercise(None, SubAdaptationType.strength,
-#                                                       times_per_week_range=StandardErrorRange(lower_bound=2),
-#                                                       duration_range=None,
-#                                                       rpe_range=None)
-#     periodized_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
-#                                                     times_per_week_range=StandardErrorRange(lower_bound=2),
-#                                                     duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
-#                                                     rpe_range=StandardErrorRange(lower_bound=4, upper_bound=5))
-#
-#     strength_workout = SimpleWorkout(1, 5, 75, strength_list,[], session_load=600)
-#     cardio_workout = SimpleWorkout(1, 5, 75, cardio_list, [], session_load=600)
-#
-#     strength_score = proc.get_workout_score(strength_workout, periodized_strength_exercise,
-#                                             StandardErrorRange(lower_bound=450, upper_bound=650))
-#     cardio_score = proc.get_workout_score(cardio_workout, periodized_cardio_exercise,
-#                                           StandardErrorRange(lower_bound=450, upper_bound=650))
-#
-#     assert strength_score == cardio_score
-#
-#
-# def test_completing_combo_required_reduces_score():
-#
-#     proc = PeriodizationPlanProcessor(None, None, None, None)
-#     cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
-#                    RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
-#
-#     vigorous_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
-#                                                     times_per_week_range=StandardErrorRange(lower_bound=2),
-#                                                     duration_range=StandardErrorRange(lower_bound=30, upper_bound=60),
-#                                                     rpe_range=StandardErrorRange(lower_bound=6, upper_bound=10))
-#
-#     moderate_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
-#                                                     times_per_week_range=StandardErrorRange(lower_bound=3, upper_bound=5),
-#                                                     duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
-#                                                     rpe_range=StandardErrorRange(lower_bound=3, upper_bound=5))
-#
-#
-#
-#     paul_cardio_workout = get_planned_workout([TrainingType.strength_cardiorespiratory],
-#                                               session_rpe=StandardErrorRange(lower_bound=3, observed_value=4, upper_bound=5),
-#                                               projected_rpe_load=StandardErrorRange(lower_bound=3 * 75, observed_value=4 * 75,
-#                                                                 upper_bound=5 * 75),
-#                                               exercise_reps_list=[10],
-#                                               exercise_rpe_list=[7.5],
-#                                               duration=75)
-#
-#     vigorous_cardio_workout = get_planned_workout([TrainingType.strength_cardiorespiratory],
-#                                                   session_rpe=StandardErrorRange(lower_bound=7, observed_value=8, upper_bound=9),
-#                                                   projected_rpe_load=StandardErrorRange(lower_bound=7 * 75, observed_value=8 * 75,
-#                                                                 upper_bound=9 * 75),
-#                                                   exercise_reps_list=[10],
-#                                                   exercise_rpe_list=[7.5],
-#                                                   duration=75)
-#
-#     one_required_combination = StandardErrorRange(lower_bound=3, upper_bound=5)
-#
-#     paul_cardio_workout_score_vigorous = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
-#                                             StandardErrorRange(lower_bound=450, upper_bound=650),
-#                                                                 one_required_combination)
-#     paul_cardio_workout_score_moderate = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
-#                                                                 StandardErrorRange(lower_bound=450, upper_bound=650),
-#                                                                 one_required_combination)
-#
-#     vigorous_cardio_workout_score_vigorous = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
-#                                             StandardErrorRange(lower_bound=450, upper_bound=650),
-#                                                                 one_required_combination)
-#     vigorous_cardio_workout_score_moderate = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
-#                                                                 StandardErrorRange(lower_bound=450, upper_bound=650),
-#                                                                 one_required_combination)
-#
-#     one_required_combination_statisfied = StandardErrorRange(lower_bound=0, upper_bound=2)
-#
-#     paul_cardio_workout_score_vigorous_2 = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
-#                                                                 StandardErrorRange(lower_bound=450, upper_bound=650),
-#                                                                   one_required_combination_statisfied)
-#     paul_cardio_workout_score_moderate_2 = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
-#                                                                 StandardErrorRange(lower_bound=450, upper_bound=650),
-#                                                                   one_required_combination_statisfied)
-#
-#     vigorous_cardio_workout_score_vigorous_2 = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
-#                                                                     StandardErrorRange(lower_bound=450,
-#                                                                                        upper_bound=650),
-#                                                                       one_required_combination_statisfied)
-#     vigorous_cardio_workout_score_moderate_2 = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
-#                                                                     StandardErrorRange(lower_bound=450,
-#                                                                                        upper_bound=650),
-#                                                                       one_required_combination_statisfied)
-#
-#     assert paul_cardio_workout_score_moderate > paul_cardio_workout_score_moderate_2
-#     assert paul_cardio_workout_score_vigorous > paul_cardio_workout_score_vigorous_2
-#     assert vigorous_cardio_workout_score_moderate > vigorous_cardio_workout_score_moderate_2
-#     assert vigorous_cardio_workout_score_vigorous > vigorous_cardio_workout_score_vigorous_2
-#
-#
+
+
+def test_acceptable_strength_cardio_same_score_both_required():
+
+    proc = PeriodizationPlanProcessor(datetime.now(), CompletedSessionDetailsDatastore(), None, None, None)
+    strength_list = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
+                    RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
+    cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
+                   RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
+    periodized_strength_exercise = PeriodizedExercise(None, SubAdaptationType.strength,
+                                                      times_per_week_range=StandardErrorRange(lower_bound=2),
+                                                      duration_range=None,
+                                                      rpe_range=None)
+    periodized_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+                                                    times_per_week_range=StandardErrorRange(lower_bound=2),
+                                                    duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
+                                                    rpe_range=StandardErrorRange(lower_bound=4, upper_bound=5))
+
+    session_rpe_load = StandardErrorRange(500, 700, 600)
+    # Note session rpe needs to match cardio's rpe range for this to work
+    session_rpe = StandardErrorRange(lower_bound=4, observed_value=4.5, upper_bound=5)
+    strength_workout = SimpleWorkout(1, session_rpe, 75, strength_list,[], session_rpe_load=session_rpe_load)
+    cardio_workout = SimpleWorkout(1, session_rpe, 75, cardio_list, [], session_rpe_load=session_rpe_load)
+
+    strength_score = proc.get_workout_score(strength_workout, periodized_strength_exercise,
+                                            StandardErrorRange(lower_bound=450, upper_bound=650))
+    cardio_score = proc.get_workout_score(cardio_workout, periodized_cardio_exercise,
+                                          StandardErrorRange(lower_bound=450, upper_bound=650))
+
+    assert strength_score == cardio_score
+
+
+def test_completing_combo_required_reduces_score():
+
+    proc = PeriodizationPlanProcessor(datetime.now(), CompletedSessionDetailsDatastore(), None, None, None)
+    cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
+                   RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
+
+    vigorous_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+                                                    times_per_week_range=StandardErrorRange(lower_bound=2),
+                                                    duration_range=StandardErrorRange(lower_bound=30, upper_bound=60),
+                                                    rpe_range=StandardErrorRange(lower_bound=6, upper_bound=10))
+
+    moderate_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+                                                    times_per_week_range=StandardErrorRange(lower_bound=3, upper_bound=5),
+                                                    duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
+                                                    rpe_range=StandardErrorRange(lower_bound=3, upper_bound=5))
+
+    paul_cardio_workout = get_planned_workout(1, [TrainingType.strength_cardiorespiratory],
+                                              session_rpe=StandardErrorRange(lower_bound=3, observed_value=4, upper_bound=5),
+                                              projected_rpe_load=StandardErrorRange(lower_bound=3 * 75, observed_value=4 * 75,
+                                                                upper_bound=5 * 75),
+                                              reps=10,
+                                              rpe=7.5,
+                                              duration=75,
+                                              percent_max_hr=65
+                                              )
+
+    vigorous_cardio_workout = get_planned_workout(1, [TrainingType.strength_cardiorespiratory],
+                                                  session_rpe=StandardErrorRange(lower_bound=7, observed_value=8, upper_bound=9),
+                                                  projected_rpe_load=StandardErrorRange(lower_bound=7 * 75, observed_value=8 * 75,
+                                                                upper_bound=9 * 75),
+                                                  reps=10,
+                                                  rpe=7.5,
+                                                  duration=75,
+                                                  percent_max_hr=75)
+
+    one_required_combination = StandardErrorRange(lower_bound=3, upper_bound=5)
+
+    paul_cardio_workout_score_vigorous = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
+                                            StandardErrorRange(lower_bound=2700, upper_bound=3500),
+                                                                one_required_combination)
+    paul_cardio_workout_score_moderate = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
+                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
+                                                                one_required_combination)
+
+    vigorous_cardio_workout_score_vigorous = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
+                                            StandardErrorRange(lower_bound=2700, upper_bound=3500),
+                                                                one_required_combination)
+    vigorous_cardio_workout_score_moderate = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
+                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
+                                                                one_required_combination)
+
+    one_required_combination_statisfied = StandardErrorRange(lower_bound=0, upper_bound=2)
+
+    paul_cardio_workout_score_vigorous_2 = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
+                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
+                                                                  one_required_combination_statisfied)
+    paul_cardio_workout_score_moderate_2 = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
+                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
+                                                                  one_required_combination_statisfied)
+
+    vigorous_cardio_workout_score_vigorous_2 = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
+                                                                    StandardErrorRange(lower_bound=2700,
+                                                                                       upper_bound=3500),
+                                                                      one_required_combination_statisfied)
+    vigorous_cardio_workout_score_moderate_2 = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
+                                                                    StandardErrorRange(lower_bound=2700,
+                                                                                       upper_bound=3500),
+                                                                      one_required_combination_statisfied)
+
+    assert paul_cardio_workout_score_moderate > paul_cardio_workout_score_moderate_2
+    assert paul_cardio_workout_score_vigorous > paul_cardio_workout_score_vigorous_2
+    assert vigorous_cardio_workout_score_moderate > vigorous_cardio_workout_score_moderate_2
+    assert vigorous_cardio_workout_score_vigorous > vigorous_cardio_workout_score_vigorous_2
+
+
 # def test_too_high_session_load_lower_score():
 #
 #     proc = PeriodizationPlanProcessor(None, None, None, None)

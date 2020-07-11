@@ -1,3 +1,4 @@
+from enum import Enum
 from fathomapi.utils.xray import xray_recorder
 from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
@@ -9,6 +10,11 @@ class TrainingLoad(object):
     def __init__(self):
         self.power_load = StandardErrorRange()
         self.rpe_load = StandardErrorRange()
+
+
+class LoadType(Enum):
+    rpe = 0
+    power = 1
 
 
 class TrainingTypeLoad(object):
@@ -121,6 +127,19 @@ class DetailedTrainingLoad(Serialisable):
 
         return load
 
+    def add(self, detailed_training_load):
+
+        detailed_types = list(DetailedAdaptationType)
+
+        for detailed_type in detailed_types:
+            load_value = getattr(self, detailed_type.name)
+            source_load_value = getattr(detailed_training_load, detailed_type.name)
+            if source_load_value is not None:
+                if load_value is None:
+                    setattr(self, detailed_type.name, source_load_value)
+                else:
+                    setattr(self, detailed_type.name, load_value.add(source_load_value))
+
     def add_load(self, detailed_adaptation_type: DetailedAdaptationType, load_range):
 
         attribute_name = detailed_adaptation_type.name
@@ -165,13 +184,6 @@ class DetailedTrainingLoad(Serialisable):
             sub_rank += 1
 
 
-
-# TODO need some easy way to see the summary so we can easily rank the workouts
-class DetailedLoadSummary(object):
-    def __init__(self, provider_id):
-        self.provider_id = provider_id
-
-
 class MuscleDetailedLoad(object):
     def __init__(self, provider_id, program_id):
         self.provider_id = provider_id
@@ -194,6 +206,19 @@ class MuscleDetailedLoad(object):
             detailed_load.items[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
 
         return detailed_load
+
+
+class CompletedSessionDetails(object):
+    def __init__(self, event_date_time, provider_id, workout_id):
+        self.event_date_time = event_date_time
+        self.provider_id = provider_id
+        self.workout_id = workout_id
+        self.session_detailed_load = DetailedTrainingLoad()
+        self.muscle_detailed_load = {}
+        self.duration = 0
+        self.session_rpe = None
+        self.rpe_load = None
+        self.power_load = None
 
 
 # TODO need some easy way to see the summary so we can easily rank the workouts
