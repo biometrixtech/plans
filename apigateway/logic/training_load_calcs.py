@@ -84,11 +84,11 @@ class TrainingLoadCalculator(object):
         self.previous_week_3_power_load_values = [l.power_load for l in self.previous_week_3_load_list]
         self.previous_week_4_power_load_values = [l.power_load for l in self.previous_week_4_load_list]
 
-        self.current_week_rpe_values = [l.session_rpe for l in self.current_week_load_list]
-        self.previous_week_1_rpe_values = [l.session_rpe for l in self.previous_week_1_load_list]
-        self.previous_week_2_rpe_values = [l.session_rpe for l in self.previous_week_2_load_list]
-        self.previous_week_3_rpe_values = [l.session_rpe for l in self.previous_week_3_load_list]
-        self.previous_week_4_rpe_values = [l.session_rpe for l in self.previous_week_4_load_list]
+        self.current_week_rpe_values = [l.session_RPE for l in self.current_week_load_list]
+        self.previous_week_1_rpe_values = [l.session_RPE for l in self.previous_week_1_load_list]
+        self.previous_week_2_rpe_values = [l.session_RPE for l in self.previous_week_2_load_list]
+        self.previous_week_3_rpe_values = [l.session_RPE for l in self.previous_week_3_load_list]
+        self.previous_week_4_rpe_values = [l.session_RPE for l in self.previous_week_4_load_list]
 
     def sum_weeks(self):
 

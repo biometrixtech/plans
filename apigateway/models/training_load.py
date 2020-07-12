@@ -3,7 +3,7 @@ from fathomapi.utils.xray import xray_recorder
 from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
 from models.training_volume import StandardErrorRange
-from models.movement_tags import DetailedAdaptationType, RankedAdaptationType, AdaptationDictionary, SubAdaptationType
+from models.movement_tags import DetailedAdaptationType, RankedAdaptationType, AdaptationDictionary, SubAdaptationType, AdaptationTypeMeasure, TrainingType
 
 
 class TrainingLoad(object):
@@ -17,10 +17,34 @@ class LoadType(Enum):
     power = 1
 
 
-class TrainingTypeLoad(object):
+class TrainingTypeLoad(Serialisable):
     def __init__(self):
         self.load = {}
         self.training_types = []
+
+    def json_serialise(self):
+
+        ret = {
+            'load': [{"training_type": key.value,
+                      "training_load": value.json_serialise()} for key, value in self.load.items()],
+            'training_types': [t.json_serialise() for t in self.training_types]
+
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        training_type_load = TrainingTypeLoad()
+
+        for load in input_dict.get('load', []):
+            training_type_load.load[
+                TrainingType(load['training_type'])] = StandardErrorRange.json_deserialise(load['training_load'])
+        training_type_load.training_types = [RankedAdaptationType.json_deserialise(r) for r in
+                                             input_dict['training_types'] if
+                                             input_dict.get('training_types') is not None]
+
+        return training_type_load
 
     def add_load(self, training_type, load_range):
 
@@ -36,7 +60,7 @@ class TrainingTypeLoad(object):
         training_rank = 1
 
         for training_type, load in sorted_training.items():
-            self.training_types.append(RankedAdaptationType(training_type, training_rank))
+            self.training_types.append(RankedAdaptationType(AdaptationTypeMeasure.training_type, training_type, training_rank))
             training_rank += 1
 
 
@@ -82,7 +106,8 @@ class DetailedTrainingLoad(Serialisable):
             'sustained_power': self.sustained_power.json_serialise() if self.sustained_power is not None else None,
             'power': self.power.json_serialise() if self.power is not None else None,
             'maximal_power': self.maximal_power.json_serialise() if self.maximal_power is not None else None,
-
+            'detailed_adaptation_types': [d.json_serialise() for d in self.detailed_adaptation_types],
+            'sub_adaptation_types': [s.json_serialise() for s in self.sub_adaptation_types]
         }
 
         return ret
@@ -91,7 +116,7 @@ class DetailedTrainingLoad(Serialisable):
     def json_deserialise(cls, input_dict):
 
         load = DetailedTrainingLoad()
-        load.mobility = StandardErrorRange.json_serialise(input_dict['mobility']) if input_dict.get('mobility') is not None else None
+        load.mobility = StandardErrorRange.json_deserialise(input_dict['mobility']) if input_dict.get('mobility') is not None else None
         load.corrective = StandardErrorRange.json_deserialise(input_dict['corrective']) if input_dict.get(
             'corrective') is not None else None
         load.base_aerobic_training = StandardErrorRange.json_deserialise(input_dict['base_aerobic_training']) if input_dict.get(
@@ -124,6 +149,11 @@ class DetailedTrainingLoad(Serialisable):
             'power') is not None else None
         load.maximal_power = StandardErrorRange.json_deserialise(input_dict['maximal_power']) if input_dict.get(
             'maximal_power') is not None else None
+
+        load.detailed_adaptation_types = [RankedAdaptationType.json_deserialise(r) for r in input_dict['detailed_adaptation_types'] if input_dict.get('detailed_adaptation_types') is not None]
+        load.sub_adaptation_types = [RankedAdaptationType.json_deserialise(r) for r in
+                                          input_dict['sub_adaptation_types'] if
+                                          input_dict.get('sub_adaptation_types') is not None]
 
         return load
 
@@ -174,13 +204,13 @@ class DetailedTrainingLoad(Serialisable):
         rank = 1
 
         for detailed_type, load in sorted_details.items():
-            self.detailed_adaptation_types.append(RankedAdaptationType(detailed_type, rank))
+            self.detailed_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, detailed_type, rank))
             rank += 1
 
         sub_rank = 1
 
         for sub_type, load in sorted_subs.items():
-            self.sub_adaptation_types.append(RankedAdaptationType(sub_type, sub_rank))
+            self.sub_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, sub_type, sub_rank))
             sub_rank += 1
 
 
@@ -208,7 +238,7 @@ class MuscleDetailedLoad(object):
         return detailed_load
 
 
-class CompletedSessionDetails(object):
+class CompletedSessionDetails(Serialisable):
     def __init__(self, event_date_time, provider_id, workout_id):
         self.event_date_time = event_date_time
         self.provider_id = provider_id
@@ -216,9 +246,24 @@ class CompletedSessionDetails(object):
         self.session_detailed_load = DetailedTrainingLoad()
         self.muscle_detailed_load = {}
         self.duration = 0
-        self.session_rpe = None
+        self.session_RPE = None
         self.rpe_load = None
         self.power_load = None
+
+    def json_serialise(self):
+        ret = {
+            'event_date_time': self.event_date_time,
+            'provider_id': self.provider_id,
+            'workout_id': self.workout_id,
+            'session_detailed_load': self.session_detailed_load.json_serialise(),
+            #'muscle_detailed_load': self.muscle_detailed_load.json_serialise(),
+            'duration': self.duration,
+            'session_rpe': self.session_rpe.json_serialise(),
+            'rpe_load': self.rpe_load.joson_serialise(),
+            'power_load': self.power_load.json_serialise()
+        }
+
+        return ret
 
 
 # TODO need some easy way to see the summary so we can easily rank the workouts

@@ -4,7 +4,7 @@ from collections import Counter
 from models.training_volume import StandardErrorRange
 from statistics import mean
 from models.training_load import TrainingLoad, CompletedSessionDetails, LoadType
-from models.movement_tags import AdaptationDictionary, RankedAdaptationType
+from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure
 from logic.training_load_calcs import TrainingLoadCalculator
 from math import sqrt
 from datetime import timedelta
@@ -413,7 +413,7 @@ class PeriodizationPlanProcessor(object):
         else:
             load_score = test_workout.projected_rpe_load.lower_bound / target_load_range.lower_bound
 
-        cosine_similarity = self.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(recommended_exercise.sub_adaptation_type, 1)])
+        cosine_similarity = self.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, recommended_exercise.sub_adaptation_type, 1)])
 
         if cosine_similarity > 0:
             if one_required_combination is None:

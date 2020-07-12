@@ -3,8 +3,8 @@ class CompletedSessionDetailsDatastore(object):
     def __init__(self):
         self.completed_sessions = []
 
-    def side_load_planned_workout(self, workout):
-        self.completed_sessions = workout
+    def side_load_planned_workout(self, workouts):
+        self.completed_sessions = workouts
 
     def get(self, program_id=None, event_date_time=None, start_date_time=None, end_date_time=None):
         return self._query_mongodb(program_id, event_date_time, start_date_time, end_date_time)

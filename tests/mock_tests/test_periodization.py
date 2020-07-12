@@ -6,17 +6,21 @@ from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor
 from logic.detailed_load_processing import DetailedLoadProcessor
+from logic.training_load_calcs import TrainingLoadCalculator
 from models.periodization import AthleteTrainingHistory, PeriodizationModel, PeriodizationProgression, PeriodizationModelFactory, PeriodizationPersona, PeriodizationGoal, TrainingPhaseType, PeriodizedExercise
 from models.training_load import TrainingLoad
 from statistics import mean
-from models.movement_tags import RankedAdaptationType, AdaptationDictionary, SubAdaptationType, TrainingType
+from models.movement_tags import RankedAdaptationType, AdaptationDictionary, SubAdaptationType, TrainingType, AdaptationTypeMeasure
 from models.planned_exercise import PlannedWorkoutLoad
 from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
+from tests.mocks.mock_workout_library_datastore import PlannedWorkoutLibraryDatastore
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
 from datetime import datetime, timedelta
-
+import os
+import json
 
 action_dictionary = ActionLibraryDatastore().get()
+planned_workout_dictionary = PlannedWorkoutLibraryDatastore().get()
 
 
 def get_filtered_actions(training_type_list):
@@ -26,6 +30,13 @@ def get_filtered_actions(training_type_list):
     filtered_list = [a for a in action_list if a.training_type in training_type_list]
 
     return filtered_list
+
+
+def get_workout_list():
+
+    workout_library_list = list(planned_workout_dictionary.values())
+
+    return workout_library_list
 
 
 def process_adaptation_types(action_list, reps, rpe, duration=None, percent_max_hr=None):
@@ -83,7 +94,7 @@ class SimpleWorkout(object):
 
         if len(self.session_detailed_load.sub_adaptation_types) == 0:
             self.session_detailed_load.sub_adaptation_types = [
-                RankedAdaptationType(adaptation_dictionary.detailed_types[d.adaptation_type], d.ranking) for d in
+                RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, adaptation_dictionary.detailed_types[d.adaptation_type], d.ranking) for d in
                 self.session_detailed_load.detailed_adaptation_types]
             adapt_dict = {}
             for a in self.session_detailed_load.sub_adaptation_types:
@@ -93,7 +104,7 @@ class SimpleWorkout(object):
                     adapt_dict[a.adaptation_type] = min(a.ranking, adapt_dict[a.adaptation_type])
             sub_types = []
             for a, r in adapt_dict.items():
-                sub_types.append(RankedAdaptationType(a, r))
+                sub_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, a, r))
             self.session_detailed_load.sub_adaptation_types = sub_types
 
 
@@ -102,26 +113,46 @@ def get_workout_library(rpe_list, duration_list):
     workouts = []
     id = 1
 
-    training_type_list_1 = [TrainingType.strength_cardiorespiratory]
-    training_type_list_2 = [TrainingType.strength_integrated_resistance, TrainingType.strength_endurance]
+    training_type_list_cardio = [TrainingType.strength_cardiorespiratory]
+    training_type_list_resistance_endurance = [TrainingType.strength_integrated_resistance, TrainingType.strength_endurance]
+    training_type_list_power = [TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics]
 
-    for r in rpe_list:
-        for d in duration_list:
+    percent_max_hr_list = [70, 82, 90]
 
-            projected_rpe_load = StandardErrorRange(lower_bound=r*d, upper_bound=r*d, observed_value=r*d)
-            projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
-            planned_workout = get_planned_workout(id, training_type_list_1,projected_rpe,projected_rpe_load,reps=None,
-                                                  rpe=r,duration=d,percent_max_hr=70)
-            workouts.append(planned_workout)
-            id += 1
+    for p in percent_max_hr_list:
+        for r in rpe_list:
+            for d in duration_list:
+                projected_rpe_load = StandardErrorRange(lower_bound=r * d, upper_bound=r * d, observed_value=r * d)
+                projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
+                planned_workout = get_planned_workout(id,
+                                                      training_type_list_cardio,
+                                                      projected_rpe,
+                                                      projected_rpe_load,
+                                                      reps=None,
+                                                      rpe=r, duration=d,
+                                                      percent_max_hr=p)
+                workouts.append(planned_workout)
+                id += 1
 
-    for r in rpe_list:
-        for d in duration_list:
-            projected_rpe_load = StandardErrorRange(lower_bound=r * d, upper_bound=r * d, observed_value=r * d)
-            projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
-            planned_workout = get_planned_workout(id, training_type_list_2, projected_rpe, projected_rpe_load, reps=10, rpe=r)
-            workouts.append(planned_workout)
-            id += 1
+    reps_list = [10, 15]
+    for reps in reps_list:
+        for r in rpe_list:
+            for d in duration_list:
+                projected_rpe_load = StandardErrorRange(lower_bound=r * d, upper_bound=r * d, observed_value=r * d)
+                projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
+                planned_workout = get_planned_workout(id, training_type_list_resistance_endurance, projected_rpe, projected_rpe_load, reps=reps, rpe=r)
+                workouts.append(planned_workout)
+                id += 1
+
+    for reps in reps_list:
+        for r in rpe_list:
+            for d in duration_list:
+                projected_rpe_load = StandardErrorRange(lower_bound=r*d, upper_bound=r*d, observed_value=r*d)
+                projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
+                planned_workout = get_planned_workout(id, training_type_list_power,projected_rpe,projected_rpe_load,
+                                                      reps=reps,rpe=r,duration=d,percent_max_hr=None)
+                workouts.append(planned_workout)
+                id += 1
 
     return workouts
 
@@ -149,6 +180,39 @@ def get_fake_training_history(start_date_time, rpe_list, watts_list, durations_l
             load_list.append(completed_workout)
 
     return load_list
+
+
+def create_workout_week(start_date_time, week_list):
+
+    completed_workouts = []
+
+    for d in range(0, len(week_list)):
+        workout_id = week_list[d]
+        if workout_id > 0:
+            workout = planned_workout_dictionary[str(workout_id)]
+            completed_workout = complete_a_planned_workout(start_date_time - timedelta(days=d), workout)
+            completed_workouts.append(completed_workout)
+
+    return completed_workouts
+
+
+def create_workout_history(start_date_time):
+
+    workout_history = []
+
+    current_weeks_load = create_workout_week(start_date_time, [0, 25])
+    previous_1_weeks_load = create_workout_week(start_date_time - timedelta(days=6), [0, 28, 0, 26, 35, 28, 0])
+    previous_2_weeks_load = create_workout_week(start_date_time - timedelta(days=13), [0, 25, 26, 0, 28, 25, 15])
+    previous_3_weeks_load = create_workout_week(start_date_time - timedelta(days=20), [0, 25, 34, 31, 0, 26, 0])
+    previous_4_weeks_load = create_workout_week(start_date_time - timedelta(days=27), [0, 29, 0, 0, 45, 48, 0])
+
+    workout_history.extend(current_weeks_load)
+    workout_history.extend(previous_1_weeks_load)
+    workout_history.extend(previous_2_weeks_load)
+    workout_history.extend(previous_3_weeks_load)
+    workout_history.extend(previous_4_weeks_load)
+
+    return workout_history
 
 
 def get_planned_workout(workout_id, training_type_list, session_rpe, projected_rpe_load, reps, rpe, duration=None,
@@ -217,6 +281,30 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
     return session
 
 
+def write_workouts_json(workout_json):
+    json_string = json.dumps(workout_json, indent=4)
+    file_name = os.path.join(os.path.realpath('..'), f"../apigateway/models/planned_workout_library.json")
+    print(f"writing: {file_name}")
+    f1 = open(file_name, 'w')
+    f1.write(json_string)
+    f1.close()
+
+
+def get_workouts_json(workouts):
+    workouts_json = {}
+    for workout in workouts:
+        workouts_json[workout.workout_id] = workout.json_serialise()
+    return workouts_json
+
+
+# DON'T DELETE - THIS CREATES OUR LIBRARY!
+# def test_create_workouts():
+#     rpe_list = list(range(1, 11))
+#     duration_list = list(range(30, 90, 5))
+#     workouts = get_workout_library(rpe_list, duration_list)
+#     workouts_json = get_workouts_json(workouts)
+#     write_workouts_json(workouts_json)
+
 # def test_find_workout_combinations():
 #
 #     rpe_list = list(range(1,11,1))
@@ -267,26 +355,28 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 
 # def test_top_rec_should_be_greatest_need_day_3_cardio():
 #
-#     rpe_list = list(range(5,6))
-#     duration_list = list(range(30, 60, 10))
-#     workouts = get_workout_library(rpe_list, duration_list)
+#     workouts = get_workout_list()
 #
 #     start_date_time = datetime.now()
 #
-#     athlete_training_history = AthleteTrainingHistory()
+#     workout_history = create_workout_history(datetime.now())
 #
-#     athlete_training_history.average_session_load.rpe_load = StandardErrorRange(lower_bound=500, observed_value=600, upper_bound=700)
-#     athlete_training_history.average_session_load.power_load = StandardErrorRange(lower_bound=500, observed_value=600,
-#                                                                                 upper_bound=700)
-#     athlete_training_history.average_session_rpe = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
-#     athlete_training_history.average_sessions_per_week = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
+#     completed_session_details_datastore = CompletedSessionDetailsDatastore()
+#     completed_session_details_datastore.side_load_planned_workout(workout_history)
+#
+#     # athlete_training_history = AthleteTrainingHistory()
+#     #
+#     # athlete_training_history.average_session_load.rpe_load = StandardErrorRange(lower_bound=500, observed_value=600, upper_bound=700)
+#     # athlete_training_history.average_session_load.power_load = StandardErrorRange(lower_bound=500, observed_value=600,
+#     #                                                                             upper_bound=700)
+#     # athlete_training_history.average_session_rpe = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
+#     # athlete_training_history.average_sessions_per_week = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
 #
 #     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
-#     completed_session_details_datastore = CompletedSessionDetailsDatastore()
+#     #completed_session_details_datastore = CompletedSessionDetailsDatastore()
 #
 #     proc = PeriodizationPlanProcessor(start_date_time,completed_session_details_datastore,athlete_training_goal,
-#                                       PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase,
-#                                       athlete_training_history = athlete_training_history)
+#                                       PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
 #     proc.set_weekly_targets()
 #
 #     completed_workouts = []
@@ -302,7 +392,8 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #     completed_workouts.append(completed_workout_1)
 #
 #     # refresh list of workouts
-#     workouts = get_workout_library(rpe_list, duration_list)
+#     workouts = get_workout_list()
+#
 #     acceptable_workouts_2 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
 #
 #     acceptable_workouts_2_copy = [a for a in acceptable_workouts_2]
@@ -314,19 +405,24 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #     completed_workouts.append(completed_workout_2)
 #
 #     # refresh list of workouts
-#     workouts = get_workout_library(rpe_list, duration_list)
+#     workouts = get_workout_list()
+#
 #     acceptable_workouts_3 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
 #
-#     assert acceptable_workouts_3[0].sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
+#     strength_workouts = [a for a in acceptable_workouts_3 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength]
+#     cardio_workouts = [a for a in acceptable_workouts_3 if
+#                          a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training]
 #
+#     assert acceptable_workouts_3[0].session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
+
 
 def test_acceptable_strength_cardio_same_score_both_required():
 
     proc = PeriodizationPlanProcessor(datetime.now(), CompletedSessionDetailsDatastore(), None, None, None)
-    strength_list = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
-                    RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
-    cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
-                   RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
+    strength_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1),
+                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.strength_endurance, 2)]
+    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1),
+                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
     periodized_strength_exercise = PeriodizedExercise(None, SubAdaptationType.strength,
                                                       times_per_week_range=StandardErrorRange(lower_bound=2),
                                                       duration_range=None,
@@ -353,8 +449,8 @@ def test_acceptable_strength_cardio_same_score_both_required():
 def test_completing_combo_required_reduces_score():
 
     proc = PeriodizationPlanProcessor(datetime.now(), CompletedSessionDetailsDatastore(), None, None, None)
-    cardio_list = [RankedAdaptationType(DetailedAdaptationType.anaerobic_threshold_training, 1),
-                   RankedAdaptationType(DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
+    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1),
+                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
 
     vigorous_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
                                                     times_per_week_range=StandardErrorRange(lower_bound=2),

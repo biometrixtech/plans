@@ -1,4 +1,12 @@
 from enum import Enum, IntEnum
+from serialisable import Serialisable
+
+
+class AdaptationTypeMeasure(Enum):
+    training_type = 0
+    adaptation_type = 1
+    sub_adaptation_type = 2
+    detailed_adaptation_type = 3
 
 
 class TrainingType(Enum):
@@ -50,8 +58,9 @@ class SubAdaptationType(Enum):
     power = 4
 
 
-class RankedAdaptationType(object):
-    def __init__(self, adaptation_type, ranking):
+class RankedAdaptationType(Serialisable):
+    def __init__(self, adaptation_type_measure, adaptation_type, ranking):
+        self.adaptation_type_measure = adaptation_type_measure
         self.adaptation_type = adaptation_type
         self.ranking = ranking
 
@@ -62,6 +71,37 @@ class RankedAdaptationType(object):
         val = (self.adaptation_type.value == other.adaptation_type.value and self.ranking == other.ranking)
 
         return val
+
+    def json_serialise(self):
+
+        ret = {
+            'adaptation_type_measure': self.adaptation_type_measure.value,
+            'adaptation_type': self.adaptation_type.value,
+            'ranking': self.ranking
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        measure = AdaptationTypeMeasure(input_dict['adaptation_type_measure'])
+        ranked_type = RankedAdaptationType(measure,
+                                           RankedAdaptationType.get_adaptation_type_from_measure(measure, input_dict['adaptation_type']),
+                                           input_dict['ranking'] if input_dict.get('ranking') is not None else None
+                                           )
+        return ranked_type
+
+    @staticmethod
+    def get_adaptation_type_from_measure(adaptation_type_measure, adaptation_type_value):
+
+        if adaptation_type_measure == AdaptationTypeMeasure.training_type:
+            return TrainingType(adaptation_type_value)
+        elif adaptation_type_measure == AdaptationTypeMeasure.adaptation_type:
+            return AdaptationType(adaptation_type_value)
+        elif adaptation_type_measure == AdaptationTypeMeasure.detailed_adaptation_type:
+            return DetailedAdaptationType(adaptation_type_value)
+        else:
+            return SubAdaptationType(adaptation_type_value)
 
 
 class AdaptationDictionary(object):
