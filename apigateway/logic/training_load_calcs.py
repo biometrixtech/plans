@@ -150,7 +150,7 @@ class TrainingLoadCalculator(object):
             sessions_per_week.append(len(self.previous_week_2_load_list))
         sessions_per_week.append(len(self.previous_week_1_load_list))
 
-        self.average_sessions_per_week = mean(sessions_per_week)
+        self.average_sessions_per_week = StandardErrorRange(lower_bound=min(sessions_per_week), observed_value=mean(sessions_per_week), upper_bound=max(sessions_per_week))
 
     def calculate_weekly_detailed_training_load(self):
 

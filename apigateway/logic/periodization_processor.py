@@ -11,15 +11,15 @@ from datetime import timedelta
 
 
 class PeriodizationPlanProcessor(object):
-    def __init__(self, event_date, completed_session_details_datastore, athlete_periodization_goal, athlete_persona, training_phase_type):
+    def __init__(self, event_date, completed_session_details_datastore, athlete_periodization_goal, athlete_persona, training_phase_type, athlete_training_history=None, training_calculator=None):
         self.event_date = event_date
         self.completed_session_details_datastore = completed_session_details_datastore
         self.persona = athlete_persona
         self.goal = athlete_periodization_goal
-        self.athlete_training_history = None
+        self.athlete_training_history = athlete_training_history
         self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type, periodization_goal=athlete_periodization_goal)
         self.weekly_targets = []
-        self.training_load_calculator = None
+        self.training_load_calculator = training_calculator
         self.set_training_load_calculator()
         self.set_athlete_training_history()
 

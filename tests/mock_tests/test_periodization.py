@@ -267,18 +267,26 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 
 # def test_top_rec_should_be_greatest_need_day_3_cardio():
 #
-#     rpe_list = list(range(1,11,1))
-#     duration_list = list(range(30, 150, 5))
+#     rpe_list = list(range(5,6))
+#     duration_list = list(range(30, 60, 10))
 #     workouts = get_workout_library(rpe_list, duration_list)
 #
 #     start_date_time = datetime.now()
 #
-#     athlete_training_history = get_fake_training_history()
+#     athlete_training_history = AthleteTrainingHistory()
+#
+#     athlete_training_history.average_session_load.rpe_load = StandardErrorRange(lower_bound=500, observed_value=600, upper_bound=700)
+#     athlete_training_history.average_session_load.power_load = StandardErrorRange(lower_bound=500, observed_value=600,
+#                                                                                 upper_bound=700)
+#     athlete_training_history.average_session_rpe = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
+#     athlete_training_history.average_sessions_per_week = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
 #
 #     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
 #     completed_session_details_datastore = CompletedSessionDetailsDatastore()
 #
-#     proc = PeriodizationPlanProcessor(start_date_time,completed_session_details_datastore,athlete_training_goal, PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
+#     proc = PeriodizationPlanProcessor(start_date_time,completed_session_details_datastore,athlete_training_goal,
+#                                       PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase,
+#                                       athlete_training_history = athlete_training_history)
 #     proc.set_weekly_targets()
 #
 #     completed_workouts = []
@@ -310,7 +318,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #     acceptable_workouts_3 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
 #
 #     assert acceptable_workouts_3[0].sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
-
+#
 
 def test_acceptable_strength_cardio_same_score_both_required():
 
