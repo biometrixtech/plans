@@ -1,35 +1,16 @@
 from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
-from models.soreness import BodyPartSide, BodyPartLocation
-from models.functional_movement import FunctionalMovementActionMapping, FunctionalMovementFactory
-from models.workout_program import BaseWorkoutExercise
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
-from logic.periodization_processor import PeriodizationPlanProcessor
-from logic.detailed_load_processing import DetailedLoadProcessor
-from logic.training_load_calcs import TrainingLoadCalculator
-from models.periodization import AthleteTrainingHistory, PeriodizationModel, PeriodizationProgression, PeriodizationModelFactory, PeriodizationPersona, PeriodizationGoal, TrainingPhaseType, PeriodizedExercise
-from models.training_load import TrainingLoad
-from statistics import mean
+from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager
+from models.periodization import PeriodizedExercise, PeriodizationGoal, PeriodizationPersona, TrainingPhaseType
 from models.movement_tags import RankedAdaptationType, AdaptationDictionary, SubAdaptationType, TrainingType, AdaptationTypeMeasure
 from models.planned_exercise import PlannedWorkoutLoad
-from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
 from tests.mocks.mock_workout_library_datastore import PlannedWorkoutLibraryDatastore
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
 from datetime import datetime, timedelta
-import os
-import json
+from tests.mocks.planned_workout_utilities import get_planned_workout
 
-action_dictionary = ActionLibraryDatastore().get()
 planned_workout_dictionary = PlannedWorkoutLibraryDatastore().get()
-
-
-def get_filtered_actions(training_type_list):
-
-    action_list = list(action_dictionary.values())
-
-    filtered_list = [a for a in action_list if a.training_type in training_type_list]
-
-    return filtered_list
 
 
 def get_workout_list():
@@ -37,42 +18,6 @@ def get_workout_list():
     workout_library_list = list(planned_workout_dictionary.values())
 
     return workout_library_list
-
-
-def process_adaptation_types(action_list, reps, rpe, duration=None, percent_max_hr=None):
-
-    detailed_load_processor = DetailedLoadProcessor()
-
-    functional_movement_factory = FunctionalMovementFactory()
-    functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
-    event_date = datetime.now()
-
-    for action in action_list:
-        duration = duration
-
-        base_exercise = BaseWorkoutExercise()
-        base_exercise.training_type = action.training_type
-        base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-        base_exercise.set_adaption_type()
-
-        action.power_load_left = base_exercise.power_load
-        action.power_load_right = base_exercise.power_load
-
-        functional_movement_action_mapping = FunctionalMovementActionMapping(action,
-                                                                             {},
-                                                                             event_date, functional_movement_dict)
-
-        detailed_load_processor.add_load(functional_movement_action_mapping,
-                                         adaptation_type=base_exercise.adaptation_type,
-                                         movement_action=action,
-                                         training_load_range=base_exercise.power_load,
-                                         reps=reps,
-                                         duration=duration,
-                                         rpe=rpe,
-                                         percent_max_hr=percent_max_hr)
-    detailed_load_processor.rank_types()
-
-    return detailed_load_processor
 
 
 class SimpleWorkout(object):
@@ -106,55 +51,6 @@ class SimpleWorkout(object):
             for a, r in adapt_dict.items():
                 sub_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, a, r))
             self.session_detailed_load.sub_adaptation_types = sub_types
-
-
-def get_workout_library(rpe_list, duration_list):
-
-    workouts = []
-    id = 1
-
-    training_type_list_cardio = [TrainingType.strength_cardiorespiratory]
-    training_type_list_resistance_endurance = [TrainingType.strength_integrated_resistance, TrainingType.strength_endurance]
-    training_type_list_power = [TrainingType.power_action_olympic_lift, TrainingType.power_action_plyometrics]
-
-    percent_max_hr_list = [70, 82, 90]
-
-    for p in percent_max_hr_list:
-        for r in rpe_list:
-            for d in duration_list:
-                projected_rpe_load = StandardErrorRange(lower_bound=r * d, upper_bound=r * d, observed_value=r * d)
-                projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
-                planned_workout = get_planned_workout(id,
-                                                      training_type_list_cardio,
-                                                      projected_rpe,
-                                                      projected_rpe_load,
-                                                      reps=None,
-                                                      rpe=r, duration=d,
-                                                      percent_max_hr=p)
-                workouts.append(planned_workout)
-                id += 1
-
-    reps_list = [10, 15]
-    for reps in reps_list:
-        for r in rpe_list:
-            for d in duration_list:
-                projected_rpe_load = StandardErrorRange(lower_bound=r * d, upper_bound=r * d, observed_value=r * d)
-                projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
-                planned_workout = get_planned_workout(id, training_type_list_resistance_endurance, projected_rpe, projected_rpe_load, reps=reps, rpe=r)
-                workouts.append(planned_workout)
-                id += 1
-
-    for reps in reps_list:
-        for r in rpe_list:
-            for d in duration_list:
-                projected_rpe_load = StandardErrorRange(lower_bound=r*d, upper_bound=r*d, observed_value=r*d)
-                projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
-                planned_workout = get_planned_workout(id, training_type_list_power,projected_rpe,projected_rpe_load,
-                                                      reps=reps,rpe=r,duration=d,percent_max_hr=None)
-                workouts.append(planned_workout)
-                id += 1
-
-    return workouts
 
 
 def get_fake_training_history(start_date_time, rpe_list, watts_list, durations_list, workout_ids):
@@ -215,32 +111,6 @@ def create_workout_history(start_date_time):
     return workout_history
 
 
-def get_planned_workout(workout_id, training_type_list, session_rpe, projected_rpe_load, reps, rpe, duration=None,
-                        percent_max_hr=None):
-
-    workout = PlannedWorkoutLoad(workout_id=workout_id)
-    workout.projected_session_rpe = session_rpe
-    workout.duration = 75
-    workout.projected_rpe_load = projected_rpe_load
-
-    action_list = get_filtered_actions(training_type_list)
-
-    detailed_load_processor = process_adaptation_types(action_list, reps=reps, rpe=rpe, duration=duration,
-                                                       percent_max_hr=percent_max_hr)
-
-    workout.session_detailed_load = detailed_load_processor.session_detailed_load
-    workout.session_training_type_load = detailed_load_processor.session_training_type_load
-    workout.muscle_detailed_load = detailed_load_processor.muscle_detailed_load
-
-    session_load = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
-    for training_type_load in detailed_load_processor.session_training_type_load.load.values():
-        session_load.add(training_type_load)
-
-    workout.projected_power_load = session_load
-
-    return workout
-
-
 class SessionParameters(object):
     def __init__(self, event_date_time, workout_id):
         self.event_date_time = event_date_time
@@ -280,30 +150,6 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 
     return session
 
-
-def write_workouts_json(workout_json):
-    json_string = json.dumps(workout_json, indent=4)
-    file_name = os.path.join(os.path.realpath('..'), f"../apigateway/models/planned_workout_library.json")
-    print(f"writing: {file_name}")
-    f1 = open(file_name, 'w')
-    f1.write(json_string)
-    f1.close()
-
-
-def get_workouts_json(workouts):
-    workouts_json = {}
-    for workout in workouts:
-        workouts_json[workout.workout_id] = workout.json_serialise()
-    return workouts_json
-
-
-# DON'T DELETE - THIS CREATES OUR LIBRARY!
-# def test_create_workouts():
-#     rpe_list = list(range(1, 11))
-#     duration_list = list(range(30, 90, 5))
-#     workouts = get_workout_library(rpe_list, duration_list)
-#     workouts_json = get_workouts_json(workouts)
-#     write_workouts_json(workouts_json)
 
 # def test_find_workout_combinations():
 #
@@ -373,7 +219,6 @@ def get_workouts_json(workouts):
 #     # athlete_training_history.average_sessions_per_week = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
 #
 #     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
-#     #completed_session_details_datastore = CompletedSessionDetailsDatastore()
 #
 #     proc = PeriodizationPlanProcessor(start_date_time,completed_session_details_datastore,athlete_training_goal,
 #                                       PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
@@ -535,42 +380,40 @@ def test_completing_combo_required_reduces_score():
 #     assert score == 68.0
 #
 #
-# def test_cosine_similarity_prioritized_adaptation_types_equal():
-#
-#     list_a = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1), RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
-#     list_b = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
-#               RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
-#
-#     proc = PeriodizationPlanProcessor(None, None, None, None)
-#
-#     val = proc.cosine_similarity(list_a, list_b)
-#
-#     assert 1.0 == round(val, 5)
-#
-# def test_cosine_similarity_prioritized_adaptation_types_half_equal():
-#
-#     list_a = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1), RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
-#     list_b = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
-#               RankedAdaptationType(DetailedAdaptationType.hypertrophy, 2)]
-#
-#     proc = PeriodizationPlanProcessor(None, None, None, None)
-#
-#     val = proc.cosine_similarity(list_a, list_b)
-#
-#     assert 0.5 == round(val, 5)
-#
-# def test_cosine_similarity_prioritized_adaptation_types_partial_credit():
-#
-#     list_a = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 1),
-#               RankedAdaptationType(DetailedAdaptationType.strength_endurance, 2)]
-#     list_b = [RankedAdaptationType(DetailedAdaptationType.muscular_endurance, 2),
-#               RankedAdaptationType(DetailedAdaptationType.strength_endurance, 1)]
-#
-#     proc = PeriodizationPlanProcessor(None, None, None, None)
-#
-#     val = proc.cosine_similarity(list_a, list_b)
-#
-#     assert 0.5 == round(val, 5)
+def test_cosine_similarity_prioritized_adaptation_types_equal():
+
+    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
+    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
+
+    val = WorkoutScoringManager.cosine_similarity(list_a, list_b)
+
+    assert 1.0 == round(val, 5)
+
+
+def test_cosine_similarity_prioritized_adaptation_types_half_equal():
+
+    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
+    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.hypertrophy, 2)]
+
+    val = WorkoutScoringManager.cosine_similarity(list_a, list_b)
+
+    assert 0.5 == round(val, 5)
+
+
+def test_cosine_similarity_prioritized_adaptation_types_partial_credit():
+
+    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
+    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 2),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 1)]
+
+    val = WorkoutScoringManager.cosine_similarity(list_a, list_b)
+
+    assert 0.5 == round(val, 5)
 
 
 

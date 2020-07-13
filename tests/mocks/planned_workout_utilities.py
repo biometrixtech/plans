@@ -1,14 +1,10 @@
 from models.workout_program import BaseWorkoutExercise
 from models.functional_movement import FunctionalMovementActionMapping, FunctionalMovementFactory
-from models.movement_tags import TrainingType
 from models.training_volume import StandardErrorRange
 from models.planned_exercise import PlannedWorkoutLoad
 from logic.detailed_load_processing import DetailedLoadProcessor
-from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
 from datetime import datetime
-import os
-import json
-
+from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
 
 action_dictionary = ActionLibraryDatastore().get()
 
@@ -82,48 +78,3 @@ def get_planned_workout(workout_id, training_type_list, session_rpe, projected_r
     workout.projected_power_load = session_load
 
     return workout
-
-
-def get_workout_library(rpe_list, duration_list):
-
-    workouts = []
-    id = 1
-
-    training_type_list_1 = [TrainingType.strength_cardiorespiratory]
-    training_type_list_2 = [TrainingType.strength_integrated_resistance, TrainingType.strength_endurance]
-
-    for r in rpe_list:
-        for d in duration_list:
-
-            projected_rpe_load = StandardErrorRange(lower_bound=r*d, upper_bound=r*d, observed_value=r*d)
-            projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
-            planned_workout = get_planned_workout(id, training_type_list_1,projected_rpe,projected_rpe_load,reps=None,
-                                                  rpe=r,duration=d,percent_max_hr=70)
-            workouts.append(planned_workout)
-            id += 1
-
-    for r in rpe_list:
-        for d in duration_list:
-            projected_rpe_load = StandardErrorRange(lower_bound=r * d, upper_bound=r * d, observed_value=r * d)
-            projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
-            planned_workout = get_planned_workout(id, training_type_list_2, projected_rpe, projected_rpe_load, reps=10, rpe=r)
-            workouts.append(planned_workout)
-            id += 1
-
-    return workouts
-
-
-def write_workouts_json(workout_json):
-    json_string = json.dumps(workout_json, indent=4)
-    file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/planned_workout_library.json")
-    print(f"writing: {file_name}")
-    f1 = open(file_name, 'w')
-    f1.write(json_string)
-    f1.close()
-
-def test_create_workouts():
-    rpe_list = list(range(5,6))
-    duration_list = list(range(30, 60, 10))
-    workouts = get_workout_library(rpe_list, duration_list)
-    for w in workouts:
-        write_workouts_json(w.json_serialise())

@@ -10,6 +10,40 @@ from math import sqrt
 from datetime import timedelta
 
 
+class WorkoutScoringManager(object):
+
+    @staticmethod
+    def cosine_similarity(candidate_exercise_priorities, recommended_exercise_priorities):
+
+        # get the adaptation types separately so we can look for matches of type (but not necessarily ranking)
+        candidate_adaptation_types = [c.adaptation_type for c in candidate_exercise_priorities]
+        recommended_adaptation_types = [r.adaptation_type for r in recommended_exercise_priorities]
+        all_adaptation_types = set(candidate_adaptation_types).union(recommended_adaptation_types)
+
+        all_exercise_priorities = set(candidate_exercise_priorities).union(recommended_exercise_priorities)
+        dotprod_1 = sum((1 if k in candidate_exercise_priorities else 0) * (1 if k in recommended_exercise_priorities else 0) for k in all_exercise_priorities)
+        magA_1 = sqrt(sum((1 if k in candidate_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
+        magB_1 = sqrt(sum((1 if k in recommended_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
+        if (magA_1 * magB_1) == 0 :
+            cosine_similarity_1 = 0
+        else:
+            cosine_similarity_1 = dotprod_1 / (magA_1 * magB_1)
+
+        dotprod_2 = sum(
+            (1 if k in candidate_adaptation_types else 0) * (1 if k in recommended_adaptation_types else 0) for k
+            in all_adaptation_types)
+        magA_2 = sqrt(sum((1 if k in candidate_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        magB_2 = sqrt(sum((1 if k in recommended_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        if (magA_2 * magB_2) == 0:
+            cosine_similarity_2 = 0
+        else:
+            cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
+
+        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2) / 2
+
+        return average_cosine_similarity
+
+
 class PeriodizationPlanProcessor(object):
     def __init__(self, event_date, completed_session_details_datastore, athlete_periodization_goal, athlete_persona, training_phase_type, athlete_training_history=None, training_calculator=None):
         self.event_date = event_date
@@ -413,7 +447,7 @@ class PeriodizationPlanProcessor(object):
         else:
             load_score = test_workout.projected_rpe_load.lower_bound / target_load_range.lower_bound
 
-        cosine_similarity = self.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, recommended_exercise.sub_adaptation_type, 1)])
+        cosine_similarity = WorkoutScoringManager.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, recommended_exercise.sub_adaptation_type, 1)])
 
         if cosine_similarity > 0:
             if one_required_combination is None:
@@ -427,35 +461,6 @@ class PeriodizationPlanProcessor(object):
 
         return composite_score
 
-    def cosine_similarity(self, candidate_exercise_priorities, recommended_exercise_priorities):
-
-        # get the adaptation types separately so we can look for matches of type (but not necessarily ranking)
-        candidate_adaptation_types = [c.adaptation_type for c in candidate_exercise_priorities]
-        recommended_adaptation_types = [r.adaptation_type for r in recommended_exercise_priorities]
-        all_adaptation_types = set(candidate_adaptation_types).union(recommended_adaptation_types)
-
-        all_exercise_priorities = set(candidate_exercise_priorities).union(recommended_exercise_priorities)
-        dotprod_1 = sum((1 if k in candidate_exercise_priorities else 0) * (1 if k in recommended_exercise_priorities else 0) for k in all_exercise_priorities)
-        magA_1 = sqrt(sum((1 if k in candidate_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
-        magB_1 = sqrt(sum((1 if k in recommended_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
-        if (magA_1 * magB_1) == 0 :
-            cosine_similarity_1 = 0
-        else:
-            cosine_similarity_1 = dotprod_1 / (magA_1 * magB_1)
-
-        dotprod_2 = sum(
-            (1 if k in candidate_adaptation_types else 0) * (1 if k in recommended_adaptation_types else 0) for k
-            in all_adaptation_types)
-        magA_2 = sqrt(sum((1 if k in candidate_adaptation_types else 0) ** 2 for k in all_adaptation_types))
-        magB_2 = sqrt(sum((1 if k in recommended_adaptation_types else 0) ** 2 for k in all_adaptation_types))
-        if (magA_2 * magB_2) == 0:
-            cosine_similarity_2 = 0
-        else:
-            cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
-
-        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2) / 2
-
-        return average_cosine_similarity
 
 
 
