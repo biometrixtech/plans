@@ -16,6 +16,7 @@ Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fath
                              }
            )
 
+import json
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -369,15 +370,25 @@ def get_completed_workout(user, planned_workout):
     return workout
 
 
+def write_json(data, user):
+    json_string = json.dumps(data, indent=4)
+    file_name = os.path.join(os.path.realpath('..'), f"../tests/data/otf/completed_workout_{user}.json")
+    print(f"writing: {file_name}")
+    f1 = open(file_name, 'w')
+    f1.write(json_string)
+    f1.close()
+
 if __name__ == '__main__':
     import time
     st = time.time()
     planned_workout = parse_file('june8_alt', write=False)
     for user in [1, 2, 3]:
         workout = get_completed_workout(user, planned_workout)
-        workout_program = WorkoutProgramModule.json_deserialise(workout)
-        session = MixedActivitySession()
-        session.workout_program_module = workout_program
-        WorkoutProcessor(user_weight=70, gender=Gender.male).process_workout(session)
-        print(user, session.power_load.json_serialise())
+        write_json(workout, user)
+
+    #     workout_program = WorkoutProgramModule.json_deserialise(workout)
+    #     session = MixedActivitySession()
+    #     session.workout_program_module = workout_program
+    #     WorkoutProcessor(user_weight=70, gender=Gender.male).process_workout(session)
+    #     print(user, session.power_load.json_serialise())
     print(time.time() - st)

@@ -105,7 +105,7 @@ def get_session_2(date, rpe=5, duration=60, file_name=None, assignment_type='def
     workout_json = read_json(file_name)
     workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
     session.workout_program_module = workout_program_module
-    WorkoutProcessor(user_weight=60).process_workout(session)
+    WorkoutProcessor(user_weight=70, user_age=30).process_workout(session)
 
     return session
 
@@ -520,6 +520,12 @@ def test_may1_alt2():
     assert ex_default.name == ex_variation.name
     assert ex_default.movement_id != ex_variation.movement_id
 
+
+# def test_srpe():
+#     for user in [1, 2, 3]:
+#         session = get_session_2(datetime.datetime.now(), file_name=f'completed_workout_{user}')
+#         print(session.session_RPE)
+#     print('here')
 
 #
 # def test_at_home1():

@@ -54,11 +54,13 @@ class WorkoutProcessor(object):
 
                     session = self.set_session_intensity_metrics(session, workout_exercise)
 
+
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, session):
 
+        volume = 0
+        session_RPE = StandardErrorRange()
         heart_rate_processing = HeartRateProcessing(self.user_age)
-
         for workout_section in session.workout_program_module.workout_sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
             section_hr = []
@@ -72,8 +74,9 @@ class WorkoutProcessor(object):
                 workout_exercise.shrz = workout_section.shrz
                 if len(workout_exercise.hr) > 0:
                     hr_values = sorted(workout_exercise.hr)
-                    top_25_percentile_hr = hr_values[int(len(hr_values) * .75):]
-                    workout_exercise.end_of_workout_hr = round(sum(top_25_percentile_hr) / len(top_25_percentile_hr), 0)
+                    top_95_percentile_hr = hr_values[int(len(hr_values) * .95):]
+                    workout_exercise.end_of_workout_hr = round(sum(top_95_percentile_hr) / len(top_95_percentile_hr), 0)
+                    # workout_exercise.end_of_workout_hr = max(workout_exercise.hr)
                 elif len(section_hr) > 0:
                     hr_values = sorted([hr.value for hr in section_hr])  # TODO: improve this to use exercise specific values, not inherit all from section
                     top_25_percentile_hr = hr_values[int(len(hr_values) * .75):]
@@ -94,11 +97,18 @@ class WorkoutProcessor(object):
                         session.add_maximal_strength_hypertrophic_load(workout_exercise.power_load)
                     elif workout_exercise.adaptation_type == AdaptationType.power_explosive_action:
                         session.add_power_explosive_action_load(workout_exercise.power_load)
+                    if workout_exercise.total_volume is not None and workout_exercise.predicted_rpe is not None:
+                        exercise_rpe = workout_exercise.predicted_rpe.plagiarize()
+                        exercise_rpe.multiply(workout_exercise.total_volume)
+                        session_RPE.add(exercise_rpe)
+                        volume += workout_exercise.total_volume
 
                 session = self.set_session_intensity_metrics(session, workout_exercise)
 
             workout_section.should_assess_shrz()
-
+        if volume > 0 :
+            session_RPE.divide(volume)
+            session.session_RPE = session_RPE
         return session
 
     def set_session_intensity_metrics(self, session, workout_exercise):
@@ -193,7 +203,11 @@ class WorkoutProcessor(object):
                 exercise.distance = exercise.duration * exercise.speed
             exercise.predicted_rpe = StandardErrorRange()
             if exercise.end_of_workout_hr is not None:
-                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr)
+                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
+                                                                                          user_age=self.user_age,
+                                                                                          user_weight=self.user_weight,
+                                                                                          gender=self.gender,
+                                                                                          vo2_max=self.vo2_max.observed_value)
             else:
                 #exercise.predicted_rpe.observed_value = exercise.shrz or 4
                 self.set_planned_cardio_rpe(exercise)
