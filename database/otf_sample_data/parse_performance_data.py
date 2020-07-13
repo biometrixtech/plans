@@ -87,48 +87,60 @@ def get_rowing_floor_sections(user):
     non_zero_power = np.where(rower_data.powerperstroke != 0)[0]
     rower_data.loc[non_zero_power, 'has_power'] = 1
     rower_data['block'] = get_block(rower_data.timestamp, min_change=20, min_duration=1) + 1
-    rower_data['block'] *= rower_data.has_power
-    rower_data['block'] = get_block(rower_data.block, min_change=1, min_duration=1)
 
-    grouped = rower_data.groupby(by='block')
-    group_aggs = grouped.agg(['mean', 'count', 'sum', 'min', 'max'])
-    rower_exercises = []
-    for i, row in group_aggs.iterrows():
-        ex = {}
-        ex['start_date_time'] = get_datetime_from_timestamp(row['timestamp']['min'], timezone)
-        ex['end_date_time'] = get_datetime_from_timestamp(row['timestamp']['max'], timezone)
-        ex['name'] = 'row'
-        ex['movement_id'] = '58459d9ddc2ce90011f93d84'
-        ex['speed'] = round(row['speed']['mean'], 2)
-        ex['power'] = round(row['powerperstroke']['mean'], 3)
-        ex['pace'] = round(1 / ex['speed'], 2)
-        # ex['hr'] = int(row['heartrate']['mean'])
-        ex['hr'] = list(rower_data.heartrate[(rower_data.timestamp > row['timestamp']['min']) & (rower_data.timestamp < row['timestamp']['max'])])
+    groups = int(max(rower_data['block']))
+    rower_sections = []
+    for i in range(1, groups + 1):
+        section_data = rower_data[rower_data.block == i]
 
-        ex['distance'] = row['distance']['max'] - row['distance']['min']
-        ex['duration'] = row['movingtime']['max'] - row['movingtime']['min']
-        if ex['duration'] > 10 and ex['power'] != 0:
-            rower_exercises.append(ex)
-    rower_floor_sections = []
-    for i in range(len(rower_exercises)):
+        section_data['ex_block'] = get_block(section_data.has_power, min_change=1, min_duration=1)
+        grouped = section_data.groupby(by=['ex_block'])
+        group_aggs = grouped.agg(['mean', 'count', 'sum', 'min', 'max'])
         rower_section = {}
-        rower_section['start_date_time'] = rower_exercises[i]['start_date_time']
-        rower_section['end_date_time'] = rower_exercises[i]['end_date_time']
+        rower_section['start_date_time'] = get_datetime_from_timestamp(min(section_data.timestamp), timezone)
+        rower_section['end_date_time'] = get_datetime_from_timestamp(max(section_data.timestamp), timezone)
         rower_section['duration_seconds'] = (rower_section['end_date_time'] - rower_section['start_date_time']).seconds
         rower_section['name'] = 'rower'
-        rower_section['exercises'] = [rower_exercises[i]]
+        rower_section['exercises'] = []
+        for i, row in group_aggs.iterrows():
+            ex = {}
+            ex['start_date_time'] = get_datetime_from_timestamp(row['timestamp']['min'], timezone)
+            ex['end_date_time'] = get_datetime_from_timestamp(row['timestamp']['max'], timezone)
+            ex['name'] = 'row'
+            ex['movement_id'] = '58459d9ddc2ce90011f93d84'
+            ex['speed'] = round(row['speed']['mean'], 2)
+            ex['power'] = round(row['powerperstroke']['mean'], 3)
+            ex['pace'] = round(1 / ex['speed'], 2)
+            # ex['hr'] = int(row['heartrate']['mean'])
+            ex['hr'] = list(rower_data.heartrate[(rower_data.timestamp > row['timestamp']['min']) & (rower_data.timestamp < row['timestamp']['max'])])
+
+            ex['distance'] = row['distance']['max'] - row['distance']['min']
+            ex['duration'] = row['movingtime']['max'] - row['movingtime']['min']
+            if ex['duration'] > 10 and ex['power'] != 0:
+                rower_section['exercises'].append(ex)
+            else:
+                ex['name'] = "rest"
+                ex['movement_id'] = ""  # update with id from rest
+                ex['pace'] = None
+                ex['speed'] = None
+                ex['distance'] = None
+                ex['power'] = None
+                ex['duration'] = (ex['end_date_time'] - ex['start_date_time']).seconds
+                rower_section['exercises'].append(ex)
+        rower_sections.append(rower_section)
+    floor_sections = []
+    for i in range(len(rower_sections)):
         if i != 0:
-            if (rower_exercises[i]['start_date_time'] - rower_exercises[i - 1]['end_date_time']).seconds > 30:
+            if (rower_sections[i]['start_date_time'] - rower_sections[i - 1]['end_date_time']).seconds > 30:
                 floor_section = {}
-                floor_section['start_date_time'] = rower_exercises[i-1]['end_date_time']
-                floor_section['end_date_time'] = rower_exercises[i]['start_date_time']
+                floor_section['start_date_time'] = rower_sections[i-1]['end_date_time']
+                floor_section['end_date_time'] = rower_sections[i]['start_date_time']
                 floor_section['duration_seconds'] = (floor_section['end_date_time'] - floor_section['start_date_time']).seconds
                 floor_section['name'] = 'floor'
                 floor_section['exercises'] = []
-                rower_floor_sections.append(floor_section)
-        rower_floor_sections.append(rower_section)
-
-
+                floor_sections.append(floor_section)
+    rower_sections.extend(floor_sections)
+    rower_floor_sections = sorted(rower_sections, key= lambda x:x['start_date_time'])
     return rower_floor_sections
 
 
@@ -165,6 +177,15 @@ def get_treadmill_section(user):
         ex['distance'] = row['distance']['max'] - row['distance']['min']
         ex['duration'] = row['incline']['count']
         if ex['duration'] > 10 and ex['speed'] > 0:
+            treadmill_exercises.append(ex)
+        else:
+            ex['name'] = "rest"
+            ex['movement_id'] = ""  # update with id from rest
+            ex['pace'] = None
+            ex['speed'] = None
+            ex['distance'] = None
+            ex['grade'] = None
+            ex['duration'] = (ex['end_date_time'] - ex['start_date_time']).seconds
             treadmill_exercises.append(ex)
     treadmill_seciton = {}
     treadmill_seciton['start_date_time'] = treadmill_exercises[0]['start_date_time']
@@ -346,11 +367,6 @@ def get_completed_workout(user, planned_workout):
     workout['event_date_time'] = format_datetime(workout['event_date_time'])
 
     return workout
-
-# workout_program = WorkoutProgramModule.json_deserialise(workout)
-# session = MixedActivitySession()
-# session.workout_program_module = workout_program
-# WorkoutProcessor().process_workout(session)
 
 
 if __name__ == '__main__':
