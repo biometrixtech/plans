@@ -272,11 +272,15 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         self.percent_time_at_65_80_max_hr = 0.0
         self.percent_time_at_80_85_max_hr = 0.0
         self.percent_time_at_85_above_max_hr = 0.0
+        self.percent_time_below_vo2max = 0.0
+        self.percent_time_above_vo2max = 0.0
 
     def json_serialise(self):
         ret = {
             'id': self.id,
             'name': self.name,
+            'start_date_time': format_datetime(self.start_date_time),
+            'end_date_time': format_datetime(self.end_date_time),
             'weight_measure': self.weight_measure.value if self.weight_measure is not None else None,
             'weight': self.weight,
             'sets': self.sets,
@@ -287,6 +291,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
             'bilateral': self.bilateral,
             'movement_id': self.movement_id,
             'hr': self.hr,
+            'end_of_workout_hr': self.end_of_workout_hr,
             'predicted_rpe':self.predicted_rpe.json_serialise() if self.predicted_rpe is not None else None,
             'duration': self.duration,
             'distance': self.distance,
@@ -316,7 +321,12 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
             'tissue_load': self.tissue_load.json_serialise() if self.tissue_load is not None else None,
             'force_load': self.force_load.json_serialise() if self.tissue_load is not None else None,
             'power_load': self.power_load.json_serialise() if self.power_load is not None else None,
-            'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None
+            'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None,
+            'percent_time_at_65_80_max_hr': self.percent_time_at_65_80_max_hr,
+            'percent_time_at_80_85_max_hr': self.percent_time_at_80_85_max_hr,
+            'percent_time_at_85_above_max_hr': self.percent_time_at_85_above_max_hr,
+            'percent_time_below_vo2max': self.percent_time_below_vo2max,
+            'percent_time_above_vo2max': self.percent_time_above_vo2max
         }
         return ret
 
@@ -325,6 +335,8 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise = cls()
         exercise.id = input_dict.get('id', '')
         exercise.name = input_dict.get('name', '')
+        exercise.start_date_time = parse_datetime(input_dict['start_date_time']) if input_dict.get('start_date_time') is not None else None
+        exercise.end_date_time = parse_datetime(input_dict['end_date_time']) if input_dict.get('end_date_time') is not None else None
         exercise.weight = input_dict.get('weight')
         exercise.equipments = [Equipment(equipment) for equipment in input_dict.get('equipments', [])]
         exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get('weight_measure') is not None else None
@@ -333,6 +345,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise.unit_of_measure = UnitOfMeasure(input_dict['unit_of_measure']) if input_dict.get('unit_of_measure') is not None else None
         exercise.movement_id = input_dict.get('movement_id')
         exercise.hr = input_dict.get('hr', [])
+        exercise.end_of_workout_hr = input_dict.get('end_of_workout_hr')
         exercise.predicted_rpe = StandardErrorRange.json_deserialise(input_dict.get('predicted_rpe')) if input_dict.get('predicted_rpe') is not None else None
         exercise.intensity_pace = input_dict.get('intensity_pace')
         exercise.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get(
@@ -372,6 +385,13 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
             'power_load') is not None else None
         exercise.rpe_load = StandardErrorRange.json_deserialise(input_dict.get('rpe_load')) if input_dict.get(
             'rpe_load') is not None else None
+
+        exercise.percent_time_at_65_80_max_hr = input_dict.get('percent_time_at_65_80_max_hr', 0.0)
+        exercise.percent_time_at_80_85_max_hr = input_dict.get('percent_time_at_80_85_max_hr', 0.0)
+        exercise.percent_time_at_85_above_max_hr = input_dict.get('percent_time_at_85_above_max_hr', 0.0)
+        exercise.percent_time_below_vo2max = input_dict.get('percent_time_below_vo2max', 0.0)
+        exercise.percent_time_above_vo2max = input_dict.get('percent_time_above_vo2max', 0.0)
+
         return exercise
 
     def set_intensity(self):
