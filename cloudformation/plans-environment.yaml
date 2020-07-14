@@ -138,6 +138,7 @@ Resources:
                         Resource: "*"
                       - Action:
                           - "s3:GetObject"
+                          - "s3:PutObject"
                         Effect: "Allow"
                         Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
