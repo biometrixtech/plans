@@ -108,7 +108,7 @@ class WorkoutProcessor(object):
             workout_section.should_assess_shrz()
         if volume > 0 :
             session_RPE.divide(volume)
-            session.session_RPE = session_RPE
+            session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?
         return session
 
     def set_session_intensity_metrics(self, session, workout_exercise):
