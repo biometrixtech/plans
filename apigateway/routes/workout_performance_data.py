@@ -7,12 +7,10 @@ from fathomapi.utils.xray import xray_recorder
 
 app = Blueprint('performance_data', __name__)
 
-print('importing')
-
 
 @app.route('/<uuid:user_id>/upload', methods=['PUT'])
 @require.authenticated.any
-@xray_recorder.capture('routes.performance_data.upload')
+# @xray_recorder.capture('routes.performance_data.upload')
 def handle_performance_data_upload(user_id):
     # import boto3
     # import zipfile
