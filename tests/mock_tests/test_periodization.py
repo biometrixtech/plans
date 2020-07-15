@@ -263,7 +263,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 
 def test_acceptable_strength_cardio_same_score_both_required():
 
-    proc = PeriodizationPlanProcessor(datetime.now(), CompletedSessionDetailsDatastore(), None, None, None)
+    proc = PeriodizationPlanProcessor(datetime.now(),None, None, None,  CompletedSessionDetailsDatastore(), None)
     strength_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1),
                     RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.strength_endurance, 2)]
     cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1),
@@ -293,7 +293,7 @@ def test_acceptable_strength_cardio_same_score_both_required():
 
 def test_completing_combo_required_reduces_score():
 
-    proc = PeriodizationPlanProcessor(datetime.now(), CompletedSessionDetailsDatastore(), None, None, None)
+    proc = PeriodizationPlanProcessor(datetime.now(), None, None, None,  CompletedSessionDetailsDatastore(), None)
     cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1),
                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
 

@@ -1,4 +1,4 @@
-from models.periodization import AthleteTrainingHistory, PeriodizationPlan, PeriodizationPlanWeek, PeriodizationModelFactory
+from models.periodization import AthleteTrainingHistory, PeriodizationPlanWeek, PeriodizationModelFactory, PeriodizationPlan
 from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
 from models.training_volume import StandardErrorRange
@@ -45,71 +45,107 @@ class WorkoutScoringManager(object):
 
 
 class PeriodizationPlanProcessor(object):
-    def __init__(self, event_date, completed_session_details_datastore, athlete_periodization_goal, athlete_persona, training_phase_type, athlete_training_history=None, training_calculator=None):
-        self.event_date = event_date
-        self.completed_session_details_datastore = completed_session_details_datastore
+    def __init__(self, event_date, athlete_periodization_goal, athlete_persona, training_phase_type, completed_session_details_datastore, workout_library_datastore, exclude_completed=True):
+        self.start_date = event_date
+
         self.persona = athlete_persona
         self.goal = athlete_periodization_goal
-        self.athlete_training_history = athlete_training_history
+        self.training_phase_type = training_phase_type
         self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type, periodization_goal=athlete_periodization_goal)
+        self.exclude_completed = exclude_completed
+        self.completed_session_details_datastore = completed_session_details_datastore
+        self.workout_library_datastore = workout_library_datastore
+        self.current_weekly_workouts = []
         self.weekly_targets = []
-        self.training_load_calculator = training_calculator
+        self.athlete_training_history = None
+        self.training_load_calculator = None
+
+    def create_periodization_plan(self, start_date):
+
+        self.start_date = start_date
         self.set_training_load_calculator()
         self.set_athlete_training_history()
+        self.set_weekly_targets()
+
+        periodization_plan = PeriodizationPlan(self.start_date, self.goal, self.training_phase_type, self.persona)
+        week_number = 0
+        workouts = self.workout_library_datastore.get()
+        periodization_plan.next_workouts[0] = self.get_acceptable_workouts(week_number,
+                                                                           workouts=workouts,
+                                                                           completed_session_details_list=self.current_weekly_workouts,
+                                                                           exclude_completed=self.exclude_completed)
+
+        return periodization_plan
+
+    def update_periodization_plan(self, periodization_plan: PeriodizationPlan, event_date):
+
+        self.start_date = periodization_plan.start_date
+        self.set_training_load_calculator()
+        self.set_athlete_training_history()
+        self.set_weekly_targets()
+
+        periodization_plan.athlete_persona = self.persona
+        periodization_plan.training_phase = self.training_phase_type
+        periodization_plan.periodization_goal = self.goal
+
+        week_number = periodization_plan.get_week_number(event_date)
+        workouts = self.workout_library_datastore.get()
+        periodization_plan.next_workouts[0] = self.get_acceptable_workouts(week_number,
+                                                                           workouts=workouts,
+                                                                           completed_session_details_list=self.current_weekly_workouts,
+                                                                           exclude_completed=self.exclude_completed)
+
+        return periodization_plan
 
     def set_training_load_calculator(self):
 
-        if self.training_load_calculator is None:
+        self.current_weekly_workouts = self.completed_session_details_datastore.get(
+            start_date_time=self.start_date - timedelta(days=6), end_date_time=self.start_date)
+        previous_week_1_load_list = self.completed_session_details_datastore.get(
+            start_date_time=self.start_date - timedelta(days=13), end_date_time=self.start_date - timedelta(days=7))
+        previous_week_2_load_list = self.completed_session_details_datastore.get(
+            start_date_time=self.start_date - timedelta(days=20), end_date_time=self.start_date - timedelta(days=14))
+        previous_week_3_load_list = self.completed_session_details_datastore.get(
+            start_date_time=self.start_date - timedelta(days=27), end_date_time=self.start_date - timedelta(days=21))
+        previous_week_4_load_list = self.completed_session_details_datastore.get(
+            start_date_time=self.start_date - timedelta(days=34), end_date_time=self.start_date - timedelta(days=28))
 
-            current_week_load_list = self.completed_session_details_datastore.get(
-                start_date_time=self.event_date - timedelta(days=6), end_date_time=self.event_date)
-            previous_week_1_load_list = self.completed_session_details_datastore.get(
-                start_date_time=self.event_date - timedelta(days=13), end_date_time=self.event_date - timedelta(days=7))
-            previous_week_2_load_list = self.completed_session_details_datastore.get(
-                start_date_time=self.event_date - timedelta(days=20), end_date_time=self.event_date - timedelta(days=14))
-            previous_week_3_load_list = self.completed_session_details_datastore.get(
-                start_date_time=self.event_date - timedelta(days=27), end_date_time=self.event_date - timedelta(days=21))
-            previous_week_4_load_list = self.completed_session_details_datastore.get(
-                start_date_time=self.event_date - timedelta(days=34), end_date_time=self.event_date - timedelta(days=28))
-
-            self.training_load_calculator = TrainingLoadCalculator(current_week_load_list,
-                                                                   previous_week_1_load_list,
-                                                                   previous_week_2_load_list,
-                                                                   previous_week_3_load_list,
-                                                                   previous_week_4_load_list)
+        self.training_load_calculator = TrainingLoadCalculator(self.current_weekly_workouts,
+                                                               previous_week_1_load_list,
+                                                               previous_week_2_load_list,
+                                                               previous_week_3_load_list,
+                                                               previous_week_4_load_list)
 
     def set_athlete_training_history(self):
 
-        if self.athlete_training_history is None:
+        self.athlete_training_history = AthleteTrainingHistory()
 
-            self.athlete_training_history = AthleteTrainingHistory()
+        self.athlete_training_history.current_weeks_load.rpe_load = self.training_load_calculator.current_week_rpe_load_sum
+        self.athlete_training_history.current_weeks_load.power_load = self.training_load_calculator.current_week_power_load_sum
 
-            self.athlete_training_history.current_weeks_load.rpe_load = self.training_load_calculator.current_week_rpe_load_sum
-            self.athlete_training_history.current_weeks_load.power_load = self.training_load_calculator.current_week_power_load_sum
+        self.athlete_training_history.previous_1_weeks_load.rpe_load = self.training_load_calculator.previous_week_1_rpe_load_sum
+        self.athlete_training_history.previous_1_weeks_load.power_load = self.training_load_calculator.previous_week_1_power_load_sum
 
-            self.athlete_training_history.previous_1_weeks_load.rpe_load = self.training_load_calculator.previous_week_1_rpe_load_sum
-            self.athlete_training_history.previous_1_weeks_load.power_load = self.training_load_calculator.previous_week_1_power_load_sum
+        self.athlete_training_history.previous_2_weeks_load.rpe_load = self.training_load_calculator.previous_week_2_rpe_load_sum
+        self.athlete_training_history.previous_2_weeks_load.power_load = self.training_load_calculator.previous_week_2_power_load_sum
 
-            self.athlete_training_history.previous_2_weeks_load.rpe_load = self.training_load_calculator.previous_week_2_rpe_load_sum
-            self.athlete_training_history.previous_2_weeks_load.power_load = self.training_load_calculator.previous_week_2_power_load_sum
+        self.athlete_training_history.previous_3_weeks_load.rpe_load = self.training_load_calculator.previous_week_3_rpe_load_sum
+        self.athlete_training_history.previous_3_weeks_load.power_load = self.training_load_calculator.previous_week_3_power_load_sum
 
-            self.athlete_training_history.previous_3_weeks_load.rpe_load = self.training_load_calculator.previous_week_3_rpe_load_sum
-            self.athlete_training_history.previous_3_weeks_load.power_load = self.training_load_calculator.previous_week_3_power_load_sum
+        self.athlete_training_history.previous_4_weeks_load.rpe_load = self.training_load_calculator.previous_week_4_rpe_load_sum
+        self.athlete_training_history.previous_4_weeks_load.power_load = self.training_load_calculator.previous_week_4_power_load_sum
 
-            self.athlete_training_history.previous_4_weeks_load.rpe_load = self.training_load_calculator.previous_week_4_rpe_load_sum
-            self.athlete_training_history.previous_4_weeks_load.power_load = self.training_load_calculator.previous_week_4_power_load_sum
+        self.athlete_training_history.average_session_load.rpe_load = self.training_load_calculator.average_session_load
+        self.athlete_training_history.average_session_load.power_load = self.training_load_calculator.average_session_load
 
-            self.athlete_training_history.average_session_load.rpe_load = self.training_load_calculator.average_session_load
-            self.athlete_training_history.average_session_load.power_load = self.training_load_calculator.average_session_load
+        self.athlete_training_history.average_session_rpe = self.training_load_calculator.average_session_rpe
+        self.athlete_training_history.average_sessions_per_week = self.training_load_calculator.average_sessions_per_week
 
-            self.athlete_training_history.average_session_rpe = self.training_load_calculator.average_session_rpe
-            self.athlete_training_history.average_sessions_per_week = self.training_load_calculator.average_sessions_per_week
-
-            self.athlete_training_history.current_weeks_detailed_load = self.training_load_calculator.current_weeks_detailed_load
-            self.athlete_training_history.previous_1_weeks_detailed_load = self.training_load_calculator.previous_1_weeks_detailed_load
-            self.athlete_training_history.previous_2_weeks_detailed_load = self.training_load_calculator.previous_2_weeks_detailed_load
-            self.athlete_training_history.previous_3_weeks_detailed_load = self.training_load_calculator.previous_3_weeks_detailed_load
-            self.athlete_training_history.previous_4_weeks_detailed_load = self.training_load_calculator.previous_4_weeks_detailed_load
+        self.athlete_training_history.current_weeks_detailed_load = self.training_load_calculator.current_weeks_detailed_load
+        self.athlete_training_history.previous_1_weeks_detailed_load = self.training_load_calculator.previous_1_weeks_detailed_load
+        self.athlete_training_history.previous_2_weeks_detailed_load = self.training_load_calculator.previous_2_weeks_detailed_load
+        self.athlete_training_history.previous_3_weeks_detailed_load = self.training_load_calculator.previous_3_weeks_detailed_load
+        self.athlete_training_history.previous_4_weeks_detailed_load = self.training_load_calculator.previous_4_weeks_detailed_load
 
     def set_weekly_targets(self):
         # sets procession from high volume-low intensity to low volume-high intensity over the course of the

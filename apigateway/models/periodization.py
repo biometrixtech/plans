@@ -2,6 +2,7 @@ from enum import Enum
 from models.training_volume import StandardErrorRange
 from models.training_load import DetailedTrainingLoad, TrainingLoad
 from models.movement_tags import DetailedAdaptationType, SubAdaptationType, AdaptationDictionary
+from datetime import datetime, timedelta
 
 
 class AthleteTrainingHistory(object):
@@ -124,12 +125,20 @@ class TrainingPhase(object):
         self.acwr = StandardErrorRange(lower_bound=lower_progression_bound, upper_bound=upper_progression_bound)
 
 
-# should proceed from high volume-low intensity to low volume-high intensity training over the course of the mesocycle
 class PeriodizationPlan(object):
-    def __init__(self, athlete_periodization_goal):
+    def __init__(self, start_date, athlete_periodization_goal, training_phase, athlete_persona):
+        self.start_date = start_date
         self.periodization_goal = athlete_periodization_goal
-        self.training_phase = None
-        self.weeks = []
+        self.training_phase = training_phase
+        self.athlete_persona = athlete_persona
+        self.next_workouts = {}
+
+    def get_week_number(self, event_date):
+
+        monday1 = (self.start_date - timedelta(days=self.start_date.weekday()))
+        monday2 = (event_date - timedelta(days=event_date.weekday()))
+
+        return (monday2 - monday1).days / 7
 
 
 class PeriodizationPlanWeek(object):
