@@ -18,7 +18,7 @@ _ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf')
 # Need to use single threading to prevent X Ray tracing errors
 _s3_config = TransferConfig(use_threads=False)
 
-@app.route('/<uuid:user_id>/upload', methods=['POST'])
+@app.route('/<uuid:user_id>/upload', methods=['PUT'])
 @require.authenticated.any
 @xray_recorder.capture('routes.performance_data.upload')
 def handle_performance_data_upload(user_id):
