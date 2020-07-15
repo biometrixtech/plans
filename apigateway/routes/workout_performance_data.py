@@ -4,24 +4,25 @@ from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import ApplicationException
 from fathomapi.utils.xray import xray_recorder
 
-# import boto3
-# import zipfile
-import io
-import boto3
-from boto3.s3.transfer import TransferConfig
-import base64
-
 
 app = Blueprint('performance_data', __name__)
 
-_ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf')
-# Need to use single threading to prevent X Ray tracing errors
-_s3_config = TransferConfig(use_threads=False)
+print('importing')
+
 
 @app.route('/<uuid:user_id>/upload', methods=['PUT'])
 @require.authenticated.any
 @xray_recorder.capture('routes.performance_data.upload')
 def handle_performance_data_upload(user_id):
+    # import boto3
+    # import zipfile
+    import io
+    import boto3
+    from boto3.s3.transfer import TransferConfig
+    import base64
+    _ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf')
+    # Need to use single threading to prevent X Ray tracing errors
+    _s3_config = TransferConfig(use_threads=False)
     # if request.headers['Content-Type'] == 'application/zip':
     #     # data = request.get_data().encode()
     #     data = base64.b64decode(request.get_data())
@@ -39,19 +40,6 @@ def handle_performance_data_upload(user_id):
             'UnsupportedContentType',
             'This endpoint requires the Content-Type application/zip with a zip file'
         )
-
-    return {'message': 'Received'}, 202
-
-
-@app.route('/<uuid:user_id>/upload_second', methods=['POST'])
-@require.authenticated.any
-@xray_recorder.capture('routes.performance_data.upload_second')
-def handle_performance_data_upload_second(user_id):
-    print(request.files)
-    file = request.files['file']
-    print(file)
-    f = io.BytesIO(file)
-    _ingest_s3_bucket.upload_fileobj(f, 'test_file_files.zip', Config=_s3_config)
 
     return {'message': 'Received'}, 202
 
