@@ -14,16 +14,16 @@ class AthleteTrainingHistory(object):
         self.average_session_load = TrainingLoad()
         self.average_day_load = TrainingLoad()
 
-        self.current_weeks_load = TrainingLoad()
+        self.last_weeks_load = TrainingLoad()
         self.previous_1_weeks_load = TrainingLoad()
         self.previous_2_weeks_load = TrainingLoad()
         self.previous_3_weeks_load = TrainingLoad()
         self.previous_4_weeks_load = TrainingLoad()
 
-        self.current_weeks_average_session_duration = StandardErrorRange()
-        self.current_weeks_average_session_rpe = StandardErrorRange()
+        # self.last_weeks_average_session_duration = StandardErrorRange()
+        # self.current_weeks_average_session_rpe = StandardErrorRange()
 
-        self.current_weeks_detailed_load = DetailedTrainingLoad()
+        self.last_weeks_detailed_load = DetailedTrainingLoad()
         self.previous_1_weeks_detailed_load = DetailedTrainingLoad()
         self.previous_2_weeks_detailed_load = DetailedTrainingLoad()
         self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
@@ -33,8 +33,8 @@ class AthleteTrainingHistory(object):
 
         power_load_list = []
 
-        if self.current_weeks_load.power_load is not None:
-            power_load_list.append(self.current_weeks_load.power_load)
+        if self.last_weeks_load.power_load is not None:
+            power_load_list.append(self.last_weeks_load.power_load)
 
         if self.previous_1_weeks_load.power_load is not None:
             power_load_list.append(self.previous_1_weeks_load.power_load)
@@ -51,8 +51,8 @@ class AthleteTrainingHistory(object):
 
         load_list = []
 
-        if self.current_weeks_load.rpe_load is not None:
-            load_list.append(self.current_weeks_load.rpe_load)
+        if self.last_weeks_load.rpe_load is not None:
+            load_list.append(self.last_weeks_load.rpe_load)
 
         if self.previous_1_weeks_load.rpe_load is not None:
             load_list.append(self.previous_1_weeks_load.rpe_load)
@@ -139,6 +139,12 @@ class PeriodizationPlan(object):
         monday2 = (event_date - timedelta(days=event_date.weekday()))
 
         return (monday2 - monday1).days / 7
+
+    def get_week_start_date(self, event_date):
+
+        week_number = self.get_week_number(event_date)
+
+        return self.start_date + timedelta(weeks=week_number)
 
 
 class PeriodizationPlanWeek(object):

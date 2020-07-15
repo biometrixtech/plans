@@ -63,7 +63,7 @@ class PeriodizationPlanProcessor(object):
     def create_periodization_plan(self, start_date):
 
         self.start_date = start_date
-        self.set_training_load_calculator()
+        self.set_completed_workouts(start_date)
         self.set_athlete_training_history()
         self.set_weekly_targets()
 
@@ -80,7 +80,8 @@ class PeriodizationPlanProcessor(object):
     def update_periodization_plan(self, periodization_plan: PeriodizationPlan, event_date):
 
         self.start_date = periodization_plan.start_date
-        self.set_training_load_calculator()
+        week_start_date = periodization_plan.get_week_start_date(event_date)
+        self.set_completed_workouts(week_start_date)
         self.set_athlete_training_history()
         self.set_weekly_targets()
 
@@ -97,20 +98,23 @@ class PeriodizationPlanProcessor(object):
 
         return periodization_plan
 
-    def set_training_load_calculator(self):
+    def set_completed_workouts(self, week_start_date):
 
         self.current_weekly_workouts = self.completed_session_details_datastore.get(
-            start_date_time=self.start_date - timedelta(days=6), end_date_time=self.start_date)
-        previous_week_1_load_list = self.completed_session_details_datastore.get(
-            start_date_time=self.start_date - timedelta(days=13), end_date_time=self.start_date - timedelta(days=7))
-        previous_week_2_load_list = self.completed_session_details_datastore.get(
-            start_date_time=self.start_date - timedelta(days=20), end_date_time=self.start_date - timedelta(days=14))
-        previous_week_3_load_list = self.completed_session_details_datastore.get(
-            start_date_time=self.start_date - timedelta(days=27), end_date_time=self.start_date - timedelta(days=21))
-        previous_week_4_load_list = self.completed_session_details_datastore.get(
-            start_date_time=self.start_date - timedelta(days=34), end_date_time=self.start_date - timedelta(days=28))
+            start_date_time=week_start_date, end_date_time=week_start_date+timedelta(days=6))
 
-        self.training_load_calculator = TrainingLoadCalculator(self.current_weekly_workouts,
+        last_week_workouts = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=7), end_date_time=week_start_date - timedelta(days=1))
+        previous_week_1_load_list = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=14), end_date_time=week_start_date - timedelta(days=8))
+        previous_week_2_load_list = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=21), end_date_time=week_start_date - timedelta(days=15))
+        previous_week_3_load_list = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=28), end_date_time=week_start_date - timedelta(days=22))
+        previous_week_4_load_list = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=35), end_date_time=week_start_date - timedelta(days=29))
+
+        self.training_load_calculator = TrainingLoadCalculator(last_week_workouts,
                                                                previous_week_1_load_list,
                                                                previous_week_2_load_list,
                                                                previous_week_3_load_list,
@@ -120,8 +124,8 @@ class PeriodizationPlanProcessor(object):
 
         self.athlete_training_history = AthleteTrainingHistory()
 
-        self.athlete_training_history.current_weeks_load.rpe_load = self.training_load_calculator.current_week_rpe_load_sum
-        self.athlete_training_history.current_weeks_load.power_load = self.training_load_calculator.current_week_power_load_sum
+        self.athlete_training_history.last_weeks_load.rpe_load = self.training_load_calculator.current_week_rpe_load_sum
+        self.athlete_training_history.last_weeks_load.power_load = self.training_load_calculator.current_week_power_load_sum
 
         self.athlete_training_history.previous_1_weeks_load.rpe_load = self.training_load_calculator.previous_week_1_rpe_load_sum
         self.athlete_training_history.previous_1_weeks_load.power_load = self.training_load_calculator.previous_week_1_power_load_sum
@@ -141,7 +145,7 @@ class PeriodizationPlanProcessor(object):
         self.athlete_training_history.average_session_rpe = self.training_load_calculator.average_session_rpe
         self.athlete_training_history.average_sessions_per_week = self.training_load_calculator.average_sessions_per_week
 
-        self.athlete_training_history.current_weeks_detailed_load = self.training_load_calculator.current_weeks_detailed_load
+        self.athlete_training_history.last_weeks_detailed_load = self.training_load_calculator.last_weeks_detailed_load
         self.athlete_training_history.previous_1_weeks_detailed_load = self.training_load_calculator.previous_1_weeks_detailed_load
         self.athlete_training_history.previous_2_weeks_detailed_load = self.training_load_calculator.previous_2_weeks_detailed_load
         self.athlete_training_history.previous_3_weeks_detailed_load = self.training_load_calculator.previous_3_weeks_detailed_load

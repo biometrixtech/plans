@@ -6,7 +6,7 @@ from statistics import mean
 class TrainingLoadCalculator(object):
 
     def __init__(self,
-                 current_week_load_list: [StandardErrorRange],
+                 last_week_load_list: [StandardErrorRange],
                  previous_week_1_load_list: [StandardErrorRange],
                  previous_week_2_load_list: [StandardErrorRange],
                  previous_week_3_load_list: [StandardErrorRange],
@@ -14,38 +14,38 @@ class TrainingLoadCalculator(object):
                  calculate_averages=True,
                  calculate_detailes=False):
 
-        self.current_week_load_list = current_week_load_list
+        self.last_week_load_list = last_week_load_list
         self.previous_week_1_load_list = previous_week_1_load_list
         self.previous_week_2_load_list = previous_week_2_load_list
         self.previous_week_3_load_list = previous_week_3_load_list
         self.previous_week_4_load_list = previous_week_4_load_list
 
-        self.current_week_rpe_load_values = []
+        self.last_week_rpe_load_values = []
         self.previous_week_1_rpe_load_values = []
         self.previous_week_2_rpe_load_values = []
         self.previous_week_3_rpe_load_values = []
         self.previous_week_4_rpe_load_values = []
 
-        self.current_week_power_load_values = []
+        self.last_week_power_load_values = []
         self.previous_week_1_power_load_values = []
         self.previous_week_2_power_load_values = []
         self.previous_week_3_power_load_values = []
         self.previous_week_4_power_load_values = []
 
-        self.current_week_rpe_values = []
+        self.last_week_rpe_values = []
         self.previous_week_1_rpe_values = []
         self.previous_week_2_rpe_values = []
         self.previous_week_3_rpe_values = []
         self.previous_week_4_rpe_values = []
 
-        self.current_week_rpe_load_sum = None
+        self.last_week_rpe_load_sum = None
         self.previous_week_1_rpe_load_sum = None
         self.previous_week_2_rpe_load_sum = None
         self.previous_week_3_rpe_load_sum = None
         self.previous_week_4_rpe_load_sum = None
         self.chronic_rpe_load_average = None
 
-        self.current_week_power_load_sum = None
+        self.last_week_power_load_sum = None
         self.previous_week_1_power_load_sum = None
         self.previous_week_2_power_load_sum = None
         self.previous_week_3_power_load_sum = None
@@ -56,7 +56,7 @@ class TrainingLoadCalculator(object):
         self.average_session_rpe = None
         self.average_sessions_per_week = None
 
-        self.current_weeks_detailed_load = DetailedTrainingLoad()
+        self.last_weeks_detailed_load = DetailedTrainingLoad()
         self.previous_1_weeks_detailed_load = DetailedTrainingLoad()
         self.previous_2_weeks_detailed_load = DetailedTrainingLoad()
         self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
@@ -72,19 +72,19 @@ class TrainingLoadCalculator(object):
 
     def populate_values(self):
 
-        self.current_week_rpe_load_values = [l.rpe_load for l in self.current_week_load_list]
+        self.last_week_rpe_load_values = [l.rpe_load for l in self.last_week_load_list]
         self.previous_week_1_rpe_load_values = [l.rpe_load for l in self.previous_week_1_load_list]
         self.previous_week_2_rpe_load_values = [l.rpe_load for l in self.previous_week_2_load_list]
         self.previous_week_3_rpe_load_values = [l.rpe_load for l in self.previous_week_3_load_list]
         self.previous_week_4_rpe_load_values = [l.rpe_load for l in self.previous_week_4_load_list]
 
-        self.current_week_power_load_values = [l.power_load for l in self.current_week_load_list]
+        self.last_week_power_load_values = [l.power_load for l in self.last_week_load_list]
         self.previous_week_1_power_load_values = [l.power_load for l in self.previous_week_1_load_list]
         self.previous_week_2_power_load_values = [l.power_load for l in self.previous_week_2_load_list]
         self.previous_week_3_power_load_values = [l.power_load for l in self.previous_week_3_load_list]
         self.previous_week_4_power_load_values = [l.power_load for l in self.previous_week_4_load_list]
 
-        self.current_week_rpe_values = [l.session_RPE for l in self.current_week_load_list]
+        self.last_week_rpe_values = [l.session_RPE for l in self.last_week_load_list]
         self.previous_week_1_rpe_values = [l.session_RPE for l in self.previous_week_1_load_list]
         self.previous_week_2_rpe_values = [l.session_RPE for l in self.previous_week_2_load_list]
         self.previous_week_3_rpe_values = [l.session_RPE for l in self.previous_week_3_load_list]
@@ -92,14 +92,14 @@ class TrainingLoadCalculator(object):
 
     def sum_weeks(self):
 
-        self.current_week_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.current_week_rpe_load_values)
+        self.last_week_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.last_week_rpe_load_values)
         self.previous_week_1_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_1_rpe_load_values)
         self.previous_week_2_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_rpe_load_values)
         self.previous_week_3_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_rpe_load_values)
         self.previous_week_4_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_rpe_load_values)
 
-        self.current_week_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
-            self.current_week_power_load_values)
+        self.last_week_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
+            self.last_week_power_load_values)
         self.previous_week_1_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
             self.previous_week_1_power_load_values)
         self.previous_week_2_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
@@ -124,16 +124,16 @@ class TrainingLoadCalculator(object):
         self.chronic_rpe_load_average = StandardErrorRange.get_average_from_error_range_list(rpe_chronic_weeks)
         self.chronic_power_load_average = StandardErrorRange.get_average_from_error_range_list(power_chronic_weeks)
 
-        last_two_weeks_sessions = self.current_week_power_load_values
+        last_two_weeks_sessions = self.last_week_power_load_values
         last_two_weeks_sessions.extend(self.previous_week_1_power_load_values)
-        if len(self.current_week_power_load_values) <= 1:
+        if len(self.last_week_power_load_values) <= 1:
             last_two_weeks_sessions.extend(self.previous_week_2_power_load_values)
 
         self.average_session_load = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_sessions)
 
-        last_two_weeks_rpes = self.current_week_rpe_values
+        last_two_weeks_rpes = self.last_week_rpe_values
         last_two_weeks_rpes.extend(self.previous_week_1_rpe_values)
-        if len(self.current_week_rpe_values) <= 1:
+        if len(self.last_week_rpe_values) <= 1:
             last_two_weeks_rpes.extend(self.previous_week_2_rpe_values)
 
         self.average_session_rpe = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_rpes)
@@ -154,8 +154,8 @@ class TrainingLoadCalculator(object):
 
     def calculate_weekly_detailed_training_load(self):
 
-        for c in self.current_week_load_list:
-            self.current_weeks_detailed_load.add(c.session_detailed_load)
+        for c in self.last_week_load_list:
+            self.last_weeks_detailed_load.add(c.session_detailed_load)
 
         for c in self.previous_week_1_load_list:
             self.previous_1_weeks_detailed_load.add(c.session_detailed_load)
@@ -169,7 +169,7 @@ class TrainingLoadCalculator(object):
         for c in self.previous_week_4_load_list:
             self.previous_4_weeks_detailed_load.add(c.session_detailed_load)
 
-        self.current_weeks_detailed_load.rank_adaptation_types()
+        self.last_weeks_detailed_load.rank_adaptation_types()
         self.previous_1_weeks_detailed_load.rank_adaptation_types()
         self.previous_2_weeks_detailed_load.rank_adaptation_types()
         self.previous_3_weeks_detailed_load.rank_adaptation_types()
@@ -178,10 +178,10 @@ class TrainingLoadCalculator(object):
     def get_ramp(self, load_type):
 
         if load_type == LoadType.power:
-            current_week_total_load = self.current_week_power_load_sum.plagiarize()
+            current_week_total_load = self.last_week_power_load_sum.plagiarize()
             current_week_total_load.divide_range(self.previous_week_1_power_load_sum)
         else:
-            current_week_total_load = self.current_week_rpe_load_sum.plagiarize()
+            current_week_total_load = self.last_week_rpe_load_sum.plagiarize()
             current_week_total_load.divide_range(self.previous_week_1_rpe_load_sum)
 
         return current_week_total_load
@@ -189,10 +189,10 @@ class TrainingLoadCalculator(object):
     def get_acwr(self, load_type):
 
         if load_type == LoadType.power:
-            current_week_sum = self.current_week_power_load_sum.plagiarize()
+            current_week_sum = self.last_week_power_load_sum.plagiarize()
             current_week_sum.divide_range(self.chronic_power_load_average)
         else:
-            current_week_sum = self.current_week_rpe_load_sum.plagiarize()
+            current_week_sum = self.last_week_rpe_load_sum.plagiarize()
             current_week_sum.divide_range(self.chronic_rpe_load_average)
 
         return current_week_sum
@@ -200,10 +200,10 @@ class TrainingLoadCalculator(object):
     def get_freshness(self, load_type):
 
         if load_type == LoadType.power:
-            current_week_sum = self.current_week_power_load_sum.plagiarize()
+            current_week_sum = self.last_week_power_load_sum.plagiarize()
             current_week_sum.subtract(self.previous_week_1_power_load_sum)
         else:
-            current_week_sum = self.current_week_rpe_load_sum.plagiarize()
+            current_week_sum = self.last_week_rpe_load_sum.plagiarize()
             current_week_sum.subtract(self.previous_week_1_rpe_load_sum)
 
         return current_week_sum
@@ -233,20 +233,20 @@ class TrainingLoadCalculator(object):
 
         if load_type == LoadType.power:
             # don't want an event with strain > 1.2
-            current_week_strain = self.get_strain(self.current_week_power_load_values)
+            last_week_strain = self.get_strain(self.last_week_power_load_values)
             previous_week_1_strain = self.get_strain(self.previous_week_1_power_load_values)
             previous_week_2_strain = self.get_strain(self.previous_week_2_power_load_values)
             previous_week_3_strain = self.get_strain(self.previous_week_3_power_load_values)
             previous_week_4_strain = self.get_strain(self.previous_week_4_power_load_values)
         else:
-            current_week_strain = self.get_strain(self.current_week_rpe_load_values)
+            last_week_strain = self.get_strain(self.last_week_rpe_load_values)
             previous_week_1_strain = self.get_strain(self.previous_week_1_rpe_load_values)
             previous_week_2_strain = self.get_strain(self.previous_week_2_rpe_load_values)
             previous_week_3_strain = self.get_strain(self.previous_week_3_rpe_load_values)
             previous_week_4_strain = self.get_strain(self.previous_week_4_rpe_load_values)
 
         strain_list = [
-            current_week_strain,
+            last_week_strain,
             previous_week_1_strain,
             previous_week_2_strain,
             previous_week_3_strain,
@@ -256,10 +256,10 @@ class TrainingLoadCalculator(object):
         strain_average = StandardErrorRange.get_average_from_error_range_list(strain_list)
         strain_stddev = StandardErrorRange.get_stddev_from_error_range_list(strain_list)
 
-        current_week_strain.subtract(strain_average)
-        current_week_strain.divide_range(strain_stddev)
+        last_week_strain.subtract(strain_average)
+        last_week_strain.divide_range(strain_stddev)
 
-        return current_week_strain
+        return last_week_strain
 
 
 
