@@ -41,3 +41,17 @@ def handle_performance_data_upload(user_id):
         )
 
     return {'message': 'Received'}, 202
+
+
+@app.route('/<uuid:user_id>/upload_second', methods=['POST'])
+@require.authenticated.any
+@xray_recorder.capture('routes.performance_data.upload_second')
+def handle_performance_data_upload_second(user_id):
+    print(request.files)
+    file = request.files['file']
+    print(file)
+    f = io.BytesIO(file)
+    _ingest_s3_bucket.upload_fileobj(f, 'test_file_files.zip', Config=_s3_config)
+
+    return {'message': 'Received'}, 202
+
