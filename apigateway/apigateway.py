@@ -3,6 +3,7 @@ from fathomapi.api.flask_app import app
 from datastores.ml_model_datastore import MLModelsDatastore
 MLModelsDatastore.load_models()
 
+from routes.workout_performance_data import app as performance_data_route
 from routes.active_recovery import app as active_recovery_routes
 from routes.athlete import app as athlete_routes
 from routes.coach import app as coach_routes
@@ -21,8 +22,8 @@ from routes.mobility_wod import app as mobility_wod_routes
 from routes.responsive_recovery import app as responsive_recovery_routes
 from routes.training_session import app as training_session_routes
 from routes.report_symptoms import app as report_symptoms_route
-from routes.workout_performance_data import app as performance_data_route
 
+app.register_blueprint(performance_data_route, url_prefix='/performance_data')
 app.register_blueprint(active_recovery_routes, url_prefix='/active_recovery')
 app.register_blueprint(session_routes, url_prefix='/session')
 app.register_blueprint(athlete_routes, url_prefix='/athlete')
@@ -41,7 +42,6 @@ app.register_blueprint(mobility_wod_routes, url_prefix='/mobility_wod')
 app.register_blueprint(responsive_recovery_routes, url_prefix='/responsive_recovery')
 app.register_blueprint(training_session_routes, url_prefix='/training_session')
 app.register_blueprint(report_symptoms_route, url_prefix='/report_symptoms')
-app.register_blueprint(performance_data_route, url_prefix='/performance_data')
 
 
 def handler(event, context):
