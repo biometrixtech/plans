@@ -529,20 +529,20 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         else:
             session.session_load_dict = None
 
-        session.tissue_load = StandardErrorRange.json_deserialise(input_dict['tissue_load'])
-        session.force_load = StandardErrorRange.json_deserialise(input_dict['force_load'])
-        session.power_load = StandardErrorRange.json_deserialise(input_dict['power_load'])
-        session.rpe_load = StandardErrorRange.json_deserialise(input_dict['rpe_load'])
+        session.tissue_load = StandardErrorRange.json_deserialise(input_dict['tissue_load']) if input_dict.get('tissue_load') is not None else None
+        session.force_load = StandardErrorRange.json_deserialise(input_dict['force_load']) if input_dict.get('force_load') is not None else None
+        session.power_load = StandardErrorRange.json_deserialise(input_dict['power_load']) if input_dict.get('power_load') is not None else None
+        session.rpe_load = StandardErrorRange.json_deserialise(input_dict['rpe_load']) if input_dict.get('rpe_load') is not None else None
         session.strength_endurance_cardiorespiratory_load = StandardErrorRange.json_deserialise(
-            input_dict['strength_endurance_cardiorespiratory_load'])
+            input_dict['strength_endurance_cardiorespiratory_load']) if input_dict.get('strength_endurance_cardiorespiratory_load') is not None else None
         session.strength_endurance_strength_load = StandardErrorRange.json_deserialise(
-            input_dict['strength_endurance_strength_load'])
-        session.power_drill_load = StandardErrorRange.json_deserialise(input_dict['power_drill_load'])
+            input_dict['strength_endurance_strength_load']) if input_dict.get('strength_endurance_strength_load') is not None else None
+        session.power_drill_load = StandardErrorRange.json_deserialise(input_dict['power_drill_load']) if input_dict.get('power_drill_load') is not None else None
         session.maximal_strength_hypertrophic_load = StandardErrorRange.json_deserialise(
-            input_dict['maximal_strength_hypertrophic_load'])
+            input_dict['maximal_strength_hypertrophic_load']) if input_dict.get('maximal_strength_hypertrophic_load') is not None else None
         session.power_explosive_action_load = StandardErrorRange.json_deserialise(
-            input_dict['power_explosive_action_load'])
-        session.not_tracked_load = StandardErrorRange.json_deserialise(input_dict['not_tracked_load'])
+            input_dict['power_explosive_action_load']) if input_dict.get('power_explosive_action_load') is not None else None
+        session.not_tracked_load = StandardErrorRange.json_deserialise(input_dict['not_tracked_load']) if input_dict.get('not_tracked_load') is not None else None
         session.cardio_plyometrics = input_dict.get('cardio_plyometrics')
         session.ultra_high_intensity = input_dict.get('ultra_high_intensity')
 
