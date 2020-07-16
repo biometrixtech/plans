@@ -60,6 +60,8 @@ class UserStats(Serialisable):
                     value = parse_datetime(value)
                 except InvalidSchemaException:
                     value = parse_date(value)
+        elif name == 'vo2_max_date_time' and value is not None:
+            value = parse_datetime(value)
         super().__setattr__(name, value)
 
     def json_serialise(self):
