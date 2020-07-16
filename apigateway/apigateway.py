@@ -1,7 +1,7 @@
 from fathomapi.api.handler import handler as fathom_handler
 from fathomapi.api.flask_app import app
-# from datastores.ml_model_datastore import MLModelsDatastore
-# MLModelsDatastore.load_models()
+from datastores.ml_model_datastore import MLModelsDatastore
+MLModelsDatastore.load_models()
 
 from routes.workout_performance_data import app as performance_data_route
 from routes.active_recovery import app as active_recovery_routes
