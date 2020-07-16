@@ -23,9 +23,7 @@ def test_ramp():
     week_1 = create_week_workouts([50, 80, 60, 50])
     week_2 = create_week_workouts([60, 80, 65, 60])
 
-    calc = TrainingLoadCalculator(week_1, week_2, [], [], [],calculate_averages=False)
-
-    ramp = calc.get_ramp(LoadType.rpe)
+    ramp = TrainingLoadCalculator().get_ramp(LoadType.rpe, week_1, week_2)
 
     assert 0 < ramp.lower_bound
     assert 0 < ramp.observed_value
@@ -35,14 +33,12 @@ def test_ramp():
 def test_acwr():
 
     week_1 = create_week_workouts([50, 80, 60, 50])
-    week_2 = create_week_workouts([60, 80, 65, 60])
-    week_3 = create_week_workouts([40, 70, 55, 30])
-    week_4 = create_week_workouts([50, 60, 55, 50])
-    week_5 = create_week_workouts([50, 50, 55, 60])
+    week_2_list = [create_week_workouts([60, 80, 65, 60]),
+            create_week_workouts([40, 70, 55, 30]),
+            create_week_workouts([50, 60, 55, 50]),
+            create_week_workouts([50, 50, 55, 60])]
 
-    calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
-
-    acwr = calc.get_acwr(LoadType.rpe)
+    acwr = TrainingLoadCalculator().get_acwr(LoadType.rpe, week_1, week_2_list)
 
     assert 0 < acwr.lower_bound
     assert 0 < acwr.observed_value
@@ -52,49 +48,49 @@ def test_acwr():
 def test_freshness():
 
     week_1 = create_week_workouts([50, 80, 60, 50])
-    week_2 = create_week_workouts([60, 80, 65, 60])
-    week_3 = create_week_workouts([40, 70, 55, 30])
-    week_4 = create_week_workouts([50, 60, 55, 50])
-    week_5 = create_week_workouts([50, 50, 55, 60])
+    week_2_list = [create_week_workouts([60, 80, 65, 60]),
+                   create_week_workouts([40, 70, 55, 30]),
+                   create_week_workouts([50, 60, 55, 50]),
+                   create_week_workouts([50, 50, 55, 60])]
 
-    calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
-
-    freshness = calc.get_freshness(LoadType.rpe)
+    freshness = TrainingLoadCalculator().get_freshness(LoadType.rpe, week_1, week_2_list)
 
     assert 0 > freshness.lower_bound
     assert 0 > freshness.observed_value
     assert 0 > freshness.upper_bound
 
+
 def test_monotony():
 
     week_1 = create_week_workouts([50, 80, 60, 50])
-    week_2 = create_week_workouts([60, 80, 65, 60])
-    week_3 = create_week_workouts([40, 70, 55, 30])
-    week_4 = create_week_workouts([50, 60, 55, 50])
-    week_5 = create_week_workouts([50, 50, 55, 60])
+    # week_2 = create_week_workouts([60, 80, 65, 60])
+    # week_3 = create_week_workouts([40, 70, 55, 30])
+    # week_4 = create_week_workouts([50, 60, 55, 50])
+    # week_5 = create_week_workouts([50, 50, 55, 60])
 
-    calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
+    #calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
 
-    values_list = [w.rpe_load for w in week_1]
+    #values_list = [w.rpe_load for w in week_1]
 
-    monotony = calc.get_monotony(values_list)
+    monotony = TrainingLoadCalculator().get_monotony(LoadType.rpe, week_1)
 
     assert 0 < monotony.lower_bound
     assert 0 < monotony.observed_value
     assert 0 < monotony.upper_bound
 
+
 def test_strain():
 
     week_1 = create_week_workouts([50, 80, 60, 50])
-    week_2 = create_week_workouts([60, 80, 65, 60])
-    week_3 = create_week_workouts([40, 70, 55, 30])
-    week_4 = create_week_workouts([50, 60, 55, 50])
-    week_5 = create_week_workouts([50, 50, 55, 60])
+    # week_2 = create_week_workouts([60, 80, 65, 60])
+    # week_3 = create_week_workouts([40, 70, 55, 30])
+    # week_4 = create_week_workouts([50, 60, 55, 50])
+    # week_5 = create_week_workouts([50, 50, 55, 60])
+    #
+    # calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
 
-    calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
-
-    values_list = [w.rpe_load for w in week_1]
-    strain = calc.get_strain(values_list)
+    #values_list = [w.rpe_load for w in week_1]
+    strain = TrainingLoadCalculator().get_strain(LoadType.rpe, week_1)
 
     assert 0 < strain.lower_bound
     assert 0 < strain.observed_value
@@ -108,9 +104,11 @@ def test_strain_spike():
     week_4 = create_week_workouts([50, 60, 55, 50])
     week_5 = create_week_workouts([50, 50, 55, 60])
 
-    calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
+    weeks = [week_1, week_2, week_3, week_4, week_5]
 
-    spike = calc.get_strain_spike(LoadType.rpe)
+    #calc = TrainingLoadCalculator(week_1, week_2, week_3, week_4, week_5,calculate_averages=False)
+
+    spike = TrainingLoadCalculator().get_strain_spike(LoadType.rpe, weeks)
 
     assert 0 < spike.lower_bound
     assert 0 < spike.observed_value

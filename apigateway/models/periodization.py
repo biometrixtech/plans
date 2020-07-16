@@ -5,65 +5,65 @@ from models.movement_tags import DetailedAdaptationType, SubAdaptationType, Adap
 from datetime import datetime, timedelta
 
 
-class AthleteTrainingHistory(object):
-    def __init__(self):
-        self.average_session_duration = StandardErrorRange()
-        self.average_session_rpe = StandardErrorRange()
-        self.average_sessions_per_week = StandardErrorRange()
-
-        self.average_session_load = TrainingLoad()
-        self.average_day_load = TrainingLoad()
-
-        self.last_weeks_load = TrainingLoad()
-        self.previous_1_weeks_load = TrainingLoad()
-        self.previous_2_weeks_load = TrainingLoad()
-        self.previous_3_weeks_load = TrainingLoad()
-        self.previous_4_weeks_load = TrainingLoad()
-
-        # self.last_weeks_average_session_duration = StandardErrorRange()
-        # self.current_weeks_average_session_rpe = StandardErrorRange()
-
-        self.last_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_1_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_2_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_4_weeks_detailed_load = DetailedTrainingLoad()
-
-    def get_last_four_weeks_power_load(self):
-
-        power_load_list = []
-
-        if self.last_weeks_load.power_load is not None:
-            power_load_list.append(self.last_weeks_load.power_load)
-
-        if self.previous_1_weeks_load.power_load is not None:
-            power_load_list.append(self.previous_1_weeks_load.power_load)
-
-        if self.previous_2_weeks_load.power_load is not None:
-            power_load_list.append(self.previous_2_weeks_load.power_load)
-
-        if self.previous_3_weeks_load.power_load is not None:
-            power_load_list.append(self.previous_3_weeks_load.power_load)
-
-        return power_load_list
-
-    def get_last_four_weeks_rpe_load(self):
-
-        load_list = []
-
-        if self.last_weeks_load.rpe_load is not None:
-            load_list.append(self.last_weeks_load.rpe_load)
-
-        if self.previous_1_weeks_load.rpe_load is not None:
-            load_list.append(self.previous_1_weeks_load.rpe_load)
-
-        if self.previous_2_weeks_load.rpe_load is not None:
-            load_list.append(self.previous_2_weeks_load.rpe_load)
-
-        if self.previous_3_weeks_load.rpe_load is not None:
-            load_list.append(self.previous_3_weeks_load.rpe_load)
-
-        return load_list
+# class AthleteTrainingHistory(object):
+#     def __init__(self):
+#         self.average_session_duration = StandardErrorRange()
+#         self.average_session_rpe = StandardErrorRange()
+#         self.average_sessions_per_week = StandardErrorRange()
+#
+#         self.average_session_load = TrainingLoad()
+#         self.average_day_load = TrainingLoad()
+#
+#         self.last_weeks_load = TrainingLoad()
+#         self.previous_1_weeks_load = TrainingLoad()
+#         self.previous_2_weeks_load = TrainingLoad()
+#         self.previous_3_weeks_load = TrainingLoad()
+#         self.previous_4_weeks_load = TrainingLoad()
+#
+#         # self.last_weeks_average_session_duration = StandardErrorRange()
+#         # self.current_weeks_average_session_rpe = StandardErrorRange()
+#
+#         self.last_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_1_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_2_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_4_weeks_detailed_load = DetailedTrainingLoad()
+#
+#     def get_last_four_weeks_power_load(self):
+#
+#         power_load_list = []
+#
+#         if self.last_weeks_load.power_load is not None:
+#             power_load_list.append(self.last_weeks_load.power_load)
+#
+#         if self.previous_1_weeks_load.power_load is not None:
+#             power_load_list.append(self.previous_1_weeks_load.power_load)
+#
+#         if self.previous_2_weeks_load.power_load is not None:
+#             power_load_list.append(self.previous_2_weeks_load.power_load)
+#
+#         if self.previous_3_weeks_load.power_load is not None:
+#             power_load_list.append(self.previous_3_weeks_load.power_load)
+#
+#         return power_load_list
+#
+#     def get_last_four_weeks_rpe_load(self):
+#
+#         load_list = []
+#
+#         if self.last_weeks_load.rpe_load is not None:
+#             load_list.append(self.last_weeks_load.rpe_load)
+#
+#         if self.previous_1_weeks_load.rpe_load is not None:
+#             load_list.append(self.previous_1_weeks_load.rpe_load)
+#
+#         if self.previous_2_weeks_load.rpe_load is not None:
+#             load_list.append(self.previous_2_weeks_load.rpe_load)
+#
+#         if self.previous_3_weeks_load.rpe_load is not None:
+#             load_list.append(self.previous_3_weeks_load.rpe_load)
+#
+#         return load_list
 
 
 class TrainingPhaseType(Enum):
