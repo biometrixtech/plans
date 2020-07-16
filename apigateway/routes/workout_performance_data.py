@@ -1,5 +1,8 @@
 from flask import request, Blueprint
-
+import io
+import boto3
+from boto3.s3.transfer import TransferConfig
+import base64
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import ApplicationException
 from fathomapi.utils.xray import xray_recorder
@@ -10,14 +13,9 @@ app = Blueprint('performance_data', __name__)
 
 @app.route('/<uuid:user_id>/upload', methods=['PUT'])
 @require.authenticated.any
-# @xray_recorder.capture('routes.performance_data.upload')
+@xray_recorder.capture('routes.performance_data.upload')
 def handle_performance_data_upload(user_id):
-    # import boto3
-    # import zipfile
-    import io
-    import boto3
-    from boto3.s3.transfer import TransferConfig
-    import base64
+    print(user_id)
     _ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf')
     # Need to use single threading to prevent X Ray tracing errors
     _s3_config = TransferConfig(use_threads=False)
