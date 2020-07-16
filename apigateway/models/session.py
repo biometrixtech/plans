@@ -451,7 +451,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'not_tracked_load': self.not_tracked_load.json_serialise() if self.not_tracked_load is not None else None,
             'strength_endurance_cardiorespiratory_load': self.strength_endurance_cardiorespiratory_load.json_serialise() if self.strength_endurance_cardiorespiratory_load is not None else None,
             'strength_endurance_strength_load': self.strength_endurance_strength_load.json_serialise() if self.strength_endurance_strength_load is not None else None,
-            'power_drill_load': self.power_drill_load if self.power_drill_load.json_serialise() is not None else None,
+            'power_drill_load': self.power_drill_load.json_serialise() if self.power_drill_load is not None else None,
             'maximal_strength_hypertrophic_load': self.maximal_strength_hypertrophic_load.json_serialise() if self.maximal_strength_hypertrophic_load is not None else None,
             'power_explosive_action_load': self.power_explosive_action_load.json_serialise() if self.power_explosive_action_load is not None else None,
             'tissue_load': self.tissue_load.json_serialise() if self.tissue_load is not None else None,
