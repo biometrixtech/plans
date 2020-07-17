@@ -29,7 +29,7 @@ def handle_performance_data_upload(user_id):
     if request.headers['Content-Type'] == 'application/octet-stream':
         data = base64.b64decode(request.get_data())
         f = io.BytesIO(data)
-        _ingest_s3_bucket.upload_fileobj(f, 'test_file_octet.zip', Config=_s3_config)
+        _ingest_s3_bucket.upload_fileobj(f, 'input/test_file_octet.zip', Config=_s3_config)
     else:
         raise ApplicationException(
             415,
