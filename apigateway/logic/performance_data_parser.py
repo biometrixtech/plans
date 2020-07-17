@@ -18,11 +18,14 @@ class PerformanceDataParser(object):
         print('unzipped file')
         names = unzipped_files.namelist()
         for name in names:
+            print(name)
             if 'rower' in name:
                 self.rower_data = pd.read_csv(unzipped_files.open(name))
+                print(self.rower_data.columns)
                 print('rower data read')
             elif 'treadmill' in name:
                 self.treadmill_data = pd.read_csv(unzipped_files.open(name))
+                print(self.treadmill_data.columns)
                 print('treadmill data read')
         with open('data/june8_alt.json', 'r') as f:
             self.planned_workout  = json.load(f)
