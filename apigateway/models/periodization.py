@@ -138,7 +138,7 @@ class PeriodizationPlan(object):
         monday1 = (self.start_date - timedelta(days=self.start_date.weekday()))
         monday2 = (event_date - timedelta(days=event_date.weekday()))
 
-        return (monday2 - monday1).days / 7
+        return int(round((monday2 - monday1).days / 7, 0))
 
     def get_week_start_date(self, event_date):
 

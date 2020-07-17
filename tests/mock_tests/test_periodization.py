@@ -7,6 +7,7 @@ from models.movement_tags import RankedAdaptationType, AdaptationDictionary, Sub
 from models.planned_exercise import PlannedWorkoutLoad
 from tests.mocks.mock_workout_library_datastore import PlannedWorkoutLibraryDatastore
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
+from tests.mocks.mock_workout_datastore import WorkoutDatastore
 from datetime import datetime, timedelta
 from tests.mocks.planned_workout_utilities import get_planned_workout
 
@@ -199,66 +200,49 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #     assert len(acceptable_workouts_5) > 0
 
 
-# def test_top_rec_should_be_greatest_need_day_3_cardio():
-#
-#     workouts = get_workout_list()
-#
-#     start_date_time = datetime.now()
-#
-#     workout_history = create_workout_history(datetime.now())
-#
-#     completed_session_details_datastore = CompletedSessionDetailsDatastore()
-#     completed_session_details_datastore.side_load_planned_workout(workout_history)
-#
-#     # athlete_training_history = AthleteTrainingHistory()
-#     #
-#     # athlete_training_history.average_session_load.rpe_load = StandardErrorRange(lower_bound=500, observed_value=600, upper_bound=700)
-#     # athlete_training_history.average_session_load.power_load = StandardErrorRange(lower_bound=500, observed_value=600,
-#     #                                                                             upper_bound=700)
-#     # athlete_training_history.average_session_rpe = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
-#     # athlete_training_history.average_sessions_per_week = StandardErrorRange(lower_bound=3,observed_value=4,upper_bound=5)
-#
-#     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
-#
-#     proc = PeriodizationPlanProcessor(start_date_time,completed_session_details_datastore,athlete_training_goal,
-#                                       PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
-#     proc.set_weekly_targets()
-#
-#     completed_workouts = []
-#
-#     acceptable_workouts_1 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
-#
-#     acceptable_workouts_1_copy = [a for a in acceptable_workouts_1]
-#
-#     acceptable_workout_1 = next(a for a in acceptable_workouts_1_copy if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
-#
-#     completed_workout_1 = complete_a_planned_workout(start_date_time+timedelta(days=1),acceptable_workout_1)
-#
-#     completed_workouts.append(completed_workout_1)
-#
-#     # refresh list of workouts
-#     workouts = get_workout_list()
-#
-#     acceptable_workouts_2 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
-#
-#     acceptable_workouts_2_copy = [a for a in acceptable_workouts_2]
-#
-#     acceptable_workout_2 = next(a for a in acceptable_workouts_2_copy if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
-#
-#     completed_workout_2 = complete_a_planned_workout(start_date_time + timedelta(days=2), acceptable_workout_2)
-#
-#     completed_workouts.append(completed_workout_2)
-#
-#     # refresh list of workouts
-#     workouts = get_workout_list()
-#
-#     acceptable_workouts_3 = proc.get_acceptable_workouts(0, workouts, completed_workouts, exclude_completed=True)
-#
-#     strength_workouts = [a for a in acceptable_workouts_3 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength]
-#     cardio_workouts = [a for a in acceptable_workouts_3 if
-#                          a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training]
-#
-#     assert acceptable_workouts_3[0].session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
+def test_top_rec_should_be_greatest_need_day_3_cardio():
+
+    start_date_time = datetime.now()
+
+    workout_history = create_workout_history(datetime.now())
+
+    completed_session_details_datastore = CompletedSessionDetailsDatastore()
+    completed_session_details_datastore.side_load_planned_workout(workout_history)
+
+    workout_library_datastore = PlannedWorkoutLibraryDatastore()
+
+    athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
+
+    proc = PeriodizationPlanProcessor(start_date_time,athlete_training_goal,PeriodizationPersona.well_trained,
+                                      TrainingPhaseType.slowly_increase,
+                                      completed_session_details_datastore,
+                                      workout_library_datastore)
+    plan = proc.create_periodization_plan(datetime.now().date())
+
+    acceptable_workouts_1 = [a for a in plan.next_workouts[0]]
+
+    acceptable_workout_1 = next(a for a in acceptable_workouts_1 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
+    completed_workout_1 = complete_a_planned_workout(start_date_time+timedelta(days=1), acceptable_workout_1)
+
+    proc.completed_session_details_datastore.completed_sessions.append(completed_workout_1)
+    plan = proc.update_periodization_plan(plan, (start_date_time+timedelta(days=1)).date())
+
+    acceptable_workouts_2 = [a for a in plan.next_workouts[0]]
+
+    acceptable_workout_2 = next(a for a in acceptable_workouts_2 if a.session_detailed_load.sub_adaptation_types[
+        0].adaptation_type == SubAdaptationType.strength)
+    completed_workout_2 = complete_a_planned_workout(start_date_time + timedelta(days=2), acceptable_workout_2)
+
+    proc.completed_session_details_datastore.completed_sessions.append(completed_workout_2)
+    plan = proc.update_periodization_plan(plan, (start_date_time + timedelta(days=2)).date())
+
+    acceptable_workouts_3 = [a for a in plan.next_workouts[0]]
+
+    strength_workouts = [a for a in acceptable_workouts_3 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength]
+    cardio_workouts = [a for a in acceptable_workouts_3 if
+                         a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training]
+
+    assert acceptable_workouts_3[0].session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
 
 
 def test_acceptable_strength_cardio_same_score_both_required():

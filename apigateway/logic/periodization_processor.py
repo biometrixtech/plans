@@ -88,18 +88,18 @@ class PeriodizationPlanProcessor(object):
         self.previous_week_3_rpe_values = []
         self.previous_week_4_rpe_values = []
 
-        self.last_week_rpe_load_sum = None
-        self.previous_week_1_rpe_load_sum = None
-        self.previous_week_2_rpe_load_sum = None
-        self.previous_week_3_rpe_load_sum = None
-        self.previous_week_4_rpe_load_sum = None
+        # self.last_week_rpe_load_sum = None
+        # self.previous_week_1_rpe_load_sum = None
+        # self.previous_week_2_rpe_load_sum = None
+        # self.previous_week_3_rpe_load_sum = None
+        # self.previous_week_4_rpe_load_sum = None
         self.chronic_rpe_load_average = None
 
-        self.last_week_power_load_sum = None
-        self.previous_week_1_power_load_sum = None
-        self.previous_week_2_power_load_sum = None
-        self.previous_week_3_power_load_sum = None
-        self.previous_week_4_power_load_sum = None
+        # self.last_week_power_load_sum = None
+        # self.previous_week_1_power_load_sum = None
+        # self.previous_week_2_power_load_sum = None
+        # self.previous_week_3_power_load_sum = None
+        # self.previous_week_4_power_load_sum = None
         self.chronic_power_load_average = None
 
         self.last_weeks_load = TrainingLoad()
@@ -235,34 +235,34 @@ class PeriodizationPlanProcessor(object):
 
     def sum_weeks(self):
 
-        self.last_week_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.last_week_rpe_load_values)
-        self.previous_week_1_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_1_rpe_load_values)
-        self.previous_week_2_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_rpe_load_values)
-        self.previous_week_3_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_rpe_load_values)
-        self.previous_week_4_rpe_load_sum = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_rpe_load_values)
+        self.last_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.last_week_rpe_load_values)
+        self.previous_1_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_1_rpe_load_values)
+        self.previous_2_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_rpe_load_values)
+        self.previous_3_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_rpe_load_values)
+        self.previous_4_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_rpe_load_values)
 
-        self.last_week_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
+        self.last_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
             self.last_week_power_load_values)
-        self.previous_week_1_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
+        self.previous_1_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
             self.previous_week_1_power_load_values)
-        self.previous_week_2_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
+        self.previous_2_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
             self.previous_week_2_power_load_values)
-        self.previous_week_3_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
+        self.previous_3_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
             self.previous_week_3_power_load_values)
-        self.previous_week_4_power_load_sum = StandardErrorRange.get_sum_from_error_range_list(
+        self.previous_4_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
             self.previous_week_4_power_load_values)
 
     def calculate_averages(self):
 
-        rpe_chronic_weeks = [self.previous_week_1_rpe_load_sum,
-                             self.previous_week_2_rpe_load_sum,
-                             self.previous_week_3_rpe_load_sum,
-                             self.previous_week_4_rpe_load_sum]
+        rpe_chronic_weeks = [self.previous_1_weeks_load.rpe_load,
+                             self.previous_2_weeks_load.rpe_load,
+                             self.previous_3_weeks_load.rpe_load,
+                             self.previous_4_weeks_load.rpe_load]
 
-        power_chronic_weeks = [self.previous_week_1_power_load_sum,
-                               self.previous_week_2_power_load_sum,
-                               self.previous_week_3_power_load_sum,
-                               self.previous_week_4_power_load_sum]
+        power_chronic_weeks = [self.previous_1_weeks_load.power_load,
+                               self.previous_2_weeks_load.power_load,
+                               self.previous_3_weeks_load.power_load,
+                               self.previous_4_weeks_load.power_load]
 
         self.chronic_rpe_load_average = StandardErrorRange.get_average_from_error_range_list(rpe_chronic_weeks)
         self.chronic_power_load_average = StandardErrorRange.get_average_from_error_range_list(power_chronic_weeks)
@@ -272,7 +272,14 @@ class PeriodizationPlanProcessor(object):
         if len(self.last_week_power_load_values) <= 1:
             last_two_weeks_sessions.extend(self.previous_week_2_power_load_values)
 
-        self.average_session_load = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_sessions)
+        self.average_session_load.power_load = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_sessions)
+
+        last_two_weeks_sessions_rpe = self.last_week_rpe_load_values
+        last_two_weeks_sessions_rpe.extend(self.previous_week_1_rpe_load_values)
+        if len(self.previous_week_1_rpe_load_values) <= 1:
+            last_two_weeks_sessions.extend(self.previous_week_2_rpe_load_values)
+
+        self.average_session_load.rpe_load = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_sessions_rpe)
 
         last_two_weeks_rpes = self.last_week_rpe_values
         last_two_weeks_rpes.extend(self.previous_week_1_rpe_values)
@@ -291,7 +298,9 @@ class PeriodizationPlanProcessor(object):
             started = True
         if len(self.previous_week_2_workouts) > 0 or started:
             sessions_per_week.append(len(self.previous_week_2_workouts))
-        sessions_per_week.append(len(self.previous_week_1_workouts))
+        if len(self.previous_week_1_workouts) > 0 or started:
+            sessions_per_week.append(len(self.previous_week_1_workouts))
+        sessions_per_week.append(len(self.last_week_workouts))
 
         self.average_sessions_per_week = StandardErrorRange(lower_bound=min(sessions_per_week), observed_value=mean(sessions_per_week), upper_bound=max(sessions_per_week))
 
@@ -468,7 +477,7 @@ class PeriodizationPlanProcessor(object):
         max_workouts_week = self.average_sessions_per_week.upper_bound - len(completed_session_details_list)
 
         if exclude_completed:
-            workouts = [w for w in workouts if w.workout_id not in [c.workout_id for c in completed_session_details_list]]
+            workouts = [w for id, w in workouts.items() if id not in [c.workout_id for c in completed_session_details_list]]
 
         # first how many of the plan's recommended workouts have not been completed?
         required_exercises, required_found_times = self.get_non_completed_required_exercises(self.model.required_exercises,
@@ -563,7 +572,7 @@ class PeriodizationPlanProcessor(object):
             for c in completed_session_details_list:
                 if r.sub_adaptation_type in [d.adaptation_type for d in c.session_detailed_load.sub_adaptation_types]:
                     if r.rpe is not None:
-                        if r.rpe.lower_bound <= c.session_rpe.lower_bound and c.session_rpe.upper_bound <= r.rpe.upper_bound:
+                        if r.rpe.lower_bound <= c.session_RPE.lower_bound and c.session_RPE.upper_bound <= r.rpe.upper_bound:
                             found = True
                         else:
                             found = False
