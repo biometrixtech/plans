@@ -3,7 +3,7 @@ import urllib
 import boto3
 import logging
 import io
-import pandas as pd
+# import pandas as pd
 import numpy as np
 
 
@@ -12,7 +12,7 @@ def lambda_handler(event, context):
     print('invoked')
     print(event, context)
     print(np.__version__)
-    print(pd.__version__)
+    # print(pd.__version__)
     
     # logger.info('Starting unzipping for file' + urllib.unquote_plus(event['Records'][0]['s3']['object']['key']).encode('utf8'))
     
