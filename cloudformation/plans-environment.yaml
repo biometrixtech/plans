@@ -72,6 +72,26 @@ Conditions:
 Resources:
 
     ##########################################################################################################
+    ##  S3
+    ##########################################################################################################
+
+    S3Bucket:
+        Type: "AWS::S3::Bucket"
+        Properties:
+            BucketName: { "Fn::Sub": "fathom-otf" }
+            NotificationConfiguration:
+                LambdaConfigurations:
+                    - Event: "s3:ObjectCreated:*"
+                      Function: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ]}
+            Tags:
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "apigateway" }
+        # Don't delete this if we accidentally delete the stack (which would fail anyway unless the bucket is empty)
+        DeletionPolicy : "Retain"
+
+    ##########################################################################################################
     ## VPC & NETWORKING
     ##########################################################################################################
 
@@ -206,6 +226,45 @@ Resources:
                 },
                 { Ref: "AWS::NoValue" }
             ]}
+
+
+    DataParseLambda:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Code:
+                S3Bucket: { "Fn::ImportValue": "InfrastructureBucketName" }
+                S3Key: { "Fn::Sub": [ "lambdas/plans/${TemplateVersion}/apigateway.zip", {
+                    TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Self", "Commit" ] }
+                } ] }
+            Environment:
+                Variables:
+                    SERVICE: 'plans'
+                    ENVIRONMENT: { Ref: 'Environment' }
+                    AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
+                    USERS_API_VERSION: { Ref: "UsersApiVersion"}
+            Handler: "parse_performance_data.lambda_handler"
+            Runtime: "python3.6"
+            Timeout: "60"
+            MemorySize: "512"
+            Role: { "Fn::GetAtt" : [ "ApiGatewayLambdaExecutionRole", "Arn" ] }
+            FunctionName: { "Fn::Sub": "plans-${Environment}-data-parse" }
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-data-parse" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "apigateway" }
+            TracingConfig:
+                Mode: "Active"
+            # VpcConfig: { "Fn::If": [
+            #     "CreateVpc",
+            #     {
+            #         SubnetIds: { "Fn::Split": [ ",", { "Fn::GetAtt": [ "VpcStack", "Outputs.PrivateSubnetIds" ] } ] },
+            #         SecurityGroupIds: [ { Ref: "LambdaVpcSecurityGroup" } ]
+            #     },
+            #     { Ref: "AWS::NoValue" }
+            # ]}
+
 
     ApigatewayStack:
         Type: "AWS::CloudFormation::Stack"
