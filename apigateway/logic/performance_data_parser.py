@@ -328,7 +328,8 @@ class PerformanceDataParser(object):
 
     @staticmethod
     def sort_data(dataframe):
-        _, dataframe['second_marker'] = dataframe.uniqueid.str.split('_').str
+        print(dataframe.columns)
+        _, dataframe['second_marker'] = dataframe['uniqueid'].str.split('_').str
         dataframe.second_marker = dataframe.second_marker.astype(int)
         dataframe.sort_values(by=['timestamp', 'second_marker' ], inplace=True, ignore_index=True)
         grouped = dataframe.groupby(by='timestamp')
