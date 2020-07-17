@@ -16,7 +16,7 @@ app = Blueprint('performance_data', __name__)
 @xray_recorder.capture('routes.performance_data.upload')
 def handle_performance_data_upload(user_id):
     print(user_id)
-    _ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf')
+    _ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf2')
     # Need to use single threading to prevent X Ray tracing errors
     _s3_config = TransferConfig(use_threads=False)
     # if request.headers['Content-Type'] == 'application/zip':
