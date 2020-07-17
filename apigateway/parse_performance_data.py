@@ -1,8 +1,5 @@
 import boto3
 import io
-import pandas as pd
-import numpy as np
-import zipfile
 from logic.performance_data_parser import PerformanceDataParser
 
 

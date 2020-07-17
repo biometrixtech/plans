@@ -18,6 +18,9 @@ class PerformanceDataParser(object):
         print('unzipped file')
         names = unzipped_files.namelist()
         for name in names:
+            if 'MACOSX' in name:
+                print(f"skipping {name}")
+                continue
             print(name)
             if 'rower' in name:
                 self.rower_data = pd.read_csv(unzipped_files.open(name))
