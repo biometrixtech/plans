@@ -270,6 +270,9 @@ Resources:
             MemorySize: "512"
             Role: { "Fn::GetAtt" : [ "ApiGatewayLambdaExecutionRole", "Arn" ] }
             FunctionName: { "Fn::Sub": "plans-${Environment}-data-parse" }
+            Layers: [
+              "arn:aws:lambda:us-west-2:887689817172:layer:numpy-and-pandas:1"
+            ]
             Tags:
               - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-data-parse" } }
               - { Key: "Management", Value: "managed" }
