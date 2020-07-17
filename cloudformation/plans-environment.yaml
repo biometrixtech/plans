@@ -77,12 +77,13 @@ Resources:
 
     S3Bucket:
         Type: "AWS::S3::Bucket"
+        DependsOn: LambdaTriggerPermission
         Properties:
             BucketName: { "Fn::Sub": "fathom-otf2" }
             NotificationConfiguration:
                 LambdaConfigurations:
                     - Event: "s3:ObjectCreated:*"
-                      Function: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ]}
+                      Function: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] }
             Tags:
               - { Key: "Management", Value: "managed" }
               - { Key: "Project", Value: "plans" }
@@ -90,6 +91,18 @@ Resources:
               - { Key: "Service", Value: "apigateway" }
         # Don't delete this if we accidentally delete the stack (which would fail anyway unless the bucket is empty)
         DeletionPolicy : "Retain"
+
+
+    LambdaTriggerPermission:
+        Type: "AWS::Lambda::Permission"
+        DependsOn: DataParseLambda
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] }
+            Principal: "s3.amazonaws.com"
+            SourceArn: "arn:aws:s3:::fathom-otf2"
+            SourceAccount: { Ref : "AWS::AccountId" }
+
 
     ##########################################################################################################
     ## VPC & NETWORKING
