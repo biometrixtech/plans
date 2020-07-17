@@ -8,7 +8,7 @@ def is_valid(row, name):
         return True
     return False
 
-def parse_file(file_name, write=True):
+def parse_file(file_name, write=True, path=None):
     data = pd.read_csv(f'{file_name}.csv')
     data = data.fillna('')
     sections = {}
@@ -198,7 +198,10 @@ def parse_file(file_name, write=True):
     workout['sections'] = list(sections.values())
     if write:
         json_string = json.dumps(workout, indent=4)
-        file_name = os.path.join(os.path.realpath('..'), f"tests/data/otf/{file_name}.json")
+        if path is None:
+            file_name = os.path.join(os.path.realpath('..'), f"tests/data/otf/{file_name}.json")
+        else:
+            file_name = os.path.join(path, f"{file_name}.json")
         print(f"writing: {file_name}")
         f1 = open(file_name, 'w')
         f1.write(json_string)

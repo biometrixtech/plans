@@ -381,7 +381,8 @@ def write_json(data, user):
 if __name__ == '__main__':
     import time
     st = time.time()
-    planned_workout = parse_file('june8_alt', write=False)
+    path = os.path.join(os.path.realpath('..'), f"../tests/data/otf")
+    planned_workout = parse_file('june8_alt', write=True, path=path)
     for user in [1, 2, 3]:
         workout = get_completed_workout(user, planned_workout)
         write_json(workout, user)

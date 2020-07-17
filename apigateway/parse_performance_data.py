@@ -3,6 +3,7 @@ import io
 import pandas as pd
 import numpy as np
 import zipfile
+from logic.performance_data_parser import PerformanceDataParser
 
 
 def lambda_handler(event, _):
@@ -27,13 +28,19 @@ def lambda_handler(event, _):
         print('Read Content')
         content = io.BytesIO(body)
         print('Converted Content')
-        unzipped_files = zipfile.ZipFile(content)
-        names = unzipped_files.namelist()
-        for name in names:
-            unzipped_content = unzipped_files.open(name).read()
-            print(f'Unzipped File: {name}')
-            s3_resource.Bucket(s3_bucket).put_object(Key=f'unzipped/{user_id}/{session_id}/{name}', Body=unzipped_content)
-        print('Wrote File to processed container')
+
+        data_parser = PerformanceDataParser()
+        data_parser.parse_fileobj(content)
+        workout_data = data_parser.get_completed_workout(user_id)
+        print('done')
+
+        # unzipped_files = zipfile.ZipFile(content)
+        # names = unzipped_files.namelist()
+        # for name in names:
+        #     unzipped_content = unzipped_files.open(name).read()
+        #     print(f'Unzipped File: {name}')
+        #     s3_resource.Bucket(s3_bucket).put_object(Key=f'unzipped/{user_id}/{session_id}/{name}', Body=unzipped_content)
+        # print('Wrote File to processed container')
     except Exception as e:
         print(e)
         print(f'Error getting object {s3_key} from bucket {s3_bucket}. Make sure they exist and your bucket is in the same region as this function.')
