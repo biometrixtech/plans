@@ -1,5 +1,6 @@
 from flask import request, Blueprint
 import io
+import uuid
 import boto3
 from boto3.s3.transfer import TransferConfig
 import base64
@@ -15,21 +16,15 @@ app = Blueprint('performance_data', __name__)
 @require.authenticated.any
 @xray_recorder.capture('routes.performance_data.upload')
 def handle_performance_data_upload(user_id):
-    print(user_id)
+    session_id = str(uuid.uuid4())
+
     _ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf2')
     # Need to use single threading to prevent X Ray tracing errors
     _s3_config = TransferConfig(use_threads=False)
-    # if request.headers['Content-Type'] == 'application/zip':
-    #     # data = request.get_data().encode()
-    #     data = base64.b64decode(request.get_data())
-    #     print(type(data))
-    #     # f = io.StringIO(data)
-    #     f = io.BytesIO(data)
-    #     _ingest_s3_bucket.upload_fileobj(f, 'test_file.zip', Config=_s3_config)
     if request.headers['Content-Type'] == 'application/octet-stream':
         data = base64.b64decode(request.get_data())
         f = io.BytesIO(data)
-        _ingest_s3_bucket.upload_fileobj(f, 'input/test_file_octet.zip', Config=_s3_config)
+        _ingest_s3_bucket.upload_fileobj(f, f'input/{user_id}/{session_id}.zip', Config=_s3_config)
     else:
         raise ApplicationException(
             415,
@@ -38,4 +33,3 @@ def handle_performance_data_upload(user_id):
         )
 
     return {'message': 'Received'}, 202
-
