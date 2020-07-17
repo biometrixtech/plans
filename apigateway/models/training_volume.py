@@ -175,11 +175,11 @@ class StandardErrorRange(Serialisable):
 
         stdev_range = StandardErrorRange()
 
-        if len(lower_bound_list) > 0:
+        if len(lower_bound_list) > 1:
             stdev_range.lower_bound = stdev(lower_bound_list)
-        if len(observed_value_list) > 0:
+        if len(observed_value_list) > 1:
             stdev_range.observed_value = stdev(observed_value_list)
-        if len(upper_bound_list) > 0:
+        if len(upper_bound_list) > 1:
             stdev_range.upper_bound = stdev(upper_bound_list)
 
         return stdev_range

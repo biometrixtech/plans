@@ -33,6 +33,8 @@ class SimpleWorkout(object):
         self.session_detailed_load.detailed_adaptation_types = ranked_detailed_adaptation_types
         self.session_detailed_load.sub_adaptation_types = ranked_sub_adaptation_types
         self.update_adaptation_types()
+        self.projected_monotony = None
+        self.projected_strain_event_level = None
 
     def update_adaptation_types(self):
 

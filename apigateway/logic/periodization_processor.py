@@ -6,6 +6,7 @@ from statistics import mean
 from models.training_load import TrainingLoad, CompletedSessionDetails, LoadType, DetailedTrainingLoad
 from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure
 from logic.training_load_calcs import TrainingLoadCalculator
+from models.planned_exercise import PlannedWorkoutLoad
 from math import sqrt
 from datetime import timedelta
 
@@ -163,10 +164,10 @@ class PeriodizationPlanProcessor(object):
         periodization_plan = PeriodizationPlan(self.start_date, self.goal, self.training_phase_type, self.persona)
         week_number = 0
         workouts = self.workout_library_datastore.get()
-        periodization_plan.next_workouts[0] = self.get_acceptable_workouts(week_number,
-                                                                           workouts=workouts,
-                                                                           completed_session_details_list=self.current_weekly_workouts,
-                                                                           exclude_completed=self.exclude_completed)
+        periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
+                                                                       workouts=workouts,
+                                                                       completed_session_details_list=self.current_weekly_workouts,
+                                                                       exclude_completed=self.exclude_completed)
 
         return periodization_plan
 
@@ -186,10 +187,10 @@ class PeriodizationPlanProcessor(object):
 
         week_number = periodization_plan.get_week_number(event_date)
         workouts = self.workout_library_datastore.get()
-        periodization_plan.next_workouts[0] = self.get_acceptable_workouts(week_number,
-                                                                           workouts=workouts,
-                                                                           completed_session_details_list=self.current_weekly_workouts,
-                                                                           exclude_completed=self.exclude_completed)
+        periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
+                                                                       workouts=workouts,
+                                                                       completed_session_details_list=self.current_weekly_workouts,
+                                                                       exclude_completed=self.exclude_completed)
 
         return periodization_plan
 
@@ -460,7 +461,7 @@ class PeriodizationPlanProcessor(object):
 
         return periodization_plan_week
 
-    def get_acceptable_workouts(self, week_number, workouts, completed_session_details_list: [CompletedSessionDetails], exclude_completed=True):
+    def get_ranked_workouts(self, week_number, workouts, completed_session_details_list: [CompletedSessionDetails], exclude_completed=True):
 
         current_week_target = self.weekly_targets[week_number]
 
@@ -523,6 +524,23 @@ class PeriodizationPlanProcessor(object):
 
         # TODO calculate training load metrics for each potential workout given the athlete's training history
         # right stinking here
+        for w in workouts:
+            last_two_weeks_workouts = []
+            fake_completed_workout = self.complete_a_planned_workout(self.start_date, w)
+            current_workout_list = [fake_completed_workout]
+            current_workout_list.extend(self.current_weekly_workouts)
+            last_two_weeks_workouts = [c for c in current_workout_list]
+            if len(last_two_weeks_workouts) < 4:
+                last_two_weeks_workouts.extend(self.last_week_workouts)
+            w.projected_strain = TrainingLoadCalculator().get_strain(LoadType.rpe, last_two_weeks_workouts)
+            w.projected_monotony = TrainingLoadCalculator().get_monotony(LoadType.rpe, last_two_weeks_workouts)
+            spike_list = [current_workout_list,
+                          self.last_week_workouts,
+                          self.previous_week_1_workouts,
+                          self.previous_week_2_workouts,
+                          self.previous_week_3_workouts,
+                          self.previous_week_4_workouts]
+            w.projected_strain_event_level = TrainingLoadCalculator().get_strain_spike(LoadType.rpe, spike_list)
 
         for r in required_exercises:
             for w in workouts:
@@ -614,6 +632,18 @@ class PeriodizationPlanProcessor(object):
             for i, j in zip(range(i, r), f(count(j), islice(counts, j, None))):
                 indices[i] = j
 
+    def complete_a_planned_workout(self, event_date_time, planned_workout: PlannedWorkoutLoad):
+
+        session = CompletedSessionDetails(event_date_time, 1, planned_workout.workout_id)
+        session.duration = planned_workout.duration
+        session.session_RPE = planned_workout.projected_session_rpe
+        session.rpe_load = planned_workout.projected_rpe_load
+        session.power_load = planned_workout.projected_power_load
+        session.session_detailed_load = planned_workout.session_detailed_load
+        session.muscle_detailed_load = planned_workout.muscle_detailed_load
+
+        return session
+
     def get_acceptable_workouts_from_combinations(self, workouts, lowest_weekly_load_target, highest_weekly_load_target,
                                                   lowest_workouts_week, highest_workouts_week):
 
@@ -683,7 +713,25 @@ class PeriodizationPlanProcessor(object):
         else:
             times_per_week_score = 0
 
-        composite_score = ((times_per_week_score * .2) + (rpe_score * .2) + (duration_score * .2) + (load_score * .2) + (cosine_similarity * .2)) * 100
+        if test_workout.projected_monotony is None or test_workout.projected_monotony.observed_value is None:
+            monotony_score = 1.0
+        elif test_workout.projected_monotony.observed_value < 1.5:
+            monotony_score = 1.0
+        elif 1.5 <= test_workout.projected_monotony.observed_value < 2:
+            monotony_score = 0.5
+        else:
+            monotony_score = 0.0
+
+        if test_workout.projected_strain_event_level is None or test_workout.projected_strain_event_level.observed_value is None:
+            strain_event_score = 1.0
+        elif test_workout.projected_strain_event_level.observed_value == 0:
+            strain_event_score = 1.0
+        elif 1.5 <= test_workout.projected_strain_event_level.observed_value < 2:
+            strain_event_score = 0.5
+        else:
+            strain_event_score = 0.0
+
+        composite_score = ((monotony_score * .1) + (strain_event_score * .1) + (times_per_week_score * .2) + (rpe_score * .2) + (duration_score * .1) + (load_score * .1) + (cosine_similarity * .2)) * 100
 
         return composite_score
 
