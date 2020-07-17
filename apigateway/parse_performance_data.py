@@ -27,8 +27,8 @@ def lambda_handler(event, _):
         names = unzipped_files.namelist()
         for name in names:
             unzipped_content = unzipped_files.open(name).read()
-            print('Unzipped File')
-            s3_resource.Bucket(s3_bucket).put_object(Key='unzipped/'+s3_key+'.csv', Body=unzipped_content)
+            print(f'Unzipped File: {name}')
+            s3_resource.Bucket(s3_bucket).put_object(Key='unzipped/' + name, Body=unzipped_content)
         print('Wrote File to processed container')
     except Exception as e:
         print(e)
