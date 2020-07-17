@@ -75,21 +75,21 @@ Resources:
     ##  S3
     ##########################################################################################################
 
-    S3Bucket:
-        Type: "AWS::S3::Bucket"
-        Properties:
-            BucketName: { "Fn::Sub": "fathom-otf2" }
-            NotificationConfiguration:
-                LambdaConfigurations:
-                    - Event: "s3:ObjectCreated:*"
-                      Function: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ]}
-            Tags:
-              - { Key: "Management", Value: "managed" }
-              - { Key: "Project", Value: "plans" }
-              - { Key: "Environment", Value: { Ref: "Environment" } }
-              - { Key: "Service", Value: "apigateway" }
-        # Don't delete this if we accidentally delete the stack (which would fail anyway unless the bucket is empty)
-        DeletionPolicy : "Retain"
+    # S3Bucket:
+    #     Type: "AWS::S3::Bucket"
+    #     Properties:
+    #         BucketName: { "Fn::Sub": "fathom-otf2" }
+    #         NotificationConfiguration:
+    #             LambdaConfigurations:
+    #                 - Event: "s3:ObjectCreated:*"
+    #                   Function: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ]}
+    #         Tags:
+    #           - { Key: "Management", Value: "managed" }
+    #           - { Key: "Project", Value: "plans" }
+    #           - { Key: "Environment", Value: { Ref: "Environment" } }
+    #           - { Key: "Service", Value: "apigateway" }
+    #     # Don't delete this if we accidentally delete the stack (which would fail anyway unless the bucket is empty)
+    #     DeletionPolicy : "Retain"
 
     ##########################################################################################################
     ## VPC & NETWORKING
@@ -161,6 +161,10 @@ Resources:
                           - "s3:PutObject"
                         Effect: "Allow"
                         Resource: "*"
+                      # - Action:
+                      #     - "lambda:InvokeFunction"
+                      #   Effect: "Allow"
+                      #   Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
 
     ##########################################################################################################
