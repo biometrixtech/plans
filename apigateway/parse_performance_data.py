@@ -49,7 +49,7 @@ def lambda_handler(event, _):
 
         session = {
             'session_id': 'session_id',
-            'event_date_time': workout_data['event_date_time'],
+            'event_date': workout_data['event_date_time'],
             'end_date': workout_data['workout_sections'][-1]['end_date_time'],
             'session_type': 7,
             'duration': workout_data['duration'],
