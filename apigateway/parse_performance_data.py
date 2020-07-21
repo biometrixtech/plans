@@ -40,7 +40,7 @@ def lambda_handler(event, _):
             'workout_program_module': workout_data
         }
         # use session to create responsive recovery
-        # 
+        #
 
 
     except Exception as e:

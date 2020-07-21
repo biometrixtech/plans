@@ -14,25 +14,24 @@ class PerformanceDataParser(object):
         self.planned_workout = None
 
     def parse_fileobj(self, fileobj):
+        # TODO: Standardize the names of the files and update this.
         unzipped_files = zipfile.ZipFile(fileobj)
         print('unzipped file')
         names = unzipped_files.namelist()
         for name in names:
-            if 'MACOSX' in name:
+            if 'MACOSX' in name:  # Can remove after standardizing names and only checking for specific names
                 print(f"skipping {name}")
                 continue
-            print(name)
             if 'rower' in name:
                 self.rower_data = pd.read_csv(unzipped_files.open(name))
-                print(self.rower_data.columns)
                 print('rower data read')
             elif 'treadmill' in name:
                 self.treadmill_data = pd.read_csv(unzipped_files.open(name))
-                print(self.treadmill_data.columns)
                 print('treadmill data read')
+
+        # TODO: Better strategy to store/retrieve the planned session (probably store in mongo/s3s)
         with open('data/june8_alt.json', 'r') as f:
-            self.planned_workout  = json.load(f)
-        print(self.planned_workout)
+            self.planned_workout = json.load(f)
 
     def get_completed_workout(self, user_id):
         planned_workout = self.planned_workout
@@ -46,7 +45,7 @@ class PerformanceDataParser(object):
         all_sections = np.concatenate([treadmill_sections, rower_floor_sections])
         all_sections = sorted(all_sections, key=lambda x: x['start_date_time'])
 
-        workout = {}
+        workout = dict()
         workout['user_id'] = user_id
         workout['workout_sections'] = all_sections
         workout['event_date_time'] = all_sections[0]['start_date_time']
@@ -55,7 +54,6 @@ class PerformanceDataParser(object):
         for section in workout['workout_sections']:
             section['elapsed_start_time'] = (section['start_date_time'] - workout['event_date_time']).seconds
             section['elapsed_end_time'] = (section['end_date_time'] - workout['event_date_time']).seconds
-
 
         # figure out where the planned sections are relative to start time
         for section in planned_workout['sections']:
@@ -70,7 +68,6 @@ class PerformanceDataParser(object):
                     section['elapsed_end_time'] = None
             else:
                 section['elapsed_end_time'] = None
-
 
         # Great groups of "floor" and "rest" blocks between rowing during rowing portion
         planned_sections_between_row = []
@@ -115,9 +112,6 @@ class PerformanceDataParser(object):
                             between_row_sections_group['elapsed_start_time'] = min([between_row_sections_group['elapsed_start_time'], section['elapsed_start_time']])
                             between_row_sections_group['elapsed_end_time'] = max([between_row_sections_group['elapsed_end_time'], section['elapsed_end_time']])
 
-        # if len(between_row_sections_group['sections']) > 0:
-        #     planned_sections_between_row.append(between_row_sections_group)
-
         # add in any non-rowing workouts in rowing section
         # insert "floor" and "rest" groups in the gap "floor" section obtained from performance data
         for section in workout['workout_sections']:
@@ -126,7 +120,8 @@ class PerformanceDataParser(object):
                 section['available_duration'] = section['duration_seconds']
                 for planned_sections in planned_sections_between_row:
                     if not planned_sections.get('used', False):
-                        planned_completely_within_actual = section['elapsed_start_time'] <= planned_sections['elapsed_start_time'] and planned_sections['elapsed_end_time'] < section['elapsed_end_time']
+                        planned_completely_within_actual = (section['elapsed_start_time'] <= planned_sections['elapsed_start_time'] and
+                                                            planned_sections['elapsed_end_time'] < section['elapsed_end_time'])
                         planned_starts_close_start_of_actual = abs(section['elapsed_start_time'] - planned_sections['elapsed_start_time']) < 100
                         planned_ends_close_end_of_actual = abs(section['elapsed_end_time'] - planned_sections['elapsed_end_time']) < 100
                         duration_is_reasonable = planned_sections['duration'] - section['available_duration'] < 60 or section['available_duration'] > planned_sections['duration']
@@ -135,11 +130,10 @@ class PerformanceDataParser(object):
                             section['available_duration'] -= planned_sections['duration']
                             planned_sections['used'] = True
 
-
         # convert and create "completed" floor sections based on planned sections (detect possible multiple sets)
         new_sections = []
         for section in workout['workout_sections']:
-            planned_sections =  section.get('planned_sections', [])
+            planned_sections = section.get('planned_sections', [])
             if len(planned_sections) > 0:
                 section['delete'] = True
                 start_date_time = section['start_date_time']
@@ -150,7 +144,7 @@ class PerformanceDataParser(object):
                     start_date_time = start_date_time + datetime.timedelta(seconds=new_section['duration_seconds'])
                     new_section['exercises'] = []
                     for ex in planned_section['exercises']:
-                        new_ex = {}
+                        new_ex = dict()
                         new_ex['name'] = ex['name']
                         new_ex['movement_id'] = ex['movement_id']  # TODO: what to do about alternates
                         new_ex['reps_per_set'] = ex.get('reps_per_set')
@@ -167,28 +161,28 @@ class PerformanceDataParser(object):
 
                     new_sections.append(new_section)
 
-
         # insert and sort the new sections
         workout['workout_sections'].extend(new_sections)
-        workout['workout_sections'] = sorted([section for section in workout['workout_sections'] if not section.get('delete', False)], key=lambda x:x['start_date_time'])
+        workout['workout_sections'] = sorted([section for section in workout['workout_sections'] if not section.get('delete', False)], key=lambda x: x['start_date_time'])
 
         # cleanup unnecessary data from sections
-        section_variables = ['name', 'start_date_time', 'duration_seconds', 'exercises']
+        section_variables = ['name', 'start_date_time', 'duration_seconds', 'exercises', 'end_date_time']
         for section in workout['workout_sections']:
             for key in list(section):
                 if key not in section_variables:
                     del section[key]
-                if key == 'start_date_time':
+                if key in ['start_date_time', 'end_date_time']:
                     section[key] = format_datetime(section[key])
                 for ex in section['exercises']:
                     if 'start_date_time' in ex:
                         ex['start_date_time'] = format_datetime(ex['start_date_time'])
                     if 'end_date_time' in ex:
                         ex['end_date_time'] = format_datetime(ex['end_date_time'])
+        workout['duration'] = sum([section['duration_seconds'] for section in workout['workout_sections']])
         workout['event_date_time'] = format_datetime(workout['event_date_time'])
-
-
-        print(workout)
+        last_section = workout['workout_sections'][-1]
+        if 'end_date_time' not in last_section:
+            last_section['end_date_time'] = format_datetime(parse_datetime(last_section['start_date_time']) + datetime.timedelta(seconds=last_section['duration_seconds']))
 
         return workout
 
@@ -211,14 +205,14 @@ class PerformanceDataParser(object):
             section_data['ex_block'] = self.get_block(section_data.has_power, min_change=1, min_duration=1)
             grouped = section_data.groupby(by=['ex_block'])
             group_aggs = grouped.agg(['mean', 'count', 'sum', 'min', 'max'])
-            rower_section = {}
+            rower_section = dict()
             rower_section['start_date_time'] = self.get_datetime_from_timestamp(min(section_data.timestamp), timezone)
             rower_section['end_date_time'] = self.get_datetime_from_timestamp(max(section_data.timestamp), timezone)
             rower_section['duration_seconds'] = (rower_section['end_date_time'] - rower_section['start_date_time']).seconds
             rower_section['name'] = 'rower'
             rower_section['exercises'] = []
-            for i, row in group_aggs.iterrows():
-                ex = {}
+            for _, row in group_aggs.iterrows():
+                ex = dict()
                 ex['start_date_time'] = self.get_datetime_from_timestamp(row['timestamp']['min'], timezone)
                 ex['end_date_time'] = self.get_datetime_from_timestamp(row['timestamp']['max'], timezone)
                 ex['name'] = 'row'
@@ -226,7 +220,6 @@ class PerformanceDataParser(object):
                 ex['speed'] = round(row['speed']['mean'], 2)
                 ex['power'] = round(row['powerperstroke']['mean'], 3)
                 ex['pace'] = round(1 / ex['speed'], 2)
-                # ex['hr'] = int(row['heartrate']['mean'])
                 ex['hr'] = list(rower_data.heartrate[(rower_data.timestamp > row['timestamp']['min']) & (rower_data.timestamp < row['timestamp']['max'])])
 
                 ex['distance'] = row['distance']['max'] - row['distance']['min']
@@ -243,11 +236,12 @@ class PerformanceDataParser(object):
                     ex['duration'] = (ex['end_date_time'] - ex['start_date_time']).seconds
                     rower_section['exercises'].append(ex)
             rower_sections.append(rower_section)
+
         floor_sections = []
         for i in range(len(rower_sections)):
             if i != 0:
                 if (rower_sections[i]['start_date_time'] - rower_sections[i - 1]['end_date_time']).seconds > 30:
-                    floor_section = {}
+                    floor_section = dict()
                     floor_section['start_date_time'] = rower_sections[i-1]['end_date_time']
                     floor_section['end_date_time'] = rower_sections[i]['start_date_time']
                     floor_section['duration_seconds'] = (floor_section['end_date_time'] - floor_section['start_date_time']).seconds
@@ -255,7 +249,7 @@ class PerformanceDataParser(object):
                     floor_section['exercises'] = []
                     floor_sections.append(floor_section)
         rower_sections.extend(floor_sections)
-        rower_floor_sections = sorted(rower_sections, key= lambda x:x['start_date_time'])
+        rower_floor_sections = sorted(rower_sections, key=lambda x: x['start_date_time'])
         return rower_floor_sections
 
     def get_treadmill_section(self):
@@ -278,7 +272,7 @@ class PerformanceDataParser(object):
         group_aggs = grouped.agg(['mean', 'count', 'sum', 'min', 'max'])
         treadmill_exercises = []
         for i, row in group_aggs.iterrows():
-            ex = {}
+            ex = dict()
             ex['start_date_time'] = self.get_datetime_from_timestamp(row['timestamp']['min'], timezone)
             ex['end_date_time'] = self.get_datetime_from_timestamp(row['timestamp']['max'], timezone)
             ex['name'] = 'treadmill run'
@@ -302,17 +296,17 @@ class PerformanceDataParser(object):
                 ex['grade'] = None
                 ex['duration'] = (ex['end_date_time'] - ex['start_date_time']).seconds
                 treadmill_exercises.append(ex)
-        treadmill_seciton = {}
-        treadmill_seciton['start_date_time'] = treadmill_exercises[0]['start_date_time']
-        treadmill_seciton['end_date_time'] = treadmill_exercises[-1]['end_date_time']
-        treadmill_seciton['duration_seconds'] = (treadmill_seciton['end_date_time'] - treadmill_seciton['start_date_time']).seconds
-        treadmill_seciton['name'] = 'treadmill'
-        treadmill_seciton['exercises'] = treadmill_exercises
-        return [treadmill_seciton]
+        treadmill_section = dict()
+        treadmill_section['start_date_time'] = treadmill_exercises[0]['start_date_time']
+        treadmill_section['end_date_time'] = treadmill_exercises[-1]['end_date_time']
+        treadmill_section['duration_seconds'] = (treadmill_section['end_date_time'] - treadmill_section['start_date_time']).seconds
+        treadmill_section['name'] = 'treadmill'
+        treadmill_section['exercises'] = treadmill_exercises
+        return [treadmill_section]
 
     @staticmethod
     def extract_ex_from_row_section(section):
-        ex_section = {}
+        ex_section = dict()
         ex_section['name'] = 'non_row_ex_row'
         ex_section['duration_seconds'] = {'assigned_value': 0}
         ex_section['exercises'] = []
@@ -331,10 +325,9 @@ class PerformanceDataParser(object):
 
     @staticmethod
     def sort_data(dataframe):
-        print(dataframe.columns)
         _, dataframe['second_marker'] = dataframe['uniqueid'].str.split('_').str
         dataframe.second_marker = dataframe.second_marker.astype(int)
-        dataframe.sort_values(by=['timestamp', 'second_marker' ], inplace=True, ignore_index=True)
+        dataframe.sort_values(by=['timestamp', 'second_marker'], inplace=True, ignore_index=True)
         grouped = dataframe.groupby(by='timestamp')
         group_aggs = grouped.second_marker.agg(['max'])
         prev = 0
@@ -345,7 +338,6 @@ class PerformanceDataParser(object):
             prev = i
 
         dataframe.timestamp = dataframe.timestamp + (dataframe.second_marker + 60 - dataframe.total_seconds)
-
 
     @staticmethod
     def get_block(series, min_change, min_duration=10):
@@ -365,7 +357,6 @@ class PerformanceDataParser(object):
         blocks[last_value:] = block
         return blocks
 
-
     # def get_hr_data(user):
     #     hr_data = pd.read_csv(f'performance_data_06_08/Anonymous{user}-Hr-Detailed.csv')
     #     sort_data(hr_data)
@@ -379,6 +370,8 @@ class PerformanceDataParser(object):
         tz = datetime_string[-6:]
         cleaned_date = parse_datetime(datetime_string.split('.')[0] + tz)
         return cleaned_date.tzinfo
+
+    @staticmethod
     def write_json(data, user):
         json_string = json.dumps(data, indent=4)
         file_name = os.path.join(os.path.realpath('..'), f"../tests/data/otf/completed_workout_{user}.json")
