@@ -272,7 +272,7 @@ Resources:
             FunctionName: { "Fn::Sub": "plans-${Environment}-data-parse" }
             Layers: [
               "arn:aws:lambda:us-west-2:887689817172:layer:pandas105:2",
-              "arn:aws:lambda:us-west-2:420165488524:layer:AWSLambda-Python36-SciPy1x:20",
+              "arn:aws:lambda:us-west-2:887689817172:layer:numpyscipy:1",
               "arn:aws:lambda:us-west-2:887689817172:layer:sklearn2:1"
             ]
             Tags:
