@@ -299,7 +299,7 @@ def get_responsive_recovery(user_id, event_date_time, session=None, symptoms=Non
         api_processor.create_session_from_survey(session)
 
     # get symptoms
-    if 'symptoms' is not None:
+    if symptoms is not None:
         for symptom in symptoms:
             api_processor.create_symptom_from_survey(symptom)
 
