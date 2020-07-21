@@ -3,9 +3,6 @@ import io
 from logic.performance_data_parser import PerformanceDataParser
 
 from datastores.datastore_collection import DatastoreCollection
-from fathomapi.api.config import Config
-from models.user_stats import UserStats
-from logic.api_processing import APIProcessing
 from routes.environments import consolidated_dosage
 from routes.responsive_recovery import get_responsive_recovery
 from utils import parse_datetime
