@@ -29,15 +29,20 @@ def lambda_handler(event, _):
         data_parser = PerformanceDataParser()
         data_parser.parse_fileobj(content)
         workout_data = data_parser.get_completed_workout(user_id)
-        print('done')
+        workout_data['session_id'] = session_id
 
-        # unzipped_files = zipfile.ZipFile(content)
-        # names = unzipped_files.namelist()
-        # for name in names:
-        #     unzipped_content = unzipped_files.open(name).read()
-        #     print(f'Unzipped File: {name}')
-        #     s3_resource.Bucket(s3_bucket).put_object(Key=f'unzipped/{user_id}/{session_id}/{name}', Body=unzipped_content)
-        # print('Wrote File to processed container')
+        session = {
+            'session_id': 'session_id',
+            'event_date_time': workout_data['event_date_time'],
+            'end_date': workout_data['workout_sections'][-1]['end_date_time'],
+            'session_type': 7,
+            'duration': workout_data['duration'],
+            'workout_program_module': workout_data
+        }
+        # use session to create responsive recovery
+        # 
+
+
     except Exception as e:
         print(e)
         print(f'Error getting object {s3_key} from bucket {s3_bucket}. Make sure they exist and your bucket is in the same region as this function.')
