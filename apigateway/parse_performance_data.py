@@ -2,6 +2,22 @@ import boto3
 import io
 from logic.performance_data_parser import PerformanceDataParser
 
+from datastores.datastore_collection import DatastoreCollection
+from fathomapi.api.config import Config
+from models.user_stats import UserStats
+from logic.api_processing import APIProcessing
+from routes.environments import consolidated_dosage
+from routes.responsive_recovery import get_responsive_recovery
+from utils import parse_datetime
+
+consolidated = consolidated_dosage()
+
+datastore_collection = DatastoreCollection()
+user_stats_datastore = datastore_collection.user_stats_datastore
+heart_rate_datastore = datastore_collection.heart_rate_datastore
+workout_program_datastore = datastore_collection.workout_program_datastore
+responsive_recovery_datastore = datastore_collection.responsive_recovery_datastore
+
 
 def lambda_handler(event, _):
     print(f"Starting unzipping for file {event['Records'][0]['s3']['object']['key']}")
@@ -41,9 +57,40 @@ def lambda_handler(event, _):
         }
         # use session to create responsive recovery
         #
+        responsive_recovery = get_responsive_recovery(user_id, event_date_time=parse_datetime(workout_data['event_date_time']), session=session)
+        print(responsive_recovery.json_serialise(api=True, consolidated=True))
 
 
     except Exception as e:
         print(e)
         print(f'Error getting object {s3_key} from bucket {s3_bucket}. Make sure they exist and your bucket is in the same region as this function.')
         raise e
+
+
+# def get_responsive_recovery(user_id, event_date_time, timezone, session, user_age):
+#
+#     # set up processing
+#     user_stats = user_stats_datastore.get(athlete_id=user_id)
+#     if user_stats is None:
+#         user_stats = UserStats(user_id)
+#         user_stats.event_date = event_date_time
+#     user_stats.api_version = Config.get('API_VERSION')
+#     user_stats.timezone = timezone
+#     api_processor = APIProcessing(
+#             user_id,
+#             event_date_time,
+#             user_stats=user_stats,
+#             datastore_collection=datastore_collection
+#     )
+#
+#     api_processor.create_session_from_survey(session)
+#
+#     if len(api_processor.workout_programs) > 0:
+#         workout_program_datastore.put(api_processor.workout_programs)
+#
+#     if len(api_processor.heart_rate_data) > 0:
+#         heart_rate_datastore.put(api_processor.heart_rate_data)
+#
+#     responsive_recovery = api_processor.create_activity(
+#             activity_type='responsive_recovery'
+#     )
