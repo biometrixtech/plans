@@ -10,6 +10,13 @@
             "src": "apigateway",
             "pip": true,
             "publish_tags": true
+        },
+        {
+            "name": "plans-{ENVIRONMENT}-data-parse",
+            "s3_filename": "apigateway.zip",
+            "src": "apigateway",
+            "pip": true,
+            "publish_tags": false
         }
     ],
     "datastores": [
