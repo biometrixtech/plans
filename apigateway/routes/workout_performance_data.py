@@ -32,8 +32,10 @@ def handle_performance_data_upload(user_id, program_id):
     _s3_config = TransferConfig(use_threads=False)
     if request.headers['Content-Type'] == 'application/octet-stream':
         data = base64.b64decode(request.get_data())
+        api_version = Config.get('API_VERSION')
+        file_name = f'{api_version}_lambda_version/{user_id}/{program_id}/{session_id}.zip'
         f = io.BytesIO(data)
-        _ingest_s3_bucket.upload_fileobj(f, f'input/{user_id}/{program_id}/{session_id}.zip', Config=_s3_config)
+        _ingest_s3_bucket.upload_fileobj(f, file_name, Config=_s3_config)
     else:
         raise ApplicationException(
             415,

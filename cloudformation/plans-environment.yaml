@@ -92,7 +92,7 @@ Resources:
                         S3Key:
                           Rules:
                             - Name: prefix
-                              Value: input
+                              Value: latest_lambda_version
                       Function: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] }
             Tags:
               - { Key: "Management", Value: "managed" }
