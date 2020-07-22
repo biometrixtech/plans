@@ -27,7 +27,8 @@ def lambda_handler(event, _):
         s3_key = record['s3']['object']['key']
 
         ids = s3_key.split('/')
-        user_id = ids[-2]
+        user_id = ids[-3]
+        program_id = ids[-2]
         session_id = ids[-1]
         s3_resource = boto3.resource('s3')
         s3_object = s3_resource.Object(s3_bucket, s3_key)
@@ -40,7 +41,7 @@ def lambda_handler(event, _):
         print('Converted Content')
 
         data_parser = PerformanceDataParser()
-        data_parser.parse_fileobj(content)
+        data_parser.parse_fileobj(content, program_id)
         workout_data = data_parser.get_completed_workout(user_id)
         workout_data['session_id'] = session_id
 

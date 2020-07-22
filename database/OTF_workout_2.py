@@ -194,6 +194,9 @@ def parse_file(file_name, write=True, path=None):
         workout['program_module_id'] = 'at_home1'
     elif file_name == 'at_home2':
         workout['program_module_id'] = 'at_home2'
+    elif file_name == 'june8_alt':
+        workout['program_module_id'] = 'june_8'
+        workout['program_id'] = 'june_8'
 
     workout['sections'] = list(sections.values())
     if write:

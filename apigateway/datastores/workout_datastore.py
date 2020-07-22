@@ -11,14 +11,14 @@ class WorkoutDatastore(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.WorkoutDatastore.get')
-    def get(self, program_id=None, event_date=None, start_date=None, end_date=None):
+    def get(self, program_id=None, event_date=None, start_date=None, end_date=None, json=False):
         """
         program_id: uuid
         event_date: datetime.date
         start_date: datetime.date
         end_date: datetime.date
         """
-        return self._query_mongodb(program_id, event_date, start_date, end_date)
+        return self._query_mongodb(program_id, event_date, start_date, end_date, json=json)
 
     @xray_recorder.capture('datastore.WorkoutDatastore.put')
     def put(self, items):
@@ -31,14 +31,17 @@ class WorkoutDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.WorkoutDatastore._query_mongodb')
-    def _query_mongodb(self, program_id, event_date, start_date, end_date):
+    def _query_mongodb(self, program_id, event_date, start_date, end_date, json=False):
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
         if program_id is not None:
             mongo_result = mongo_collection.find_one({'program_id': program_id})
             if mongo_result is not None:
-                session = PlannedWorkout.json_deserialise(mongo_result)
-                return session
+                if json:
+                    return mongo_result
+                else:
+                    session = PlannedWorkout.json_deserialise(mongo_result)
+                    return session
             else:
                 raise NoSuchEntityException(f'Workout with the provided id not found')
         else:

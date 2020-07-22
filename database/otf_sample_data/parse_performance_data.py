@@ -378,11 +378,19 @@ def write_json(data, user):
     f1.write(json_string)
     f1.close()
 
+
+def save_to_mongo(planned_workout):
+    from datastores.workout_datastore import WorkoutDatastore
+    from models.planned_exercise import PlannedWorkout
+    planned_workout = PlannedWorkout.json_deserialise(planned_workout)
+    WorkoutDatastore().put(planned_workout)
+
 if __name__ == '__main__':
     import time
     st = time.time()
     path = os.path.join(os.path.realpath('..'), f"../tests/data/otf")
-    planned_workout = parse_file('june8_alt', write=True, path=path)
+    planned_workout = parse_file('june8_alt', write=False)
+    save_to_mongo(planned_workout)
     for user in [1, 2, 3]:
         workout = get_completed_workout(user, planned_workout)
         write_json(workout, user)

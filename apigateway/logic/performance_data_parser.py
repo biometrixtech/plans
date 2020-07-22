@@ -5,6 +5,7 @@ import numpy as np
 import datetime
 import zipfile
 from utils import parse_datetime, format_datetime
+from datastores.workout_datastore import WorkoutDatastore
 
 
 class PerformanceDataParser(object):
@@ -13,7 +14,7 @@ class PerformanceDataParser(object):
         self.treadmill_data = None
         self.planned_workout = None
 
-    def parse_fileobj(self, fileobj):
+    def parse_fileobj(self, fileobj, program_id):
         # TODO: Standardize the names of the files and update this.
         unzipped_files = zipfile.ZipFile(fileobj)
         print('unzipped file')
@@ -30,8 +31,9 @@ class PerformanceDataParser(object):
                 print('treadmill data read')
 
         # TODO: Better strategy to store/retrieve the planned session (probably store in mongo/s3s)
-        with open('data/june8_alt.json', 'r') as f:
-            self.planned_workout = json.load(f)
+        self.planned_workout = WorkoutDatastore().get(program_id=program_id, json=True)
+        # with open('data/june8_alt.json', 'r') as f:
+        #     self.planned_workout = json.load(f)
 
     def get_completed_workout(self, user_id):
         planned_workout = self.planned_workout
