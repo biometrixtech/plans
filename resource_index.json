@@ -21,6 +21,12 @@
     ],
     "datastores": [
     ],
+    "s3s": [
+        {
+            "name": "biometrix-plans-{Environment}-performance-data",
+            "type": "performance_data"
+        }
+    ],
     "apigateways": [
         {
             "name": "plans-{ENVIRONMENT}-apigateway",

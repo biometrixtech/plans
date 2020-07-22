@@ -49,13 +49,17 @@ class PlannedWorkout(object):
 class PlannedWorkoutSection(WorkoutSection, Serialisable):
     def __init__(self):
         super().__init__()
+        self.planned_start_time_run_first = None
+        self.planned_start_time_rower_first = None
 
     def json_serialise(self):
         ret = {
             'name': self.name,
             'start_date_time': self.start_date_time,
             'duration_seconds': self.duration_seconds,
-            'exercises': [e.json_serialise() for e in self.exercises]
+            'exercises': [e.json_serialise() for e in self.exercises],
+            'planned_start_time_run_first': self.planned_start_time_run_first,
+            'planned_start_time_rower_first': self.planned_start_time_rower_first
         }
         return ret
 
@@ -67,6 +71,8 @@ class PlannedWorkoutSection(WorkoutSection, Serialisable):
         workout_section.duration_seconds = input_dict.get('duration_seconds')
         workout_section.exercises = [PlannedExercise.json_deserialise(workout_exercise) for workout_exercise in
                                      input_dict.get('exercises', [])]
+        workout_section.planned_start_time_run_first = input_dict.get('planned_start_time_run_first')
+        workout_section.planned_start_time_rower_first = input_dict.get('planned_start_time_rower_first')
 
         return workout_section
 
