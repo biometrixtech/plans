@@ -32,4 +32,4 @@ def handle_performance_data_upload(user_id):
             'This endpoint requires the Content-Type application/zip with a zip file'
         )
 
-    return {'message': 'Received'}, 202
+    return {'session_id': session_id}, 201
