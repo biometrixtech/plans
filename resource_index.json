@@ -23,7 +23,7 @@
     ],
     "s3s": [
         {
-            "name": "biometrix-plans-{Environment}-performance-data",
+            "name": "biometrix-plans-{ENVIRONMENT}-performance-data",
             "type": "performance_data"
         }
     ],
