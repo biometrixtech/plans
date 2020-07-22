@@ -80,7 +80,12 @@ Resources:
         DependsOn: LambdaTriggerPermission
         Properties:
             BucketName: { "Fn::Sub": "biometrix-plans-${Environment}-performance-data" }
-            NotificationConfiguration:
+            NotificationConfiguration: 
+            #   { "Fn::If": [
+            #     "CreateIngest",
+            #     { "LambdaConfigurations": [ { "Event": "s3:ObjectCreated:*", "Function": { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] } } ] },
+            #     { Ref: "AWS::NoValue" }
+            # ]}
                 LambdaConfigurations:
                     - Event: "s3:ObjectCreated:*"
                       Filter:
@@ -105,7 +110,7 @@ Resources:
             Action: "lambda:InvokeFunction"
             FunctionName: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] }
             Principal: "s3.amazonaws.com"
-            SourceArn:  { "Fn::GetAtt": [ "S3Bucket", "Arn" ] }
+            SourceArn:  { "Fn::Sub": "arn:aws:s3:::biometrix-plans-${Environment}-performance-data" }
             SourceAccount: { Ref : "AWS::AccountId" }
 
 
