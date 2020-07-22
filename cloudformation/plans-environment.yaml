@@ -79,7 +79,7 @@ Resources:
         Type: "AWS::S3::Bucket"
         DependsOn: LambdaTriggerPermission
         Properties:
-            BucketName: { "Fn::Sub": "fathom-otf2" }
+            BucketName: { "Fn::Sub": "biometrix-plans-${Environment}-performance-data" }
             NotificationConfiguration:
                 LambdaConfigurations:
                     - Event: "s3:ObjectCreated:*"
@@ -223,6 +223,7 @@ Resources:
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
                     USERS_API_VERSION: { Ref: "UsersApiVersion"}
+                    PERFORMANCE_DATA_S3_BUCKET: { Ref: "S3Bucket" }
             Handler: "apigateway.handler"
             Runtime: "python3.6"
             Timeout: "60"
@@ -248,7 +249,6 @@ Resources:
                 },
                 { Ref: "AWS::NoValue" }
             ]}
-
 
     DataParseLambda:
         Type: "AWS::Lambda::Function"
@@ -291,7 +291,6 @@ Resources:
             #     },
             #     { Ref: "AWS::NoValue" }
             # ]}
-
 
     ApigatewayStack:
         Type: "AWS::CloudFormation::Stack"
