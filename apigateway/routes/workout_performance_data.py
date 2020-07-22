@@ -16,7 +16,7 @@ from utils import format_datetime
 app = Blueprint('performance_data', __name__)
 
 
-@app.route('/<uuid:user_id>/<str:program_id>/upload', methods=['PUT'])
+@app.route('/<uuid:user_id>/<string:program_id>/upload', methods=['PUT'])
 @require.authenticated.any
 @xray_recorder.capture('routes.performance_data.upload')
 def handle_performance_data_upload(user_id, program_id):
