@@ -43,7 +43,7 @@ class WorkoutDatastore(object):
                     session = PlannedWorkout.json_deserialise(mongo_result)
                     return session
             else:
-                raise NoSuchEntityException(f'Workout with the provided id not found')
+                raise NoSuchEntityException(f'Workout with the program_id: {program_id} not found')
         else:
             query = {}
             if event_date is not None:

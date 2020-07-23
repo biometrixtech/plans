@@ -32,8 +32,6 @@ class PerformanceDataParser(object):
 
         # TODO: Better strategy to store/retrieve the planned session (probably store in mongo/s3s)
         self.planned_workout = WorkoutDatastore().get(program_id=program_id, json=True)
-        # with open('data/june8_alt.json', 'r') as f:
-        #     self.planned_workout = json.load(f)
 
     def get_completed_workout(self, user_id):
         planned_workout = self.planned_workout

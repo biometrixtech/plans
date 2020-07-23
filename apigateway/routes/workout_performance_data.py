@@ -6,12 +6,16 @@ from boto3.s3.transfer import TransferConfig
 import base64
 import datetime
 
+from datastores.workout_datastore import WorkoutDatastore
 from fathomapi.api.config import Config
 from fathomapi.utils.decorators import require
 from fathomapi.utils.exceptions import ApplicationException
 from fathomapi.utils.xray import xray_recorder
 from utils import format_datetime
 
+_ingest_s3_bucket = boto3.resource('s3').Bucket(Config.get('PERFORMANCE_DATA_S3_BUCKET'))
+# Need to use single threading to prevent X Ray tracing errors
+_s3_config = TransferConfig(use_threads=False)
 
 app = Blueprint('performance_data', __name__)
 
@@ -24,25 +28,27 @@ def handle_performance_data_upload(user_id, program_id):
     unique_key = f'http://session.fathomai.com/{user_id}_{program_id}_{event_date_time}'
     session_id = str(uuid.uuid5(uuid.NAMESPACE_URL, unique_key))
 
-    # session_id = str(uuid.uuid4())
-
-    _ingest_s3_bucket = boto3.resource('s3').Bucket(Config.get('PERFORMANCE_DATA_S3_BUCKET'))
-    # _ingest_s3_bucket = boto3.resource('s3').Bucket('fathom-otf2')
-    # Need to use single threading to prevent X Ray tracing errors
-    _s3_config = TransferConfig(use_threads=False)
-    if request.headers['Content-Type'] == 'application/octet-stream':
-        data = base64.b64decode(request.get_data())
-        api_version = Config.get('API_VERSION')
-        if len(api_version.split('_')) > 2:
-            api_version = '_'.join(api_version.split('_')[0:2])
-        file_name = f'{api_version}_lambda_version/{user_id}/{program_id}/{session_id}.zip'
-        f = io.BytesIO(data)
-        _ingest_s3_bucket.upload_fileobj(f, file_name, Config=_s3_config)
+    if program_exists(program_id):
+        if request.headers['Content-Type'] == 'application/octet-stream':
+            data = base64.b64decode(request.get_data())
+            api_version = Config.get('API_VERSION')
+            if len(api_version.split('_')) > 2:
+                api_version = '_'.join(api_version.split('_')[0:2])
+            file_name = f'{api_version}_lambda_version/{user_id}/{program_id}/{session_id}.zip'
+            f = io.BytesIO(data)
+            _ingest_s3_bucket.upload_fileobj(f, file_name, Config=_s3_config)
+        else:
+            raise ApplicationException(
+                415,
+                'UnsupportedContentType',
+                'This endpoint requires the Content-Type application/octet-stream with binary content'
+            )
+        return {'session_id': session_id}, 201
     else:
-        raise ApplicationException(
-            415,
-            'UnsupportedContentType',
-            'This endpoint requires the Content-Type application/zip with a zip file'
-        )
+        return {'message': 'Workout Program with the provided ID does not exist'}, 404
 
-    return {'session_id': session_id}, 201
+
+def program_exists(program_id):
+    if WorkoutDatastore().get(program_id=program_id, json=True) is not None:
+        return True
+    return False
