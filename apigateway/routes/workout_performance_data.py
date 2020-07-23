@@ -33,6 +33,8 @@ def handle_performance_data_upload(user_id, program_id):
     if request.headers['Content-Type'] == 'application/octet-stream':
         data = base64.b64decode(request.get_data())
         api_version = Config.get('API_VERSION')
+        if len(api_version.split('_')) > 2:
+            api_version = '_'.join(api_version.split('_')[0:2])
         file_name = f'{api_version}_lambda_version/{user_id}/{program_id}/{session_id}.zip'
         f = io.BytesIO(data)
         _ingest_s3_bucket.upload_fileobj(f, file_name, Config=_s3_config)
