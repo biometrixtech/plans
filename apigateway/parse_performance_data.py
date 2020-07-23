@@ -1,20 +1,12 @@
 import boto3
 import io
 
-from fathomapi.utils.exceptions import NoSuchEntityException
-from datastores.datastore_collection import DatastoreCollection
 from logic.performance_data_parser import PerformanceDataParser
-from routes.environments import consolidated_dosage
+# from routes.environments import consolidated_dosage
 from routes.responsive_recovery import get_responsive_recovery
 from utils import parse_datetime
 
-consolidated = consolidated_dosage()
-
-datastore_collection = DatastoreCollection()
-user_stats_datastore = datastore_collection.user_stats_datastore
-heart_rate_datastore = datastore_collection.heart_rate_datastore
-workout_program_datastore = datastore_collection.workout_program_datastore
-responsive_recovery_datastore = datastore_collection.responsive_recovery_datastore
+# consolidated = consolidated_dosage()
 
 
 def lambda_handler(event, _):
@@ -55,7 +47,8 @@ def lambda_handler(event, _):
         }
         # use session to create responsive recovery
         responsive_recovery = get_responsive_recovery(user_id, event_date_time=parse_datetime(workout_data['event_date_time']), session=session)
-        print(responsive_recovery.json_serialise(api=True, consolidated=True))
+        # print(responsive_recovery.json_serialise(api=True, consolidated=True))
+        # TODO: content delivery
 
 
     except Exception as e:
