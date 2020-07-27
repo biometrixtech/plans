@@ -386,7 +386,7 @@ def handle_no_sessions_planned(user_id=None):
     if not _check_plan_exists(user_id, plan_event_date):
         plan = DailyPlan(event_date=plan_event_date)
         plan.user_id = user_id
-        plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
+        # plan.last_sensor_sync = daily_plan_datastore.get_last_sensor_sync(user_id, plan_event_date)
     else:
         plan = daily_plan_datastore.get(user_id, plan_event_date, plan_event_date)[0]
 
