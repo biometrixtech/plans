@@ -1132,7 +1132,7 @@ class ActivityFunctionalMovementFactory(object):
 
 class FunctionalMovementFactory(object):
 
-    def get_functional_movement_dictinary(self):
+    def get_functional_movement_dictionary(self):
 
         dict = {}
 

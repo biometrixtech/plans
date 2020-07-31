@@ -60,7 +60,7 @@ def test_aggregate_load_concentric():
     program_module.workout_sections.append(section_2)
 
     factory = FunctionalMovementFactory()
-    dict = factory.get_functional_movement_dictinary()
+    dict = factory.get_functional_movement_dictionary()
 
     session_functional_movement = SessionFunctionalMovement(None, {})
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
@@ -116,7 +116,7 @@ def test_normalize_load_concentric():
     program_module.workout_sections.append(section_2)
 
     factory = FunctionalMovementFactory()
-    dict = factory.get_functional_movement_dictinary()
+    dict = factory.get_functional_movement_dictionary()
 
     athlete_injury_risk = AthleteInjuryRisk("tester")
     session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)

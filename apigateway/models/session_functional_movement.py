@@ -27,7 +27,7 @@ class SessionFunctionalMovement(object):
         if self.session.session_type() == SessionType.mixed_activity:
             if self.session.workout_program_module is not None:
                 functional_movement_factory = FunctionalMovementFactory()
-                functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+                functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
                 total_load_dict = self.process_workout_load(self.session.workout_program_module, event_date, functional_movement_dict)
                 #consolidated_dict = self.consolidate_load(total_load_dict, event_date)
 
@@ -38,7 +38,7 @@ class SessionFunctionalMovement(object):
         elif self.session.session_type() == SessionType.planned:
             if self.session.workout is not None:
                 functional_movement_factory = FunctionalMovementFactory()
-                functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+                functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
                 total_load_dict = self.process_planned_workout_load(self.session.workout, event_date, functional_movement_dict)
                 #consolidated_dict = self.consolidate_load(total_load_dict, event_date)
 

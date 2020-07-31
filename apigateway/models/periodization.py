@@ -2,67 +2,68 @@ from enum import Enum
 from models.training_volume import StandardErrorRange
 from models.training_load import DetailedTrainingLoad, TrainingLoad
 from models.movement_tags import DetailedAdaptationType, SubAdaptationType, AdaptationDictionary
+from datetime import datetime, timedelta
 
 
-class AthleteTrainingHistory(object):
-    def __init__(self):
-        self.average_session_duration = StandardErrorRange()
-        self.average_session_rpe = StandardErrorRange()
-        self.average_sessions_per_week = StandardErrorRange()
-
-        self.average_session_load = TrainingLoad()
-        self.average_day_load = TrainingLoad()
-
-        self.current_weeks_load = TrainingLoad()
-        self.previous_1_weeks_load = TrainingLoad()
-        self.previous_2_weeks_load = TrainingLoad()
-        self.previous_3_weeks_load = TrainingLoad()
-        self.previous_4_weeks_load = TrainingLoad()
-
-        self.current_weeks_average_session_duration = StandardErrorRange()
-        self.current_weeks_average_session_rpe = StandardErrorRange()
-
-        self.current_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_1_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_2_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
-        self.previous_4_weeks_detailed_load = DetailedTrainingLoad()
-
-    def get_last_four_weeks_power_load(self):
-
-        power_load_list = []
-
-        if self.current_weeks_load.power_load is not None:
-            power_load_list.append(self.current_weeks_load.power_load)
-
-        if self.previous_1_weeks_load.power_load is not None:
-            power_load_list.append(self.previous_1_weeks_load.power_load)
-
-        if self.previous_2_weeks_load.power_load is not None:
-            power_load_list.append(self.previous_2_weeks_load.power_load)
-
-        if self.previous_3_weeks_load.power_load is not None:
-            power_load_list.append(self.previous_3_weeks_load.power_load)
-
-        return power_load_list
-
-    def get_last_four_weeks_rpe_load(self):
-
-        load_list = []
-
-        if self.current_weeks_load.rpe_load is not None:
-            load_list.append(self.current_weeks_load.rpe_load)
-
-        if self.previous_1_weeks_load.rpe_load is not None:
-            load_list.append(self.previous_1_weeks_load.rpe_load)
-
-        if self.previous_2_weeks_load.rpe_load is not None:
-            load_list.append(self.previous_2_weeks_load.rpe_load)
-
-        if self.previous_3_weeks_load.rpe_load is not None:
-            load_list.append(self.previous_3_weeks_load.rpe_load)
-
-        return load_list
+# class AthleteTrainingHistory(object):
+#     def __init__(self):
+#         self.average_session_duration = StandardErrorRange()
+#         self.average_session_rpe = StandardErrorRange()
+#         self.average_sessions_per_week = StandardErrorRange()
+#
+#         self.average_session_load = TrainingLoad()
+#         self.average_day_load = TrainingLoad()
+#
+#         self.last_weeks_load = TrainingLoad()
+#         self.previous_1_weeks_load = TrainingLoad()
+#         self.previous_2_weeks_load = TrainingLoad()
+#         self.previous_3_weeks_load = TrainingLoad()
+#         self.previous_4_weeks_load = TrainingLoad()
+#
+#         # self.last_weeks_average_session_duration = StandardErrorRange()
+#         # self.current_weeks_average_session_rpe = StandardErrorRange()
+#
+#         self.last_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_1_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_2_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
+#         self.previous_4_weeks_detailed_load = DetailedTrainingLoad()
+#
+#     def get_last_four_weeks_power_load(self):
+#
+#         power_load_list = []
+#
+#         if self.last_weeks_load.power_load is not None:
+#             power_load_list.append(self.last_weeks_load.power_load)
+#
+#         if self.previous_1_weeks_load.power_load is not None:
+#             power_load_list.append(self.previous_1_weeks_load.power_load)
+#
+#         if self.previous_2_weeks_load.power_load is not None:
+#             power_load_list.append(self.previous_2_weeks_load.power_load)
+#
+#         if self.previous_3_weeks_load.power_load is not None:
+#             power_load_list.append(self.previous_3_weeks_load.power_load)
+#
+#         return power_load_list
+#
+#     def get_last_four_weeks_rpe_load(self):
+#
+#         load_list = []
+#
+#         if self.last_weeks_load.rpe_load is not None:
+#             load_list.append(self.last_weeks_load.rpe_load)
+#
+#         if self.previous_1_weeks_load.rpe_load is not None:
+#             load_list.append(self.previous_1_weeks_load.rpe_load)
+#
+#         if self.previous_2_weeks_load.rpe_load is not None:
+#             load_list.append(self.previous_2_weeks_load.rpe_load)
+#
+#         if self.previous_3_weeks_load.rpe_load is not None:
+#             load_list.append(self.previous_3_weeks_load.rpe_load)
+#
+#         return load_list
 
 
 class TrainingPhaseType(Enum):
@@ -124,12 +125,26 @@ class TrainingPhase(object):
         self.acwr = StandardErrorRange(lower_bound=lower_progression_bound, upper_bound=upper_progression_bound)
 
 
-# should proceed from high volume-low intensity to low volume-high intensity training over the course of the mesocycle
 class PeriodizationPlan(object):
-    def __init__(self, athlete_periodization_goal):
+    def __init__(self, start_date, athlete_periodization_goal, training_phase, athlete_persona):
+        self.start_date = start_date
         self.periodization_goal = athlete_periodization_goal
-        self.training_phase = None
-        self.weeks = []
+        self.training_phase = training_phase
+        self.athlete_persona = athlete_persona
+        self.next_workouts = {}
+
+    def get_week_number(self, event_date):
+
+        monday1 = (self.start_date - timedelta(days=self.start_date.weekday()))
+        monday2 = (event_date - timedelta(days=event_date.weekday()))
+
+        return int(round((monday2 - monday1).days / 7, 0))
+
+    def get_week_start_date(self, event_date):
+
+        week_number = self.get_week_number(event_date)
+
+        return self.start_date + timedelta(weeks=week_number)
 
 
 class PeriodizationPlanWeek(object):

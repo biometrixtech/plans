@@ -1,20 +1,340 @@
-from models.periodization import AthleteTrainingHistory, PeriodizationPlan, PeriodizationPlanWeek, PeriodizationModelFactory
+from models.periodization import PeriodizationPlanWeek, PeriodizationModelFactory, PeriodizationPlan
 from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
 from models.training_volume import StandardErrorRange
 from statistics import mean
-from models.training_load import TrainingLoad
-from models.movement_tags import AdaptationDictionary, RankedAdaptationType
+from models.training_load import TrainingLoad, CompletedSessionDetails, LoadType, DetailedTrainingLoad
+from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure
+from logic.training_load_calcs import TrainingLoadCalculator
+from models.planned_exercise import PlannedWorkoutLoad
 from math import sqrt
+from datetime import timedelta
+
+
+class WorkoutScoringManager(object):
+
+    @staticmethod
+    def cosine_similarity(candidate_exercise_priorities, recommended_exercise_priorities):
+
+        # get the adaptation types separately so we can look for matches of type (but not necessarily ranking)
+        candidate_adaptation_types = [c.adaptation_type for c in candidate_exercise_priorities]
+        recommended_adaptation_types = [r.adaptation_type for r in recommended_exercise_priorities]
+        all_adaptation_types = set(candidate_adaptation_types).union(recommended_adaptation_types)
+
+        all_exercise_priorities = set(candidate_exercise_priorities).union(recommended_exercise_priorities)
+        dotprod_1 = sum((1 if k in candidate_exercise_priorities else 0) * (1 if k in recommended_exercise_priorities else 0) for k in all_exercise_priorities)
+        magA_1 = sqrt(sum((1 if k in candidate_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
+        magB_1 = sqrt(sum((1 if k in recommended_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
+        if (magA_1 * magB_1) == 0 :
+            cosine_similarity_1 = 0
+        else:
+            cosine_similarity_1 = dotprod_1 / (magA_1 * magB_1)
+
+        dotprod_2 = sum(
+            (1 if k in candidate_adaptation_types else 0) * (1 if k in recommended_adaptation_types else 0) for k
+            in all_adaptation_types)
+        magA_2 = sqrt(sum((1 if k in candidate_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        magB_2 = sqrt(sum((1 if k in recommended_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        if (magA_2 * magB_2) == 0:
+            cosine_similarity_2 = 0
+        else:
+            cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
+
+        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2) / 2
+
+        return average_cosine_similarity
 
 
 class PeriodizationPlanProcessor(object):
-    def __init__(self, athlete_periodization_goal, athlete_training_history, athlete_persona, training_phase_type):
+    def __init__(self, event_date, athlete_periodization_goal, athlete_persona, training_phase_type, completed_session_details_datastore, workout_library_datastore, exclude_completed=True):
+        self.start_date = event_date
+
         self.persona = athlete_persona
         self.goal = athlete_periodization_goal
-        self.athlete_training_history = athlete_training_history
+        self.training_phase_type = training_phase_type
         self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type, periodization_goal=athlete_periodization_goal)
+        self.exclude_completed = exclude_completed
+        self.completed_session_details_datastore = completed_session_details_datastore
+        self.workout_library_datastore = workout_library_datastore
+        self.current_weekly_workouts = []
         self.weekly_targets = []
+        self.current_weekly_load = TrainingLoad()
+        self.last_week_workouts = []
+        self.previous_week_1_workouts = []
+        self.previous_week_2_workouts = []
+        self.previous_week_3_workouts = []
+        self.previous_week_4_workouts = []
+
+        self.average_session_duration = StandardErrorRange()
+        self.average_session_rpe = StandardErrorRange()
+        self.average_sessions_per_week = StandardErrorRange()
+        self.average_session_load = TrainingLoad()
+        #self.average_day_load = TrainingLoad()
+
+        self.last_week_rpe_load_values = []
+        self.previous_week_1_rpe_load_values = []
+        self.previous_week_2_rpe_load_values = []
+        self.previous_week_3_rpe_load_values = []
+        self.previous_week_4_rpe_load_values = []
+
+        self.last_week_power_load_values = []
+        self.previous_week_1_power_load_values = []
+        self.previous_week_2_power_load_values = []
+        self.previous_week_3_power_load_values = []
+        self.previous_week_4_power_load_values = []
+
+        self.last_week_rpe_values = []
+        self.previous_week_1_rpe_values = []
+        self.previous_week_2_rpe_values = []
+        self.previous_week_3_rpe_values = []
+        self.previous_week_4_rpe_values = []
+
+        # self.last_week_rpe_load_sum = None
+        # self.previous_week_1_rpe_load_sum = None
+        # self.previous_week_2_rpe_load_sum = None
+        # self.previous_week_3_rpe_load_sum = None
+        # self.previous_week_4_rpe_load_sum = None
+        self.chronic_rpe_load_average = None
+
+        # self.last_week_power_load_sum = None
+        # self.previous_week_1_power_load_sum = None
+        # self.previous_week_2_power_load_sum = None
+        # self.previous_week_3_power_load_sum = None
+        # self.previous_week_4_power_load_sum = None
+        self.chronic_power_load_average = None
+
+        self.last_weeks_load = TrainingLoad()
+        self.previous_1_weeks_load = TrainingLoad()
+        self.previous_2_weeks_load = TrainingLoad()
+        self.previous_3_weeks_load = TrainingLoad()
+        self.previous_4_weeks_load = TrainingLoad()
+
+        self.current_weeks_detailed_load = DetailedTrainingLoad()
+        self.last_weeks_detailed_load = DetailedTrainingLoad()
+        self.previous_1_weeks_detailed_load = DetailedTrainingLoad()
+        self.previous_2_weeks_detailed_load = DetailedTrainingLoad()
+        self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
+        self.previous_4_weeks_detailed_load = DetailedTrainingLoad()
+
+    def get_last_four_weeks_power_load(self):
+
+        power_load_list = []
+
+        if self.last_weeks_load.power_load is not None:
+            power_load_list.append(self.last_weeks_load.power_load)
+
+        if self.previous_1_weeks_load.power_load is not None:
+            power_load_list.append(self.previous_1_weeks_load.power_load)
+
+        if self.previous_2_weeks_load.power_load is not None:
+            power_load_list.append(self.previous_2_weeks_load.power_load)
+
+        if self.previous_3_weeks_load.power_load is not None:
+            power_load_list.append(self.previous_3_weeks_load.power_load)
+
+        return power_load_list
+
+    def get_last_four_weeks_rpe_load(self):
+
+        load_list = []
+
+        if self.last_weeks_load.rpe_load is not None:
+            load_list.append(self.last_weeks_load.rpe_load)
+
+        if self.previous_1_weeks_load.rpe_load is not None:
+            load_list.append(self.previous_1_weeks_load.rpe_load)
+
+        if self.previous_2_weeks_load.rpe_load is not None:
+            load_list.append(self.previous_2_weeks_load.rpe_load)
+
+        if self.previous_3_weeks_load.rpe_load is not None:
+            load_list.append(self.previous_3_weeks_load.rpe_load)
+
+        return load_list
+
+    def create_periodization_plan(self, start_date):
+
+        self.start_date = start_date
+        self.load_completed_workouts(start_date)
+        self.populate_values()
+        self.sum_weeks()
+        self.calculate_averages()
+        self.set_weekly_targets()
+
+        periodization_plan = PeriodizationPlan(self.start_date, self.goal, self.training_phase_type, self.persona)
+        week_number = 0
+        workouts = self.workout_library_datastore.get()
+        periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
+                                                                       workouts=workouts,
+                                                                       completed_session_details_list=self.current_weekly_workouts,
+                                                                       exclude_completed=self.exclude_completed)
+
+        return periodization_plan
+
+    def update_periodization_plan(self, periodization_plan: PeriodizationPlan, event_date):
+
+        self.start_date = periodization_plan.start_date
+        week_start_date = periodization_plan.get_week_start_date(event_date)
+        self.load_completed_workouts(week_start_date)
+        self.populate_values()
+        self.sum_weeks()
+        self.calculate_averages()
+        self.set_weekly_targets()
+
+        periodization_plan.athlete_persona = self.persona
+        periodization_plan.training_phase = self.training_phase_type
+        periodization_plan.periodization_goal = self.goal
+
+        week_number = periodization_plan.get_week_number(event_date)
+        workouts = self.workout_library_datastore.get()
+        periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
+                                                                       workouts=workouts,
+                                                                       completed_session_details_list=self.current_weekly_workouts,
+                                                                       exclude_completed=self.exclude_completed)
+
+        return periodization_plan
+
+    def load_completed_workouts(self, week_start_date):
+
+        self.current_weekly_workouts = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date, end_date_time=week_start_date+timedelta(days=6))
+        rpe_load_values = [l.rpe_load for l in self.current_weekly_workouts]
+        power_load_values = [l.power_load for l in self.current_weekly_workouts]
+        self.current_weekly_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(rpe_load_values)
+        self.current_weekly_load.power_load = StandardErrorRange.get_sum_from_error_range_list(power_load_values)
+
+        self.last_week_workouts = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=7), end_date_time=week_start_date - timedelta(days=1))
+        self.previous_week_1_workouts = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=14), end_date_time=week_start_date - timedelta(days=8))
+        self.previous_week_2_workouts = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=21), end_date_time=week_start_date - timedelta(days=15))
+        self.previous_week_3_workouts = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=28), end_date_time=week_start_date - timedelta(days=22))
+        self.previous_week_4_workouts = self.completed_session_details_datastore.get(
+            start_date_time=week_start_date - timedelta(days=35), end_date_time=week_start_date - timedelta(days=29))
+
+    def populate_values(self):
+
+        self.last_week_rpe_load_values = [l.rpe_load for l in self.last_week_workouts]
+        self.previous_week_1_rpe_load_values = [l.rpe_load for l in self.previous_week_1_workouts]
+        self.previous_week_2_rpe_load_values = [l.rpe_load for l in self.previous_week_2_workouts]
+        self.previous_week_3_rpe_load_values = [l.rpe_load for l in self.previous_week_3_workouts]
+        self.previous_week_4_rpe_load_values = [l.rpe_load for l in self.previous_week_4_workouts]
+
+        self.last_week_power_load_values = [l.power_load for l in self.last_week_workouts]
+        self.previous_week_1_power_load_values = [l.power_load for l in self.previous_week_1_workouts]
+        self.previous_week_2_power_load_values = [l.power_load for l in self.previous_week_2_workouts]
+        self.previous_week_3_power_load_values = [l.power_load for l in self.previous_week_3_workouts]
+        self.previous_week_4_power_load_values = [l.power_load for l in self.previous_week_4_workouts]
+
+        self.last_week_rpe_values = [l.session_RPE for l in self.last_week_workouts]
+        self.previous_week_1_rpe_values = [l.session_RPE for l in self.previous_week_1_workouts]
+        self.previous_week_2_rpe_values = [l.session_RPE for l in self.previous_week_2_workouts]
+        self.previous_week_3_rpe_values = [l.session_RPE for l in self.previous_week_3_workouts]
+        self.previous_week_4_rpe_values = [l.session_RPE for l in self.previous_week_4_workouts]
+
+    def sum_weeks(self):
+
+        self.last_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.last_week_rpe_load_values)
+        self.previous_1_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_1_rpe_load_values)
+        self.previous_2_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_rpe_load_values)
+        self.previous_3_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_rpe_load_values)
+        self.previous_4_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_rpe_load_values)
+
+        self.last_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
+            self.last_week_power_load_values)
+        self.previous_1_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
+            self.previous_week_1_power_load_values)
+        self.previous_2_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
+            self.previous_week_2_power_load_values)
+        self.previous_3_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
+            self.previous_week_3_power_load_values)
+        self.previous_4_weeks_load.power_load = StandardErrorRange.get_sum_from_error_range_list(
+            self.previous_week_4_power_load_values)
+
+    def calculate_averages(self):
+
+        rpe_chronic_weeks = [self.previous_1_weeks_load.rpe_load,
+                             self.previous_2_weeks_load.rpe_load,
+                             self.previous_3_weeks_load.rpe_load,
+                             self.previous_4_weeks_load.rpe_load]
+
+        power_chronic_weeks = [self.previous_1_weeks_load.power_load,
+                               self.previous_2_weeks_load.power_load,
+                               self.previous_3_weeks_load.power_load,
+                               self.previous_4_weeks_load.power_load]
+
+        self.chronic_rpe_load_average = StandardErrorRange.get_average_from_error_range_list(rpe_chronic_weeks)
+        self.chronic_power_load_average = StandardErrorRange.get_average_from_error_range_list(power_chronic_weeks)
+
+        last_two_weeks_sessions = self.last_week_power_load_values
+        last_two_weeks_sessions.extend(self.previous_week_1_power_load_values)
+        if len(self.last_week_power_load_values) <= 1:
+            last_two_weeks_sessions.extend(self.previous_week_2_power_load_values)
+
+        self.average_session_load.power_load = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_sessions)
+
+        last_two_weeks_sessions_rpe = self.last_week_rpe_load_values
+        last_two_weeks_sessions_rpe.extend(self.previous_week_1_rpe_load_values)
+        if len(self.previous_week_1_rpe_load_values) <= 1:
+            last_two_weeks_sessions.extend(self.previous_week_2_rpe_load_values)
+
+        self.average_session_load.rpe_load = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_sessions_rpe)
+
+        last_two_weeks_rpes = self.last_week_rpe_values
+        last_two_weeks_rpes.extend(self.previous_week_1_rpe_values)
+        if len(self.last_week_rpe_values) <= 1:
+            last_two_weeks_rpes.extend(self.previous_week_2_rpe_values)
+
+        self.average_session_rpe = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_rpes)
+
+        sessions_per_week = []
+        started = False
+        if len(self.previous_week_4_workouts) > 0:
+            sessions_per_week.append(len(self.previous_week_4_workouts))
+            started = True
+        if len(self.previous_week_3_workouts) > 0 or started:
+            sessions_per_week.append(len(self.previous_week_3_workouts))
+            started = True
+        if len(self.previous_week_2_workouts) > 0 or started:
+            sessions_per_week.append(len(self.previous_week_2_workouts))
+        if len(self.previous_week_1_workouts) > 0 or started:
+            sessions_per_week.append(len(self.previous_week_1_workouts))
+        sessions_per_week.append(len(self.last_week_workouts))
+
+        self.average_sessions_per_week = StandardErrorRange(lower_bound=min(sessions_per_week), observed_value=mean(sessions_per_week), upper_bound=max(sessions_per_week))
+
+    # def set_athlete_training_history(self):
+    #
+    #     self.athlete_training_history = AthleteTrainingHistory()
+    #
+    #     self.athlete_training_history.last_weeks_load.rpe_load = self.training_load_calculator.current_week_rpe_load_sum
+    #     self.athlete_training_history.last_weeks_load.power_load = self.training_load_calculator.current_week_power_load_sum
+    #
+    #     self.athlete_training_history.previous_1_weeks_load.rpe_load = self.training_load_calculator.previous_week_1_rpe_load_sum
+    #     self.athlete_training_history.previous_1_weeks_load.power_load = self.training_load_calculator.previous_week_1_power_load_sum
+    #
+    #     self.athlete_training_history.previous_2_weeks_load.rpe_load = self.training_load_calculator.previous_week_2_rpe_load_sum
+    #     self.athlete_training_history.previous_2_weeks_load.power_load = self.training_load_calculator.previous_week_2_power_load_sum
+    #
+    #     self.athlete_training_history.previous_3_weeks_load.rpe_load = self.training_load_calculator.previous_week_3_rpe_load_sum
+    #     self.athlete_training_history.previous_3_weeks_load.power_load = self.training_load_calculator.previous_week_3_power_load_sum
+    #
+    #     self.athlete_training_history.previous_4_weeks_load.rpe_load = self.training_load_calculator.previous_week_4_rpe_load_sum
+    #     self.athlete_training_history.previous_4_weeks_load.power_load = self.training_load_calculator.previous_week_4_power_load_sum
+    #
+    #     self.athlete_training_history.average_session_load.rpe_load = self.training_load_calculator.average_session_load
+    #     self.athlete_training_history.average_session_load.power_load = self.training_load_calculator.average_session_load
+    #
+    #     self.athlete_training_history.average_session_rpe = self.training_load_calculator.average_session_rpe
+    #     self.athlete_training_history.average_sessions_per_week = self.training_load_calculator.average_sessions_per_week
+    #
+    #     self.athlete_training_history.last_weeks_detailed_load = self.training_load_calculator.last_weeks_detailed_load
+    #     self.athlete_training_history.previous_1_weeks_detailed_load = self.training_load_calculator.previous_1_weeks_detailed_load
+    #     self.athlete_training_history.previous_2_weeks_detailed_load = self.training_load_calculator.previous_2_weeks_detailed_load
+    #     self.athlete_training_history.previous_3_weeks_detailed_load = self.training_load_calculator.previous_3_weeks_detailed_load
+    #     self.athlete_training_history.previous_4_weeks_detailed_load = self.training_load_calculator.previous_4_weeks_detailed_load
 
     def set_weekly_targets(self):
         # sets procession from high volume-low intensity to low volume-high intensity over the course of the
@@ -27,7 +347,7 @@ class PeriodizationPlanProcessor(object):
     def get_weekly_load_target(self, progression):
 
         # acwr
-        last_four_weeks_rpe_load = self.athlete_training_history.get_last_four_weeks_rpe_load()
+        last_four_weeks_rpe_load = self.get_last_four_weeks_rpe_load()
         lower_bounds = [w.lower_bound for w in last_four_weeks_rpe_load if w.lower_bound is not None]
         upper_bounds = [w.upper_bound for w in last_four_weeks_rpe_load if w.upper_bound is not None]
 
@@ -51,34 +371,34 @@ class PeriodizationPlanProcessor(object):
 
     def get_weekly_targets(self, progression):
 
-        current_weeks_rpe_load_lower = self.athlete_training_history.current_weeks_load.rpe_load.lower_bound
-        current_weeks_rpe_load_upper = self.athlete_training_history.current_weeks_load.rpe_load.upper_bound
+        current_weeks_rpe_load_lower = self.current_weekly_load.rpe_load.lower_bound
+        current_weeks_rpe_load_upper = self.current_weekly_load.rpe_load.upper_bound
 
-        current_average_session_rpe_load_lower = self.athlete_training_history.average_session_load.rpe_load.lower_bound
-        current_average_session_rpe_load_upper = self.athlete_training_history.average_session_load.rpe_load.upper_bound
+        average_session_rpe_load_lower = self.average_session_load.rpe_load.lower_bound
+        average_session_rpe_load_upper = self.average_session_load.rpe_load.upper_bound
 
-        current_average_session_rpe_lower = self.athlete_training_history.average_session_rpe.lower_bound
-        current_average_session_rpe_upper = self.athlete_training_history.average_session_rpe.upper_bound
+        average_session_rpe_lower = self.average_session_rpe.lower_bound
+        average_session_rpe_upper = self.average_session_rpe.upper_bound
 
-        min_workouts_week = self.athlete_training_history.average_sessions_per_week.lower_bound
-        max_workouts_week = self.athlete_training_history.average_sessions_per_week.upper_bound
+        min_workouts_week = self.average_sessions_per_week.lower_bound
+        max_workouts_week = self.average_sessions_per_week.upper_bound
 
         # determine the weekly load increase and determine the RPE/volume contributions according the the progression
 
         weekly_rpe_load_target = self.get_weekly_load_target(progression)
 
-        net_weeks_rpe_load_increase_lower = weekly_rpe_load_target.rpe_load.lower_bound - current_weeks_rpe_load_lower
-        net_weeks_rpe_load_increase_upper = weekly_rpe_load_target.rpe_load.upper_bound - current_weeks_rpe_load_upper
+        net_weeks_rpe_load_increase_lower = weekly_rpe_load_target.rpe_load.lower_bound - self.last_weeks_load.rpe_load.lower_bound
+        net_weeks_rpe_load_increase_upper = weekly_rpe_load_target.rpe_load.upper_bound - self.last_weeks_load.rpe_load.upper_bound
 
-        rpe_load_rate_increase_lower = (current_weeks_rpe_load_lower - net_weeks_rpe_load_increase_lower) / float(
-            current_weeks_rpe_load_lower)
-        rpe_load_rate_increase_upper = (current_weeks_rpe_load_upper - net_weeks_rpe_load_increase_upper) / float(
-            current_weeks_rpe_load_upper)
+        rpe_load_rate_increase_lower = (weekly_rpe_load_target.rpe_load.lower_bound - net_weeks_rpe_load_increase_lower) / float(
+            weekly_rpe_load_target.rpe_load.lower_bound)
+        rpe_load_rate_increase_upper = (weekly_rpe_load_target.rpe_load.upper_bound - net_weeks_rpe_load_increase_upper) / float(
+            weekly_rpe_load_target.rpe_load.upper_bound)
 
-        target_session_loads = [(1 + rpe_load_rate_increase_lower) * current_average_session_rpe_load_lower,
-                                (1 + rpe_load_rate_increase_lower) * current_average_session_rpe_load_upper,
-                                (1 + rpe_load_rate_increase_upper) * current_average_session_rpe_load_lower,
-                                (1 + rpe_load_rate_increase_upper) * current_average_session_rpe_load_upper]
+        target_session_loads = [(1 + rpe_load_rate_increase_lower) * average_session_rpe_load_lower,
+                                (1 + rpe_load_rate_increase_lower) * average_session_rpe_load_upper,
+                                (1 + rpe_load_rate_increase_upper) * average_session_rpe_load_lower,
+                                (1 + rpe_load_rate_increase_upper) * average_session_rpe_load_upper]
 
         target_session_load_lower = min(target_session_loads)
         target_session_load_upper = max(target_session_loads)
@@ -93,10 +413,10 @@ class PeriodizationPlanProcessor(object):
 
         # apply adjusted RPE rate of increase
 
-        target_rpes = [target_rpe_increase_lower * current_average_session_rpe_lower,
-                       target_rpe_increase_lower * current_average_session_rpe_upper,
-                       target_rpe_increase_upper * current_average_session_rpe_lower,
-                       target_rpe_increase_upper * current_average_session_rpe_upper,
+        target_rpes = [target_rpe_increase_lower * average_session_rpe_lower,
+                       target_rpe_increase_lower * average_session_rpe_upper,
+                       target_rpe_increase_upper * average_session_rpe_lower,
+                       target_rpe_increase_upper * average_session_rpe_upper,
 
         ]
 
@@ -141,7 +461,7 @@ class PeriodizationPlanProcessor(object):
 
         return periodization_plan_week
 
-    def get_acceptable_workouts(self, week_number, workouts, completed_sessions, exclude_completed=True):
+    def get_ranked_workouts(self, week_number, workouts, completed_session_details_list: [CompletedSessionDetails], exclude_completed=True):
 
         current_week_target = self.weekly_targets[week_number]
 
@@ -154,18 +474,18 @@ class PeriodizationPlanProcessor(object):
         longest_acceptable_duration = current_week_target.target_session_duration.upper_bound
 
         # TODO - how do we adjust weekly workouts (based on goals) when they appear to exceed athlete's number of expected workouts?
-        min_workouts_week = max(self.athlete_training_history.average_sessions_per_week.lower_bound - len(completed_sessions), 0)
-        max_workouts_week = self.athlete_training_history.average_sessions_per_week.upper_bound - len(completed_sessions)
+        min_workouts_week = max(self.average_sessions_per_week.lower_bound - len(completed_session_details_list), 0)
+        max_workouts_week = self.average_sessions_per_week.upper_bound - len(completed_session_details_list)
 
         if exclude_completed:
-            workouts = [w for w in workouts if w.id not in [c.id for c in completed_sessions]]
+            workouts = [w for id, w in workouts.items() if id not in [c.workout_id for c in completed_session_details_list]]
 
         # first how many of the plan's recommended workouts have not been completed?
         required_exercises, required_found_times = self.get_non_completed_required_exercises(self.model.required_exercises,
-                                                                       completed_sessions)
+                                                                                             completed_session_details_list)
 
         one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(self.model.one_required_exercises,
-                                                                           completed_sessions)
+                                                                                                     completed_session_details_list)
         if self.model.one_required_combination is not None:
             if self.model.one_required_combination.lower_bound is not None:
                 self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
@@ -189,12 +509,38 @@ class PeriodizationPlanProcessor(object):
                 if r.duration.upper_bound < r.duration.lower_bound:
                     r.duration.lower_bound = shortest_acceptable_duration
 
-        load_this_week = sum([c.session_load for c in completed_sessions])
-        min_week_load = max(current_week_target.target_weekly_load.rpe_load.lower_bound - load_this_week, 0)
-        max_week_load = current_week_target.target_weekly_load.rpe_load.upper_bound - load_this_week
+        load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
+
+        for c in completed_session_details_list:
+            load_this_week.add(c.power_load)
+
+        # even though we subtracted out existing load this week in the weekly target step,
+        # the weekly load value here is the overall target and doesn't consider load this week
+        min_week_load = max(current_week_target.target_weekly_load.rpe_load.lower_bound - load_this_week.lower_bound, 0)
+        max_week_load = current_week_target.target_weekly_load.rpe_load.upper_bound - load_this_week.upper_bound
 
         lowest_acceptable_load = min(lowest_acceptable_load, min_week_load)
         highest_acceptable_load = min(highest_acceptable_load, max_week_load)
+
+        # TODO calculate training load metrics for each potential workout given the athlete's training history
+        # right stinking here
+        for w in workouts:
+            last_two_weeks_workouts = []
+            fake_completed_workout = self.complete_a_planned_workout(self.start_date, w)
+            current_workout_list = [fake_completed_workout]
+            current_workout_list.extend(self.current_weekly_workouts)
+            last_two_weeks_workouts = [c for c in current_workout_list]
+            if len(last_two_weeks_workouts) < 4:
+                last_two_weeks_workouts.extend(self.last_week_workouts)
+            w.projected_strain = TrainingLoadCalculator().get_strain(LoadType.rpe, last_two_weeks_workouts)
+            w.projected_monotony = TrainingLoadCalculator().get_monotony(LoadType.rpe, last_two_weeks_workouts)
+            spike_list = [current_workout_list,
+                          self.last_week_workouts,
+                          self.previous_week_1_workouts,
+                          self.previous_week_2_workouts,
+                          self.previous_week_3_workouts,
+                          self.previous_week_4_workouts]
+            w.projected_strain_event_level = TrainingLoadCalculator().get_strain_spike(LoadType.rpe, spike_list)
 
         for r in required_exercises:
             for w in workouts:
@@ -235,37 +581,16 @@ class PeriodizationPlanProcessor(object):
 
         return workouts
 
-    def get_non_completed_required_exercises(self, required_exercises, completed_exercises):
-
-        # assumed adaptation type comparability already in place
-        # use_sub_adaptation_type = False
-        #
-        # if len(required_exercises) > 0 and required_exercises[0].uses_sub_adaptation_type():
-        #     use_sub_adaptation_type = True
-        #
-        # if use_sub_adaptation_type:
-        #     adaptation_dictionary = AdaptationDictionary()
-        #     for c in completed_exercises:
-        #         if len(c.sub_adaptation_types) == 0:
-        #             c.sub_adaptation_types = [RankedAdaptationType(adaptation_dictionary.detailed_types[d.adaptation_type], d.ranking) for d in c.detailed_adaptation_types]
-        #             adapt_dict = {}
-        #             for a in c.sub_adaptation_types:
-        #                 if a.adaptation_type not in adapt_dict.keys():
-        #                     adapt_dict[a.adaptation_type] = a.ranking
-        #                 else:
-        #                     adapt_dict[a.adaptation_type] = min(a.ranking, adapt_dict[a.adaptation_type])
-        #             sub_types = []
-        #             for a, r in adapt_dict.items():
-        #                 sub_types.append(RankedAdaptationType(a, r))
-        #             c.sub_adaptation_types = sub_types
+    def get_non_completed_required_exercises(self, required_exercises,
+                                             completed_session_details_list: [CompletedSessionDetails]):
 
         found_times = 0
 
         for r in required_exercises:
-            for c in completed_exercises:
-                if r.sub_adaptation_type in [d.adaptation_type for d in c.sub_adaptation_types]:
+            for c in completed_session_details_list:
+                if r.sub_adaptation_type in [d.adaptation_type for d in c.session_detailed_load.sub_adaptation_types]:
                     if r.rpe is not None:
-                        if r.rpe.lower_bound <= c.session_rpe <= r.rpe.upper_bound:
+                        if r.rpe.lower_bound <= c.session_RPE.lower_bound and c.session_RPE.upper_bound <= r.rpe.upper_bound:
                             found = True
                         else:
                             found = False
@@ -282,12 +607,6 @@ class PeriodizationPlanProcessor(object):
                             found_times += 1
                         if r.times_per_week.upper_bound is not None:
                             r.times_per_week.upper_bound = max(0, r.times_per_week.upper_bound - 1)
-
-        # cleaned_required = [r for r in required_exercises if
-        #                     (r.times_per_week.lower_bound is not None and r.times_per_week.lower_bound > 0) or
-        #                     (r.times_per_week.upper_bound is not None and r.times_per_week.upper_bound > 0)]
-        #
-        # return cleaned_required
 
         return required_exercises, found_times
 
@@ -313,6 +632,18 @@ class PeriodizationPlanProcessor(object):
             for i, j in zip(range(i, r), f(count(j), islice(counts, j, None))):
                 indices[i] = j
 
+    def complete_a_planned_workout(self, event_date_time, planned_workout: PlannedWorkoutLoad):
+
+        session = CompletedSessionDetails(event_date_time, 1, planned_workout.workout_id)
+        session.duration = planned_workout.duration
+        session.session_RPE = planned_workout.projected_session_rpe
+        session.rpe_load = planned_workout.projected_rpe_load
+        session.power_load = planned_workout.projected_power_load
+        session.session_detailed_load = planned_workout.session_detailed_load
+        session.muscle_detailed_load = planned_workout.muscle_detailed_load
+
+        return session
+
     def get_acceptable_workouts_from_combinations(self, workouts, lowest_weekly_load_target, highest_weekly_load_target,
                                                   lowest_workouts_week, highest_workouts_week):
 
@@ -335,17 +666,17 @@ class PeriodizationPlanProcessor(object):
     def get_workout_score(self, test_workout, recommended_exercise, target_load_range, one_required_combination=None):
 
         if recommended_exercise.rpe is not None:
-            if recommended_exercise.rpe.upper_bound is not None and (recommended_exercise.rpe.lower_bound <= test_workout.session_rpe <= recommended_exercise.rpe.upper_bound):
+            if recommended_exercise.rpe.upper_bound is not None and (recommended_exercise.rpe.lower_bound <= test_workout.projected_session_rpe.lower_bound and test_workout.projected_rpe_load.upper_bound <= recommended_exercise.rpe.upper_bound):
                 rpe_score = 1.0
             elif recommended_exercise.rpe.upper_bound is not None and (
-                    test_workout.session_rpe > recommended_exercise.rpe.upper_bound):
+                    test_workout.projected_session_rpe.upper_bound > recommended_exercise.rpe.upper_bound):
                 rpe_score = 0.0
-            elif recommended_exercise.rpe.lower_bound <= test_workout.session_rpe:
+            elif recommended_exercise.rpe.lower_bound <= test_workout.projected_session_rpe.lower_bound:
                 rpe_score = 1.0
-            elif test_workout.session_rpe > recommended_exercise.rpe.upper_bound:
+            elif test_workout.projected_session_rpe.upper_bound > recommended_exercise.rpe.upper_bound:
                 rpe_score = 0.0
             else:
-                rpe_score = test_workout.session_rpe / recommended_exercise.rpe.lower_bound
+                rpe_score = test_workout.projected_session_rpe.lower_bound / recommended_exercise.rpe.lower_bound
         else:
             rpe_score = 1.0
 
@@ -361,18 +692,18 @@ class PeriodizationPlanProcessor(object):
             duration_score = 1.0
 
         if target_load_range.upper_bound is not None and (
-                target_load_range.lower_bound <= test_workout.session_load <= target_load_range.upper_bound):
+                target_load_range.lower_bound <= test_workout.projected_rpe_load.lower_bound and test_workout.projected_rpe_load.upper_bound <= target_load_range.upper_bound):
             load_score = 1.0
-        elif target_load_range.upper_bound is not None and (test_workout.session_load > target_load_range.upper_bound):
+        elif target_load_range.upper_bound is not None and (test_workout.projected_rpe_load.upper_bound > target_load_range.upper_bound):
             load_score = 0.0
-        elif target_load_range.lower_bound <= test_workout.session_load:
+        elif target_load_range.lower_bound <= test_workout.projected_rpe_load.lower_bound:
             load_score = 1.0
-        elif test_workout.session_load > target_load_range.upper_bound:
+        elif test_workout.projected_rpe_load.upper_bound > target_load_range.upper_bound:
             load_score = 0.0
         else:
-            load_score = test_workout.session_load / target_load_range.lower_bound
+            load_score = test_workout.projected_rpe_load.lower_bound / target_load_range.lower_bound
 
-        cosine_similarity = self.cosine_similarity(test_workout.sub_adaptation_types, [RankedAdaptationType(recommended_exercise.sub_adaptation_type, 1)])
+        cosine_similarity = WorkoutScoringManager.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, recommended_exercise.sub_adaptation_type, 1)])
 
         if cosine_similarity > 0:
             if one_required_combination is None:
@@ -382,33 +713,28 @@ class PeriodizationPlanProcessor(object):
         else:
             times_per_week_score = 0
 
-        composite_score = ((times_per_week_score * .2) + (rpe_score * .2) + (duration_score * .2) + (load_score * .2) + (cosine_similarity * .2)) * 100
+        if test_workout.projected_monotony is None or test_workout.projected_monotony.observed_value is None:
+            monotony_score = 1.0
+        elif test_workout.projected_monotony.observed_value < 1.5:
+            monotony_score = 1.0
+        elif 1.5 <= test_workout.projected_monotony.observed_value < 2:
+            monotony_score = 0.5
+        else:
+            monotony_score = 0.0
+
+        if test_workout.projected_strain_event_level is None or test_workout.projected_strain_event_level.observed_value is None:
+            strain_event_score = 1.0
+        elif test_workout.projected_strain_event_level.observed_value == 0:
+            strain_event_score = 1.0
+        elif 1.5 <= test_workout.projected_strain_event_level.observed_value < 2:
+            strain_event_score = 0.5
+        else:
+            strain_event_score = 0.0
+
+        composite_score = ((monotony_score * .1) + (strain_event_score * .1) + (times_per_week_score * .2) + (rpe_score * .2) + (duration_score * .1) + (load_score * .1) + (cosine_similarity * .2)) * 100
 
         return composite_score
 
-    def cosine_similarity(self, candidate_exercise_priorities, recommended_exercise_priorities):
-
-        # get the adaptation types separately so we can look for matches of type (but not necessarily ranking)
-        candidate_adaptation_types = [c.adaptation_type for c in candidate_exercise_priorities]
-        recommended_adaptation_types = [r.adaptation_type for r in recommended_exercise_priorities]
-        all_adaptation_types = set(candidate_adaptation_types).union(recommended_adaptation_types)
-
-        all_exercise_priorities = set(candidate_exercise_priorities).union(recommended_exercise_priorities)
-        dotprod_1 = sum((1 if k in candidate_exercise_priorities else 0) * (1 if k in recommended_exercise_priorities else 0) for k in all_exercise_priorities)
-        magA_1 = sqrt(sum((1 if k in candidate_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
-        magB_1 = sqrt(sum((1 if k in recommended_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
-        cosine_similarity_1 = dotprod_1 / (magA_1 * magB_1)
-
-        dotprod_2 = sum(
-            (1 if k in candidate_adaptation_types else 0) * (1 if k in recommended_adaptation_types else 0) for k
-            in all_adaptation_types)
-        magA_2 = sqrt(sum((1 if k in candidate_adaptation_types else 0) ** 2 for k in all_adaptation_types))
-        magB_2 = sqrt(sum((1 if k in recommended_adaptation_types else 0) ** 2 for k in all_adaptation_types))
-        cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
-
-        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2) / 2
-
-        return average_cosine_similarity
 
 
 

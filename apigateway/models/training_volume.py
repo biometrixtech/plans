@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
-from statistics import mean
+from statistics import mean, stdev
 
 
 '''deprecated for now
@@ -166,6 +166,34 @@ class StandardErrorRange(Serialisable):
 
         return average_range
 
+    @staticmethod
+    def get_stddev_from_error_range_list(error_range_list):
+
+        upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
+        observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
+        lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+
+        stdev_range = StandardErrorRange()
+
+        if len(lower_bound_list) > 1:
+            stdev_range.lower_bound = stdev(lower_bound_list)
+        if len(observed_value_list) > 1:
+            stdev_range.observed_value = stdev(observed_value_list)
+        if len(upper_bound_list) > 1:
+            stdev_range.upper_bound = stdev(upper_bound_list)
+
+        return stdev_range
+
+    @staticmethod
+    def get_sum_from_error_range_list(error_range_list):
+
+        total_load = StandardErrorRange()
+
+        for load_value in error_range_list:
+            total_load.add(load_value)
+
+        return total_load
+
     def lowest_value(self):
 
         if self.lower_bound is not None:
@@ -212,6 +240,31 @@ class StandardErrorRange(Serialisable):
         if standard_error_range is not None:
             self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
 
+    def subtract(self, standard_error_range):
+        if standard_error_range.lower_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.lower_bound = standard_error_range.observed_value
+        if standard_error_range.upper_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.upper_bound = standard_error_range.observed_value
+
+        if standard_error_range is not None and standard_error_range.lower_bound is not None:
+            if self.lower_bound is not None:
+                self.lower_bound = self.lower_bound - standard_error_range.lower_bound
+        if standard_error_range is not None and standard_error_range.upper_bound is not None:
+            if self.upper_bound is not None:
+                self.upper_bound = self.upper_bound - standard_error_range.upper_bound
+        if standard_error_range is not None and standard_error_range.observed_value is not None:
+            if self.observed_value is not None:
+                self.observed_value = self.observed_value - standard_error_range.observed_value
+
+        if self.lower_bound is None:
+            self.lower_bound = self.observed_value
+        if self.upper_bound is None:
+            self.upper_bound = self.observed_value
+
+        # TODO: verify the assumption present in the following line: insufficient data trumps sufficient data
+        if standard_error_range is not None:
+            self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
+
     def add_value(self, number_value):
         if number_value is not None :
             if self.lower_bound is not None:
@@ -247,6 +300,35 @@ class StandardErrorRange(Serialisable):
             self.upper_bound = self.upper_bound * factor
         if self.observed_value is not None:
             self.observed_value = self.observed_value * factor
+
+    def multiply_range(self, standard_error_range):
+        if self.lower_bound is not None and standard_error_range.lower_bound is not None:
+            self.lower_bound = self.lower_bound * standard_error_range.lower_bound
+        else:
+            self.lower_bound = None
+        if self.upper_bound is not None and standard_error_range.upper_bound is not None:
+            self.upper_bound = self.upper_bound * standard_error_range.upper_bound
+        else:
+            self.upper_bound = None
+        if self.observed_value is not None and standard_error_range.observed_value is not None:
+            self.observed_value = self.observed_value * standard_error_range.observed_value
+        else:
+            self.observed_value = None
+
+    def divide_range_simple(self, standard_error_range):
+        if self.lower_bound is not None and standard_error_range.lower_bound is not None and standard_error_range.lower_bound > 0:
+            self.lower_bound = self.lower_bound / standard_error_range.lower_bound
+        else:
+            self.lower_bound = None
+        if self.upper_bound is not None and standard_error_range.upper_bound is not None and standard_error_range.upper_bound > 0:
+            self.upper_bound = self.upper_bound / standard_error_range.upper_bound
+        else:
+            self.upper_bound = None
+        if self.observed_value is not None and standard_error_range.observed_value is not None and standard_error_range.observed_value > 0:
+            self.observed_value = self.observed_value / standard_error_range.observed_value
+        else:
+            self.observed_value = None
+
 
     def divide(self, factor):
         if self.lower_bound is not None:

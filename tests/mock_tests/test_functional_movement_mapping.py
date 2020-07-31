@@ -47,7 +47,7 @@ def test_apply_load_concentric():
     priority_3_ratio = 0.3
 
     factory = FunctionalMovementFactory()
-    dict = factory.get_functional_movement_dictinary()
+    dict = factory.get_functional_movement_dictionary()
 
     functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now(), dict)
     assert len(functional_movement_action_mapping.muscle_load) == 67
@@ -109,7 +109,7 @@ def test_apply_load_eccentric():
     priority_3_ratio = 0.3
 
     factory = FunctionalMovementFactory()
-    dict = factory.get_functional_movement_dictinary()
+    dict = factory.get_functional_movement_dictionary()
 
     functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now(), dict)
     assert len(functional_movement_action_mapping.muscle_load) == 67
