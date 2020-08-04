@@ -4,6 +4,7 @@ from models.workout_program import WorkoutSection, BaseWorkoutExercise, Exercise
 from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
+from models.soreness_base import RankedBodyPart
 from serialisable import Serialisable
 
 
@@ -56,6 +57,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         self.session_detailed_load = DetailedTrainingLoad()
         self.session_training_type_load = TrainingTypeLoad()
         self.muscle_detailed_load = {}
+        self.ranked_muscle_detailed_load = []
 
         # not yet certain these need to be serialised/deserialised
         self.projected_rpe_load = StandardErrorRange()
@@ -90,7 +92,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             'workout_id': self.workout_id,
             'session_detailed_load': self.session_detailed_load.json_serialise(),
             'session_training_type_load': self.session_training_type_load.json_serialise(),
-            #'muscle_detailed_load'
+            'ranked_muscle_detailed_load': [ml.json_serialise() for ml in self.ranked_muscle_detailed_load],
             'projected_rpe_load': self.projected_rpe_load.json_serialise(),
             'projected_power_load': self.projected_power_load.json_serialise(),
             'projected_session_rpe': self.projected_session_rpe.json_serialise()
@@ -111,7 +113,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         workout_load.session_detailed_load = DetailedTrainingLoad.json_deserialise(input_dict['session_detailed_load']) if input_dict.get('session_detailed_load') is not None else None
         workout_load.session_training_type_load = TrainingTypeLoad.json_deserialise(
             input_dict['session_training_type_load']) if input_dict.get('session_training_type_load') is not None else None
-        #muscle load goes here
+        workout_load.ranked_muscle_detailed_load = [RankedBodyPart.json_deserialise(bp) for bp in input_dict.get('ranked_muscle_detailed_load', [])]
         workout_load.projected_rpe_load = StandardErrorRange.json_deserialise(input_dict['projected_rpe_load']) if input_dict.get('projected_rpe_load') is not None else None
         workout_load.projected_power_load = StandardErrorRange.json_deserialise(
             input_dict['projected_power_load']) if input_dict.get('projected_power_load') is not None else None

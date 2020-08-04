@@ -1,9 +1,10 @@
 from models.movement_tags import DetailedAdaptationType, AdaptationType, TrainingType
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.movement_actions import MovementSpeed, ExerciseAction, MovementResistance
-from models.soreness_base import BodyPartSystems, BodyPartSide, BodyPartGeneralLocation
+from models.soreness_base import BodyPartSystems, BodyPartSide, BodyPartGeneralLocation, RankedBodyPart, BodyPartLocation
 from models.functional_movement import BodyPartFunctionalMovement, FunctionalMovementActionMapping
 from models.training_volume import StandardErrorRange
+from models.body_parts import BodyPartFactory
 
 
 class DetailedLoadProcessor(object):
@@ -11,10 +12,52 @@ class DetailedLoadProcessor(object):
         self.session_detailed_load = DetailedTrainingLoad()
         self.session_training_type_load = TrainingTypeLoad()
         self.muscle_detailed_load = {}
+        self.ranked_muscle_load = []
 
     def rank_types(self):
         self.session_detailed_load.rank_adaptation_types()
         self.session_training_type_load.rank_types()
+        self.rank_muscle_load()
+
+    def rank_muscle_load(self):
+        aggregated_muscle_load = {}
+        for body_part_side, detailed_load in self.muscle_detailed_load.items():
+            if body_part_side not in aggregated_muscle_load:
+                muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
+                if isinstance(muscle_group, BodyPartLocation):
+                    new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
+                    if new_body_part_side not in aggregated_muscle_load:
+                        aggregated_muscle_load[new_body_part_side] = detailed_load.total_load.plagiarize()
+                    else:
+                        aggregated_muscle_load[new_body_part_side].add(detailed_load.total_load)
+                else:
+                    aggregated_muscle_load[body_part_side] = detailed_load.total_load.plagiarize()
+            else:
+                aggregated_muscle_load[body_part_side].add(detailed_load.total_load.plagiarize())
+
+
+        consolidated_muscle_load = {}
+
+        body_part_factory = BodyPartFactory()
+
+        for body_part_side, muscle_load in aggregated_muscle_load.items():
+            body_part = body_part_factory.get_body_part(body_part_side)
+            if body_part not in consolidated_muscle_load:
+                consolidated_muscle_load[body_part] = muscle_load.plagiarize()
+            else:
+                consolidated_muscle_load[body_part].add(muscle_load.plagiarize())
+
+        sorted_muscle_load = {k: v for k, v in sorted(consolidated_muscle_load.items(), key=lambda item: item[1].lowest_value(), reverse=True)}
+
+        # sorted_muscles = {k: v for k, v in sorted(self.muscle_detailed_load.items(), key=lambda item: item[1].total_load.lowest_value(), reverse=True)}
+
+        rank = 1
+
+        for body_part, load in sorted_muscle_load.items():
+
+            self.ranked_muscle_load.append(RankedBodyPart(body_part.location, rank))
+            rank += 1
+
 
     def add_muscle_load(self, muscle, detailed_adaptation_type, load_range):
 

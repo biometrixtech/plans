@@ -619,3 +619,33 @@ class BodyPartSideViz(object):
         if legend_color is not None:
             legend_color = LegendColor(legend_color)
         return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'], legend_color)
+
+
+class RankedBodyPart(object):
+    def __init__(self, body_part_location, ranking):
+        self.body_part_location = body_part_location
+        self.ranking = ranking
+
+    def __hash__(self):
+        return hash((self.body_part_location, self.ranking))
+
+    def __eq__(self, other):
+        val = (self.body_part_location == other.body_part_location and self.ranking == other.ranking)
+
+        return val
+
+    def json_serialise(self):
+
+        ret = {
+            'body_part_location': self.body_part_location.value,
+            'ranking': self.ranking
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        ranked_body_part = cls(
+                BodyPartLocation(input_dict.get('body_part_location')) if input_dict.get('body_part_location') is not None else None,
+                input_dict.get('ranking')
+        )
+        return ranked_body_part

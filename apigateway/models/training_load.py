@@ -86,6 +86,7 @@ class DetailedTrainingLoad(Serialisable):
 
         self.detailed_adaptation_types = []
         self.sub_adaptation_types = []
+        self.total_load = None
 
     def json_serialise(self):
         ret = {
@@ -179,6 +180,9 @@ class DetailedTrainingLoad(Serialisable):
         self_load_range = getattr(self, attribute_name)
         self_load_range.add(load_range)
 
+        if self.total_load is None:
+            self.total_load = StandardErrorRange()
+        self.total_load.add(load_range)
 
     def rank_adaptation_types(self):
 
@@ -212,6 +216,16 @@ class DetailedTrainingLoad(Serialisable):
         for sub_type, load in sorted_subs.items():
             self.sub_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, sub_type, sub_rank))
             sub_rank += 1
+
+    def get_total_load(self):
+        detailed_types = list(DetailedAdaptationType)
+        total_load = StandardErrorRange()
+        for detailed_type in detailed_types:
+            load_value = getattr(self, detailed_type.name)
+            if load_value is not None:
+                total_load.add(load_value)
+        return total_load
+
 
 
 class MuscleDetailedLoad(object):

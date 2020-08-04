@@ -7,14 +7,40 @@ from datetime import datetime
 from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
 
 action_dictionary = ActionLibraryDatastore().get()
+action_list = list(action_dictionary.values())
+
+def group_actions(training_type_list):
+
+    # action_list = list(action_dictionary.values())
+    filtered_list = [a for a in action_list if a.training_type in training_type_list]
+    action_ids = [a.id for a in filtered_list]
+
+    grouped_actions = {}
+    for action_id in action_ids:
+        if '.' in action_id:
+            id_group = action_id.split('.')[0]
+        elif '_' in action_id:
+            id_group = action_id.split('_')[0]
+        else:
+            id_group = action_id
+        if id_group not in grouped_actions:
+            grouped_actions[id_group] = [action_id]
+        else:
+            grouped_actions[id_group].append(action_id)
+
+    return grouped_actions
 
 
 def get_filtered_actions(training_type_list):
 
-    action_list = list(action_dictionary.values())
+    # action_list = list(action_dictionary.values())
 
     filtered_list = [a for a in action_list if a.training_type in training_type_list]
 
+    return filtered_list
+
+def get_all_actions_for_groups(action_id_list):
+    filtered_list = [a for a in action_list if a.id in action_id_list]
     return filtered_list
 
 
@@ -55,14 +81,18 @@ def process_adaptation_types(action_list, reps, rpe, duration=None, percent_max_
 
 
 def get_planned_workout(workout_id, training_type_list, session_rpe, projected_rpe_load, reps, rpe, duration=None,
-                        percent_max_hr=None):
+                        percent_max_hr=None, actions_group_dict=None):
 
     workout = PlannedWorkoutLoad(workout_id=workout_id)
     workout.projected_session_rpe = session_rpe
-    workout.duration = 75
+    workout.duration = duration or 75
     workout.projected_rpe_load = projected_rpe_load
 
-    action_list = get_filtered_actions(training_type_list)
+    action_id_list = []
+    for action_ids in actions_group_dict.values():
+        action_id_list.extend(action_ids)
+    action_list = get_all_actions_for_groups(action_id_list)
+    action_list2 = get_filtered_actions(training_type_list)
 
     detailed_load_processor = process_adaptation_types(action_list, reps=reps, rpe=rpe, duration=duration,
                                                        percent_max_hr=percent_max_hr)
@@ -70,6 +100,7 @@ def get_planned_workout(workout_id, training_type_list, session_rpe, projected_r
     workout.session_detailed_load = detailed_load_processor.session_detailed_load
     workout.session_training_type_load = detailed_load_processor.session_training_type_load
     workout.muscle_detailed_load = detailed_load_processor.muscle_detailed_load
+    workout.ranked_muscle_detailed_load = detailed_load_processor.ranked_muscle_load
 
     session_load = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
     for training_type_load in detailed_load_processor.session_training_type_load.load.values():
