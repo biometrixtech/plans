@@ -108,6 +108,7 @@ def get_strain_and_monotony(workout):
 
 def get_workout_features(library_workout, recommended_workouts):
     events = []
+    all_muscles = list(BodyPartLocation.muscle_groups())
     for recommended_workout in recommended_workouts:
     # recommended_workout = np.random.choice(periodization_model.one_required_exercises)
         if recommended_workout.duration is None:
@@ -117,7 +118,6 @@ def get_workout_features(library_workout, recommended_workouts):
         # recommended_workout.duration.divide(60)
         # progression = np.random.choice(periodization_model.progressions)
         required_muscles = get_ranked_muscle_needs()
-        library_workout_muscles = library_workout.ranked_muscle_detailed_load
 
         target_load_range = get_target_range()
 
@@ -131,17 +131,25 @@ def get_workout_features(library_workout, recommended_workouts):
                 sat_features_lw[f"{sub_adaptation_type.name}_lw"] = [sat.ranking for sat in library_workout.session_detailed_load.sub_adaptation_types if sat.adaptation_type == sub_adaptation_type][0]
             else:
                 sat_features_lw[f"{sub_adaptation_type.name}_lw"] = 0
+        muscles_features_lw = {}
+        lw_ranked_muscles = [rb.body_part_location for rb in library_workout.ranked_muscle_detailed_load]
+        for muscle in all_muscles:
+            if muscle in lw_ranked_muscles:
+                muscles_features_lw[f"{muscle.name}_lw"] = [bp.ranking for bp in library_workout.ranked_muscle_detailed_load if bp.body_part_location == muscle][0]
+            else:
+                muscles_features_lw[f"{muscle.name}_lw"] = 0
+
 
         features_lw = {
-            'duration_lw': library_workout.duration,
-            'rpe_lower_lw': library_workout.projected_session_rpe.lower_bound,
-            'rpe_observed_lw': library_workout.projected_session_rpe.observed_value,
-            'rpe_upper_lw': library_workout.projected_session_rpe.upper_bound,
-            'rpe_load_lower_lw': library_workout.projected_rpe_load.lower_bound,
-            'rpe_load_upper_lw': library_workout.projected_rpe_load.upper_bound,
-            'strain_lw': library_workout.projected_strain_event_level.observed_value,
-            'monotony_lw': library_workout.projected_monotony.observed_value,
-        }
+                'duration_lw': library_workout.duration,
+                'rpe_lower_lw': library_workout.projected_session_rpe.lower_bound,
+                'rpe_observed_lw': library_workout.projected_session_rpe.observed_value,
+                'rpe_upper_lw': library_workout.projected_session_rpe.upper_bound,
+                'rpe_load_lower_lw': library_workout.projected_rpe_load.lower_bound,
+                'rpe_load_upper_lw': library_workout.projected_rpe_load.upper_bound,
+                'strain_lw': library_workout.projected_strain_event_level.observed_value,
+                'monotony_lw': library_workout.projected_monotony.observed_value,
+            }
         features_rw = {
             'duration_lower_rw': recommended_workout.duration.lower_bound,
             'duration_upper_rw': recommended_workout.duration.upper_bound,
@@ -158,11 +166,23 @@ def get_workout_features(library_workout, recommended_workouts):
             else:
                 sat_features_rw[f"{sub_adaptation_type.name}_rw"] = 0
 
+        muscles_features_rw = {}
+
+        rw_ranked_muscles = [rb.body_part_location for rb in required_muscles]
+        for muscle in all_muscles:
+            if muscle in rw_ranked_muscles:
+                muscles_features_rw[f"{muscle.name}_rw"] = [bp.ranking for bp in required_muscles if bp.body_part_location == muscle][0]
+            else:
+                muscles_features_rw[f"{muscle.name}_rw"] = 0
+
         features = {}
         features.update(features_lw)
         features.update(sat_features_lw)
+        features.update(muscles_features_lw)
         features.update(features_rw)
         features.update(sat_features_rw)
+        features.update(muscles_features_rw)
+
         features['match'] = workout_match
         features['score'] = score
         events.append(features)
@@ -171,7 +191,9 @@ def get_workout_features(library_workout, recommended_workouts):
 
 
 def load_data():
-    with open('data/planned_workout_library.json', 'r') as f:
+    # with open('data/planned_workout_library.json', 'r') as f:
+
+    with open('../../apigateway/models/planned_workout_library.json', 'r') as f:
         json_data = json.load(f)
     workouts = json_data.values()
     # get_muscle_distribution(workouts)
@@ -361,6 +383,7 @@ def train_test(data):
 def run():
     # get_ranked_muscle_needs()
     events = load_data()
+    events.to_csv('data/all_data.csv', index=False)
     train_test(events)
 
     #
