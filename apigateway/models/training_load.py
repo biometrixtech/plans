@@ -60,7 +60,7 @@ class TrainingTypeLoad(Serialisable):
         training_rank = 1
 
         for training_type, load in sorted_training.items():
-            self.training_types.append(RankedAdaptationType(AdaptationTypeMeasure.training_type, training_type, training_rank))
+            self.training_types.append(RankedAdaptationType(AdaptationTypeMeasure.training_type, training_type, training_rank, None))  # TODO: need actual duration
             training_rank += 1
 
 
@@ -208,13 +208,13 @@ class DetailedTrainingLoad(Serialisable):
         rank = 1
 
         for detailed_type, load in sorted_details.items():
-            self.detailed_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, detailed_type, rank))
+            self.detailed_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, detailed_type, rank, None))  # TODO: need actual duration
             rank += 1
 
         sub_rank = 1
 
         for sub_type, load in sorted_subs.items():
-            self.sub_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, sub_type, sub_rank))
+            self.sub_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, sub_type, sub_rank, None))  # TODO: need actual duration
             sub_rank += 1
 
     def get_total_load(self):
