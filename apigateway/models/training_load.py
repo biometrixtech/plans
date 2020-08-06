@@ -227,7 +227,6 @@ class DetailedTrainingLoad(Serialisable):
         return total_load
 
 
-
 class MuscleDetailedLoad(object):
     def __init__(self, provider_id, program_id):
         self.provider_id = provider_id
@@ -259,6 +258,7 @@ class CompletedSessionDetails(Serialisable):
         self.workout_id = workout_id
         self.session_detailed_load = DetailedTrainingLoad()
         self.muscle_detailed_load = {}
+        self.ranked_muscle_load = []
         self.duration = 0
         self.session_RPE = None
         self.rpe_load = None
@@ -272,7 +272,7 @@ class CompletedSessionDetails(Serialisable):
             'session_detailed_load': self.session_detailed_load.json_serialise(),
             #'muscle_detailed_load': self.muscle_detailed_load.json_serialise(),
             'duration': self.duration,
-            'session_rpe': self.session_rpe.json_serialise(),
+            'session_rpe': self.session_RPE.json_serialise(),
             'rpe_load': self.rpe_load.joson_serialise(),
             'power_load': self.power_load.json_serialise()
         }

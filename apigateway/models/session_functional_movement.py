@@ -7,6 +7,8 @@ from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.movement_tags import AdaptationType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from logic.detailed_load_processing import DetailedLoadProcessor
+from models.training_load import DetailedTrainingLoad
 from models.training_volume import StandardErrorRange
 from datetime import timedelta
 from fathomapi.utils.xray import xray_recorder
@@ -19,6 +21,7 @@ class SessionFunctionalMovement(object):
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
         self.session_load_dict = {}
+        self.session_detailed_load = DetailedTrainingLoad()
 
     def process(self, event_date, load_stats):
         activity_factory = ActivityFunctionalMovementFactory()
@@ -135,6 +138,8 @@ class SessionFunctionalMovement(object):
 
         workout_load = {}
 
+        detailed_load_processor = DetailedLoadProcessor()
+
         for workout_section in workout_program.workout_sections:
             if workout_section.assess_load:
                 #section_load = {}  # load by adaptation type
@@ -147,6 +152,16 @@ class SessionFunctionalMovement(object):
                                                                                              self.injury_risk_dict,
                                                                                              event_date, function_movement_dict)
                         # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+                        detailed_load_processor.add_load(functional_movement_action_mapping,
+                                                         workout_exercise.adaptation_type,
+                                                         action,
+                                                         workout_exercise.power_load,
+                                                         reps=workout_exercise.reps_per_set,
+                                                         duration=workout_exercise.duration,
+                                                         rpe=workout_exercise.rpe,
+                                                         percent_max_hr=None)
+
+                        self.session_detailed_load.add(detailed_load_processor.session_detailed_load)
                         self.functional_movement_mappings.append(functional_movement_action_mapping)
 
                         # new
@@ -164,6 +179,8 @@ class SessionFunctionalMovement(object):
 
         workout_load = {}
 
+        detailed_load_processor = DetailedLoadProcessor()
+
         for workout_section in workout.sections:
             if workout_section.assess_load:
                 #section_load = {}  # load by adaptation type
@@ -176,6 +193,17 @@ class SessionFunctionalMovement(object):
                                                                                              self.injury_risk_dict,
                                                                                              event_date, function_movement_dict)
                         # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+                        detailed_load_processor.add_load(functional_movement_action_mapping,
+                                                         workout_exercise.adaptation_type,
+                                                         action,
+                                                         workout_exercise.power_load,
+                                                         reps=workout_exercise.reps_per_set,
+                                                         duration=workout_exercise.duration,
+                                                         rpe=workout_exercise.rpe,
+                                                         percent_max_hr=None)
+
+                        self.session_detailed_load.add(detailed_load_processor.session_detailed_load)
+
                         self.functional_movement_mappings.append(functional_movement_action_mapping)
 
                         # new

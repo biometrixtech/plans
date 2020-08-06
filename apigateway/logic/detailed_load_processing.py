@@ -35,7 +35,6 @@ class DetailedLoadProcessor(object):
             else:
                 aggregated_muscle_load[body_part_side].add(detailed_load.total_load.plagiarize())
 
-
         consolidated_muscle_load = {}
 
         body_part_factory = BodyPartFactory()
@@ -65,7 +64,7 @@ class DetailedLoadProcessor(object):
             self.muscle_detailed_load[muscle] = DetailedTrainingLoad()
         self.muscle_detailed_load[muscle].add_load(detailed_adaptation_type, load_range)
 
-    def add_load(self, functional_movement_action_mapping: FunctionalMovementActionMapping , adaptation_type,
+    def add_load(self, functional_movement_action_mapping: FunctionalMovementActionMapping, adaptation_type,
                  movement_action: ExerciseAction, training_load_range, reps=None, duration=None, rpe=None, percent_max_hr=None):
 
         includes_lower_body = False

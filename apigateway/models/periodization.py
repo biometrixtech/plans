@@ -125,12 +125,22 @@ class TrainingPhase(object):
         self.acwr = StandardErrorRange(lower_bound=lower_progression_bound, upper_bound=upper_progression_bound)
 
 
+class TemplateWorkout(object):
+    def __init__(self):
+        self.acceptable_session_rpe = None
+        self.acceptable_session_duration = None
+        self.acceptable_session_load = None
+        self.muscle_load_ranking = []
+        self.adaptation_type_ranking = []
+
+
 class PeriodizationPlan(object):
     def __init__(self, start_date, athlete_periodization_goal, training_phase, athlete_persona):
         self.start_date = start_date
         self.periodization_goal = athlete_periodization_goal
         self.training_phase = training_phase
         self.athlete_persona = athlete_persona
+        self.template_workout = None
         self.next_workouts = {}
 
     def get_week_number(self, event_date):

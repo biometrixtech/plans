@@ -1,4 +1,4 @@
-from models.periodization import PeriodizationPlanWeek, PeriodizationModelFactory, PeriodizationPlan
+from models.periodization import PeriodizationPlanWeek, PeriodizationModelFactory, PeriodizationPlan, TemplateWorkout
 from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
 from models.training_volume import StandardErrorRange
@@ -116,6 +116,10 @@ class PeriodizationPlanProcessor(object):
         self.previous_3_weeks_detailed_load = DetailedTrainingLoad()
         self.previous_4_weeks_detailed_load = DetailedTrainingLoad()
 
+        self.last_seven_days_workouts = []
+        self.last_seven_days_detailed_load = DetailedTrainingLoad()
+        self.last_seven_days_muscle_detailed_load = DetailedTrainingLoad()
+
     def get_last_four_weeks_power_load(self):
 
         power_load_list = []
@@ -160,14 +164,16 @@ class PeriodizationPlanProcessor(object):
         self.sum_weeks()
         self.calculate_averages()
         self.set_weekly_targets()
+        self.sum_detailed_load()
 
         periodization_plan = PeriodizationPlan(self.start_date, self.goal, self.training_phase_type, self.persona)
         week_number = 0
-        workouts = self.workout_library_datastore.get()
-        periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
-                                                                       workouts=workouts,
-                                                                       completed_session_details_list=self.current_weekly_workouts,
-                                                                       exclude_completed=self.exclude_completed)
+        # workouts = self.workout_library_datastore.get()
+        # periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
+        #                                                                workouts=workouts,
+        #                                                                completed_session_details_list=self.current_weekly_workouts,
+        #                                                                exclude_completed=self.exclude_completed)
+        periodization_plan.template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
 
         return periodization_plan
 
@@ -180,17 +186,20 @@ class PeriodizationPlanProcessor(object):
         self.sum_weeks()
         self.calculate_averages()
         self.set_weekly_targets()
+        self.sum_detailed_load()
 
         periodization_plan.athlete_persona = self.persona
         periodization_plan.training_phase = self.training_phase_type
         periodization_plan.periodization_goal = self.goal
 
         week_number = periodization_plan.get_week_number(event_date)
-        workouts = self.workout_library_datastore.get()
-        periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
-                                                                       workouts=workouts,
-                                                                       completed_session_details_list=self.current_weekly_workouts,
-                                                                       exclude_completed=self.exclude_completed)
+        # workouts = self.workout_library_datastore.get()
+        # periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
+        #                                                                workouts=workouts,
+        #                                                                completed_session_details_list=self.current_weekly_workouts,
+        #                                                                exclude_completed=self.exclude_completed)
+
+        periodization_plan.template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
 
         return periodization_plan
 
@@ -213,6 +222,28 @@ class PeriodizationPlanProcessor(object):
             start_date_time=week_start_date - timedelta(days=28), end_date_time=week_start_date - timedelta(days=22))
         self.previous_week_4_workouts = self.completed_session_details_datastore.get(
             start_date_time=week_start_date - timedelta(days=35), end_date_time=week_start_date - timedelta(days=29))
+
+        self.last_seven_days_workouts = self.completed_session_details_datastore.get(
+            start_date_time=self.start_date - timedelta(days=7), end_date_time=self.start_date)
+
+    def sum_detailed_load(self):
+
+        # TODO - do we even have detailed load per completed workout?
+
+        seven_days_detailed_load = DetailedTrainingLoad()
+        #seven_days_muscle_detailed_load = {}
+
+        for w in self.last_seven_days_workouts:
+            seven_days_detailed_load.add(w.session_detailed_load)
+            # for m, detailed_load in w.ranked_muscle_load.items():
+            #     if m not in seven_days_muscle_detailed_load:
+            #         seven_days_muscle_detailed_load[m] = detailed_load
+            #     else:
+            #         seven_days_muscle_detailed_load[m].add(detailed_load)
+
+        self.last_seven_days_detailed_load = seven_days_detailed_load
+        self.last_seven_days_detailed_load.rank_adaptation_types()
+        # self.last_seven_days_muscle_detailed_load = seven_days_muscle_detailed_load
 
     def populate_values(self):
 
@@ -460,6 +491,74 @@ class PeriodizationPlanProcessor(object):
                                                                         upper_bound=target_rpe_upper)
 
         return periodization_plan_week
+
+    def get_template_workout(self, week_number, completed_session_details_list: [CompletedSessionDetails]):
+
+        template_workout = TemplateWorkout()
+
+        current_week_target = self.weekly_targets[week_number]
+
+        lowest_acceptable_load = current_week_target.target_session_load.rpe_load.lower_bound
+        highest_acceptable_load = current_week_target.target_session_load.rpe_load.upper_bound
+
+        lowest_acceptable_rpe = current_week_target.target_session_rpe.lower_bound
+        highest_acceptable_rpe = current_week_target.target_session_rpe.upper_bound
+        shortest_acceptable_duration = current_week_target.target_session_duration.lower_bound
+        longest_acceptable_duration = current_week_target.target_session_duration.upper_bound
+
+        # TODO - how do we adjust weekly workouts (based on goals) when they appear to exceed athlete's number of expected workouts?
+        min_workouts_week = max(self.average_sessions_per_week.lower_bound - len(completed_session_details_list), 0)
+        max_workouts_week = self.average_sessions_per_week.upper_bound - len(completed_session_details_list)
+
+        # first how many of the plan's recommended workouts have not been completed?
+        required_exercises, required_found_times = self.get_non_completed_required_exercises(
+            self.model.required_exercises,
+            completed_session_details_list)
+
+        one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(
+            self.model.one_required_exercises,
+            completed_session_details_list)
+        if self.model.one_required_combination is not None:
+            if self.model.one_required_combination.lower_bound is not None:
+                self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
+            if self.model.one_required_combination.upper_bound is not None:
+                self.model.one_required_combination.upper_bound = self.model.one_required_combination.upper_bound - one_required_found_times
+
+        # adjust required workout ranges to athlete's rpe and duration capacities:
+        for r in required_exercises:
+            if r.rpe is not None:
+                r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
+            if r.duration is not None:
+                r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
+                if r.duration.upper_bound < r.duration.lower_bound:
+                    r.duration.lower_bound = shortest_acceptable_duration
+
+        for r in one_required_exercises:
+            if r.rpe is not None:
+                r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
+            if r.duration is not None:
+                r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
+                if r.duration.upper_bound < r.duration.lower_bound:
+                    r.duration.lower_bound = shortest_acceptable_duration
+
+        load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
+
+        for c in completed_session_details_list:
+            load_this_week.add(c.power_load)
+
+        # even though we subtracted out existing load this week in the weekly target step,
+        # the weekly load value here is the overall target and doesn't consider load this week
+        min_week_load = max(current_week_target.target_weekly_load.rpe_load.lower_bound - load_this_week.lower_bound, 0)
+        max_week_load = current_week_target.target_weekly_load.rpe_load.upper_bound - load_this_week.upper_bound
+
+        lowest_acceptable_load = min(lowest_acceptable_load, min_week_load)
+        highest_acceptable_load = min(highest_acceptable_load, max_week_load)
+
+        template_workout.acceptable_session_load = StandardErrorRange(lower_bound=lowest_acceptable_load, upper_bound=highest_acceptable_load)
+
+        template_workout.adaptation_type_ranking = self.last_seven_days_muscle_detailed_load.detailed_adaptation_types
+
+        return template_workout
 
     def get_ranked_workouts(self, week_number, workouts, completed_session_details_list: [CompletedSessionDetails], exclude_completed=True):
 
