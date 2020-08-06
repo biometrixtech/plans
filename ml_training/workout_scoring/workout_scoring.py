@@ -7,7 +7,8 @@ from logic.periodization_processor import WorkoutScoringManager
 from models.periodization import PeriodizedExercise, RequiredExerciseFactory, PeriodizationGoal, PeriodizationModelFactory, PeriodizationPersona, TrainingPhaseType
 from models.training_volume import StandardErrorRange
 from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure, SubAdaptationType
-from models.soreness_base import BodyPartLocation, RankedBodyPart
+from models.ranked_types import RankedBodyPart
+from models.soreness_base import BodyPartLocation
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
