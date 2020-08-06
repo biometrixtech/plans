@@ -1,7 +1,8 @@
 from models.movement_tags import DetailedAdaptationType, AdaptationType, TrainingType
+from models.ranked_types import RankedBodyPart
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.movement_actions import MovementSpeed, ExerciseAction, MovementResistance
-from models.soreness_base import BodyPartSystems, BodyPartSide, BodyPartGeneralLocation, RankedBodyPart, BodyPartLocation
+from models.soreness_base import BodyPartSystems, BodyPartSide, BodyPartGeneralLocation, BodyPartLocation
 from models.functional_movement import BodyPartFunctionalMovement, FunctionalMovementActionMapping
 from models.training_volume import StandardErrorRange
 from models.body_parts import BodyPartFactory
@@ -51,11 +52,17 @@ class DetailedLoadProcessor(object):
         # sorted_muscles = {k: v for k, v in sorted(self.muscle_detailed_load.items(), key=lambda item: item[1].total_load.lowest_value(), reverse=True)}
 
         rank = 1
+        last_value = None
 
         for body_part, load in sorted_muscle_load.items():
-
-            self.ranked_muscle_load.append(RankedBodyPart(body_part.location, rank))
-            rank += 1
+            if last_value is None:
+                last_value = load.plagiarize()
+            if load.highest_value() < last_value.highest_value():
+                rank += 1
+                last_value = load.plagiarize()
+            ranked_body_part = RankedBodyPart(body_part.location, rank)
+            ranked_body_part.power_load = load
+            self.ranked_muscle_load.append(ranked_body_part)
 
 
     def add_muscle_load(self, muscle, detailed_adaptation_type, load_range):
@@ -65,7 +72,7 @@ class DetailedLoadProcessor(object):
         self.muscle_detailed_load[muscle].add_load(detailed_adaptation_type, load_range)
 
     def add_load(self, functional_movement_action_mapping: FunctionalMovementActionMapping, adaptation_type,
-                 movement_action: ExerciseAction, training_load_range, reps=None, duration=None, rpe=None, percent_max_hr=None):
+                 movement_action: ExerciseAction, training_load_range, reps=None, duration=None, rpe_range=None, percent_max_hr=None):
 
         includes_lower_body = False
         includes_upper_body = False
@@ -78,6 +85,11 @@ class DetailedLoadProcessor(object):
         training_type_load = {}
         detailed_adaptation_types = list(DetailedAdaptationType)
         training_types = list(TrainingType)
+
+        if rpe_range is not None:
+            rpe = rpe_range.lowest_value()
+        else:
+            rpe = None
 
         for detailed_adaptation_type in detailed_adaptation_types:
             adaptation_type_load[detailed_adaptation_type] = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)

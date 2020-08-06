@@ -53,6 +53,19 @@ class TrainingTypeLoad(Serialisable):
         else:
             self.load[training_type].add(load_range)
 
+    def add(self, training_type_load):
+
+        training_types = list(TrainingTypeLoad)
+
+        for training_type in training_types:
+            load_value = getattr(self, training_type.name)
+            source_load_value = getattr(training_type_load, training_type.name)
+            if source_load_value is not None:
+                if load_value is None:
+                    setattr(self, training_type.name, source_load_value)
+                else:
+                    setattr(self, training_type.name, load_value.add(source_load_value))
+
     def rank_types(self):
         sorted_training = {k: v for k, v in
                            sorted(self.load.items(), key=lambda item: item[1].lowest_value(),
@@ -169,7 +182,8 @@ class DetailedTrainingLoad(Serialisable):
                 if load_value is None:
                     setattr(self, detailed_type.name, source_load_value)
                 else:
-                    setattr(self, detailed_type.name, load_value.add(source_load_value))
+                    load_value.add(source_load_value)
+                    setattr(self, detailed_type.name, load_value)
 
     def add_load(self, detailed_adaptation_type: DetailedAdaptationType, load_range):
 
@@ -257,8 +271,10 @@ class CompletedSessionDetails(Serialisable):
         self.provider_id = provider_id
         self.workout_id = workout_id
         self.session_detailed_load = DetailedTrainingLoad()
-        self.muscle_detailed_load = {}
+        self.session_training_type_load = TrainingTypeLoad()
+        #self.muscle_detailed_load = {}
         self.ranked_muscle_load = []
+        #self.ranked_training_types = []
         self.duration = 0
         self.session_RPE = None
         self.rpe_load = None

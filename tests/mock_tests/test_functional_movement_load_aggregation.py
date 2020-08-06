@@ -9,6 +9,7 @@ from models.session import MixedActivitySession
 from models.exercise import WeightMeasure
 from models.athlete_injury_risk import AthleteInjuryRisk
 from models.training_volume import StandardErrorRange
+from models.training_load import CompletedSessionDetails
 from datetime import datetime
 
 def test_aggregate_load_concentric():
@@ -43,11 +44,15 @@ def test_aggregate_load_concentric():
     exercise_1.weight_measure = WeightMeasure.actual_weight
     exercise_1.weight = 100
     exercise_1.reps_per_set = 5
+    exercise_1.power_load = StandardErrorRange(observed_value=300)
     exercise_1.equipment = Equipment.dumbbells
     exercise_1.primary_actions.append(exercise_action_1)
+    exercise_1.training_type = TrainingType.strength_integrated_resistance
 
     exercise_2 = WorkoutExercise()
+    exercise_2.power_load = StandardErrorRange(observed_value=300)
     exercise_2.primary_actions.append(exercise_action_2)
+    exercise_2.training_type = TrainingType.power_action_plyometrics
 
     section_1 = WorkoutSection()
     section_1.exercises.append(exercise_1)
@@ -63,6 +68,7 @@ def test_aggregate_load_concentric():
     dict = factory.get_functional_movement_dictionary()
 
     session_functional_movement = SessionFunctionalMovement(None, {})
+    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None)
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     # assert len(load_dict) == 2
@@ -100,10 +106,14 @@ def test_normalize_load_concentric():
     exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
 
     exercise_1 = WorkoutExercise()
+    exercise_1.power_load = StandardErrorRange(observed_value=300)
     exercise_1.primary_actions.append(exercise_action_1)
+    exercise_1.training_type = TrainingType.strength_integrated_resistance
 
     exercise_2 = WorkoutExercise()
+    exercise_2.power_load = StandardErrorRange(observed_value=300)
     exercise_2.primary_actions.append(exercise_action_2)
+    exercise_2.training_type = TrainingType.power_action_plyometrics
 
     section_1 = WorkoutSection()
     section_1.exercises.append(exercise_1)
@@ -120,6 +130,7 @@ def test_normalize_load_concentric():
 
     athlete_injury_risk = AthleteInjuryRisk("tester")
     session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)
+    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None)
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     # not used anymore

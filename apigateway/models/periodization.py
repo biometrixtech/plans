@@ -129,8 +129,9 @@ class TemplateWorkout(object):
     def __init__(self):
         self.acceptable_session_rpe = None
         self.acceptable_session_duration = None
-        self.acceptable_session_load = None
-        self.muscle_load_ranking = []
+        self.acceptable_session_rpe_load = None
+        self.acceptable_session_power_load = None
+        self.muscle_load_ranking = {}
         self.adaptation_type_ranking = []
 
 

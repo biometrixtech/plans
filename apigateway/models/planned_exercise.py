@@ -1,10 +1,10 @@
 from utils import format_date, parse_date
 from models.movement_tags import CardioAction, Equipment
+from models.ranked_types import RankedBodyPart
 from models.workout_program import WorkoutSection, BaseWorkoutExercise, ExerciseAction
 from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.soreness_base import RankedBodyPart
 from serialisable import Serialisable
 
 

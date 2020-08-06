@@ -1,4 +1,5 @@
 from enum import Enum, IntEnum
+
 from serialisable import Serialisable
 
 
@@ -253,3 +254,5 @@ class MovementSurfaceStability(Enum):
 class Gender(Enum):
     female = 0
     male = 1
+
+
