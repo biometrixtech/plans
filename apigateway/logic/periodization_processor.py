@@ -3,8 +3,8 @@ from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
 from models.training_volume import StandardErrorRange
 from statistics import mean
-from models.training_load import TrainingLoad, CompletedSessionDetails, LoadType, DetailedTrainingLoad, TrainingTypeLoad
-from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure
+from models.training_load import TrainingLoad, CompletedSessionDetails, LoadType, DetailedTrainingLoad
+from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure, SubAdaptationType, DetailedAdaptationType
 from logic.training_load_calcs import TrainingLoadCalculator
 from models.planned_exercise import PlannedWorkoutLoad
 from models.body_parts import BodyPartLocation
@@ -42,7 +42,31 @@ class WorkoutScoringManager(object):
         else:
             cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
 
-        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2) / 2
+        candidate_durations = []
+        recommended_durations = []
+        if len(candidate_exercise_priorities) > 0:
+            if candidate_exercise_priorities[0].adaptation_type_measure == AdaptationTypeMeasure.sub_adaptation_type:
+                candidate_duration_dict = {p.adaptation_type.value: p.duration for p in candidate_exercise_priorities}
+                candidate_durations = [candidate_duration_dict.get(sat.value, 0) or 0 for sat in SubAdaptationType]
+                recommended_duration_dict = {p.adaptation_type.value: p.duration for p in recommended_exercise_priorities}
+                recommended_durations = [recommended_duration_dict.get(sat.value, 0) or 0 for sat in SubAdaptationType]
+            elif candidate_exercise_priorities[0].adaptation_type_measure == AdaptationTypeMeasure.detailed_adaptation_type:
+                candidate_duration_dict = {p.adaptation_type.value: p.duration for p in candidate_exercise_priorities}
+                candidate_durations = [candidate_duration_dict.get(dat.value, 0) or 0 for dat in DetailedAdaptationType]
+                recommended_duration_dict = {p.adaptation_type.value: p.duration for p in recommended_exercise_priorities}
+                recommended_durations = [recommended_duration_dict.get(dat.value, 0) or 0 for dat in DetailedAdaptationType]
+
+        if len(candidate_durations) > 0 and len(recommended_durations) > 0:
+            difference = [abs(cand - rec) for cand, rec in zip(candidate_durations, recommended_durations)]
+            percent_covered = [max([1 - diff / rec, 0]) for diff, rec in zip(difference, recommended_durations) if rec > 0]
+            if len(percent_covered) > 0:
+                cosine_similarity_3 = sum(percent_covered) / len(percent_covered)
+            else:
+                cosine_similarity_3 = 0
+        else:
+            cosine_similarity_3 = 0
+
+        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2 + cosine_similarity_3) / 3
 
         return average_cosine_similarity
 
@@ -902,7 +926,7 @@ class PeriodizationPlanProcessor(object):
         else:
             load_score = test_workout.projected_rpe_load.lower_bound / target_load_range.lower_bound
 
-        cosine_similarity = WorkoutScoringManager.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, recommended_exercise.sub_adaptation_type, 1)])
+        cosine_similarity = WorkoutScoringManager.cosine_similarity(test_workout.session_detailed_load.sub_adaptation_types, [RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, recommended_exercise.sub_adaptation_type, 1, 0)])
 
         if cosine_similarity > 0:
             if one_required_combination is None:

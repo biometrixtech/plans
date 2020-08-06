@@ -42,7 +42,7 @@ class SimpleWorkout(object):
 
         if len(self.session_detailed_load.sub_adaptation_types) == 0:
             self.session_detailed_load.sub_adaptation_types = [
-                RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, adaptation_dictionary.detailed_types[d.adaptation_type], d.ranking) for d in
+                RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, adaptation_dictionary.detailed_types[d.adaptation_type], d.ranking, 0) for d in
                 self.session_detailed_load.detailed_adaptation_types]
             adapt_dict = {}
             for a in self.session_detailed_load.sub_adaptation_types:
@@ -52,7 +52,7 @@ class SimpleWorkout(object):
                     adapt_dict[a.adaptation_type] = min(a.ranking, adapt_dict[a.adaptation_type])
             sub_types = []
             for a, r in adapt_dict.items():
-                sub_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, a, r))
+                sub_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, a, r, 0))
             self.session_detailed_load.sub_adaptation_types = sub_types
 
 
@@ -250,10 +250,10 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 def test_acceptable_strength_cardio_same_score_both_required():
 
     proc = PeriodizationPlanProcessor(datetime.now(),None, None, None,  CompletedSessionDetailsDatastore(), None)
-    strength_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1),
-                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.strength_endurance, 2)]
-    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1),
-                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
+    strength_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1, 0),
+                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.strength_endurance, 1, 0)]
+    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 0),
+                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2, 0)]
     periodized_strength_exercise = PeriodizedExercise(None, SubAdaptationType.strength,
                                                       times_per_week_range=StandardErrorRange(lower_bound=2),
                                                       duration_range=None,
@@ -280,8 +280,8 @@ def test_acceptable_strength_cardio_same_score_both_required():
 def test_completing_combo_required_reduces_score():
 
     proc = PeriodizationPlanProcessor(datetime.now(), None, None, None,  CompletedSessionDetailsDatastore(), None)
-    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1),
-                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2)]
+    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 10),
+                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2, 10)]
 
     vigorous_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
                                                     times_per_week_range=StandardErrorRange(lower_bound=2),
@@ -368,10 +368,10 @@ def test_completing_combo_required_reduces_score():
 #
 def test_cosine_similarity_prioritized_adaptation_types_equal():
 
-    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
-              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
-    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
-              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
+    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1, 10),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2, 10)]
+    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1, 10),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2, 10)]
 
     val = WorkoutScoringManager.cosine_similarity(list_a, list_b)
 
@@ -380,26 +380,26 @@ def test_cosine_similarity_prioritized_adaptation_types_equal():
 
 def test_cosine_similarity_prioritized_adaptation_types_half_equal():
 
-    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
-              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
-    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1),
-              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.hypertrophy, 2)]
+    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1, 10),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2, 0)]
+    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1, 10),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.hypertrophy, 2, 0)]
 
     val = WorkoutScoringManager.cosine_similarity(list_a, list_b)
 
-    assert 0.5 == round(val, 5)
+    assert 0.67 == round(val, 2)
 
 
 def test_cosine_similarity_prioritized_adaptation_types_partial_credit():
 
-    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1),
-              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2)]
-    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 2),
-              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 1)]
+    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1, 10),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2, 10)]
+    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 2, 10),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 1, 10)]
 
     val = WorkoutScoringManager.cosine_similarity(list_a, list_b)
 
-    assert 0.5 == round(val, 5)
+    assert 0.67 == round(val, 2)
 
 
 

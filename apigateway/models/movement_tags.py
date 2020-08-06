@@ -60,10 +60,11 @@ class SubAdaptationType(Enum):
 
 
 class RankedAdaptationType(Serialisable):
-    def __init__(self, adaptation_type_measure, adaptation_type, ranking):
+    def __init__(self, adaptation_type_measure, adaptation_type, ranking, duration):
         self.adaptation_type_measure = adaptation_type_measure
         self.adaptation_type = adaptation_type
         self.ranking = ranking
+        self.duration = duration
 
     def __hash__(self):
         return hash((self.adaptation_type.value, self.ranking))
@@ -78,7 +79,8 @@ class RankedAdaptationType(Serialisable):
         ret = {
             'adaptation_type_measure': self.adaptation_type_measure.value,
             'adaptation_type': self.adaptation_type.value,
-            'ranking': self.ranking
+            'ranking': self.ranking,
+            'duration': self.duration
         }
         return ret
 
@@ -88,7 +90,8 @@ class RankedAdaptationType(Serialisable):
         measure = AdaptationTypeMeasure(input_dict['adaptation_type_measure'])
         ranked_type = RankedAdaptationType(measure,
                                            RankedAdaptationType.get_adaptation_type_from_measure(measure, input_dict['adaptation_type']),
-                                           input_dict['ranking'] if input_dict.get('ranking') is not None else None
+                                           input_dict['ranking'] if input_dict.get('ranking') is not None else None,
+                                           input_dict.get('duration')
                                            )
         return ranked_type
 
