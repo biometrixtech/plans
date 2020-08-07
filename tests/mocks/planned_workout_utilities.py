@@ -73,7 +73,7 @@ def process_adaptation_types(action_list, reps, rpe, duration=None, percent_max_
                                          training_load_range=base_exercise.power_load,
                                          reps=reps,
                                          duration=duration,
-                                         rpe=rpe,
+                                         rpe_range=rpe,
                                          percent_max_hr=percent_max_hr)
     detailed_load_processor.rank_types()
 
