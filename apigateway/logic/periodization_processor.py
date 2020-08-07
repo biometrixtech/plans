@@ -269,16 +269,24 @@ class PeriodizationPlanProcessor(object):
         # rank in order of what's required
         completed_session_details_list = self.current_weekly_workouts
         # first how many of the plan's recommended workouts have not been completed?
-        required_exercises, required_found_times = self.get_non_completed_required_exercises(self.model.required_exercises,
-                                                                                             completed_session_details_list)
+        required_exercises = self.get_non_completed_required_exercises(self.model.required_exercises,
+                                                                       completed_session_details_list)
 
-        one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(self.model.one_required_exercises,
-                                                                                                     completed_session_details_list)
-        if self.model.one_required_combination is not None:
-            if self.model.one_required_combination.lower_bound is not None:
-                self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
-            if self.model.one_required_combination.upper_bound is not None:
-                self.model.one_required_combination.upper_bound = self.model.one_required_combination.upper_bound - one_required_found_times
+        one_required_exercises = self.get_non_completed_required_exercises(self.model.one_required_exercises,
+                                                                           completed_session_details_list)
+        for combination in self.model.one_required_combinations:
+            relevant_one_required_exercises = [o for o in one_required_exercises if o.periodization_id == combination.periodization_id]
+            total_found_times = [r.found_times for r in relevant_one_required_exercises]
+            total_found = 0
+            if len(total_found_times) > 0:
+                total_found = sum(total_found_times)
+
+            relevent_combinations = [c for c in self.model.one_required_combinations if c.periodization_id == combination.periodization_id]
+            for relevant_combo in relevent_combinations:
+                if relevant_combo.combination_range.lower_bound is not None:
+                    relevant_combo.combination_range.lower_bound = relevant_combo.combination_range.lower_bound - total_found
+                if relevant_combo.combination_range.upper_bound is not None:
+                    relevant_combo.combination_range.upper_bound = relevant_combo.combination_range.upper_bound - total_found
 
         # adjust required workout ranges to athlete's rpe and duration capacities:
         for r in required_exercises:
@@ -879,8 +887,6 @@ class PeriodizationPlanProcessor(object):
     def get_non_completed_required_exercises(self, required_exercises,
                                              completed_session_details_list: [CompletedSessionDetails]):
 
-        found_times = 0
-
         for r in required_exercises:
             for c in completed_session_details_list:
                 if r.sub_adaptation_type in [d.adaptation_type for d in c.session_detailed_load.sub_adaptation_types]:
@@ -899,11 +905,11 @@ class PeriodizationPlanProcessor(object):
                     if found:
                         if r.times_per_week.lower_bound is not None:
                             r.times_per_week.lower_bound = max(0, r.times_per_week.lower_bound - 1)
-                            found_times += 1
+                            r.found_times += 1
                         if r.times_per_week.upper_bound is not None:
                             r.times_per_week.upper_bound = max(0, r.times_per_week.upper_bound - 1)
 
-        return required_exercises, found_times
+        return required_exercises
 
     def combinations_without_repetition(self, r, iterable=None, values=None, counts=None):
         if iterable:

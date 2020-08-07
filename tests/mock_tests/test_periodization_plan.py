@@ -225,7 +225,8 @@ def test_7_days_completed_sessions():
 
     data_store = CompletedSessionDetailsDatastore()
     data_store.side_load_planned_workout(completed_session_details_list)
-    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.improve_cardiovascular_health,PeriodizationPersona.well_trained, TrainingPhaseType.increase,data_store,None)
+    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardiovascular_health,
+                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
     plan = proc.create_periodization_plan(datetime.now().date())
 
     assert plan.template_workout is not None
