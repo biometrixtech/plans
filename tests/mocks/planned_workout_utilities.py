@@ -81,11 +81,11 @@ def process_adaptation_types(training_type_list, reps, rpe, duration=None, perce
             duration /= len(actions_group_dict)
         for action__id_list in actions_group_dict.values():
             action_list = get_all_actions_for_groups(action__id_list)
-            all_detail_adaptation_set = set()
+            exercise_detail_adaptation_types = set()
             for action in action_list:
-                detailed_adaptation_types = process_action(action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
-                all_detail_adaptation_set.update(detailed_adaptation_types)
-            for detailed_adaptation_type in all_detail_adaptation_set:
+                action_detailed_adaptation_types = process_action(action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
+                exercise_detail_adaptation_types.update(action_detailed_adaptation_types)
+            for detailed_adaptation_type in exercise_detail_adaptation_types:
                 detailed_load_processor.session_detailed_load.add_duration(detailed_adaptation_type, duration)
     else:  # if a subset of specific actions is defined
         action_list = get_filtered_actions(training_type_list)

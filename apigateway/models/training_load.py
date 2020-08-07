@@ -221,6 +221,7 @@ class DetailedTrainingLoad(Serialisable):
 
         detailed_rank = {}
         sub_adaptation_rank = {}
+        sub_adaptation_type_durations = {}
 
         for detailed_type in detailed_types:
             load_value = getattr(self, detailed_type.name)
@@ -231,6 +232,13 @@ class DetailedTrainingLoad(Serialisable):
                     sub_adaptation_rank[sub_adaptation_type] = load_value
                 else:
                     sub_adaptation_rank[sub_adaptation_type].add(load_value)
+                # add duration
+                duration = self.detailed_durations.get(detailed_type.name)
+                if duration is not None:
+                    if sub_adaptation_type not in sub_adaptation_type_durations:
+                        sub_adaptation_type_durations[sub_adaptation_type] = duration
+                    else:
+                        sub_adaptation_type_durations[sub_adaptation_type] += duration
 
         sorted_details = {k: v for k, v in sorted(detailed_rank.items(), key=lambda item: item[1].lowest_value(), reverse=True)}
         sorted_subs = {k: v for k, v in sorted(sub_adaptation_rank.items(), key=lambda item: item[1].lowest_value(), reverse=True)}
@@ -244,7 +252,8 @@ class DetailedTrainingLoad(Serialisable):
             if load.highest_value() < last_value.highest_value():
                 rank += 1
                 last_value = load.plagiarize()
-            self.detailed_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, detailed_type, rank, None))  # TODO: need actual duration
+            duration = self.detailed_durations.get(detailed_type.name)
+            self.detailed_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, detailed_type, rank, duration))
             # rank += 1
 
         sub_rank = 1
@@ -256,7 +265,8 @@ class DetailedTrainingLoad(Serialisable):
             if load.highest_value() < last_value.highest_value():
                 sub_rank += 1
                 last_value = load.plagiarize()
-            self.sub_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, sub_type, sub_rank, None))  # TODO: need actual duration
+            duration = sub_adaptation_type_durations.get(sub_type)
+            self.sub_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, sub_type, sub_rank, duration))
             # sub_rank += 1
 
     def get_total_load(self):
