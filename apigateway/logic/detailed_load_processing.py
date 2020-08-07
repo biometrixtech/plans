@@ -72,7 +72,8 @@ class DetailedLoadProcessor(object):
         self.muscle_detailed_load[muscle].add_load(detailed_adaptation_type, load_range)
 
     def add_load(self, functional_movement_action_mapping: FunctionalMovementActionMapping, adaptation_type,
-                 movement_action: ExerciseAction, training_load_range, reps=None, duration=None, rpe_range=None, percent_max_hr=None):
+                 movement_action: ExerciseAction, training_load_range, reps=None, duration=None, rpe_range=None, percent_max_hr=None,
+                 return_adaptation_types=False):
 
         includes_lower_body = False
         includes_upper_body = False
@@ -304,3 +305,7 @@ class DetailedLoadProcessor(object):
                         self.session_training_type_load.add_load(training_type, adjusted_training_type_load)
                     else:
                         self.session_training_type_load.add_load(training_type, training_type_load)
+
+        if return_adaptation_types:
+            detailed_adaptation_types_affected = [dat for dat, dat_load in adaptation_type_load.items() if dat_load.observed_value > 0]
+            return detailed_adaptation_types_affected

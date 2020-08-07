@@ -167,7 +167,7 @@ class SessionFunctionalMovement(object):
                                                          action,
                                                          workout_exercise.power_load,
                                                          reps=workout_exercise.reps_per_set,
-                                                         duration=workout_exercise.duration,
+                                                         duration=workout_exercise.total_volume,
                                                          rpe_range=workout_exercise.rpe,
                                                          percent_max_hr=None)
 

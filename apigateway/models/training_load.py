@@ -104,9 +104,18 @@ class DetailedTrainingLoad(Serialisable):
         self.power = None
         self.maximal_power = None
 
+        self.detailed_durations = {det.name: None for det in DetailedAdaptationType}
+
         self.detailed_adaptation_types = []
         self.sub_adaptation_types = []
         self.total_load = None
+
+    def add_duration(self, detailed_adaptation_type, duration):
+        if duration is not None:
+            if self.detailed_durations[detailed_adaptation_type.name] is None:
+                self.detailed_durations[detailed_adaptation_type.name] = duration
+            else:
+                self.detailed_durations[detailed_adaptation_type.name] += duration
 
     def json_serialise(self):
         ret = {
