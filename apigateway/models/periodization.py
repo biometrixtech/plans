@@ -86,16 +86,29 @@ class PeriodizationPersona(Enum):
 
 
 class PeriodizationGoal(Enum):
-    improve_cardiovascular_health = 10
+    building_foundation_proficiency_move_well = 5
+    increase_cardiovascular_health = 10
+    lose_weight = 15
+    increase_cardio_endurance = 20
+    increase_cardio_endurance_with_speed = 25
+    increase_strength_max_strength = 30
+    increase_athleticism_high_force = 35
+    increase_athleticism_low_force = 40
+    increase_functional_strength = 45
+    increase_general_fitness = 50
 
 
 class PeriodizedExercise(object):
-    def __init__(self, detailed_adaptation_type, sub_adaptation_type, times_per_week_range, duration_range, rpe_range):
+    def __init__(self, detailed_adaptation_type, sub_adaptation_type, times_per_week_range, duration_range, rpe_range,
+                 priority=0):
         self.detailed_adaptation_type = detailed_adaptation_type
         self.sub_adaptation_type = sub_adaptation_type
         self.times_per_week = times_per_week_range
+        self.found_times = 0
         self.duration = duration_range
         self.rpe = rpe_range
+        self.priority = priority
+        self.periodization_id = None
         self.update_adaptation_types()
 
     def update_adaptation_types(self):
@@ -170,13 +183,19 @@ class PeriodizationPlanWeek(object):
         self.target_sessions_per_week = StandardErrorRange()
 
 
+class PeriodizationOneRequiredCombination(object):
+    def __init__(self):
+        self.periodization_id = None
+        self.combination_range = StandardErrorRange()
+
+
 class PeriodizationModel(object):
     def __init__(self):
         self.progression_persona = None
         self.progressions = []
         self.required_exercises = []
         self.one_required_exercises = []
-        self.one_required_combination = StandardErrorRange()
+        self.one_required_combinations = []
 
 #     def get_available_workouts(self, workout_library, completed_workouts):
 #         pass
@@ -203,36 +222,86 @@ class RequiredExerciseFactory(object):
 
     def get_required_exercises(self, periodization_goal):
 
-        if periodization_goal == PeriodizationGoal.improve_cardiovascular_health:
+        if periodization_goal == PeriodizationGoal.increase_cardiovascular_health or periodization_goal == PeriodizationGoal.lose_weight:
 
             return [PeriodizedExercise(None, SubAdaptationType.strength,
                                        times_per_week_range=StandardErrorRange(lower_bound=2), duration_range=None,
-                                       rpe_range=None)]
+                                       rpe_range=None, priority=1)]
+        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance:
+
+            base_training_volume = None # TBD
+
+            correctives = PeriodizedExercise([DetailedAdaptationType.corrective], SubAdaptationType.movement_efficiency,
+                                             times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
+                                             duration_range=None, rpe_range=None, priority=1)
+
+            anaerobic_threshold = PeriodizedExercise([DetailedAdaptationType.anaerobic_threshold_training],
+                                                    SubAdaptationType.cardiorespiratory_training,
+                                                    times_per_week_range=StandardErrorRange(lower_bound=1,
+                                                                                            upper_bound=2),
+                                                    duration_range=None, rpe_range=None, priority=3)
+
+            exercises = [correctives, anaerobic_threshold]
+
+            return exercises
 
     def get_one_required_exercises(self, periodization_goal):
 
-        if periodization_goal == PeriodizationGoal.improve_cardiovascular_health:
+        if periodization_goal == PeriodizationGoal.increase_cardiovascular_health:
 
             mod_intensity = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
                                                times_per_week_range=StandardErrorRange(lower_bound=5),
                                                duration_range=StandardErrorRange(lower_bound=30*60, upper_bound=60*60),
-                                               rpe_range=StandardErrorRange(lower_bound=3, upper_bound=5))
+                                               rpe_range=StandardErrorRange(lower_bound=3, upper_bound=5), priority=1)
+
+            mod_intensity.periodization_id = 1
 
             vigorous_intensity = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
                                                     times_per_week_range=StandardErrorRange(lower_bound=3),
                                                     duration_range=StandardErrorRange(lower_bound=20 * 60,
                                                                                       upper_bound=60 * 60),
-                                                    rpe_range=StandardErrorRange(lower_bound=6, upper_bound=10))
+                                                    rpe_range=StandardErrorRange(lower_bound=6, upper_bound=10),
+                                                    priority=1)
+
+            vigorous_intensity.periodization_id = 1
 
             exercises = [mod_intensity, vigorous_intensity]
 
             return exercises
 
+        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance:
+
+            stabilization_strength = PeriodizedExercise(DetailedAdaptationType.stabilization_strength, None,
+                                             times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
+                                             duration_range=None, rpe_range=None, priority=2)
+
+            stabilization_strength.periodization_id = 2
+
+            strength_endurance = PeriodizedExercise(DetailedAdaptationType.strength_endurance, None,
+                                               times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
+                                               duration_range=None, rpe_range=None, priority=2)
+
+            strength_endurance.periodization_id = 2
+
+            return [stabilization_strength, strength_endurance]
+
     def get_one_required_combination(self, periodization_goal):
 
-        if periodization_goal == PeriodizationGoal.improve_cardiovascular_health:
+        if periodization_goal == PeriodizationGoal.increase_cardiovascular_health or periodization_goal == PeriodizationGoal.lose_weight:
 
-            return StandardErrorRange(lower_bound=3, upper_bound=5)
+            combo = PeriodizationOneRequiredCombination()
+            combo.periodization_id = 1
+            combo.combination_range = StandardErrorRange(lower_bound=3, upper_bound=5)
+
+            return [combo]
+
+        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance:
+
+            combo = PeriodizationOneRequiredCombination()
+            combo.periodization_id = 2
+            combo.combination_range = StandardErrorRange(lower_bound=2, upper_bound=3)
+
+            return [combo]
 
 
 class PeriodizationModelFactory(object):
@@ -247,7 +316,7 @@ class PeriodizationModelFactory(object):
             periodization_model.required_exercises = RequiredExerciseFactory().get_required_exercises(periodization_goal)
             periodization_model.one_required_exercises = RequiredExerciseFactory().get_one_required_exercises(
                 periodization_goal)
-            periodization_model.one_required_combination = RequiredExerciseFactory().get_one_required_combination(
+            periodization_model.one_required_combinations = RequiredExerciseFactory().get_one_required_combination(
                 periodization_goal)
 
             training_phase = TrainingPhaseFactory().create(training_phase_type)

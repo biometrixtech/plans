@@ -58,7 +58,7 @@ def get_periodization_model():
     model = PeriodizationModelFactory().create(
             persona=PeriodizationPersona.well_trained,
             training_phase_type=TrainingPhaseType.slowly_increase,
-            periodization_goal=PeriodizationGoal.improve_cardiovascular_health
+            periodization_goal=PeriodizationGoal.increase_cardiovascular_health
     )
     return model
 

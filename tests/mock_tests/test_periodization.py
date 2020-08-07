@@ -162,7 +162,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #
 #     athlete_training_history = get_fake_training_history()
 #
-#     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
+#     athlete_training_goal = PeriodizationGoal.increase_cardiovascular_health
 #
 #     proc = PeriodizationPlanProcessor(athlete_training_goal, athlete_training_history, PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
 #     proc.set_weekly_targets()
@@ -213,7 +213,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #
 #     workout_library_datastore = PlannedWorkoutLibraryDatastore()
 #
-#     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
+#     athlete_training_goal = PeriodizationGoal.increase_cardiovascular_health
 #
 #     proc = PeriodizationPlanProcessor(start_date_time,athlete_training_goal,PeriodizationPersona.well_trained,
 #                                       TrainingPhaseType.slowly_increase,
