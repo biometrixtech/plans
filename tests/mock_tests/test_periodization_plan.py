@@ -191,14 +191,15 @@ def get_sessions(session_types, dates, rpes, durations, sport_names, sections_li
 #     session.workout_program_module = program_module
 #
 
-#
-def test_7_days_completed_sessions():
+
+def get_seven_day_completed_data_store():
+
     session_types = [7, 7, 7, 7, 7, 7, 7]
-    sections  = [1,2,3,4,5,2,1]
+    sections = [1, 2, 3, 4, 5, 2, 1]
 
     dates = []
-    for d in range(0,7):
-        dates.append(datetime.now()-timedelta(days=d))
+    for d in range(0, 7):
+        dates.append(datetime.now() - timedelta(days=d))
     rpes = [StandardErrorRange(observed_value=5),
             StandardErrorRange(observed_value=6),
             StandardErrorRange(observed_value=4),
@@ -207,7 +208,7 @@ def test_7_days_completed_sessions():
             StandardErrorRange(observed_value=3),
             StandardErrorRange(observed_value=4)]
 
-    durations = [100*60, 90*60, 80*60, 90*60, 95*60, 85*60, 105*60]
+    durations = [100 * 60, 90 * 60, 80 * 60, 90 * 60, 95 * 60, 85 * 60, 105 * 60]
     sport_names = [None, None, None, None, None, None, None]
 
     # workout_programs = [get_workout_program(sections=sections)]
@@ -225,7 +226,23 @@ def test_7_days_completed_sessions():
 
     data_store = CompletedSessionDetailsDatastore()
     data_store.side_load_planned_workout(completed_session_details_list)
+
+    return data_store
+
+
+def test_7_days_completed_sessions_cardio_health():
+
+    data_store = get_seven_day_completed_data_store()
     proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardiovascular_health,
+                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
+    plan = proc.create_periodization_plan(datetime.now().date())
+
+    assert plan.template_workout is not None
+
+
+def test_7_days_completed_sessions_cardio_endurance():
+    data_store = get_seven_day_completed_data_store()
+    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardio_endurance,
                                       PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
     plan = proc.create_periodization_plan(datetime.now().date())
 
