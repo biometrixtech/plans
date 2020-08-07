@@ -712,37 +712,6 @@ class PeriodizationPlanProcessor(object):
         min_workouts_week = max(self.average_sessions_per_week.lower_bound - len(completed_session_details_list), 0)
         max_workouts_week = self.average_sessions_per_week.upper_bound - len(completed_session_details_list)
 
-        # first how many of the plan's recommended workouts have not been completed?
-        required_exercises, required_found_times = self.get_non_completed_required_exercises(
-            self.model.required_exercises,
-            completed_session_details_list)
-
-        one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(
-            self.model.one_required_exercises,
-            completed_session_details_list)
-        if self.model.one_required_combination is not None:
-            if self.model.one_required_combination.lower_bound is not None:
-                self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
-            if self.model.one_required_combination.upper_bound is not None:
-                self.model.one_required_combination.upper_bound = self.model.one_required_combination.upper_bound - one_required_found_times
-
-        # adjust required workout ranges to athlete's rpe and duration capacities:
-        for r in required_exercises:
-            if r.rpe is not None:
-                r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
-            if r.duration is not None:
-                r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
-                if r.duration.upper_bound < r.duration.lower_bound:
-                    r.duration.lower_bound = shortest_acceptable_duration
-
-        for r in one_required_exercises:
-            if r.rpe is not None:
-                r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
-            if r.duration is not None:
-                r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
-                if r.duration.upper_bound < r.duration.lower_bound:
-                    r.duration.lower_bound = shortest_acceptable_duration
-
         rpe_load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
         power_load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
