@@ -317,13 +317,24 @@ class PeriodizationPlanProcessor(object):
 
         ranking = 1
         last_times_per_week = None
+        last_priority = None
+        last_ranking_used = 0
 
         for periodized_exercise in sorted_required_exercises:
+            adjusted_ranking = False
             if periodized_exercise.times_per_week.lowest_value() > 0:
                 if last_times_per_week is None:
                     last_times_per_week = periodized_exercise.times_per_week.lowest_value()
-                elif last_times_per_week < periodized_exercise.times_per_week.lowest_value():
-                    ranking += 1
+                elif last_times_per_week > periodized_exercise.times_per_week.lowest_value():
+                    if ranking == last_ranking_used:
+                        ranking += 1
+                        adjusted_ranking = True
+
+                if last_priority is None:
+                    last_priority = periodized_exercise.priority
+                elif last_priority < periodized_exercise.priority and not adjusted_ranking:
+                    if ranking == last_ranking_used:
+                        ranking += 1
 
                 if periodized_exercise.detailed_adaptation_type is not None:
                     detailed_ranked_type = RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,
@@ -333,6 +344,7 @@ class PeriodizationPlanProcessor(object):
 
                     if periodized_exercise.detailed_adaptation_type not in required_exercise_dict:
                         required_exercise_dict[periodized_exercise.detailed_adaptation_type] = detailed_ranked_type
+                        last_ranking_used = ranking
                     else:
                         # if same ranking, go with the larger duration, otherwise ignore the duration of the lower ranking
                         if required_exercise_dict[periodized_exercise.detailed_adaptation_type].ranking == ranking:
@@ -351,6 +363,7 @@ class PeriodizationPlanProcessor(object):
 
                     if periodized_exercise.sub_adaptation_type not in required_exercise_dict:
                         required_exercise_dict[periodized_exercise.sub_adaptation_type] = sub_adaptation_type
+                        last_ranking_used = ranking
                     else:
                         # if same ranking, go with the larger duration, otherwise ignore the duration of the lower ranking
                         if required_exercise_dict[periodized_exercise.sub_adaptation_type].ranking == ranking:
@@ -889,7 +902,26 @@ class PeriodizationPlanProcessor(object):
 
         for r in required_exercises:
             for c in completed_session_details_list:
-                if r.sub_adaptation_type in [d.adaptation_type for d in c.session_detailed_load.sub_adaptation_types]:
+                if r.sub_adaptation_type is not None and r.sub_adaptation_type in [d.adaptation_type for d in c.session_detailed_load.sub_adaptation_types]:
+                    if r.rpe is not None:
+                        if r.rpe.lower_bound <= c.session_RPE.lower_bound and c.session_RPE.upper_bound <= r.rpe.upper_bound:
+                            found = True
+                        else:
+                            found = False
+                    else:
+                        found = True
+                    if r.duration is not None:
+                        if found and r.duration.lower_bound <= c.duration <= r.duration.upper_bound:
+                            found = True
+                        else:
+                            found = False
+                    if found:
+                        if r.times_per_week.lower_bound is not None:
+                            r.times_per_week.lower_bound = max(0, r.times_per_week.lower_bound - 1)
+                            r.found_times += 1
+                        if r.times_per_week.upper_bound is not None:
+                            r.times_per_week.upper_bound = max(0, r.times_per_week.upper_bound - 1)
+                elif r.sub_adaptation_type is None and r.detailed_adaptation_type is not None and r.detailed_adaptation_type in [d.adaptation_type for d in c.session_detailed_load.detailed_adaptation_types]:
                     if r.rpe is not None:
                         if r.rpe.lower_bound <= c.session_RPE.lower_bound and c.session_RPE.upper_bound <= r.rpe.upper_bound:
                             found = True

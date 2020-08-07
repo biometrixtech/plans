@@ -109,7 +109,7 @@ class PeriodizedExercise(object):
         self.rpe = rpe_range
         self.priority = priority
         self.periodization_id = None
-        self.update_adaptation_types()
+        #self.update_adaptation_types()
 
     def update_adaptation_types(self):
 
@@ -231,12 +231,11 @@ class RequiredExerciseFactory(object):
 
             base_training_volume = None # TBD
 
-            correctives = PeriodizedExercise([DetailedAdaptationType.corrective], SubAdaptationType.movement_efficiency,
+            correctives = PeriodizedExercise(DetailedAdaptationType.corrective, None,
                                              times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
                                              duration_range=None, rpe_range=None, priority=1)
 
-            anaerobic_threshold = PeriodizedExercise([DetailedAdaptationType.anaerobic_threshold_training],
-                                                    SubAdaptationType.cardiorespiratory_training,
+            anaerobic_threshold = PeriodizedExercise(DetailedAdaptationType.anaerobic_threshold_training, None,
                                                     times_per_week_range=StandardErrorRange(lower_bound=1,
                                                                                             upper_bound=2),
                                                     duration_range=None, rpe_range=None, priority=3)
