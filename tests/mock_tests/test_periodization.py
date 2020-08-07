@@ -3,7 +3,8 @@ from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager
 from models.periodization import PeriodizedExercise, PeriodizationGoal, PeriodizationPersona, TrainingPhaseType
-from models.movement_tags import RankedAdaptationType, AdaptationDictionary, SubAdaptationType, TrainingType, AdaptationTypeMeasure
+from models.movement_tags import AdaptationDictionary, SubAdaptationType, TrainingType, AdaptationTypeMeasure
+from models.ranked_types import RankedAdaptationType
 from models.planned_exercise import PlannedWorkoutLoad
 from tests.mocks.mock_workout_library_datastore import PlannedWorkoutLibraryDatastore
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore

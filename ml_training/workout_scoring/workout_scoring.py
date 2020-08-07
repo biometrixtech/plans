@@ -6,9 +6,9 @@ from models.planned_exercise import PlannedWorkoutLoad
 from logic.periodization_processor import WorkoutScoringManager
 from models.periodization import PeriodizedExercise, RequiredExerciseFactory, PeriodizationGoal, PeriodizationModelFactory, PeriodizationPersona, TrainingPhaseType
 from models.training_volume import StandardErrorRange
-from models.ranked_types import RankedBodyPart
+from models.ranked_types import RankedBodyPart, RankedAdaptationType
 from models.soreness_base import BodyPartLocation
-from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure, SubAdaptationType, DetailedAdaptationType
+from models.movement_tags import AdaptationDictionary, AdaptationTypeMeasure, SubAdaptationType, DetailedAdaptationType
 
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split

@@ -4,11 +4,11 @@ from collections import Counter
 from models.training_volume import StandardErrorRange
 from statistics import mean
 from models.training_load import TrainingLoad, CompletedSessionDetails, LoadType, DetailedTrainingLoad
-from models.movement_tags import AdaptationDictionary, RankedAdaptationType, AdaptationTypeMeasure, SubAdaptationType, DetailedAdaptationType
+from models.movement_tags import AdaptationDictionary, AdaptationTypeMeasure, SubAdaptationType, DetailedAdaptationType
 from logic.training_load_calcs import TrainingLoadCalculator
 from models.planned_exercise import PlannedWorkoutLoad
 from models.body_parts import BodyPartLocation
-from models.ranked_types import RankedBodyPart
+from models.ranked_types import RankedBodyPart, RankedAdaptationType
 from math import sqrt
 from datetime import timedelta
 
