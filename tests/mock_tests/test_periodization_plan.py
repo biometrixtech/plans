@@ -248,6 +248,23 @@ def test_7_days_completed_sessions_cardio_endurance():
 
     assert plan.template_workout is not None
 
+
+def test_7_days_completed_sessions_cardio_endurance_with_speed():
+    data_store = get_seven_day_completed_data_store()
+    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardio_endurance_with_speed,
+                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
+    plan = proc.create_periodization_plan(datetime.now().date())
+
+    assert plan.template_workout is not None
+
+def test_7_days_completed_sessions_strength_max_strength():
+    data_store = get_seven_day_completed_data_store()
+    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_strength_max_strength,
+                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
+    plan = proc.create_periodization_plan(datetime.now().date())
+
+    assert plan.template_workout is not None
+
 #
 # def test_aggregate_load_concentric():
 #

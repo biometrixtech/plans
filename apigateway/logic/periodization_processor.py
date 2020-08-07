@@ -311,7 +311,7 @@ class PeriodizationPlanProcessor(object):
 
         # TODO if nothing is required but they're hellbent on working out, we give them a "needs" list like muscle load
 
-        sorted_required_exercises = sorted(all_required_exercises, key=lambda x: x.times_per_week.lowest_value(), reverse=True)
+        sorted_required_exercises = sorted(all_required_exercises, key=lambda x: (1-x.priority, x.times_per_week.lowest_value()), reverse=True)
 
         required_exercise_dict = {}
 
@@ -332,9 +332,11 @@ class PeriodizationPlanProcessor(object):
 
                 if last_priority is None:
                     last_priority = periodized_exercise.priority
-                elif last_priority < periodized_exercise.priority and not adjusted_ranking:
-                    if ranking == last_ranking_used:
-                        ranking += 1
+                elif last_priority < periodized_exercise.priority:
+                    last_priority = periodized_exercise.priority
+                    if not adjusted_ranking:
+                        if ranking == last_ranking_used:
+                            ranking += 1
 
                 if periodized_exercise.detailed_adaptation_type is not None:
                     detailed_ranked_type = RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,
