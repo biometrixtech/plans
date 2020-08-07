@@ -30,8 +30,8 @@ def get_exercise_json(name, movement_id, reps, reps_unit=1, weight_measure=None,
 
 def define_all_exercises():
     return {
-        "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6, duration=30),
-        "indoor_cycle": get_exercise_json("Indoor Cycle", reps=180, reps_unit=4, movement_id="57e2fd3a4c6a031dc777e90c", duration=20),
+        "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6, duration=30*60),
+        "indoor_cycle": get_exercise_json("Indoor Cycle", reps=180, reps_unit=4, movement_id="57e2fd3a4c6a031dc777e90c", duration=20*60),
         "med_ball_chest_pass": get_exercise_json("Med Ball Chest Pass", reps=15, reps_unit=1, movement_id="586540fd4d0fec0011c031a4", weight_measure=2, weight=15),
         "explosive_burpee": get_exercise_json("Explosive Burpee", reps=15, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e913"),
         "dumbbell_bench_press": get_exercise_json("Dumbbell Bench Press", reps=8, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e847", weight_measure=2, weight=50),
@@ -207,7 +207,7 @@ def test_7_days_completed_sessions():
             StandardErrorRange(observed_value=3),
             StandardErrorRange(observed_value=4)]
 
-    durations = [100, 90, 80, 90, 95, 85, 105]
+    durations = [100*60, 90*60, 80*60, 90*60, 95*60, 85*60, 105*60]
     sport_names = [None, None, None, None, None, None, None]
 
     # workout_programs = [get_workout_program(sections=sections)]

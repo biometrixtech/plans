@@ -189,6 +189,8 @@ class SessionFunctionalMovement(object):
             self.completed_session_details.power_load = self.session.power_load
             self.completed_session_details.rpe_load = self.session.rpe_load
             self.completed_session_details.session_RPE = self.session.session_RPE
+            if self.session.duration_minutes is not None:
+                self.completed_session_details.duration = self.session.duration_minutes * 60
         else:
             # TODO - is this the best way to handle this?
             self.completed_session_details.power_load = StandardErrorRange()
@@ -238,9 +240,17 @@ class SessionFunctionalMovement(object):
         self.completed_session_details.session_detailed_load = detailed_load_processor.session_detailed_load
         self.completed_session_details.training_type_load = detailed_load_processor.session_training_type_load
         self.completed_session_details.ranked_muscle_load = detailed_load_processor.ranked_muscle_load
-        self.completed_session_details.power_load = self.session.power_load
-        self.completed_session_details.rpe_load = self.session.rpe_load
-        self.completed_session_details.session_RPE = self.session.session_RPE
+        if self.session is not None:
+            self.completed_session_details.power_load = self.session.power_load
+            self.completed_session_details.rpe_load = self.session.rpe_load
+            self.completed_session_details.session_RPE = self.session.session_RPE
+            if self.session.duration_minutes is not None:
+                self.completed_session_details.duration = self.session.duration_minutes * 60
+        else:
+            # TODO - is this the best way to handle this?
+            self.completed_session_details.power_load = StandardErrorRange()
+            self.completed_session_details.rpe_load = StandardErrorRange()
+            self.completed_session_details.session_RPE = StandardErrorRange()
         return workout_load
 
     def get_adaption_type_scalar(self, adaptation_type):

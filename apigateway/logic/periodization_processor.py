@@ -202,8 +202,11 @@ class PeriodizationPlanProcessor(object):
         #                                                                completed_session_details_list=self.current_weekly_workouts,
         #                                                                exclude_completed=self.exclude_completed)
 
-        periodization_plan.template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
-        periodization_plan.template_workout.muscle_load_ranking = self.muscle_load_needs
+        template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
+        template_workout.muscle_load_ranking = self.muscle_load_needs
+        template_workout = self.add_adaptation_type_needs_from_required_to_template(template_workout)
+
+        periodization_plan.template_workout = template_workout
 
         return periodization_plan
 
@@ -229,9 +232,11 @@ class PeriodizationPlanProcessor(object):
         #                                                                completed_session_details_list=self.current_weekly_workouts,
         #                                                                exclude_completed=self.exclude_completed)
 
-        muscle_groups = BodyPartLocation.muscle_groups()
+        template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
+        template_workout.muscle_load_ranking = self.muscle_load_needs
+        template_workout = self.add_adaptation_type_needs_from_required_to_template(template_workout)
 
-        periodization_plan.template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
+        periodization_plan.template_workout = template_workout
 
         return periodization_plan
 
@@ -257,6 +262,104 @@ class PeriodizationPlanProcessor(object):
 
         self.last_seven_days_workouts = self.completed_session_details_datastore.get(
             start_date_time=self.start_date - timedelta(days=7), end_date_time=self.start_date)
+
+    def add_adaptation_type_needs_from_required_to_template(self, template_workout: TemplateWorkout):
+
+        # get an adaptation type (with duration) for each one needed by required workouts
+        # rank in order of what's required
+        completed_session_details_list = self.current_weekly_workouts
+        # first how many of the plan's recommended workouts have not been completed?
+        required_exercises, required_found_times = self.get_non_completed_required_exercises(self.model.required_exercises,
+                                                                                             completed_session_details_list)
+
+        one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(self.model.one_required_exercises,
+                                                                                                     completed_session_details_list)
+        if self.model.one_required_combination is not None:
+            if self.model.one_required_combination.lower_bound is not None:
+                self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
+            if self.model.one_required_combination.upper_bound is not None:
+                self.model.one_required_combination.upper_bound = self.model.one_required_combination.upper_bound - one_required_found_times
+
+        # adjust required workout ranges to athlete's rpe and duration capacities:
+        for r in required_exercises:
+            if r.rpe is not None:
+                r.rpe.upper_bound = min(r.rpe.upper_bound, template_workout.acceptable_session_rpe.upper_bound)
+            if r.duration is not None:
+                r.duration.upper_bound = min(r.duration.upper_bound, template_workout.acceptable_session_duration.upper_bound)
+                if r.duration.upper_bound < r.duration.lower_bound:
+                    r.duration.lower_bound = template_workout.acceptable_session_duration.lower_bound
+
+        for r in one_required_exercises:
+            if r.rpe is not None:
+                r.rpe.upper_bound = min(r.rpe.upper_bound, template_workout.acceptable_session_rpe.upper_bound)
+            if r.duration is not None:
+                r.duration.upper_bound = min(r.duration.upper_bound, template_workout.acceptable_session_duration.upper_bound)
+                if r.duration.upper_bound < r.duration.lower_bound:
+                    r.duration.lower_bound = template_workout.acceptable_session_duration.lower_bound
+
+        all_required_exercises = []
+        all_required_exercises.extend(required_exercises)
+        all_required_exercises.extend(one_required_exercises)
+
+        # TODO if nothing is required but they're hellbent on working out, we give them a "needs" list like muscle load
+
+        sorted_required_exercises = sorted(all_required_exercises, key=lambda x: x.times_per_week.lowest_value(), reverse=True)
+
+        required_exercise_dict = {}
+
+        ranking = 1
+        last_times_per_week = None
+
+        for periodized_exercise in sorted_required_exercises:
+            if periodized_exercise.times_per_week.lowest_value() > 0:
+                if last_times_per_week is None:
+                    last_times_per_week = periodized_exercise.times_per_week.lowest_value()
+                elif last_times_per_week < periodized_exercise.times_per_week.lowest_value():
+                    ranking += 1
+
+                if periodized_exercise.detailed_adaptation_type is not None:
+                    detailed_ranked_type = RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,
+                                                                periodized_exercise.detailed_adaptation_type,
+                                                                ranking,
+                                                                periodized_exercise.duration.highest_value() if periodized_exercise.duration is not None else None)
+
+                    if periodized_exercise.detailed_adaptation_type not in required_exercise_dict:
+                        required_exercise_dict[periodized_exercise.detailed_adaptation_type] = detailed_ranked_type
+                    else:
+                        # if same ranking, go with the larger duration, otherwise ignore the duration of the lower ranking
+                        if required_exercise_dict[periodized_exercise.detailed_adaptation_type].ranking == ranking:
+                            if required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration is None:
+                                required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration = periodized_exercise.duration.highest_value()
+                            else:
+                                if periodized_exercise.duration is not None:
+                                    required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration = max(required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration,
+                                                                                                                        periodized_exercise.duration.highest_value())
+
+                if periodized_exercise.sub_adaptation_type is not None:
+                    sub_adaptation_type = RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type,
+                                                                periodized_exercise.sub_adaptation_type,
+                                                                ranking,
+                                                                periodized_exercise.duration.highest_value() if periodized_exercise.duration is not None else None)
+
+                    if periodized_exercise.sub_adaptation_type not in required_exercise_dict:
+                        required_exercise_dict[periodized_exercise.sub_adaptation_type] = sub_adaptation_type
+                    else:
+                        # if same ranking, go with the larger duration, otherwise ignore the duration of the lower ranking
+                        if required_exercise_dict[periodized_exercise.sub_adaptation_type].ranking == ranking:
+                            if required_exercise_dict[periodized_exercise.sub_adaptation_type].duration is None:
+                                required_exercise_dict[
+                                    periodized_exercise.sub_adaptation_type].duration = periodized_exercise.duration.highest_value()
+                            else:
+                                if periodized_exercise.duration is not None:
+                                    required_exercise_dict[periodized_exercise.sub_adaptation_type].duration = max(
+                                        required_exercise_dict[periodized_exercise.sub_adaptation_type].duration,
+                                        periodized_exercise.duration.highest_value())
+
+        ranked_adaptation_type_list = list(required_exercise_dict.values())
+
+        template_workout.adaptation_type_ranking = ranked_adaptation_type_list
+
+        return template_workout
 
     def sum_detailed_load(self):
 
@@ -608,37 +711,6 @@ class PeriodizationPlanProcessor(object):
         # TODO - how do we adjust weekly workouts (based on goals) when they appear to exceed athlete's number of expected workouts?
         min_workouts_week = max(self.average_sessions_per_week.lower_bound - len(completed_session_details_list), 0)
         max_workouts_week = self.average_sessions_per_week.upper_bound - len(completed_session_details_list)
-
-        # first how many of the plan's recommended workouts have not been completed?
-        required_exercises, required_found_times = self.get_non_completed_required_exercises(
-            self.model.required_exercises,
-            completed_session_details_list)
-
-        one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(
-            self.model.one_required_exercises,
-            completed_session_details_list)
-        if self.model.one_required_combination is not None:
-            if self.model.one_required_combination.lower_bound is not None:
-                self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
-            if self.model.one_required_combination.upper_bound is not None:
-                self.model.one_required_combination.upper_bound = self.model.one_required_combination.upper_bound - one_required_found_times
-
-        # adjust required workout ranges to athlete's rpe and duration capacities:
-        for r in required_exercises:
-            if r.rpe is not None:
-                r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
-            if r.duration is not None:
-                r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
-                if r.duration.upper_bound < r.duration.lower_bound:
-                    r.duration.lower_bound = shortest_acceptable_duration
-
-        for r in one_required_exercises:
-            if r.rpe is not None:
-                r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
-            if r.duration is not None:
-                r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
-                if r.duration.upper_bound < r.duration.lower_bound:
-                    r.duration.lower_bound = shortest_acceptable_duration
 
         rpe_load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
         power_load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
