@@ -71,10 +71,17 @@ class TrainingTypeLoad(Serialisable):
                            sorted(self.load.items(), key=lambda item: item[1].lowest_value(),
                                   reverse=True)}
         training_rank = 1
-
+        last_value = None
         for training_type, load in sorted_training.items():
+
+            if last_value is None:
+                last_value = load.plagiarize()
+            if load.highest_value() < last_value.highest_value():
+                training_rank += 1
+                last_value = load.plagiarize()
+
             self.training_types.append(RankedAdaptationType(AdaptationTypeMeasure.training_type, training_type, training_rank, None))  # TODO: need actual duration
-            training_rank += 1
+            # training_rank += 1
 
 
 class DetailedTrainingLoad(Serialisable):
@@ -221,15 +228,27 @@ class DetailedTrainingLoad(Serialisable):
 
         rank = 1
 
+        last_value = None
         for detailed_type, load in sorted_details.items():
+            if last_value is None:
+                last_value = load.plagiarize()
+            if load.highest_value() < last_value.highest_value():
+                rank += 1
+                last_value = load.plagiarize()
             self.detailed_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, detailed_type, rank, None))  # TODO: need actual duration
-            rank += 1
+            # rank += 1
 
         sub_rank = 1
+        last_value = None
 
         for sub_type, load in sorted_subs.items():
+            if last_value is None:
+                last_value = load.plagiarize()
+            if load.highest_value() < last_value.highest_value():
+                sub_rank += 1
+                last_value = load.plagiarize()
             self.sub_adaptation_types.append(RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type, sub_type, sub_rank, None))  # TODO: need actual duration
-            sub_rank += 1
+            # sub_rank += 1
 
     def get_total_load(self):
         detailed_types = list(DetailedAdaptationType)
