@@ -38,7 +38,7 @@ def get_workout_library(rpe_list, duration_list):
                                                           projected_rpe,
                                                           projected_rpe_load,
                                                           reps=None,
-                                                          rpe=r, duration=d,
+                                                          rpe=projected_rpe, duration=d,
                                                           percent_max_hr=p,
                                                           actions_group_dict=action_group_dict)
                     workouts.append(planned_workout)
@@ -58,7 +58,7 @@ def get_workout_library(rpe_list, duration_list):
                                                           projected_rpe,
                                                           projected_rpe_load,
                                                           reps=reps,
-                                                          rpe=r,
+                                                          rpe=projected_rpe,
                                                           actions_group_dict=action_group_dict)
                     workouts.append(planned_workout)
                     id += 1
@@ -72,7 +72,7 @@ def get_workout_library(rpe_list, duration_list):
                     projected_rpe_load = StandardErrorRange(lower_bound=r*d, upper_bound=r*d, observed_value=r*d)
                     projected_rpe = StandardErrorRange(lower_bound=r, upper_bound=r, observed_value=r)
                     planned_workout = get_planned_workout(id, training_type_list_power,projected_rpe,projected_rpe_load,
-                                                          reps=reps,rpe=r,duration=d,percent_max_hr=None,
+                                                          reps=reps,rpe=projected_rpe,duration=d,percent_max_hr=None,
                                                           actions_group_dict=action_group_dict)
                     workouts.append(planned_workout)
                     id += 1

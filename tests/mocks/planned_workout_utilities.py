@@ -88,11 +88,13 @@ def get_planned_workout(workout_id, training_type_list, session_rpe, projected_r
     workout.duration = duration or 75
     workout.projected_rpe_load = projected_rpe_load
 
-    action_id_list = []
-    for action_ids in actions_group_dict.values():
-        action_id_list.extend(action_ids)
-    action_list = get_all_actions_for_groups(action_id_list)
-    action_list2 = get_filtered_actions(training_type_list)
+    if actions_group_dict is not None:  # if we want all actions for the training types
+        action_id_list = []
+        for action_ids in actions_group_dict.values():
+            action_id_list.extend(action_ids)
+        action_list = get_all_actions_for_groups(action_id_list)
+    else:  # if a subset of specific actions is defined
+        action_list = get_filtered_actions(training_type_list)
 
     detailed_load_processor = process_adaptation_types(action_list, reps=reps, rpe=rpe, duration=duration,
                                                        percent_max_hr=percent_max_hr)
