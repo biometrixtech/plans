@@ -72,7 +72,8 @@ class DetailedLoadProcessor(object):
         self.muscle_detailed_load[muscle].add_load(detailed_adaptation_type, load_range)
 
     def add_load(self, functional_movement_action_mapping: FunctionalMovementActionMapping, adaptation_type,
-                 movement_action: ExerciseAction, training_load_range, reps=None, duration=None, rpe_range=None, percent_max_hr=None):
+                 movement_action: ExerciseAction, training_load_range, reps=None, duration=None, rpe_range=None, percent_max_hr=None,
+                 return_adaptation_types=False):
 
         includes_lower_body = False
         includes_upper_body = False
@@ -171,13 +172,13 @@ class DetailedLoadProcessor(object):
                     if rpe is not None and duration is not None:
                         # muscular endurance
                         # TODO make this less than VO2Max
-                        if rpe <= 7 and duration >= 240:
+                        if rpe <= 7 and duration >= 240 * 60:
                             adaptation_type_load[DetailedAdaptationType.muscular_endurance].add(muscle_load)
                             training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.muscular_endurance,
                                                  body_part_total_load)
                         # sustained power
-                        elif rpe > 7 and duration >= 15:
+                        elif rpe > 7 and duration >= 15 * 60:
                             adaptation_type_load[DetailedAdaptationType.sustained_power].add(muscle_load)
                             training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.sustained_power,
@@ -224,7 +225,7 @@ class DetailedLoadProcessor(object):
                         self.add_muscle_load(muscle, DetailedAdaptationType.speed, body_part_total_load)
 
                     # sustained power
-                    if (duration is not None and duration >= 45 and
+                    if (duration is not None and duration >= 45 * 60 and
                             (movement_action.speed == MovementSpeed.fast or movement_action.speed == MovementSpeed.explosive)):
                         adaptation_type_load[DetailedAdaptationType.sustained_power].add(muscle_load)
                         training_type_load[movement_action.training_type].add(muscle_load)
@@ -263,6 +264,7 @@ class DetailedLoadProcessor(object):
                         self.add_muscle_load(muscle, DetailedAdaptationType.functional_strength,
                                              body_part_total_load)
 
+        action_detailed_adaptation_types = []
         # for cardiorespiratory load, we only add session load, not muscle-specific load
         if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             # TODO - allow for rpe not hr
@@ -272,16 +274,19 @@ class DetailedLoadProcessor(object):
                     training_type_load[movement_action.training_type].add(training_load_range)
                     self.session_detailed_load.add_load(DetailedAdaptationType.base_aerobic_training,
                                                         training_load_range)
+                    action_detailed_adaptation_types.append(DetailedAdaptationType.base_aerobic_training)
                 # anaerobic threshold
                 if 80 <= percent_max_hr < 86:
                     training_type_load[movement_action.training_type].add(training_load_range)
                     self.session_detailed_load.add_load(DetailedAdaptationType.anaerobic_threshold_training,
                                                         training_load_range)
+                    action_detailed_adaptation_types.append(DetailedAdaptationType.anaerobic_threshold_training)
                 # anaerobic interval
                 if 86 <= percent_max_hr:
                     training_type_load[movement_action.training_type].add(training_load_range)
                     self.session_detailed_load.add_load(DetailedAdaptationType.high_intensity_anaerobic_training,
                                                         training_load_range)
+                    action_detailed_adaptation_types.append(DetailedAdaptationType.high_intensity_anaerobic_training)
 
         # scale non-cardio to be comparable with cardio
         if total_muscle_load.lowest_value() > 0:
@@ -304,3 +309,7 @@ class DetailedLoadProcessor(object):
                         self.session_training_type_load.add_load(training_type, adjusted_training_type_load)
                     else:
                         self.session_training_type_load.add_load(training_type, training_type_load)
+
+        if return_adaptation_types:
+            action_detailed_adaptation_types.extend([dat for dat, dat_load in adaptation_type_load.items() if dat_load.observed_value > 0])
+            return action_detailed_adaptation_types

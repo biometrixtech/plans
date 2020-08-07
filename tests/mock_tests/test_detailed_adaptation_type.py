@@ -347,7 +347,7 @@ def test_muscular_endurance_cardio_detection():
 
     rpes = [StandardErrorRange(observed_value=6)]
 
-    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=300)
+    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=300 * 60)
 
     action_list_length = len(action_list)
     no_speed_length = len(no_speed_list)
@@ -367,7 +367,7 @@ def test_muscular_endurance_strength_detection():
     rpes = [StandardErrorRange(observed_value=6)]
     reps = [15]
 
-    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes,duration=300)
+    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes,duration=300 * 60)
 
     action_list_length = len(action_list)
     no_speed_length = len(no_speed_list)
@@ -452,7 +452,7 @@ def test_sustained_power_from_power_detection():
     rpes = [StandardErrorRange(observed_value=4)]
     duration = 60
 
-    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes, duration=60)
+    detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes, duration=60 * 60)
 
     action_list_length = len(action_list)
     no_speed_length = len(no_speed_list)
@@ -474,7 +474,7 @@ def test_sustained_power_from_caridio_detection():
     rpes = [StandardErrorRange(observed_value=8)]
     duration = 60
 
-    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=60)
+    detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=60 * 60)
 
     action_list_length = len(action_list)
     no_speed_length = len(no_speed_list)

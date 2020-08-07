@@ -98,7 +98,7 @@ def write_workouts_json(workout_json):
 
 def test_write_workout_library_json():
     rpe_list = list(range(1, 11))
-    duration_list = list(range(30, 90, 5))
+    duration_list = list(range(30 * 60, 90 * 60, 5 * 60))
     workouts = get_workout_library(rpe_list, duration_list)
     workouts_json = get_workouts_json(workouts)
     write_workouts_json(workouts_json)
