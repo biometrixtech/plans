@@ -189,7 +189,8 @@ class SessionFunctionalMovement(object):
             self.completed_session_details.power_load = self.session.power_load
             self.completed_session_details.rpe_load = self.session.rpe_load
             self.completed_session_details.session_RPE = self.session.session_RPE
-            self.completed_session_details.duration = self.session.duration_minutes * 60
+            if self.session.duration_minutes is not None:
+                self.completed_session_details.duration = self.session.duration_minutes * 60
         else:
             # TODO - is this the best way to handle this?
             self.completed_session_details.power_load = StandardErrorRange()
@@ -243,7 +244,8 @@ class SessionFunctionalMovement(object):
             self.completed_session_details.power_load = self.session.power_load
             self.completed_session_details.rpe_load = self.session.rpe_load
             self.completed_session_details.session_RPE = self.session.session_RPE
-            self.completed_session_details.duration = self.session.duration_minutes * 60
+            if self.session.duration_minutes is not None:
+                self.completed_session_details.duration = self.session.duration_minutes * 60
         else:
             # TODO - is this the best way to handle this?
             self.completed_session_details.power_load = StandardErrorRange()

@@ -232,8 +232,11 @@ class PeriodizationPlanProcessor(object):
         #                                                                completed_session_details_list=self.current_weekly_workouts,
         #                                                                exclude_completed=self.exclude_completed)
 
-        periodization_plan.template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
-        periodization_plan.template_workout.muscle_load_ranking = self.muscle_load_needs
+        template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
+        template_workout.muscle_load_ranking = self.muscle_load_needs
+        template_workout = self.add_adaptation_type_needs_from_required_to_template(template_workout)
+
+        periodization_plan.template_workout = template_workout
 
         return periodization_plan
 
@@ -300,9 +303,61 @@ class PeriodizationPlanProcessor(object):
 
         # TODO if nothing is required but they're hellbent on working out, we give them a "needs" list like muscle load
 
-        sorted_required_exercises = sorted(all_required_exercises, key=lambda x: x.times_per_week, reverse=True)
+        sorted_required_exercises = sorted(all_required_exercises, key=lambda x: x.times_per_week.lowest_value(), reverse=True)
 
-        i=0
+        required_exercise_dict = {}
+
+        ranking = 1
+        last_times_per_week = None
+
+        for periodized_exercise in sorted_required_exercises:
+            if periodized_exercise.times_per_week.lowest_value() > 0:
+                if last_times_per_week is None:
+                    last_times_per_week = periodized_exercise.times_per_week.lowest_value()
+                elif last_times_per_week < periodized_exercise.times_per_week.lowest_value():
+                    ranking += 1
+
+                if periodized_exercise.detailed_adaptation_type is not None:
+                    detailed_ranked_type = RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,
+                                                                periodized_exercise.detailed_adaptation_type,
+                                                                ranking,
+                                                                periodized_exercise.duration.highest_value() if periodized_exercise.duration is not None else None)
+
+                    if periodized_exercise.detailed_adaptation_type not in required_exercise_dict:
+                        required_exercise_dict[periodized_exercise.detailed_adaptation_type] = detailed_ranked_type
+                    else:
+                        # if same ranking, go with the larger duration, otherwise ignore the duration of the lower ranking
+                        if required_exercise_dict[periodized_exercise.detailed_adaptation_type].ranking == ranking:
+                            if required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration is None:
+                                required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration = periodized_exercise.duration.highest_value()
+                            else:
+                                if periodized_exercise.duration is not None:
+                                    required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration = max(required_exercise_dict[periodized_exercise.detailed_adaptation_type].duration,
+                                                                                                                        periodized_exercise.duration.highest_value())
+
+                if periodized_exercise.sub_adaptation_type is not None:
+                    sub_adaptation_type = RankedAdaptationType(AdaptationTypeMeasure.sub_adaptation_type,
+                                                                periodized_exercise.sub_adaptation_type,
+                                                                ranking,
+                                                                periodized_exercise.duration.highest_value() if periodized_exercise.duration is not None else None)
+
+                    if periodized_exercise.sub_adaptation_type not in required_exercise_dict:
+                        required_exercise_dict[periodized_exercise.sub_adaptation_type] = sub_adaptation_type
+                    else:
+                        # if same ranking, go with the larger duration, otherwise ignore the duration of the lower ranking
+                        if required_exercise_dict[periodized_exercise.sub_adaptation_type].ranking == ranking:
+                            if required_exercise_dict[periodized_exercise.sub_adaptation_type].duration is None:
+                                required_exercise_dict[
+                                    periodized_exercise.sub_adaptation_type].duration = periodized_exercise.duration.highest_value()
+                            else:
+                                if periodized_exercise.duration is not None:
+                                    required_exercise_dict[periodized_exercise.sub_adaptation_type].duration = max(
+                                        required_exercise_dict[periodized_exercise.sub_adaptation_type].duration,
+                                        periodized_exercise.duration.highest_value())
+
+        ranked_adaptation_type_list = list(required_exercise_dict.values())
+
+        template_workout.adaptation_type_ranking = ranked_adaptation_type_list
 
         return template_workout
 
