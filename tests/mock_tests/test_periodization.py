@@ -202,49 +202,49 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #     assert len(acceptable_workouts_5) > 0
 
 
-def test_top_rec_should_be_greatest_need_day_3_cardio():
-
-    start_date_time = datetime.now()
-
-    workout_history = create_workout_history(datetime.now())
-
-    completed_session_details_datastore = CompletedSessionDetailsDatastore()
-    completed_session_details_datastore.side_load_planned_workout(workout_history)
-
-    workout_library_datastore = PlannedWorkoutLibraryDatastore()
-
-    athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
-
-    proc = PeriodizationPlanProcessor(start_date_time,athlete_training_goal,PeriodizationPersona.well_trained,
-                                      TrainingPhaseType.slowly_increase,
-                                      completed_session_details_datastore,
-                                      workout_library_datastore)
-    plan = proc.create_periodization_plan(datetime.now().date())
-
-    acceptable_workouts_1 = [a for a in plan.next_workouts[0]]
-
-    acceptable_workout_1 = next(a for a in acceptable_workouts_1 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
-    completed_workout_1 = complete_a_planned_workout(start_date_time+timedelta(days=1), acceptable_workout_1)
-
-    proc.completed_session_details_datastore.completed_sessions.append(completed_workout_1)
-    plan = proc.update_periodization_plan(plan, (start_date_time+timedelta(days=1)).date())
-
-    acceptable_workouts_2 = [a for a in plan.next_workouts[0]]
-
-    acceptable_workout_2 = next(a for a in acceptable_workouts_2 if a.session_detailed_load.sub_adaptation_types[
-        0].adaptation_type == SubAdaptationType.strength)
-    completed_workout_2 = complete_a_planned_workout(start_date_time + timedelta(days=2), acceptable_workout_2)
-
-    proc.completed_session_details_datastore.completed_sessions.append(completed_workout_2)
-    plan = proc.update_periodization_plan(plan, (start_date_time + timedelta(days=2)).date())
-
-    acceptable_workouts_3 = [a for a in plan.next_workouts[0]]
-
-    strength_workouts = [a for a in acceptable_workouts_3 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength]
-    cardio_workouts = [a for a in acceptable_workouts_3 if
-                         a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training]
-
-    assert acceptable_workouts_3[0].session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
+# def test_top_rec_should_be_greatest_need_day_3_cardio():
+#
+#     start_date_time = datetime.now()
+#
+#     workout_history = create_workout_history(datetime.now())
+#
+#     completed_session_details_datastore = CompletedSessionDetailsDatastore()
+#     completed_session_details_datastore.side_load_planned_workout(workout_history)
+#
+#     workout_library_datastore = PlannedWorkoutLibraryDatastore()
+#
+#     athlete_training_goal = PeriodizationGoal.improve_cardiovascular_health
+#
+#     proc = PeriodizationPlanProcessor(start_date_time,athlete_training_goal,PeriodizationPersona.well_trained,
+#                                       TrainingPhaseType.slowly_increase,
+#                                       completed_session_details_datastore,
+#                                       workout_library_datastore)
+#     plan = proc.create_periodization_plan(datetime.now().date())
+#
+#     acceptable_workouts_1 = [a for a in plan.next_workouts[0]]
+#
+#     acceptable_workout_1 = next(a for a in acceptable_workouts_1 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength)
+#     completed_workout_1 = complete_a_planned_workout(start_date_time+timedelta(days=1), acceptable_workout_1)
+#
+#     proc.completed_session_details_datastore.completed_sessions.append(completed_workout_1)
+#     plan = proc.update_periodization_plan(plan, (start_date_time+timedelta(days=1)).date())
+#
+#     acceptable_workouts_2 = [a for a in plan.next_workouts[0]]
+#
+#     acceptable_workout_2 = next(a for a in acceptable_workouts_2 if a.session_detailed_load.sub_adaptation_types[
+#         0].adaptation_type == SubAdaptationType.strength)
+#     completed_workout_2 = complete_a_planned_workout(start_date_time + timedelta(days=2), acceptable_workout_2)
+#
+#     proc.completed_session_details_datastore.completed_sessions.append(completed_workout_2)
+#     plan = proc.update_periodization_plan(plan, (start_date_time + timedelta(days=2)).date())
+#
+#     acceptable_workouts_3 = [a for a in plan.next_workouts[0]]
+#
+#     strength_workouts = [a for a in acceptable_workouts_3 if a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.strength]
+#     cardio_workouts = [a for a in acceptable_workouts_3 if
+#                          a.session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training]
+#
+#     assert acceptable_workouts_3[0].session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
 
 
 def test_acceptable_strength_cardio_same_score_both_required():
@@ -298,7 +298,7 @@ def test_completing_combo_required_reduces_score():
                                               projected_rpe_load=StandardErrorRange(lower_bound=3 * 75, observed_value=4 * 75,
                                                                 upper_bound=5 * 75),
                                               reps=10,
-                                              rpe=7.5,
+                                              rpe=StandardErrorRange(observed_value=7.5),
                                               duration=75,
                                               percent_max_hr=65
                                               )
@@ -308,7 +308,7 @@ def test_completing_combo_required_reduces_score():
                                                   projected_rpe_load=StandardErrorRange(lower_bound=7 * 75, observed_value=8 * 75,
                                                                 upper_bound=9 * 75),
                                                   reps=10,
-                                                  rpe=7.5,
+                                                  rpe=StandardErrorRange(observed_value=7.5),
                                                   duration=75,
                                                   percent_max_hr=75)
 

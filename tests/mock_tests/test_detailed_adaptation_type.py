@@ -58,7 +58,7 @@ def process_adaptation_types(action_list, reps_list, rpe_list, duration=None):
                                                  training_load_range=base_exercise.power_load,
                                                  reps=reps,
                                                  duration=duration,
-                                                 rpe=rpe)
+                                                 rpe_range=rpe)
 
     return detailed_load_processor
 
@@ -91,7 +91,7 @@ def process_adaptation_types_no_reps(action_list, rpe_list, duration=None):
                                              movement_action=action,
                                              training_load_range=base_exercise.power_load,
                                              duration=duration,
-                                             rpe=rpe)
+                                             rpe_range=rpe)
 
     return detailed_load_processor
 
@@ -223,7 +223,7 @@ def test_stabilization_endurance_from_strength_detection():
     slow_tempo_list = [a for a in action_list if a.speed == MovementSpeed.slow]
 
     reps_list = [15]
-    rpes = [6]
+    rpes = [StandardErrorRange(observed_value=6)]
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
 
@@ -244,7 +244,7 @@ def test_stabilization_endurance_from_cardio_detection():
     slow_tempo_list = [a for a in action_list if a.speed == MovementSpeed.slow]
 
     reps_list = [15]
-    rpes = [6]
+    rpes = [StandardErrorRange(observed_value=6)]
 
     detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=15)
 
@@ -264,7 +264,7 @@ def test_stabilization_strength_detection():
     no_resistance_list = [a for a in action_list if a.resistance is None]
 
     reps_list = [10]
-    rpes = [7.5]
+    rpes = [StandardErrorRange(observed_value=7.5)]
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
 
@@ -285,7 +285,7 @@ def test_stabilization_power_detection():
     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
 
     reps_list = [10]
-    rpes = [4]
+    rpes = [StandardErrorRange(observed_value=4)]
     #duration = 60
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
@@ -327,7 +327,7 @@ def test_functional_strength_from_strength_endurance_strength_detection():
     no_resistance_list = [a for a in action_list if a.resistance is None]
 
     reps_list = [10]
-    rpes = [7.5]
+    rpes = [StandardErrorRange(observed_value=7.5)]
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
 
@@ -345,7 +345,7 @@ def test_muscular_endurance_cardio_detection():
     no_speed_list = [a for a in action_list if a.speed is None]
     no_resistance_list = [a for a in action_list if a.resistance is None]
 
-    rpes = [6]
+    rpes = [StandardErrorRange(observed_value=6)]
 
     detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=300)
 
@@ -364,7 +364,7 @@ def test_muscular_endurance_strength_detection():
     no_resistance_list = [a for a in action_list if a.resistance is None]
     slow_tempo_list = [a for a in action_list if a.speed in [MovementSpeed.slow, MovementSpeed.none]]
 
-    rpes = [6]
+    rpes = [StandardErrorRange(observed_value=6)]
     reps = [15]
 
     detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes,duration=300)
@@ -385,7 +385,7 @@ def test_strength_endurance_detection():
     no_resistance_list = [a for a in action_list if a.resistance is None]
 
     reps_list = [10]
-    rpes = [7.5]
+    rpes = [StandardErrorRange(observed_value=7.5)]
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
 
@@ -406,7 +406,7 @@ def test_speed_detection():
     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
 
     reps_list = [15]
-    rpes = [4]
+    rpes = [StandardErrorRange(observed_value=4)]
     # duration = 60
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
@@ -449,7 +449,7 @@ def test_sustained_power_from_power_detection():
     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
 
     reps_list = [15]
-    rpes = [4]
+    rpes = [StandardErrorRange(observed_value=4)]
     duration = 60
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes, duration=60)
@@ -471,7 +471,7 @@ def test_sustained_power_from_caridio_detection():
     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
 
     reps_list = [15]
-    rpes = [8]
+    rpes = [StandardErrorRange(observed_value=8)]
     duration = 60
 
     detailed_load_processor = process_adaptation_types_no_reps(action_list, rpes, duration=60)
@@ -516,7 +516,7 @@ def test_power_detection():
     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
 
     reps_list = [15]
-    rpes = [4]
+    rpes = [StandardErrorRange(observed_value=4)]
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
 
@@ -559,7 +559,7 @@ def test_maximal_power_detection():
     explosive_speed_list = [a for a in action_list if a.speed == MovementSpeed.explosive]
 
     reps_list = [15]
-    rpes = [4]
+    rpes = [StandardErrorRange(observed_value=4)]
 
     detailed_load_processor = process_adaptation_types(action_list, reps_list, rpes)
 

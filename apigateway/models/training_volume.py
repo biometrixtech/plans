@@ -164,6 +164,11 @@ class StandardErrorRange(Serialisable):
         if len(upper_bound_list) > 0:
             average_range.upper_bound = mean(upper_bound_list)
 
+        if average_range.lower_bound is None and average_range.observed_value is not None:
+            average_range.lower_bound = average_range.observed_value
+        if average_range.upper_bound is None and average_range.observed_value is not None:
+            average_range.upper_bound = average_range.observed_value
+
         return average_range
 
     @staticmethod
