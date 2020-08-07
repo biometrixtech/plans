@@ -202,8 +202,11 @@ class PeriodizationPlanProcessor(object):
         #                                                                completed_session_details_list=self.current_weekly_workouts,
         #                                                                exclude_completed=self.exclude_completed)
 
-        periodization_plan.template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
-        periodization_plan.template_workout.muscle_load_ranking = self.muscle_load_needs
+        template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
+        template_workout.muscle_load_ranking = self.muscle_load_needs
+        template_workout = self.add_adaptation_type_needs_from_required_to_template(template_workout)
+
+        periodization_plan.template_workout = template_workout
 
         return periodization_plan
 
@@ -229,9 +232,8 @@ class PeriodizationPlanProcessor(object):
         #                                                                completed_session_details_list=self.current_weekly_workouts,
         #                                                                exclude_completed=self.exclude_completed)
 
-        muscle_groups = BodyPartLocation.muscle_groups()
-
         periodization_plan.template_workout = self.get_template_workout(week_number, self.current_weekly_workouts)
+        periodization_plan.template_workout.muscle_load_ranking = self.muscle_load_needs
 
         return periodization_plan
 
@@ -257,6 +259,52 @@ class PeriodizationPlanProcessor(object):
 
         self.last_seven_days_workouts = self.completed_session_details_datastore.get(
             start_date_time=self.start_date - timedelta(days=7), end_date_time=self.start_date)
+
+    def add_adaptation_type_needs_from_required_to_template(self, template_workout: TemplateWorkout):
+
+        # get an adaptation type (with duration) for each one needed by required workouts
+        # rank in order of what's required
+        completed_session_details_list = self.current_weekly_workouts
+        # first how many of the plan's recommended workouts have not been completed?
+        required_exercises, required_found_times = self.get_non_completed_required_exercises(self.model.required_exercises,
+                                                                                             completed_session_details_list)
+
+        one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(self.model.one_required_exercises,
+                                                                                                     completed_session_details_list)
+        if self.model.one_required_combination is not None:
+            if self.model.one_required_combination.lower_bound is not None:
+                self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
+            if self.model.one_required_combination.upper_bound is not None:
+                self.model.one_required_combination.upper_bound = self.model.one_required_combination.upper_bound - one_required_found_times
+
+        # adjust required workout ranges to athlete's rpe and duration capacities:
+        for r in required_exercises:
+            if r.rpe is not None:
+                r.rpe.upper_bound = min(r.rpe.upper_bound, template_workout.acceptable_session_rpe.upper_bound)
+            if r.duration is not None:
+                r.duration.upper_bound = min(r.duration.upper_bound, template_workout.acceptable_session_duration.upper_bound)
+                if r.duration.upper_bound < r.duration.lower_bound:
+                    r.duration.lower_bound = template_workout.acceptable_session_duration.lower_bound
+
+        for r in one_required_exercises:
+            if r.rpe is not None:
+                r.rpe.upper_bound = min(r.rpe.upper_bound, template_workout.acceptable_session_rpe.upper_bound)
+            if r.duration is not None:
+                r.duration.upper_bound = min(r.duration.upper_bound, template_workout.acceptable_session_duration.upper_bound)
+                if r.duration.upper_bound < r.duration.lower_bound:
+                    r.duration.lower_bound = template_workout.acceptable_session_duration.lower_bound
+
+        all_required_exercises = []
+        all_required_exercises.extend(required_exercises)
+        all_required_exercises.extend(one_required_exercises)
+
+        # TODO if nothing is required but they're hellbent on working out, we give them a "needs" list like muscle load
+
+        sorted_required_exercises = sorted(all_required_exercises, key=lambda x: x.times_per_week, reverse=True)
+
+        i=0
+
+        return template_workout
 
     def sum_detailed_load(self):
 
