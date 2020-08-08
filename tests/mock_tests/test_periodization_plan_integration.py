@@ -30,7 +30,11 @@ def get_exercise_json(name, movement_id, reps, reps_unit=1, weight_measure=None,
 
 def define_all_exercises():
     return {
-        "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6, duration=30*60),
+        # "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6,
+        #                             duration=30 * 60),
+        "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6),
+        "cardio_rowing": get_exercise_json("Long Row", reps=1800, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84",
+                                           rpe=6),
         "indoor_cycle": get_exercise_json("Indoor Cycle", reps=180, reps_unit=4, movement_id="57e2fd3a4c6a031dc777e90c", duration=20*60),
         "med_ball_chest_pass": get_exercise_json("Med Ball Chest Pass", reps=15, reps_unit=1, movement_id="586540fd4d0fec0011c031a4", weight_measure=2, weight=15),
         "explosive_burpee": get_exercise_json("Explosive Burpee", reps=15, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e913"),
@@ -69,6 +73,7 @@ def get_section(reference_number):
     if reference_number==0:
         sections = {
             "Warmup / Movement Prep": ['rowing'],
+            'Cardio': ['cardio_rowing'],
             'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
             'Strength': ['dumbbell_bench_press', 'bent_over_row'],
             'Recovery Protocol': ['indoor_cycle']
@@ -195,7 +200,7 @@ def get_sessions(session_types, dates, rpes, durations, sport_names, sections_li
 def get_seven_day_completed_data_store():
 
     session_types = [7, 7, 7, 7, 7, 7, 7]
-    sections = [1, 2, 3, 4, 5, 2, 1]
+    sections = [0, 1, 2, 3, 4, 5, 2]
 
     dates = []
     for d in range(0, 7):
