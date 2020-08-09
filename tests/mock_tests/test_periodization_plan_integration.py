@@ -30,11 +30,9 @@ def get_exercise_json(name, movement_id, reps, reps_unit=1, weight_measure=None,
 
 def define_all_exercises():
     return {
-        # "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6,
-        #                             duration=30 * 60),
         "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6),
-        "cardio_rowing": get_exercise_json("Long Row", reps=1800, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84",
-                                           rpe=6),
+        # "cardio_rowing": get_exercise_json("Long Row", reps=1800, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84",
+        #                                    rpe=6),
         "indoor_cycle": get_exercise_json("Indoor Cycle", reps=180, reps_unit=4, movement_id="57e2fd3a4c6a031dc777e90c"),
         "med_ball_chest_pass": get_exercise_json("Med Ball Chest Pass", reps=15, reps_unit=1, movement_id="586540fd4d0fec0011c031a4", weight_measure=2, weight=15),
         "explosive_burpee": get_exercise_json("Explosive Burpee", reps=15, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e913"),
@@ -112,9 +110,9 @@ def get_section(reference_number):
     return sections
 
 
-def get_sessions(session_types, dates, rpes, durations, sport_names, sections_list):
+def get_sessions(session_types, dates, rpes, duration_minutes, sport_names, sections_list):
 
-    if len(session_types) != len(dates) != len(rpes) != len(durations) != len(sport_names):
+    if len(session_types) != len(dates) != len(rpes) != len(duration_minutes) != len(sport_names):
         raise Exception("length must match for all arguments")
 
     sessions = []
@@ -129,7 +127,7 @@ def get_sessions(session_types, dates, rpes, durations, sport_names, sections_li
             session.sport_name = sport_names[d]
         session.event_date = dates[d]
         session.session_RPE = rpes[d]
-        session.duration_minutes = durations[d]
+        session.duration_minutes = duration_minutes[d]
 
         sessions.append(session)
 
@@ -212,12 +210,12 @@ def get_seven_day_completed_data_store():
             StandardErrorRange(observed_value=3),
             StandardErrorRange(observed_value=4)]
 
-    durations = [100 * 60, 90 * 60, 80 * 60, 90 * 60, 95 * 60, 85 * 60, 105 * 60]
+    duration_minutes = [100, 90, 80, 90, 95, 85, 105]
     sport_names = [None, None, None, None, None, None, None]
 
     # workout_programs = [get_workout_program(sections=sections)]
 
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, sections)
+    sessions = get_sessions(session_types, dates, rpes, duration_minutes, sport_names, sections)
 
     completed_session_details_list = []
 
