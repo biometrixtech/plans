@@ -58,7 +58,7 @@ def test_get_target_session_rpe():
     progression = PeriodizationProgression(1, TrainingPhaseType.increase, rpe_load_contribution=0.20,
                                            volume_load_contribution=0.80)
     load_rate_increase = StandardErrorRange(lower_bound=1.25, upper_bound=1.33)
-    session_rpe = calc.get_target_session_rpe(average_session_rpe, progression, load_rate_increase)
+    session_rpe = calc.get_target_session_intensity(average_session_rpe, progression, load_rate_increase)
 
     # this is embarrassingly bad algebra, but it seems to get to the right answer
     # let's assume rpe=4, volume=100. session_rpe_load = 400
@@ -79,16 +79,12 @@ def test_get_target_session_volume():
 
     calc = TargetLoadCalculator()
     target_session_rpe = StandardErrorRange(lower_bound=4, upper_bound=6, observed_value=5)
-    weekly_load_target = StandardErrorRange(lower_bound=800, upper_bound=1200, observed_value=1000)
-    session_volume = calc.get_target_session_volume(min_workouts_week=3, max_workouts_week=5,
-                                                    target_session_rpe=target_session_rpe,
-                                                    weekly_load_target=weekly_load_target)
-    # so let's say we have max 5 workouts a week.  weekly_load_target lower=800
-    # that means lowest average session is 160 load units
-    # if the highest value of the average rpe is 6, that means the lowest volume should be 26.67
+    target_session_load = StandardErrorRange(lower_bound=300, upper_bound=400)
+    session_volume = calc.get_target_session_volume(target_session_load,
+                                                    target_session_rpe=target_session_rpe)
 
-    assert 26.67 == round(session_volume.lower_bound, 2)
-    assert 63.33 == round(session_volume.observed_value, 2)
+    assert 50.00 == round(session_volume.lower_bound, 2)
+    assert 75.00 == round(session_volume.observed_value, 2)
     assert 100 == round(session_volume.upper_bound, 2)
 
 

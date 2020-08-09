@@ -86,20 +86,12 @@ class TargetLoadCalculator(object):
                                   observed_value=(min_load_calcs_load + max_load_calcs_load) / float(2))
         return load
 
-    def get_target_session_volume(self, min_workouts_week, max_workouts_week, target_session_rpe, weekly_load_target):
-        target_weekly_volumes = [weekly_load_target.lower_bound / float(target_session_rpe.lower_bound),
-                                 weekly_load_target.lower_bound / float(target_session_rpe.upper_bound),
-                                 weekly_load_target.upper_bound / float(target_session_rpe.lower_bound),
-                                 weekly_load_target.upper_bound / float(target_session_rpe.upper_bound),
+    def get_target_session_volume(self, target_session_load, target_session_rpe):
 
-                                 ]
-        target_weekly_volume_lower = min(target_weekly_volumes)
-        target_weekly_volume_upper = max(target_weekly_volumes)
-
-        target_session_volumes = [target_weekly_volume_lower / float(min_workouts_week),
-                                  target_weekly_volume_lower / float(max_workouts_week),
-                                  target_weekly_volume_upper / float(min_workouts_week),
-                                  target_weekly_volume_upper / float(max_workouts_week),
+        target_session_volumes = [target_session_load.lower_bound / float(target_session_rpe.lower_bound),
+                                  target_session_load.lower_bound / float(target_session_rpe.upper_bound),
+                                  target_session_load.upper_bound / float(target_session_rpe.lower_bound),
+                                  target_session_load.upper_bound / float(target_session_rpe.upper_bound),
                                   ]
 
         target_session_volume_lower = min(target_session_volumes)
@@ -111,41 +103,42 @@ class TargetLoadCalculator(object):
 
         return target_session_volume
 
-    def get_target_session_rpe(self, average_session_rpe, progression, rpe_load_rate_increase):
+    def get_target_session_intensity(self, average_session_intensity, progression, load_rate_increase):
 
         sample_volume = 1000
-        lowest_load = average_session_rpe.lower_bound * sample_volume
-        new_lowest_load = (lowest_load * rpe_load_rate_increase.lower_bound)
-        vol_increase_100_contribution = new_lowest_load / float(average_session_rpe.lower_bound)
+        lowest_load = average_session_intensity.lower_bound * sample_volume
+        new_lowest_load = (lowest_load * load_rate_increase.lower_bound)
+        vol_increase_100_contribution = new_lowest_load / float(average_session_intensity.lower_bound)
         vol_increase_scaled_contribution = ((vol_increase_100_contribution - sample_volume) * progression.volume_load_contribution) + sample_volume
 
-        rep_load_rate_lower_rpe_lower = ((rpe_load_rate_increase.lower_bound * average_session_rpe.lower_bound)
-                                         - average_session_rpe.lower_bound)
-        rep_load_rate_upper_rpe_lower = ((rpe_load_rate_increase.upper_bound * average_session_rpe.lower_bound)
-                                         - average_session_rpe.lower_bound)
-        rep_load_rate_lower_rpe_upper = ((rpe_load_rate_increase.lower_bound * average_session_rpe.upper_bound)
-                                         - average_session_rpe.upper_bound)
-        rep_load_rate_upper_rpe_upper = ((rpe_load_rate_increase.upper_bound * average_session_rpe.upper_bound)
-                                         - average_session_rpe.upper_bound)
+        load_rate_lower_intensity_lower = ((load_rate_increase.lower_bound * average_session_intensity.lower_bound)
+                                         - average_session_intensity.lower_bound)
+        load_rate_upper_intensity_lower = ((load_rate_increase.upper_bound * average_session_intensity.lower_bound)
+                                         - average_session_intensity.lower_bound)
+        load_rate_lower_intensity_upper = ((load_rate_increase.lower_bound * average_session_intensity.upper_bound)
+                                         - average_session_intensity.upper_bound)
+        load_rate_upper_intensity_upper = ((load_rate_increase.upper_bound * average_session_intensity.upper_bound)
+                                         - average_session_intensity.upper_bound)
 
-        target_rpes = [(rep_load_rate_lower_rpe_lower * progression.rpe_load_contribution) + average_session_rpe.lower_bound,
-                       (rep_load_rate_upper_rpe_lower * progression.rpe_load_contribution) + average_session_rpe.lower_bound,
-                       (rep_load_rate_lower_rpe_upper * progression.rpe_load_contribution) + average_session_rpe.upper_bound,
-                       (rep_load_rate_upper_rpe_upper * progression.rpe_load_contribution) + average_session_rpe.upper_bound,
+        target_intensities = [(load_rate_lower_intensity_lower * progression.rpe_load_contribution) + average_session_intensity.lower_bound,
+                       (load_rate_upper_intensity_lower * progression.rpe_load_contribution) + average_session_intensity.lower_bound,
+                       (load_rate_lower_intensity_upper * progression.rpe_load_contribution) + average_session_intensity.upper_bound,
+                       (load_rate_upper_intensity_upper * progression.rpe_load_contribution) + average_session_intensity.upper_bound,
                        ]
-        target_rpe_lower = min(target_rpes)
-        target_rpe_upper = max(target_rpes)
+        target_intensity_lower = min(target_intensities)
+        target_intensity_upper = max(target_intensities)
 
-        new_factor_lowest_load = target_rpe_lower * vol_increase_scaled_contribution
+        new_factor_lowest_load = target_intensity_lower * vol_increase_scaled_contribution
         adjustment = new_lowest_load / new_factor_lowest_load
 
-        target_session_rpe = StandardErrorRange(lower_bound=target_rpe_lower * adjustment,
-                                                upper_bound=target_rpe_upper * adjustment,
-                                                observed_value=((target_rpe_lower + target_rpe_upper) / 2) * adjustment)
+        target_session_intensity = StandardErrorRange(lower_bound=target_intensity_lower * adjustment,
+                                                upper_bound=target_intensity_upper * adjustment,
+                                                observed_value=((target_intensity_lower + target_intensity_upper) / 2) * adjustment)
 
-        return target_session_rpe
+        return target_session_intensity
 
     def get_target_session_load_and_rate(self, average_session_load, last_weeks_load, weekly_load_target):
+
         net_weeks_load_increase_lower = weekly_load_target.lower_bound - last_weeks_load.lower_bound
         net_weeks_load_increase_upper = weekly_load_target.upper_bound - last_weeks_load.upper_bound
 
@@ -185,7 +178,6 @@ class TargetLoadCalculator(object):
         return acceptable_session_load
 
 
-
 class PeriodizationPlanProcessor(object):
     def __init__(self, event_date, athlete_periodization_goal, athlete_persona, training_phase_type, completed_session_details_datastore, workout_library_datastore, exclude_completed=True):
         self.start_date = event_date
@@ -208,6 +200,7 @@ class PeriodizationPlanProcessor(object):
 
         self.average_session_duration = StandardErrorRange()
         self.average_session_rpe = StandardErrorRange()
+        self.average_session_watts = StandardErrorRange()
         self.average_sessions_per_week = StandardErrorRange()
         self.average_session_load = TrainingLoad()
         #self.average_day_load = TrainingLoad()
@@ -229,6 +222,12 @@ class PeriodizationPlanProcessor(object):
         self.previous_week_2_rpe_values = []
         self.previous_week_3_rpe_values = []
         self.previous_week_4_rpe_values = []
+
+        self.last_week_watts_values = []
+        self.previous_week_1_watts_values = []
+        self.previous_week_2_watts_values = []
+        self.previous_week_3_watts_values = []
+        self.previous_week_4_watts_values = []
 
         # self.last_week_rpe_load_sum = None
         # self.previous_week_1_rpe_load_sum = None
@@ -561,6 +560,12 @@ class PeriodizationPlanProcessor(object):
         self.previous_week_3_rpe_values = [l.session_RPE for l in self.previous_week_3_workouts if l.session_RPE is not None]
         self.previous_week_4_rpe_values = [l.session_RPE for l in self.previous_week_4_workouts if l.session_RPE is not None]
 
+        # self.last_week_watts_values = [l.power_load / l.duration for l in self.last_week_workouts if l.power_load is not None]
+        # self.previous_week_1_watts_values = [l.power_load / l.duration for l in self.previous_week_1_workouts if l.power_load is not None]
+        # self.previous_week_2_watts_values = [l.power_load / l.duration for l in self.previous_week_2_workouts if l.power_load is not None]
+        # self.previous_week_3_watts_values = [l.power_load / l.duration for l in self.previous_week_3_workouts if l.power_load is not None]
+        # self.previous_week_4_watts_values = [l.power_load / l.duration for l in self.previous_week_4_workouts if l.power_load is not None]
+
     def sum_weeks(self):
 
         self.last_weeks_load.rpe_load = StandardErrorRange.get_sum_from_error_range_list(self.last_week_rpe_load_values)
@@ -631,6 +636,13 @@ class PeriodizationPlanProcessor(object):
             last_two_weeks_rpes.extend(self.previous_week_2_rpe_values)
 
         self.average_session_rpe = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_rpes)
+
+        last_two_weeks_watts = self.last_week_watts_values
+        last_two_weeks_watts.extend(self.previous_week_1_watts_values)
+        if len(self.last_week_watts_values) <= 1:
+            last_two_weeks_watts.extend(self.previous_week_2_watts_values)
+
+        self.average_session_watts = StandardErrorRange.get_average_from_error_range_list(last_two_weeks_watts)
 
         sessions_per_week = []
         started = False
@@ -719,23 +731,31 @@ class PeriodizationPlanProcessor(object):
         # given load rate of increase, determine the RPE's share of that increase
         # apply adjusted RPE rate of increase
 
-        target_session_rpe = calc.get_target_session_rpe(self.average_session_rpe, progression, rpe_load_rate_increase)
-
-        # target_watts_rates = [1 + (power_load_rate_increase.lower_bound * progression.rpe_load_contribution),
-        #                      1 + (power_load_rate_increase.upper_bound * progression.rpe_load_contribution)]
-        #
-        # target_watts_increase_lower = min(target_watts_rates)
-        # target_watts_increase_upper = max(target_watts_rates)
+        target_session_rpe = calc.get_target_session_intensity(self.average_session_rpe, progression,
+                                                               rpe_load_rate_increase)
+        # target_session_watts = calc.get_target_session_intensity(self.average_session_watts, progression,
+        #                                                          power_load_rate_increase)
 
         # now reverse engineer the volume's contribution of increase given load and RPE
 
-        target_session_volume = calc.get_target_session_volume(self.average_sessions_per_week.lower_bound,
-                                                               self.average_sessions_per_week.upper_bound,
-                                                               target_session_rpe,
-                                                               weekly_load_target.rpe_load)
+        target_session_volume = calc.get_target_session_volume(target_session_rpe_load, target_session_rpe)
+        #target_session_watts_volume = calc.get_target_session_volume(target_session_power_load, target_session_watts)
+
+        # so here's the issue...
+        # given the range of possible volumes and rpes, we may actually get different load range
+
+        updated_rpe_load = StandardErrorRange(lower_bound=target_session_rpe.lower_bound * target_session_volume.lower_bound,
+                                              upper_bound=target_session_rpe.upper_bound * target_session_volume.upper_bound,
+                                              observed_value=((target_session_rpe.lower_bound * target_session_volume.lower_bound) +
+                                                              (target_session_rpe.upper_bound * target_session_volume.upper_bound))/float(2))
+
+        # updated_watts_load = StandardErrorRange(lower_bound=target_session_watts.lower_bound * target_session_watts_volume.lower_bound,
+        #                                       upper_bound=target_session_watts.upper_bound * target_session_watts_volume.upper_bound,
+        #                                       observed_value=((target_session_watts.lower_bound * target_session_watts_volume.lower_bound) +
+        #                                                       (target_session_watts.upper_bound * target_session_watts_volume.upper_bound))/float(2))
 
         target_session_load = TrainingLoad()
-        target_session_load.rpe_load = target_session_rpe_load
+        target_session_load.rpe_load = updated_rpe_load
         target_session_load.power_load = target_session_power_load
 
         periodization_plan_week = PeriodizationPlanWeek()
