@@ -669,7 +669,8 @@ class PeriodizationPlanProcessor(object):
         target_session_volume_upper = max(target_session_volumes)
 
         target_session_volume = StandardErrorRange(lower_bound=target_session_volume_lower,
-                                                   upper_bound=target_session_volume_upper)
+                                                   upper_bound=target_session_volume_upper,
+                                                   observed_value=(target_session_volume_lower + target_session_volume_upper) / 2)
 
         return target_session_volume
 
@@ -688,7 +689,9 @@ class PeriodizationPlanProcessor(object):
         target_rpe_lower = min(target_rpes)
         target_rpe_upper = max(target_rpes)
 
-        target_session_rpe = StandardErrorRange(lower_bound=target_rpe_lower, upper_bound=target_rpe_upper)
+        target_session_rpe = StandardErrorRange(lower_bound=target_rpe_lower,
+                                                upper_bound=target_rpe_upper,
+                                                observed_value=(target_rpe_lower + target_rpe_increase_upper) / 2)
 
         return target_session_rpe
 
@@ -706,10 +709,15 @@ class PeriodizationPlanProcessor(object):
                                     (1 + load_rate_increase_upper) * average_session_load.lower_bound,
                                     (1 + load_rate_increase_upper) * average_session_load.upper_bound]
 
-        target_session_load = StandardErrorRange(lower_bound= min(target_session_loads),
-                                                     upper_bound= max(target_session_loads))
+        min_session_load = min(target_session_loads)
+        max_session_load = max(target_session_loads)
+        target_session_load = StandardErrorRange(lower_bound= min_session_load,
+                                                 upper_bound= max_session_load,
+                                                 observed_value=(min_session_load + max_session_load) / 2)
 
-        target_session_rate = StandardErrorRange(lower_bound=load_rate_increase_lower, upper_bound=load_rate_increase_upper)
+        target_session_rate = StandardErrorRange(lower_bound=load_rate_increase_lower,
+                                                 upper_bound=load_rate_increase_upper,
+                                                 observed_value=(load_rate_increase_lower + load_rate_increase_upper) / 2)
 
         return target_session_load, target_session_rate
 
@@ -719,20 +727,7 @@ class PeriodizationPlanProcessor(object):
 
         current_week_target = self.weekly_targets[week_number]
 
-        lowest_acceptable_rpe_load = current_week_target.target_session_load.rpe_load.lower_bound
-        highest_acceptable_rpe_load = current_week_target.target_session_load.rpe_load.upper_bound
-
-        lowest_acceptable_power_load = current_week_target.target_session_load.power_load.lower_bound
-        highest_acceptable_power_load = current_week_target.target_session_load.power_load.upper_bound
-
-        lowest_acceptable_rpe = current_week_target.target_session_rpe.lower_bound
-        highest_acceptable_rpe = current_week_target.target_session_rpe.upper_bound
-        shortest_acceptable_duration = current_week_target.target_session_duration.lower_bound
-        longest_acceptable_duration = current_week_target.target_session_duration.upper_bound
-
         # TODO - how do we adjust weekly workouts (based on goals) when they appear to exceed athlete's number of expected workouts?
-        min_workouts_week = max(self.average_sessions_per_week.lower_bound - len(completed_session_details_list), 0)
-        max_workouts_week = self.average_sessions_per_week.upper_bound - len(completed_session_details_list)
 
         rpe_load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
         power_load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
@@ -743,40 +738,36 @@ class PeriodizationPlanProcessor(object):
 
         # even though we subtracted out existing load this week in the weekly target step,
         # the weekly load value here is the overall target and doesn't consider load this week
-        min_week_rpe_load = max(current_week_target.target_weekly_load.rpe_load.lower_bound - rpe_load_this_week.lower_bound, 0)
-        max_week_rpe_load = current_week_target.target_weekly_load.rpe_load.upper_bound - rpe_load_this_week.upper_bound
+        acceptable_session_rpe_load = self.get_updated_session_load_target(current_week_target.target_weekly_load.rpe_load,
+                                                                           current_week_target.target_session_load.rpe_load,
+                                                                           rpe_load_this_week)
 
-        min_week_power_load = max(
-            current_week_target.target_weekly_load.power_load.lower_bound - power_load_this_week.lower_bound, 0)
-        max_week_power_load = current_week_target.target_weekly_load.power_load.upper_bound - power_load_this_week.upper_bound
+        acceptable_session_power_load = self.get_updated_session_load_target(current_week_target.target_weekly_load.power_load,
+                                                                             current_week_target.target_session_load.power_load,
+                                                                             power_load_this_week)
 
-        lowest_acceptable_rpe_load = min(lowest_acceptable_rpe_load, min_week_rpe_load)
-        highest_acceptable_rpe_load = min(highest_acceptable_rpe_load, max_week_rpe_load)
-
-        lowest_acceptable_power_load = min(lowest_acceptable_power_load, min_week_power_load)
-        highest_acceptable_power_load = min(highest_acceptable_power_load, max_week_power_load)
-
-        template_workout.acceptable_session_rpe_load = StandardErrorRange(lower_bound=lowest_acceptable_rpe_load,
-                                                                          upper_bound=highest_acceptable_rpe_load,
-                                                                          observed_value=(lowest_acceptable_rpe_load+
-                                                                                          highest_acceptable_rpe_load)/2)
-        template_workout.acceptable_session_power_load = StandardErrorRange(lower_bound=lowest_acceptable_power_load,
-                                                                            upper_bound=highest_acceptable_power_load,
-                                                                            observed_value=(lowest_acceptable_power_load +
-                                                                                            highest_acceptable_power_load)/2)
+        template_workout.acceptable_session_rpe_load = acceptable_session_rpe_load
+        template_workout.acceptable_session_power_load = acceptable_session_power_load
 
         template_workout.adaptation_type_ranking = self.last_seven_days_detailed_load.detailed_adaptation_types
 
-        template_workout.acceptable_session_rpe = StandardErrorRange(lower_bound=lowest_acceptable_rpe,
-                                                                     upper_bound=highest_acceptable_rpe,
-                                                                     observed_value=(lowest_acceptable_rpe + highest_acceptable_rpe)/2)
-
-        template_workout.acceptable_session_duration = StandardErrorRange(lower_bound=shortest_acceptable_duration,
-                                                                          upper_bound=longest_acceptable_duration,
-                                                                          observed_value=(shortest_acceptable_duration +
-                                                                                          longest_acceptable_duration)/2)
+        template_workout.acceptable_session_rpe = current_week_target.target_session_rpe
+        template_workout.acceptable_session_duration = current_week_target.target_session_duration
 
         return template_workout
+
+    def get_updated_session_load_target(self, current_weekly_target_load, target_session_load, load_this_week):
+
+        min_week_load = max(current_weekly_target_load.lower_bound - load_this_week.lower_bound, 0)
+        max_week_load = current_weekly_target_load.upper_bound - load_this_week.upper_bound
+        lowest_acceptable_session_load = min(target_session_load.lower_bound, min_week_load)
+        highest_acceptable_session_load = min(target_session_load.upper_bound, max_week_load)
+
+        acceptable_session_load = StandardErrorRange(lower_bound=lowest_acceptable_session_load,
+                                                     upper_bound=highest_acceptable_session_load,
+                                                     observed_value=(lowest_acceptable_session_load +
+                                                                     highest_acceptable_session_load) / 2)
+        return acceptable_session_load
 
     # def get_ranked_workouts(self, week_number, workouts, completed_session_details_list: [CompletedSessionDetails], exclude_completed=True):
     #
