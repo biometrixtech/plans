@@ -574,39 +574,29 @@ class PeriodizationPlanProcessor(object):
 
     def get_weekly_load_target(self, progression, average_training_load):
 
-        # acwr
-
-        lower_acwr = progression.training_phase.acwr.lower_bound
-        upper_acwr = progression.training_phase.acwr.upper_bound
-
-        load_calcs_rpe_load = [average_training_load.rpe_load.lower_bound * lower_acwr,
-                               average_training_load.rpe_load.lower_bound * upper_acwr,
-                               average_training_load.rpe_load.upper_bound * lower_acwr,
-                               average_training_load.rpe_load.upper_bound * upper_acwr]
-
-        load_calcs_power_load = [average_training_load.power_load.lower_bound * lower_acwr,
-                                 average_training_load.power_load.lower_bound * upper_acwr,
-                                 average_training_load.power_load.upper_bound * lower_acwr,
-                                 average_training_load.power_load.upper_bound * upper_acwr]
+        rpe_load = self.get_load_target(average_training_load.rpe_load, progression.training_phase.acwr)
+        power_load = self.get_load_target(average_training_load.power_load, progression.training_phase.acwr)
 
         load_target = TrainingLoad()
-        load_target.rpe_load.lower_bound = min(load_calcs_rpe_load)
-        load_target.rpe_load.upper_bound = max(load_calcs_rpe_load)
-        load_target.rpe_load.observed_value = (load_target.rpe_load.upper_bound + load_target.rpe_load.lower_bound) / float(2)
-
-        load_target.power_load.lower_bound = min(load_calcs_power_load)
-        load_target.power_load.upper_bound = max(load_calcs_power_load)
-        load_target.power_load.observed_value = (load_target.power_load.upper_bound + load_target.power_load.lower_bound) / float(2)
+        load_target.rpe_load = rpe_load
+        load_target.power_load = power_load
 
         return load_target
 
+    def get_load_target(self, average_training_load, acwr_range):
+
+        load_calcs_load = [average_training_load.lower_bound * acwr_range.lower_bound,
+                           average_training_load.lower_bound * acwr_range.upper_bound,
+                           average_training_load.upper_bound * acwr_range.lower_bound,
+                           average_training_load.upper_bound * acwr_range.upper_bound]
+
+        min_load_calcs_load = min(load_calcs_load)
+        max_load_calcs_load = max(load_calcs_load)
+        rpe_load = StandardErrorRange(lower_bound=min_load_calcs_load, upper_bound=max_load_calcs_load,
+                                      observed_value=(min_load_calcs_load + max_load_calcs_load) / float(2))
+        return rpe_load
+
     def get_weekly_targets(self, progression):
-
-        average_session_rpe = StandardErrorRange(lower_bound=self.average_session_rpe.lower_bound,
-                                                 upper_bound=self.average_session_rpe.upper_bound)
-
-        min_workouts_week = self.average_sessions_per_week.lower_bound
-        max_workouts_week = self.average_sessions_per_week.upper_bound
 
         # determine the weekly load increase and determine the RPE/volume contributions according the the progression
 
@@ -623,7 +613,7 @@ class PeriodizationPlanProcessor(object):
         # given load rate of increase, determine the RPE's share of that increase
         # apply adjusted RPE rate of increase
 
-        target_session_rpe = self.get_target_session_rpe(average_session_rpe, progression, rpe_load_rate_increase)
+        target_session_rpe = self.get_target_session_rpe(self.average_session_rpe, progression, rpe_load_rate_increase)
 
         # target_watts_rates = [1 + (power_load_rate_increase.lower_bound * progression.rpe_load_contribution),
         #                      1 + (power_load_rate_increase.upper_bound * progression.rpe_load_contribution)]
@@ -633,7 +623,9 @@ class PeriodizationPlanProcessor(object):
 
         # now reverse engineer the volume's contribution of increase given load and RPE
 
-        target_session_volume = self.get_target_session_volume(min_workouts_week, max_workouts_week, target_session_rpe,
+        target_session_volume = self.get_target_session_volume(self.average_sessions_per_week.lower_bound,
+                                                               self.average_sessions_per_week.upper_bound,
+                                                               target_session_rpe,
                                                                weekly_load_target)
 
         target_session_load = TrainingLoad()
@@ -768,126 +760,6 @@ class PeriodizationPlanProcessor(object):
                                                      observed_value=(lowest_acceptable_session_load +
                                                                      highest_acceptable_session_load) / 2)
         return acceptable_session_load
-
-    # def get_ranked_workouts(self, week_number, workouts, completed_session_details_list: [CompletedSessionDetails], exclude_completed=True):
-    #
-    #     current_week_target = self.weekly_targets[week_number]
-    #
-    #     lowest_acceptable_load = current_week_target.target_session_load.rpe_load.lower_bound
-    #     highest_acceptable_load = current_week_target.target_session_load.rpe_load.upper_bound
-    #
-    #     lowest_acceptable_rpe = current_week_target.target_session_rpe.lower_bound
-    #     highest_acceptable_rpe = current_week_target.target_session_rpe.upper_bound
-    #     shortest_acceptable_duration = current_week_target.target_session_duration.lower_bound
-    #     longest_acceptable_duration = current_week_target.target_session_duration.upper_bound
-    #
-    #     # TODO - how do we adjust weekly workouts (based on goals) when they appear to exceed athlete's number of expected workouts?
-    #     min_workouts_week = max(self.average_sessions_per_week.lower_bound - len(completed_session_details_list), 0)
-    #     max_workouts_week = self.average_sessions_per_week.upper_bound - len(completed_session_details_list)
-    #
-    #     if exclude_completed:
-    #         workouts = [w for id, w in workouts.items() if id not in [c.workout_id for c in completed_session_details_list]]
-    #
-    #     # first how many of the plan's recommended workouts have not been completed?
-    #     required_exercises, required_found_times = self.get_non_completed_required_exercises(self.model.required_exercises,
-    #                                                                                          completed_session_details_list)
-    #
-    #     one_required_exercises, one_required_found_times = self.get_non_completed_required_exercises(self.model.one_required_exercises,
-    #                                                                                                  completed_session_details_list)
-    #     if self.model.one_required_combination is not None:
-    #         if self.model.one_required_combination.lower_bound is not None:
-    #             self.model.one_required_combination.lower_bound = self.model.one_required_combination.lower_bound - one_required_found_times
-    #         if self.model.one_required_combination.upper_bound is not None:
-    #             self.model.one_required_combination.upper_bound = self.model.one_required_combination.upper_bound - one_required_found_times
-    #
-    #     # adjust required workout ranges to athlete's rpe and duration capacities:
-    #     for r in required_exercises:
-    #         if r.rpe is not None:
-    #             r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
-    #         if r.duration is not None:
-    #             r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
-    #             if r.duration.upper_bound < r.duration.lower_bound:
-    #                 r.duration.lower_bound = shortest_acceptable_duration
-    #
-    #     for r in one_required_exercises:
-    #         if r.rpe is not None:
-    #             r.rpe.upper_bound = min(r.rpe.upper_bound, highest_acceptable_rpe)
-    #         if r.duration is not None:
-    #             r.duration.upper_bound = min(r.duration.upper_bound, longest_acceptable_duration)
-    #             if r.duration.upper_bound < r.duration.lower_bound:
-    #                 r.duration.lower_bound = shortest_acceptable_duration
-    #
-    #     load_this_week = StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
-    #
-    #     for c in completed_session_details_list:
-    #         load_this_week.add(c.power_load)
-    #
-    #     # even though we subtracted out existing load this week in the weekly target step,
-    #     # the weekly load value here is the overall target and doesn't consider load this week
-    #     min_week_load = max(current_week_target.target_weekly_load.rpe_load.lower_bound - load_this_week.lower_bound, 0)
-    #     max_week_load = current_week_target.target_weekly_load.rpe_load.upper_bound - load_this_week.upper_bound
-    #
-    #     lowest_acceptable_load = min(lowest_acceptable_load, min_week_load)
-    #     highest_acceptable_load = min(highest_acceptable_load, max_week_load)
-    #
-    #     # TODO calculate training load metrics for each potential workout given the athlete's training history
-    #     # right stinking here
-    #     for w in workouts:
-    #         last_two_weeks_workouts = []
-    #         fake_completed_workout = self.complete_a_planned_workout(self.start_date, w)
-    #         current_workout_list = [fake_completed_workout]
-    #         current_workout_list.extend(self.current_weekly_workouts)
-    #         last_two_weeks_workouts = [c for c in current_workout_list]
-    #         if len(last_two_weeks_workouts) < 4:
-    #             last_two_weeks_workouts.extend(self.last_week_workouts)
-    #         w.projected_strain = TrainingLoadCalculator().get_strain(LoadType.rpe, last_two_weeks_workouts)
-    #         w.projected_monotony = TrainingLoadCalculator().get_monotony(LoadType.rpe, last_two_weeks_workouts)
-    #         spike_list = [current_workout_list,
-    #                       self.last_week_workouts,
-    #                       self.previous_week_1_workouts,
-    #                       self.previous_week_2_workouts,
-    #                       self.previous_week_3_workouts,
-    #                       self.previous_week_4_workouts]
-    #         w.projected_strain_event_level = TrainingLoadCalculator().get_strain_spike(LoadType.rpe, spike_list)
-    #
-    #     for r in required_exercises:
-    #         for w in workouts:
-    #             workout_score = self.get_workout_score(w, r, StandardErrorRange(lower_bound=lowest_acceptable_load,
-    #                                                                             upper_bound=highest_acceptable_load))
-    #             w.score = max(workout_score, w.score)
-    #
-    #     for r in one_required_exercises:
-    #         for w in workouts:
-    #             workout_score = self.get_workout_score(w, r, StandardErrorRange(lower_bound=lowest_acceptable_load,
-    #                                                                             upper_bound=highest_acceptable_load),
-    #                                                    self.model.one_required_combination)
-    #             w.score = max(workout_score, w.score)
-    #
-    #     workouts.sort(key=lambda x: x.score, reverse=True)
-    #
-    #     # give tied scores same ranking
-    #     last_score = None
-    #     ranking = 0
-    #     for k in range(0, len(workouts)):
-    #         if last_score is None or last_score > workouts[k].score:
-    #             ranking += 1
-    #         workouts[k].ranking = ranking
-    #         last_score = workouts[k].score
-    #
-    #     # TODO: compare acceptable workouts vs top 10-25 rankings
-    #
-    #     # acceptable_workouts = [w for w in workouts if
-    #     #                        lowest_acceptable_load <= w.session_rpe * w.duration <= highest_acceptable_load and
-    #     #                        #lowest_acceptable_rpe <= w.session_rpe <= highest_acceptable_rpe) and
-    #     #                        w.session_rpe <= highest_acceptable_rpe and
-    #     #                        shortest_acceptable_duration <= w.duration <= longest_acceptable_duration]
-    #     #
-    #     # combinations = self.get_acceptable_workouts_from_combinations(acceptable_workouts, min_week_load, max_week_load,
-    #     #                                                               min_workouts_week, max_workouts_week)
-    #     #
-    #     # return combinations
-    #
-    #     return workouts
 
     def get_non_completed_required_exercises(self, required_exercises,
                                              completed_session_details_list: [CompletedSessionDetails]):
