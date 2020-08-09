@@ -107,28 +107,41 @@ class TargetLoadCalculator(object):
 
         target_session_volume = StandardErrorRange(lower_bound=target_session_volume_lower,
                                                    upper_bound=target_session_volume_upper,
-                                                   observed_value=(
-                                                                              target_session_volume_lower + target_session_volume_upper) / 2)
+                                                   observed_value=(target_session_volume_lower + target_session_volume_upper) / 2)
 
         return target_session_volume
 
     def get_target_session_rpe(self, average_session_rpe, progression, rpe_load_rate_increase):
-        target_rpe_rates = [1 + (rpe_load_rate_increase.lower_bound * progression.rpe_load_contribution),
-                            1 + (rpe_load_rate_increase.upper_bound * progression.rpe_load_contribution)]
-        target_rpe_increase_lower = min(target_rpe_rates)
-        target_rpe_increase_upper = max(target_rpe_rates)
-        target_rpes = [target_rpe_increase_lower * average_session_rpe.lower_bound,
-                       target_rpe_increase_lower * average_session_rpe.upper_bound,
-                       target_rpe_increase_upper * average_session_rpe.lower_bound,
-                       target_rpe_increase_upper * average_session_rpe.upper_bound,
 
+        sample_volume = 1000
+        lowest_load = average_session_rpe.lower_bound * sample_volume
+        new_lowest_load = (lowest_load * rpe_load_rate_increase.lower_bound)
+        vol_increase_100_contribution = new_lowest_load / float(average_session_rpe.lower_bound)
+        vol_increase_scaled_contribution = ((vol_increase_100_contribution - sample_volume) * progression.volume_load_contribution) + sample_volume
+
+        rep_load_rate_lower_rpe_lower = ((rpe_load_rate_increase.lower_bound * average_session_rpe.lower_bound)
+                                         - average_session_rpe.lower_bound)
+        rep_load_rate_upper_rpe_lower = ((rpe_load_rate_increase.upper_bound * average_session_rpe.lower_bound)
+                                         - average_session_rpe.lower_bound)
+        rep_load_rate_lower_rpe_upper = ((rpe_load_rate_increase.lower_bound * average_session_rpe.upper_bound)
+                                         - average_session_rpe.upper_bound)
+        rep_load_rate_upper_rpe_upper = ((rpe_load_rate_increase.upper_bound * average_session_rpe.upper_bound)
+                                         - average_session_rpe.upper_bound)
+
+        target_rpes = [(rep_load_rate_lower_rpe_lower * progression.rpe_load_contribution) + average_session_rpe.lower_bound,
+                       (rep_load_rate_upper_rpe_lower * progression.rpe_load_contribution) + average_session_rpe.lower_bound,
+                       (rep_load_rate_lower_rpe_upper * progression.rpe_load_contribution) + average_session_rpe.upper_bound,
+                       (rep_load_rate_upper_rpe_upper * progression.rpe_load_contribution) + average_session_rpe.upper_bound,
                        ]
         target_rpe_lower = min(target_rpes)
         target_rpe_upper = max(target_rpes)
 
-        target_session_rpe = StandardErrorRange(lower_bound=target_rpe_lower,
-                                                upper_bound=target_rpe_upper,
-                                                observed_value=(target_rpe_lower + target_rpe_increase_upper) / 2)
+        new_factor_lowest_load = target_rpe_lower * vol_increase_scaled_contribution
+        adjustment = new_lowest_load / new_factor_lowest_load
+
+        target_session_rpe = StandardErrorRange(lower_bound=target_rpe_lower * adjustment,
+                                                upper_bound=target_rpe_upper * adjustment,
+                                                observed_value=((target_rpe_lower + target_rpe_upper) / 2) * adjustment)
 
         return target_session_rpe
 
@@ -136,14 +149,15 @@ class TargetLoadCalculator(object):
         net_weeks_load_increase_lower = weekly_load_target.lower_bound - last_weeks_load.lower_bound
         net_weeks_load_increase_upper = weekly_load_target.upper_bound - last_weeks_load.upper_bound
 
-        load_rate_increase_lower = (weekly_load_target.lower_bound - net_weeks_load_increase_lower) / float(
-            weekly_load_target.lower_bound)
-        load_rate_increase_upper = (weekly_load_target.upper_bound - net_weeks_load_increase_upper) / float(
-            weekly_load_target.upper_bound)
-        target_session_loads = [(1 + load_rate_increase_lower) * average_session_load.lower_bound,
-                                (1 + load_rate_increase_lower) * average_session_load.upper_bound,
-                                (1 + load_rate_increase_upper) * average_session_load.lower_bound,
-                                (1 + load_rate_increase_upper) * average_session_load.upper_bound]
+        load_rate_increase_lower = (last_weeks_load.lower_bound + net_weeks_load_increase_lower) / float(
+            last_weeks_load.lower_bound)
+        load_rate_increase_upper = (last_weeks_load.upper_bound + net_weeks_load_increase_upper) / float(
+            last_weeks_load.upper_bound)
+
+        target_session_loads = [load_rate_increase_lower * average_session_load.lower_bound,
+                                load_rate_increase_lower * average_session_load.upper_bound,
+                                load_rate_increase_upper * average_session_load.lower_bound,
+                                load_rate_increase_upper * average_session_load.upper_bound]
 
         min_session_load = min(target_session_loads)
         max_session_load = max(target_session_loads)
@@ -153,8 +167,7 @@ class TargetLoadCalculator(object):
 
         target_session_rate = StandardErrorRange(lower_bound=load_rate_increase_lower,
                                                  upper_bound=load_rate_increase_upper,
-                                                 observed_value=(
-                                                                            load_rate_increase_lower + load_rate_increase_upper) / 2)
+                                                 observed_value=(load_rate_increase_lower + load_rate_increase_upper) / 2)
 
         return target_session_load, target_session_rate
 
