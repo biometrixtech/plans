@@ -3,7 +3,8 @@ from fathomapi.utils.xray import xray_recorder
 from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
 from models.training_volume import StandardErrorRange
-from models.movement_tags import DetailedAdaptationType, RankedAdaptationType, AdaptationDictionary, SubAdaptationType, AdaptationTypeMeasure, TrainingType
+from models.movement_tags import DetailedAdaptationType, AdaptationDictionary, SubAdaptationType, AdaptationTypeMeasure, TrainingType
+from models.ranked_types import RankedAdaptationType
 
 
 class TrainingLoad(object):
