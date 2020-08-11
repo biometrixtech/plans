@@ -44,22 +44,13 @@ class ExerciseAction(object):
         self.id = id
         self.name = name
 
-        # defined per action
-        self.training_type = None
-        self.eligible_external_resistance = []
-        self.lower_body_stance = None
-        self.upper_body_stance = None
-        self.body_position = None
-        self.lateral_distribution_pattern = WeightDistribution.bilateral
-        self.percent_bodyweight = 0.0
-        self.lateral_distribution = [0, 0]
-        self.apply_resistance = False
-        self.explosiveness = None
-        self.apply_instability = False
-        self.speed = None
-        self.resistance = None
+        self.primary_muscle_action = None  # muscle_action
 
-        self.primary_muscle_action = None
+        # New
+        self.movement_system_priority = None  # 1,2,3
+        self.movement_system_name = None
+        self.movement_system = None
+
         self.hip_joint_action = []
         self.knee_joint_action = []
         self.ankle_joint_action = []
@@ -68,6 +59,37 @@ class ExerciseAction(object):
         self.shoulder_scapula_joint_action = []
         self.elbow_joint_action = []
         self.wrist_joint_action = []
+
+        self.body_position = None
+        self.eligible_external_resistance = []
+
+        # New
+        self.contribute_to_power_production = False
+
+        self.apply_instability = False
+        self.apply_resistance = False
+        self.lower_body_stance = None
+        self.upper_body_stance = None
+        self.lateral_distribution_pattern = WeightDistribution.bilateral
+
+        # New
+        self.arm = None
+        self.torso = None
+        self.leg = None
+        self.multiplier = 1
+
+        self.percent_bodyweight = 0.0
+        self.lateral_distribution = [0, 0]
+
+        # ===== Sub action ends here =====
+
+        # defined per action
+        self.training_type = None
+
+        self.explosiveness = None
+
+        self.speed = None
+        self.resistance = None
 
         # self.ancillary_muscle_action = None
         # self.hip_stability_action = []
