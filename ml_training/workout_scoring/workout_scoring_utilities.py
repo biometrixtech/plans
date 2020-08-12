@@ -1,14 +1,7 @@
-from models.session_functional_movement import SessionFunctionalMovement
-from models.workout_program import WorkoutProgramModule
-from models.session import MixedActivitySession, SportTrainingSession
-from logic.workout_processing import WorkoutProcessor
-from datetime import datetime, timedelta
-from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
-from logic.periodization_processor import PeriodizationPlanProcessor
-from models.periodization import PeriodizationPersona, PeriodizationGoal, TrainingPhaseType
+from models.periodization import PeriodizationGoal
 from models.training_volume import StandardErrorRange
 from models.soreness_base import BodyPartLocation
-from models.ranked_types import RankedAdaptationType, RankedBodyPart
+from models.ranked_types import RankedAdaptationType
 from models.movement_tags import AdaptationTypeMeasure
 from models.periodization import TemplateWorkout
 import numpy as np
@@ -16,175 +9,6 @@ import numpy as np
 from models.periodization import RequiredExerciseFactory
 
 muscle_groups = list(BodyPartLocation.muscle_groups().keys())
-
-
-def get_exercise_json(name, movement_id, reps, reps_unit=1, weight_measure=None, weight=None, rpe=5, duration=None):
-    return {
-            "id": "1",
-            "name": name,
-            "weight_measure": weight_measure,
-            "weight": weight,
-            "sets": 1,
-            "reps_per_set": reps,
-            "unit_of_measure": reps_unit,
-            "movement_id": movement_id,
-            "bilateral": True,
-            "side": 0,
-            "rpe": rpe,
-            "pace": 120,
-            "stroke_rate": 22,
-            "duration": duration
-        }
-
-
-def define_all_exercises():
-    return {
-        "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6, duration=30*60),
-        "indoor_cycle": get_exercise_json("Indoor Cycle", reps=180, reps_unit=4, movement_id="57e2fd3a4c6a031dc777e90c", duration=20*60),
-        "med_ball_chest_pass": get_exercise_json("Med Ball Chest Pass", reps=15, reps_unit=1, movement_id="586540fd4d0fec0011c031a4", weight_measure=2, weight=15),
-        "explosive_burpee": get_exercise_json("Explosive Burpee", reps=15, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e913"),
-        "dumbbell_bench_press": get_exercise_json("Dumbbell Bench Press", reps=8, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e847", weight_measure=2, weight=50),
-        "bent_over_row": get_exercise_json("Bent Over Row", reps=8, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e936", weight_measure=2, weight=150)
-    }
-
-
-def get_section_json(name, exercises):
-    return {
-                "name": name,
-                "duration_seconds": 360,
-                "start_date_time": None,
-                "end_date_time": None,
-                "exercises": exercises
-            }
-
-
-def get_workout_program(session, sections):
-    all_exercises = define_all_exercises()
-    workout_program = {
-        "workout_sections": []
-    }
-
-    for section_name, exercises in sections.items():
-        workout_program['workout_sections'].append(get_section_json(section_name, exercises=[all_exercises[ex] for ex in exercises]))
-
-    workout = WorkoutProgramModule.json_deserialise(workout_program)
-    processor = WorkoutProcessor()
-    session.workout_program_module = workout
-    processor.process_workout(session)
-    return workout
-
-def get_section(reference_number):
-
-    if reference_number==0:
-        sections = {
-            "Cardio": ['rowing'],
-            'Stamina': ['med_ball_chest_pass', 'explosive_burpee'],
-            'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-            'Cardio2': ['indoor_cycle']
-        }
-    elif reference_number==1:
-        sections = {
-            "Cardio": ['rowing'],
-            'Stamina': ['med_ball_chest_pass'],
-            'Strength': ['dumbbell_bench_press'],
-            'Cardio2': ['indoor_cycle']
-        }
-    elif reference_number==2:
-        sections = {
-            "Cardio": ['rowing'],
-            'Stamina': ['explosive_burpee'],
-            'Strength': ['bent_over_row'],
-            'Cardio2': ['indoor_cycle']
-        }
-    elif reference_number==3:
-        sections = {
-            "cardio": ['indoor_cycle'],
-            'Strength': ['bent_over_row','indoor_cycle'],
-            'cardio2': ['indoor_cycle']
-        }
-    elif reference_number==4:
-        sections = {
-            "Warmup / Movement Prep": ['rowing'],
-            'Stamina': ['med_ball_chest_pass', 'explosive_burpee','med_ball_chest_pass'],
-            'Strength': ['dumbbell_bench_press', 'bent_over_row'],
-            'Recovery Protocol': ['indoor_cycle']
-        }
-    else:
-        sections = {
-            "cardio": ['indoor_cycle']
-        }
-
-    return sections
-
-
-def get_sessions(session_types, dates, rpes, durations, sport_names, sections_list):
-
-    if len(session_types) != len(dates) != len(rpes) != len(durations) != len(sport_names):
-        raise Exception("length must match for all arguments")
-
-    sessions = []
-
-    for d in range(0, len(dates)):
-        if session_types[d] == 7:
-            session = MixedActivitySession()
-            sections = get_section(sections_list[d])
-            session.workout_program_module = get_workout_program(session, sections=sections)
-        else:
-            session = SportTrainingSession()
-            session.sport_name = sport_names[d]
-        session.event_date = dates[d]
-        session.session_RPE = rpes[d]
-        session.duration_minutes = durations[d]
-
-        sessions.append(session)
-
-    return sessions
-
-def get_seven_day_completed_data_store():
-
-    session_types = [7, 7, 7, 7, 7, 7, 7]
-    sections = [1, 2, 3, 4, 5, 2, 1]
-
-    dates = []
-    for d in range(0, 7):
-        dates.append(datetime.now() - timedelta(days=d))
-    rpes = [StandardErrorRange(observed_value=5),
-            StandardErrorRange(observed_value=6),
-            StandardErrorRange(observed_value=4),
-            StandardErrorRange(observed_value=5),
-            StandardErrorRange(observed_value=6),
-            StandardErrorRange(observed_value=3),
-            StandardErrorRange(observed_value=4)]
-
-    durations = [100, 90, 80, 90, 95, 85, 105]
-    sport_names = [None, None, None, None, None, None, None]
-
-    # workout_programs = [get_workout_program(sections=sections)]
-
-    sessions = get_sessions(session_types, dates, rpes, durations, sport_names, sections)
-
-    completed_session_details_list = []
-
-    for session in sessions:
-        session_functional_movement = SessionFunctionalMovement(session, {})
-        session_functional_movement.process(session.event_date, None)
-        completed_session_details_list.append(session_functional_movement.completed_session_details)
-
-    completed_session_details_list = [c for c in completed_session_details_list if c is not None]
-
-    data_store = CompletedSessionDetailsDatastore()
-    data_store.side_load_planned_workout(completed_session_details_list)
-
-    return data_store
-
-
-def get_template_workout():
-
-    data_store = get_seven_day_completed_data_store()
-    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardio_endurance_with_speed,
-                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
-    plan = proc.create_periodization_plan(datetime.now().date())
-    return plan.template_workout
 
 
 def get_required_exercises(goal):
@@ -211,12 +35,13 @@ def get_muscle_needs():
         muscle_load_needs[muscle] = np.random.random() * 100  # TODO need a better way to randomize how much a muscle has been loaded so far
     return muscle_load_needs
 
+
 def randomize_template_workout(template_workout):
     rpe_lower = np.random.uniform(1, 8)
     rpe_upper = np.random.uniform(rpe_lower, max([rpe_lower + 3, 9]))
     template_workout.acceptable_session_rpe = StandardErrorRange(lower_bound=rpe_lower, upper_bound=rpe_upper)
-    duration_lower = np.random.uniform(20 * 60, 90 * 60) # lower is in range 20 min to 90 min
-    duration_upper = np.random.uniform(duration_lower, max([duration_lower + 20 * 60, 90 * 60]))  #upper limit is max of lower + 20 mins or 100 mins
+    duration_lower = np.random.uniform(20 * 60, 90 * 60)  # lower is in range 20 min to 90 min
+    duration_upper = np.random.uniform(duration_lower, max([duration_lower + 20 * 60, 90 * 60]))  # upper limit is max of lower + 20 mins or 100 mins
     template_workout.acceptable_session_duration = StandardErrorRange(lower_bound=duration_lower, upper_bound=duration_upper)
     rpe_load = template_workout.acceptable_session_rpe.plagiarize()
     rpe_load.multiply_range(template_workout.acceptable_session_duration)
@@ -273,6 +98,7 @@ def get_template_workouts():
         all_template_workouts.append(template_workout)
 
     return all_template_workouts
+
 
 def rank_adaptation_types(sorted_required_exercises):
     required_exercise_dict = {}
@@ -342,4 +168,3 @@ def rank_adaptation_types(sorted_required_exercises):
 
     ranked_adaptation_type_list = list(required_exercise_dict.values())
     return ranked_adaptation_type_list
-

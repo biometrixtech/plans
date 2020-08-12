@@ -26,9 +26,10 @@ from logic.periodization_processor import WorkoutScoringManager
 from models.ranked_types import RankedAdaptationType
 from models.soreness_base import BodyPartLocation
 from models.movement_tags import AdaptationDictionary, AdaptationTypeMeasure, DetailedAdaptationType
+from sklearn.model_selection import train_test_split
+from ml_training.workout_scoring.workout_scoring_utilities import get_template_workouts, randomize_template_workout
 
-from math import sqrt
-from ml_training.workout_scoring.workout_scoring_utilities import get_template_workout, get_template_workouts, randomize_template_workout
+all_muscles = list(BodyPartLocation.muscle_groups())
 
 
 ########## Scoring #######
@@ -129,7 +130,6 @@ def convert_sub_to_detail_adaptation_type(adaptation_type_ranking):
     return adaptation_type_ranking
 
 
-all_muscles = list(BodyPartLocation.muscle_groups())
 def get_normalized_muscle_load(test_workout):
 
     highest_muscle_load = 0
@@ -147,48 +147,7 @@ def get_normalized_muscle_load(test_workout):
     test_workout.ranked_muscle_detailed_load = test_workout_muscle_load_ranking
 
 
-
-
-def cosine_similarity(A, B):
-    mag_a = sqrt(sum([a**2 for a in A]))
-    mag_b = sqrt(sum([b**2 for b in B]))
-
-    dotprod = sum([a * b for a, b in zip(A, B)])
-    if (mag_a * mag_b) == 0:
-        cosine_similarity = 0
-    else:
-        cosine_similarity = dotprod / (mag_a * mag_b)
-    return cosine_similarity
-
 #########SCORING#############
-def get_muscle_cosine_similarity(test_muscle_load, template_muscle_load):
-    # get the muscles separately so we can look for matches of type (but not necessarily ranking)
-    candidate_muscles = [m for m, load in test_muscle_load.items() if load > 0]
-    recommended_muscles = [m for m, load in template_muscle_load.items() if load > 0]
-    all_used_muscles = set(candidate_muscles).union(recommended_muscles)
-
-    candidate_muscle_list = [1 if k in candidate_muscles else 0 for k in all_used_muscles]
-    recommended_muscle_list = [1 if k in recommended_muscles else 0 for k in all_used_muscles]
-    presence_sim = cosine_similarity(candidate_muscle_list, recommended_muscle_list)
-
-    # Score normalized muscle load similarity
-    all_muscles = list(template_muscle_load.keys())
-
-    candidate_loads = [test_muscle_load.get(muscle, 0) or 0 for muscle in all_muscles]
-    recommended_loads = [template_muscle_load.get(muscle, 0) or 0 for muscle in all_muscles]
-    load_sim = cosine_similarity(candidate_loads, recommended_loads)
-
-    average_cosine_similarity = (load_sim + presence_sim) / 2
-
-    return average_cosine_similarity
-    # difference = [abs(cand - rec) for cand, rec in zip(candidate_loads, recommended_loads)]
-    # percent_covered = [max([1 - diff / rec, 0]) for diff, rec in zip(difference, recommended_loads) if rec > 0]
-    # if len(percent_covered) > 0:
-    #     cosine_similarity_1 = sum(percent_covered) / len(percent_covered)
-    # else:
-    #     cosine_similarity_1 = 0
-
-
 def get_template_workout_features(template_workout):
     features = {}
     for attribute in ['rpe', 'duration', 'rpe_load', 'power_load']:
@@ -229,21 +188,6 @@ def get_library_workout_features(library_workout):
     for muscle, muscle_load in library_workout.ranked_muscle_detailed_load.items():
         features[f'{muscle.name}_library'] = muscle_load or 0
 
-    # highest_muscle_load = 0
-    # for s in library_workout.ranked_muscle_detailed_load:
-    #     highest_muscle_load = max(s.power_load.highest_value(), highest_muscle_load)
-    #
-    # muscle_features = {}
-    # all_muscles = list(BodyPartLocation.muscle_groups())
-    # ranked_muscles = [rb.body_part_location for rb in library_workout.ranked_muscle_detailed_load]
-    # for muscle in all_muscles:
-    #     if muscle in ranked_muscles:
-    #         muscle_load = [ranked_muscle.power_load.highest_value() for ranked_muscle in library_workout.ranked_muscle_detailed_load if ranked_muscle.body_part_location == muscle][0]
-    #         muscle_load = muscle_load / highest_muscle_load * 100
-    #         muscle_features[f"{muscle.name}"] = muscle_load
-    #     else:
-    #         muscle_features[f"{muscle.name}"] = 0
-
     at_features = {}
     ranked_dat = [rat.adaptation_type for rat in library_workout.session_detailed_load.detailed_adaptation_types]
     for detailed_adaptation_type in DetailedAdaptationType:
@@ -257,6 +201,7 @@ def get_library_workout_features(library_workout):
 
     features.update(at_features)
     return features
+
 
 def read_library():
     with open('../../apigateway/models/planned_workout_library.json', 'r') as f:
@@ -272,15 +217,11 @@ def read_library():
 
     return all_library_workouts, all_library_workout_features
 
-def run2():
-    # all_events = {}
+def run():
     all_events = []
-    # events_subset = []
     workout_library, workout_library_features = read_library()
-    # lw_features = get_library_workout_features(workout_library[0])
 
     template_workouts = get_template_workouts()
-    # template_workout = get_template_workout()
     count = 0
     for library_workout, features_lw in zip(workout_library, workout_library_features):
         for t_w in template_workouts:
@@ -291,16 +232,11 @@ def run2():
             event.update(features_lw)
             event.update(get_template_workout_features(template_workout))
             workout_match, score = is_workout_selected(library_workout, template_workout, event)
-            # event['match'] = workout_match
-            # event['score'] = score
             all_events.append(event)
     data = pd.DataFrame(all_events)
-    data.to_csv('data/training_data.csv', index=False)
-
-    print(data.shape, sum(data['match']))
-
-    print('here')
-import time
-st = time.time()
-run2()
-print(time.time() - st)
+    np.random.seed(1000)
+    training_data, validation_data = train_test_split(data, test_size=0.2)
+    training_data.to_csv('training_data.csv', index=False)
+    validation_data.to_csv('validation_data.csv', index=False)
+    # data.to_csv('data/training_data.csv', index=False)
+run()
