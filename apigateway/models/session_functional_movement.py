@@ -189,6 +189,7 @@ class SessionFunctionalMovement(object):
             self.completed_session_details.power_load = self.session.power_load
             self.completed_session_details.rpe_load = self.session.rpe_load
             self.completed_session_details.session_RPE = self.session.session_RPE
+            self.completed_session_details.training_volume = self.session.training_volume
             if self.session.duration_minutes is not None:
                 self.completed_session_details.duration = self.session.duration_minutes * 60
         else:

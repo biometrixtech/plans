@@ -152,6 +152,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         self.total_minutes_at_moderate_intensity = 0.0
         self.total_blocks_at_moderate_intensity = 0  # 5 min or more
 
+        self.training_volume = 0
+
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
             if not isinstance(value, datetime.datetime) and value is not None:
@@ -460,7 +462,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None,
 
             'cardio_plyometrics': self.cardio_plyometrics,
-            'ultra_high_intensity': self.ultra_high_intensity
+            'ultra_high_intensity': self.ultra_high_intensity,
+            'training_volume': self.training_volume
+
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
             # 'underactive_weak_body_parts': [u.json_serialise() for u in self.underactive_weak_body_parts],
@@ -545,6 +549,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.not_tracked_load = StandardErrorRange.json_deserialise(input_dict['not_tracked_load']) if input_dict.get('not_tracked_load') is not None else None
         session.cardio_plyometrics = input_dict.get('cardio_plyometrics')
         session.ultra_high_intensity = input_dict.get('ultra_high_intensity')
+        session.training_volume = input_dict.get('training_volume')
 
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]

@@ -109,6 +109,7 @@ class WorkoutProcessor(object):
         if volume > 0 :
             session_RPE.divide(volume)
             session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?
+            session.training_volume = volume
         return session
 
     def set_session_intensity_metrics(self, session, workout_exercise):
@@ -326,10 +327,21 @@ class WorkoutProcessor(object):
             weight = 20  # TODO: need to change this
         exercise.force = StandardErrorRange(observed_value=Calculators.force_resistance_exercise(weight))
 
+        percent_bodyweight = 0
+
+        bodyweight_count = 0
+        for action in exercise.primary_actions:
+            if isinstance(action.percent_bodyweight,int):
+                percent_bodyweight += float(action.percent_bodyweight)
+                bodyweight_count += 1
+
+        if bodyweight_count > 0:
+            percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
+
         # TODO: still need to differentiate distance traveled by exercise
         observed_power = Calculators.power_resistance_exercise(
             weight_used=weight,
-            user_weight=self.user_weight,
+            user_weight=self.user_weight*percent_bodyweight,
             time_eccentric=exercise.duration_per_rep.observed_value / 2,
             time_concentric=exercise.duration_per_rep.observed_value / 2
             )
@@ -338,13 +350,13 @@ class WorkoutProcessor(object):
             # TODO: still need to differentiate distance traveled by exercise
             power_1 = Calculators.power_resistance_exercise(
                 weight_used=weight,
-                user_weight=self.user_weight,
+                user_weight=self.user_weight*percent_bodyweight,
                 time_eccentric=exercise.duration_per_rep.lower_bound / 2,
                 time_concentric=exercise.duration_per_rep.lower_bound / 2
                 )
             power_2 = Calculators.power_resistance_exercise(
                 weight_used=weight,
-                user_weight=self.user_weight,
+                user_weight=self.user_weight*percent_bodyweight,
                 time_eccentric=exercise.duration_per_rep.upper_bound / 2,
                 time_concentric=exercise.duration_per_rep.upper_bound / 2
                 )
