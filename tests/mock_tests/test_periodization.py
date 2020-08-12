@@ -11,6 +11,7 @@ from tests.mocks.mock_completed_session_details_datastore import CompletedSessio
 from tests.mocks.mock_workout_datastore import WorkoutDatastore
 from datetime import datetime, timedelta
 from tests.mocks.planned_workout_utilities import get_planned_workout
+from models.soreness_base import BodyPartLocation
 
 planned_workout_dictionary = PlannedWorkoutLibraryDatastore().get()
 
@@ -403,5 +404,72 @@ def test_cosine_similarity_prioritized_adaptation_types_partial_credit():
     assert 0.67 == round(val, 2)
 
 
+def test_cosine_similarity_prioritized_adaptation_types_different_duration():
+
+    list_a = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1, 5),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2, 5)]
+    list_b = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.muscular_endurance, 1, 10),
+              RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type,DetailedAdaptationType.strength_endurance, 2, 10)]
+
+    val = WorkoutScoringManager.cosine_similarity(list_a, list_b)
+
+    assert 0.98 == round(val, 2) # types and ranking match perfectly -> .6666,  15 of 17 adaptation types match perfectly and 2 have 50% so score is 16/17
 
 
+def test_muscle_cosine_similarity_all_100():
+    muscle_groups = list(BodyPartLocation.muscle_groups().keys())
+    candidate_muscles = {}
+    required_muscles = {}
+    for muscle in muscle_groups:
+        candidate_muscles[muscle] = 100
+        required_muscles[muscle] = 100
+
+    score = WorkoutScoringManager.muscle_cosine_similarity(candidate_muscles, required_muscles)
+
+    assert score == 1.0
+
+
+def test_muscle_cosine_similarity_all_required_100_candidate_0():
+    muscle_groups = list(BodyPartLocation.muscle_groups().keys())
+    candidate_muscles = {}
+    required_muscles = {}
+    for muscle in muscle_groups:
+        candidate_muscles[muscle] = 0
+        required_muscles[muscle] = 100
+
+    score = WorkoutScoringManager.muscle_cosine_similarity(candidate_muscles, required_muscles)
+
+    assert score == 0.0
+
+
+def test_muscle_cosine_similarity_all_required_0_candidate_100():
+    muscle_groups = list(BodyPartLocation.muscle_groups().keys())
+    candidate_muscles = {}
+    required_muscles = {}
+    for muscle in muscle_groups:
+        candidate_muscles[muscle] = 100
+        required_muscles[muscle] = 0
+
+    score = WorkoutScoringManager.muscle_cosine_similarity(candidate_muscles, required_muscles)
+
+    assert score == 0.0
+
+
+def test_muscle_cosine_similarity():
+    muscle_groups = list(BodyPartLocation.muscle_groups().keys())
+    candidate_muscles = {}
+    required_muscles = {}
+    loads = [(100, 100), (95, 85), (93, 73), (5, 0), (0, 30)]
+    count = 0
+    for muscle in muscle_groups:
+        if count < len(loads):
+            candidate_muscles[muscle] = loads[count][0]
+            required_muscles[muscle] = loads[count][1]
+            count += 1
+        else:
+            candidate_muscles[muscle] = 0
+            required_muscles[muscle] = 0
+
+    score = WorkoutScoringManager.muscle_cosine_similarity(candidate_muscles, required_muscles)
+
+    assert 0.0 < score < 1

@@ -16,31 +16,58 @@ from datetime import timedelta
 class WorkoutScoringManager(object):
 
     @staticmethod
-    def cosine_similarity(candidate_exercise_priorities, recommended_exercise_priorities):
+    def cos_sim(A, B):
+        """
+
+        :param A:
+        :param B:
+        :return:
+        """
+        mag_a = sqrt(sum([a ** 2 for a in A]))
+        mag_b = sqrt(sum([b ** 2 for b in B]))
+
+        dotprod = sum([a * b for a, b in zip(A, B)])
+        if (mag_a * mag_b) == 0:
+            cos_sim = 0
+        else:
+            cos_sim = dotprod / (mag_a * mag_b)
+        return cos_sim
+
+    @classmethod
+    def cosine_similarity(cls, candidate_exercise_priorities, recommended_exercise_priorities):
 
         # get the adaptation types separately so we can look for matches of type (but not necessarily ranking)
         candidate_adaptation_types = [c.adaptation_type for c in candidate_exercise_priorities]
         recommended_adaptation_types = [r.adaptation_type for r in recommended_exercise_priorities]
         all_adaptation_types = set(candidate_adaptation_types).union(recommended_adaptation_types)
+        candidate_types = [1 if k in candidate_adaptation_types else 0 for k in all_adaptation_types]
+        recommended_types = [1 if k in recommended_adaptation_types else 0 for k in all_adaptation_types]
+        cosine_similarity_types = cls.cos_sim(candidate_types, recommended_types)
 
-        all_exercise_priorities = set(candidate_exercise_priorities).union(recommended_exercise_priorities)
-        dotprod_1 = sum((1 if k in candidate_exercise_priorities else 0) * (1 if k in recommended_exercise_priorities else 0) for k in all_exercise_priorities)
-        magA_1 = sqrt(sum((1 if k in candidate_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
-        magB_1 = sqrt(sum((1 if k in recommended_exercise_priorities else 0) ** 2 for k in all_exercise_priorities))
-        if (magA_1 * magB_1) == 0 :
-            cosine_similarity_1 = 0
-        else:
-            cosine_similarity_1 = dotprod_1 / (magA_1 * magB_1)
+        ranked_candidates = [(c.adaptation_type.value, c.ranking) for c in candidate_exercise_priorities]
+        ranked_recommendations = [(r.adaptation_type.value, r.ranking) for r in recommended_exercise_priorities]
+        all_exercise_priorities = set(ranked_candidates).union(ranked_recommendations)
+        candidate_ranks = [1 if k in ranked_candidates else 0 for k in all_exercise_priorities]
+        recommended_ranks = [1 if k in ranked_recommendations else 0 for k in all_exercise_priorities]
+        cosine_similarity_ranks = cls.cos_sim(candidate_ranks, recommended_ranks)
 
-        dotprod_2 = sum(
-            (1 if k in candidate_adaptation_types else 0) * (1 if k in recommended_adaptation_types else 0) for k
-            in all_adaptation_types)
-        magA_2 = sqrt(sum((1 if k in candidate_adaptation_types else 0) ** 2 for k in all_adaptation_types))
-        magB_2 = sqrt(sum((1 if k in recommended_adaptation_types else 0) ** 2 for k in all_adaptation_types))
-        if (magA_2 * magB_2) == 0:
-            cosine_similarity_2 = 0
-        else:
-            cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
+        # dotprod_1 = sum((1 if k in ranked_candidates else 0) * (1 if k in ranked_recommendations else 0) for k in all_exercise_priorities)
+        # magA_1 = sqrt(sum((1 if k in ranked_candidates else 0) ** 2 for k in all_exercise_priorities))
+        # magB_1 = sqrt(sum((1 if k in ranked_recommendations else 0) ** 2 for k in all_exercise_priorities))
+        # if (magA_1 * magB_1) == 0 :
+        #     cosine_similarity_1 = 0
+        # else:
+        #     cosine_similarity_1 = dotprod_1 / (magA_1 * magB_1)
+        #
+        # dotprod_2 = sum(
+        #     (1 if k in candidate_adaptation_types else 0) * (1 if k in recommended_adaptation_types else 0) for k
+        #     in all_adaptation_types)
+        # magA_2 = sqrt(sum((1 if k in candidate_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        # magB_2 = sqrt(sum((1 if k in recommended_adaptation_types else 0) ** 2 for k in all_adaptation_types))
+        # if (magA_2 * magB_2) == 0:
+        #     cosine_similarity_2 = 0
+        # else:
+        #     cosine_similarity_2 = dotprod_2 / (magA_2 * magB_2)
 
         candidate_durations = []
         recommended_durations = []
@@ -58,15 +85,37 @@ class WorkoutScoringManager(object):
 
         if len(candidate_durations) > 0 and len(recommended_durations) > 0:
             difference = [abs(cand - rec) for cand, rec in zip(candidate_durations, recommended_durations)]
-            percent_covered = [max([1 - diff / rec, 0]) for diff, rec in zip(difference, recommended_durations) if rec > 0]
+            percent_covered = [max([1 - diff / rec, 0]) if rec > 0 else 1 for diff, rec in zip(difference, recommended_durations)]
             if len(percent_covered) > 0:
-                cosine_similarity_3 = sum(percent_covered) / len(percent_covered)
+                similarity_duration = sum(percent_covered) / len(percent_covered)
             else:
-                cosine_similarity_3 = 0
+                similarity_duration = 0
         else:
-            cosine_similarity_3 = 0
+            similarity_duration = 0
 
-        average_cosine_similarity = (cosine_similarity_1 + cosine_similarity_2 + cosine_similarity_3) / 3
+        average_cosine_similarity = (cosine_similarity_ranks + cosine_similarity_types + similarity_duration) / 3
+
+        return average_cosine_similarity
+
+    @classmethod
+    def muscle_cosine_similarity(cls, test_muscle_load, template_muscle_load):
+        # get the muscles separately so we can look for matches of type (but not necessarily ranking)
+        candidate_muscles = [m for m, load in test_muscle_load.items() if load > 0]
+        recommended_muscles = [m for m, load in template_muscle_load.items() if load > 0]
+        all_used_muscles = set(candidate_muscles).union(recommended_muscles)
+
+        candidate_muscle_list = [1 if k in candidate_muscles else 0 for k in all_used_muscles]
+        recommended_muscle_list = [1 if k in recommended_muscles else 0 for k in all_used_muscles]
+        presence_sim = cls.cos_sim(candidate_muscle_list, recommended_muscle_list)
+
+        # Score normalized muscle load similarity
+        all_muscles = list(template_muscle_load.keys())
+
+        candidate_loads = [test_muscle_load.get(muscle, 0) or 0 for muscle in all_muscles]
+        recommended_loads = [template_muscle_load.get(muscle, 0) or 0 for muscle in all_muscles]
+        load_sim = cls.cos_sim(candidate_loads, recommended_loads)
+
+        average_cosine_similarity = (load_sim + presence_sim) / 2
 
         return average_cosine_similarity
 
@@ -729,7 +778,7 @@ class PeriodizationPlanProcessor(object):
                                                                           weekly_load_target.power_load)
 
         # given load rate of increase, determine the RPE's share of that increase
-        # apply adjusted RPE rate of increase
+        # apply adjusted RPE rate of increaseƒ
 
         target_session_rpe = calc.get_target_session_intensity(self.average_session_rpe, progression,
                                                                rpe_load_rate_increase)
