@@ -87,7 +87,6 @@ Partners __may__ include the non-standardized fields `_nbf` and `_exp` in key de
 
 Partners __may__ include the non-standardized field `_env` in key definitions; if this field is provided the value  __must__ be a String matching the regular expression `^[a-z0-9]+$` or an array of such Strings, and the API  __will__ interpret this as a list of the environments where the key should be accepted.  This allows partners to use different signing keys for production and non-production environments.
 
-<div style="page-break-after: always;"></div>
 
 ##### JWT claims
 
@@ -119,7 +118,6 @@ In addition to the AWS API Gateway responses and the specific responses for each
 * `403 Forbidden` with `Status` header equal to `Forbidden`, if the user is not allowed to perform the requested action.
 * `404 Unknown` with `Status` header equal to `UnknownEndpoint`, if an invalid endpoint was requested.
 
-<div style="page-break-after: always;"></div>
 
 #### Schema
 
@@ -235,6 +233,7 @@ Authorization: eyJraWQ...ajBc4VQ
 
 * `movement_integration_prep` will have the schema as defined in the Appendix.
 
+
 ### Including Today's Symptoms
 
 If the client includes the optional  __symptoms__ element, a _Movement Integration Preparation Activity_ will be returned with consideration for the symptoms the athlete is experiencing today and the projected, resulting response to the upcoming workout.
@@ -321,6 +320,8 @@ The Get Movement Prep endpoint can be called to retrieve a previously assigned M
  
 The client  __must__ submit a request to the endpoint `/plans/{version}/movement_prep/{User UUID}/{Movement Prep UUID}`. The request method  __must__ be `GET`.
 
+<div style="page-break-after: always;"></div>
+
 ##### Request
 
 Body is not required for this request.
@@ -359,8 +360,6 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 ### Start Movement Prep Activity
 
 The Start Movement Prep endpoint can be called to indicate that the athlete has started a specific activity recommended as part of Movement Prep.
-
-<div style="page-break-after: always;"></div>
 
 ##### Query String
  
@@ -555,6 +554,8 @@ The client  __must__ submit a request body containing a JSON object having the f
 * `session` __should__ reflect the schema of the Simple or Detailed Session formats as outlined in the Appendix.
 * `user_age` __should__ be provided if heart rate data is included for any session
 
+<div style="page-break-after: always;"></div>
+
 ```
 POST /plans/{version}/mobility_wod/{User UUID} HTTPS/1.1
 Host: apis.{env}.fathomai.com
@@ -615,7 +616,6 @@ Authorization: eyJraWQ...ajBc4VQ
                                 }]
                             }
                 }
-                
             ]
 }
 ```
@@ -687,6 +687,7 @@ Authorization: eyJraWQ...ajBc4VQ
             }]
 }
 ```
+<div style="page-break-after: always;"></div>
 
 ##### Response
  
@@ -711,8 +712,6 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
 ```
 
 * `active_rest` will have the schema as defined in the Appendix.
-
-<div style="page-break-after: always;"></div>
 
 ### Get Mobility WOD
 
@@ -752,6 +751,7 @@ If the request was successful, the Service  __will__ respond with HTTP Status `2
     "active_rest": active_rest
 }
 ```
+<div style="page-break-after: always;"></div>
 
 ### Start Mobility WOD Activity
 
@@ -920,8 +920,6 @@ Authorization: eyJraWQ...ajBc4VQ
                 "distance": 200,
                 "session_RPE": 7,
                 "end_date": "2019-02-12T10:54:57-05:00",
-``` 
-```
                 "hr_data":  [
                             {"value": 153,
                              "startDate": "2019-01-12T10:43:08.490-0500",
@@ -1026,6 +1024,8 @@ Authorization: eyJraWQ...ajBc4VQ
                     "session_RPE": 8,
                     "end_date": "2019-01-12T10:54:57-05:00"
                 },
+```
+```
     "symptoms":[{
                     "body_part": 14,
                     "side": 2
@@ -1154,6 +1154,8 @@ Authorization: eyJraWQ...ajBc4VQ
                     "session_RPE": 8,
                     "end_date": "2019-01-12T10:54:57-05:00"
                 },
+```
+```
     "symptoms":[{
                     "body_part": 14,
                     "side": 2
@@ -1337,6 +1339,8 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 }
 ```
 
+<div style="page-break-after: always;"></div>
+
 ### Update Workout
 
 The Update Workout endpoint can be called to update details of a planned or completed workout when new information becomes available.  This updated information will improve future personalization.
@@ -1420,7 +1424,6 @@ If the write was successful, the Service  __will__ respond with HTTP Status `200
 ### Workout Sessions
 `session` __should__ either follow the schema of the _Simple Session_ or _Detailed Session_ format:
 
-<div style="page-break-after: always;"></div>
 
 #### Simple Session Format
 
@@ -1501,8 +1504,6 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `program_module_id` is an __optional__ parameter and is an identifier for the specific program module
 * `workout_sections` __should__ be a list of individual _workout_section_ elements contained within the module
 
-<div style="page-break-after: always;"></div>
-
 `workout_section` __should__ be of the following schema:
 ```
 {
@@ -1520,6 +1521,8 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `end_date_time` is an __optional__ parameter and should reflect the end time of the workout section
 * `exercises` __should__ be a list of of all  _exercise_ elements assigned within the section
 
+<div style="page-break-after: always;"></div>
+
 `exercise` __should__ be of the following schema:
 ```
 {
@@ -1533,23 +1536,42 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
     "reps_per_set": integaer,
     "unit_of_measure": integer,
     "movement_id": string,
-    "rpe": number
+    "rpe": number,
+    "duration" number,
+    "distance": number,
+    "speed": number,
+    "pace": number,
+    "power": number,
+    "calories": number,
+    "stroke_rate": number,
+    "cadence": number,
+    "grade": number
 }
 ```
 
 * `id` __should__ be provider's unique identifier for the exercise
 * `name` __should__ be the exercise name
-* `weight_measure` __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
-* `weight` __should__ represent the numeric value of the weight used according to the  `weight_measure` attribute
-* `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
-* `side` __should__ represent the side (left or right) on which the exercise is performed if  `bilateral` is false
-* `sets` __should__ be an integer representation of total sets of the exercise to be performed
-* `reps_per_set` __should__ be an integer representing of total reps of exercise to be performed per set
+* `weight_measure` __if present__, __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
+* `weight` __if present__, __should__ represent the numeric value of the weight used according to the  `weight_measure` attribute
+* `bilateral` __if present__, __should__ be a boolean representation of whether exercise is performed on both sides
+* `side` __if present__, __should__ represent the side (left or right) on which the exercise is performed if  `bilateral` is false
+* `sets` __if present__, __should__ be an integer representation of total sets of the exercise to be performed
+* `reps_per_set` __if present__, __should__ be an integer representing of total reps of exercise to be performed per set
 * `unit_of_measure` __should__ be an integer reflecting the Unit of Measure enumeration and should indicate the unit in which the reps are measured
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
+* `duration` __if present__, __should__ be the total time assigned or taken to complete the exercise
+* `distance` __if present__, __should__ be an number representing distance assigned or covered in meters
+* `speed` __if present__, __should__ be an number representing average speed (meters/second) for the exercise
+* `pace` __if present__, __should__ be an number representing average pace (seconds/meters) for the exercise
+* `power` __if present__, __should__ be an number representing the average power production during the exercise in watts
+* `calories` __if present__, __should__ be an number representing calories burned during the exercise
+* `stroke_rate` __if present__, __should__ be an number representing average rowing stroke rate
+* `cadence` __if present__, __should__ be an number representing cadence for running (steps per min) or biking (RPM) 
+* `grade` __if present__, __should__ be a number representing average percent grade during the exercise
 
 
+<div style="page-break-after: always;"></div>
 ### Movement Integration Prep
 
 `movement_integration_prep` will be of following schema:
@@ -1649,6 +1671,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 * `goals` __will__ be a name/value collection of Activity Goals as defined in this Appendix
 * `exercise_phases` __will__ be list of Exercise Phase objects as defined in this Appendix
 
+<div style="page-break-after: always;"></div>
 
 ### Active Recovery
 
@@ -1683,8 +1706,6 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 * `goals` __will__ be a name/value collection of Activity Goals as defined in this Appendix
 * `exercise_phases` __will__ be list of Exercise Phase objects as defined in this Appendix
 
-<div style="page-break-after: always;"></div>
-
 ### Ice
 
 * `ice` will be of the following schema
@@ -1715,7 +1736,7 @@ In the following response, exercises associated with the `Reduce Injury Risks` g
 * `start_date_time` __will__ be the date/time the end user starts this activity
 * `goal` will be a goal as defined in this Appendix.
 
-
+<div style="page-break-after: always;"></div>
 ### Cold Water Immersion
 
 * `cold_water_immersion` will be of the following schema
@@ -1827,6 +1848,7 @@ Exercises are assigned to each phase based on the needs of the athlete. Each ass
 * `goal_text` will be name of the ActivityGoal that can be displayed to an end-user
 * `priority` is the normalized ranking of this Exercise Goal across all  __Exercise Phase__ objects returned
 
+<div style="page-break-after: always;"></div>
 
 #### Detailed Assigned Exercise Format
 
@@ -1958,7 +1980,6 @@ Sports science research places importance on the order in which phases are compl
     asymmetric_session = 20
     asymmetric_pattern = 21
 ```
-<div style="page-break-after: always;"></div>
 
 #### Unit of Measure
 ```
@@ -2008,9 +2029,6 @@ Sports science research places importance on the order in which phases are compl
     curling = 31
     dance = 32
     equestrian_sports = 33
-```
-
-```
     fencing = 34
     fishing = 35
     handball = 36
@@ -2121,5 +2139,5 @@ The following reportable body parts are considered muscles. Allowable Sides (0, 
     rotator_cuff = 119 {1, 2}
     serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: April 13, 2020
+###### Last Modified: June 02, 2020
 

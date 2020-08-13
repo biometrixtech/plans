@@ -49,9 +49,9 @@ def test_body_parts_have_volume():
     assert len(session_functional_movement.functional_movement_mappings) > 0
     for c in session_functional_movement.functional_movement_mappings:
         for b in c.prime_movers:
-            assert b.concentric_load > 0 or b.eccentric_load > 0
+            assert b.concentric_load.observed_value > 0 or b.eccentric_load.observed_value > 0
         for b in c.synergists:
-            assert b.concentric_load > 0 or b.eccentric_load > 0
+            assert b.concentric_load.observed_value > 0 or b.eccentric_load.observed_value > 0
 
 
 # def test_body_parts_overactive():

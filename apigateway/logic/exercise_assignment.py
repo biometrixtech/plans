@@ -1,3 +1,4 @@
+from fathomapi.utils.xray import xray_recorder
 from models.functional_movement_modalities import MovementIntegrationPrepModality, ActiveRestBeforeTraining, ActiveRestAfterTraining, ActiveRecoveryModality, ColdWaterImmersionModality, IceModality, IceSessionModalities
 from models.functional_movement_activities import MovementPrep, MobilityWOD, MovementIntegrationPrep, ActiveRest, ResponsiveRecovery, ActiveRecovery, ColdWaterImmersion, IceSession, Ice
 from models.body_parts import BodyPartLocation, BodyPartFactory
@@ -32,6 +33,7 @@ class ExerciseAssignment(object):
         activity.scale_all_active_time()
         activity.reconcile_default_plan_with_active_time()
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_pre_active_rest')
     def get_pre_active_rest(self, force_data=False, force_on_demand=False):
 
         if len(self.injury_risk_dict) > 0 or force_data:
@@ -47,6 +49,7 @@ class ExerciseAssignment(object):
                 return [active_rest]
         return []
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_post_active_rest')
     def get_post_active_rest(self, force_data=False, force_on_demand=False):
 
         if len(self.injury_risk_dict) > 0 or force_data:
@@ -62,6 +65,7 @@ class ExerciseAssignment(object):
                 return [active_rest]
         return []
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_movement_prep')
     def get_movement_prep(self, athlete_id, force_data=False, force_on_demand=True):
         # get activity
         movement_integration_prep = MovementIntegrationPrep(
@@ -79,6 +83,7 @@ class ExerciseAssignment(object):
 
         return movement_prep
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_mobility_wod')
     def get_mobility_wod(self, athlete_id, force_data=False, force_on_demand=True):
 
         # get activity
@@ -92,6 +97,7 @@ class ExerciseAssignment(object):
 
         return mobility_wod
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_movement_integration_prep')
     def get_movement_integration_prep(self, force_data=False, force_on_demand=True):
         # get activity
         movement_integration_prep = MovementIntegrationPrepModality(
@@ -108,6 +114,7 @@ class ExerciseAssignment(object):
 
         return []
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_active_rest')
     def get_active_rest(self, force_data=False, force_on_demand=True):
         # get activity
         active_rest = ActiveRestAfterTraining(self.event_date_time, force_data=force_data, relative_load_level=self.relative_load_level, force_on_demand=force_on_demand)
@@ -118,6 +125,7 @@ class ExerciseAssignment(object):
 
         return []
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_responsive_recovery')
     def get_responsive_recovery(self, athlete_id, force_data=False, force_on_demand=True):
         responsive_recovery = ResponsiveRecovery(athlete_id, self.event_date_time)
 
@@ -147,6 +155,7 @@ class ExerciseAssignment(object):
 
         return responsive_recovery
 
+    @xray_recorder.capture('logic.ExerciseAssignment.get_responsive_recovery_modality')
     def get_responsive_recovery_modality(self, source_session_id, force_data=False, force_on_demand=True, ice_cwi=True):
         exercise_activity = []
         active_recovery = ActiveRecoveryModality(self.event_date_time)

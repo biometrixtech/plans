@@ -61,7 +61,7 @@ class DailyPlanDatastore(object):
         if len(ret) == 0 and not isinstance(user_id, list):
             plan = DailyPlan(event_date=end_date)
             plan.user_id = user_id
-            plan.last_sensor_sync = self.get_last_sensor_sync(user_id, end_date)
+            # plan.last_sensor_sync = self.get_last_sensor_sync(user_id, end_date)
             ret.append(plan)
         return ret
 

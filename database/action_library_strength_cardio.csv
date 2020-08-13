@@ -1,0 +1,30 @@
+,Define candidate action's applicability to movement,,,,How to Apply Weight,,,,,,,,,Define categories for actions to align with adaptation types and similar functional movements,,,,,,,,,,,Primary Joint Actions: selecting muscles to apply primary load type - dependent on adaptation type power/maxstrength/endstrength,,,,,,,,,,,,
+compound_action_id,compound_action_name,description,example_urls,,training_type,eligible_external_resistance,apply_resistance,apply_instability,contribute_to_power_production,resistance,speed,relative_explosiveness,,id,action_name,stance_lower_body,stance_upper_body,lateral_distribution_pattern,arm,torso,leg,percent_bodyweight,lateral_distribution,,muscle_action,hip_joint_priority,hip_joint_action,knee_joint_priority,knee_joint_action,ankle_joint_priority,ankle_joint_action,trunk_joint_priority,trunk_joint_action,shoulder_scapula_joint_priority,shoulder_scapula_joint_action,elbow_joint_priority,elbow_joint_action
+,Cardio - Gait Types,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Bipedal,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,ruck,,,,strength_cardiorespiratory,"ruck, sandbag",TRUE,TRUE,FALSE,,,no_speed,,0_a,Propulsion,single_leg,,unilateral_alternating,2,1,2,100,"100,100",,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+,,,,,strength_cardiorespiratory,"ruck, sandbag",TRUE,TRUE,FALSE,,,no_speed,,0_b,Loading,single_leg,,unilateral_alternating,2,1,2,100,"100,100",,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,,,,,strength_cardiorespiratory,,FALSE,FALSE,FALSE,,,no_speed,,0_c,Swing,single_leg,,unilateral_alternating,0,0,1,20.37,"100,100",,concentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,run,,,,strength_cardiorespiratory,,TRUE,TRUE,FALSE,,,no_speed,,1_a,Propulsion,single_leg,,unilateral_alternating,2,1,2,100,"100,100",,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+,,,,,strength_cardiorespiratory,,TRUE,TRUE,FALSE,,,no_speed,,1_b,Loading,single_leg,,unilateral_alternating,2,1,2,100,"100,100",,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,,,,,strength_cardiorespiratory,,FALSE,TRUE,FALSE,,,no_speed,,1_c,Swing,single_leg,,unilateral_alternating,0,0,1,20.37,"100,100",,concentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,sprint,,,,strength_cardiorespiratory,sled,TRUE,TRUE,FALSE,,,low_force,,2_a,Propulsion,single_leg,,unilateral_alternating,2,1,2,100,"100,100",,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+,,,,,strength_cardiorespiratory,,TRUE,TRUE,FALSE,,,no_speed,,2_b,Loading,single_leg,,unilateral_alternating,2,1,2,100,"100,100",,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,,,,,strength_cardiorespiratory,,FALSE,FALSE,FALSE,,,no_speed,,2_c,Swing,single_leg,,unilateral_alternating,0,0,1,20.37,"100,100",,concentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,Cycle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Cycling not clipped in,,,,strength_cardiorespiratory,"machine resistence, elevation, wind",TRUE,TRUE,FALSE,,,no_speed,,100_a,power phase,single_leg,,unilateral_alternating,0,0,1,20.37,"100,100",,concentric,1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,
+,,,,,strength_cardiorespiratory,,FALSE,FALSE,FALSE,,,no_speed,,100_b,recovery phase,single_leg,,unilateral_alternating,0,0,1,20.37,"100,100",,concentric,1,hip flexion,1,knee flexion,3,ankle dorsiflexion,,,,,,
+,Misc,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,row,,,,strength_cardiorespiratory,machine resistence,TRUE,TRUE,FALSE,,,low_force,,200_a,power phase,double_leg,double_arm,bilateral,0,0,0,0,"50,50",,concentric,1,hip extension,2,knee extension,,,2,Trunk Extension,2,Shoulder Horizontal Abduction (Horizontal Extension),2,elbow flexion
+,,,,,strength_cardiorespiratory,,FALSE,FALSE,FALSE,,,no_speed,,200_b,recovery phase,double_leg,double_arm,bilateral,0,0,0,0,"50,50",,concentric,3,hip flexion,3,knee flexion,,,3,Trunk Flexion,3,Shoulder Horizontal Adduction (Horizontal Flexion),3,elbow extension
+,ski erg,,https://www.concept2.com/skierg/training/technique-video,,strength_cardiorespiratory,machine resistence,TRUE,TRUE,FALSE,,,low_force,,201_a,power phase,double_leg,double_arm,bilateral,2,1,0,59.26,"50,50",,concentric,2,hip flexion,2,knee flexion,,,1,Trunk Flexion,,Shoulder Extension,,elbow extension
+,,,,,strength_cardiorespiratory,,FALSE,FALSE,FALSE,,,no_speed,,201_b,recovery phase,double_leg,double_arm,bilateral,2,1,0,59.26,"50,50",,concentric,2,hip extension,2,knee extension,2,ankle plantar flexion,2,Trunk Extension,2,Shoulder Flexion,2,elbow flexion
+,Swim,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,freestyle,,,,strength_cardiorespiratory,,TRUE,TRUE,FALSE,,,no_speed,,300_a,against resistence,,alternating_arms,unilateral_alternating,0,0,0,0,"100,100",,concentric,,,,,,,2,Trunk Rotation,1,Shoulder Extension,,
+,,,,,strength_cardiorespiratory,,FALSE,FALSE,FALSE,,,no_speed,,300_b,return to start,,alternating_arms,unilateral_alternating,1,0,0,4.715,"100,100",,concentric,,,,,,,,,1,"Shoulder Flexion
+Shoulder External Rotation
+Shoulder Internal Rotation",,
+,scissor kicking,,,,strength_cardiorespiratory,,TRUE,TRUE,FALSE,,,no_speed,,303_a,kick towards belly,double_leg,,unilateral_alternating,0,0,0,0,"100,100",,concentric,1,hip flexion,,,,,,,,,,
+,,,,,strength_cardiorespiratory,,TRUE,FALSE,FALSE,,,no_speed,,303_b,hold leg straight while kick towards belly,double_leg,,unilateral_alternating,0,0,0,0,"100,100",,isometric,,,2,knee extension,,,,,,,,
+,,,,,strength_cardiorespiratory,,TRUE,TRUE,FALSE,,,no_speed,,303_c,kick towards butt,double_leg,,unilateral_alternating,0,0,0,0,"100,100",,concentric,1,hip extension,,,,,,,,,,
+,,,,,strength_cardiorespiratory,,TRUE,FALSE,FALSE,,,no_speed,,303_d,hold leg straight while kick towards butt,double_leg,,unilateral_alternating,0,0,0,0,"100,100",,isometric,,,2,knee flexion,,,,,,,,

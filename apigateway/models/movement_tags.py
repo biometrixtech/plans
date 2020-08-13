@@ -1,4 +1,11 @@
-from enum import Enum
+from enum import Enum, IntEnum
+
+
+class AdaptationTypeMeasure(Enum):
+    training_type = 0
+    adaptation_type = 1
+    sub_adaptation_type = 2
+    detailed_adaptation_type = 3
 
 
 class TrainingType(Enum):
@@ -20,6 +27,60 @@ class AdaptationType(Enum):
     power_drill = 3
     maximal_strength_hypertrophic = 4
     power_explosive_action = 5
+
+
+class DetailedAdaptationType(IntEnum):
+    mobility = 0
+    corrective = 1
+    base_aerobic_training = 2
+    anaerobic_threshold_training = 3
+    high_intensity_anaerobic_training = 4
+    stabilization_endurance = 5
+    stabilization_strength = 6
+    stabilization_power = 7
+    functional_strength = 8
+    muscular_endurance = 9
+    strength_endurance = 10
+    hypertrophy = 11
+    maximal_strength = 12
+    speed = 13
+    sustained_power = 14
+    power = 15
+    maximal_power = 16
+
+
+class SubAdaptationType(Enum):
+    movement_efficiency = 0
+    cardiorespiratory_training = 1
+    core_strength = 2
+    strength = 3
+    power = 4
+
+
+class AdaptationDictionary(object):
+
+    def __init__(self):
+        self.detailed_types = {}
+        self.initialize()
+
+    def initialize(self):
+        self.detailed_types[DetailedAdaptationType.mobility] = SubAdaptationType.movement_efficiency
+        self.detailed_types[DetailedAdaptationType.corrective] = SubAdaptationType.movement_efficiency
+        self.detailed_types[DetailedAdaptationType.stabilization_endurance] = SubAdaptationType.core_strength
+        self.detailed_types[DetailedAdaptationType.stabilization_strength] = SubAdaptationType.core_strength
+        self.detailed_types[DetailedAdaptationType.stabilization_power] = SubAdaptationType.core_strength
+        self.detailed_types[DetailedAdaptationType.base_aerobic_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.anaerobic_threshold_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.high_intensity_anaerobic_training] = SubAdaptationType.cardiorespiratory_training
+        self.detailed_types[DetailedAdaptationType.functional_strength] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.muscular_endurance] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.strength_endurance] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.hypertrophy] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.maximal_strength] = SubAdaptationType.strength
+        self.detailed_types[DetailedAdaptationType.speed] = SubAdaptationType.power
+        self.detailed_types[DetailedAdaptationType.sustained_power] = SubAdaptationType.power
+        self.detailed_types[DetailedAdaptationType.power] = SubAdaptationType.power
+        self.detailed_types[DetailedAdaptationType.maximal_power] = SubAdaptationType.power
 
 
 class CardioAction(Enum):
@@ -78,13 +139,14 @@ class BodyPosition(Enum):
     split_leg_standing = 8
     staggered_leg_standing = 9
     single_leg_standing = 10
-    non_stationary_single_leg = 11
+    single_leg_moving = 11
     seated = 12
-    non_stationary_double_leg = 13
-    non_stationary_lunge = 14
+    double_leg_moving = 13
+    split_leg_moving = 14
     non_stationary_other = 15
-    two_arms = 16
-    single_arm = 17
+    hanging = 16
+    upright_torso = 17
+    staggered_leg_moving = 18
 
 
 class Equipment(Enum):
@@ -114,9 +176,14 @@ class Equipment(Enum):
     barbell_without_plates = 23
     step = 24
     bodyweight = 25
+    hex_bar = 26
+    trx = 27
+    mini_bands = 28
+    single_dumbbells = 29
 
     def distribute_weights(self):
-        if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells', 'double_kettlebells']:
+        if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells',
+                         'double_kettlebells', 'bodyweight', 'mini_bands']:
             return False
         else:
             return True
@@ -127,9 +194,17 @@ class WeightDistribution(Enum):
     bilateral_uneven = 1
     unilateral = 2
     unilateral_alternating = 3
+    contralateral = 4
 
 
 class MovementSurfaceStability(Enum):
     stable = 0
     unstable = 1
     very_unstable = 2
+
+
+class Gender(Enum):
+    female = 0
+    male = 1
+
+

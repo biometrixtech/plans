@@ -1,5 +1,5 @@
 from models.movement_actions import Movement, MovementSpeed, MovementResistance
-from movement_tags import CardioAction, TrainingType, MovementSurfaceStability, Equipment, PowerAction, PowerDrillAction, StrengthEnduranceAction, StrengthResistanceAction
+from models.movement_tags import CardioAction, TrainingType, MovementSurfaceStability, Equipment, PowerAction, PowerDrillAction, StrengthEnduranceAction, StrengthResistanceAction
 import os
 import json
 import pandas as pd
@@ -24,8 +24,15 @@ class MovementLibraryParser(object):
         self.write_movements_json()
 
     def parse_row(self, row):
-        if self.is_valid(row, 'id'):
-            movement = Movement(row['id'], row['soflete_name'])
+        if self.is_valid(row, 'id') or self.is_valid(row, 'base_movement_name') or self.is_valid(row, 'fathom_name'):
+            # movement = Movement(row['id'], row['soflete_name'])
+            if self.is_valid(row, 'id'):
+                movement = Movement(row['id'], row['fathom_name'])
+            elif self.is_valid(row, 'base_movement_name'):
+                movement = Movement(row['base_movement_name'], row['fathom_name'])
+            else:
+                movement = Movement(row['fathom_name'], row['fathom_name'])
+
 
             if self.is_valid(row, 'training_type'):
                 movement.training_type = TrainingType[row['training_type']]
@@ -54,25 +61,51 @@ class MovementLibraryParser(object):
                 movement.surface_stability = MovementSurfaceStability[row['surface_stability']]
             if self.is_valid(row, 'external_weight_implement'):
                 row['external_weight_implement'].replace(", ", ",")
-                external_weight_implement = row['external_weight_implement'].split(",")
+                external_weight_implement = row['external_weight_implement'].lower().split(",")
                 try:
                     movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
                 except:
-                    print('here')
+                    print('here', external_weight_implement)
 
-            if self.is_valid(row, 'resistance'):
-                movement.resistance = MovementResistance[row['resistance']]
-            if self.is_valid(row, 'speed'):
-                movement.speed = MovementSpeed[row['speed']]
+            if self.is_valid(row, 'resistance', False):
+            # if row.get('resistance') is not None and row['resistance'] != "":
+                movement.resistance = self.get_resistance(row['resistance'])
+                # movement.resistance = MovementResistance[row['resistance']]
+            if self.is_valid(row, 'speed', False):
+            # if row.get('speed') is not None and row['speed'] != "":
+                movement.speed = self.get_speed(row['speed'])
+                # movement.speed = MovementSpeed[row['speed']]
 
             return movement
         else:
             return None
+    @staticmethod
+    def get_resistance(resistance):
+        if 'resistance' in resistance:
+            resistance = resistance.split('_')[0]
+        return MovementResistance[resistance]
 
     @staticmethod
-    def is_valid(row, name):
-        if row.get(name) is not None and row[name] != "" and row[name] != "none":
-            return True
+    def get_speed(speed):
+        speed_conversion_dict = {
+            'no_speed': 'none',
+            'speed': 'slow',
+            'normal': 'mod',
+            'max_speed': 'fast'
+        }
+        if speed in speed_conversion_dict:
+            speed = speed_conversion_dict[speed]
+        return MovementSpeed[speed]
+
+
+    @staticmethod
+    def is_valid(row, name, check_none=True):
+        if row.get(name) is not None and row[name] != "":
+            if check_none:
+                if row[name] != "none":
+                    return True
+            else:
+                return True
         return False
 
     def write_movements_json(self):
@@ -88,9 +121,29 @@ class MovementLibraryParser(object):
         f1.write(json_string)
         f1.close()
 
+def read_json(source):
+    file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_{source}.json")
+    with open(file_name, 'r') as f:
+        library = json.load(f)
+    return library
+
+def write_json(json_data):
+    json_string = json.dumps(json_data, indent=4)
+    # file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_soflete.json")
+    file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/movement_library_demo.json")
+    print(f"writing: {file_name}")
+    f1 = open(file_name, 'w')
+    f1.write(json_string)
+    f1.close()
+
 
 if __name__ == '__main__':
-    sources = ['demo']
+    # sources = ['demo']
+    sources = ['demo', 'strength_integrated_resistance']
     for movements_source in sources:
         mov_parser = MovementLibraryParser(movements_source)
         mov_parser.load_data()
+    all_data = {}
+    for source in sources:
+        all_data.update(read_json(source))
+    write_json(all_data)

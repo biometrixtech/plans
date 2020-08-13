@@ -4,6 +4,7 @@ from collections import namedtuple
 from models.compensation_source import CompensationSource
 from models.soreness_base import BodyPartSide
 from models.body_parts import BodyPartFactory
+from models.training_volume import StandardErrorRange
 from datetime import timedelta
 from models.movement_actions import MuscleAction
 from models.functional_movement_type import FunctionalMovementType
@@ -58,6 +59,12 @@ class FunctionalMovementPairs(object):
                                                  FunctionalMovementType.external_rotation))
         self.pairs.append(FunctionalMovementPair(FunctionalMovementType.scapular_elevation,
                                                  FunctionalMovementType.scapular_depression))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.ankle_dorsiflexion_and_eversion,
+                                                 FunctionalMovementType.ankle_plantar_flexion_and_inversion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.ankle_dorsiflexion_and_inversion,
+                                                 FunctionalMovementType.ankle_plantar_flexion_and_eversion))
+        self.pairs.append(FunctionalMovementPair(FunctionalMovementType.wrist_flexion,
+                                                 FunctionalMovementType.wrist_extension))
 
     def get_functional_movement_for_muscle_action(self, muscle_action, functional_movement_type):
 
@@ -70,6 +77,13 @@ class FunctionalMovementPairs(object):
                 return self.pairs[pair_item][1]
             else:
                 return self.pairs[pair_item][0]
+
+
+class JointActionPlane(Enum):
+    frontal = 0
+    sagital = 1
+    transverse = 2
+    adduction_in_transverse = 3
 
 
 class BodyPartFunction(Enum):
@@ -116,50 +130,65 @@ class FunctionalMovement(object):
         self.stabilizers = []
         self.fixators = []
         self.parts_receiving_compensation = []
+        self.planes = []
 
 
 class BodyPartFunctionalMovement(Serialisable):
     def __init__(self, body_part_side):
         self.body_part_side = body_part_side
-        self.concentric_load = 0
-        self.eccentric_load = 0
-        self.compensated_concentric_load = 0
-        self.compensated_eccentric_load = 0
+        self.concentric_load = StandardErrorRange()
+        self.isometric_load = StandardErrorRange()
+        self.eccentric_load = StandardErrorRange()
+        self.compensated_concentric_load = StandardErrorRange()
+        self.compensated_isometric_load = StandardErrorRange()
+        self.compensated_eccentric_load = StandardErrorRange()
         self.compensating_causes_load = []
-        # self.concentric_intensity = 0
-        # self.eccentric_intensity = 0
-        # self.compensated_concentric_intensity = 0
-        # self.compensated_eccentric_intensity = 0
-        # self.compensating_causes_intensity = []
-        self.concentric_ramp = 0.0
-        self.eccentric_ramp = 0.0
         self.is_compensating = False
-        self.compensation_source_load = None
-        # self.compensation_source_intensity = None
+        #self.compensation_source_load = None
         self.body_part_function = None
-        self.inhibited = 0
-        self.weak = 0
-        self.tight = 0
-        self.inflamed = 0
-        self.long = 0
+        #self.inhibited = 0
+        #self.weak = 0
+        #self.tight = 0
+        #self.inflamed = 0
+        #self.long = 0
 
-        self.total_normalized_load = 0
+        #self.total_normalized_load = StandardErrorRange()
 
     def total_load(self):
 
-        return self.concentric_load + self.eccentric_load + self.compensated_concentric_load + self.compensated_eccentric_load
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.concentric_load)
+        total_load.add(self.isometric_load)
+        total_load.add(self.eccentric_load)
+        total_load.add(self.compensated_concentric_load)
+        total_load.add(self.compensated_isometric_load)
+        total_load.add(self.compensated_eccentric_load)
+
+        return total_load
 
     def total_concentric_load(self):
 
-        return self.concentric_load + self.compensated_concentric_load
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.concentric_load)
+        total_load.add(self.compensated_concentric_load)
+
+        return total_load
+
+    def total_isometric_load(self):
+
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.isometric_load)
+        total_load.add(self.compensated_isometric_load)
+
+        return total_load
 
     def total_eccentric_load(self):
 
-        return self.eccentric_load + self.compensated_eccentric_load
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.eccentric_load)
+        total_load.add(self.compensated_eccentric_load)
 
-    # def total_intensity(self):
-    #
-    #     return max(self.concentric_intensity, self.eccentric_intensity, self.compensated_concentric_intensity, self.compensated_eccentric_intensity)
+        return total_load
 
     def __hash__(self):
         return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
@@ -175,87 +204,64 @@ class BodyPartFunctionalMovement(Serialisable):
     def json_serialise(self):
         return {
                 'body_part_side': self.body_part_side.json_serialise(),
-                'concentric_load': self.concentric_load,
-                'eccentric_load': self.eccentric_load,
-                'compensated_concentric_load': self.compensated_concentric_load,
-                'compensated_eccentric_load': self.compensated_concentric_load,
+                'concentric_load': self.concentric_load.json_serialise(),
+                'isometric_load': self.isometric_load.json_serialise(),
+                'eccentric_load': self.eccentric_load.json_serialise(),
+                'compensated_concentric_load': self.compensated_concentric_load.json_serialise(),
+                'compensated_isometric_load': self.compensated_isometric_load.json_serialise(),
+                'compensated_eccentric_load': self.compensated_eccentric_load.json_serialise(),
                 'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
-                #'concentric_intensity': self.concentric_intensity,
-                #'eccentric_intensity': self.eccentric_intensity,
-                #'compensated_concentric_intensity': self.compensated_concentric_intensity,
-                #'compensated_eccentric_intensity': self.compensated_eccentric_intensity,
-                # 'compensating_causes_intensity': [c.json_serialise() for c in self.compensating_causes_intensity],
-                'concentric_ramp': self.concentric_ramp,
-                'eccentric_ramp': self.eccentric_ramp,
                 'is_compensating': self.is_compensating,
-                'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
-                #'compensation_source_intensity': self.compensation_source_intensity.value if self.compensation_source_intensity is not None else None,
+                #'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
                 'body_part_function': self.body_part_function.value if self.body_part_function is not None else None,
-                'inhibited': self.inhibited if self.inhibited is not None else None,
-                'weak': self.weak,
-                'tight': self.tight,
-                'inflamed': self.inflamed,
-                'long': self.long,
-                'total_normalized_load': self.total_normalized_load
+                #'inhibited': self.inhibited if self.inhibited is not None else None,
+                #'weak': self.weak,
+                #'tight': self.tight,
+                #'inflamed': self.inflamed,
+                #'long': self.long,
+                #'total_normalized_load': self.total_normalized_load
             }
 
     @classmethod
     def json_deserialise(cls, input_dict):
         movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
-        movement.concentric_load = input_dict.get('concentric_load', 0)
-        movement.eccentric_load = input_dict.get('eccentric_load', 0)
-        movement.compensated_concentric_load = input_dict.get('compensated_concentric_load', 0)
-        movement.compensated_eccentric_load = input_dict.get('compensated_eccentric_load', 0)
+        movement.concentric_load = StandardErrorRange.json_deserialise(input_dict.get('concentric_load')) if input_dict.get('concentric_load') is not None else StandardErrorRange()
+        movement.isometric_load = StandardErrorRange.json_deserialise(
+            input_dict.get('isometric_load')) if input_dict.get('isometric_load') is not None else StandardErrorRange()
+        movement.eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('eccentric_load')) if input_dict.get('eccentric_load') is not None else StandardErrorRange()
+        movement.compensated_concentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_concentric_load')) if input_dict.get('compensated_concentric_load') is not None else StandardErrorRange()
+        movement.compensated_isometric_load = StandardErrorRange.json_deserialise(
+            input_dict.get('compensated_isometric_load')) if input_dict.get(
+            'compensated_isometric_load') is not None else StandardErrorRange()
+        movement.compensated_eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_eccentric_load')) if input_dict.get('compensated_eccentric_load') is not None else StandardErrorRange()
         movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
-        # movement.concentric_intensity = input_dict.get('concentric_intensity', 0)
-        # movement.eccentric_intensity = input_dict.get('eccentric_intensity', 0)
-        # movement.compensated_concentric_intensity = input_dict.get('compensated_concentric_intensity', 0)
-        # movement.compensated_eccentric_intensity = input_dict.get('compensated_eccentric_intensity', 0)
-        # movement.compensating_causes_intensity = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_intensity',[])]  # I don't know what gets saved here!
-        movement.concentric_ramp = input_dict.get('concentric_ramp', 0.0)
-        movement.eccentric_ramp = input_dict.get('eccentric_ramp', 0.0)
         movement.is_compensating = input_dict.get('is_compensating', False)
-        movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
-        # movement.compensation_source_intensity = CompensationSource(input_dict['compensation_source_intensity']) if input_dict.get('compensation_source_intensity') is not None else None
+        #movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
         movement.body_part_function = BodyPartFunction(input_dict['body_part_function']) if input_dict.get('body_part_function') is not None else None
-        movement.inhibited = input_dict.get('inhibited', 0)
-        movement.weak = input_dict.get('weak', 0)
-        movement.tight = input_dict.get('tight', 0)
-        movement.inflamed = input_dict.get('inflamed', 0)
-        movement.long = input_dict.get('long', 0)
-        movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
+        #movement.inhibited = input_dict.get('inhibited', 0)
+        #movement.weak = input_dict.get('weak', 0)
+        #movement.tight = input_dict.get('tight', 0)
+        #movement.inflamed = input_dict.get('inflamed', 0)
+        #movement.long = input_dict.get('long', 0)
+        #movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
         return movement
 
     def merge(self, target):
 
         if self.body_part_side == target.body_part_side:
 
-            self.concentric_load += target.concentric_load
-            self.eccentric_load += target.eccentric_load
-            self.compensated_concentric_load += target.compensated_concentric_load
-            self.compensated_eccentric_load += target.compensated_eccentric_load
+            self.concentric_load.add(target.concentric_load)
+            self.isometric_load.add(target.isometric_load)
+            self.eccentric_load.add(target.eccentric_load)
+            self.compensated_concentric_load.add(target.compensated_concentric_load)
+            self.compensated_isometric_load.add(target.compensated_isometric_load)
+            self.compensated_eccentric_load.add(target.compensated_eccentric_load)
             self.compensating_causes_load.extend(target.compensating_causes_load)
             self.compensating_causes_load = list(set(self.compensating_causes_load))
-            # self.concentric_intensity += target.concentric_intensity
-            # self.eccentric_intensity += target.eccentric_intensity
-            # self.compensated_concentric_intensity += target.compensated_concentric_intensity
-            # self.compensated_eccentric_intensity += target.compensated_eccentric_intensity
-            #self.compensating_causes_intensity.extend(target.compensating_causes_intensity)
-            # self.compensating_causes_intensity = list(set(self.compensating_causes_intensity))
-            self.concentric_ramp = max(self.concentric_ramp, target.concentric_ramp)
-            self.eccentric_ramp = max(self.eccentric_ramp, target.eccentric_ramp)
             self.is_compensating = max(self.is_compensating, target.is_compensating)
-            self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
-            # self.compensation_source_intensity = self.merge_with_none(self.compensation_source_intensity, target.compensation_source_intensity)
+            #self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
             self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
-            # not sure these are even used
-            # self.body_part_function = None
-            # self.inhibited = 0
-            # self.weak = 0
-            # self.tight = 0
-            # self.inflamed = 0
-            # self.long = 0
-            self.total_normalized_load += target.total_normalized_load
+            #self.total_normalized_load.add(target.total_normalized_load)
 
     def merge_with_none(self, value_a, value_b):
 
@@ -281,9 +287,11 @@ class FunctionalMovementActionMapping(object):
         self.hip_joint_functional_movements = []
         self.knee_joint_functional_movements = []
         self.ankle_joint_functional_movements = []
+        self.pelvic_tilt_joint_functional_movements = []
         self.trunk_joint_functional_movements = []
         self.shoulder_scapula_joint_functional_movements = []
         self.elbow_joint_functional_movements = []
+        self.wrist_joint_functional_movements = []
         self.muscle_load = {}
         self.functional_movement_dict = functional_movement_dict
         #self.injury_risk_dict = injury_risk_dict
@@ -292,15 +300,66 @@ class FunctionalMovementActionMapping(object):
         self.set_functional_movements()
         self.set_muscle_load(injury_risk_dict, event_date)
 
+    def get_types_of_joint_actions(self):
+
+        actions = []
+
+        if len(self.hip_joint_functional_movements) > 0:
+            actions.append("hip")
+        if len(self.knee_joint_functional_movements) > 0:
+            actions.append("knee")
+        if len(self.ankle_joint_functional_movements) > 0:
+            actions.append("ankle")
+        if len(self.trunk_joint_functional_movements) > 0:
+            actions.append("trunk")
+        if len(self.shoulder_scapula_joint_functional_movements) > 0:
+            actions.append("shoulder")
+        if len(self.elbow_joint_functional_movements) > 0:
+            actions.append("elbow")
+
+        return actions
+
+    def get_planes_of_movement(self):
+
+        planes = set()
+
+        for h in self.hip_joint_functional_movements:
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
+
+        for h in self.knee_joint_functional_movements:
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
+
+        for h in self.ankle_joint_functional_movements:
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
+
+        for h in self.trunk_joint_functional_movements:
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
+
+        for h in self.shoulder_scapula_joint_functional_movements:
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
+
+        for h in self.elbow_joint_functional_movements:
+            if h.functional_movement.priority == 1:
+                planes.update(h.functional_movement.planes)
+
+        return list(planes)
+
     def set_functional_movements(self):
 
         if self.exercise_action is not None:
             self.hip_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.hip_joint_action)
             self.knee_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.knee_joint_action)
             self.ankle_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.ankle_joint_action)
+            self.pelvic_tilt_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.pelvic_tilt_joint_action)
             self.trunk_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.trunk_joint_action)
             self.shoulder_scapula_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
             self.elbow_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.elbow_joint_action)
+            self.wrist_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.wrist_joint_action)
 
     def get_functional_movements_for_joint_action(self, target_joint_action_list):
 
@@ -353,12 +412,25 @@ class FunctionalMovementActionMapping(object):
 
     def set_muscle_load(self, injury_risk_dict, event_date):
 
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.hip_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.knee_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.ankle_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.trunk_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action)
-        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements, self.exercise_action)
+        # TODO - deal with this later
+        # if self.exercise_action.power_load_left is not None and self.exercise_action.power_load_right is not None:
+        #     left_load = self.exercise_action.power_load_left
+        #     right_load = self.exercise_action.power_load_right
+        # elif self.exercise_action.tissue_load_left is not None and self.exercise_action.tissue_load_right is not None:
+        #     left_load = self.exercise_action.tissue_load_left
+        #     right_load = self.exercise_action.tissue_load_right
+        # else:
+        left_load = self.exercise_action.power_load_left
+        right_load = self.exercise_action.power_load_right
+
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.hip_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.knee_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.ankle_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.pelvic_tilt_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.trunk_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.wrist_joint_functional_movements, self.exercise_action, left_load, right_load)
 
 
     def get_matching_stability_rating(self, functional_movement_load, exercise_action):
@@ -493,13 +565,15 @@ class FunctionalMovementActionMapping(object):
     #                             self.muscle_load[
     #                                 body_part_side].compensation_source_load = CompensationSource.internal_processing
 
-    def apply_load_to_functional_movements(self, injury_risk_dict, event_date, functional_movement_list, exercise_action):
+    def apply_load_to_functional_movements(self, injury_risk_dict, event_date, functional_movement_list, exercise_action, left_load, right_load):
 
         compensation_causing_prime_movers = self.get_compensating_body_parts(injury_risk_dict, event_date,
                                                                              functional_movement_list)
 
-        left_load = exercise_action.total_load_left
-        right_load = exercise_action.total_load_right
+        # left_load = exercise_action.total_load_left
+        # right_load = exercise_action.total_load_right
+        #left_load = exercise_action.tissue_load_left
+        #right_load = exercise_action.tissue_load_right
 
         for functional_movement_load in functional_movement_list:
             functional_movement = functional_movement_load.functional_movement
@@ -598,42 +672,60 @@ class FunctionalMovementActionMapping(object):
                     if c.side == body_part_side.side or c.side == 0 or body_part_side.side == 0:
                         if body_part_side_string in self.muscle_load:
                             concentric_load = self.muscle_load[body_part_side_string].concentric_load
+                            isometric_load = self.muscle_load[body_part_side_string].isometric_load
                             eccentric_load = self.muscle_load[body_part_side_string].eccentric_load
                         else:
-                            concentric_load = 0
-                            eccentric_load = 0
+                            concentric_load = StandardErrorRange(observed_value=0)
+                            isometric_load = StandardErrorRange(observed_value=0)
+                            eccentric_load = StandardErrorRange(observed_value=0)
 
-                        if functional_movement_load.muscle_action == MuscleAction.concentric or functional_movement_load.muscle_action == MuscleAction.isometric:
-
-                            compensated_concentric_load = concentric_load * factor
-                            compensated_eccentric_load = 0
-
+                        if functional_movement_load.muscle_action == MuscleAction.concentric:
+                            concentric_load.multiply(factor)
+                            compensated_concentric_load = concentric_load
+                            compensated_isometric_load = StandardErrorRange(observed_value=0)
+                            compensated_eccentric_load = StandardErrorRange(observed_value=0)
+                        elif functional_movement_load.muscle_action == MuscleAction.isometric:
+                            isometric_load.multiply(factor)
+                            compensated_isometric_load = isometric_load
+                            compensated_concentric_load = StandardErrorRange(observed_value=0)
+                            compensated_eccentric_load = StandardErrorRange(observed_value=0)
                         else:
-                            compensated_concentric_load = 0
-                            compensated_eccentric_load = eccentric_load * factor
+                            eccentric_load.multiply(factor)
+                            compensated_concentric_load = StandardErrorRange(observed_value=0)
+                            compensated_isometric_load = StandardErrorRange(observed_value=0)
+                            compensated_eccentric_load = eccentric_load
 
                         functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
                         functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
 
-                        synergist_compensated_concentric_load = compensated_concentric_load / float(
-                            len(functional_movement.parts_receiving_compensation))
-                        synergist_compensated_eccentric_load = compensated_eccentric_load / float(
-                            len(functional_movement.parts_receiving_compensation))
+                        compensated_concentric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
+                        synergist_compensated_concentric_load = compensated_concentric_load
+
+                        compensated_isometric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
+                        synergist_compensated_isometric_load = compensated_isometric_load
+
+                        compensated_eccentric_load.divide(float(len(functional_movement.parts_receiving_compensation)))
+                        synergist_compensated_eccentric_load = compensated_eccentric_load
+
                         functional_movement_body_part_side.body_part_function = BodyPartFunction.synergist
-                        functional_movement_body_part_side.compensated_concentric_load += synergist_compensated_concentric_load
-                        functional_movement_body_part_side.compensated_eccentric_load += synergist_compensated_eccentric_load
+                        functional_movement_body_part_side.compensated_concentric_load.add(synergist_compensated_concentric_load)
+                        functional_movement_body_part_side.compensated_isometric_load.add(synergist_compensated_isometric_load)
+                        functional_movement_body_part_side.compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                         functional_movement_body_part_side.compensating_causes_load.append(c)
-                        functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
+                        #functional_movement_body_part_side.compensation_source_load = CompensationSource.internal_processing
                         if body_part_side_string not in self.muscle_load:
                             self.muscle_load[body_part_side_string] = functional_movement_body_part_side
                         else:
                             self.muscle_load[
-                                body_part_side_string].compensated_concentric_load += synergist_compensated_concentric_load
+                                body_part_side_string].compensated_concentric_load.add(synergist_compensated_concentric_load)
                             self.muscle_load[
-                                body_part_side_string].compensated_eccentric_load += synergist_compensated_eccentric_load
+                                body_part_side_string].compensated_isometric_load.add(
+                                synergist_compensated_isometric_load)
+                            self.muscle_load[
+                                body_part_side_string].compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                             self.muscle_load[body_part_side_string].compensating_causes_load.append(c)
-                            self.muscle_load[
-                                body_part_side_string].compensation_source_load = CompensationSource.internal_processing
+                            #self.muscle_load[
+                            #    body_part_side_string].compensation_source_load = CompensationSource.internal_processing
 
     def apply_load_to_list(self, functional_movement_list, functional_movement_priority, target_body_part_function,
                            functional_movement_muscle_action, left_load, right_load, stability_rating):
@@ -642,12 +734,13 @@ class FunctionalMovementActionMapping(object):
             functional_movement_body_part_side = BodyPartFunctionalMovement(body_part_side)
             functional_movement_body_part_side.body_part_function = target_body_part_function
             attributed_muscle_load = 0
-            load = 0
+            #load = 0
+            load = StandardErrorRange()
 
             if body_part_side.side == 1 or body_part_side.side == 0:
-                load += left_load
+                load.add(left_load)
             elif body_part_side.side == 2 or body_part_side.side == 0:
-                load += right_load
+                load.add(right_load)
 
             if functional_movement_priority == 1:
                 priority_ratio = 1.00
@@ -671,23 +764,29 @@ class FunctionalMovementActionMapping(object):
             else:
                 muscle_ratio = 0.0
 
-            attributed_muscle_load = load * priority_ratio * muscle_ratio
+            #attributed_muscle_load = load.multiply(priority_ratio * muscle_ratio)
+            load.multiply(priority_ratio * muscle_ratio)
+            attributed_muscle_load = load
 
                 # self.update_muscle_dictionary(functional_movement_body_part_side, attributed_muscle_load,
                 #                               functional_movement_load.muscle_action)
-            if attributed_muscle_load > 0:
+            if attributed_muscle_load.observed_value is not None and attributed_muscle_load.observed_value > 0:
                 body_part_side_string = body_part_side.to_string()
                 if body_part_side_string in self.muscle_load:
-                    if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
-                        self.muscle_load[body_part_side_string].concentric_load += attributed_muscle_load
+                    if functional_movement_muscle_action == MuscleAction.concentric:
+                        self.muscle_load[body_part_side_string].concentric_load.add(attributed_muscle_load)
+                    elif functional_movement_muscle_action == MuscleAction.isometric:
+                        self.muscle_load[body_part_side_string].isometric_load.add(attributed_muscle_load)
                     else:
-                        self.muscle_load[body_part_side_string].eccentric_load += attributed_muscle_load
+                        self.muscle_load[body_part_side_string].eccentric_load.add(attributed_muscle_load)
                 else:
                     self.muscle_load[body_part_side_string] = functional_movement_body_part_side
-                    if functional_movement_muscle_action == MuscleAction.concentric or functional_movement_muscle_action == MuscleAction.isometric:
-                        self.muscle_load[body_part_side_string].concentric_load = attributed_muscle_load
+                    if functional_movement_muscle_action == MuscleAction.concentric:
+                        self.muscle_load[body_part_side_string].concentric_load.add(attributed_muscle_load)
+                    elif functional_movement_muscle_action == MuscleAction.isometric:
+                        self.muscle_load[body_part_side_string].isometric_load.add(attributed_muscle_load)
                     else:
-                        self.muscle_load[body_part_side_string].eccentric_load = attributed_muscle_load
+                        self.muscle_load[body_part_side_string].eccentric_load.add(attributed_muscle_load)
             # if body_part_side.side == 2 or body_part_side.side == 0:
             #     attributed_muscle_load = self.get_muscle_load(functional_movement_list_priority,
             #                                                   target_body_part_function, right_load,
@@ -842,49 +941,61 @@ class FunctionalMovementActivityMapping(object):
             else:
                 factor = .20
 
-            compensated_concentric_load = training_load * self.concentric_level * factor
-            compensated_eccentric_load = training_load * self.eccentric_level * factor
+            compensated_concentric_load = training_load.plagiarize()
+            compensated_eccentric_load = training_load.plagiarize()
+            compensated_concentric_load.multiply(self.concentric_level * factor)
+            compensated_eccentric_load.multiply(self.eccentric_level * factor)
 
             for s in self.parts_receiving_compensation:
                 if c.side == s.body_part_side.side or c.side == 0 or s.body_part_side.side == 0:
-                    synergist_compensated_concentric_load = compensated_concentric_load / float(len(self.parts_receiving_compensation))
-                    synergist_compensated_eccentric_load = compensated_eccentric_load / float(len(self.parts_receiving_compensation))
+                    synergist_compensated_concentric_load = compensated_concentric_load.plagiarize()
+                    synergist_compensated_eccentric_load = compensated_eccentric_load.plagiarize()
+                    synergist_compensated_concentric_load.divide(float(len(self.parts_receiving_compensation)))
+                    synergist_compensated_eccentric_load.divide(float(len(self.parts_receiving_compensation)))
                     s.body_part_function = BodyPartFunction.synergist
-                    s.compensated_concentric_load += synergist_compensated_concentric_load
-                    s.compensated_eccentric_load += synergist_compensated_eccentric_load
+                    s.compensated_concentric_load.add(synergist_compensated_concentric_load)
+                    s.compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                     s.compensating_causes_load.append(c)
-                    s.compensation_source_load = CompensationSource.internal_processing
+                    #s.compensation_source_load = CompensationSource.internal_processing
                     if s.body_part_side not in self.muscle_load:
                         self.muscle_load[s.body_part_side] = s
                     else:
-                        self.muscle_load[s.body_part_side].compensated_concentric_load += synergist_compensated_concentric_load
-                        self.muscle_load[s.body_part_side].compensated_eccentric_load += synergist_compensated_eccentric_load
+                        self.muscle_load[s.body_part_side].compensated_concentric_load.add(synergist_compensated_concentric_load)
+                        self.muscle_load[s.body_part_side].compensated_eccentric_load.add(synergist_compensated_eccentric_load)
                         self.muscle_load[s.body_part_side].compensating_causes_load.append(c)
-                        self.muscle_load[s.body_part_side].compensation_source_load = CompensationSource.internal_processing
+                        #self.muscle_load[s.body_part_side].compensation_source_load = CompensationSource.internal_processing
 
         for p in self.prime_movers:
-            attributed_concentric_load = training_load * self.concentric_level * prime_mover_ratio
-            attributed_eccentric_load = training_load * self.eccentric_level * prime_mover_ratio
+            concentric_training_load = training_load.plagiarize()
+            eccentric_training_load = training_load.plagiarize()
+            concentric_training_load.multiply(self.concentric_level * prime_mover_ratio)
+            eccentric_training_load.multiply(self.eccentric_level * prime_mover_ratio)
+            attributed_concentric_load = concentric_training_load
+            attributed_eccentric_load = eccentric_training_load
             p.body_part_function = BodyPartFunction.prime_mover
-            p.concentric_load = attributed_concentric_load
-            p.eccentric_load = attributed_eccentric_load
+            p.concentric_load.add(attributed_concentric_load)
+            p.eccentric_load.add(attributed_eccentric_load)
             if p.body_part_side not in self.muscle_load:
                 self.muscle_load[p.body_part_side] = p
             else:
-                self.muscle_load[p.body_part_side].concentric_load += p.concentric_load
-                self.muscle_load[p.body_part_side].eccentric_load += p.eccentric_load
+                self.muscle_load[p.body_part_side].concentric_load.add(p.concentric_load)
+                self.muscle_load[p.body_part_side].eccentric_load.add(p.eccentric_load)
 
         for s in self.synergists:
-            attributed_concentric_load = training_load * self.concentric_level * synergist_ratio
-            attributed_eccentric_load = training_load * self.eccentric_level * synergist_ratio
+            concentric_training_load = training_load.plagiarize()
+            eccentric_training_load = training_load.plagiarize()
+            concentric_training_load.multiply(self.concentric_level * prime_mover_ratio)
+            eccentric_training_load.multiply(self.eccentric_level * prime_mover_ratio)
+            attributed_concentric_load = concentric_training_load
+            attributed_eccentric_load = eccentric_training_load
             s.body_part_function = BodyPartFunction.synergist
             s.concentric_load = attributed_concentric_load
             s.eccentric_load = attributed_eccentric_load
             if s.body_part_side not in self.muscle_load:
                 self.muscle_load[s.body_part_side] = s
             else:
-                self.muscle_load[s.body_part_side].concentric_load += s.concentric_load
-                self.muscle_load[s.body_part_side].eccentric_load += s.eccentric_load
+                self.muscle_load[s.body_part_side].concentric_load.add(s.concentric_load)
+                self.muscle_load[s.body_part_side].eccentric_load.add(s.eccentric_load)
 
     def other_body_parts_affected(self, target_body_part, injury_risk_dict, event_date, prime_movers):
 
@@ -1021,7 +1132,7 @@ class ActivityFunctionalMovementFactory(object):
 
 class FunctionalMovementFactory(object):
 
-    def get_functional_movement_dictinary(self):
+    def get_functional_movement_dictionary(self):
 
         dict = {}
 
@@ -1029,6 +1140,8 @@ class FunctionalMovementFactory(object):
         dict[FunctionalMovementType.ankle_dorsiflexion_and_inversion.value] = self.convert_ints_to_objects(self.get_ankle_dorsiflexion_and_inversion())
         dict[FunctionalMovementType.ankle_plantar_flexion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion())
         dict[FunctionalMovementType.ankle_plantar_flexion_and_eversion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion_and_eversion())
+        dict[FunctionalMovementType.ankle_dorsiflexion_and_eversion.value] = self.convert_ints_to_objects(self.get_ankle_dorsiflexion_and_eversion())
+        dict[FunctionalMovementType.ankle_plantar_flexion_and_inversion.value] = self.convert_ints_to_objects(self.get_ankle_plantar_flexion_and_inversion())
         dict[FunctionalMovementType.inversion_of_the_foot.value] = self.convert_ints_to_objects(self.get_inversion_of_the_foot())
         dict[FunctionalMovementType.eversion_of_the_foot.value] = self.convert_ints_to_objects(self.get_eversion_of_the_foot())
         dict[FunctionalMovementType.knee_flexion.value] = self.convert_ints_to_objects(self.get_knee_flexion())
@@ -1063,6 +1176,8 @@ class FunctionalMovementFactory(object):
         dict[FunctionalMovementType.external_rotation.value] = self.convert_ints_to_objects(self.get_external_rotation())
         dict[FunctionalMovementType.scapular_elevation.value] = self.convert_ints_to_objects(self.get_scapular_elevation())
         dict[FunctionalMovementType.scapular_depression.value] = self.convert_ints_to_objects(self.get_scapular_depression())
+        dict[FunctionalMovementType.wrist_extension.value] = self.convert_ints_to_objects(self.get_wrist_extension())
+        dict[FunctionalMovementType.wrist_flexion.value] = self.convert_ints_to_objects(self.get_wrist_flexion())
 
         return dict
 
@@ -1109,6 +1224,10 @@ class FunctionalMovementFactory(object):
             return self.get_inversion_of_the_foot()
         elif movement_type == FunctionalMovementType.eversion_of_the_foot:
             return self.get_eversion_of_the_foot()
+        elif movement_type == FunctionalMovementType.ankle_dorsiflexion_and_eversion:
+            return self.get_ankle_dorsiflexion_and_eversion()
+        elif movement_type == FunctionalMovementType.ankle_plantar_flexion_and_inversion:
+            return self.get_ankle_plantar_flexion_and_inversion()
 
         elif movement_type == FunctionalMovementType.knee_flexion:
             return self.get_knee_flexion()
@@ -1180,6 +1299,11 @@ class FunctionalMovementFactory(object):
         elif movement_type == FunctionalMovementType.scapular_depression:
             return self.get_scapular_depression()
 
+        elif movement_type == FunctionalMovementType.wrist_flexion:
+            return self.get_wrist_extension()
+        elif movement_type == FunctionalMovementType.wrist_extension:
+            return self.get_wrist_extension()
+
     def get_ankle_fixators(self):
 
         return [44, 68, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66, 57, 58]
@@ -1217,6 +1341,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [41, 42]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = []
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_ankle_dorsiflexion_and_inversion(self):
@@ -1228,6 +1353,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [41]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = []
+        functional_movement.planes = [JointActionPlane.frontal, JointActionPlane.sagital]
         return functional_movement
 
     def get_ankle_plantar_flexion(self):
@@ -1239,6 +1365,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [41, 42]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [41, 42]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_ankle_plantar_flexion_and_eversion(self):
@@ -1250,6 +1377,29 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [41, 42]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [41]
+        functional_movement.planes = [JointActionPlane.frontal, JointActionPlane.sagital]
+        return functional_movement
+
+    def get_ankle_dorsiflexion_and_eversion(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.ankle_dorsiflexion_and_eversion)
+        functional_movement.prime_movers = [40]
+        functional_movement.synergists = [41]
+        functional_movement.antagonists = [43, 44, 42]
+        functional_movement.stabilizers = [41]
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = [41]
+        functional_movement.planes = [JointActionPlane.frontal, JointActionPlane.sagital]
+        return functional_movement
+
+    def get_ankle_plantar_flexion_and_inversion(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.ankle_plantar_flexion_and_inversion)
+        functional_movement.prime_movers = [43, 44]
+        functional_movement.synergists = [42]
+        functional_movement.antagonists = [40]
+        functional_movement.stabilizers = [41, 42]
+        functional_movement.fixators = self.get_ankle_fixators()
+        functional_movement.parts_receiving_compensation = [42]
+        functional_movement.planes = [JointActionPlane.frontal, JointActionPlane.sagital]
         return functional_movement
 
     def get_inversion_of_the_foot(self):
@@ -1261,6 +1411,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [41]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [44]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_eversion_of_the_foot(self):
@@ -1272,6 +1423,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [40, 41, 42]
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [43, 61]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_tibial_external_rotation(self):
@@ -1282,6 +1434,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = []
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = []
+        functional_movement.planes = [JointActionPlane.transverse]
         return functional_movement
 
     def get_tibial_internal_rotation(self):
@@ -1292,6 +1445,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = []
         functional_movement.fixators = self.get_ankle_fixators()
         functional_movement.parts_receiving_compensation = [53, 68]
+        functional_movement.planes = [JointActionPlane.transverse]
         return functional_movement
 
     def get_knee_flexion(self):
@@ -1303,6 +1457,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [44, 68, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66]
         functional_movement.fixators = self.get_knee_fixators()
         functional_movement.parts_receiving_compensation = [44, 61, 53]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_knee_extension(self):
@@ -1314,6 +1469,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [44, 47, 48, 53, 56, 61, 45, 46, 55, 59, 66]
         functional_movement.fixators = self.get_knee_fixators()
         functional_movement.parts_receiving_compensation = []
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_hip_extension(self):
@@ -1325,6 +1481,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [45, 47, 48, 51]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_hip_flexion(self):
@@ -1336,6 +1493,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [49, 50, 52, 53, 58, 59, 65]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_hip_internal_rotation(self):
@@ -1347,6 +1505,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [46, 47, 48, 49, 50, 52, 53, 59, 63]
+        functional_movement.planes = [JointActionPlane.transverse]
         return functional_movement
 
     def get_hip_external_rotation(self):
@@ -1358,6 +1517,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [60, 67, 63, 64, 65]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [45, 51, 67, 64, 66]
+        functional_movement.planes = [JointActionPlane.transverse]
         return functional_movement
 
     def get_hip_abduction(self):
@@ -1369,6 +1529,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [55, 59, 65, 66]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_hip_adduction(self):
@@ -1380,6 +1541,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [60, 67]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [47, 48, 54, 67, 66]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_hip_horizontal_abduction(self):
@@ -1391,6 +1553,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [54, 60, 67, 63, 64, 65]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [59, 67, 63, 64, 65, 66]
+        functional_movement.planes = [JointActionPlane.adduction_in_transverse]
         return functional_movement
 
     def get_hip_horizontal_adduction(self):
@@ -1402,6 +1565,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [54, 60, 67, 63, 64, 65]
         functional_movement.fixators = self.get_hip_fixators()
         functional_movement.parts_receiving_compensation = [47, 48, 54, 67, 66]
+        functional_movement.planes = [JointActionPlane.adduction_in_transverse]
         return functional_movement
 
     def get_pelvic_anterior_tilt(self):
@@ -1412,6 +1576,7 @@ class FunctionalMovementFactory(object):
         functional_movement.antagonists = [74, 75]
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71, 60, 63, 64, 65]
         functional_movement.parts_receiving_compensation = [54, 59]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_pelvic_posterior_tilt(self):
@@ -1422,6 +1587,7 @@ class FunctionalMovementFactory(object):
         functional_movement.antagonists = [58, 71, 72, 26, 70, 21]
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71, 60, 63, 64, 65]
         functional_movement.parts_receiving_compensation = [45, 69]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_trunk_flexion(self):
@@ -1433,6 +1599,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [71, 74, 69]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_trunk_extension(self):
@@ -1444,6 +1611,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = []
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_trunk_lateral_flexion(self):
@@ -1455,6 +1623,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [58, 71, 73, 74, 34, 35, 36, 70]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [26, 21, 74, 69]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_trunk_rotation(self):
@@ -1466,6 +1635,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [21, 71]
+        functional_movement.planes = [JointActionPlane.transverse]
         return functional_movement
 
     def get_trunk_flexion_with_rotation(self):
@@ -1477,6 +1647,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [21, 71]
+        functional_movement.planes = [JointActionPlane.sagital, JointActionPlane.transverse]
         return functional_movement
 
     def get_trunk_extension_with_rotation(self):
@@ -1488,6 +1659,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [73, 74, 34, 35, 36, 70, 71]
         functional_movement.fixators = self.get_trunk_fixators()
         functional_movement.parts_receiving_compensation = [21, 71]
+        functional_movement.planes = [JointActionPlane.sagital, JointActionPlane.transverse]
         return functional_movement
 
     def get_elbow_flexion(self):
@@ -1499,6 +1671,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [33]
         functional_movement.fixators = self.get_elbow_fixators()
         functional_movement.parts_receiving_compensation = [127, 128]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_elbow_extension(self):
@@ -1510,6 +1683,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [33]
         functional_movement.fixators = self.get_elbow_fixators()
         functional_movement.parts_receiving_compensation = [32]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_shoulder_horizontal_adduction_and_scapular_protraction(self):
@@ -1521,6 +1695,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [83, 81]
+        functional_movement.planes = [JointActionPlane.adduction_in_transverse]
         return functional_movement
 
     def get_shoulder_horizontal_abduction_and_scapular_retraction(self):
@@ -1532,6 +1707,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [80]
+        functional_movement.planes = [JointActionPlane.adduction_in_transverse]
         return functional_movement
 
     def get_shoulder_flexion_and_scapular_upward_rotation(self):
@@ -1543,6 +1719,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [76, 79, 82, 127, 129]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_shoulder_extension_and_scapular_downward_rotation(self):
@@ -1554,6 +1731,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [77, 80, 120, 85, 132]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement
 
     def get_shoulder_abduction_and_scapular_upward_rotation(self):
@@ -1564,6 +1742,7 @@ class FunctionalMovementFactory(object):
         functional_movement.antagonists = [21, 77, 80, 120, 122, 123, 124, 81, 82, 129, 132]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [76, 79, 121]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_shoulder_adduction_and_scapular_downward_rotation(self):
@@ -1575,6 +1754,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124, 125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [77, 80, 120, 122, 123, 124, 82, 129, 132]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_internal_rotation(self):
@@ -1586,6 +1766,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [21, 120, 83, 82]
+        functional_movement.planes = [JointActionPlane.transverse]
         return functional_movement
 
     def get_external_rotation(self):
@@ -1597,6 +1778,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [121, 122, 123, 124]
         functional_movement.fixators = self.get_shoulder_fixators_1()
         functional_movement.parts_receiving_compensation = [85]
+        functional_movement.planes = [JointActionPlane.transverse]
         return functional_movement
 
     def get_scapular_elevation(self):
@@ -1608,6 +1790,7 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_2()
         functional_movement.parts_receiving_compensation = [77, 80]
+        functional_movement.planes = [JointActionPlane.frontal]
         return functional_movement
 
     def get_scapular_depression(self):
@@ -1619,4 +1802,27 @@ class FunctionalMovementFactory(object):
         functional_movement.stabilizers = [125, 77, 80]
         functional_movement.fixators = self.get_shoulder_fixators_2()
         functional_movement.parts_receiving_compensation = [81]
+        functional_movement.planes = [JointActionPlane.frontal]
+        return functional_movement
+
+    def get_wrist_flexion(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.wrist_flexion)
+        functional_movement.prime_movers = [33]
+        functional_movement.synergists = [32]
+        functional_movement.antagonists = []
+        functional_movement.stabilizers = [32, 126, 127, 128]
+        functional_movement.fixators = [32, 126, 127, 128, 130, 131, 132]
+        functional_movement.parts_receiving_compensation = [32]
+        functional_movement.planes = [JointActionPlane.sagital]
+        return functional_movement
+
+    def get_wrist_extension(self):
+        functional_movement = FunctionalMovement(FunctionalMovementType.wrist_extension)
+        functional_movement.prime_movers = [33]
+        functional_movement.synergists = [32]
+        functional_movement.antagonists = []
+        functional_movement.stabilizers = [32, 126, 127, 128, 130, 131, 132]
+        functional_movement.fixators = [32, 126, 127, 128, 130, 131, 132]
+        functional_movement.parts_receiving_compensation = [32]
+        functional_movement.planes = [JointActionPlane.sagital]
         return functional_movement

@@ -666,13 +666,23 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
     "reps_per_set": integaer,
     "unit_of_measure": integer,
     "movement_id": string,
-    "rpe": number
+    "rpe": number,
+    "duration": number,
+    "distance": number,
+    "speed": number,
+    "pace": number,
+    "power": number,
+    "calories": number,
+    "stroke_rate": number,
+    "cadence": number,
+    "grade": number
+}
 }
 ```
 
 * `id` __should__ be provider's unique identifier for the exercise
 * `name` __should__ be the exercise name
-* `weight_measure` __should__ be the unit external weight used is measured in (weight in lbs, percent bodyweight or rep max)
+* `weight_measure` __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
 * `weight` __should__ represent the numeric value of the weight used according to the  `weight_measure` attribute
 * `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
 * `side` __should__ represent the side (left or right) on which the exercise is performed if  `bilateral` is false
@@ -681,7 +691,16 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
 * `unit_of_measure` __should__ be an integer reflecting the Unit of Measure enumeration and should indicate the unit in which the reps are measured
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
-
+* `duration` __if present__, __should__ be the total time assigned or taken to complete the exercise
+* `distance` __if present__, __should__ be an number representing distance assigned or covered in meters
+* `speed` __if present__, __should__ be an number representing average speed (meters/second) for the exercise
+* `pace` __if present__, __should__ be an number representing average pace (seconds/meters) for the exercise
+* `power` __if present__, __should__ be an number representing the average power production during the exercise in watts
+* `calories` __if present__, __should__ be an number representing calories burned during the exercise
+* `stroke_rate` __if present__, __should__ be an number representing average rowing stroke rate
+* `cadence` __if present__, __should__ be an number representing cadence for running (steps per min) or biking (RPM) 
+* `grade` __if present__, __should__ be a number representing average percent grade during the exercise
+`grade` __if present__, __should__ be a number representing average percent grade during the exercise
 
 ### Active Rest
 

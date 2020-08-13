@@ -8,6 +8,7 @@ from models.daily_plan import DailyPlan
 from models.athlete_trend import AthleteTrends
 from models.athlete_injury_risk import AthleteInjuryRisk
 from models.functional_movement_modalities import ModalityType
+from models.session import SessionType
 from utils import format_date, parse_datetime, parse_date, format_datetime
 import copy
 
@@ -103,6 +104,9 @@ class TrainingPlanManager(object):
         for session in self.active_training_sessions:
             if session.ultra_high_intensity_session() and session.high_intensity_RPE():
                 return True
+            elif session.session_type() == SessionType.mixed_activity or session.session_type() == SessionType.planned:
+                if session.contains_high_intensity_blocks():
+                    return True
         return False
 
     def get_sport_body_parts(self):

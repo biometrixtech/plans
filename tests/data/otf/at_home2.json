@@ -1,0 +1,36 @@
+{
+    "program_id": "may",
+    "program_module_id": "at_home2",
+    "workout_sections": [
+        {
+            "name": "dynamic warmup",
+            "duration_seconds": 300.0,
+            "exercises": []
+        },
+        {
+            "name": "block1",
+            "duration_seconds": 480.0,
+            "exercises": []
+        },
+        {
+            "name": "block2",
+            "duration_seconds": 600.0,
+            "exercises": []
+        },
+        {
+            "name": "block3",
+            "duration_seconds": 480.0,
+            "exercises": []
+        },
+        {
+            "name": "block4",
+            "duration_seconds": 660.0,
+            "exercises": []
+        },
+        {
+            "name": "flexibility",
+            "duration_seconds": 300.0,
+            "exercises": []
+        }
+    ]
+}

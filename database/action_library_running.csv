@@ -31,3 +31,28 @@ ankle eversion",,,,,,
 ,2_e,Frontal Plane Stability - Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,mod_force,TRUE,,a bit,isometric,1,hip abduction,3,tibial external rotation,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,very little,little,a bit,some,significant,most,,,,,,,,
+,,,,,,,,,,,,,,,,,1-5%,5-10%,10-15%,15-20%,20-40%,40+%,,,,,,,,
+,,,,,,,,,,,,,,,,,,Concentric actions contribute to power generation,,,,,,,,,,,,
+Biomechanics of Rowing,,source 2,,,,,,,,,,,,,,,,Isometric actions are stabilizers that are in addition to power generated,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Rowing,,Drive - Leg Emphasis,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,most,concentric,,,1,knee extension,3,ankle plantar flexion,,,,,,
+,,,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,some,isometric,1,hip extension,,,,,1,Trunk Extension,1,"Shoulder Flexion
+Shoulder Extension",,
+,,Drive - Back Emphasis,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,significant,concentric,1,hip extension,3,knee extension,,,1,Trunk Extension,3,"Shoulder Extension
+Shoulder Adduction
+Shoulder Horizontal Abduction (Horizontal Extension)",3,elbow flexion
+,,Drive - Arms Emphasis,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,significant,concentric,3,hip extension,,,,,3,Trunk Extension,2,"Shoulder Extension
+Shoulder Adduction
+Shoulder Horizontal Abduction (Horizontal Extension)",1,elbow flexion
+,,,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,some,isometric,,,,,,,,,,,1,wrist flexors and extensors
+,,Recovery,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",FALSE,no_speed,TRUE,,very little,concentric,2,hip flexion,1,knee flexion,2,ankle dorsiflexion,2,Trunk Flexion,2,"Shoulder Flexion
+Shoulder Horizontal Adduction (Horizontal Flexion)",2,elbow extension
+,,,,,,,,,,,,,FALSE,,FALSE,,,concentric,2,hip external rotation,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Simplified Rowing,200_a,Drive,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,most,concentric,2,hip extension,1,knee extension,3,ankle plantar flexion,2,Trunk Extension,2,"Shoulder Extension
+Shoulder Adduction
+Shoulder Horizontal Abduction (Horizontal Extension)",2,elbow flexion
+,200_b,Recovery,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",FALSE,no_speed,TRUE,,very little,concentric,2,hip flexion,1,knee flexion,2,ankle dorsiflexion,2,Trunk Flexion,2,"Shoulder Horizontal Adduction (Horizontal Flexion)
+Shoulder Flexion",2,elbow extension
+,,,,,,,,,,,,,FALSE,,FALSE,,,concentric,2,hip external rotation,,,,,,,,,,

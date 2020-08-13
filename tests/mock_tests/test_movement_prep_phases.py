@@ -15,12 +15,12 @@ from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.exercise_assignment import ExerciseAssignment
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
-from models.movement_tags import AdaptationType
+from models.movement_tags import AdaptationType, TrainingType
 from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
 from models.functional_movement_type import FunctionalMovementType
 from models.exercise_phase import ExercisePhaseType
-
+from models.training_volume import StandardErrorRange
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
@@ -256,8 +256,10 @@ def test_check_movement_prep_phases_no_soreness_with_mixed_session():
     exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_1.total_load_left = 100
-    exercise_action_1.total_load_right = 200
+    #exercise_action_1.tissue_load_left = StandardErrorRange(observed_value=100)
+    #exercise_action_1.tissue_load_right = StandardErrorRange(observed_value=200)
+    exercise_action_1.power_load_left = StandardErrorRange(observed_value=100)
+    exercise_action_1.power_load_right = StandardErrorRange(observed_value=200)
     exercise_action_1.lower_body_stability_rating = 1.1
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
@@ -267,17 +269,23 @@ def test_check_movement_prep_phases_no_soreness_with_mixed_session():
     exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action_2.total_load_left = 200
-    exercise_action_2.total_load_right = 100
+    #exercise_action_2.tissue_load_left = StandardErrorRange(observed_value=200)
+    #exercise_action_2.tissue_load_right = StandardErrorRange(observed_value=100)
+    exercise_action_2.power_load_left = StandardErrorRange(observed_value=200)
+    exercise_action_2.power_load_right = StandardErrorRange(observed_value=100)
     exercise_action_2.lower_body_stability_rating = 1.1
     exercise_action_2.upper_body_stability_rating = 0.6
     exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
 
     exercise_1 = WorkoutExercise()
+    exercise_1.power_load = StandardErrorRange(observed_value=300)
     exercise_1.primary_actions.append(exercise_action_1)
+    exercise_1.training_type = TrainingType.strength_integrated_resistance
 
     exercise_2 = WorkoutExercise()
+    exercise_2.power_load = StandardErrorRange(observed_value=300)
     exercise_2.primary_actions.append(exercise_action_2)
+    exercise_2.training_type = TrainingType.power_action_plyometrics
 
     section_1 = WorkoutSection()
     section_1.exercises.append(exercise_1)
@@ -308,9 +316,9 @@ def test_check_movement_prep_phases_no_soreness_with_mixed_session():
 
     # should be either active or dynamic stretch but not both
     assert movement_prep.exercise_phases[2].type == ExercisePhaseType.active_stretch
-    assert len(movement_prep.exercise_phases[2].exercises) > 0
+    assert len(movement_prep.exercise_phases[2].exercises) == 0
     assert movement_prep.exercise_phases[3].type == ExercisePhaseType.dynamic_stretch
-    assert len(movement_prep.exercise_phases[3].exercises) == 0
+    assert len(movement_prep.exercise_phases[3].exercises) > 0
 
     assert movement_prep.exercise_phases[4].type == ExercisePhaseType.isolated_activate
     assert len(movement_prep.exercise_phases[4].exercises) > 0

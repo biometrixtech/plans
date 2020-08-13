@@ -1,6 +1,7 @@
 from models.functional_movement import FunctionalMovementPairs, FunctionalMovementActionMapping, FunctionalMovementFactory
 from models.functional_movement_type import FunctionalMovementType
 from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
+from models.training_volume import StandardErrorRange
 from models.soreness_base import BodyPartLocation, BodyPartSide
 from datetime import datetime
 
@@ -33,8 +34,10 @@ def test_apply_load_concentric():
     exercise_action.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
     exercise_action.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
-    exercise_action.total_load_left = 100
-    exercise_action.total_load_right = 200
+    #exercise_action.tissue_load_left = StandardErrorRange(observed_value=100)
+    #exercise_action.tissue_load_right = StandardErrorRange(observed_value=200)
+    exercise_action.power_load_left = StandardErrorRange(observed_value=100)
+    exercise_action.power_load_right = StandardErrorRange(observed_value=200)
     exercise_action.lower_body_stability_rating = 1.1
     exercise_action.upper_body_stability_rating = 0.6
 
@@ -44,7 +47,7 @@ def test_apply_load_concentric():
     priority_3_ratio = 0.3
 
     factory = FunctionalMovementFactory()
-    dict = factory.get_functional_movement_dictinary()
+    dict = factory.get_functional_movement_dictionary()
 
     functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now(), dict)
     assert len(functional_movement_action_mapping.muscle_load) == 67
@@ -94,8 +97,10 @@ def test_apply_load_eccentric():
     exercise_action.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_flexion)]
     exercise_action.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_flexion)]
     exercise_action.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_dorsiflexion)]
-    exercise_action.total_load_left = 100
-    exercise_action.total_load_right = 200
+    #exercise_action.tissue_load_left = StandardErrorRange(observed_value=100)
+    #exercise_action.tissue_load_right = StandardErrorRange(observed_value=200)
+    exercise_action.power_load_left = StandardErrorRange(observed_value=100)
+    exercise_action.power_load_right = StandardErrorRange(observed_value=200)
     exercise_action.lower_body_stability_rating = 1.1
     exercise_action.upper_body_stability_rating = 0.6
 
@@ -104,7 +109,7 @@ def test_apply_load_eccentric():
     priority_3_ratio = 0.3
 
     factory = FunctionalMovementFactory()
-    dict = factory.get_functional_movement_dictinary()
+    dict = factory.get_functional_movement_dictionary()
 
     functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.now(), dict)
     assert len(functional_movement_action_mapping.muscle_load) == 67
