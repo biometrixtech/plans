@@ -81,11 +81,6 @@ Resources:
         Properties:
             BucketName: { "Fn::Sub": "biometrix-plans-${Environment}-performance-data" }
             NotificationConfiguration: 
-            #   { "Fn::If": [
-            #     "CreateIngest",
-            #     { "LambdaConfigurations": [ { "Event": "s3:ObjectCreated:*", "Function": { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] } } ] },
-            #     { Ref: "AWS::NoValue" }
-            # ]}
                 LambdaConfigurations:
                     - Event: "s3:ObjectCreated:*"
                       Filter:
@@ -184,10 +179,6 @@ Resources:
                           - "s3:PutObject"
                         Effect: "Allow"
                         Resource: "*"
-                      # - Action:
-                      #     - "lambda:InvokeFunction"
-                      #   Effect: "Allow"
-                      #   Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
 
     ##########################################################################################################
@@ -288,14 +279,6 @@ Resources:
               - { Key: "Service", Value: "apigateway" }
             TracingConfig:
                 Mode: "Active"
-            # VpcConfig: { "Fn::If": [
-            #     "CreateVpc",
-            #     {
-            #         SubnetIds: { "Fn::Split": [ ",", { "Fn::GetAtt": [ "VpcStack", "Outputs.PrivateSubnetIds" ] } ] },
-            #         SecurityGroupIds: [ { Ref: "LambdaVpcSecurityGroup" } ]
-            #     },
-            #     { Ref: "AWS::NoValue" }
-            # ]}
 
     ApigatewayStack:
         Type: "AWS::CloudFormation::Stack"
