@@ -72,6 +72,44 @@ Conditions:
 Resources:
 
     ##########################################################################################################
+    ##  S3
+    ##########################################################################################################
+
+    S3Bucket:
+        Type: "AWS::S3::Bucket"
+        DependsOn: LambdaTriggerPermission
+        Properties:
+            BucketName: { "Fn::Sub": "biometrix-plans-${Environment}-performance-data" }
+            NotificationConfiguration: 
+                LambdaConfigurations:
+                    - Event: "s3:ObjectCreated:*"
+                      Filter:
+                        S3Key:
+                          Rules:
+                            - Name: prefix
+                              Value: latest_lambda_version
+                      Function: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] }
+            Tags:
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "apigateway" }
+        # Don't delete this if we accidentally delete the stack (which would fail anyway unless the bucket is empty)
+        DeletionPolicy : "Retain"
+
+
+    LambdaTriggerPermission:
+        Type: "AWS::Lambda::Permission"
+        DependsOn: DataParseLambda
+        Properties:
+            Action: "lambda:InvokeFunction"
+            FunctionName: { "Fn::GetAtt": [ "DataParseLambda", "Arn" ] }
+            Principal: "s3.amazonaws.com"
+            SourceArn:  { "Fn::Sub": "arn:aws:s3:::biometrix-plans-${Environment}-performance-data" }
+            SourceAccount: { Ref : "AWS::AccountId" }
+
+
+    ##########################################################################################################
     ## VPC & NETWORKING
     ##########################################################################################################
 
@@ -138,6 +176,7 @@ Resources:
                         Resource: "*"
                       - Action:
                           - "s3:GetObject"
+                          - "s3:PutObject"
                         Effect: "Allow"
                         Resource: "*"
             RoleName: { "Fn::Sub": "plans-${Environment}-apigateway-${AWS::Region}" }
@@ -180,6 +219,7 @@ Resources:
                     ENVIRONMENT: { Ref: 'Environment' }
                     AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
                     USERS_API_VERSION: { Ref: "UsersApiVersion"}
+                    PERFORMANCE_DATA_S3_BUCKET: { Ref: "S3Bucket" }
             Handler: "apigateway.handler"
             Runtime: "python3.6"
             Timeout: "60"
@@ -205,6 +245,40 @@ Resources:
                 },
                 { Ref: "AWS::NoValue" }
             ]}
+
+    DataParseLambda:
+        Type: "AWS::Lambda::Function"
+        Properties:
+            Code:
+                S3Bucket: { "Fn::ImportValue": "InfrastructureBucketName" }
+                S3Key: { "Fn::Sub": [ "lambdas/plans/${TemplateVersion}/apigateway.zip", {
+                    TemplateVersion: { "Fn::FindInMap": [ "TemplateVersion", "Self", "Commit" ] }
+                } ] }
+            Environment:
+                Variables:
+                    SERVICE: 'plans'
+                    ENVIRONMENT: { Ref: 'Environment' }
+                    AWS_ACCOUNT_ID: { Ref: "AWS::AccountId" }
+                    USERS_API_VERSION: { Ref: "UsersApiVersion"}
+            Handler: "parse_performance_data.lambda_handler"
+            Runtime: "python3.6"
+            Timeout: "60"
+            MemorySize: "512"
+            Role: { "Fn::GetAtt" : [ "ApiGatewayLambdaExecutionRole", "Arn" ] }
+            FunctionName: { "Fn::Sub": "plans-${Environment}-data-parse" }
+            Layers: [
+              "arn:aws:lambda:us-west-2:887689817172:layer:pandas105:5",
+              "arn:aws:lambda:us-west-2:420165488524:layer:AWSLambda-Python36-SciPy1x:20",
+              "arn:aws:lambda:us-west-2:887689817172:layer:sklearn2:3"
+            ]
+            Tags:
+              - { Key: "Name", Value: { "Fn::Sub": "plans-${Environment}-data-parse" } }
+              - { Key: "Management", Value: "managed" }
+              - { Key: "Project", Value: "plans" }
+              - { Key: "Environment", Value: { Ref: "Environment" } }
+              - { Key: "Service", Value: "apigateway" }
+            TracingConfig:
+                Mode: "Active"
 
     ApigatewayStack:
         Type: "AWS::CloudFormation::Stack"

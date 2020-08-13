@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 from serialisable import Serialisable
-from statistics import mean
+from statistics import mean, stdev
 
 
 '''deprecated for now
@@ -164,7 +164,40 @@ class StandardErrorRange(Serialisable):
         if len(upper_bound_list) > 0:
             average_range.upper_bound = mean(upper_bound_list)
 
+        if average_range.lower_bound is None and average_range.observed_value is not None:
+            average_range.lower_bound = average_range.observed_value
+        if average_range.upper_bound is None and average_range.observed_value is not None:
+            average_range.upper_bound = average_range.observed_value
+
         return average_range
+
+    @staticmethod
+    def get_stddev_from_error_range_list(error_range_list):
+
+        upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
+        observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
+        lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+
+        stdev_range = StandardErrorRange()
+
+        if len(lower_bound_list) > 1:
+            stdev_range.lower_bound = stdev(lower_bound_list)
+        if len(observed_value_list) > 1:
+            stdev_range.observed_value = stdev(observed_value_list)
+        if len(upper_bound_list) > 1:
+            stdev_range.upper_bound = stdev(upper_bound_list)
+
+        return stdev_range
+
+    @staticmethod
+    def get_sum_from_error_range_list(error_range_list):
+
+        total_load = StandardErrorRange()
+
+        for load_value in error_range_list:
+            total_load.add(load_value)
+
+        return total_load
 
     def lowest_value(self):
 
@@ -212,6 +245,31 @@ class StandardErrorRange(Serialisable):
         if standard_error_range is not None:
             self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
 
+    def subtract(self, standard_error_range):
+        if standard_error_range.lower_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.lower_bound = standard_error_range.observed_value
+        if standard_error_range.upper_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.upper_bound = standard_error_range.observed_value
+
+        if standard_error_range is not None and standard_error_range.lower_bound is not None:
+            if self.lower_bound is not None:
+                self.lower_bound = self.lower_bound - standard_error_range.lower_bound
+        if standard_error_range is not None and standard_error_range.upper_bound is not None:
+            if self.upper_bound is not None:
+                self.upper_bound = self.upper_bound - standard_error_range.upper_bound
+        if standard_error_range is not None and standard_error_range.observed_value is not None:
+            if self.observed_value is not None:
+                self.observed_value = self.observed_value - standard_error_range.observed_value
+
+        if self.lower_bound is None:
+            self.lower_bound = self.observed_value
+        if self.upper_bound is None:
+            self.upper_bound = self.observed_value
+
+        # TODO: verify the assumption present in the following line: insufficient data trumps sufficient data
+        if standard_error_range is not None:
+            self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
+
     def add_value(self, number_value):
         if number_value is not None :
             if self.lower_bound is not None:
@@ -247,6 +305,35 @@ class StandardErrorRange(Serialisable):
             self.upper_bound = self.upper_bound * factor
         if self.observed_value is not None:
             self.observed_value = self.observed_value * factor
+
+    def multiply_range(self, standard_error_range):
+        if self.lower_bound is not None and standard_error_range.lower_bound is not None:
+            self.lower_bound = self.lower_bound * standard_error_range.lower_bound
+        else:
+            self.lower_bound = None
+        if self.upper_bound is not None and standard_error_range.upper_bound is not None:
+            self.upper_bound = self.upper_bound * standard_error_range.upper_bound
+        else:
+            self.upper_bound = None
+        if self.observed_value is not None and standard_error_range.observed_value is not None:
+            self.observed_value = self.observed_value * standard_error_range.observed_value
+        else:
+            self.observed_value = None
+
+    def divide_range_simple(self, standard_error_range):
+        if self.lower_bound is not None and standard_error_range.lower_bound is not None and standard_error_range.lower_bound > 0:
+            self.lower_bound = self.lower_bound / standard_error_range.lower_bound
+        else:
+            self.lower_bound = None
+        if self.upper_bound is not None and standard_error_range.upper_bound is not None and standard_error_range.upper_bound > 0:
+            self.upper_bound = self.upper_bound / standard_error_range.upper_bound
+        else:
+            self.upper_bound = None
+        if self.observed_value is not None and standard_error_range.observed_value is not None and standard_error_range.observed_value > 0:
+            self.observed_value = self.observed_value / standard_error_range.observed_value
+        else:
+            self.observed_value = None
+
 
     def divide(self, factor):
         if self.lower_bound is not None:
@@ -628,3 +715,23 @@ class Assignment(object):
                 new_range.upper_bound = range.upper_bound * assignment.max_value
 
         return new_range
+
+
+class MovementOption(object):
+    def __init__(self, option_type='default', movement_id=None):
+        self.option_type = option_type
+        self.movement_id = movement_id
+
+    def json_serialise(self):
+        ret = {
+            'option_type': self.option_type,
+            'movement_id': self.movement_id
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        option = cls()
+        option.option_type = input_dict.get('option_type', 'default')
+        option.movement_id = input_dict.get('movement_id')
+        return option

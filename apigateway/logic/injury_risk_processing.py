@@ -36,6 +36,7 @@ class InjuryRiskProcessor(object):
         
         self.eccentric_volume_dict = {}
         self.concentric_volume_dict = {}
+        self.isometric_volume_dict = {}
         self.total_volume_dict = {}
         self.prime_mover_eccentric_volume_dict = {}
         self.prime_mover_concentric_volume_dict = {}
@@ -47,6 +48,7 @@ class InjuryRiskProcessor(object):
         self.synergist_total_volume_dict = {}
         
         self.eccentric_intensity_dict = {}
+        self.isometric_intensity_dict = {}
         self.concentric_intensity_dict = {}
         self.total_intensity_dict = {}
         self.prime_mover_eccentric_intensity_dict = {}
@@ -1140,6 +1142,13 @@ class InjuryRiskProcessor(object):
         if d not in self.concentric_volume_dict[body_part_side]:
             self.concentric_volume_dict[body_part_side][d] = 0
         self.concentric_volume_dict[body_part_side][d] = body_part_injury_risk.concentric_volume_today
+
+        # isometric volume
+        if body_part_side not in self.isometric_volume_dict:
+            self.isometric_volume_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
+        if d not in self.isometric_volume_dict[body_part_side]:
+            self.isometric_volume_dict[body_part_side][d] = 0
+        self.isometric_volume_dict[body_part_side][d] = body_part_injury_risk.isometric_volume_today
         
         # total volume
         if body_part_side not in self.total_volume_dict:
@@ -1165,13 +1174,20 @@ class InjuryRiskProcessor(object):
             self.concentric_intensity_dict[body_part_side][d] = 0
         self.concentric_intensity_dict[body_part_side][d] += body_part_injury_risk.concentric_intensity_today
 
+        # isometric intensity
+        if body_part_side not in self.isometric_intensity_dict:
+            self.isometric_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
+        if d not in self.isometric_intensity_dict[body_part_side]:
+            self.isometric_intensity_dict[body_part_side][d] = 0
+        self.isometric_intensity_dict[body_part_side][d] += body_part_injury_risk.isometric_intensity_today
+
         # total intensity
         if body_part_side not in self.total_intensity_dict:
             self.total_intensity_dict[body_part_side] = {}  # now we have a dictionary of dictionaries
         if d not in self.total_intensity_dict[body_part_side]:
             self.total_intensity_dict[body_part_side][d] = 0
         self.total_intensity_dict[body_part_side][
-            d] += body_part_injury_risk.concentric_intensity_today + body_part_injury_risk.eccentric_intensity_today
+            d] += body_part_injury_risk.concentric_intensity_today + body_part_injury_risk.eccentric_intensity_today + body_part_injury_risk.isometric_intensity_today
 
     @xray_recorder.capture('logic.InjuryRiskProcessor.process_todays_sessions')
     def process_todays_sessions(self, base_date, injury_risk_dict, load_stats):
@@ -1185,14 +1201,19 @@ class InjuryRiskProcessor(object):
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 
             injury_risk_dict[body_part_side].concentric_volume_today = StandardErrorRange(observed_value=0)
+            injury_risk_dict[body_part_side].isometric_volume_today = StandardErrorRange(observed_value=0)
             injury_risk_dict[body_part_side].eccentric_volume_today = StandardErrorRange(observed_value=0)
             injury_risk_dict[body_part_side].compensating_concentric_volume_today = StandardErrorRange(observed_value=0)
+            injury_risk_dict[body_part_side].compensating_isometric_volume_today = StandardErrorRange(observed_value=0)
             injury_risk_dict[body_part_side].compensating_eccentric_volume_today = StandardErrorRange(observed_value=0)
 
             injury_risk_dict[body_part_side].concentric_intensity_today = StandardErrorRange(observed_value=0)
+            injury_risk_dict[body_part_side].isometric_intensity_today = StandardErrorRange(observed_value=0)
             injury_risk_dict[body_part_side].eccentric_intensity_today = StandardErrorRange(observed_value=0)
 
             injury_risk_dict[body_part_side].compensating_concentric_intensity_today = StandardErrorRange(observed_value=0)
+            injury_risk_dict[body_part_side].compensating_isometric_intensity_today = StandardErrorRange(
+                observed_value=0)
             injury_risk_dict[body_part_side].compensating_eccentric_intensity_today = StandardErrorRange(observed_value=0)
 
         session_mapping_dict = {}
@@ -1248,8 +1269,11 @@ class InjuryRiskProcessor(object):
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 
             injury_risk_dict[body_part_side].concentric_volume_today = StandardErrorRange(observed_value=0)
+            injury_risk_dict[body_part_side].isometric_volume_today = StandardErrorRange(observed_value=0)
             injury_risk_dict[body_part_side].eccentric_volume_today = StandardErrorRange(observed_value=0)
             injury_risk_dict[body_part_side].compensating_concentric_volume_today = StandardErrorRange(observed_value=0)
+            injury_risk_dict[body_part_side].compensating_isometric_volume_today = StandardErrorRange(observed_value=0)
+
             injury_risk_dict[body_part_side].compensating_eccentric_volume_today = StandardErrorRange(observed_value=0)
             #injury_risk_dict[body_part_side].compensating_causes_volume_today = []
             #injury_risk_dict[body_part_side].compensating_source_volume = None
@@ -1259,8 +1283,12 @@ class InjuryRiskProcessor(object):
 
             for body_part_side, body_part_functional_movement in session_load_dict.items():
                 injury_risk_dict[body_part_side].concentric_volume_today.add(body_part_functional_movement.concentric_load)
+                injury_risk_dict[body_part_side].isometric_volume_today.add(
+                    body_part_functional_movement.isometric_load)
                 injury_risk_dict[body_part_side].eccentric_volume_today.add(body_part_functional_movement.eccentric_load)
                 injury_risk_dict[body_part_side].compensating_concentric_volume_today.add(body_part_functional_movement.compensated_concentric_load)
+                injury_risk_dict[body_part_side].compensating_isometric_volume_today.add(
+                    body_part_functional_movement.compensated_isometric_load)
                 injury_risk_dict[body_part_side].compensating_eccentric_volume_today.add(body_part_functional_movement.compensated_eccentric_load)
 
                 #injury_risk_dict[body_part_side].compensating_causes_volume_today.extend(

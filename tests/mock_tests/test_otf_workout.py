@@ -77,7 +77,7 @@ def get_workout(date, file_name):
 
     return planned_session
 
-def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default'):
+def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default', movement_option=None):
     # session = MixedActivitySession()
     # session.event_date = date
     # session.session_RPE = rpe
@@ -90,10 +90,24 @@ def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='defau
     #workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
     planned_workout = PlannedWorkout.json_deserialise(workout_json)
     planned_session.workout = planned_workout
-    WorkoutProcessor(user_weight=60).process_planned_workout(planned_session, assignment_type)
+    WorkoutProcessor(user_weight=60).process_planned_workout(planned_session, assignment_type, movement_option)
 
     return planned_session
 
+
+def get_session_2(date, rpe=5, duration=60, file_name=None, assignment_type='default'):
+    session = MixedActivitySession()
+    session.event_date = date
+    session.session_RPE = rpe
+    session.duration_minutes = duration
+    session.sport_name = SportName.high_intensity_interval_training
+
+    workout_json = read_json(file_name)
+    workout_program_module = WorkoutProgramModule.json_deserialise(workout_json)
+    session.workout_program_module = workout_program_module
+    WorkoutProcessor(user_weight=70, user_age=30).process_workout(session)
+
+    return session
 
 def get_activity(event_date_time, symptoms, sessions):
     proc = InjuryRiskProcessor(event_date_time, symptoms, sessions, {}, UserStats("tester"), "tester")
@@ -480,14 +494,39 @@ def test_api_movement_prep_compare_volume_may1_alt():
     assert total_concentric_volume_2_upper_bound < total_concentric_volume_3_upper_bound
 
 #
-# def test_may2():
-#     session = get_session(datetime.datetime.now(), file_name='may2')
-#     movement_prep = get_activity(datetime.datetime.now(), [], [session])
-#     assigned_exercises = {}
-#     for ex_phase in movement_prep[0].exercise_phases:
-#         assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+def test_may2():
+    session = get_session_2(datetime.datetime.now(), file_name='may2')
+    movement_prep = get_activity(datetime.datetime.now(), [], [session])
+    assigned_exercises = {}
+    for ex_phase in movement_prep[0].exercise_phases:
+        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+    print('here')
+
+
+def test_may18():
+    session = get_session_2(datetime.datetime.now(), file_name='may18')
+    movement_prep = get_activity(datetime.datetime.now(), [], [session])
+    assigned_exercises = {}
+    for ex_phase in movement_prep[0].exercise_phases:
+        assigned_exercises[ex_phase.name] = list(ex_phase.exercises.keys())
+    print('here')
+
+
+def test_may1_alt2():
+    session_default = get_session(datetime.datetime.now(), file_name='may1_alt2')
+    session_variation = get_session(datetime.datetime.now(), file_name='may1_alt2', movement_option='variation')
+    ex_default = session_default.workout.sections[6].exercises[1]
+    ex_variation = session_variation.workout.sections[6].exercises[1]
+    assert ex_default.name == ex_variation.name
+    assert ex_default.movement_id != ex_variation.movement_id
+
+
+# def test_srpe():
+#     for user in [1, 2, 3]:
+#         session = get_session_2(datetime.datetime.now(), file_name=f'completed_workout_{user}')
+#         print(session.session_RPE)
 #     print('here')
-#
+
 #
 # def test_at_home1():
 #     session = get_session(datetime.datetime.now(), file_name='at_home1')

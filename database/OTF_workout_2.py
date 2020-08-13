@@ -8,7 +8,7 @@ def is_valid(row, name):
         return True
     return False
 
-def parse_file(file_name):
+def parse_file(file_name, write=True, path=None):
     data = pd.read_csv(f'{file_name}.csv')
     data = data.fillna('')
     sections = {}
@@ -29,6 +29,8 @@ def parse_file(file_name):
                     'duration_seconds': new_duration_assignment,
                     'exercises': []
                 }
+                new_section['planned_start_time_run_first'] = row.get('planned_start_time_run_first')
+                new_section['planned_start_time_rower_first'] = row.get('planned_start_time_rower_first')
                 sections[section_name] = new_section
             else:
                 exercise = {}
@@ -39,6 +41,20 @@ def parse_file(file_name):
                         'assigned_value': 1.56
                     }
                 exercise['movement_id'] = row['movement']
+                exercise['alternate_movement_ids'] = []
+                if is_valid(row, 'movement_alt_variation'):
+                    alt_movement = {
+                        'option_type': 'variation',
+                        'movement_id': row['movement_alt_variation']
+                    }
+                    exercise['alternate_movement_ids'].append(alt_movement)
+
+                if is_valid(row, 'movement_alt_challenge'):
+                    alt_movement = {
+                        'option_type': 'challenge',
+                        'movement_id': row['movement_alt_challenge']
+                    }
+                    exercise['alternate_movement_ids'].append(alt_movement)
                 if is_valid(row, 'duration_value') or is_valid(row, 'duration_min') or is_valid(row, 'duration_max'):  #if not np.isnan(row['duration']):
                     duration_assignment = {
                         'assigned_value': row['duration_value'],
@@ -178,18 +194,28 @@ def parse_file(file_name):
         workout['program_module_id'] = 'at_home1'
     elif file_name == 'at_home2':
         workout['program_module_id'] = 'at_home2'
+    elif file_name == 'june8_alt':
+        workout['program_module_id'] = 'june_8'
+        workout['program_id'] = 'june_8'
 
-    workout['workout_sections'] = list(sections.values())
-    json_string = json.dumps(workout, indent=4)
-    file_name = os.path.join(os.path.realpath('..'), f"tests/data/otf/{file_name}.json")
-    print(f"writing: {file_name}")
-    f1 = open(file_name, 'w')
-    f1.write(json_string)
-    f1.close()
+    workout['sections'] = list(sections.values())
+    if write:
+        json_string = json.dumps(workout, indent=4)
+        if path is None:
+            file_name = os.path.join(os.path.realpath('..'), f"tests/data/otf/{file_name}.json")
+        else:
+            file_name = os.path.join(path, f"{file_name}.json")
+        print(f"writing: {file_name}")
+        f1 = open(file_name, 'w')
+        f1.write(json_string)
+        f1.close()
+    else:
+        return workout
 
+if __name__ == '__main__':
 
-# for file_name in ['may1', 'may2']:
-#for file_name in ['at_home1', 'at_home2']:
-for file_name in ['may1_alt']:
-    parse_file(file_name)
+    # for file_name in ['may1', 'may2']:
+    #for file_name in ['at_home1', 'at_home2']:
+    for file_name in ['may1_alt']:
+        parse_file(file_name)
 

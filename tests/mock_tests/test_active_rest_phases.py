@@ -15,7 +15,7 @@ from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.exercise_assignment import ExerciseAssignment
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
-from models.movement_tags import AdaptationType
+from models.movement_tags import AdaptationType, TrainingType
 from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
 from models.functional_movement_type import FunctionalMovementType
@@ -206,6 +206,7 @@ def test_check_active_rest_phases_no_soreness_with_mixed_session():
     exercise_action_1.lower_body_stability_rating = 1.1
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
+    exercise_action_1.training_type = TrainingType.strength_cardiorespiratory
 
     exercise_action_2 = ExerciseAction("1", "flail")
     exercise_action_2.primary_muscle_action = MuscleAction.concentric
@@ -219,11 +220,20 @@ def test_check_active_rest_phases_no_soreness_with_mixed_session():
     exercise_action_2.lower_body_stability_rating = 1.1
     exercise_action_2.upper_body_stability_rating = 0.6
     exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
+    exercise_action_2.training_type = TrainingType.strength_cardiorespiratory
 
     exercise_1 = WorkoutExercise()
+    exercise_1.rpe = StandardErrorRange(observed_value=5)
+    exercise_1.duration = 90
+    exercise_1.power_load = StandardErrorRange(observed_value=300)
+    exercise_1.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     exercise_1.primary_actions.append(exercise_action_1)
 
     exercise_2 = WorkoutExercise()
+    exercise_2.rpe = StandardErrorRange(observed_value=5)
+    exercise_2.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    exercise_2.duration = 90
+    exercise_2.power_load = StandardErrorRange(observed_value=300)
     exercise_2.primary_actions.append(exercise_action_2)
 
     section_1 = WorkoutSection()

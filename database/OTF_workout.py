@@ -33,7 +33,7 @@ def parse_file(file_name):
                     if is_valid(row, 'weight'):
                         exercise['weight'] = row['weight']
                     else:
-                        exercise['weight'] = 15
+                        exercise['weight'] = 15 / 2.2  # 15 lbs
                     exercise['weight_measure'] = 2
                 if is_valid(row, 'reps'):  #if not np.isnan(row['reps']):
                     exercise['reps_per_set'] = row['reps']
@@ -77,8 +77,9 @@ def parse_file(file_name):
     f1.write(json_string)
     f1.close()
 
-
-# for file_name in ['may1', 'may2']:
-for file_name in ['at_home1', 'at_home2']:
+# files = ['may1', 'may2']
+# files = ['at_home1', 'at_home2']
+files = ['may18']
+for file_name in files:
     parse_file(file_name)
 

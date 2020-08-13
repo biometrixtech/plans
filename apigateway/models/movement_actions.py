@@ -25,12 +25,18 @@ class LowerBodyStance(Enum):
     kneeling = 9
     half_kneeling = 10
     seated = 11
+    contralateral_single_leg = 12
+    alternating_single_leg = 13
+    contralateral_alternating_single_leg = 14
+
 
 class UpperBodyStance(Enum):
     double_arm = 0
     alternating_arms = 1
     single_arm = 2
     single_arm_with_trunk_rotation = 3
+    contralateral_single_arm = 4
+    contralateral_alternating_single_arm = 5
 
 
 class ExerciseAction(object):
@@ -38,25 +44,52 @@ class ExerciseAction(object):
         self.id = id
         self.name = name
 
-        # defined per action
-        self.training_type = None
-        self.eligible_external_resistance = []
-        self.lower_body_stance = None
-        self.upper_body_stance = None
-        self.lateral_distribution_pattern = WeightDistribution.bilateral
-        self.percent_bodyweight = 0.0
-        self.lateral_distribution = [0, 0]
-        self.apply_resistance = False
-        self.explosiveness = None
-        self.apply_instability = False
+        self.primary_muscle_action = None  # muscle_action
 
-        self.primary_muscle_action = None
+        # New
+        self.movement_system_priority = None  # 1,2,3
+        self.movement_system_name = None
+        self.movement_system = None
+
         self.hip_joint_action = []
         self.knee_joint_action = []
         self.ankle_joint_action = []
+        self.pelvic_tilt_joint_action = []
         self.trunk_joint_action = []
         self.shoulder_scapula_joint_action = []
         self.elbow_joint_action = []
+        self.wrist_joint_action = []
+
+        self.body_position = None
+        self.eligible_external_resistance = []
+
+        # New
+        self.contribute_to_power_production = False
+
+        self.apply_instability = False
+        self.apply_resistance = False
+        self.lower_body_stance = None
+        self.upper_body_stance = None
+        self.lateral_distribution_pattern = WeightDistribution.bilateral
+
+        # New
+        self.arm = None
+        self.torso = None
+        self.leg = None
+        self.multiplier = 1
+
+        self.percent_bodyweight = 0.0
+        self.lateral_distribution = [0, 0]
+
+        # ===== Sub action ends here =====
+
+        # defined per action
+        self.training_type = None
+
+        self.explosiveness = None
+
+        self.speed = None
+        self.resistance = None
 
         # self.ancillary_muscle_action = None
         # self.hip_stability_action = []
@@ -118,6 +151,7 @@ class ExerciseAction(object):
             "name": self.name,
             "training_type": self.training_type.value if self.training_type is not None else None,
             "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
+            "body_position": self.body_position.value if self.body_position is not None else None,
             "lower_body_stance": self.lower_body_stance.value if self.lower_body_stance is not None else None,
             "upper_body_stance": self.upper_body_stance.value if self.upper_body_stance is not None else None,
             "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
@@ -126,14 +160,18 @@ class ExerciseAction(object):
             "apply_resistance": self.apply_resistance,
             "explosiveness": self.explosiveness.value if self.explosiveness is not None else None,
             "apply_instability": self.apply_instability,
+            'speed': self.speed.value if self.speed is not None else None,
+            'resistance': self.resistance.value if self.resistance is not None else None,
 
             "primary_muscle_action": self.primary_muscle_action.value if self.primary_muscle_action is not None else None,
             "hip_joint_action": [ac.json_serialise() for ac in self.hip_joint_action],
             "knee_joint_action": [ac.json_serialise() for ac in self.knee_joint_action],
             "ankle_joint_action": [ac.json_serialise() for ac in self.ankle_joint_action],
+            "pelvic_tilt_joint_action": [ac.json_serialise() for ac in self.pelvic_tilt_joint_action],
             "trunk_joint_action": [ac.json_serialise() for ac in self.trunk_joint_action],
             "shoulder_scapula_joint_action": [ac.json_serialise() for ac in self.shoulder_scapula_joint_action],
             "elbow_joint_action": [ac.json_serialise() for ac in self.elbow_joint_action],
+            "wrist_joint_action": [ac.json_serialise() for ac in self.wrist_joint_action],
 
             # "ancillary_muscle_action": self.ancillary_muscle_action,
             # "hip_stability_action": self.hip_stability_action,
@@ -187,6 +225,7 @@ class ExerciseAction(object):
         # defined per action
         action.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
         action.eligible_external_resistance = [Equipment(equip) for equip in input_dict.get('eligible_external_resistance', [])]
+        action.body_position = BodyPosition(input_dict['body_position']) if input_dict.get('body_position') is not None else None
         action.lower_body_stance = LowerBodyStance(input_dict['lower_body_stance']) if input_dict.get('lower_body_stance') is not None else None
         action.upper_body_stance = UpperBodyStance(input_dict['upper_body_stance']) if input_dict.get('upper_body_stance') is not None else None
         action.lateral_distribution_pattern = WeightDistribution(input_dict['lateral_distribution_pattern']) if input_dict.get('lateral_distribution_pattern') is not None else WeightDistribution.bilateral
@@ -195,15 +234,18 @@ class ExerciseAction(object):
         action.apply_resistance = input_dict.get('apply_resistance', False)
         action.explosiveness = Explosiveness(input_dict['explosiveness']) if input_dict.get('explosiveness') is not None else None
         action.apply_instability = input_dict.get('apply_instability', False)
-
+        action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
+        action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
         action.primary_muscle_action = MuscleAction(input_dict['primary_muscle_action']) if input_dict.get('primary_muscle_action') is not None else None
         action.hip_joint_rating = None
         action.hip_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('hip_joint_action', [])]
         action.knee_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('knee_joint_action', [])]
         action.ankle_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('ankle_joint_action', [])]
+        action.pelvic_tilt_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('pelvic_tilt_joint_action', [])]
         action.trunk_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('trunk_joint_action', [])]
         action.shoulder_scapula_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('shoulder_scapula_joint_action', [])]
         action.elbow_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('elbow_joint_action', [])]
+        action.wrist_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('wrist_joint_action', [])]
 
         # action.ancillary_muscle_action = MuscleAction(input_dict['ancillary_muscle_action']) if input_dict.get('ancillary_muscle_action') is not None else None
         # action.hip_stability_action = []
@@ -544,8 +586,14 @@ class ExerciseAction(object):
                 elif self.side == 2:
                     self.training_volume_right = total_volume
                 else:
-                    self.training_volume_left = total_volume / 2
-                    self.training_volume_right = total_volume / 2
+                    if isinstance(total_volume, Assignment):
+                        self.training_volume_left = Assignment.divide_assignment_by_scalar(total_volume, 2)
+                    else:
+                        self.training_volume_left = total_volume / 2
+                    if isinstance(total_volume, Assignment):
+                        self.training_volume_right = Assignment.divide_assignment_by_scalar(total_volume, 2)
+                    else:
+                        self.training_volume_right = total_volume / 2
             elif self.lateral_distribution_pattern == WeightDistribution.bilateral_uneven:
                 if self.side == 1:
                     if self.lateral_distribution[0] != 0:
@@ -590,20 +638,22 @@ class ExerciseCompoundAction(object):
 
 
 class MovementSpeed(Enum):
-    no_speed = 0
-    speed = 1
-    max_speed = 2
-
+    none = 0
+    slow = 1
+    mod = 2
+    fast = 3
+    explosive = 4
 
 class MovementResistance(Enum):
-    low_resistance = 0
-    mod_resistance = 1
-    high_resistance = 2
-    max_resistance = 3
+    none = 0
+    low = 1
+    mod = 2
+    high = 3
+    max = 4
 
 
 class Explosiveness(IntEnum):
-    no_speed = 0
+    no_force = 0
     low_force = 1
     mod_force = 2
     high_force = 3
@@ -682,23 +732,23 @@ class Movement(Serialisable):
         self.explosiveness_rating = 0
 
         if self.speed is not None and self.resistance is not None:
-            if self.resistance == MovementResistance.low_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            if self.resistance == MovementResistance.low:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 4
                 else:
                     self.explosiveness_rating = 3
-            elif self.resistance == MovementResistance.mod_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            elif self.resistance == MovementResistance.mod:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 6
                 else:
                     self.explosiveness_rating = 5
-            elif self.resistance == MovementResistance.high_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            elif self.resistance == MovementResistance.high:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 8
                 else:
                     self.explosiveness_rating = 7
-            elif self.resistance == MovementResistance.max_resistance:
-                if self.speed == MovementSpeed.max_speed:
+            elif self.resistance == MovementResistance.max:
+                if self.speed == MovementSpeed.explosive:
                     self.explosiveness_rating = 10
                 else:
                     self.explosiveness_rating = 9

@@ -60,6 +60,8 @@ class UserStats(Serialisable):
                     value = parse_datetime(value)
                 except InvalidSchemaException:
                     value = parse_date(value)
+        elif name == 'vo2_max_date_time' and value is not None:
+            value = parse_datetime(value)
         super().__setattr__(name, value)
 
     def json_serialise(self):
@@ -72,7 +74,7 @@ class UserStats(Serialisable):
             'sport_max_load': {str(sport_name): sport_max_load.json_serialise() for (sport_name, sport_max_load) in self.sport_max_load.items()},
             'api_version': self.api_version,
             'timezone': self.timezone,
-            'vo2_max': self.vo2_max,
+            'vo2_max': self.vo2_max.json_serialise() if self.vo2_max is not None else None,
             'vo2_max_date_time': format_datetime(self.vo2_max_date_time),
             'athlete_age': self.athlete_age,
             'athlete_weight': self.athlete_weight,
@@ -113,7 +115,7 @@ class UserStats(Serialisable):
         user_stats.high_relative_load_sessions = [HighLoadSession.json_deserialise(session) if 'sport_name' in session else HighDetailedLoadSession.json_deserialise(session) for session in input_dict.get('high_relative_load_sessions', [])]
         user_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
         user_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
-        user_stats.vo2_max = input_dict.get('vo2_max')
+        user_stats.vo2_max = StandardErrorRange.json_deserialise(input_dict.get('vo2_max')) if input_dict.get('vo2_max') is not None else None
         user_stats.functional_threshold_power = input_dict.get('functional_threshold_power')
         user_stats.average_force_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_5_day') is not None else None
         user_stats.average_force_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_20_day') is not None else None

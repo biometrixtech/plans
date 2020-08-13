@@ -1,7 +1,9 @@
 from utils import format_date, parse_date
 from models.movement_tags import CardioAction, Equipment
+from models.ranked_types import RankedBodyPart
 from models.workout_program import WorkoutSection, BaseWorkoutExercise, ExerciseAction
-from models.training_volume import StandardErrorRange, Assignment
+from models.training_volume import StandardErrorRange, Assignment, MovementOption
+from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
 from serialisable import Serialisable
 
@@ -34,7 +36,7 @@ class PlannedWorkout(object):
         workout.program_id = input_dict.get('program_id')
         workout.program_module_id = input_dict.get('program_module_id')
         workout.duration = input_dict.get('duration')
-        workout.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('workout_sections', [])]
+        workout.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('sections', [])]
 
         return workout
 
@@ -46,16 +48,95 @@ class PlannedWorkout(object):
 #         self.duration = None
 #         self.exercises = []
 
+
+class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
+    def __init__(self, workout_id):
+        super().__init__()
+        self.workout_id = workout_id
+
+        self.session_detailed_load = DetailedTrainingLoad()
+        self.session_training_type_load = TrainingTypeLoad()
+        self.muscle_detailed_load = {}
+        self.ranked_muscle_detailed_load = []
+
+        # not yet certain these need to be serialised/deserialised
+        self.projected_rpe_load = StandardErrorRange()
+        self.projected_power_load = StandardErrorRange()
+        self.projected_session_rpe = StandardErrorRange()
+
+        self.projected_ramp = StandardErrorRange()
+        self.projected_acwr = StandardErrorRange()
+        self.projected_freshness = StandardErrorRange()
+        self.projected_fit_fatigue = StandardErrorRange()
+        self.projected_strain = StandardErrorRange()
+        self.projected_monotony = StandardErrorRange()
+        self.projected_strain_event_level = StandardErrorRange()
+
+        self.ranking = 0
+        self.score = 0
+
+    def rank_muscle_load(self):
+
+        for muscle in self.muscle_detailed_load.keys():
+            self.muscle_detailed_load[muscle].rank_adaptation_types()
+
+    def json_serialise(self):
+
+        ret = {
+            'name': self.name,
+            'event_date': format_date(self.event_date),
+            'program_id': self.program_id,
+            'program_module_id': self.program_module_id,
+            'duration': self.duration,
+            'sections': [s.json_serialise() for s in self.sections],
+            'workout_id': self.workout_id,
+            'session_detailed_load': self.session_detailed_load.json_serialise(),
+            'session_training_type_load': self.session_training_type_load.json_serialise(),
+            'ranked_muscle_detailed_load': [ml.json_serialise() for ml in self.ranked_muscle_detailed_load],
+            'projected_rpe_load': self.projected_rpe_load.json_serialise(),
+            'projected_power_load': self.projected_power_load.json_serialise(),
+            'projected_session_rpe': self.projected_session_rpe.json_serialise()
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        workout_load = PlannedWorkoutLoad(input_dict['workout_id'])
+        workout_load.name = input_dict.get('name')
+        workout_load.event_date = parse_date(input_dict.get('event_date')) if input_dict.get('event_date') is not None else None
+        workout_load.program_id = input_dict.get('program_id')
+        workout_load.program_module_id = input_dict.get('program_module_id')
+        workout_load.duration = input_dict.get('duration')
+        workout_load.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('sections', [])]
+        workout_load.session_detailed_load = DetailedTrainingLoad.json_deserialise(input_dict['session_detailed_load']) if input_dict.get('session_detailed_load') is not None else None
+        workout_load.session_training_type_load = TrainingTypeLoad.json_deserialise(
+            input_dict['session_training_type_load']) if input_dict.get('session_training_type_load') is not None else None
+        workout_load.ranked_muscle_detailed_load = [RankedBodyPart.json_deserialise(bp) for bp in input_dict.get('ranked_muscle_detailed_load', [])]
+        workout_load.projected_rpe_load = StandardErrorRange.json_deserialise(input_dict['projected_rpe_load']) if input_dict.get('projected_rpe_load') is not None else None
+        workout_load.projected_power_load = StandardErrorRange.json_deserialise(
+            input_dict['projected_power_load']) if input_dict.get('projected_power_load') is not None else None
+        workout_load.projected_session_rpe = StandardErrorRange.json_deserialise(
+            input_dict['projected_session_rpe']) if input_dict.get('projected_session_rpe') is not None else None
+
+        return workout_load
+
+
 class PlannedWorkoutSection(WorkoutSection, Serialisable):
     def __init__(self):
         super().__init__()
+        self.planned_start_time_run_first = None
+        self.planned_start_time_rower_first = None
 
     def json_serialise(self):
         ret = {
             'name': self.name,
             'start_date_time': self.start_date_time,
             'duration_seconds': self.duration_seconds,
-            'exercises': [e.json_serialise() for e in self.exercises]
+            'exercises': [e.json_serialise() for e in self.exercises],
+            'planned_start_time_run_first': self.planned_start_time_run_first,
+            'planned_start_time_rower_first': self.planned_start_time_rower_first
         }
         return ret
 
@@ -67,6 +148,8 @@ class PlannedWorkoutSection(WorkoutSection, Serialisable):
         workout_section.duration_seconds = input_dict.get('duration_seconds')
         workout_section.exercises = [PlannedExercise.json_deserialise(workout_exercise) for workout_exercise in
                                      input_dict.get('exercises', [])]
+        workout_section.planned_start_time_run_first = input_dict.get('planned_start_time_run_first')
+        workout_section.planned_start_time_rower_first = input_dict.get('planned_start_time_rower_first')
 
         return workout_section
 
@@ -102,6 +185,8 @@ class PlannedExercise(BaseWorkoutExercise):
         self.alternate_cadence = []  # will be a list of Assignment objects
         self.alternate_stroke_rate = []  # will be a list of Assignment objects
 
+        self.alternate_movement_ids = []
+
         self.stroke_adjustment = 0  # how much lower than your base stroke rate
 
         self.force = None
@@ -115,6 +200,8 @@ class PlannedExercise(BaseWorkoutExercise):
         self.maximal_intensity = False  # Potentially use this in calculating HRMax, VO2Max etc
 
         self.total_volume = None
+
+        self.detailed_power_load = None
         # only need this to set default values. So, possibly need it in spreadsheet but not stored
         # self.intensity = None  # e.g. base/push/all_out for OTF, potentially used to determine pace,watts etc e.g. rowing all out power is base + 50 or more
 
@@ -149,12 +236,13 @@ class PlannedExercise(BaseWorkoutExercise):
             'stroke_rate': self.stroke_rate if self.stroke_rate is not None else None,
 
             'alternate_duration': [duration.json_serialise() for duration in self.alternate_duration],
-            'alternate_distance': [distance.json_serialise() for distance in self.alternate_duration],
-            'alternate_pace': [pace.json_serialise() for pace in self.alternate_duration],
-            'alternate_speed': [speed.json_serialise() for speed in self.alternate_duration],
-            'alternate_grade': [grade.json_serialise() for grade in self.alternate_duration],
-            'alternate_cadence': [cadence.json_serialise() for cadence in self.alternate_duration],
-            'alternate_stroke_rate': [stroke_rate.json_serialise() for stroke_rate in self.alternate_duration],
+            'alternate_distance': [distance.json_serialise() for distance in self.alternate_distance],
+            'alternate_pace': [pace.json_serialise() for pace in self.alternate_pace],
+            'alternate_speed': [speed.json_serialise() for speed in self.alternate_speed],
+            'alternate_grade': [grade.json_serialise() for grade in self.alternate_grade],
+            'alternate_cadence': [cadence.json_serialise() for cadence in self.alternate_cadence],
+            'alternate_stroke_rate': [stroke_rate.json_serialise() for stroke_rate in self.alternate_stroke_rate],
+            'alternate_movement_ids': [movement_id.json_serialise() for movement_id in self.alternate_movement_ids],
 
             'stroke_adjustment': self.stroke_adjustment,
             'power_goal': self.power_goal,
@@ -216,6 +304,8 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise.alternate_cadence = [Assignment.json_deserialise(a) for a in input_dict.get('alternate_cadence', [])]   # will be a list of Assignment objects
         exercise.alternate_stroke_rate = [Assignment.json_deserialise(a) for a in input_dict.get('alternate_stroke_rate', [])]   # will be a list of Assignment objects
 
+        exercise.alternate_movement_ids = [MovementOption.json_deserialise(a) for a in input_dict.get('alternate_movement_ids', [])]
+
         exercise.stroke_adjustment = input_dict.get('stroke_adjustment', 0)  # how much lower than your base stroke rate
         exercise.power_goal = input_dict.get('power_goal')  # average power goal for exercise
         exercise.force = StandardErrorRange.json_deserialise(input_dict['force']) if input_dict.get('force') is not None else None
@@ -273,6 +363,10 @@ class PlannedExercise(BaseWorkoutExercise):
 
         if self.duration is not None and self.duration.max_value is not None and isinstance(self.duration.max_value, str):
             self.duration.max_value = None
+
+    def update_movement_id(self, movement_option):
+        if movement_option is not None:
+            self.movement_id = next((option.movement_id for option in self.alternate_movement_ids if option.option_type == movement_option), self.movement_id)
 
     def set_speed_pace(self):
         speed = None

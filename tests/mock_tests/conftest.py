@@ -14,6 +14,7 @@ def pytest_configure():
                                  'cardio_data_filename': 'cardiorespiratory_data_soflete.json',
                                  'hr_rpe_model_filename': 'hr_rpe.joblib',
                                  'bodyweight_ratio_model_filename': 'bodyweight_ratio.joblib',
-                                 'model_bucket': 'biometrix-globalmodels'
+                                 'model_bucket': 'biometrix-globalmodels',
+                                 'action_library_filename': 'actions_library.json',
                                  }
                )

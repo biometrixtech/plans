@@ -63,6 +63,7 @@ def handle_movement_prep_create(user_id):
         session = request.json['session']
         if session is not None:
             api_processor.create_session_from_survey(session)
+            workout = api_processor.sessions[0]
 
     # get symptoms
     if 'symptoms' in request.json:

@@ -1547,17 +1547,16 @@ Note: `user_age` __should__ be provided if `hr_data` is supplied.  See the speci
     "cadence": number,
     "grade": number
 }
-}
 ```
 
 * `id` __should__ be provider's unique identifier for the exercise
 * `name` __should__ be the exercise name
-* `weight_measure` __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
-* `weight` __should__ represent the numeric value of the weight used according to the  `weight_measure` attribute
-* `bilateral` __should__ be a boolean representation of whether exercise is performed on both sides
-* `side` __should__ represent the side (left or right) on which the exercise is performed if  `bilateral` is false
-* `sets` __should__ be an integer representation of total sets of the exercise to be performed
-* `reps_per_set` __should__ be an integer representing of total reps of exercise to be performed per set
+* `weight_measure` __if present__, __should__ be the unit external weight used is measured in either (weight in lbs, percent bodyweight or rep max)
+* `weight` __if present__, __should__ represent the numeric value of the weight used according to the  `weight_measure` attribute
+* `bilateral` __if present__, __should__ be a boolean representation of whether exercise is performed on both sides
+* `side` __if present__, __should__ represent the side (left or right) on which the exercise is performed if  `bilateral` is false
+* `sets` __if present__, __should__ be an integer representation of total sets of the exercise to be performed
+* `reps_per_set` __if present__, __should__ be an integer representing of total reps of exercise to be performed per set
 * `unit_of_measure` __should__ be an integer reflecting the Unit of Measure enumeration and should indicate the unit in which the reps are measured
 * `movement_id` __if present__, __should__ be an unique identifier for underlying movement associated with the exercise
 * `rpe` __should__ be an number between 1.0 and 10.0 indicating the  _Rating of Perceived Exertion_ of the athlete during the exercise
@@ -2140,5 +2139,5 @@ The following reportable body parts are considered muscles. Allowable Sides (0, 
     rotator_cuff = 119 {1, 2}
     serratus_anterior = 125 {1, 2}
 ```
-###### Last Modified: April 30, 2020
+###### Last Modified: June 02, 2020
 

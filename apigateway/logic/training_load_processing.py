@@ -327,6 +327,11 @@ class TrainingLoadProcessing(object):
     def get_percent(self, test_value, base_value):
 
             if test_value is not None:
+                # TODO: using only observed_value
+                if isinstance(test_value, StandardErrorRange):
+                    test_value = test_value.observed_value
+                    if test_value is None:
+                        return 0
                 if base_value is None:
                     return 100
                 if test_value > base_value:

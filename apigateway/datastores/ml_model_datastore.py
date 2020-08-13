@@ -1,11 +1,13 @@
 import os
 import boto3
 import joblib
+from boto3.s3.transfer import TransferConfig
 
 from fathomapi.api.config import Config
 from fathomapi.utils.xray import xray_recorder
 
 model_bucket_name = Config.get('PROVIDER_INFO')['model_bucket']
+_s3_config = TransferConfig(use_threads=False)
 hr_rpe_model_filename = Config.get('PROVIDER_INFO')['hr_rpe_model_filename']
 bodyweight_ratio_model_filename = Config.get('PROVIDER_INFO')['bodyweight_ratio_model_filename']
 
@@ -71,4 +73,4 @@ class MLModelsDatastore(object):
         bucket = boto3.resource('s3').Bucket(model_bucket_name)
         file_location = cls.file_location(model_filename)
         if not os.path.exists(file_location):
-            bucket.download_file(f"plans/{model_filename}", file_location)
+            bucket.download_file(f"plans/{model_filename}", file_location, Config=_s3_config)
