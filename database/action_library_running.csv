@@ -1,0 +1,58 @@
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+base_movement,id,action_name,,training_type,stance_lower_body,stance_upper_body,lateral_distribution_pattern,arm,torso,leg,percent_bodyweight,lateral_distribution,apply_resistance,relative_explosiveness,apply_instability,,target share of load,muscle_action,hip_joint_priority,hip_joint_action,knee_joint_priority,knee_joint_action,ankle_joint_priority,ankle_joint_action,trunk_joint_priority,trunk_joint_action,shoulder_scapula_joint_priority,shoulder_scapula_joint_action,elbow_joint_priority,elbow_joint_action
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+walk,3_a,Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,no_speed,TRUE,,significant,concentric,1,hip extension,2,knee extension,3,"ankle plantar flexion
+ankle eversion",,,,,,
+,3_b,Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,no_speed,TRUE,,significant,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,3_c,Swing,,strength_cardiorespiratory,single_leg,,unilateral_alternating,,,1,20.37,"100, 0",FALSE,no_speed,FALSE,,very little,concentric,1,hip flexion,3,knee flexion,3,ankle dorsiflexion,,,,,,
+,3_d,Frontal Plane Stability - Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,no_speed,TRUE,,significant,eccentric,1,hip abduction,3,tibial external rotation,2,eversion of the foot,,,,,,
+,3_e,Frontal Plane Stability - Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,no_speed,TRUE,,some,isometric,1,hip abduction,3,tibial external rotation,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Jog,4_a,Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,low_force,TRUE,,most,concentric,1,hip extension,2,knee extension,3,"ankle plantar flexion
+ankle eversion",,,,,,
+,4_b,Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,mod_force,TRUE,,significant,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,4_c,Swing,,strength_cardiorespiratory,single_leg,,unilateral_alternating,,,1,20.37,"100, 0",FALSE,no_speed,FALSE,,little,concentric,1,hip flexion,3,knee flexion,3,ankle dorsiflexion,,,,,,
+,4_d,Frontal Plane Stability - Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,low_force,TRUE,,some,eccentric,1,hip abduction,3,tibial external rotation,2,eversion of the foot,,,,,,
+,4_e,Frontal Plane Stability - Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,low_force,TRUE,,some,isometric,1,hip abduction,3,tibial external rotation,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Run,1_a,Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,mod_force,TRUE,,most,concentric,1,hip extension,2,knee extension,3,"ankle plantar flexion
+ankle eversion",,,,,,
+,1_b,Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,mod_force,TRUE,,significant,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,1_c,Swing,,strength_cardiorespiratory,single_leg,,unilateral_alternating,,,1,20.37,"100, 0",FALSE,low_force,FALSE,,a bit,concentric,1,hip flexion,3,knee flexion,3,ankle dorsiflexion,,,,,,
+,1_d,Frontal Plane Stability - Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,mod_force,TRUE,,some,eccentric,1,hip abduction,3,tibial external rotation,2,eversion of the foot,,,,,,
+,1_e,Frontal Plane Stability - Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,mod_force,TRUE,,some,isometric,1,hip abduction,3,tibial external rotation,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Sprint,2_a,Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,high_force,TRUE,,most,concentric,1,hip extension,2,knee extension,3,"ankle plantar flexion
+ankle eversion",,,,,,
+,2_b,Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,2,100,"100, 0",TRUE,high_force,TRUE,,significant,eccentric,1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,
+,2_c,Swing,,strength_cardiorespiratory,single_leg,,unilateral_alternating,,,1,20.37,"100, 0",FALSE,low_force,FALSE,,a bit,concentric,1,hip flexion,3,knee flexion,3,ankle dorsiflexion,,,,,,
+,2_d,Frontal Plane Stability - Loading,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,mod_force,TRUE,,some,eccentric,1,hip abduction,3,tibial external rotation,2,eversion of the foot,,,,,,
+,2_e,Frontal Plane Stability - Propulsion,,strength_cardiorespiratory,single_leg,,unilateral_alternating,2,1,1,79.63,"100, 0",TRUE,mod_force,TRUE,,a bit,isometric,1,hip abduction,3,tibial external rotation,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,very little,little,a bit,some,significant,most,,,,,,,,
+,,,,,,,,,,,,,,,,,1-5%,5-10%,10-15%,15-20%,20-40%,40+%,,,,,,,,
+,,,,,,,,,,,,,,,,,,Concentric actions contribute to power generation,,,,,,,,,,,,
+Biomechanics of Rowing,,source 2,,,,,,,,,,,,,,,,Isometric actions are stabilizers that are in addition to power generated,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Rowing,,Drive - Leg Emphasis,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,most,concentric,,,1,knee extension,3,ankle plantar flexion,,,,,,
+,,,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,some,isometric,1,hip extension,,,,,1,Trunk Extension,1,"Shoulder Flexion
+Shoulder Extension",,
+,,Drive - Back Emphasis,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,significant,concentric,1,hip extension,3,knee extension,,,1,Trunk Extension,3,"Shoulder Extension
+Shoulder Adduction
+Shoulder Horizontal Abduction (Horizontal Extension)",3,elbow flexion
+,,Drive - Arms Emphasis,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,significant,concentric,3,hip extension,,,,,3,Trunk Extension,2,"Shoulder Extension
+Shoulder Adduction
+Shoulder Horizontal Abduction (Horizontal Extension)",1,elbow flexion
+,,,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,some,isometric,,,,,,,,,,,1,wrist flexors and extensors
+,,Recovery,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",FALSE,no_speed,TRUE,,very little,concentric,2,hip flexion,1,knee flexion,2,ankle dorsiflexion,2,Trunk Flexion,2,"Shoulder Flexion
+Shoulder Horizontal Adduction (Horizontal Flexion)",2,elbow extension
+,,,,,,,,,,,,,FALSE,,FALSE,,,concentric,2,hip external rotation,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Simplified Rowing,200_a,Drive,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",TRUE,high_force,TRUE,,most,concentric,2,hip extension,1,knee extension,3,ankle plantar flexion,2,Trunk Extension,2,"Shoulder Extension
+Shoulder Adduction
+Shoulder Horizontal Abduction (Horizontal Extension)",2,elbow flexion
+,200_b,Recovery,,strength_cardiorespiratory,supine,,bilateral,2,1,2,100,"50,50",FALSE,no_speed,TRUE,,very little,concentric,2,hip flexion,1,knee flexion,2,ankle dorsiflexion,2,Trunk Flexion,2,"Shoulder Horizontal Adduction (Horizontal Flexion)
+Shoulder Flexion",2,elbow extension
+,,,,,,,,,,,,,FALSE,,FALSE,,,concentric,2,hip external rotation,,,,,,,,,,

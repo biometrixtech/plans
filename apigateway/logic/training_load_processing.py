@@ -9,11 +9,11 @@ from models.movement_tags import AdaptationType
 
 
 class TrainingLoadProcessing(object):
-    def __init__(self, start_date, end_date, load_stats):
+    def __init__(self, start_date, end_date, load_stats, expected_weekly_workouts):
         self.start_date = start_date
         self.end_date = end_date
 
-        self.load_monitoring_measures = {}
+        #self.load_monitoring_measures = {}
 
         self.no_soreness_load_tuples = []
         self.soreness_load_tuples = []
@@ -21,36 +21,94 @@ class TrainingLoadProcessing(object):
         self.load_tuples_last_2_4_weeks = []
         self.no_soreness_load_tuples_last_2_weeks = []
         self.no_soreness_load_tuples_last_2_4_weeks = []
-        self.recovery_loads = {}
-        self.maintenance_loads = {}
-        self.functional_overreaching_loads = {}
-        self.functional_overreaching_NFO_loads = {}
-        self.high_relative_load_session = False
+        #self.recovery_loads = {}
+        #self.maintenance_loads = {}
+        #self.functional_overreaching_loads = {}
+        #self.functional_overreaching_NFO_loads = {}
+        #self.high_relative_load_session = False
         self.high_relative_load_sessions = []
+        self.high_relative_load_score = 50
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
         self.last_14_days_training_sessions = []
+        self.last_5_days_training_sessions = []
+        self.last_20_days_training_sessions = []
         self.load_stats = load_stats
         self.sport_max_load = {}
         self.adaptation_type_load = {}
 
+        self.average_tissue_load_5_day = None
+        self.average_tissue_load_20_day = None
+        self.average_force_load_5_day = None
+        self.average_force_load_20_day = None
+        self.average_power_load_5_day = None
+        self.average_power_load_20_day = None
+
         self.training_sessions_exist_days_8_35 = False
 
+        self.expected_weekly_workouts = expected_weekly_workouts
+
+    def get_load_5_20(self, attribute_5_day_name, attribute_20_day_name):
+
+        attribute_5_day = getattr(self, attribute_5_day_name)
+        attribute_20_day = getattr(self, attribute_20_day_name)
+
+        if attribute_5_day is not None and attribute_20_day is not None:
+            standard_error_range = attribute_5_day.plagiarize()
+            standard_error_range.divide_range(attribute_20_day)
+
+            return standard_error_range
+
+        else:
+
+            return None
+
+    def force_load_5_20(self):
+
+        return self.get_load_5_20("average_force_load_5_day", "average_force_load_20_day")
+
+    def rpe_load_5_20(self):
+
+        return self.get_load_5_20("average_rpe_load_5_day", "average_rpe_load_20_day")
+
+    def tissue_load_5_20(self):
+
+        return self.get_load_5_20("average_tissue_load_5_day", "average_tissue_load_20_day")
+
+    def trimp_5_20(self):
+
+        return self.get_load_5_20("average_trimp_load_5_day", "average_trimp_load_20_day")
+
+    def power_load_5_20(self):
+
+        return self.get_load_5_20("average_power_load_5_day", "average_power_load_20_day")
+
+    def work_vo2_load_5_20(self):
+
+        return self.get_load_5_20("average_work_vo2_load_5_day", "average_work_vo2_load_20_day")
+
     @xray_recorder.capture('logic.TrainingLoadProcessing.load_plan_values')
-    def load_training_session_values(self, last_7_day_training_sessions, previous_7_day_training_sessions,
-                                     chronic_training_sessions):
+    def load_training_session_values(self, all_training_sessions):
 
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
 
-        eight_days_ago = parse_date(self.end_date) - timedelta(days=8)
-        eight_day_plus_sessions = list(c for c in chronic_training_sessions if c.event_date <= eight_days_ago)
+        five_days_ago = parse_date(self.end_date) - timedelta(days=4)
+        eight_days_ago = parse_date(self.end_date) - timedelta(days=7)
+        fourteen_days_ago = parse_date(self.end_date) - timedelta(days=13)
+        twenty_days_ago = parse_date(self.end_date) - timedelta(days=19)
+
+        eight_day_plus_sessions = list(c for c in all_training_sessions if c.event_date <= eight_days_ago)
+
+        self.last_5_days_training_sessions = list(c for c in all_training_sessions if c.event_date >= five_days_ago)
+        self.last_20_days_training_sessions = list(c for c in all_training_sessions if c.event_date >= twenty_days_ago)
+
         if len(eight_day_plus_sessions) > 0:
             self.training_sessions_exist_days_8_35 = True
 
-        last_14_day_sessions = []
-        last_14_day_sessions.extend(previous_7_day_training_sessions)
-        last_14_day_sessions.extend(last_7_day_training_sessions)
+        last_14_day_sessions = list(c for c in all_training_sessions if c.event_date > fourteen_days_ago)
+        previous_7_day_training_sessions = list(c for c in all_training_sessions if eight_days_ago >= c.event_date > fourteen_days_ago)
+        last_7_day_training_sessions = list(c for c in all_training_sessions if c.event_date > eight_days_ago)
 
         self.last_14_days_training_sessions = last_14_day_sessions
 
@@ -71,15 +129,15 @@ class TrainingLoadProcessing(object):
                     self.last_week_sport_training_loads[p.sport_name] = []
                     self.previous_week_sport_training_loads[p.sport_name] = []
                 training_load = p.training_load(self.load_stats)
-                if training_load is not None:
-                    self.previous_week_sport_training_loads[p.sport_name].append(training_load)
+                if training_load is not None and training_load.observed_value is not None and training_load.observed_value > 0:
+                    self.previous_week_sport_training_loads[p.sport_name].append(training_load.observed_value)
                     if p.sport_name.value in self.sport_max_load:
-                        if training_load > self.sport_max_load[p.sport_name.value].load:
-                            self.sport_max_load[p.sport_name.value].load = training_load
+                        if training_load.observed_value > self.sport_max_load[p.sport_name.value].load:
+                            self.sport_max_load[p.sport_name.value].load = training_load.observed_value
                             self.sport_max_load[p.sport_name.value].event_date_time = p.event_date
                             self.sport_max_load[p.sport_name.value].first_time_logged = False
                     else:
-                        self.sport_max_load[p.sport_name.value] = SportMaxLoad(p.event_date, training_load)
+                        self.sport_max_load[p.sport_name.value] = SportMaxLoad(p.event_date, training_load.observed_value)
                         self.sport_max_load[p.sport_name.value].first_time_logged = True
 
         for l in last_7_day_training_sessions:
@@ -89,15 +147,15 @@ class TrainingLoadProcessing(object):
                     self.last_week_sport_training_loads[l.sport_name] = []
                     self.previous_week_sport_training_loads[l.sport_name] = []
                 training_load = l.training_load(self.load_stats)
-                if training_load is not None:
-                    self.last_week_sport_training_loads[l.sport_name].append(training_load)
+                if training_load is not None and training_load.observed_value is not None and training_load.observed_value > 0:
+                    self.last_week_sport_training_loads[l.sport_name].append(training_load.observed_value)
                     if l.sport_name.value in self.sport_max_load:
-                        if training_load > self.sport_max_load[l.sport_name.value].load:
-                            self.sport_max_load[l.sport_name.value].load = training_load
+                        if training_load.observed_value > self.sport_max_load[l.sport_name.value].load:
+                            self.sport_max_load[l.sport_name.value].load = training_load.observed_value
                             self.sport_max_load[l.sport_name.value].event_date_time = l.event_date
                             self.sport_max_load[l.sport_name.value].first_time_logged = False
                     else:
-                        self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load)
+                        self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load.observed_value)
                         self.sport_max_load[l.sport_name.value].first_time_logged = True
 
     @xray_recorder.capture('logic.TrainingLoadProcessing.calc_training_load_metrics')
@@ -197,6 +255,7 @@ class TrainingLoadProcessing(object):
                     greater_than_50.append(percent)
 
                 percent = self.get_percent(t.power_explosive_action_load,self.adaptation_type_load[AdaptationType.power_explosive_action.value])
+
                 if percent > 80 and percent > max_percent:
                     max_percent = percent
 
@@ -214,9 +273,65 @@ class TrainingLoadProcessing(object):
                         high_load_session.percent_of_max = max(greater_than_50)
                         self.high_relative_load_sessions.append(high_load_session)
 
+        average_5_day_tissue_load_list = [f.tissue_load for f in self.last_5_days_training_sessions if
+                                          f.tissue_load is not None]
+        if len(average_5_day_tissue_load_list) > 0:
+            self.average_tissue_load_5_day = self.get_average_for_error_ranges(average_5_day_tissue_load_list,
+                                                                               0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+
+        average_20_day_tissue_load_list = [f.tissue_load for f in self.last_20_days_training_sessions if
+                                           f.tissue_load is not None]
+        if len(average_20_day_tissue_load_list) > 0:
+            self.average_tissue_load_20_day = self.get_average_for_error_ranges(average_20_day_tissue_load_list,
+                                                                                0.95 * (
+                                                                                            self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+
+        average_5_day_power_load_list = [f.power_load for f in self.last_5_days_training_sessions if
+                                         f.power_load is not None]
+        if len(average_5_day_power_load_list) > 0:
+            self.average_power_load_5_day = self.get_average_for_error_ranges(average_5_day_power_load_list,
+                                                                              0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+
+        average_20_day_power_load_list = [f.power_load for f in self.last_20_days_training_sessions if
+                                          f.power_load is not None]
+        if len(average_20_day_power_load_list) > 0:
+            self.average_power_load_20_day = self.get_average_for_error_ranges(average_20_day_power_load_list,
+                                                                               0.95 * (
+                                                                                           self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+        tissue_load_5_20_lowest_value = 0.0
+        power_load_5_20_lowest_value = 0.0
+
+        tissue_load_5_20 = self.tissue_load_5_20()
+        if tissue_load_5_20 is not None:
+            tissue_load_5_20_lowest_value = tissue_load_5_20.lowest_value()
+        power_load_5_20 = self.power_load_5_20()
+        if power_load_5_20 is not None:
+            power_load_5_20_lowest_value = power_load_5_20.lowest_value()
+
+        tissue_load_percent = 50
+        power_load_percent = 50
+
+        if tissue_load_5_20_lowest_value is not None and tissue_load_5_20_lowest_value > 1.1:
+            tissue_load_percent = min(100, ((tissue_load_5_20_lowest_value - 1.1) * 100) + 50)
+
+        if power_load_5_20_lowest_value is not None and power_load_5_20_lowest_value > 1.1:
+            power_load_percent = min(100, ((power_load_5_20_lowest_value - 1.1) * 100) + 50)
+
+        self.high_relative_load_score = max(tissue_load_percent, power_load_percent)
+
+    # def get_average_error_range(self, atrribute_name, session_list):
+    #
+    #     error_range_values = [getattr(s, atrribute_name) for s in session_list]
+
+
     def get_percent(self, test_value, base_value):
 
             if test_value is not None:
+                # TODO: using only observed_value
+                if isinstance(test_value, StandardErrorRange):
+                    test_value = test_value.observed_value
+                    if test_value is None:
+                        return 0
                 if base_value is None:
                     return 100
                 if test_value > base_value:
@@ -278,14 +393,56 @@ class TrainingLoadProcessing(object):
 
         if self.load_stats is not None and self.sport_max_load is not None:
             training_volume = training_session.training_load(self.load_stats)
-            if training_volume is not None and training_volume > 0:
-                training_volume = round(training_volume, 2)
+            if training_volume is not None and training_volume.observed_value > 0:
+                training_volume_value = round(training_volume.observed_value, 2)
 
                 if training_session.sport_name.value in self.sport_max_load:
 
-                    percent = int(round((training_volume / self.sport_max_load[training_session.sport_name.value].load) * 100, 0))
+                    percent = int(round((training_volume_value / self.sport_max_load[training_session.sport_name.value].load) * 100, 0))
 
         return percent
+
+    def get_average_for_error_ranges(self, error_range_list, expected_weekly_workouts):
+
+        lower_adjustments = 0
+        upper_adjustments = 0
+        for e in error_range_list:
+            if e.lower_bound is None and e.observed_value is not None:
+                e.lower_bound = e.observed_value
+                lower_adjustments += 1
+            if e.upper_bound is None and e.observed_value is not None:
+                e.upper_bound = e.observed_value
+                upper_adjustments += 1
+
+        if lower_adjustments == upper_adjustments and lower_adjustments == len(error_range_list): # just use observed values
+            observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
+            upper_bound_list = []
+            lower_bound_list = []
+        else:
+            observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
+            upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
+            lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+
+        average_range = StandardErrorRange()
+
+        if len(observed_value_list) > 0:
+            average_range = self.get_standard_error_range(expected_weekly_workouts, observed_value_list, return_sum=False)
+
+        if len(upper_bound_list) > 0:
+            upper_bound_value_range = self.get_standard_error_range(expected_weekly_workouts, upper_bound_list, return_sum=False)
+            if average_range.upper_bound is not None and upper_bound_value_range.upper_bound is not None:
+                average_range.upper_bound = max(average_range.upper_bound, upper_bound_value_range.upper_bound)
+            elif average_range.upper_bound is None and upper_bound_value_range.upper_bound is not None:
+                average_range.upper_bound = upper_bound_value_range.upper_bound
+
+        if len(lower_bound_list) > 0:
+            lower_bound_value_range = self.get_standard_error_range(expected_weekly_workouts, lower_bound_list, return_sum=False)
+            if average_range.lower_bound is not None and lower_bound_value_range.lower_bound is not None:
+                average_range.lower_bound = min(average_range.upper_bound, lower_bound_value_range.lower_bound)
+            elif average_range.lower_bound is None and lower_bound_value_range.lower_bound is not None:
+                average_range.lower_bound = lower_bound_value_range.lower_bound
+
+        return average_range
 
     def get_standard_error_range(self, expected_workouts_week, values, return_sum=True):
 
@@ -297,7 +454,10 @@ class TrainingLoadProcessing(object):
             expected_workouts = expected_workouts_week
 
         if len(values) > 0:
-            standard_error_range.observed_value = sum(values)
+            if return_sum:
+                standard_error_range.observed_value = sum(values)
+            else:
+                standard_error_range.observed_value = statistics.mean(values)
 
         if 1 < len(values) < expected_workouts:
             average_value = statistics.mean(values)
