@@ -822,7 +822,7 @@ class WorkoutChart(BaseChart, Serialisable):
                 summary.event_date = training_session.event_date
             summary.end_date = training_session.end_date
             summary.RPE = training_session.session_RPE
-            summary.training_volume = training_volume
+            summary.training_volume = training_volume_value
 
             if summary.event_date.date() == self.end_date.date():
                 if self.last_workout_today is None:
