@@ -745,7 +745,7 @@ class Calculators(object):
         :param time_taken:
         :return:
         """
-        accel = 2 * distance_moved / time_taken ** 2
+        accel = 2 * distance_moved / (time_taken ** 2)
         return accel
 
     @classmethod

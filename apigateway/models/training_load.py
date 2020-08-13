@@ -318,6 +318,7 @@ class CompletedSessionDetails(Serialisable):
         self.session_RPE = None
         self.rpe_load = None
         self.power_load = None
+        self.training_volume = 0
 
     def json_serialise(self):
         ret = {

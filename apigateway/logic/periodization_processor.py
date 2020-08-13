@@ -609,11 +609,18 @@ class PeriodizationPlanProcessor(object):
         self.previous_week_3_rpe_values = [l.session_RPE for l in self.previous_week_3_workouts if l.session_RPE is not None]
         self.previous_week_4_rpe_values = [l.session_RPE for l in self.previous_week_4_workouts if l.session_RPE is not None]
 
-        # self.last_week_watts_values = [l.power_load / l.duration for l in self.last_week_workouts if l.power_load is not None]
-        # self.previous_week_1_watts_values = [l.power_load / l.duration for l in self.previous_week_1_workouts if l.power_load is not None]
-        # self.previous_week_2_watts_values = [l.power_load / l.duration for l in self.previous_week_2_workouts if l.power_load is not None]
-        # self.previous_week_3_watts_values = [l.power_load / l.duration for l in self.previous_week_3_workouts if l.power_load is not None]
-        # self.previous_week_4_watts_values = [l.power_load / l.duration for l in self.previous_week_4_workouts if l.power_load is not None]
+        self.last_week_watts_values = [self.get_watts_from_power_load(l.power_load, l.training_volume) for l in self.last_week_workouts if l.power_load is not None and l.training_volume is not None and l.training_volume > 0]
+        self.previous_week_1_watts_values = [self.get_watts_from_power_load(l.power_load, l.training_volume) for l in self.previous_week_1_workouts if l.power_load is not None and l.training_volume is not None and l.training_volume > 0]
+        self.previous_week_2_watts_values = [self.get_watts_from_power_load(l.power_load, l.training_volume) for l in self.previous_week_2_workouts if l.power_load is not None and l.training_volume is not None and l.training_volume > 0]
+        self.previous_week_3_watts_values = [self.get_watts_from_power_load(l.power_load, l.training_volume) for l in self.previous_week_3_workouts if l.power_load is not None and l.training_volume is not None and l.training_volume > 0]
+        self.previous_week_4_watts_values = [self.get_watts_from_power_load(l.power_load, l.training_volume) for l in self.previous_week_4_workouts if l.power_load is not None and l.training_volume is not None and l.training_volume > 0]
+
+    def get_watts_from_power_load(self, power_load, training_volume):
+
+        power = power_load.plagiarize()
+        power.divide(training_volume)
+
+        return power
 
     def sum_weeks(self):
 
@@ -782,13 +789,13 @@ class PeriodizationPlanProcessor(object):
 
         target_session_rpe = calc.get_target_session_intensity(self.average_session_rpe, progression,
                                                                rpe_load_rate_increase)
-        # target_session_watts = calc.get_target_session_intensity(self.average_session_watts, progression,
-        #                                                          power_load_rate_increase)
+        target_session_watts = calc.get_target_session_intensity(self.average_session_watts, progression,
+                                                                 power_load_rate_increase)
 
         # now reverse engineer the volume's contribution of increase given load and RPE
 
         target_session_volume = calc.get_target_session_volume(target_session_rpe_load, target_session_rpe)
-        #target_session_watts_volume = calc.get_target_session_volume(target_session_power_load, target_session_watts)
+        target_session_watts_volume = calc.get_target_session_volume(target_session_power_load, target_session_watts)
 
         # so here's the issue...
         # given the range of possible volumes and rpes, we may actually get different load range
@@ -798,20 +805,22 @@ class PeriodizationPlanProcessor(object):
                                               observed_value=((target_session_rpe.lower_bound * target_session_volume.lower_bound) +
                                                               (target_session_rpe.upper_bound * target_session_volume.upper_bound))/float(2))
 
-        # updated_watts_load = StandardErrorRange(lower_bound=target_session_watts.lower_bound * target_session_watts_volume.lower_bound,
-        #                                       upper_bound=target_session_watts.upper_bound * target_session_watts_volume.upper_bound,
-        #                                       observed_value=((target_session_watts.lower_bound * target_session_watts_volume.lower_bound) +
-        #                                                       (target_session_watts.upper_bound * target_session_watts_volume.upper_bound))/float(2))
+        updated_watts_load = StandardErrorRange(lower_bound=target_session_watts.lower_bound * target_session_watts_volume.lower_bound,
+                                              upper_bound=target_session_watts.upper_bound * target_session_watts_volume.upper_bound,
+                                              observed_value=((target_session_watts.lower_bound * target_session_watts_volume.lower_bound) +
+                                                              (target_session_watts.upper_bound * target_session_watts_volume.upper_bound))/float(2))
 
         target_session_load = TrainingLoad()
         target_session_load.rpe_load = updated_rpe_load
-        target_session_load.power_load = target_session_power_load
+        target_session_load.power_load = updated_watts_load
 
         periodization_plan_week = PeriodizationPlanWeek()
         periodization_plan_week.target_weekly_load = weekly_load_target
         periodization_plan_week.target_session_load = target_session_load
         periodization_plan_week.target_session_duration = target_session_volume
+        periodization_plan_week.target_session_watts_duration = target_session_watts_volume
         periodization_plan_week.target_session_rpe = target_session_rpe
+        periodization_plan_week.target_session_watts = target_session_watts
 
         return periodization_plan_week
 
@@ -847,7 +856,9 @@ class PeriodizationPlanProcessor(object):
         template_workout.adaptation_type_ranking = self.last_seven_days_detailed_load.detailed_adaptation_types
 
         template_workout.acceptable_session_rpe = current_week_target.target_session_rpe
+        template_workout.acceptable_session_watts = current_week_target.target_session_watts
         template_workout.acceptable_session_duration = current_week_target.target_session_duration
+        template_workout.acceptable_session_watts_duration = current_week_target.target_session_watts_duration
 
         return template_workout
 

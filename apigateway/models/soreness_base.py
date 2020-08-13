@@ -507,6 +507,9 @@ class BodyPartSystems(object):
             BodyPartLocation.erector_spinae
         ]
 
+    def get_movemement_system(self, movement_system_name):
+
+        return getattr(self, movement_system_name)
 
 class BodyPartLocationText(object):
     def __init__(self, body_part_location):

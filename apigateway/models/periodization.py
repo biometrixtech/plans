@@ -141,7 +141,9 @@ class TrainingPhase(object):
 class TemplateWorkout(object):
     def __init__(self):
         self.acceptable_session_rpe = None
+        self.acceptable_session_watts = None
         self.acceptable_session_duration = None
+        self.acceptable_session_watts_duration = None
         self.acceptable_session_rpe_load = None
         self.acceptable_session_power_load = None
         self.muscle_load_ranking = {}
@@ -177,7 +179,9 @@ class PeriodizationPlanWeek(object):
         self.start_date = None
         self.end_date = None
         self.target_session_duration = StandardErrorRange()
+        self.target_session_watts_duration = StandardErrorRange()
         self.target_session_rpe = StandardErrorRange()
+        self.target_session_watts = StandardErrorRange()
         self.target_session_load = TrainingLoad()
         self.target_day_load = StandardErrorRange()
         self.target_sessions_per_week = StandardErrorRange()
