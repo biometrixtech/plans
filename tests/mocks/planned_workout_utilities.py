@@ -128,7 +128,7 @@ def get_planned_workout(workout_id, training_type_list, session_rpe, projected_r
 
     workout = PlannedWorkoutLoad(workout_id=workout_id)
     workout.projected_session_rpe = session_rpe
-    workout.duration = duration or 75
+    workout.duration = duration or 75 * 60
     workout.projected_rpe_load = projected_rpe_load
 
     detailed_load_processor = process_adaptation_types(training_type_list, reps=reps, rpe=rpe, duration=duration,

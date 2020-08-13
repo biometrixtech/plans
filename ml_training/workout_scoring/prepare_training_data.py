@@ -84,8 +84,6 @@ def is_workout_selected(test_workout, template_workout, event: dict):
             template_workout.adaptation_type_ranking
     )
 
-    # get_normalized_muscle_load(test_workout)
-
     muscle_score =  WorkoutScoringManager.muscle_cosine_similarity(test_workout.ranked_muscle_detailed_load, template_workout.muscle_load_ranking)
 
     composite_score = (
@@ -97,6 +95,11 @@ def is_workout_selected(test_workout, template_workout, event: dict):
     )
 
     workout_match = np.random.binomial(1, composite_score)
+    # if composite_score >= .5:
+    #     workout_match = 1.0
+    # else:
+    #     workout_match = 0.0
+
     event['rpe_score'] = rpe_score
     event['duration_score'] = duration_score
     event['rpe_load_score'] = rpe_load_score
@@ -165,8 +168,8 @@ def get_template_workout_features(template_workout):
             at_features[f'{detailed_adaptation_type.name}_duration_template'] = 0
         else:
             ranked_adaptation_type = [rat for rat in template_workout.adaptation_type_ranking if rat.adaptation_type == detailed_adaptation_type][0]
-            at_features[f'{detailed_adaptation_type.name}_template'] = ranked_adaptation_type.ranking
-            at_features[f'{detailed_adaptation_type.name}_duration_template'] = ranked_adaptation_type.duration
+            at_features[f'{detailed_adaptation_type.name}_template'] = ranked_adaptation_type.ranking or 0
+            at_features[f'{detailed_adaptation_type.name}_duration_template'] = ranked_adaptation_type.duration or 0
 
     features.update(at_features)
 
@@ -206,9 +209,10 @@ def get_library_workout_features(library_workout):
 def read_library():
     with open('../../apigateway/models/planned_workout_library.json', 'r') as f:
         json_data = json.load(f)
-    workouts = json_data.values()
+    workouts = list(json_data.values())
     all_library_workouts = []
     all_library_workout_features = []
+
     for workout in workouts:
         library_workout = PlannedWorkoutLoad.json_deserialise(workout)
         get_normalized_muscle_load(library_workout)
@@ -236,7 +240,6 @@ def run():
     data = pd.DataFrame(all_events)
     np.random.seed(1000)
     training_data, validation_data = train_test_split(data, test_size=0.2)
-    training_data.to_csv('training_data.csv', index=False)
-    validation_data.to_csv('validation_data.csv', index=False)
-    # data.to_csv('data/training_data.csv', index=False)
+    training_data.to_csv('data/training_data_binom.csv', index=False)
+    validation_data.to_csv('data/validation_data_binom.csv', index=False)
 run()
