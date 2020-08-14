@@ -7,6 +7,10 @@ from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.movement_tags import AdaptationType
 from models.session import SessionType
 from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.training_load import CompletedSessionDetails
+from logic.detailed_load_processing import DetailedLoadProcessor
+from models.training_load import DetailedTrainingLoad
+from models.training_volume import StandardErrorRange
 from datetime import timedelta
 from fathomapi.utils.xray import xray_recorder
 
@@ -18,19 +22,43 @@ class SessionFunctionalMovement(object):
         self.functional_movement_mappings = []
         self.injury_risk_dict = injury_risk_dict
         self.session_load_dict = {}
+        self.completed_session_details = None
 
     def process(self, event_date, load_stats):
         activity_factory = ActivityFunctionalMovementFactory()
         movement_factory = FunctionalMovementFactory()
 
+        provider_id=None
+        workout_id=None
+
+        if self.session.workout_program_module is not None:
+            provider_id = self.session.workout_program_module.program_id
+            workout_id = self.session.workout_program_module.program_module_id
+
+        self.completed_session_details = CompletedSessionDetails(event_date,provider_id=provider_id, workout_id=workout_id)
+
         if self.session.session_type() == SessionType.mixed_activity:
             if self.session.workout_program_module is not None:
                 functional_movement_factory = FunctionalMovementFactory()
-                functional_movement_dict = functional_movement_factory.get_functional_movement_dictinary()
+                functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
                 total_load_dict = self.process_workout_load(self.session.workout_program_module, event_date, functional_movement_dict)
-                normalized_dict = self.normalize_and_consolidate_load(total_load_dict, event_date)
+                #consolidated_dict = self.consolidate_load(total_load_dict, event_date)
 
-                self.session_load_dict = normalized_dict
+                #self.session_load_dict = consolidated_dict
+
+                # this is now a muscle load only, aggregated by muscle
+                self.session_load_dict = total_load_dict
+        elif self.session.session_type() == SessionType.planned:
+            if self.session.workout is not None:
+                functional_movement_factory = FunctionalMovementFactory()
+                functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
+                total_load_dict = self.process_planned_workout_load(self.session.workout, event_date, functional_movement_dict)
+                #consolidated_dict = self.consolidate_load(total_load_dict, event_date)
+
+                #self.session_load_dict = consolidated_dict
+
+                # this is now a muscle load only, aggregated by muscle
+                self.session_load_dict = total_load_dict
 
         else:
 
@@ -75,15 +103,18 @@ class SessionFunctionalMovement(object):
                     session_load_dict[body_part_side] = BodyPartFunctionalMovement(body_part_side)
 
                 session_load_dict[body_part_side].body_part_function = BodyPartFunction.merge(body_part_functional_movement.body_part_function, session_load_dict[body_part_side].body_part_function)
-                session_load_dict[body_part_side].concentric_load += body_part_functional_movement.concentric_load
-                session_load_dict[body_part_side].eccentric_load += body_part_functional_movement.eccentric_load
-                session_load_dict[body_part_side].compensated_concentric_load += body_part_functional_movement.compensated_concentric_load
+                session_load_dict[body_part_side].concentric_load.add(body_part_functional_movement.concentric_load)
+                session_load_dict[body_part_side].isometric_load.add(body_part_functional_movement.isometric_load)
+                session_load_dict[body_part_side].eccentric_load.add(body_part_functional_movement.eccentric_load)
+                session_load_dict[body_part_side].compensated_concentric_load.add(body_part_functional_movement.compensated_concentric_load)
+                session_load_dict[body_part_side].compensated_isometric_load.add(
+                    body_part_functional_movement.compensated_isometric_load)
                 session_load_dict[
-                    body_part_side].compensated_eccentric_load += body_part_functional_movement.compensated_eccentric_load
+                    body_part_side].compensated_eccentric_load.add(body_part_functional_movement.compensated_eccentric_load)
 
                 session_load_dict[body_part_side].compensating_causes_load.extend(body_part_functional_movement.compensating_causes_load)
                 session_load_dict[body_part_side].compensating_causes_load = list(set(session_load_dict[body_part_side].compensating_causes_load))
-                session_load_dict[body_part_side].compensation_source_load = CompensationSource.internal_processing
+                #session_load_dict[body_part_side].compensation_source_load = CompensationSource.internal_processing
 
                 # session_load_dict[body_part_side].concentric_intensity = max(body_part_functional_movement.concentric_intensity, session_load_dict[body_part_side].concentric_intensity)
                 # session_load_dict[body_part_side].eccentric_intensity = max(body_part_functional_movement.eccentric_intensity, session_load_dict[body_part_side].eccentric_intensity)
@@ -117,128 +148,111 @@ class SessionFunctionalMovement(object):
 
         workout_load = {}
 
+        detailed_load_processor = DetailedLoadProcessor()
+
         for workout_section in workout_program.workout_sections:
             if workout_section.assess_load:
-                section_load = {}  # load by adaptation type
+                #section_load = {}  # load by adaptation type
                 for workout_exercise in workout_section.exercises:
                     #exercise_load = self.apply_load(workout_exercise.primary_actions, event_date)
-                    exercise_load = {}  # load by adaptation type
+                    #exercise_load = {}  # load by adaptation type
 
                     for action in workout_exercise.primary_actions:
                         functional_movement_action_mapping = FunctionalMovementActionMapping(action,
                                                                                              self.injury_risk_dict,
                                                                                              event_date, function_movement_dict)
                         # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+                        detailed_load_processor.add_load(functional_movement_action_mapping,
+                                                         workout_exercise.adaptation_type,
+                                                         action,
+                                                         workout_exercise.power_load,
+                                                         reps=workout_exercise.reps_per_set,
+                                                         duration=workout_exercise.total_volume,
+                                                         rpe_range=workout_exercise.rpe,
+                                                         percent_max_hr=None)
+
                         self.functional_movement_mappings.append(functional_movement_action_mapping)
-                        if action.adaptation_type.value not in exercise_load:
-                            exercise_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
-                        else:
-                            for muscle, load in functional_movement_action_mapping.muscle_load.items():
-                                if muscle not in exercise_load[action.adaptation_type.value]:
-                                    exercise_load[action.adaptation_type.value][muscle] = load
-                                else:
-                                    exercise_load[action.adaptation_type.value][muscle].merge(load)
 
-                    #return total_load
-
-                    for adaptation_type, muscle_load in exercise_load.items():
-                        if adaptation_type not in section_load:
-                            section_load[adaptation_type] = muscle_load
-                        else:
-                            for muscle, load in muscle_load.items():
-                                if muscle not in section_load[adaptation_type]:
-                                    section_load[adaptation_type][muscle] = load
-                                else:
-                                    section_load[adaptation_type][muscle].merge(load)
-
-                for adaptation_type, muscle_load in section_load.items():
-                    if adaptation_type not in workout_load:
-                        workout_load[adaptation_type] = muscle_load
-                    else:
-                        for muscle, load in muscle_load.items():
-                            if muscle not in workout_load[adaptation_type]:
-                                workout_load[adaptation_type][muscle] = load
+                        # new
+                        for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
+                            muscle = BodyPartSide.from_string(muscle_string)
+                            if muscle not in workout_load:
+                                workout_load[muscle] = load
                             else:
-                                workout_load[adaptation_type][muscle].merge(load)
+                                workout_load[muscle].merge(load)
 
+        detailed_load_processor.rank_types()
+        self.completed_session_details.session_detailed_load = detailed_load_processor.session_detailed_load
+        self.completed_session_details.training_type_load = detailed_load_processor.session_training_type_load
+        self.completed_session_details.ranked_muscle_load = detailed_load_processor.ranked_muscle_load
+        if self.session is not None:
+            self.completed_session_details.power_load = self.session.power_load
+            self.completed_session_details.rpe_load = self.session.rpe_load
+            self.completed_session_details.session_RPE = self.session.session_RPE
+            self.completed_session_details.training_volume = self.session.training_volume
+            if self.session.duration_minutes is not None:
+                self.completed_session_details.duration = self.session.duration_minutes * 60
+        else:
+            # TODO - is this the best way to handle this?
+            self.completed_session_details.power_load = StandardErrorRange()
+            self.completed_session_details.rpe_load = StandardErrorRange()
+            self.completed_session_details.session_RPE = StandardErrorRange()
         return workout_load
 
-    # def apply_load(self, action_list, event_date):
-    #
-    #     total_load = {}  # load by adaptation type
-    #
-    #     for action in action_list:
-    #         functional_movement_action_mapping = FunctionalMovementActionMapping(action, self.injury_risk_dict, event_date)
-    #         #functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
-    #         self.functional_movement_mappings.append(functional_movement_action_mapping)
-    #         if action.adaptation_type.value not in total_load:
-    #             total_load[action.adaptation_type.value] = functional_movement_action_mapping.muscle_load
-    #         else:
-    #             for muscle, load in functional_movement_action_mapping.muscle_load.items():
-    #                 if muscle not in total_load[action.adaptation_type.value]:
-    #                     total_load[action.adaptation_type.value][muscle] = load
-    #                 else:
-    #                     total_load[action.adaptation_type.value][muscle].merge(load)
-    #
-    #     return total_load
+    @xray_recorder.capture('logic.SessionFunctionalMovement.process_workout_load')
+    def process_planned_workout_load(self, workout, event_date, function_movement_dict):
 
-    @xray_recorder.capture('logic.SessionFunctionalMovement.normalize_and_consolidate_load')
-    def normalize_and_consolidate_load(self, total_load_dict, event_date):
+        workout_load = {}
 
-        normalized_dict = {}
+        detailed_load_processor = DetailedLoadProcessor()
 
-        # initialize session values
-        self.session.strength_endurance_cardiorespiratory_load = 0
-        self.session.strength_endurance_strength_load = 0
-        self.session.power_drill_load = 0
-        self.session.maximal_strength_hypertrophic_load = 0
-        self.session.power_explosive_action_load = 0
-        self.session.not_tracked_load = 0
+        for workout_section in workout.sections:
+            if workout_section.assess_load:
+                #section_load = {}  # load by adaptation type
+                for workout_exercise in workout_section.exercises:
+                    #exercise_load = self.apply_load(workout_exercise.primary_actions, event_date)
+                    #exercise_load = {}  # load by adaptation type
 
-        for adaptation_type, muscle_load_dict in total_load_dict.items():
-            scalar = self.get_adaption_type_scalar(adaptation_type)
-            # concentric_values = [c.concentric_load for c in muscle_load_dict.values() if c.concentric_load > 0]
-            # eccentric_values = [c.eccentric_load for c in muscle_load_dict.values() if c.eccentric_load > 0]
-            all_values = [c.total_load() for c in muscle_load_dict.values() if c.total_load() > 0]
-            # all_values.extend(concentric_values)
-            # all_values.extend(eccentric_values)
-            if len(all_values) > 0:
-                minimum = min(all_values)
-                # maximum = max(all_values)
-                # value_range = maximum - minimum
-                for muscle_string in muscle_load_dict:
-                    muscle = BodyPartSide.from_string(muscle_string)
-                    maximum = self.get_body_part_injury_risk_max(adaptation_type, muscle, event_date)
-                    max_current_load = muscle_load_dict[muscle_string].total_load()
+                    for action in workout_exercise.primary_actions:
+                        functional_movement_action_mapping = FunctionalMovementActionMapping(action,
+                                                                                             self.injury_risk_dict,
+                                                                                             event_date, function_movement_dict)
+                        # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+                        detailed_load_processor.add_load(functional_movement_action_mapping,
+                                                         workout_exercise.adaptation_type,
+                                                         action,
+                                                         workout_exercise.power_load,
+                                                         reps=workout_exercise.reps_per_set,
+                                                         duration=workout_exercise.duration,
+                                                         rpe_range=workout_exercise.rpe,
+                                                         percent_max_hr=None)
 
-                    if maximum < max_current_load:
-                        self.set_body_part_injury_risk_max(adaptation_type, muscle, max_current_load, event_date)
-                        maximum = max_current_load
+                        self.functional_movement_mappings.append(functional_movement_action_mapping)
 
-                    value_range = maximum - minimum
-                    if muscle_load_dict[muscle_string].total_load() > 0 and value_range > 0:
-                        muscle_load_dict[muscle_string].total_normalized_load = scalar * ((muscle_load_dict[muscle_string].total_load() - minimum) / value_range)
+                        # new
+                        for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
+                            muscle = BodyPartSide.from_string(muscle_string)
+                            if muscle not in workout_load:
+                                workout_load[muscle] = load
+                            else:
+                                workout_load[muscle].merge(load)
 
-                    if muscle not in normalized_dict:
-                        normalized_dict[muscle] = muscle_load_dict[muscle_string]
-                    else:
-                        normalized_dict[muscle].total_normalized_load += muscle_load_dict[muscle_string].total_normalized_load
-
-                    # saved normalized load to the session while we're looping through
-                    if adaptation_type == AdaptationType.strength_endurance_cardiorespiratory.value:
-                        self.session.strength_endurance_cardiorespiratory_load += muscle_load_dict[muscle_string].total_normalized_load
-                    elif adaptation_type == AdaptationType.strength_endurance_strength.value:
-                        self.session.strength_endurance_strength_load += muscle_load_dict[muscle_string].total_normalized_load
-                    elif adaptation_type == AdaptationType.power_drill.value:
-                        self.session.power_drill_load += muscle_load_dict[muscle_string].total_normalized_load
-                    elif adaptation_type == AdaptationType.maximal_strength_hypertrophic.value:
-                        self.session.maximal_strength_hypertrophic_load += muscle_load_dict[muscle_string].total_normalized_load
-                    elif adaptation_type == AdaptationType.power_explosive_action.value:
-                        self.session.power_explosive_action_load += muscle_load_dict[muscle_string].total_normalized_load
-                    else:
-                        self.session.not_tracked_load += muscle_load_dict[muscle_string].total_normalized_load
-
-        return normalized_dict
+        detailed_load_processor.rank_types()
+        self.completed_session_details.session_detailed_load = detailed_load_processor.session_detailed_load
+        self.completed_session_details.training_type_load = detailed_load_processor.session_training_type_load
+        self.completed_session_details.ranked_muscle_load = detailed_load_processor.ranked_muscle_load
+        if self.session is not None:
+            self.completed_session_details.power_load = self.session.power_load
+            self.completed_session_details.rpe_load = self.session.rpe_load
+            self.completed_session_details.session_RPE = self.session.session_RPE
+            if self.session.duration_minutes is not None:
+                self.completed_session_details.duration = self.session.duration_minutes * 60
+        else:
+            # TODO - is this the best way to handle this?
+            self.completed_session_details.power_load = StandardErrorRange()
+            self.completed_session_details.rpe_load = StandardErrorRange()
+            self.completed_session_details.session_RPE = StandardErrorRange()
+        return workout_load
 
     def get_adaption_type_scalar(self, adaptation_type):
 

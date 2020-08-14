@@ -7,6 +7,7 @@ apigateway/*
 .idea/*
 .pytest_cache/*
 apigateway/logic/__pycache__/*
+Apigateway/models/planned_workout_library.json
 tests/.pytest_cache/*
 tests/database_tests/.pytest_cache/*
 tests/integration_tests/.pytest_cache/*
@@ -35,3 +36,8 @@ apigateway/session.py
 output/*
 tests/database_tests/*.csv
 output_persona/*
+tests/data/*.joblib
+ml_training/hr_rpe/data/*
+ml_training/hr_rpe/model/*
+ml_training/bodyweight_ratio/data/*
+ml_training/bodyweight_ratio/model/*

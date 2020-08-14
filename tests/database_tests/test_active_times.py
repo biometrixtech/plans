@@ -114,7 +114,7 @@ def get_section_json(name, exercises):
             }
 
 
-def get_workout_program(sections):
+def get_workout_program(session, sections):
     all_exercises = define_all_exercises()
     workout_program = {
         "workout_sections": []
@@ -124,8 +124,9 @@ def get_workout_program(sections):
         workout_program['workout_sections'].append(get_section_json(section_name, exercises=[all_exercises[ex] for ex in exercises]))
 
     workout = WorkoutProgramModule.json_deserialise(workout_program)
+    session.workout_program_module = workout
     processor = WorkoutProcessor()
-    processor.process_workout(workout)
+    processor.process_workout(session)
     return workout
 
 
@@ -161,7 +162,7 @@ def get_session(session_type, current_date_time, rpe=5, duration=100, sport_name
                        'Strength': ['dumbbell_bench_press', 'bent_over_row'],
                        'Recovery Protocol': ['indoor_cycle']
         }
-        session.workout_program_module = get_workout_program(sections)
+        session.workout_program_module = get_workout_program(session, sections)
     else:
         session = SportTrainingSession()
         session.sport_name = sport_name

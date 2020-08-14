@@ -405,12 +405,12 @@ def test_workload_new_user():
         training_load = s.training_load(load_stats)
 
         if s.sport_name.value in sport_max_load:
-            if training_load > sport_max_load[s.sport_name.value].load:
-                sport_max_load[s.sport_name.value].load = training_load
+            if training_load.observed_value > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load.observed_value
                 sport_max_load[s.sport_name.value].event_date_time = s.event_date
                 sport_max_load[s.sport_name.value].first_time_logged = False
         else:
-            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load.observed_value)
             sport_max_load[s.sport_name.value].first_time_logged = True
         workload_chart.add_training_volume(s, load_stats, sport_max_load)
 
@@ -442,12 +442,12 @@ def test_workload_new_sport():
         training_load = s.training_load(load_stats)
 
         if s.sport_name.value in sport_max_load:
-            if training_load > sport_max_load[s.sport_name.value].load:
-                sport_max_load[s.sport_name.value].load = training_load
+            if training_load.observed_value > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load.observed_value
                 sport_max_load[s.sport_name.value].event_date_time = s.event_date
                 sport_max_load[s.sport_name.value].first_time_logged = False
         else:
-            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load.observed_value)
             sport_max_load[s.sport_name.value].first_time_logged = True
         workload_chart.add_training_volume(s, load_stats, sport_max_load)
         session_count += 1
@@ -487,12 +487,12 @@ def test_workload_new_max():
         training_load = s.training_load(load_stats)
 
         if s.sport_name.value in sport_max_load:
-            if training_load > sport_max_load[s.sport_name.value].load:
-                sport_max_load[s.sport_name.value].load = training_load
+            if training_load.observed_value > sport_max_load[s.sport_name.value].load:
+                sport_max_load[s.sport_name.value].load = training_load.observed_value
                 sport_max_load[s.sport_name.value].event_date_time = s.event_date
             sport_max_load[s.sport_name.value].first_time_logged = False
         else:
-            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load)
+            sport_max_load[s.sport_name.value] = SportMaxLoad(s.event_date, training_load.observed_value)
             sport_max_load[s.sport_name.value].first_time_logged = True
         workload_chart.add_training_volume(s, load_stats, sport_max_load)
 
