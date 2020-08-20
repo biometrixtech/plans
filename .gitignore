@@ -41,3 +41,5 @@ ml_training/hr_rpe/data/*
 ml_training/hr_rpe/model/*
 ml_training/bodyweight_ratio/data/*
 ml_training/bodyweight_ratio/model/*
+ml_training/workout_scoring/data/*
+ml_training/workout_scoring/model/*
