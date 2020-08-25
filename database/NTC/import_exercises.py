@@ -86,8 +86,9 @@ class ExerciseParser(object):
 
     def parse_row(self, row):
         if (row['nike_exercise_name'] is not None and row['nike_exercise_name'] != ''):
-            ex = ClientExercise(row['nike_exercise_name'])
-            ex.base_movement_name = row['base_movement_name']
+            name = row['nike_exercise_name'].strip().lower()
+            ex = ClientExercise(name)
+            ex.base_movement_name = row['base_movement_name'].strip().lower()
             training_type = self.training_type_lookup.get(row['training_type']) or row['training_type']
             ex.training_type = TrainingType[training_type]
             if self.is_valid(row['bilateral_distribution_of_resistance']):

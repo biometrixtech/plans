@@ -103,7 +103,7 @@ class WorkoutParser(object):
 
     def parse_exercise_row(self, row):
         ex = PlannedExercise()
-        ex.name = row['description']
+        ex.name = row['description'].strip().lower()
 
         observed_duration = None
         max_duration = None
@@ -214,7 +214,7 @@ def read_json(file_name):
 def validate_exercises(workout, library_exercise_names):
     for section in workout.sections:
         for exercise in section.exercises:
-            ex_name = exercise.name.strip().lower()
+            ex_name = exercise.name
             if ex_name not in ['rest', 'recover']:
                 if ex_name not in library_exercise_names:
                     print(f"missing exercise: {exercise.name}, {section.name}")
@@ -222,44 +222,65 @@ def validate_exercises(workout, library_exercise_names):
             if exercise.duration is not None:
                 if exercise.duration.min_value is not None:
                     all_durations.append(exercise.duration.min_value)
-                    if exercise.duration.min_value > 150 or exercise.duration.min_value < 10:
+                    if exercise.duration.min_value > 150:
                         print(f'duration too long: {exercise.duration.min_value}')
+                        raise ValueError()
+                    elif exercise.duration.min_value < 10:
+                        print(f'duration too short: {exercise.duration.min_value}')
                         raise ValueError()
                 if exercise.duration.assigned_value is not None:
                     all_durations.append(exercise.duration.assigned_value)
-                    if exercise.duration.assigned_value > 150 or exercise.duration.assigned_value < 10:
-                        print(f'duration too long: {exercise.duration.assigned_value}')
+                    if exercise.duration.assigned_value > 150:
+                        print(f'duration too short: {exercise.duration.assigned_value}')
+                        raise ValueError()
+                    elif exercise.duration.assigned_value < 10:
+                        print(f'duration too short: {exercise.duration.assigned_value}')
                         raise ValueError()
                 if exercise.duration.max_value is not None:
                     all_durations.append(exercise.duration.max_value)
-                    if exercise.duration.max_value > 150 or exercise.duration.max_value < 10:
+                    if exercise.duration.max_value > 150:
                         print(f'duration too long: {exercise.duration.max_value}')
+                        raise ValueError()
+                    elif exercise.duration.max_value < 10:
+                        print(f'duration too short: {exercise.duration.max_value}')
                         raise ValueError()
             if exercise.distance is not None:
                 if exercise.distance.min_value is not None:
                     all_distances.append(exercise.distance.min_value)
                     if exercise.distance.min_value > 5000:
                         print(f'distance too long: {exercise.distance.min_value}')
+                    elif exercise.distance.min_value < 10:
+                        print(f'distance too short: {exercise.distance.min_value}')
                 if exercise.distance.assigned_value is not None:
                     all_distances.append(exercise.distance.assigned_value)
                     if exercise.distance.assigned_value > 5000:
                         print(f'distance too long: {exercise.distance.assigned_value}')
+                    elif exercise.distance.assigned_value < 10:
+                        print(f'distance too short: {exercise.distance.assigned_value}')
                 if exercise.distance.max_value is not None:
                     all_distances.append(exercise.distance.max_value)
                     if exercise.distance.max_value > 5000:
                         print(f'distance too long: {exercise.distance.max_value}')
+                    elif exercise.distance.max_value < 10:
+                        print(f'distance too short: {exercise.distance.max_value}')
             if exercise.reps_per_set is not None:
                 all_reps.append(exercise.reps_per_set)
                 if exercise.reps_per_set > 50:
                     print(f'reps too long: {exercise.reps_per_set}')
-                elif exercise.reps_per_set < 5:
-                    print(f'reps too short: {exercise.reps_per_set}, {exercise.name}')
-                    raise ValueError
+                # elif exercise.reps_per_set < 5:
+                #     print(f'reps too short: {exercise.reps_per_set}, {exercise.name}')
+                #     raise ValueError
+            if exercise.duration is not None and exercise.reps_per_set is not None:
+                print('here')
+            if exercise.duration is not None and exercise.distance is not None:
+                print('here')
+            if exercise.reps_per_set is not None and exercise.duration is not None:
+                print('here')
 
 if __name__ == '__main__':
 
     exercises = read_json('libraries/nike_exercises.json')
-    exercise_names = [ex['name'].lower() for ex in exercises]
+    exercise_names = [ex['name'] for ex in exercises]
     exercise_names.sort()
     dirs = os.listdir('workouts/')
     for dir in dirs:
@@ -268,12 +289,12 @@ if __name__ == '__main__':
             for file in files:
                 if 'DS_Store' not in file and 'included in this' not in file:
                     try:
-                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=True)
+                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=False)
                         validate_exercises(workout, exercise_names)
                         workout_json = workout.json_serialise()
                         workout_2 = PlannedWorkout.json_deserialise(workout_json)
                     except ValueError as e:
                         print(dir, file)
-    # print(f"duration: {min(all_durations), max(all_durations)}")
-    # print(f"distance: {min(all_distances), max(all_distances)}")
-    # print(f"reps: {min(all_reps), max(all_reps)}")
+    print(f"duration: {min(all_durations), max(all_durations)}")
+    print(f"distance: {min(all_distances), max(all_distances)}")
+    print(f"reps: {min(all_reps), max(all_reps)}")
