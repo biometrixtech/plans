@@ -270,8 +270,11 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise.id = input_dict.get('id', "")
         exercise.name = input_dict.get('name', "")
         exercise.movement_id = input_dict.get('movement_id', "")
-
-        exercise.weight = Assignment.json_deserialise(input_dict['weight']) if input_dict.get('weight') is not None else None  # in lbs
+        if input_dict.get('weight') is not None:
+            if isinstance(input_dict['weight'], dict):
+                exercise.weight = Assignment.json_deserialise(input_dict['weight'])  # it's Assignment json
+            else:
+                exercise.weight = Assignment(assigned_value=input_dict['weight']) # it's a single number
         exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get(
             'weight_measure') is not None else None
 

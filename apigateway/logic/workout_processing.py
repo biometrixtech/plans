@@ -322,10 +322,13 @@ class WorkoutProcessor(object):
         if exercise.weight_measure == WeightMeasure.actual_weight:
             weight = exercise.weight
         elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
-            weight = exercise.weight * self.user_weight
+            weight = Assignment().multiply_assignment_by_scalar(exercise.weight, self.user_weight)
+        elif exercise.weight_measure == WeightMeasure.percent_rep_max:
+            weight = Assignment(assigned_value=20)
         else:
-            weight = 20  # TODO: need to change this
-        exercise.force = StandardErrorRange(observed_value=Calculators.force_resistance_exercise(weight))
+            weight = Assignment(assigned_value=20)  # TODO: need to change this
+
+        exercise.force = Calculators.force_resistance_exercise(weight)
 
         percent_bodyweight = 0
 
@@ -345,7 +348,8 @@ class WorkoutProcessor(object):
             time_eccentric=exercise.duration_per_rep.observed_value / 2,
             time_concentric=exercise.duration_per_rep.observed_value / 2
             )
-        exercise.power = StandardErrorRange(observed_value=observed_power)
+        # exercise.power = StandardErrorRange(observed_value=observed_power)
+        powers = [observed_power]
         if exercise.reps_per_set is None:
             # TODO: still need to differentiate distance traveled by exercise
             power_1 = Calculators.power_resistance_exercise(
@@ -360,8 +364,14 @@ class WorkoutProcessor(object):
                 time_eccentric=exercise.duration_per_rep.upper_bound / 2,
                 time_concentric=exercise.duration_per_rep.upper_bound / 2
                 )
-            exercise.power.lower_bound = min([power_1, power_2])
-            exercise.power.upper_bound = max([power_1, power_2])
+            powers.extend([power_1, power_2])
+
+        # exercise.power.lower_bound = min([power_1, power_2])
+        # exercise.power.upper_bound = max([power_1, power_2])
+        # powers = [observed_power, power_1, power_2]
+        exercise.power = StandardErrorRange().get_average_from_error_range_list(powers)
+        exercise.power.lower_bound = StandardErrorRange().get_min_from_error_range_list(powers)
+        exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
 
         return exercise
 

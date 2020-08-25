@@ -57,6 +57,12 @@ class ExerciseParser(object):
         self.equipment_name_loookup = {
             'kettlebell': 'kettlebells'
         }
+        self.resistance_lookup = {
+            'no_resistance': 'none'
+        }
+        self.speed_lookup = {
+            'no_speed': 'none'
+        }
 
 
     def load_data(self, files):
@@ -96,9 +102,9 @@ class ExerciseParser(object):
                     row['bilateral_distribution_of_resistance'] = row['bilateral_distribution_of_resistance'].split(',')[0]
                 ex.bilateral_distribution_of_resistance = WeightDistribution[row['bilateral_distribution_of_resistance']]
             if self.is_valid(row['resistance']):
-                ex.resistance = MovementResistance[row['resistance']]
+                ex.resistance = MovementResistance[self.resistance_lookup.get(row['resistance']) or row['resistance']]
             if self.is_valid(row['speed']):
-                ex.speed = MovementSpeed[row['speed']]
+                ex.speed = MovementSpeed[self.speed_lookup.get(row['speed']) or row['speed']]
             if self.is_valid(row['rest_between_reps']):
                 ex.rest_between_reps = float(row['rest_between_reps'])
             ex.rep_tempo = row['rep_tempo']
@@ -110,7 +116,7 @@ class ExerciseParser(object):
                 ex.body_position = BodyPosition[row['body_position']]
             ex.upper_body_symmetry = row['upper_body_symmetry']
             if self.is_valid(row['external_weight_implement']):
-                ex.equipment = Equipment[self.equipment_name_loookup.get(row['external_weight_implement']) or row['external_weight_implement']]
+                ex.equipment = Equipment[self.equipment_name_loookup.get(row['external_weight_implement'].lower()) or row['external_weight_implement'].lower()]
             return ex
         return None
 

@@ -1,5 +1,5 @@
 import math
-from models.training_volume import StandardErrorRange
+from models.training_volume import StandardErrorRange, Assignment
 from models.movement_tags import Gender
 
 
@@ -621,7 +621,11 @@ class Calculators(object):
         :param time_concentric: s, time taken for concentric movement, default of 1.5s
         :return:
         """
-        total_weight = weight_used + user_weight
+        if isinstance(weight_used, Assignment):
+            total_weight = weight_used.plagiarize()
+            total_weight.add_value(user_weight)
+        else:
+            total_weight = weight_used + user_weight
         distance_moved = distance_moved or .5
         time_concentric = time_concentric or 1.5
         time_eccentric = time_eccentric or 1.5
@@ -631,16 +635,23 @@ class Calculators(object):
         force_eccentric = cls.get_force(total_weight, -accel_eccentric)
         velocity_concentric = distance_moved / time_concentric
         velocity_eccentric = distance_moved / time_eccentric
-        power_concentric = force_concentric * velocity_concentric
-        power_eccentric = force_eccentric * velocity_eccentric
-        average_power = round((power_concentric * time_concentric + power_eccentric * time_eccentric) / (time_concentric + time_eccentric), 1)
+        power_concentric = force_concentric.plagiarize()
+        power_eccentric = force_eccentric.plagiarize()
+        power_concentric.multiply(velocity_concentric)
+        power_eccentric.multiply(velocity_eccentric)
+        power_concentric.multiply(time_concentric)
+        power_eccentric.multiply(time_eccentric)
+        average_power = power_concentric.plagiarize()
+        average_power.add(power_eccentric)
+        average_power.divide(time_concentric + time_eccentric)
+        # average_power = round((power_concentric * time_concentric + power_eccentric * time_eccentric) / (time_concentric + time_eccentric), 1)
         return average_power
 
     @classmethod
     def force_resistance_exercise(cls, weight, distance_moved=None, time_down=None, time_up=None):
         """
 
-        :param weight: kg, weight of equipment used
+        :param weight: kg or Assignment, weight of equipment used
         :param distance_moved: m, expected distance moved in both up and down direction
         :param time_down: s, time taken to move weight down
         :param time_up: s, time taken to move weight up
@@ -651,7 +662,12 @@ class Calculators(object):
             accel_up = cls.get_accel(distance_moved, time_up)
             force_down = cls.get_force(weight, -accel_down)
             force_up = cls.get_force(weight, accel_up)
-            average_force = round((force_down * time_down + force_up * time_up) / (time_down + time_up), 1)
+            force_up.multiply(time_up)
+            force_down.multiply(time_down)
+            average_force = force_up.plagiarize()
+            average_force.add(force_down)
+            average_force.divide(time_down + time_up)
+            # average_force = round((force_down + force_up) / (time_down + time_up), 1)
         else:
             average_force = cls.get_force(weight)
         return average_force
@@ -728,14 +744,18 @@ class Calculators(object):
     def get_force(cls, weight, accel=0.0):
         """
 
-        :param weight: kg, weight lifted
+        :param weight: kg or Assignment with range of possible weights, weight lifted
         :param accel: m/s^2, acceleration +ve is against gravity, -ve is with gravity
         :return: force N
         """
         g = 9.8
-        force = round(weight * (g + accel), 1)
+        if isinstance(weight, Assignment):
+            force = Assignment().multiply_assignment_by_scalar(weight, (g + accel))
+            force_range = StandardErrorRange(lower_bound=force.min_value, observed_value=force.assigned_value, upper_bound=force.max_value)
+        else:
+            force_range = StandardErrorRange(observed_value=round(weight * (g + accel), 1))
 
-        return force
+        return force_range
 
     @classmethod
     def get_accel(cls, distance_moved, time_taken):

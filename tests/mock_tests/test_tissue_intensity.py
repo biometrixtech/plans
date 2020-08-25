@@ -150,4 +150,4 @@ def test_cycling():
 def test_power_lifting():
     power_same_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1.5, time_eccentric=1.5)
     power_different_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1, time_eccentric=2)
-    assert power_same_duration < power_different_duration
+    assert power_same_duration.observed_value < power_different_duration.observed_value

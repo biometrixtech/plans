@@ -584,6 +584,15 @@ class Assignment(object):
 
         return assignment
 
+    def plagiarize(self):
+
+        new_object = Assignment(assignment_type=self.assignment_type,
+                                assigned_value=self.assigned_value,
+                                min_value=self.min_value,
+                                max_value=self.max_value,
+                                assignment_level=self.assignment_level)
+        return new_object
+
     @staticmethod
     def divide_scalar_assignment(divisor_scalar, dividend_assignment):
 
@@ -612,6 +621,22 @@ class Assignment(object):
                 result_assignment.assigned_value = None
             if divisor_assignment.max_value is not None:
                 result_assignment.max_value = float(divisor_assignment.max_value) / dividend_scalar
+                result_assignment.assigned_value = None
+
+        return result_assignment
+
+    @staticmethod
+    def multiply_assignment_by_scalar(assignment, scalar):
+
+        result_assignment = Assignment()
+        if assignment.assigned_value is not None:
+            result_assignment.assigned_value = float(assignment.assigned_value) * scalar
+        else:
+            if assignment.min_value is not None:
+                result_assignment.min_value = float(assignment.min_value) * scalar
+                result_assignment.assigned_value = None
+            if assignment.max_value is not None:
+                result_assignment.max_value = float(assignment.max_value) * scalar
                 result_assignment.assigned_value = None
 
         return result_assignment
@@ -717,6 +742,17 @@ class Assignment(object):
                 new_range.upper_bound = range.upper_bound * assignment.max_value
 
         return new_range
+
+    def add_value(self, number_value):
+        if number_value is not None :
+            if self.min_value is not None:
+                self.min_value = self.min_value + number_value
+            if self.max_value is not None:
+                self.max_value = self.max_value + number_value
+            if self.assigned_value is not None:
+                self.assigned_value = self.assigned_value + number_value
+            else:
+                self.assigned_value = number_value
 
 
 class MovementOption(object):

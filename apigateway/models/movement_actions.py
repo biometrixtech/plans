@@ -310,6 +310,8 @@ class ExerciseAction(object):
         external_weight_right = 0
         if self.apply_resistance:
             for ex_weight in self.external_weight:
+                if isinstance(ex_weight.value, Assignment):
+                    ex_weight.value = ex_weight.value.assigned_value
                 left = 0
                 right = 0
                 if ex_weight.equipment in self.eligible_external_resistance:
