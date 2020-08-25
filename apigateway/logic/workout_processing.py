@@ -802,12 +802,26 @@ class WorkoutProcessor(object):
             reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
 
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
-            rpe.observed_value = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
-            if reps.lower_bound is not None:
-                rpe1 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.lower_bound)
-                rpe2 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.upper_bound)
-                rpe.lower_bound = min([rpe1, rpe2])
-                rpe.upper_bound = max([rpe1, rpe2])
+            if isinstance(workout_exercise.weight_measure, Assignment):
+                all_rpes = []
+                weights = [workout_exercise.weight.assigned_value, workout_exercise.weight.min_value, workout_exercise.weight.max_value]
+                weights = [value for value in weights if value is not None]
+                all_reps = [workout_exercise.reps.observed_value, workout_exercise.reps.lower_bound, workout_exercise.reps.upper_bound]
+                all_reps = [value for value in all_reps if value is not None]
+                for weight in weights:
+                    for reps in all_reps:
+                        all_rpes.append(self.get_rpe_from_rep_max(weight, reps))
+                if len(all_rpes) > 0:
+                    rpe.observed_value = sum(all_rpes) / len(all_rpes)
+                    rpe.lower_bound = min(all_rpes)
+                    rpe.upper_bound = max(all_rpes)
+            else:
+                rpe.observed_value = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
+                if reps.lower_bound is not None:
+                    rpe1 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.lower_bound)
+                    rpe2 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.upper_bound)
+                    rpe.lower_bound = min([rpe1, rpe2])
+                    rpe.upper_bound = max([rpe1, rpe2])
 
         else:
             if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
