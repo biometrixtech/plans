@@ -14,7 +14,9 @@ class PlannedWorkout(object):
         self.program_id = None
         self.program_module_id = None
         self.event_date = None  # date for which this is planned
-        self.duration = ""
+        self.duration = None
+        self.rpe = None
+        self.rest_between_exercises = None
         self.sections = []
 
     def json_serialise(self):
@@ -24,6 +26,8 @@ class PlannedWorkout(object):
             'program_id': self.program_id,
             'program_module_id': self.program_module_id,
             'duration': self.duration,
+            'rpe': self.rpe.json_serialise() if self.rpe is not None else None,
+            'rest_between_exercises': self.rest_between_exercises.json_serialise() if self.rest_between_exercises is not None else None,
             'sections': [s.json_serialise() for s in self.sections]
         }
         return ret
@@ -36,6 +40,8 @@ class PlannedWorkout(object):
         workout.program_id = input_dict.get('program_id')
         workout.program_module_id = input_dict.get('program_module_id')
         workout.duration = input_dict.get('duration')
+        workout.rpe = Assignment.json_deserialise(input_dict['rpe']) if input_dict.get('rpe') is not None else None
+        workout.rest_between_exercises = Assignment.json_deserialise(input_dict['rest_between_exercises']) if input_dict.get('rest_between_exercises') is not None else None
         workout.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('sections', [])]
 
         return workout
@@ -211,7 +217,7 @@ class PlannedExercise(BaseWorkoutExercise):
             'name': self.name,
             'equipments': [equipment.value for equipment in self.equipments],
             'movement_id': self.movement_id,
-            'weight': self.weight,
+            'weight': self.weight.json_serialise() if self.weight is not None else None,
             'weight_measure': self.weight_measure.value if self.weight_measure is not None else None,
             'side': self.side,
             'reps': self.reps,
@@ -265,7 +271,7 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise.name = input_dict.get('name', "")
         exercise.movement_id = input_dict.get('movement_id', "")
 
-        exercise.weight = input_dict.get('weight')  # in lbs
+        exercise.weight = Assignment.json_deserialise(input_dict['weight']) if input_dict.get('weight') is not None else None  # in lbs
         exercise.weight_measure = WeightMeasure(input_dict['weight_measure']) if input_dict.get(
             'weight_measure') is not None else None
 

@@ -331,3 +331,4 @@ class WeightMeasure(Enum):
     rep_max = 0
     percent_bodyweight = 1
     actual_weight = 2
+    percent_rep_max = 3

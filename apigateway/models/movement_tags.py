@@ -179,7 +179,7 @@ class Equipment(Enum):
     hex_bar = 26
     trx = 27
     mini_bands = 28
-    single_dumbbells = 29
+    single_dumbbell = 29
 
     def distribute_weights(self):
         if self.name in ['no_equipment', 'airbike', 'bike', 'swimming', 'dumbbells',
