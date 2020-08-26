@@ -126,8 +126,8 @@ class Calculators(object):
         """
 
         :param age:
-        :param weight:
-        :param height:
+        :param weight: kg
+        :param height: meters
         :param gender:  Gender enum
         :param activity_level
         :return:
@@ -156,8 +156,8 @@ class Calculators(object):
         """
 
         :param age:
-        :param height:
-        :param weight:
+        :param height: meters
+        :param weight: kg
         :param gender:
         :param activity_level: same as NHANES classification
         :return:
@@ -546,7 +546,7 @@ class Calculators(object):
         :param efficiency: float
         :return:
         """
-        mets = round((watts * 1000 * .0143) / (3.5 * weight * 5.05 * efficiency), 2)
+        mets = round((watts * 1000 * .01435) / (3.5 * weight * 5.05 * efficiency), 2)
         return mets
 
     @classmethod
