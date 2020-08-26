@@ -559,6 +559,23 @@ class Assignment(object):
         }
         return ret
 
+    def fix_min_max(self):
+        if self.min_value is not None and self.max_value is not None:
+            if self.min_value > self.max_value:
+                min_value = self.max_value
+                max_value = self.min_value
+                self.min_value = min_value
+                self.max_value = max_value
+        elif self.min_value is not None and self.assigned_value is not None:
+            if self.min_value > self.assigned_value:
+                self.max_value = self.min_value
+                self.min_value = None
+        elif self.max_value is not None and self.assigned_value is not None:
+            if self.max_value < self.assigned_value:
+                self.min_value = self.max_value
+                self.max_value = None
+
+
     def lowest_value(self):
 
         if self.min_value is not None:

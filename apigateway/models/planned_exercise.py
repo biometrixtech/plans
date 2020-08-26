@@ -404,7 +404,13 @@ class PlannedExercise(BaseWorkoutExercise):
         elif self.duration is not None and self.distance is not None:
             speed = Assignment.divide_assignments(self.distance, self.duration)
         elif pace is not None:
-            speed = Assignment.divide_scalar_assignment(1, self.pace)
+            speed = Assignment.divide_scalar_assignment(1, pace)
+
+        if speed is not None:
+            speed.fix_min_max()
+        if pace is not None:
+            pace.fix_min_max()
+
         self.speed = speed
         self.pace = pace
 
