@@ -623,6 +623,7 @@ class Assignment(object):
             if dividend_assignment.max_value is not None:
                 result_assignment.max_value = divisor_scalar / float(dividend_assignment.max_value)
                 result_assignment.assigned_value = None
+        result_assignment.fix_min_max()
 
         return result_assignment
 
@@ -640,6 +641,7 @@ class Assignment(object):
                 result_assignment.max_value = float(divisor_assignment.max_value) / dividend_scalar
                 result_assignment.assigned_value = None
 
+        result_assignment.fix_min_max()
         return result_assignment
 
     @staticmethod
@@ -741,7 +743,8 @@ class Assignment(object):
             if range.lower_bound is not None:
                 new_range.lower_bound = range.lower_bound * assignment.assigned_value
 
-            new_range.observed_value = range.observed_value * assignment.assigned_value
+            if range.observed_value is not None:
+                new_range.observed_value = range.observed_value * assignment.assigned_value
 
             if range.upper_bound is not None:
                 new_range.upper_bound = range.upper_bound * assignment.assigned_value
@@ -749,11 +752,12 @@ class Assignment(object):
             if range.lower_bound is not None:
                 new_range.lower_bound = range.lower_bound * assignment.min_value
 
-            if assignment.max_value is not None:
-                avg_value = (assignment.max_value + assignment.min_value) / 2
-                new_range.observed_value = range.observed_value * avg_value
-            else:
-                new_range.observed_value = range.observed_value * assignment.min_value
+            if range.observed_value is not None:
+                if assignment.max_value is not None:
+                    avg_value = (assignment.max_value + assignment.min_value) / 2
+                    new_range.observed_value = range.observed_value * avg_value
+                else:
+                    new_range.observed_value = range.observed_value * assignment.min_value
 
             if range.upper_bound is not None and assignment.max_value is not None:
                 new_range.upper_bound = range.upper_bound * assignment.max_value
@@ -768,7 +772,7 @@ class Assignment(object):
                 self.max_value = self.max_value + number_value
             if self.assigned_value is not None:
                 self.assigned_value = self.assigned_value + number_value
-            else:
+            if self.min_value is None and self.max_value is None and self.assigned_value is None:
                 self.assigned_value = number_value
 
 
