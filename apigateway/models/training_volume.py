@@ -149,11 +149,11 @@ class StandardErrorRange(Serialisable):
             return None
 
     @staticmethod
-    def get_average_from_error_range_list(error_range_list):
-
-        upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
-        observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
-        lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+    def get_average_from_error_range_list(error_range_list):        
+        # upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
+        # observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
+        # lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+        lower_bound_list, observed_value_list, upper_bound_list = StandardErrorRange.get_lower_observed_upper_list(error_range_list)
 
         average_range = StandardErrorRange()
 
@@ -174,9 +174,10 @@ class StandardErrorRange(Serialisable):
     @staticmethod
     def get_stddev_from_error_range_list(error_range_list):
 
-        upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
-        observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
-        lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+        # upper_bound_list = [e.upper_bound for e in error_range_list if e.upper_bound is not None]
+        # observed_value_list = [e.observed_value for e in error_range_list if e.observed_value is not None]
+        # lower_bound_list = [e.lower_bound for e in error_range_list if e.lower_bound is not None]
+        lower_bound_list, observed_value_list, upper_bound_list = StandardErrorRange.get_lower_observed_upper_list(error_range_list)
 
         stdev_range = StandardErrorRange()
 
@@ -220,43 +221,59 @@ class StandardErrorRange(Serialisable):
         return new_object
 
     def add(self, standard_error_range):
-        if standard_error_range.lower_bound is None and standard_error_range.observed_value is not None:
-            standard_error_range.lower_bound = standard_error_range.observed_value
-        if standard_error_range.upper_bound is None and standard_error_range.observed_value is not None:
-            standard_error_range.upper_bound = standard_error_range.observed_value
 
-        if standard_error_range is not None and standard_error_range.lower_bound is not None:
-            if self.lower_bound is None:
-                self.lower_bound = standard_error_range.lower_bound
-            else:
-                self.lower_bound += standard_error_range.lower_bound
-        if standard_error_range is not None and standard_error_range.upper_bound is not None:
-            if self.upper_bound is None:
-                self.upper_bound = standard_error_range.upper_bound
-            else:
-                self.upper_bound += standard_error_range.upper_bound
-        if standard_error_range is not None and standard_error_range.observed_value is not None:
-            if self.observed_value is None:
-                self.observed_value = standard_error_range.observed_value
-            else:
-                self.observed_value += standard_error_range.observed_value
+        lower_bound_list, observed_value_list, upper_bound_list = StandardErrorRange.get_lower_observed_upper_list([self, standard_error_range])
+        if len(lower_bound_list) > 0:
+            self.lower_bound = sum(lower_bound_list)
+        if len(observed_value_list) > 0:
+            self.observed_value = sum(observed_value_list)
+        if len(upper_bound_list) > 0:
+            self.upper_bound = sum(upper_bound_list)
+
+        # if standard_error_range.lower_bound is None and standard_error_range.observed_value is not None:
+        #     standard_error_range.lower_bound = standard_error_range.observed_value
+        # if standard_error_range.upper_bound is None and standard_error_range.observed_value is not None:
+        #     standard_error_range.upper_bound = standard_error_range.observed_value
+        #
+        # if standard_error_range is not None and standard_error_range.lower_bound is not None:
+        #     if self.lower_bound is None:
+        #         self.lower_bound = standard_error_range.lower_bound
+        #     else:
+        #         self.lower_bound += standard_error_range.lower_bound
+        # if standard_error_range is not None and standard_error_range.upper_bound is not None:
+        #     if self.upper_bound is None:
+        #         self.upper_bound = standard_error_range.upper_bound
+        #     else:
+        #         self.upper_bound += standard_error_range.upper_bound
+        # if standard_error_range is not None and standard_error_range.observed_value is not None:
+        #     if self.observed_value is None:
+        #         self.observed_value = standard_error_range.observed_value
+        #     else:
+        #         self.observed_value += standard_error_range.observed_value
 
         # TODO: verify the assumption present in the following line: insufficient data trumps sufficient data
         if standard_error_range is not None:
             self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
 
     def subtract(self, standard_error_range):
+        standard_error_range = standard_error_range.plagiarize()
         if standard_error_range.lower_bound is None and standard_error_range.observed_value is not None:
             standard_error_range.lower_bound = standard_error_range.observed_value
         if standard_error_range.upper_bound is None and standard_error_range.observed_value is not None:
             standard_error_range.upper_bound = standard_error_range.observed_value
+        if standard_error_range.lower_bound is not None and standard_error_range.upper_bound is not None and standard_error_range.observed_value is None:
+            standard_error_range.observed_value = (standard_error_range.upper_bound + standard_error_range.lower_bound) / 2
 
         if standard_error_range is not None and standard_error_range.lower_bound is not None:
             if self.lower_bound is not None:
                 self.lower_bound = self.lower_bound - standard_error_range.lower_bound
+            elif self.observed_value is not None:
+                self.lower_bound = self.observed_value - standard_error_range.lower_bound
         if standard_error_range is not None and standard_error_range.upper_bound is not None:
             if self.upper_bound is not None:
                 self.upper_bound = self.upper_bound - standard_error_range.upper_bound
+            elif self.observed_value is not None:
+                self.upper_bound = self.observed_value - standard_error_range.upper_bound
         if standard_error_range is not None and standard_error_range.observed_value is not None:
             if self.observed_value is not None:
                 self.observed_value = self.observed_value - standard_error_range.observed_value
@@ -265,7 +282,10 @@ class StandardErrorRange(Serialisable):
             self.lower_bound = self.observed_value
         if self.upper_bound is None:
             self.upper_bound = self.observed_value
+        if self.observed_value is None and self.lower_bound is not None and self.upper_bound is not None:
+            self.observed_value = (self.upper_bound + self.lower_bound) / 2
 
+        self.fix_lower_upper()
         # TODO: verify the assumption present in the following line: insufficient data trumps sufficient data
         if standard_error_range is not None:
             self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
@@ -307,18 +327,45 @@ class StandardErrorRange(Serialisable):
             self.observed_value = self.observed_value * factor
 
     def multiply_range(self, standard_error_range):
-        if self.lower_bound is not None and standard_error_range.lower_bound is not None:
-            self.lower_bound = self.lower_bound * standard_error_range.lower_bound
-        else:
-            self.lower_bound = None
-        if self.upper_bound is not None and standard_error_range.upper_bound is not None:
-            self.upper_bound = self.upper_bound * standard_error_range.upper_bound
-        else:
-            self.upper_bound = None
-        if self.observed_value is not None and standard_error_range.observed_value is not None:
-            self.observed_value = self.observed_value * standard_error_range.observed_value
-        else:
-            self.observed_value = None
+        standard_error_range = standard_error_range.plagiarize()
+        if self.observed_value is None and self.lower_bound is not None and self.upper_bound is not None:
+            average_value = (self.lower_bound + self.upper_bound) / 2
+        if standard_error_range.lower_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.lower_bound = standard_error_range.observed_value
+        if standard_error_range.upper_bound is None and standard_error_range.observed_value is not None:
+            standard_error_range.upper_bound = standard_error_range.observed_value
+        if standard_error_range.lower_bound is not None and standard_error_range.upper_bound is not None and standard_error_range.observed_value is None:
+            standard_error_range.observed_value = (standard_error_range.upper_bound + standard_error_range.lower_bound) / 2
+
+        if self.lower_bound is not None:
+            if standard_error_range.lower_bound is not None:
+                self.lower_bound = self.lower_bound * standard_error_range.lower_bound
+            elif standard_error_range.observed_value is not None:
+                self.lower_bound = self.lower_bound * standard_error_range.observed_value
+        elif self.observed_value is not None:
+            if standard_error_range.lower_bound is not None:
+                self.lower_bound = self.observed_value * standard_error_range.lower_bound
+            elif standard_error_range.observed_value is not None:
+                self.lower_bound = self.observed_value * standard_error_range.observed_value
+
+        if self.upper_bound is not None:
+            if standard_error_range.upper_bound is not None:
+                self.upper_bound = self.upper_bound * standard_error_range.upper_bound
+            elif standard_error_range.observed_value is not None:
+                self.upper_bound = self.upper_bound * standard_error_range.observed_value
+        elif self.observed_value is not None:
+            if standard_error_range.upper_bound is not None:
+                self.upper_bound = self.observed_value * standard_error_range.upper_bound
+            elif standard_error_range.observed_value is not None:
+                self.upper_bound = self.observed_value * standard_error_range.observed_value
+
+
+        if self.observed_value is not None:
+            if standard_error_range.observed_value is not None:
+                self.observed_value = self.observed_value * standard_error_range.observed_value
+        elif self.lower_bound is not None and self.upper_bound is not None:
+            if standard_error_range.observed_value is not None:
+                self.observed_value = average_value * standard_error_range.observed_value
 
     def divide_range_simple(self, standard_error_range):
         if self.lower_bound is not None and standard_error_range.lower_bound is not None and standard_error_range.lower_bound > 0:
@@ -342,6 +389,7 @@ class StandardErrorRange(Serialisable):
             self.upper_bound = self.upper_bound / factor
         if self.observed_value is not None:
             self.observed_value = self.observed_value / factor
+        self.fix_lower_upper()
 
     def divide_range(self, standard_error_range):
         values = []
@@ -426,6 +474,46 @@ class StandardErrorRange(Serialisable):
         # TODO: verify the assumption present in the following line: insufficient data trumps sufficient data
         if standard_error_range is not None:
             self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
+
+
+    @classmethod
+    def get_lower_observed_upper_list(cls, error_range_list):
+        upper_bound_list = []
+        observed_value_list = []
+        lower_bound_list = []
+        for e in error_range_list:
+            if e.lower_bound is not None:
+                lower_bound_list.append(e.lower_bound)
+            if e.upper_bound is not None:
+                upper_bound_list.append(e.upper_bound)
+            if e.observed_value is not None:
+                observed_value_list.append(e.observed_value)
+                if e.lower_bound is None:
+                    lower_bound_list.append(e.observed_value)
+                if e.upper_bound is None:
+                    upper_bound_list.append(e.observed_value)
+            else:
+                if e.lower_bound is not None and e.upper_bound is not None:
+                    average_value = (e.lower_bound + e.upper_bound) / 2
+                    observed_value_list.append(average_value)
+        return lower_bound_list, observed_value_list, upper_bound_list
+
+    def fix_lower_upper(self):
+        if self.lower_bound is not None and self.upper_bound is not None:
+            if self.lower_bound > self.upper_bound:
+                lower_bound = self.upper_bound
+                upper_bound = self.lower_bound
+                self.lower_bound = lower_bound
+                self.upper_bound = upper_bound
+        elif self.lower_bound is not None and self.observed_value is not None:
+            if self.lower_bound > self.observed_value:
+                self.upper_bound = self.lower_bound
+                self.lower_bound = None
+        elif self.upper_bound is not None and self.observed_value is not None:
+            if self.upper_bound < self.observed_value:
+                self.lower_bound = self.upper_bound
+                self.upper_bound = None
+
 
 class StandardErrorRangeMetric(StandardErrorRange):
     def __init__(self, lower_bound=None, upper_bound=None, observed_value=None):
