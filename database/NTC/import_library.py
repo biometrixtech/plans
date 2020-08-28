@@ -111,9 +111,11 @@ class WorkoutParser(object):
         max_distance = None
         count = row['count']
         if self.is_valid(count):
-            if 'm' in count:
-                observed_distance = int(count.replace('m', '').replace(',', ''))
-            else:
+            # if 'm' in count:
+            #     print('m in count')
+            #     raise ValueError
+            #     # observed_distance = int(count.replace('m', '').replace(',', ''))
+            # else:
                 ex.reps_per_set = int(count)
 
         distance = row.get('distance', None)
@@ -122,13 +124,18 @@ class WorkoutParser(object):
         time = row['time']
         max_time = row['max_time']
         if self.is_valid(time):
-            if 'm' in time:
-                observed_distance = int(time.replace('m', '').replace(',', ''))
-            else:
+            # if 'm' in time:
+            #     print(f"{time} in time")
+            #     raise ValueError
+            #     # observed_distance = int(time.replace('m', '').replace(',', ''))
+            # else:
                 observed_duration = int(row['time'])
         if self.is_valid(max_time):
             if 'm' in max_time:
-                max_distance = int(max_time.replace('m', '').replace(',', ''))
+                pass
+                # print(f"{max_time} in max_time")
+                # raise ValueError
+                # max_distance = int(max_time.replace('m', '').replace(',', ''))
             else:
                 max_duration = int(row['max_time'])
         ex.duration = self.get_assignment(observed_duration, max_duration)
@@ -158,9 +165,10 @@ class WorkoutParser(object):
                     ex.equipments = [Equipment[equipment_name]]
                 except:
                     print(equipment_name)
-            else:
-                print(equip)
-                raise ValueError()
+            # else:
+            #     pass
+                # print(equip)
+                # raise ValueError()
         intensity_measure_unit = row.get('intensity_measure_units')
         if self.is_valid(intensity_measure_unit):
             if intensity_measure_unit == 'RPE':
@@ -168,7 +176,12 @@ class WorkoutParser(object):
                 max_rpe = row.get('max_intensity_measure')
                 min_rpe = int(min_rpe) if min_rpe is not None else None
                 max_rpe = int(max_rpe) if min_rpe is not None else None
-                ex.rpe = StandardErrorRange(observed_value=min_rpe, upper_bound=max_rpe)
+                if min_rpe is not None and max_rpe is not None:
+                    ex.rpe = StandardErrorRange(lower_bound=min_rpe, upper_bound=max_rpe)
+                elif min_rpe is not None and max_rpe is None:
+                    ex.rpe = StandardErrorRange(observed_value=min_rpe)
+                elif min_rpe is None and max_rpe is not None:
+                    ex.rpe = StandardErrorRange(observed_value=max_rpe)
             elif intensity_measure_unit == 'normalized_pace':
                 pass
             elif intensity_measure_unit == 'perc_rep_max':
@@ -289,12 +302,12 @@ if __name__ == '__main__':
             for file in files:
                 if 'DS_Store' not in file and 'included in this' not in file:
                     try:
-                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=False)
+                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=True)
                         validate_exercises(workout, exercise_names)
                         workout_json = workout.json_serialise()
                         workout_2 = PlannedWorkout.json_deserialise(workout_json)
                     except ValueError as e:
                         print(dir, file)
-    print(f"duration: {min(all_durations), max(all_durations)}")
-    print(f"distance: {min(all_distances), max(all_distances)}")
-    print(f"reps: {min(all_reps), max(all_reps)}")
+    # print(f"duration: {min(all_durations), max(all_durations)}")
+    # print(f"distance: {min(all_distances), max(all_distances)}")
+    # print(f"reps: {min(all_reps), max(all_reps)}")
