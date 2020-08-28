@@ -265,3 +265,37 @@ def test_vo2max_population():
     assert vo2_max_4 is not None and vo2_max_4 > 0
     assert vo2_max_3 > vo2_max_2
     assert vo2_max_4 > vo2_max_1
+
+
+def test_get_mets_from_rpe_acsm():
+    last = 0
+    for rpe in range(1, 11):
+        mets = Calculators.get_mets_from_rpe_acsm(rpe, age=20)
+        assert mets > last
+        last = mets
+
+
+def test_get_power_from_rpe():
+    last = 0
+    for rpe in range(1, 11):
+        power = Calculators.get_power_from_rpe(rpe, age=20, weight=70)
+        assert power > last
+        last = power
+
+
+def test_get_power_from_rpe_diff_age():
+    for rpe in range(1, 11):
+        power1 = Calculators.get_power_from_rpe(rpe, age=20, weight=70)
+        power2 = Calculators.get_power_from_rpe(rpe, age=50, weight=70)
+        power3 = Calculators.get_power_from_rpe(rpe, age=70, weight=70)
+        power4 = Calculators.get_power_from_rpe(rpe, age=90, weight=70)
+        assert power1 > power2 > power3 > power4
+
+
+def test_get_power_from_rpe_diff_weight():
+    for rpe in range(1, 11):
+        power1 = Calculators.get_power_from_rpe(rpe, age=20, weight=50)
+        power2 = Calculators.get_power_from_rpe(rpe, age=20, weight=60)
+        power3 = Calculators.get_power_from_rpe(rpe, age=20, weight=70)
+        power4 = Calculators.get_power_from_rpe(rpe, age=20, weight=80)
+        assert power1 < power2 < power3 < power4

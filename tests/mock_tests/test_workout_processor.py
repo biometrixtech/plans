@@ -3,8 +3,10 @@ from models.workout_program import WorkoutExercise, CompletedWorkoutSection, Wor
 from models.movement_tags import AdaptationType, CardioAction, TrainingType
 from models.movement_actions import ExerciseAction, Movement, Explosiveness
 from models.exercise import UnitOfMeasure
+from models.planned_exercise import PlannedExercise
 from models.heart_rate import HeartRateData
 from models.session import MixedActivitySession
+from models.training_volume import Assignment, StandardErrorRange
 import datetime
 from utils import format_datetime
 import random
@@ -195,3 +197,66 @@ def test_new_actions():
     session = MixedActivitySession()
     session.workout_program_module = workout
     processor.process_workout(session)
+
+
+def test_set_planned_power_cardio_nothing_defined():
+    exercise = PlannedExercise()
+    exercise.training_type = TrainingType.strength_cardiorespiratory
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise)
+
+    assert exercise.power is not None
+
+
+def test_set_planned_power_cardio_run_speed_single_value():
+    exercise = PlannedExercise()
+    exercise.training_type = TrainingType.strength_cardiorespiratory
+    exercise.cardio_action = CardioAction.run
+    exercise.speed = Assignment(assigned_value=1.2)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise)
+
+    assert exercise.power is not None
+
+
+def test_set_planned_power_cardio_run_speed_min_max():
+    exercise = PlannedExercise()
+    exercise.training_type = TrainingType.strength_cardiorespiratory
+    exercise.cardio_action = CardioAction.run
+    exercise.speed = Assignment(min_value=1.2, max_value=2.1)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise)
+
+    assert exercise.power is not None
+    assert exercise.power.lower_bound < exercise.power.observed_value < exercise.power.upper_bound
+
+
+def test_set_planned_power_cardio_run_speed_min_max_grade():
+    exercise = PlannedExercise()
+    exercise.training_type = TrainingType.strength_cardiorespiratory
+    exercise.cardio_action = CardioAction.run
+    exercise.speed = Assignment(min_value=1.2, max_value=2.1)
+    exercise.grade = Assignment(assigned_value=.1)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise)
+
+    assert exercise.power is not None
+    assert exercise.power.lower_bound < exercise.power.observed_value < exercise.power.upper_bound
+
+
+def test_set_planned_power_cardio_run_check_difference_in_speed():
+    exercise1 = PlannedExercise()
+    exercise1.training_type = TrainingType.strength_cardiorespiratory
+    exercise1.cardio_action = CardioAction.run
+    exercise1.speed = Assignment(assigned_value=1)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise1)
+
+    exercise2 = PlannedExercise()
+    exercise2.training_type = TrainingType.strength_cardiorespiratory
+    exercise2.cardio_action = CardioAction.run
+    exercise2.speed = Assignment(assigned_value=2)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise2)
+
+    assert exercise1.power.observed_value < exercise2.power.observed_value

@@ -780,3 +780,86 @@ class Calculators(object):
         if gender.name == 'female':
             mets -= 1
         return mets
+
+    @classmethod
+    def get_power_from_rpe(cls, rpe, age=None, weight=None):
+        weight = weight or 60
+        age = age or 25
+        mets = cls.get_mets_from_rpe_acsm(rpe, age)
+        power = cls.mets_to_watts(mets, weight=weight, efficiency=.21)
+        return power
+
+    @classmethod
+    def get_mets_from_rpe_acsm(cls, rpe, age):
+        """
+        ACSM based table
+        :param rpe:
+        :return:
+        """
+        mets_lookup_tables = cls.mets_lookup_tables()
+        if age < 40:
+            age_group = 'young'
+        elif age < 65:
+            age_group = 'middle_aged'
+        elif age < 80:
+            age_group = 'old'
+        else:
+            age_group = 'very_old'
+        mets_lookup = mets_lookup_tables[age_group]
+        rpe_tuple = [r for r in mets_lookup if r[0][0] <= rpe <= r[0][1]]
+        if len(rpe_tuple) > 0:
+            rpe_range = rpe_tuple[0][0]
+            mets_min_max = rpe_tuple[0][1]
+            rpe_diff = rpe - rpe_range[0]
+            rpe_range_min_max_diff = float(rpe_range[1] - rpe_range[0])
+            mets_range = float(mets_min_max[1] - mets_min_max[0])
+            mets_diff = 0
+            if rpe_range_min_max_diff > 0:
+                mets_diff = round(rpe_diff / rpe_range_min_max_diff * mets_range, 2)
+            mets = mets_min_max[0] + mets_diff
+
+        else:
+            mets = 1
+        return mets
+
+    @classmethod
+    def mets_lookup_tables(cls):
+        all_mets_lookup = {}
+
+        mets_lookup_young = list()
+        mets_lookup_young.append(((0, 1), (1.2, 2.4)))
+        mets_lookup_young.append(((1, 2), (2.4, 4.7)))
+        mets_lookup_young.append(((2, 3), (4.7, 7.1)))
+        mets_lookup_young.append(((3, 6), (7.1, 10.1)))
+        mets_lookup_young.append(((6, 9), (10.1, 12.0)))
+        mets_lookup_young.append(((9, 10), (12.0, 14.0)))
+        all_mets_lookup['young'] = mets_lookup_young
+
+        mets_lookup_middle_aged = list()
+        mets_lookup_middle_aged.append(((0, 1), (1.0, 2.0)))
+        mets_lookup_middle_aged.append(((1, 2), (2.0, 3.9)))
+        mets_lookup_middle_aged.append(((2, 3), (3.9, 5.9)))
+        mets_lookup_middle_aged.append(((3, 6), (5.9, 8.4)))
+        mets_lookup_middle_aged.append(((6, 9), (8.4, 10.0)))
+        mets_lookup_middle_aged.append(((9, 10), (10.0, 11.5)))
+        all_mets_lookup['middle_aged'] = mets_lookup_middle_aged
+
+        mets_lookup_old = list()
+        mets_lookup_old.append(((0, 1), (0.8, 1.6)))
+        mets_lookup_old.append(((1, 2), (1.6, 3.1)))
+        mets_lookup_old.append(((2, 3), (3.1, 4.7)))
+        mets_lookup_old.append(((3, 6), (4.7, 6.7)))
+        mets_lookup_old.append(((6, 9), (6.7, 8.0)))
+        mets_lookup_old.append(((9, 10), (8.0, 9.0)))
+        all_mets_lookup['old'] = mets_lookup_old
+
+        mets_lookup_very_old = list()
+        mets_lookup_very_old.append(((0, 1), (0.5, 1.0)))
+        mets_lookup_very_old.append(((1, 2), (1.0, 1.9)))
+        mets_lookup_very_old.append(((2, 3), (1.9, 2.9)))
+        mets_lookup_very_old.append(((3, 6), (2.9, 4.2)))
+        mets_lookup_very_old.append(((6, 9), (4.2, 5.0)))
+        mets_lookup_very_old.append(((9, 10), (5.0, 5.6)))
+        all_mets_lookup['very_old'] = mets_lookup_very_old
+
+        return all_mets_lookup
