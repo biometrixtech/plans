@@ -78,6 +78,8 @@ class ExerciseAction(object):
         self.leg = None
         self.multiplier = 1
 
+        self.actions = []
+
         self.percent_bodyweight = 0.0
         self.lateral_distribution = [0, 0]
 
@@ -666,6 +668,7 @@ class Movement(Serialisable):
         self.name = name
         self.primary_actions = []
         self.secondary_actions = []
+
         self.surface_stability = None
         self.external_weight_implement = []
         self.resistance = None
@@ -676,6 +679,10 @@ class Movement(Serialisable):
         self.power_action = None
         self.strength_resistance_action = None
         self.strength_endurance_action = None
+
+        # new
+        self.compound_actions = []
+        self.bilateral_distribution_of_resistance = None
 
         # calculated
         self.explosiveness_rating = 0
@@ -696,7 +703,10 @@ class Movement(Serialisable):
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions,
-            'explosiveness_rating': self.explosiveness_rating
+            'explosiveness_rating': self.explosiveness_rating,
+            #new
+            'compound_actions': self.compound_actions,
+            'bilateral_distribution_of_resistance': self.bilateral_distribution_of_resistance.value if self.bilateral_distribution_of_resistance is not None else None
         }
         return ret
 
@@ -724,6 +734,9 @@ class Movement(Serialisable):
         movement.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         movement.primary_actions = input_dict.get('primary_actions', [])
         movement.secondary_actions = input_dict.get('secondary_actions', [])
+        #new
+        movement.compound_actions = input_dict.get('compound_actions', [])
+        movement.bilateral_distribution_of_resistance = WeightDistribution(input_dict['bilateral_distribution_of_resistance']) if input_dict.get('bilateral_distribution_of_resistance') is not None else None
 
         return movement
 

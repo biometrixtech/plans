@@ -2,6 +2,7 @@ from models.movement_actions import ExerciseAction, UpperBodyStance, LowerBodySt
 from models.movement_tags import TrainingType, Equipment, WeightDistribution, BodyPosition
 from models.functional_movement_type import FunctionalMovementType
 from models.soreness_base import BodyPartSystems
+from copy import deepcopy
 import os
 import json
 import pandas as pd
@@ -12,23 +13,31 @@ class SubActionLibraryParser(object):
         #self.actions_pd = None
         self.actions = []
         self.sub_actions = {}
+        self.sub_action_lookup = {}
 
     def load_sub_actions(self, sub_action_files):
 
-        for sub_action_file in sub_action_files:
-            actions_pd = pd.read_csv(f'sub_actions:{sub_action_file}.csv', keep_default_na=False, skiprows=1)
+        self.sub_actions = {}
 
-            self.sub_actions = {}
+        for sub_action_file in sub_action_files:
+            actions_pd = pd.read_csv(f'Fathom Sub Action Library/sub actions: {sub_action_file}.csv', keep_default_na=False, skiprows=1)
+
+            last_sub_action = ExerciseAction(None, None)
 
             for index, row in actions_pd.iterrows():
-                action_item = self.parse_sub_action_row(row)
-                if action_item is not None:
-                    if action_item.id not in self.sub_actions:
-                        self.sub_actions[action_item.id] = [action_item]
-                    else:
-                        self.sub_actions[action_item.id].append(action_item)
+                if self.is_import_done(row):
+                    break
+                if self.is_not_header_row(row):
+                    action_item = self.parse_sub_action_row(row, last_sub_action)
+                    last_sub_action = action_item
+                    if action_item is not None:
+                        if action_item.id not in self.sub_actions:
+                            self.sub_actions[action_item.id] = [action_item]
+                            self.sub_action_lookup[action_item.id] = action_item.name
+                        else:
+                            self.sub_actions[action_item.id].append(action_item)
 
-    def load_compound_actions(self, compound_actoin_files):
+    def load_compound_actions(self, compound_action_files):
         """
 
         :param compound_actoin_files: prioritized ordered list of file suffix.
@@ -36,122 +45,150 @@ class SubActionLibraryParser(object):
         :return:
         """
         actions_json = {}
-        for compound_action_file in compound_actoin_files:
-            actions_pd = pd.read_csv(f'action_library{compound_action_file}.csv', keep_default_na=False, skiprows=1)
+        self.actions = []
 
-            self.actions = []
+        for compound_action_file in compound_action_files:
+
+            actions_pd = pd.read_csv(f'Fathom Compound Action Library/Compound Actions: {compound_action_file}-Compound Action Library.csv', keep_default_na=False, skiprows=1)
+
+            compound_action = ExerciseAction(None, None)
+
+            rows = []
 
             for index, row in actions_pd.iterrows():
-                actions = self.parse_compound_action_row(row)
-                if len(actions) > 0:
-                    self.actions.extend(actions)
+
+                if self.is_valid(row, 'id'): # action id
+                    if compound_action.id is None or (len(row['compound_action_id']) > 0 and compound_action.id != row['compound_action_id']):
+                        if len(rows) > 0 and compound_action.id is not None and (len(row['compound_action_id']) > 0 and compound_action.id != row['compound_action_id']):
+                            compound_action = self.parse_compound_action_row(rows, compound_action)
+                            self.actions.append(compound_action)
+                        rows = [row]
+                        compound_action = ExerciseAction(row['compound_action_id'],
+                                                         row['compound_action_name'])
+
+                        if self.is_valid(row, 'training_type'):
+                            try:
+                                compound_action.training_type = TrainingType[row['training_type']]
+                            except:
+                                return None
+
+                        if self.is_valid(row, 'eligible_external_resistance'):
+                            row['eligible_external_resistance'] = row[
+                                'eligible_external_resistance'].replace(", ", ",")
+                            resistances = row.get('eligible_external_resistance').lower().split(",")
+                            try:
+                                compound_action.eligible_external_resistance = [Equipment[ex_res] for ex_res in
+                                                                                resistances]
+                            except:
+                                print(f"eligible_external_resistance: {row['eligible_external_resistance']}")
+
+                        if self.is_valid(row, 'resistance', False):
+                            compound_action.resistance = MovementResistance[row['resistance']]
+
+                        if self.is_valid(row, 'speed', False):
+                            if row['speed'] == 'no_speed':  # TODO this needs to be fixed in spreadsheet
+                                row['speed'] = 'none'
+                            compound_action.speed = self.get_speed(row['speed'])
+
+                        # TODO - how does this related to sub-action body position?
+                        if self.is_valid(row, 'body_position'):
+                            compound_action.body_position = BodyPosition[row['body_position']]
+
+                    elif compound_action.id is not None:
+                        rows.append(row)
+                else:
+                    if len(rows) > 0 and compound_action.id is not None:
+                        compound_action = self.parse_compound_action_row(rows, compound_action)
+                        self.actions.append(compound_action)
+                        rows = []
+            if len(rows) > 0 and compound_action.id is not None:
+                compound_action = self.parse_compound_action_row(rows, compound_action)
+                self.actions.append(compound_action)
+
             actions_json_file = self.get_actions_json()
             actions_json.update(actions_json_file)
 
         self.write_actions_json(actions_json)
 
-    def parse_compound_action_row(self, row):
+    def parse_compound_action_row(self, rows, compound_action):
 
         movement_system = BodyPartSystems()
 
-        actions = []
+        action = ExerciseAction(None, None)
 
-        if row['compound_action_id'] is not None and row['compound_action_id'] != '':
-            compound_action = ExerciseAction(row['compound_action_id'], row['compound_action_name'])
-
-            if self.is_valid(row, 'training_type'):
-                try:
-                    compound_action.training_type = TrainingType[row['training_type']]
-                except:
-                    return None
-
-            # TODO: Read in categorization as well
-            if self.is_valid(row, 'eligible_external_resistance'):
-                row['eligible_external_resistance'] = row['eligible_external_resistance'].replace(", ", ",")
-                resistances = row.get('eligible_external_resistance').lower().split(",")
-                try:
-                    compound_action.eligible_external_resistance = [Equipment[ex_res] for ex_res in resistances]
-                except:
-                    print(f"eligible_external_resistance: {row['eligible_external_resistance']}")
-
-            # TODO - this is likely going away
-            if self.is_valid(row, 'speed', False):
-                if row['speed'] == 'no_speed':  # TODO this needs to be fixed in spreadsheet
-                    row['speed'] = 'none'
-                compound_action.speed = MovementSpeed[row['speed']]
-            if self.is_valid(row, 'resistance', False):
-                compound_action.resistance = MovementResistance[row['resistance']]
-
-            # TODO - how does this related to sub-action body position?
-            if self.is_valid(row, 'body_position'):
-                compound_action.body_position = BodyPosition[row['body_position']]
+        for row in rows:
+            if action.id is None or action.id != row['id']:
+                if action.id is not None:
+                    compound_action.actions.append(action)
+                action = ExerciseAction(row['id'], "")
 
             if self.is_valid(row, 'sub_action_id'):
                 sub_action_id = row['sub_action_id']
 
                 if sub_action_id in self.sub_actions:
-                    for sub_action in self.sub_actions:
-                        action = ExerciseAction(sub_action_id, sub_action.name)
-                        action.training_type = compound_action.training_type
-                        action.eligible_external_resistance = compound_action.eligible_external_resistance
-                        action.speed = compound_action.speed
-                        action.resistance = compound_action.resistance
-                        action.body_position = compound_action.body_position
+                    sub_action_list = self.sub_actions[sub_action_id]
+                    for sub_action in sub_action_list:
+                        new_subaction = ExerciseAction(sub_action_id, sub_action.name)
+                        new_subaction.training_type = compound_action.training_type
+                        new_subaction.eligible_external_resistance = compound_action.eligible_external_resistance
+                        new_subaction.speed = compound_action.speed
+                        new_subaction.resistance = compound_action.resistance
+                        new_subaction.body_position = compound_action.body_position
 
                         # items inherited from compound action (if populated)
                         if self.is_valid(row, 'contribute_to_power_production'):
-                            action.contribute_to_power_production = row['contribute_to_power_production'].lower() == "true"
+                            new_subaction.contribute_to_power_production = row['contribute_to_power_production'].lower() == "true"
                         else:
-                            action.contribute_to_power_production = sub_action.contribute_to_power_production
+                            new_subaction.contribute_to_power_production = sub_action.contribute_to_power_production
 
                         if self.is_valid(row, 'apply_instability'):
-                            action.apply_instability = row['apply_instability'].lower() == "true"
+                            new_subaction.apply_instability = row['apply_instability'].lower() == "true"
                         else:
-                            action.apply_instability = sub_action.apply_instability
+                            new_subaction.apply_instability = sub_action.apply_instability
 
                         if self.is_valid(row, 'apply_resistance'):
-                            action.apply_resistance = row['apply_resistance'].lower() == "true"
+                            new_subaction.apply_resistance = row['apply_resistance'].lower() == "true"
                         else:
-                            action.apply_resistance = sub_action.apply_resistance
+                            new_subaction.apply_resistance = sub_action.apply_resistance
 
                         if self.is_valid(row, 'stance_lower_body'):
-                            action.lower_body_stance = LowerBodyStance[row['stance_lower_body']]
+                            new_subaction.lower_body_stance = LowerBodyStance[row['stance_lower_body']]
                         else:
-                            action.lower_body_stance = sub_action.lower_body_stance
+                            new_subaction.lower_body_stance = sub_action.lower_body_stance
 
                         if self.is_valid(row, 'stance_upper_body'):
-                            action.upper_body_stance = UpperBodyStance[row['stance_upper_body']]
+                            new_subaction.upper_body_stance = UpperBodyStance[row['stance_upper_body']]
                         else:
-                            action.upper_body_stance = sub_action.upper_body_stance
+                            new_subaction.upper_body_stance = sub_action.upper_body_stance
 
                         if self.is_valid(row, 'lateral_distribution_pattern'):
-                            action.lateral_distribution_pattern = WeightDistribution[
+                            new_subaction.lateral_distribution_pattern = WeightDistribution[
                                 row['lateral_distribution_pattern']]
                         else:
-                            action.lateral_distribution_pattern = sub_action.lateral_distribution_pattern
+                            new_subaction.lateral_distribution_pattern = sub_action.lateral_distribution_pattern
 
                             # New
                         if self.is_valid(row, 'arm'):
-                            action.arm = row['arm']
+                            new_subaction.arm = row['arm']
                         else:
-                            action.arm = sub_action.arm
+                            new_subaction.arm = sub_action.arm
                         if self.is_valid(row, 'torso'):
-                            action.torso = row['torso']
+                            new_subaction.torso = row['torso']
                         else:
-                            action.torso = sub_action.torso
+                            new_subaction.torso = sub_action.torso
                         if self.is_valid(row, 'leg'):
-                            action.leg = row['leg']
+                            new_subaction.leg = row['leg']
                         else:
-                            action.leg = sub_action.leg
+                            new_subaction.leg = sub_action.leg
                         if self.is_valid(row, 'multiplier'):
-                            action.multiplier = row['multiplier']
+                            new_subaction.multiplier = row['multiplier']
                         else:
-                            action.multiplier = sub_action.multiplier
+                            new_subaction.multiplier = sub_action.multiplier
 
                         if self.is_valid(row, 'percent_bodyweight'):
-                            action.percent_bodyweight = int(float(row.get('percent_bodyweight', 0)))
+                            new_subaction.percent_bodyweight = int(float(row.get('percent_bodyweight', 0)))
                         else:
-                            action.percent_bodyweight = sub_action.percent_bodyweight
+                            new_subaction.percent_bodyweight = sub_action.percent_bodyweight
 
                         if self.is_valid(row, 'lateral_distribution'):
                             lateral_distribution = row['lateral_distribution'].split(',')
@@ -161,51 +198,60 @@ class SubActionLibraryParser(object):
                                 print(lateral_distribution)
                             else:
                                 if len(lateral_distribution) == 0:
-                                    action.lateral_distribution = [50, 50]
+                                    new_subaction.lateral_distribution = [50, 50]
                                 elif len(lateral_distribution) == 1:
-                                    action.lateral_distribution = lateral_distribution * 2
+                                    new_subaction.lateral_distribution = lateral_distribution * 2
                                 else:
-                                    action.lateral_distribution = lateral_distribution
+                                    new_subaction.lateral_distribution = lateral_distribution
                         else:
-                            action.lateral_distribution = sub_action.lateral_distribution
+                            new_subaction.lateral_distribution = sub_action.lateral_distribution
 
                         # items unique to sub actions
-                        action.primary_muscle_action = sub_action.primary_muscle_action
+                        new_subaction.primary_muscle_action = sub_action.primary_muscle_action
 
                         # New
-                        action.movement_system_priority = sub_action.movement_system_priority
-                        action.movement_system = movement_system.get_movemement_system(sub_action.movement_system_name)
+                        new_subaction.movement_system_priority = sub_action.movement_system_priority
+                        new_subaction.movement_system = movement_system.get_movemement_system(sub_action.movement_system_name)
 
-                        action.hip_joint_action = sub_action.hip_joint_action
-                        action.knee_joint_action = sub_action.knee_joint_action
-                        action.ankle_joint_action = sub_action.ankle_joint_action
-                        action.pelvic_tilt_joint_action = sub_action.pelvic_tilt_joint_action
-                        action.trunk_joint_action = sub_action.trunk_joint_action
-                        action.shoulder_scapula_joint_action = sub_action.shoulder_scapula_joint_action
-                        action.elbow_joint_action = sub_action.elbow_joint_action
-                        action.wrist_joint_action = sub_action.wrist_joint_action
+                        new_subaction.hip_joint_action = sub_action.hip_joint_action
+                        new_subaction.knee_joint_action = sub_action.knee_joint_action
+                        new_subaction.ankle_joint_action = sub_action.ankle_joint_action
+                        new_subaction.pelvic_tilt_joint_action = sub_action.pelvic_tilt_joint_action
+                        new_subaction.trunk_joint_action = sub_action.trunk_joint_action
+                        new_subaction.shoulder_scapula_joint_action = sub_action.shoulder_scapula_joint_action
+                        new_subaction.elbow_joint_action = sub_action.elbow_joint_action
+                        new_subaction.wrist_joint_action = sub_action.wrist_joint_action
 
                         # TODO - we doing this again???
-                        action.body_position = sub_action.body_position
+                        new_subaction.body_position = sub_action.body_position
 
-                        actions.append(action)
+                        action.actions.append(new_subaction)
 
-        return actions
+        if action.id is not None:
+            compound_action.actions.append(action)
 
-    def parse_sub_action_row(self, row):
+        return compound_action
 
-        if row['id'] is not None and row['id'] != '':
-            action = ExerciseAction(row['id'], row['action_name'])
+    def parse_sub_action_row(self, row, last_sub_action):
+
+        if row['sub_action_id'] is not None and row['sub_action_id'] != '':
+            subaction_name = row['sub_action_name']
+            if row['sub_action_id'] in self.sub_action_lookup:
+                subaction_name = self.sub_action_lookup[row['sub_action_id']]
+            if last_sub_action.id is None or last_sub_action.id != row['sub_action_id']:
+                action = ExerciseAction(row['sub_action_id'], subaction_name)
+            else:
+                action = deepcopy(last_sub_action)
 
             if self.is_valid(row, 'muscle_action'):
                 action.primary_muscle_action = MuscleAction[row['muscle_action']]
 
             # New
             if self.is_valid(row, 'movement_system_priority'):
-                action.movement_system_priority = MuscleAction[row['movement_system_priority']]
+                action.movement_system_priority = row['movement_system_priority']
 
             if self.is_valid(row, 'movement_system'):
-                action.movement_system_name = MuscleAction[row['movement_system']]
+                action.movement_system_name = row['movement_system']
                 # will instantiate later
                 # action.movement_system =
 
@@ -222,6 +268,14 @@ class SubActionLibraryParser(object):
                 action.body_position = BodyPosition[row['body_position']]
 
             # New
+            if self.is_valid(row, 'eligible_external_resistance'):
+                row['eligible_external_resistance'].replace(", ", ",")
+                external_weight_implement = row['eligible_external_resistance'].lower().split(",")
+                try:
+                    action.eligible_external_resistance = [Equipment[equipment] for equipment in external_weight_implement]
+                except:
+                    print('here', external_weight_implement)
+
             if self.is_valid(row, 'contribute_to_power_production'):
                 action.contribute_to_power_production = row['contribute_to_power_production'].lower() == "true"
 
@@ -268,6 +322,34 @@ class SubActionLibraryParser(object):
             return action
         else:
             return None
+
+    def is_import_done(self, row):
+        if 'to be deleted' in row['sub_action_id']:
+            return True
+        else:
+            return False
+
+    def is_not_header_row(self, row):
+        sub_id = row['sub_action_id']
+        if len(sub_id) == 0:
+            return False
+        else:
+            return sub_id[0].isnumeric()
+
+    def get_speed(self, speed):
+        # speed_conversion_dict = {
+        #     'no_speed': 'none',
+        #     'speed': 'slow',
+        #     'normal': 'mod',
+        #     'max_speed': 'fast'
+        # }
+        # if speed in speed_conversion_dict:
+        #     speed = speed_conversion_dict[speed]
+        if 'speed' in speed:
+            speed = speed.split('_')[0]
+        elif speed == "high":
+            speed = "fast"
+        return MovementSpeed[speed]
 
     def get_prioritized_joint_actions(self, row, joint):
 
@@ -334,7 +416,7 @@ class SubActionLibraryParser(object):
     def write_actions_json(actions_json):
         # actions_json = sorted(actions_json.items())
         json_string = json.dumps(actions_json, indent=4)
-        file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/actions_library.json")
+        file_name = os.path.join(os.path.realpath('..'), f"apigateway/fml/actions_library.json")
         # file_name = os.path.join(os.path.realpath('..'), f"apigateway/models/actions_library_running.json")
         print(f"writing: {file_name}")
         f1 = open(file_name, 'w')
@@ -384,6 +466,7 @@ if __name__ == '__main__':
     # action_parser.load_data("_demo")
     # action_parser.load_data(["_demo", "_running"])
     # TODO: cardio sheet is incomplete, use the old _running sheet for now
-    action_parser.load_sub_actions(["_running", "_strength_integrated_resistance", "_power_action_plyometrics"])
-    action_parser.load_compound_actions(["_running", "_strength_integrated_resistance", "_power_action_plyometrics"])
+    action_parser.load_sub_actions(["Cardio-Table 1", "PosturalStability-Table 1", "Strength-Table 1"])
+    action_parser.load_compound_actions(["Cardio", "Strength", "Power", ])
+    j=0
 
