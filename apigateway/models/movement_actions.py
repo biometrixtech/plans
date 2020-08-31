@@ -39,6 +39,301 @@ class UpperBodyStance(Enum):
     contralateral_alternating_single_arm = 5
 
 
+class CompoundAction(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+        self.body_position = None
+        self.eligible_external_resistance = []
+
+        # New
+        self.contribute_to_power_production = False
+
+        self.apply_instability = False
+        self.apply_resistance = False
+        self.lower_body_stance = None
+        self.upper_body_stance = None
+        self.lateral_distribution_pattern = WeightDistribution.bilateral
+
+        self.actions = []
+
+        self.percent_bodyweight = 0.0
+        self.lateral_distribution = [0, 0]
+
+        self.training_type = None
+
+        self.speed = None
+        self.resistance = None
+
+    def json_serialise(self, initial_read=False):
+        ret = {
+            "id": self.id,
+            "name": self.name,
+            "training_type": self.training_type.value if self.training_type is not None else None,
+            "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
+            "body_position": self.body_position.value if self.body_position is not None else None,
+            "lower_body_stance": self.lower_body_stance.value if self.lower_body_stance is not None else None,
+            "upper_body_stance": self.upper_body_stance.value if self.upper_body_stance is not None else None,
+            "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
+            "percent_bodyweight": self.percent_bodyweight,
+            "lateral_distribution": self.lateral_distribution,
+            "apply_resistance": self.apply_resistance,
+            "apply_instability": self.apply_instability,
+            'speed': self.speed.value if self.speed is not None else None,
+            'resistance': self.resistance.value if self.resistance is not None else None,
+            'actions': [a.json_serialise(initial_read=initial_read) for a in self.actions],
+
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        compound_action = cls(input_dict.get('id'), input_dict.get('name'))
+
+        # defined per action
+        compound_action.training_type = TrainingType(input_dict['training_type']) if input_dict.get(
+            'training_type') is not None else None
+        compound_action.eligible_external_resistance = [Equipment(equip) for equip in
+                                               input_dict.get('eligible_external_resistance', [])]
+        compound_action.body_position = BodyPosition(input_dict['body_position']) if input_dict.get(
+            'body_position') is not None else None
+        compound_action.lower_body_stance = LowerBodyStance(input_dict['lower_body_stance']) if input_dict.get(
+            'lower_body_stance') is not None else None
+        compound_action.upper_body_stance = UpperBodyStance(input_dict['upper_body_stance']) if input_dict.get(
+            'upper_body_stance') is not None else None
+        compound_action.lateral_distribution_pattern = WeightDistribution(
+            input_dict['lateral_distribution_pattern']) if input_dict.get(
+            'lateral_distribution_pattern') is not None else WeightDistribution.bilateral
+        compound_action.percent_bodyweight = input_dict.get('percent_bodyweight', 0.0)
+        compound_action.lateral_distribution = input_dict.get('lateral_distribution', [0, 0])
+        compound_action.apply_resistance = input_dict.get('apply_resistance', False)
+        compound_action.apply_instability = input_dict.get('apply_instability', False)
+        compound_action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
+        compound_action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get(
+            'resistance') is not None else None
+        compound_action.actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('actions', [])]
+
+        return compound_action
+
+
+class ExerciseSubAction(object):
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+
+        self.muscle_action = None  # muscle_action
+
+        # New
+        self.movement_systems = []
+
+        self.hip_joint_action = []
+        self.knee_joint_action = []
+        self.ankle_joint_action = []
+        self.pelvic_tilt_joint_action = []
+        self.trunk_joint_action = []
+        self.shoulder_scapula_joint_action = []
+        self.elbow_joint_action = []
+        self.wrist_joint_action = []
+
+        self.body_position = None
+        self.eligible_external_resistance = []
+
+        # New
+        self.contribute_to_power_production = False
+
+        self.apply_instability = False
+        self.apply_resistance = False
+        self.lower_body_stance = None
+        self.upper_body_stance = None
+        self.lateral_distribution_pattern = WeightDistribution.bilateral
+
+        self.percent_bodyweight = 0.0
+        self.lateral_distribution = [0, 0]
+
+        # obtained from exercise
+        self.rpe = None
+        self.shrz = None
+        self.cardio_action = None
+        #self.reps = 1
+        self.external_weight = []  # list of ExternalWeight objects
+        self.bilateral = True
+        self.side = 0  # both
+        # new variables for tissue intensity
+        self.duration = None  # seconds
+        self.distance = None  # meters
+        self.pace = None  # in seconds/meter
+        self.speed = None  # meters/second
+        self.power = None  # watts
+        self.force = None  # newtons
+        self.grade = None  # percentage (decimal)
+        self.rep_tempo = None
+        self.force = None
+
+        # derived
+        self.adaptation_type = None
+        self.lower_body_stability_rating = 0
+        self.upper_body_stability_rating = 0
+        self.explosiveness_rating = 0
+        self.total_load_left = StandardErrorRange(observed_value=0)
+        self.total_load_right = StandardErrorRange(observed_value=0)
+        self.tissue_load_left = StandardErrorRange(observed_value=0)
+        self.tissue_load_right = StandardErrorRange(observed_value=0)
+        self.force_load_left = StandardErrorRange(observed_value=0)
+        self.force_load_right = StandardErrorRange(observed_value=0)
+        self.power_load_left = StandardErrorRange(observed_value=0)
+        self.power_load_right = StandardErrorRange(observed_value=0)
+        # TODO: Remove these once strength-level intensity is implemented
+        self.external_weight_left = 0
+        self.external_weight_right = 0
+        self.body_weight_left = 0
+        self.body_weight_right = 0
+        self.tissue_intensity = 0
+        self.readiness = 1
+        self.training_intensity = 0
+        self.training_intensity_left = 0
+        self.training_intensity_right = 0
+        self.training_volume_left = 0
+        self.training_volume_right = 0
+
+    def json_serialise(self, initial_read=False):
+        ret = {
+            "id": self.id,
+            "name": self.name,
+            "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
+            "body_position": self.body_position.value if self.body_position is not None else None,
+            "lower_body_stance": self.lower_body_stance.value if self.lower_body_stance is not None else None,
+            "upper_body_stance": self.upper_body_stance.value if self.upper_body_stance is not None else None,
+            "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
+            "percent_bodyweight": self.percent_bodyweight,
+            "lateral_distribution": self.lateral_distribution,
+            "apply_resistance": self.apply_resistance,
+            "apply_instability": self.apply_instability,
+            'speed': self.speed.value if self.speed is not None else None,
+
+            "muscle_action": self.muscle_action.value if self.muscle_action is not None else None,
+            "hip_joint_action": [ac.json_serialise() for ac in self.hip_joint_action],
+            "knee_joint_action": [ac.json_serialise() for ac in self.knee_joint_action],
+            "ankle_joint_action": [ac.json_serialise() for ac in self.ankle_joint_action],
+            "pelvic_tilt_joint_action": [ac.json_serialise() for ac in self.pelvic_tilt_joint_action],
+            "trunk_joint_action": [ac.json_serialise() for ac in self.trunk_joint_action],
+            "shoulder_scapula_joint_action": [ac.json_serialise() for ac in self.shoulder_scapula_joint_action],
+            "elbow_joint_action": [ac.json_serialise() for ac in self.elbow_joint_action],
+            "wrist_joint_action": [ac.json_serialise() for ac in self.wrist_joint_action],
+
+            # new
+            'movement_systems': [m.json_serialise() for m in self.movement_systems],
+
+        }
+        if not initial_read:
+            additional_params = {
+                # obtained from exercises
+                "rpe": self.rpe,
+                "shrz": self.shrz,
+                "pace": self.pace,
+                "rep_tempo": self.rep_tempo,
+                "cardio_action": self.cardio_action.value if self.cardio_action is not None else None,
+                #"reps": self.reps,
+                "side": self.side,
+                "external_weight": [ex_weight.json_serialise() for ex_weight in self.external_weight],
+                "bilateral": self.bilateral,
+
+                # derived/calculated
+                "adaptation_type": self.adaptation_type.value if self.adaptation_type is not None else None,
+                "total_load_left": self.total_load_left,
+                "total_load_right": self.total_load_right,
+                "tissue_load_left": self.tissue_load_left.json_serialise(),
+                "tissue_load_right": self.tissue_load_right.json_serialise(),
+                "force_load_left": self.force_load_left.json_serialise(),
+                "force_load_right": self.force_load_right.json_serialise(),
+                "power_load_left": self.power_load_left.json_serialise(),
+                "power_load_right": self.power_load_right.json_serialise(),
+                # "external_weight_left": self.external_weight_left,
+                # "external_weight_right": self.external_weight_right,
+                # "body_weight_left": self.body_weight_left,
+                # "body_weight_right": self.body_weight_right,
+                "training_intensity": self.training_intensity,
+                "training_intensity_left": self.training_intensity_left,
+                "training_intensity_right": self.training_intensity_right,
+                "training_volume_left": self.training_volume_left,
+                "training_volume_right": self.training_volume_right
+                }
+            ret.update(additional_params)
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        action = cls(input_dict.get('id'), input_dict.get('name'))
+
+        # defined per action
+        action.training_type = TrainingType(input_dict['training_type']) if input_dict.get('training_type') is not None else None
+        action.eligible_external_resistance = [Equipment(equip) for equip in input_dict.get('eligible_external_resistance', [])]
+        action.body_position = BodyPosition(input_dict['body_position']) if input_dict.get('body_position') is not None else None
+        action.lower_body_stance = LowerBodyStance(input_dict['lower_body_stance']) if input_dict.get('lower_body_stance') is not None else None
+        action.upper_body_stance = UpperBodyStance(input_dict['upper_body_stance']) if input_dict.get('upper_body_stance') is not None else None
+        action.lateral_distribution_pattern = WeightDistribution(input_dict['lateral_distribution_pattern']) if input_dict.get('lateral_distribution_pattern') is not None else WeightDistribution.bilateral
+        action.percent_bodyweight = input_dict.get('percent_bodyweight', 0.0)
+        action.lateral_distribution = input_dict.get('lateral_distribution', [0, 0])
+        action.apply_resistance = input_dict.get('apply_resistance', False)
+        action.apply_instability = input_dict.get('apply_instability', False)
+
+        action.muscle_action = MuscleAction(input_dict['muscle_action']) if input_dict.get('muscle_action') is not None else None
+        action.hip_joint_rating = None
+        action.hip_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('hip_joint_action', [])]
+        action.knee_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('knee_joint_action', [])]
+        action.ankle_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('ankle_joint_action', [])]
+        action.pelvic_tilt_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('pelvic_tilt_joint_action', [])]
+        action.trunk_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('trunk_joint_action', [])]
+        action.shoulder_scapula_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('shoulder_scapula_joint_action', [])]
+        action.elbow_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('elbow_joint_action', [])]
+        action.wrist_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('wrist_joint_action', [])]
+
+        # action.ancillary_muscle_action = MuscleAction(input_dict['ancillary_muscle_action']) if input_dict.get('ancillary_muscle_action') is not None else None
+        # action.hip_stability_action = []
+        # action.ankle_stability_action = []
+        # action.trunk_stability_action = []
+        # action.pelvis_stability_action = []
+        # action.shoulder_stability_action = []
+        # action.elbow_stability_action = []
+        # action.sij_stability_action = []
+
+        # obtained from exercise
+        action.rpe = input_dict.get('rpe')
+        action.pace = input_dict.get('pace')
+        action.rep_tempo = input_dict.get('rep_tempo')
+        action.cardio_action = CardioAction(input_dict.get('cardio_action')) if input_dict.get('cardio_action') is not None else None
+        #action.reps = input_dict.get('reps', 1)
+        action.side = input_dict.get('side', 0)  # both
+        action.external_weight = [ExternalWeight.json_deserialise(ex_weight) for ex_weight in input_dict.get('external_weight', [])]  # list of ExternalWeight objects
+        action.bilateral = input_dict.get('bilateral', True)
+
+        # derived
+        action.adaptation_type = AdaptationType(input_dict['adaptation_type']) if input_dict.get('adaptation_type') is not None else None
+        action.lower_body_stability_rating = input_dict.get('lower_body_stability_rating', 0)
+        action.upper_body_stability_rating = input_dict.get('upper_body_stability_rating', 0)
+        action.explosiveness_rating = input_dict.get('explosiveness_rating', 0)
+        action.total_load_left = input_dict.get('total_load_left', 0)
+        action.total_load_right = input_dict.get('total_load_right', 0)
+        action.tissue_load_left = StandardErrorRange.json_deserialise(input_dict.get('tissue_load_left')) if input_dict.get('tissue_load_left') is not None else StandardErrorRange()
+        action.tissue_load_right = StandardErrorRange.json_deserialise(input_dict.get('tissue_load_right')) if input_dict.get('tissue_load_right') is not None else StandardErrorRange()
+        action.power_load_left = StandardErrorRange.json_deserialise(input_dict.get('power_load_left')) if input_dict.get('power_load_left') is not None else StandardErrorRange()
+        action.power_load_right = StandardErrorRange.json_deserialise(input_dict.get('power_load_right')) if input_dict.get('power_load_right') is not None else StandardErrorRange()
+        action.force_load_left = StandardErrorRange.json_deserialise( input_dict.get('force_load_left')) if input_dict.get('force_load_left') is not None else StandardErrorRange()
+        action.force_load_right = StandardErrorRange.json_deserialise( input_dict.get('force_load_right')) if input_dict.get('force_load_right') is not None else StandardErrorRange()
+        # action.external_weight_left = input_dict.get('external_weight_left', 0)
+        # action.external_weight_right = input_dict.get('external_weight_right', 0)
+        # action.body_weight_left = input_dict.get('body_weight_left', 0)
+        # action.body_weight_right = input_dict.get('body_weight_right', 0)
+        action.training_intensity = input_dict.get('training_intensity', 0)
+        action.training_intensity_left = input_dict.get('training_intensity_left', 0)
+        action.training_intensity_right = input_dict.get('training_intensity_right', 0)
+        action.training_volume_left = input_dict.get('training_volume_left', 0)
+        action.training_volume_right = input_dict.get('training_volume_right', 0)
+
+        return action
+
+
 class ExerciseAction(object):
     def __init__(self, id, name):
         self.id = id
@@ -47,9 +342,7 @@ class ExerciseAction(object):
         self.primary_muscle_action = None  # muscle_action
 
         # New
-        self.movement_system_priority = None  # 1,2,3
-        self.movement_system_name = None
-        self.movement_system = None
+        self.movement_systems = []
 
         self.hip_joint_action = []
         self.knee_joint_action = []
@@ -73,12 +366,12 @@ class ExerciseAction(object):
         self.lateral_distribution_pattern = WeightDistribution.bilateral
 
         # New
-        self.arm = None
-        self.torso = None
-        self.leg = None
-        self.multiplier = 1
+        # self.arm = None
+        # self.torso = None
+        # self.leg = None
+        # self.multiplier = 1
 
-        self.actions = []
+        self.sub_actions = []
 
         self.percent_bodyweight = 0.0
         self.lateral_distribution = [0, 0]
@@ -174,6 +467,10 @@ class ExerciseAction(object):
             "shoulder_scapula_joint_action": [ac.json_serialise() for ac in self.shoulder_scapula_joint_action],
             "elbow_joint_action": [ac.json_serialise() for ac in self.elbow_joint_action],
             "wrist_joint_action": [ac.json_serialise() for ac in self.wrist_joint_action],
+
+            # new
+            'movement_systems': [m.json_serialise() for m in self.movement_systems],
+            'sub_actions': [a.json_serialise(initial_read=initial_read) for a in self.sub_actions],
 
             # "ancillary_muscle_action": self.ancillary_muscle_action,
             # "hip_stability_action": self.hip_stability_action,
@@ -630,6 +927,23 @@ class PrioritizedJointAction(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         return cls(input_dict.get('priority'), FunctionalMovementType(input_dict.get('joint_action')))
+
+
+class PrioritizedMovementSystem(object):
+    def __init__(self, priority, movement_system_name):
+        self.priority = priority
+        self.movement_system_name = movement_system_name
+
+    def json_serialise(self):
+        ret = {
+            "priority": self.priority,
+            "movement_system_name": self.movement_system_name
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        return cls(input_dict.get('priority'), input_dict.get('movement_system_name'))
 
 
 class ExerciseCompoundAction(object):
