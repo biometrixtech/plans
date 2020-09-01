@@ -506,10 +506,38 @@ class BodyPartSystems(object):
             BodyPartLocation.rectus_abdominis,
             BodyPartLocation.erector_spinae
         ]
+        self.lateral_subystem = [
+            BodyPartLocation.gluteus_medius_anterior_fibers,
+            BodyPartLocation.gluteus_medius_posterior_fibers,
+            BodyPartLocation.tensor_fascia_latae,
+            BodyPartLocation.adductor_longus,
+            BodyPartLocation.adductor_magnus_anterior_fibers,
+            BodyPartLocation.adductor_brevis,
+            BodyPartLocation.adductor_magnus_posterior_fibers,
+            BodyPartLocation.pectineus,
+            BodyPartLocation.gracilis,
+            BodyPartLocation.quadratus_lumorum
+        ]
 
     def get_movemement_system(self, movement_system_name):
 
-        return getattr(self, movement_system_name)
+        if movement_system_name == "Deep Longitudinal Subsystem (DLS)":
+            return self.deep_longitudinal_subsystem
+        elif movement_system_name == "Posterior Oblique Subsystem (POS)":
+            return self.posterior_oblique_subsystem
+        elif movement_system_name == "Lateral Subsystem (LS)":
+            return self.lateral_subystem
+        elif movement_system_name == "Anterior Oblique Subsystem (AOS)":
+            return self.anterior_oblique_subsystem
+        elif movement_system_name == "Core Stabilizers (Bracing)":
+            return self.core_stabilizers
+        elif movement_system_name == "Intrinsic Stabilization Subsystem (ISS) (Drawing In)":
+            return self.intrinsic_stabilization_subsystem
+        elif movement_system_name is None:
+            return None
+        else:
+            return getattr(self, movement_system_name)
+
 
 class BodyPartLocationText(object):
     def __init__(self, body_part_location):

@@ -276,9 +276,11 @@ class WorkoutProcessor(object):
         self.set_action_explosiveness_from_exercise(exercise, actions)
 
         for action in actions:
+            # theory: these are irrelevant
             action.training_intensity = exercise.training_intensity
             action.set_external_weight_distribution()
             action.set_body_weight_distribution()
+            # theory: only this is relevant
             action.set_training_load(exercise.total_volume)
 
         # for action_id in movement.secondary_actions:
