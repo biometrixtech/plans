@@ -260,3 +260,41 @@ def test_set_planned_power_cardio_run_check_difference_in_speed():
     proc.set_planned_power(exercise2)
 
     assert exercise1.power.observed_value < exercise2.power.observed_value
+
+
+
+def test_set_planned_power_cardio_rpe():
+    exercise = PlannedExercise()
+    exercise.training_type = TrainingType.strength_cardiorespiratory
+    exercise.cardio_action = CardioAction.run
+    exercise.rpe = StandardErrorRange(lower_bound=4, upper_bound=6)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise)
+
+    assert exercise.power is not None
+    assert exercise.power.lower_bound < exercise.power.observed_value < exercise.power.upper_bound
+
+
+def test_set_planned_power_cardio_diff_rpe_ranges():
+    exercise1 = PlannedExercise()
+    exercise1.training_type = TrainingType.strength_cardiorespiratory
+    exercise1.cardio_action = CardioAction.run
+    exercise1.rpe = StandardErrorRange(lower_bound=3, upper_bound=5)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise1)
+
+    exercise2 = PlannedExercise()
+    exercise2.training_type = TrainingType.strength_cardiorespiratory
+    exercise2.cardio_action = CardioAction.run
+    exercise2.rpe = StandardErrorRange(lower_bound=6, upper_bound=8)
+    proc = WorkoutProcessor()
+    proc.set_planned_power(exercise2)
+
+    assert exercise1.power.lower_bound < exercise1.power.observed_value < exercise1.power.upper_bound < exercise2.power.lower_bound < exercise2.power.observed_value < exercise2.power.upper_bound
+
+
+def test_get_rep_max_for_weights():
+    import numpy as np
+    for percent in np.arange(50, 100, 5):
+        rep_max_reps = WorkoutProcessor().get_reps_for_percent_rep_max(percent)
+        print(percent, rep_max_reps)

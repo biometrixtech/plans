@@ -169,7 +169,7 @@ class PlannedExercise(BaseWorkoutExercise):
 
         self.reps = 1
         self.prescribed_per_side = False  # if the prescribed dosage is per side or total
-        self.tempo = None  # OTF defines tempo for concentric/eccentric part of movement
+        # self.tempo = None  # OTF defines tempo for concentric/eccentric part of movement
 
         # primary assignments
         self.duration = None

@@ -662,6 +662,15 @@ class Explosiveness(IntEnum):
     max_force = 4
 
 
+class MovementDisplacement(IntEnum):
+    none = 0
+    partial_rom = 1
+    full_rom = 2
+    min = 3
+    mod = 4
+    max = 5
+
+
 class Movement(Serialisable):
     def __init__(self, id, name):
         self.id = id
@@ -672,6 +681,8 @@ class Movement(Serialisable):
         self.external_weight_implement = []
         self.resistance = None
         self.speed = None
+        self.displacement = None
+        self.rep_tempo = None
         self.training_type = None
         self.cardio_action = None
         self.power_drill_action = None
@@ -693,8 +704,10 @@ class Movement(Serialisable):
             'strength_resistance_action': self.strength_resistance_action.value if self.strength_resistance_action is not None else None,
             'strength_endurance_action': self.strength_endurance_action.value if self.strength_endurance_action is not None else None,
             'external_weight_implement': [equipment.value for equipment in self.external_weight_implement],
-            'speed': self.speed.value if self.speed is not None else None,
-            'resistance': self.resistance.value if self.resistance is not None else None,
+            'speed': self.speed.value if self.speed.value is not None else None,
+            'resistance': self.resistance.value if self.resistance.value is not None else None,
+            'displacement': self.displacement.value if self.displacement is not None else None,
+            'rep_tempo': self.rep_tempo,
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             'primary_actions': self.primary_actions,
             'secondary_actions': self.secondary_actions,
@@ -722,6 +735,8 @@ class Movement(Serialisable):
         movement.external_weight_implement = [Equipment(equipment) for equipment in input_dict.get('external_weight_implement', [])]
         movement.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
         movement.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
+        movement.displacement = MovementResistance(input_dict['displacement']) if input_dict.get('displacement') is not None else None
+        movement.rep_tempo = input_dict.get('rep_tempo')
         movement.set_explosiveness_rating()
         movement.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         movement.primary_actions = input_dict.get('primary_actions', [])

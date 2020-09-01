@@ -72,6 +72,8 @@ class ExerciseParser(object):
         :return:
         """
         all_exercises = []
+
+        all_rep_tempos = set()
         for file in files:
             self.exercise_pd = pd.read_csv(f'exercise_to_base_movement/{file}', keep_default_na=False)
 
@@ -82,8 +84,14 @@ class ExerciseParser(object):
                 exercise = self.parse_row(row)
                 if exercise is not None:
                     self.exercises.append(exercise)
+                    if exercise.rep_tempo != '':
+                        all_rep_tempos.add(exercise.rep_tempo)
+
             exercise_json = self.get_exercise_json()
             all_exercises.extend(exercise_json)
+
+        for rep_tempo in all_rep_tempos:
+            print(rep_tempo)
         all_movements = list({ex['base_movement_name'] for ex in all_exercises})
         all_movements.sort()
 
@@ -107,7 +115,11 @@ class ExerciseParser(object):
                 ex.speed = MovementSpeed[self.speed_lookup.get(row['speed']) or row['speed']]
             if self.is_valid(row['rest_between_reps']):
                 ex.rest_between_reps = float(row['rest_between_reps'])
-            ex.rep_tempo = row['rep_tempo']
+
+            if self.is_valid(row['rep_tempo']):
+                rep_tempo = row['rep_tempo']
+                rep_tempo.replace(' ', '')
+                ex.rep_tempo = rep_tempo
             if self.is_valid(row['surface_stability']):
                 ex.surface_stability = MovementSurfaceStability[row['surface_stability']]
             ex.involvement = row['involvement']

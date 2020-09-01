@@ -64,3 +64,26 @@ def test_bodyweight_ratio_rpe_range_of_reps():
     for reps in range(25):
         exercise.reps_per_set = reps
         print(reps, WorkoutProcessor().get_rpe_from_weight(exercise).observed_value)
+
+
+def test_get_rpe_from_weight_percent_rep_max():
+    exercise = get_exercise()
+    exercise.adaptation_type = AdaptationType.strength_endurance_strength
+    exercise.equipments = [Equipment.dumbbells]
+    exercise.weight_measure = WeightMeasure.percent_rep_max
+    exercise.weight = 67
+    for reps in range(25):
+        exercise.reps_per_set = reps
+        print(reps, WorkoutProcessor().get_rpe_from_weight(exercise).observed_value)
+
+
+
+def test_get_rpe_from_weight_rep_max():
+    exercise = get_exercise()
+    exercise.adaptation_type = AdaptationType.strength_endurance_strength
+    exercise.equipments = [Equipment.dumbbells]
+    exercise.weight_measure = WeightMeasure.rep_max
+    exercise.weight = 10
+    for reps in range(25):
+        exercise.reps_per_set = reps
+        print(reps, WorkoutProcessor().get_rpe_from_weight(exercise).observed_value)

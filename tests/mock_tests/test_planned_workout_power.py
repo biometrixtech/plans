@@ -1,5 +1,5 @@
 from models.planned_exercise import PlannedExercise, Assignment
-from models.movement_tags import CardioAction
+from models.movement_tags import CardioAction, TrainingType
 from logic.workout_processing import WorkoutProcessor
 
 
@@ -167,3 +167,12 @@ def test_planned_power_cycling_speed_min_and_max_grade_min_and_max():
     assert exercise.power.upper_bound is not None
 
     assert exercise.power.lower_bound <= exercise.power.observed_value <= exercise.power.upper_bound
+
+
+def test_planned_power_plyometrics():
+    exercise = PlannedExercise()
+    exercise.training_type = TrainingType.power_action_plyometrics
+    exercise.reps_per_set = 10
+    processor = WorkoutProcessor()
+    processor.update_planned_exercise_details(exercise, assignment_type='default')
+    assert exercise.power.observed_value is not None

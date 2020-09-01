@@ -258,6 +258,8 @@ class WorkoutProcessor(object):
             exercise = self.set_force_power_weighted(exercise)
             # TODO this needs to handle planned exercises
             # exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            rpe = Calculators.get_rpe_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
+            exercise.predicted_rpe = StandardErrorRange(observed_value=rpe)
 
         exercise = self.set_planned_total_volume(exercise)
         exercise.set_training_loads()
@@ -323,55 +325,64 @@ class WorkoutProcessor(object):
             weight = exercise.weight
         elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
             weight = Assignment().multiply_assignment_by_scalar(exercise.weight, self.user_weight)
-        elif exercise.weight_measure == WeightMeasure.percent_rep_max:
-            weight = Assignment(assigned_value=20)
+        # elif exercise.weight_measure == WeightMeasure.percent_rep_max:
+        #     weight = Assignment(assigned_value=20)
+        # elif exercise.weight_measure == WeightMeasure.rep_max:
+        #     weight = None
         else:
-            weight = Assignment(assigned_value=20)  # TODO: need to change this
+            # if weight in rep_max, percent_rep_max or not provided, use lookup table
+            weight = None
 
-        exercise.force = Calculators.force_resistance_exercise(weight)
+        if weight is not None:
+            exercise.force = Calculators.force_resistance_exercise(weight)
 
-        percent_bodyweight = 0
+            percent_bodyweight = 0
 
-        bodyweight_count = 0
-        for action in exercise.primary_actions:
-            if isinstance(action.percent_bodyweight,int):
-                percent_bodyweight += float(action.percent_bodyweight)
-                bodyweight_count += 1
+            bodyweight_count = 0
+            for action in exercise.primary_actions:
+                if isinstance(action.percent_bodyweight,int):
+                    percent_bodyweight += float(action.percent_bodyweight)
+                    bodyweight_count += 1
 
-        if bodyweight_count > 0:
-            percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
+            if bodyweight_count > 0:
+                percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
 
-        # TODO: still need to differentiate distance traveled by exercise
-        observed_power = Calculators.power_resistance_exercise(
-            weight_used=weight,
-            user_weight=self.user_weight*percent_bodyweight,
-            time_eccentric=exercise.duration_per_rep.observed_value / 2,
-            time_concentric=exercise.duration_per_rep.observed_value / 2
-            )
-        # exercise.power = StandardErrorRange(observed_value=observed_power)
-        powers = [observed_power]
-        if exercise.reps_per_set is None:
             # TODO: still need to differentiate distance traveled by exercise
-            power_1 = Calculators.power_resistance_exercise(
+            observed_power = Calculators.power_resistance_exercise(
                 weight_used=weight,
                 user_weight=self.user_weight*percent_bodyweight,
-                time_eccentric=exercise.duration_per_rep.lower_bound / 2,
-                time_concentric=exercise.duration_per_rep.lower_bound / 2
+                time_eccentric=exercise.duration_per_rep.observed_value / 2,
+                time_concentric=exercise.duration_per_rep.observed_value / 2
                 )
-            power_2 = Calculators.power_resistance_exercise(
-                weight_used=weight,
-                user_weight=self.user_weight*percent_bodyweight,
-                time_eccentric=exercise.duration_per_rep.upper_bound / 2,
-                time_concentric=exercise.duration_per_rep.upper_bound / 2
-                )
-            powers.extend([power_1, power_2])
+            # exercise.power = StandardErrorRange(observed_value=observed_power)
+            powers = [observed_power]
+            if exercise.reps_per_set is None:
+                # TODO: still need to differentiate distance traveled by exercise
+                power_1 = Calculators.power_resistance_exercise(
+                    weight_used=weight,
+                    user_weight=self.user_weight*percent_bodyweight,
+                    time_eccentric=exercise.duration_per_rep.lower_bound / 2,
+                    time_concentric=exercise.duration_per_rep.lower_bound / 2
+                    )
+                power_2 = Calculators.power_resistance_exercise(
+                    weight_used=weight,
+                    user_weight=self.user_weight*percent_bodyweight,
+                    time_eccentric=exercise.duration_per_rep.upper_bound / 2,
+                    time_concentric=exercise.duration_per_rep.upper_bound / 2
+                    )
+                powers.extend([power_1, power_2])
 
-        # exercise.power.lower_bound = min([power_1, power_2])
-        # exercise.power.upper_bound = max([power_1, power_2])
-        # powers = [observed_power, power_1, power_2]
-        exercise.power = StandardErrorRange().get_average_from_error_range_list(powers)
-        exercise.power.lower_bound = StandardErrorRange().get_min_from_error_range_list(powers)
-        exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
+            # exercise.power.lower_bound = min([power_1, power_2])
+            # exercise.power.upper_bound = max([power_1, power_2])
+            # powers = [observed_power, power_1, power_2]
+            exercise.power = StandardErrorRange().get_average_from_error_range_list(powers)
+            exercise.power.lower_bound = StandardErrorRange().get_min_from_error_range_list(powers)
+            exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
+        else:
+            # get power based on speed/resistance/displacement
+            power = Calculators.get_mets_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
+            exercise.power = StandardErrorRange(observed_value=power)
+            exercise.force = StandardErrorRange(observed_value=0)
 
         return exercise
 
@@ -657,6 +668,28 @@ class WorkoutProcessor(object):
                 else:  # for all other cardio types
                     exercise.power = StandardErrorRange(
                         observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
+            elif exercise.rpe is not None:
+                power_lower = None
+                power_observed = None
+                power_upper = None
+                if exercise.rpe.lower_bound is not None:
+                    power_lower = Calculators.get_power_from_rpe(exercise.rpe.lower_bound, age=self.user_age, weight=self.user_weight)
+                if exercise.rpe.observed_value is not None:
+                    power_observed = Calculators.get_power_from_rpe(exercise.rpe.observed_value, age=self.user_age, weight=self.user_weight)
+                if exercise.rpe.upper_bound is not None:
+                    power_upper = Calculators.get_power_from_rpe(exercise.rpe.upper_bound, age=self.user_age, weight=self.user_weight)
+                if power_lower is not None and power_upper is not None:
+                    exercise.power = StandardErrorRange(lower_bound=power_lower, upper_bound=power_upper)
+                    if power_observed is None:
+                        power_observed = (power_lower + power_upper) / 2
+                    exercise.power.observed_value = power_observed
+                else:
+                    if power_observed is not None:
+                        exercise.power = StandardErrorRange(observed_value=power_observed)
+                    elif power_lower is not None:
+                        exercise.power = StandardErrorRange(observed_value=power_lower)
+                    elif power_upper is not None:
+                        exercise.power = StandardErrorRange(observed_value=power_upper)
             else:
                 exercise.power = StandardErrorRange(
                     observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
@@ -802,7 +835,7 @@ class WorkoutProcessor(object):
             reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
 
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
-            if isinstance(workout_exercise.weight_measure, Assignment):
+            if isinstance(workout_exercise.weight, Assignment):
                 all_rpes = []
                 weights = [workout_exercise.weight.assigned_value, workout_exercise.weight.min_value, workout_exercise.weight.max_value]
                 weights = [value for value in weights if value is not None]
@@ -823,6 +856,34 @@ class WorkoutProcessor(object):
                     rpe.lower_bound = min([rpe1, rpe2])
                     rpe.upper_bound = max([rpe1, rpe2])
 
+        elif workout_exercise.weight_measure == WeightMeasure.percent_rep_max:
+            if isinstance(workout_exercise.weight_measure, Assignment):
+                all_rpes = []
+                percent_rep_maxes = [workout_exercise.weight.assigned_value, workout_exercise.weight.min_value, workout_exercise.weight.max_value]
+                percent_rep_maxes = [value for value in percent_rep_maxes if value is not None]
+                all_reps = [workout_exercise.reps.observed_value, workout_exercise.reps.lower_bound, workout_exercise.reps.upper_bound]
+                all_reps = [value for value in all_reps if value is not None]
+                for percent_rep_max in percent_rep_maxes:
+                    for reps in all_reps:
+                        rep_max_reps = self.get_reps_for_percent_rep_max(percent_rep_max)
+                        all_rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps))
+                if len(all_rpes) > 0:
+                    rpe.observed_value = sum(all_rpes) / len(all_rpes)
+                    rpe.lower_bound = min(all_rpes)
+                    rpe.upper_bound = max(all_rpes)
+            else:
+                rep_max_reps = self.get_reps_for_percent_rep_max(workout_exercise.weight)
+                if reps.observed_value > 0:
+                    rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
+                if reps.lower_bound is not None and reps.upper_bound is not None:
+                    rpes = []
+                    if reps.lower_bound > 0:
+                        rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound))
+                    if reps.upper_bound > 0:
+                        rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound))
+                    if len(rpes) > 0:
+                        rpe.lower_bound = min(rpes)
+                        rpe.upper_bound = max(rpes)
         else:
             if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
 

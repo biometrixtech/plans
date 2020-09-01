@@ -171,6 +171,10 @@ class BaseWorkoutExercise(object):
         self.power_drill_action = None
         self.strength_endurance_action = None
         self.strength_resistance_action = None
+        self.movement_speed = None
+        self.resistance = None
+        self.displacement = None
+        self.movement_rep_tempo = None
 
         self.primary_actions = []
         self.secondary_actions = []
@@ -201,6 +205,10 @@ class BaseWorkoutExercise(object):
         self.explosiveness_rating = movement.explosiveness_rating
         self.surface_stability = movement.surface_stability
         self.equipments = movement.external_weight_implement  # TODO: do we get it from the api
+        self.movement_speed = movement.speed
+        self.resistance = movement.resistance
+        self.displacement = movement.displacement
+        self.movement_rep_tempo = movement.rep_tempo
         # self.set_adaption_type(movement)
 
     def set_adaption_type(self):

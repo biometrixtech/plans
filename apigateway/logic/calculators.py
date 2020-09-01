@@ -863,3 +863,222 @@ class Calculators(object):
         all_mets_lookup['very_old'] = mets_lookup_very_old
 
         return all_mets_lookup
+
+    @classmethod
+    def get_power_by_speed_resistance_displacement(cls, speed, resistance, displacement, weight):
+        """
+
+        :param speed:
+        :param resistance:
+        :param displacement:
+        :return:
+        """
+        mets = cls.get_mets_by_speed_resistance_displacement(speed, resistance, displacement)
+        power = cls.mets_to_watts(mets=mets, weight=weight, efficiency=.21)
+        return power
+
+    @classmethod
+    def get_mets_by_speed_resistance_displacement(cls, speed, resistance, displacement):
+        """
+
+        :param speed:
+        :param resistance:
+        :param displacement:
+        :return:
+        """
+        if displacement is None or speed is None or resistance is None:
+            return 5
+        lookup_table = cls.get_mets_lookup_table_displacement(displacement)
+        mets_value_speed = lookup_table.get(resistance.name)
+        if mets_value_speed is None:
+            raise ValueError("Invalid Resistance")
+        mets = mets_value_speed.get(speed.name)
+        if mets is None:
+            raise ValueError("Invalid speed")
+        return mets
+
+    @classmethod
+    def get_mets_lookup_table_displacement(cls, displacement):
+        """
+
+        :param displacement:
+        :return:
+        """
+        if displacement.name in ['partial_rom', 'full_rom']:
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        elif displacement.name == 'min':
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        elif displacement.name == 'mod':
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        elif displacement.name == 'max':
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        else:
+            raise ValueError('Invalid displacement')
+        return lookup_table
+
+    @classmethod
+    def get_rpe_by_speed_resistance_displacement(cls, speed, resistance, displacement):
+        """
+
+        :param speed:
+        :param resistance:
+        :param displacement:
+        :return:
+        """
+        if speed is None or resistance is None or displacement is None:
+            return 3
+        lookup_table = cls.get_rpe_lookup_table_displacement(displacement)
+        rpe_values_speed = lookup_table.get(resistance.name)
+        if rpe_values_speed is None:
+            raise ValueError("Invalid Resistance")
+        rpe = rpe_values_speed.get(speed.name)
+        if rpe is None:
+            raise ValueError("Invalid speed")
+        return rpe
+
+    @classmethod
+    def get_rpe_lookup_table_displacement(cls, displacement):
+        """
+
+        :param displacement:
+        :return:
+        """
+        if displacement.name in ['partial_rom', 'full_rom']:
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        elif displacement.name == 'min':
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        elif displacement.name == 'mod':
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        elif displacement.name == 'max':
+            lookup_table = {
+                'none': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'low': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'mod': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'high': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                },
+                'max': {
+                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
+                }
+            }
+        else:
+            raise ValueError('Invalid displacement')
+        return lookup_table
