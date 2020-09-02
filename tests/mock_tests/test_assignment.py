@@ -1,4 +1,4 @@
-from training_volume import Assignment, StandardErrorRange
+from models.training_volume import Assignment, StandardErrorRange
 
 
 def test_lowest_value_min_max_present():

@@ -291,10 +291,3 @@ def test_set_planned_power_cardio_diff_rpe_ranges():
     proc.set_planned_power(exercise2)
 
     assert exercise1.power.lower_bound < exercise1.power.observed_value < exercise1.power.upper_bound < exercise2.power.lower_bound < exercise2.power.observed_value < exercise2.power.upper_bound
-
-
-def test_get_rep_max_for_weights():
-    import numpy as np
-    for percent in np.arange(50, 100, 5):
-        rep_max_reps = WorkoutProcessor().get_reps_for_percent_rep_max(percent)
-        print(percent, rep_max_reps)

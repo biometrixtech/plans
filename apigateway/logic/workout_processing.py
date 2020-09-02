@@ -382,7 +382,7 @@ class WorkoutProcessor(object):
             exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
         else:
             # get power based on speed/resistance/displacement
-            power = Calculators.get_mets_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
+            power = Calculators.get_power_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement, self.user_weight)
             exercise.power = StandardErrorRange(observed_value=power)
             exercise.force = StandardErrorRange(observed_value=0)
 

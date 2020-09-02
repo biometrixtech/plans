@@ -104,6 +104,7 @@ class WorkoutParser(object):
     def parse_exercise_row(self, row):
         ex = PlannedExercise()
         ex.name = row['description'].strip().lower()
+        ex.movement_id = ex.name
 
         observed_duration = None
         max_duration = None

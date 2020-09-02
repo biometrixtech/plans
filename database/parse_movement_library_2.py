@@ -30,9 +30,13 @@ class MovementLibraryParser(object):
     def parse_row(self, row, alt_movement_id):
         if self.is_valid(row, 'compound_actions') and (self.is_valid(row, 'base_movement_id') or self.is_valid(row, 'base_movement_name')):
             if self.is_valid(row, 'base_movement_id') and self.is_valid(row, 'base_movement_name'):
-                movement = Movement(row['base_movement_id'], row['base_movement_name'])
+                base_movement_name = row['base_movement_name']
+                base_movement_name = base_movement_name.lower().strip()
+                movement = Movement(row['base_movement_id'], base_movement_name)
             elif self.is_valid(row, 'base_movement_name'):
-                movement = Movement(str(alt_movement_id), row['base_movement_name'])
+                base_movement_name = row['base_movement_name']
+                base_movement_name = base_movement_name.lower().strip()
+                movement = Movement(str(alt_movement_id), base_movement_name)
             else:
                 movement = Movement(str(alt_movement_id), "ERROR")
                 print('error!')

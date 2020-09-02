@@ -230,7 +230,7 @@ class PlannedExercise(BaseWorkoutExercise):
             'predicted_rpe': self.predicted_rpe,
 
             'prescribed_per_side': self.prescribed_per_side,
-            'tempo': self.tempo,
+            # 'tempo': self.tempo,
             'explosiveness_rating': self.explosiveness_rating,
             'duration': self.duration.json_serialise() if self.duration is not None else None,
             'distance': self.distance.json_serialise() if self.distance is not None else None,

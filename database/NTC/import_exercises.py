@@ -15,8 +15,9 @@ class ClientExercise(object):
         self.bilateral_distribution_of_resistance = None
         self.resistance = None
         self.speed = None
+        self.displacement = None
         self.surface_stability = None
-        self.equipment = None
+        self.external_weight_implement = []
         self.rest_between_reps = None
         self.rep_tempo = None
         self.involvement = None
@@ -34,8 +35,9 @@ class ClientExercise(object):
             'bilateral_distribution_of_resistance': self.bilateral_distribution_of_resistance.value if self.bilateral_distribution_of_resistance is not None else None,
             'resistance': self.resistance.value if self.resistance is not None else None,
             'speed': self.speed.value if self.speed is not None else None,
+            'displacement': self.displacement,
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
-            'equipment': self.equipment.value if self.equipment is not None else None,
+            'external_weight_implement': [equip.value for equip in self.external_weight_implement],
             'rest_between_reps': self.rest_between_reps,
             'rep_tempo': self.rep_tempo,
             'involvement': self.involvement,
@@ -44,6 +46,27 @@ class ClientExercise(object):
             'upper_body_symmetry': self.upper_body_symmetry
         }
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        ex = cls(input_dict['name'])
+        ex.base_movement_id = input_dict.get('base_movement_id')
+        ex.base_movement_name = input_dict.get('base_movement_name')
+        ex.client_exercise_name = input_dict.get('client_exercise_name')
+        ex.training_type = TrainingType(input_dict['training_type'])
+        ex.bilateral_distribution_of_resistance = WeightDistribution(input_dict['bilateral_distribution_of_resistance']) if input_dict.get('bilateral_distribution_of_resistance') is not None else None
+        ex.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
+        ex.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
+        ex.displacement = input_dict.get('displacement')
+        ex.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
+        ex.external_weight_implement = [Equipment(equip) for equip in input_dict.get('external_weight_implement', [])]
+        ex.rest_between_reps = input_dict.get('rest_between_reps')
+        ex.rep_tempo = input_dict.get('rep_tempo')
+        ex.involvement = input_dict.get('involvement')
+        ex.plane = input_dict.get('plane')
+        ex.body_position = BodyPosition(input_dict['body_position']) if input_dict.get('body_position') is not None else None
+        ex.upper_body_symmetry = input_dict.get('upper_body_symmetry')
+        return ex
 
 
 class ExerciseParser(object):
@@ -61,7 +84,8 @@ class ExerciseParser(object):
             'no_resistance': 'none'
         }
         self.speed_lookup = {
-            'no_speed': 'none'
+            'no_speed': 'none',
+            'low': 'slow'
         }
 
 
@@ -128,7 +152,7 @@ class ExerciseParser(object):
                 ex.body_position = BodyPosition[row['body_position']]
             ex.upper_body_symmetry = row['upper_body_symmetry']
             if self.is_valid(row['external_weight_implement']):
-                ex.equipment = Equipment[self.equipment_name_loookup.get(row['external_weight_implement'].lower()) or row['external_weight_implement'].lower()]
+                ex.external_weight_implement = [Equipment[self.equipment_name_loookup.get(row['external_weight_implement'].lower()) or row['external_weight_implement'].lower()]]
             return ex
         return None
 
