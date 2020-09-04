@@ -565,6 +565,8 @@ class WorkoutProcessor(object):
                 exercise.force.lower_bound = Calculators.force_cycling(exercise.power.lower_bound, exercise.speed)
             if exercise.power.upper_bound is not None:
                 exercise.force.upper_bound = Calculators.force_cycling(exercise.power.upper_bound, exercise.speed)
+        elif exercise.rpe is not None:
+            exercise.power = Calculators.get_power_from_rpe(exercise.rpe, weight=self.user_weight, vo2_max=self.vo2_max)
         else:  # for all other cardio types
             exercise.force = StandardErrorRange(
                 observed_value=Calculators.force_cardio(exercise.cardio_action, self.user_weight, self.gender))
@@ -748,27 +750,7 @@ class WorkoutProcessor(object):
                     exercise.power = StandardErrorRange(
                         observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))
             elif exercise.rpe is not None:
-                power_lower = None
-                power_observed = None
-                power_upper = None
-                if exercise.rpe.lower_bound is not None:
-                    power_lower = Calculators.get_power_from_rpe(exercise.rpe.lower_bound, age=self.user_age, weight=self.user_weight)
-                if exercise.rpe.observed_value is not None:
-                    power_observed = Calculators.get_power_from_rpe(exercise.rpe.observed_value, age=self.user_age, weight=self.user_weight)
-                if exercise.rpe.upper_bound is not None:
-                    power_upper = Calculators.get_power_from_rpe(exercise.rpe.upper_bound, age=self.user_age, weight=self.user_weight)
-                if power_lower is not None and power_upper is not None:
-                    exercise.power = StandardErrorRange(lower_bound=power_lower, upper_bound=power_upper)
-                    if power_observed is None:
-                        power_observed = (power_lower + power_upper) / 2
-                    exercise.power.observed_value = power_observed
-                else:
-                    if power_observed is not None:
-                        exercise.power = StandardErrorRange(observed_value=power_observed)
-                    elif power_lower is not None:
-                        exercise.power = StandardErrorRange(observed_value=power_lower)
-                    elif power_upper is not None:
-                        exercise.power = StandardErrorRange(observed_value=power_upper)
+                exercise.power = Calculators.get_power_from_rpe(exercise.rpe, weight=self.user_weight, vo2_max=self.vo2_max)
             else:
                 exercise.power = StandardErrorRange(
                     observed_value=Calculators.power_cardio(exercise.cardio_action, self.user_weight, self.gender))

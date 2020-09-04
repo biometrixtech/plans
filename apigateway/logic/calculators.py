@@ -58,17 +58,7 @@ class Calculators(object):
         """
         if percent_vo2max >= 100:
             return 10.0
-        rpe_lookup_tuples = list()
-        rpe_lookup_tuples.append((10, 95, 100))
-        rpe_lookup_tuples.append((9, 90, 95))
-        rpe_lookup_tuples.append((8, 85, 90))
-        rpe_lookup_tuples.append((7, 80, 85))
-        rpe_lookup_tuples.append((6, 72.5, 80))
-        rpe_lookup_tuples.append((5, 65, 72.5))
-        rpe_lookup_tuples.append((4, 60, 65))
-        rpe_lookup_tuples.append((3, 55, 60))
-        rpe_lookup_tuples.append((2, 50, 55))
-        rpe_lookup_tuples.append((1, 0, 50))
+        rpe_lookup_tuples = cls.get_acsm_rpe_vo2_max_lookup()
 
         rpe_tuple = [r for r in rpe_lookup_tuples if r[1] <= percent_vo2max <= r[2]]
 
@@ -85,6 +75,62 @@ class Calculators(object):
             rpe = 1.0
 
         return round(rpe, 1)
+
+    @classmethod
+    def percent_vo2_max_from_rpe_range(cls, rpe):
+
+        """
+
+        :param rpe:
+        :return: StandardErrorRange
+        """
+        if rpe.lowest_value() >= 10:
+            return StandardErrorRange(lower_bound=100, observed_value=100, upper_bound=100)
+        rpe_lookup_tuples = cls.get_acsm_rpe_vo2_max_lookup()
+
+        rpe_tuple_lower = [r for r in rpe_lookup_tuples if r[0] <= rpe.lowest_value()]
+        rpe_tuple_upper = [r for r in rpe_lookup_tuples if r[0] <= rpe.highest_value()]
+
+        if len(rpe_tuple_lower) > 0:
+            sorted_tuple = sorted(rpe_tuple_lower, key=lambda x:[0], reverse=True)
+            vo2_max_range_lower = StandardErrorRange(lower_bound=sorted_tuple[0][1], upper_bound= sorted_tuple[0][2])
+        else:
+            vo2_max_range_lower = None
+
+        if len(rpe_tuple_upper) > 0:
+            sorted_tuple = sorted(rpe_tuple_upper, key=lambda x:[0], reverse=True)
+            vo2_max_range_upper = StandardErrorRange(lower_bound=sorted_tuple[0][1], upper_bound= sorted_tuple[0][2])
+        else:
+            vo2_max_range_upper = None
+
+        if vo2_max_range_lower is None and vo2_max_range_upper is not None:
+            vo2_max_range = vo2_max_range_upper
+        elif vo2_max_range_upper is None and vo2_max_range_lower is not None:
+            vo2_max_range = vo2_max_range_lower
+        elif vo2_max_range_upper is not None and vo2_max_range_lower is not None:
+            vo2_max_range = StandardErrorRange()
+            vo2_max_range.lower_bound = min(vo2_max_range_lower.lowest_value(), vo2_max_range_upper.lowest_value())
+            vo2_max_range.upper_bound = min(vo2_max_range_lower.highest_value(), vo2_max_range_upper.highest_value())
+            vo2_max_range.observed_value = (vo2_max_range.lowest_value() + vo2_max_range.highest_value()) / 2
+        else:
+            vo2_max_range = StandardErrorRange()
+
+        return vo2_max_range
+
+    @classmethod
+    def get_acsm_rpe_vo2_max_lookup(cls):
+        rpe_lookup_tuples = list()
+        rpe_lookup_tuples.append((10, 95, 100))
+        rpe_lookup_tuples.append((9, 90, 95))
+        rpe_lookup_tuples.append((8, 85, 90))
+        rpe_lookup_tuples.append((7, 80, 85))
+        rpe_lookup_tuples.append((6, 72.5, 80))
+        rpe_lookup_tuples.append((5, 65, 72.5))
+        rpe_lookup_tuples.append((4, 60, 65))
+        rpe_lookup_tuples.append((3, 55, 60))
+        rpe_lookup_tuples.append((2, 50, 55))
+        rpe_lookup_tuples.append((1, 0, 50))
+        return rpe_lookup_tuples
 
     @classmethod
     def get_percent_max_hr_from_rpe(cls, rpe):
@@ -357,6 +403,14 @@ class Calculators(object):
         mets = cls.watts_to_mets(power, user_weight, efficiency=.22)
         work_vo2 = round(mets * 3.5, 1)
         return work_vo2
+
+    @classmethod
+    def power_running_from_work_vo2(cls, work_vo2, user_weight, efficiency=.22):
+
+        mets = round(work_vo2 / 3.5, 1)
+        watts = cls.mets_to_watts(mets, user_weight, efficiency)
+
+        return watts
 
     @classmethod
     def work_vo2_cycling(cls, power, weight):
@@ -782,12 +836,28 @@ class Calculators(object):
         return mets
 
     @classmethod
-    def get_power_from_rpe(cls, rpe, age=None, weight=None):
+    def get_power_from_rpe(cls, rpe_range, weight=None, vo2_max=None):
         weight = weight or 60
-        age = age or 25
-        mets = cls.get_mets_from_rpe_acsm(rpe, age)
-        power = cls.mets_to_watts(mets, weight=weight, efficiency=.21)
-        return power
+
+        vo2_max_range = cls.percent_vo2_max_from_rpe_range(rpe_range)
+        if vo2_max is not None:
+            work_vo2_list = [
+                (vo2_max_range.lower_bound / 100) * vo2_max.lower_bound,
+                (vo2_max_range.upper_bound / 100) * vo2_max.lower_bound,
+                (vo2_max_range.lower_bound / 100) * vo2_max.upper_bound,
+                (vo2_max_range.upper_bound / 100) * vo2_max.upper_bound]
+
+            work_vo2_lower_bound = min(work_vo2_list)
+            work_vo2_upper_bound = max(work_vo2_list)
+
+            watts_lower = cls.power_running_from_work_vo2(work_vo2_lower_bound, weight, efficiency=.21)
+            watts_upper = cls.power_running_from_work_vo2(work_vo2_upper_bound, weight, efficiency=.21)
+            watts_observed = (watts_lower + watts_upper) / 2
+            watts_range = StandardErrorRange(lower_bound=watts_lower, observed_value=watts_observed, upper_bound=watts_upper)
+        else:
+            watts_range = StandardErrorRange()
+
+        return watts_range
 
     @classmethod
     def get_mets_from_rpe_acsm(cls, rpe, age):
