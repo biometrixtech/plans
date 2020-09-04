@@ -1,6 +1,6 @@
 import math
 from models.training_volume import StandardErrorRange, Assignment
-from models.movement_tags import Gender
+from models.movement_tags import Gender, RunningDistances
 
 
 cardio_mets_table = {
@@ -24,6 +24,57 @@ cardio_mets_table = {
 
 
 class Calculators(object):
+
+    @classmethod
+    def get_running_distance_from_type(cls, distance_type):
+
+        if distance_type == RunningDistances.m100:
+            return 100.00
+        elif distance_type == RunningDistances.m200:
+            return 200.00
+        elif distance_type == RunningDistances.m300:
+            return 300.00
+        elif distance_type == RunningDistances.m400:
+            return 400.00
+        elif distance_type == RunningDistances.m500:
+            return 500.00
+        elif distance_type == RunningDistances.m600:
+            return 600.00
+        elif distance_type == RunningDistances.m800:
+            return 800.00
+        elif distance_type == RunningDistances.m1000:
+            return 1000.00
+        elif distance_type == RunningDistances.m1200:
+            return 1200.00
+        elif distance_type == RunningDistances.m1600:
+            return 1600.00
+        elif distance_type == RunningDistances.m4000:
+            return 4000.00
+        elif distance_type == RunningDistances.mile3:
+            return 4828.03
+        elif distance_type == RunningDistances.k5:
+            return 5000.00
+        elif distance_type == RunningDistances.mile5:
+            return 8046.72
+        elif distance_type == RunningDistances.k10:
+            return 10000.00
+        elif distance_type == RunningDistances.k12:
+            return 12000.00
+        elif distance_type == RunningDistances.marathon_half:
+            return 20921.50
+        elif distance_type == RunningDistances.mile15:
+            return 24140.20
+        elif distance_type == RunningDistances.k25:
+            return 25000.00
+        elif distance_type == RunningDistances.marathon:
+            return 42197.00
+        elif distance_type == RunningDistances.k50:
+            return 50000.00
+        elif distance_type == RunningDistances.mile50:
+            return 80467.2
+        else:
+            return 0
+
 
     @classmethod
     def vo2_max_estimation_demographics(cls, age, user_weight, user_height=1.7, gender=Gender.female, activity_level=5):
