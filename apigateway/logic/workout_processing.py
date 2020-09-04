@@ -891,7 +891,7 @@ class WorkoutProcessor(object):
         for compound_action in exercise.primary_actions:
             for action in compound_action.actions:
                 for sub_action in action.sub_actions:
-                    if sub_action.muscle_action is not None and sub_action.muscle_action.name in ['concentric', 'isometric']:
+                    if sub_action.primary_muscle_action is not None and sub_action.primary_muscle_action.name in ['concentric', 'isometric']:
                         self.get_prime_movers_from_joint_actions(sub_action.hip_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.knee_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.ankle_joint_action, prime_movers)

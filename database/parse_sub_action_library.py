@@ -221,7 +221,7 @@ class SubActionLibraryParser(object):
                         new_subaction.lateral_distribution = sub_action.lateral_distribution
 
                     # items unique to sub actions
-                    new_subaction.muscle_action = sub_action.muscle_action
+                    new_subaction.primary_muscle_action = sub_action.primary_muscle_action
 
                     # New
                     new_subaction.movement_systems = sub_action.movement_systems
@@ -263,7 +263,7 @@ class SubActionLibraryParser(object):
                 action = deepcopy(last_sub_action)
 
             if self.is_valid(row, 'muscle_action'):
-                action.muscle_action = MuscleAction[row['muscle_action']]
+                action.primary_muscle_action = MuscleAction[row['muscle_action']]
 
             # New
             if self.is_valid(row, 'movement_system'):

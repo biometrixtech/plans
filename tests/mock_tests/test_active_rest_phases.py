@@ -16,7 +16,7 @@ from logic.exercise_assignment import ExerciseAssignment
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from models.movement_tags import AdaptationType, TrainingType
-from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
+from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction, ExerciseSubAction, CompoundAction
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
 from models.functional_movement_type import FunctionalMovementType
 from models.exercise_phase import ExercisePhaseType
@@ -194,47 +194,55 @@ def test_check_active_rest_phases_no_soreness_with_mixed_session():
     session = MixedActivitySession()
     session.event_date = datetime.now()
 
-    exercise_action_1 = ExerciseAction("1", "flail")
-    exercise_action_1.primary_muscle_action = MuscleAction.concentric
-    exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
-    exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
-    exercise_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
+    sub_action_1 = ExerciseSubAction("1", "flail")
+    sub_action_1.primary_muscle_action = MuscleAction.concentric
+    sub_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
+    sub_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
+    sub_action_1.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
     #exercise_action_1.tissue_load_left = StandardErrorRange(observed_value=100)
     #exercise_action_1.tissue_load_right = StandardErrorRange(observed_value=200)
-    exercise_action_1.power_load_left = StandardErrorRange(observed_value=100)
-    exercise_action_1.power_load_right = StandardErrorRange(observed_value=200)
-    exercise_action_1.lower_body_stability_rating = 1.1
-    exercise_action_1.upper_body_stability_rating = 0.6
-    exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
-    exercise_action_1.training_type = TrainingType.strength_cardiorespiratory
+    sub_action_1.power_load_left = StandardErrorRange(observed_value=100)
+    sub_action_1.power_load_right = StandardErrorRange(observed_value=200)
+    sub_action_1.lower_body_stability_rating = 1.1
+    sub_action_1.upper_body_stability_rating = 0.6
+    sub_action_1.adaptation_type = AdaptationType.strength_endurance_strength
+    sub_action_1.training_type = TrainingType.strength_cardiorespiratory
+    action_1 = ExerciseAction("test", "test")
+    action_1.sub_actions.append(sub_action_1)
+    compound_action_1 = CompoundAction("test", "test")
+    compound_action_1.actions.append(action_1)
 
-    exercise_action_2 = ExerciseAction("1", "flail")
-    exercise_action_2.primary_muscle_action = MuscleAction.concentric
-    exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
-    exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
-    exercise_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
+    sub_action_2 = ExerciseSubAction("1", "flail")
+    sub_action_2.primary_muscle_action = MuscleAction.concentric
+    sub_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
+    sub_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
+    sub_action_2.ankle_joint_action = [PrioritizedJointAction(3, FunctionalMovementType.ankle_plantar_flexion)]
     #exercise_action_2.tissue_load_left = StandardErrorRange(observed_value=200)
     #exercise_action_2.tissue_load_right = StandardErrorRange(observed_value=100)
-    exercise_action_2.power_load_left = StandardErrorRange(observed_value=200)
-    exercise_action_2.power_load_right = StandardErrorRange(observed_value=100)
-    exercise_action_2.lower_body_stability_rating = 1.1
-    exercise_action_2.upper_body_stability_rating = 0.6
-    exercise_action_2.adaptation_type = AdaptationType.power_explosive_action
-    exercise_action_2.training_type = TrainingType.strength_cardiorespiratory
+    sub_action_2.power_load_left = StandardErrorRange(observed_value=200)
+    sub_action_2.power_load_right = StandardErrorRange(observed_value=100)
+    sub_action_2.lower_body_stability_rating = 1.1
+    sub_action_2.upper_body_stability_rating = 0.6
+    sub_action_2.adaptation_type = AdaptationType.power_explosive_action
+    sub_action_2.training_type = TrainingType.strength_cardiorespiratory
+    action_2 = ExerciseAction("test", "test")
+    action_2.sub_actions.append(sub_action_2)
+    compound_action_2 = CompoundAction("test", "test")
+    compound_action_2.actions.append(action_2)
 
     exercise_1 = WorkoutExercise()
     exercise_1.rpe = StandardErrorRange(observed_value=5)
     exercise_1.duration = 90
     exercise_1.power_load = StandardErrorRange(observed_value=300)
     exercise_1.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
-    exercise_1.primary_actions.append(exercise_action_1)
+    exercise_1.primary_actions.append(compound_action_1)
 
     exercise_2 = WorkoutExercise()
     exercise_2.rpe = StandardErrorRange(observed_value=5)
     exercise_2.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     exercise_2.duration = 90
     exercise_2.power_load = StandardErrorRange(observed_value=300)
-    exercise_2.primary_actions.append(exercise_action_2)
+    exercise_2.primary_actions.append(compound_action_2)
 
     section_1 = WorkoutSection()
     section_1.exercises.append(exercise_1)

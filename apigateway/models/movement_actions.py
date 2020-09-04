@@ -123,7 +123,7 @@ class ExerciseSubAction(object):
         self.id = id
         self.name = name
 
-        self.muscle_action = None  # muscle_action
+        self.primary_muscle_action = None  # muscle_action
 
         # New
         self.movement_systems = []
@@ -212,7 +212,7 @@ class ExerciseSubAction(object):
             "apply_instability": self.apply_instability,
             'speed': self.speed.value if self.speed is not None else None,
 
-            "muscle_action": self.muscle_action.value if self.muscle_action is not None else None,
+            "primary_muscle_action": self.primary_muscle_action.value if self.primary_muscle_action is not None else None,
             "hip_joint_action": [ac.json_serialise() for ac in self.hip_joint_action],
             "knee_joint_action": [ac.json_serialise() for ac in self.knee_joint_action],
             "ankle_joint_action": [ac.json_serialise() for ac in self.ankle_joint_action],
@@ -277,8 +277,11 @@ class ExerciseSubAction(object):
         action.lateral_distribution = input_dict.get('lateral_distribution', [0, 0])
         action.apply_resistance = input_dict.get('apply_resistance', False)
         action.apply_instability = input_dict.get('apply_instability', False)
+        action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
+        action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get(
+            'resistance') is not None else None
 
-        action.muscle_action = MuscleAction(input_dict['muscle_action']) if input_dict.get('muscle_action') is not None else None
+        action.primary_muscle_action = MuscleAction(input_dict['primary_muscle_action']) if input_dict.get('primary_muscle_action') is not None else None
         action.hip_joint_rating = None
         action.hip_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('hip_joint_action', [])]
         action.knee_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('knee_joint_action', [])]
@@ -341,7 +344,12 @@ class ExerciseSubAction(object):
                 if ex_weight.value is None:
                     continue
                 if isinstance(ex_weight.value, Assignment):
-                    ex_weight.value = ex_weight.value.assigned_value
+                    if ex_weight.value.assigned_value is not None:
+                        ex_weight.value = ex_weight.value.assigned_value
+                    elif ex_weight.value.min_value is not None and ex_weight.value.max_value is not None:
+                        ex_weight.value = (ex_weight.value.min_value + ex_weight.value.max_value) / 2
+                    else:
+                        continue
                 left = 0
                 right = 0
                 if ex_weight.equipment in self.eligible_external_resistance:
