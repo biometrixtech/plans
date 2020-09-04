@@ -242,7 +242,7 @@ class WorkoutProcessor(object):
             # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
-            exercise.predicted_rpe = self.get_rpe_from_weight_2(exercise)
+            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
 
         exercise = self.set_total_volume(exercise)
         exercise.set_training_loads()
@@ -277,7 +277,7 @@ class WorkoutProcessor(object):
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
             # TODO this needs to handle planned exercises
-            exercise.predicted_rpe = self.get_rpe_from_weight_2(exercise)
+            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
             # rpe = Calculators.get_rpe_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
             # exercise.predicted_rpe = StandardErrorRange(observed_value=rpe)
 
@@ -912,160 +912,6 @@ class WorkoutProcessor(object):
         return bodyweight_ratio
 
     def get_rpe_from_weight(self, workout_exercise):
-        rpe = StandardErrorRange(observed_value=1)
-        # get correct equipment
-        if len(workout_exercise.equipments) > 0:
-            equipment = workout_exercise.equipments[0]
-        else:
-            equipment = Equipment.bodyweight
-        if equipment == Equipment.no_equipment:
-            equipment = Equipment.bodyweight
-
-        # get reps
-        reps = StandardErrorRange(observed_value=0)
-        if workout_exercise.reps_per_set is not None:
-            reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
-        elif workout_exercise.duration is not None:
-            if isinstance(workout_exercise.duration, Assignment):
-                possible_reps = []
-                durations = [workout_exercise.duration.min_value, workout_exercise.duration.max_value, workout_exercise.duration.assigned_value]
-                durations = [dur for dur in durations if dur is not None]
-                duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
-                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
-                for dur in durations:
-                    for dur_per_rep in duration_per_reps:
-                        possible_reps.append(dur / dur_per_rep)
-                if len(possible_reps) > 0:
-                    reps.lower_bound = min(possible_reps)
-                    reps.upper_bound = max(possible_reps)
-                    reps.observed_value = sum(possible_reps) / len(possible_reps)
-            else:
-                reps.lower_bound = workout_exercise.duration / workout_exercise.duration_per_rep.upper_bound
-                reps.upper_bound = workout_exercise.duration / workout_exercise.duration_per_rep.lower_bound
-                reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
-
-        if workout_exercise.weight_measure == WeightMeasure.rep_max:
-            if isinstance(workout_exercise.weight, Assignment):
-                all_rpes = []
-                weights = [workout_exercise.weight.assigned_value, workout_exercise.weight.min_value, workout_exercise.weight.max_value]
-                weights = [value for value in weights if value is not None]
-                all_reps = [reps.observed_value, reps.lower_bound, reps.upper_bound]
-                all_reps = [value for value in all_reps if value is not None]
-                for weight in weights:
-                    for reps in all_reps:
-                        all_rpes.append(self.get_rpe_from_rep_max(weight, reps))
-                if len(all_rpes) > 0:
-                    rpe.observed_value = sum(all_rpes) / len(all_rpes)
-                    rpe.lower_bound = min(all_rpes)
-                    rpe.upper_bound = max(all_rpes)
-            else:
-                rpe.observed_value = self.get_rpe_from_rep_max(workout_exercise.weight, reps.observed_value)
-                if reps.lower_bound is not None:
-                    rpe1 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.lower_bound)
-                    rpe2 = self.get_rpe_from_rep_max(workout_exercise.weight, reps.upper_bound)
-                    rpe.lower_bound = min([rpe1, rpe2])
-                    rpe.upper_bound = max([rpe1, rpe2])
-
-        elif workout_exercise.weight_measure == WeightMeasure.percent_rep_max:
-            if isinstance(workout_exercise.weight, Assignment):
-                all_rpes = []
-                percent_rep_maxes = [workout_exercise.weight.assigned_value, workout_exercise.weight.min_value, workout_exercise.weight.max_value]
-                percent_rep_maxes = [value for value in percent_rep_maxes if value is not None]
-                all_reps = [reps.observed_value, reps.lower_bound, reps.upper_bound]
-                all_reps = [value for value in all_reps if value is not None]
-                for percent_rep_max in percent_rep_maxes:
-                    for reps in all_reps:
-                        rep_max_reps = self.get_reps_for_percent_rep_max(percent_rep_max)
-                        all_rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps))
-                if len(all_rpes) > 0:
-                    rpe.observed_value = sum(all_rpes) / len(all_rpes)
-                    rpe.lower_bound = min(all_rpes)
-                    rpe.upper_bound = max(all_rpes)
-            else:
-                rep_max_reps = self.get_reps_for_percent_rep_max(workout_exercise.weight)
-                if reps.observed_value > 0:
-                    rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
-                if reps.lower_bound is not None and reps.upper_bound is not None:
-                    rpes = []
-                    if reps.lower_bound > 0:
-                        rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound))
-                    if reps.upper_bound > 0:
-                        rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound))
-                    if len(rpes) > 0:
-                        rpe.lower_bound = min(rpes)
-                        rpe.upper_bound = max(rpes)
-        else:
-            if workout_exercise.weight_measure == WeightMeasure.percent_bodyweight:
-                if isinstance(workout_exercise.weight, Assignment):
-                    weights = [workout_exercise.weight.assigned_value, workout_exercise.weight.min_value, workout_exercise.weight.max_value]
-                    weights = [value * self.user_weight for value in weights if value is not None]
-                else:
-                    weights = [workout_exercise.weight * self.user_weight]
-
-                # weight = workout_exercise.weight * self.user_weight
-
-            elif workout_exercise.weight_measure == WeightMeasure.actual_weight:
-                if isinstance(workout_exercise.weight, Assignment):
-                    weights = [workout_exercise.weight.assigned_value, workout_exercise.weight.min_value, workout_exercise.weight.max_value]
-                    weights = [value for value in weights if value is not None]
-                else:
-                    weights = [workout_exercise.weight]
-
-                # weight = workout_exercise.weight
-            else:
-                return rpe
-                # weight = 0
-
-            one_rep_max_bodyweight_ratio = self.get_one_rep_max_bodyweight_ratio(workout_exercise)
-            all_rep_max_reps = []
-            if equipment == Equipment.bodyweight:
-                for weight in weights:
-                    all_rep_max_reps.append(self.get_max_reps_for_bodyweight_exercises(one_rep_max_bodyweight_ratio, weight))
-                # rep_max_reps = self.get_max_reps_for_bodyweight_exercises(one_rep_max_bodyweight_ratio, weight)
-            else:
-                # if weight == 0:
-                #     return rpe
-                # else:
-                    one_rep_max_weight = one_rep_max_bodyweight_ratio * self.user_weight
-                    # find the % 1RM value
-                    for weight in weights:
-                        percent_one_rep_max_weight = min(100, (weight / one_rep_max_weight) * 100)
-
-                        # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
-                        all_rep_max_reps.append(self.get_reps_for_percent_rep_max(percent_one_rep_max_weight))
-                    # percent_one_rep_max_weight = min(100, (weight / one_rep_max_weight) * 100)
-
-                    # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
-                    # rep_max_reps = self.get_reps_for_percent_rep_max(percent_one_rep_max_weight)
-            all_rpes = []
-            all_reps = [reps.observed_value, reps.lower_bound, reps.upper_bound]
-            all_reps = [value for value in all_reps if value is not None]
-            for rep_max_rep in all_rep_max_reps:
-                for reps in all_reps:
-                    all_rpes.append(self.get_rpe_from_rep_max(rep_max_rep, reps))
-
-            if len(all_rpes) > 0:
-                rpe.observed_value = sum(all_rpes) / len(all_rpes)
-                rpe.lower_bound = min(all_rpes)
-                rpe.upper_bound = max(all_rpes)
-
-            # # given the amount of reps they completed and the n of nRM, find the RPE
-            # if reps.observed_value > 0:
-            #     rpe.observed_value = self.get_rpe_from_rep_max(rep_max_reps, reps.observed_value)
-            # if reps.lower_bound is not None and reps.upper_bound is not None:
-            #     rpes = []
-            #     if reps.lower_bound > 0:
-            #         rpes.append( self.get_rpe_from_rep_max(rep_max_reps, reps.lower_bound))
-            #     if reps.upper_bound  > 0:
-            #         rpes.append(self.get_rpe_from_rep_max(rep_max_reps, reps.upper_bound))
-            #     if len(rpes) > 0:
-            #         rpe.lower_bound = min(rpes)
-            #         rpe.upper_bound = max(rpes)
-
-        return rpe
-
-
-    def get_rpe_from_weight_2(self, workout_exercise):
         rpe = StandardErrorRange(observed_value=1)
         # get correct equipment
         if len(workout_exercise.equipments) > 0:
