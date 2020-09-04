@@ -128,6 +128,13 @@ class SubActionLibraryParser(object):
                 if action.id is not None:
                     compound_action.actions.append(action)
                 action = ExerciseAction(row['id'], "")
+                if self.is_valid(row, 'resistance', False):
+                    action.resistance = MovementResistance[row['resistance']]
+
+                if self.is_valid(row, 'speed', False):
+                    if row['speed'] == 'no_speed':  # TODO this needs to be fixed in spreadsheet
+                        row['speed'] = 'none'
+                    action.speed = self.get_speed(row['speed'])
 
             if self.is_valid(row, 'sub_action_id'):
                 sub_action_id = row['sub_action_id']
@@ -236,6 +243,10 @@ class SubActionLibraryParser(object):
                     print("ERROR: SUBACTION NOT FOUND")
 
         if action.id is not None:
+            if action.speed is None:
+                action.speed = compound_action.speed
+            if action.resistance is None:
+                action.resistance = compound_action.resistance
             compound_action.actions.append(action)
 
         return compound_action
