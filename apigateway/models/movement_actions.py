@@ -587,6 +587,7 @@ class ExerciseAction(object):
         action.training_intensity_right = input_dict.get('training_intensity_right', 0)
         action.training_volume_left = input_dict.get('training_volume_left', 0)
         action.training_volume_right = input_dict.get('training_volume_right', 0)
+        action.sub_actions = [ExerciseSubAction.json_deserialise(sa) for sa in input_dict.get('sub_actions', [])]
 
         return action
 

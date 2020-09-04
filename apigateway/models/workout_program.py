@@ -193,9 +193,11 @@ class BaseWorkoutExercise(object):
         self.rpe_load = None
 
         self.predicted_rpe = None
+        self.bilateral_distribution_of_resistance = None
 
     def initialize_from_movement(self, movement):
         # self.body_position = movement.body_position
+        self.bilateral_distribution_of_resistance = movement.bilateral_distribution_of_resistance
         self.cardio_action = movement.cardio_action
         self.power_drill_action = movement.power_drill_action
         self.power_action = movement.power_action
@@ -204,7 +206,9 @@ class BaseWorkoutExercise(object):
         self.training_type = movement.training_type
         self.explosiveness_rating = movement.explosiveness_rating
         self.surface_stability = movement.surface_stability
-        self.equipments = movement.external_weight_implement  # TODO: do we get it from the api
+        if len(self.equipments) == 0:
+            # if none provided from the workout, inherit it from movement
+            self.equipments = movement.external_weight_implement
         self.movement_speed = movement.speed
         self.resistance = movement.resistance
         self.displacement = movement.displacement

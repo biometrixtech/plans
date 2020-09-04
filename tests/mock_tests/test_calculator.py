@@ -301,11 +301,19 @@ def test_get_power_from_rpe_diff_weight():
         assert power1 < power2 < power3 < power4
 
 
-
-
 def test_power_resistance_exercise():
-    power = Calculators.power_resistance_exercise(100, 70).observed_value
-    print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
-    print(Calculators.mets_to_watts(8.4, weight=70, efficiency=.21))
+    for weight in range(10, 100):
+        print(weight, Calculators.power_resistance_exercise(weight, .05 * 70).observed_value)
+    speed = 6 * 1610 / 3600
+    print(Calculators.power_running(speed, user_weight=70))
+    # power = Calculators.power_resistance_exercise(100, 70).observed_value
+    # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
 
-    # power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_eccentric=None, time_concentric=None):
+
+
+def test_power_cycling_100():
+    speed = 25 * 1610 / 3600
+    print(Calculators.power_cycling(speed, user_weight=70))
+    print(Calculators.power_cardio(CardioAction.cycle, user_weight=70))
+    # power = Calculators.power_resistance_exercise(100, 70).observed_value
+    # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))

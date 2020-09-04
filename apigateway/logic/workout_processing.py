@@ -8,7 +8,7 @@ from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition
-from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement
+from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement, CompoundAction
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 from models.training_volume import StandardErrorRange, Assignment
@@ -144,17 +144,24 @@ class WorkoutProcessor(object):
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
 
-            for action_id in movement.primary_actions:
-                action_json = action_library.get(action_id)
+            for compound_action_id in movement.compound_actions:
+                action_json = action_library.get(compound_action_id)
                 if action_json is not None:
-                    action = ExerciseAction.json_deserialise(action_json)
+                    action = CompoundAction.json_deserialise(action_json)
                     exercise.primary_actions.append(action)
 
-            for action_id in movement.secondary_actions:
-                action_json = action_library.get(action_id)
-                if action_json is not None:
-                    action = ExerciseAction.json_deserialise(action_json)
-                    exercise.secondary_actions.append(action)
+
+            # for action_id in movement.primary_actions:
+            #     action_json = action_library.get(action_id)
+            #     if action_json is not None:
+            #         action = ExerciseAction.json_deserialise(action_json)
+            #         exercise.primary_actions.append(action)
+            #
+            # for action_id in movement.secondary_actions:
+            #     action_json = action_library.get(action_id)
+            #     if action_json is not None:
+            #         action = ExerciseAction.json_deserialise(action_json)
+            #         exercise.secondary_actions.append(action)
 
             exercise = self.update_exercise_details(exercise)
 
@@ -170,16 +177,29 @@ class WorkoutProcessor(object):
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement)
 
-            for action_id in movement.primary_actions:
-                action_json = action_library.get(action_id)
-                if action_json is not None:
-                    action = ExerciseAction.json_deserialise(action_json)
-                    exercise.primary_actions.append(action)
-            for action_id in movement.secondary_actions:
-                action_json = action_library.get(action_id)
-                if action_json is not None:
-                    action = ExerciseAction.json_deserialise(action_json)
-                    exercise.secondary_actions.append(action)
+            for compound_action_id in movement.compound_actions:
+                compound_action_json = action_library.get(compound_action_id)
+                if compound_action_json is not None:
+                    compound_action = CompoundAction.json_deserialise(compound_action_json)
+
+                    # if lateral distribution is defined at the exercise level (this would be done on a client basis), use that instead of default values
+                    if exercise.bilateral_distribution_of_resistance is not None:
+                        for action in compound_action.actions:
+                            action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                            for sub_action in action.sub_actions:
+                                sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                    exercise.primary_actions.append(compound_action)
+
+            # for action_id in movement.primary_actions:
+            #     action_json = action_library.get(action_id)
+            #     if action_json is not None:
+            #         action = ExerciseAction.json_deserialise(action_json)
+            #         exercise.primary_actions.append(action)
+            # for action_id in movement.secondary_actions:
+            #     action_json = action_library.get(action_id)
+            #     if action_json is not None:
+            #         action = ExerciseAction.json_deserialise(action_json)
+            #         exercise.secondary_actions.append(action)
 
             exercise = self.update_planned_exercise_details(exercise, assignment_type)
 
@@ -257,9 +277,9 @@ class WorkoutProcessor(object):
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
             # TODO this needs to handle planned exercises
-            # exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
-            rpe = Calculators.get_rpe_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
-            exercise.predicted_rpe = StandardErrorRange(observed_value=rpe)
+            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            # rpe = Calculators.get_rpe_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
+            # exercise.predicted_rpe = StandardErrorRange(observed_value=rpe)
 
         exercise = self.set_planned_total_volume(exercise)
         exercise.set_training_loads()
@@ -268,20 +288,23 @@ class WorkoutProcessor(object):
 
         return exercise
 
-    def add_action_details_from_exercise(self, exercise, actions):
+    def add_action_details_from_exercise(self, exercise, compound_actions):
 
-        for action in actions:
-            self.initialize_action_from_exercise(action, exercise)
+        for compound_action in compound_actions:
+            # compound_action_force_ratio = self.get_force_level(compound_action.speed, compound_action.resistance)
+            self.initialize_compound_action_from_exercise(compound_action, exercise)
 
-        self.set_action_explosiveness_from_exercise(exercise, actions)
+        # self.set_action_explosiveness_from_exercise(exercise, actions)
 
-        for action in actions:
+        for compound_action in compound_actions:
             # theory: these are irrelevant
-            action.training_intensity = exercise.training_intensity
-            action.set_external_weight_distribution()
-            action.set_body_weight_distribution()
+            # compound_action.training_intensity = exercise.training_intensity
+            # action.set_external_weight_distribution()
+            # action.set_body_weight_distribution()
             # theory: only this is relevant
-            action.set_training_load(exercise.total_volume)
+            # compound_action_force_ratio = self.get_force_level(compound_action.speed, compound_action.resistance)
+
+            compound_action.set_training_load(exercise.total_volume)
 
         # for action_id in movement.secondary_actions:
         #     action_json = action_library.get(action_id)
@@ -296,7 +319,30 @@ class WorkoutProcessor(object):
         #     action.set_body_weight_distribution()
         #     action.set_training_load(total_volume)
 
+    @staticmethod
+    def get_force_level(speed, resistance):
+        explosiveness_dict = {
+            'none': {'none': 'no_force', 'slow': 'no_force', 'mod': 'no_force', 'fast': 'high_force', 'explosive': 'high_force'},
+            'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
+            'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+            'high': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
+            'max': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
+        }
+        force_level_dict = {
+            "no_force": .5,
+            "low_force": .6,
+            "mod_force": .75,
+            "high_force": .9,
+            "max_force": 1
+        }
+        # if speed is not None and speed != "" and resistance is not None and resistance != "":
+        resistance_dict = explosiveness_dict.get(resistance.name)
+        if resistance_dict is not None:
+            explosiveness = resistance_dict.get(speed.name)
+            return force_level_dict[explosiveness]
+
     def initialize_action_from_exercise(self, action, exercise):
+        compound_action_force_ratio = self.get_force_level(action.speed, action.resistance)
 
         action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
@@ -311,7 +357,7 @@ class WorkoutProcessor(object):
         #action.bilateral = exercise.bilateral
         action.cardio_action = exercise.cardio_action
         # copy other variables
-        action.power = exercise.power  # power for rowing/other cardio in watts
+        action.power = exercise.power # power for rowing/other cardio in watts
         action.force = exercise.force
         # action.grade = exercise.grade  # for biking/running
         #
@@ -321,6 +367,29 @@ class WorkoutProcessor(object):
         # copy over duration and distance from exercise to action
         # action.duration = exercise.duration
         # action.distance = exercise.distance
+
+    def initialize_compound_action_from_exercise(self, compound_action, exercise):
+        # determne percentage of power to be distributed to each compound action
+        if len(exercise.primary_actions) <= 1:
+            compound_action_force_ratio = 1.0
+        else:
+            compound_action_force_ratio = self.get_force_level(compound_action.speed, compound_action.resistance)
+        power = exercise.power.plagiarize()
+        power.multiply(compound_action_force_ratio)
+        force = exercise.force.plagiarize()
+        force.multiply(compound_action_force_ratio)
+
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                sub_action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
+
+                sub_action.training_type = exercise.training_type
+                sub_action.adaptation_type = exercise.adaptation_type
+
+                sub_action.lower_body_stability_rating = self.calculate_lower_body_stability_rating(exercise, sub_action)
+                sub_action.upper_body_stability_rating = self.calculate_upper_body_stability_rating(exercise, sub_action)
+                sub_action.side = exercise.side
+                sub_action.cardio_action = exercise.cardio_action
 
     def set_force_power_weighted(self, exercise):
         if exercise.weight_measure == WeightMeasure.actual_weight:
@@ -427,6 +496,14 @@ class WorkoutProcessor(object):
             #total_volume = exercise.reps
             if exercise.duration is not None:
                 total_volume = exercise.duration
+            elif exercise.distance is not None:
+                if exercise.distance.min_value is not None:
+                    total_volume.min_value = self.convert_reps_to_duration(exercise.distance.min_value , UnitOfMeasure.meters, exercise.cardio_action)
+                if exercise.distance.assigned_value is not None:
+                    total_volume.assigned_value = self.convert_reps_to_duration(exercise.distance.assigned_value , UnitOfMeasure.meters, exercise.cardio_action)
+                if exercise.distance.max_value is not None:
+                    total_volume.max_value = self.convert_reps_to_duration(exercise.distance.max_value , UnitOfMeasure.meters, exercise.cardio_action)
+                exercise.duration = total_volume.plagiarize()
             elif exercise.reps_per_set is not None:
                 total_volume.assigned_value = self.convert_reps_to_duration(exercise.reps_per_set, exercise.unit_of_measure, exercise.cardio_action)
             else:
@@ -796,16 +873,18 @@ class WorkoutProcessor(object):
             "third_prime_movers": set(),
             "fourth_prime_movers": set()
             }
-        for action in exercise.primary_actions:
-            if action.primary_muscle_action.name in ['concentric', 'isometric']:
-                self.get_prime_movers_from_joint_actions(action.hip_joint_action, prime_movers)
-                self.get_prime_movers_from_joint_actions(action.knee_joint_action, prime_movers)
-                self.get_prime_movers_from_joint_actions(action.ankle_joint_action, prime_movers)
-                self.get_prime_movers_from_joint_actions(action.pelvic_tilt_joint_action, prime_movers)
-                self.get_prime_movers_from_joint_actions(action.trunk_joint_action, prime_movers)
-                self.get_prime_movers_from_joint_actions(action.shoulder_scapula_joint_action, prime_movers)
-                self.get_prime_movers_from_joint_actions(action.elbow_joint_action, prime_movers)
-                self.get_prime_movers_from_joint_actions(action.wrist_joint_action, prime_movers)
+        for compound_action in exercise.primary_actions:
+            for action in compound_action.actions:
+                for sub_action in action.sub_actions:
+                    if sub_action.muscle_action.name in ['concentric', 'isometric']:
+                        self.get_prime_movers_from_joint_actions(sub_action.hip_joint_action, prime_movers)
+                        self.get_prime_movers_from_joint_actions(sub_action.knee_joint_action, prime_movers)
+                        self.get_prime_movers_from_joint_actions(sub_action.ankle_joint_action, prime_movers)
+                        self.get_prime_movers_from_joint_actions(sub_action.pelvic_tilt_joint_action, prime_movers)
+                        self.get_prime_movers_from_joint_actions(sub_action.trunk_joint_action, prime_movers)
+                        self.get_prime_movers_from_joint_actions(sub_action.shoulder_scapula_joint_action, prime_movers)
+                        self.get_prime_movers_from_joint_actions(sub_action.elbow_joint_action, prime_movers)
+                        self.get_prime_movers_from_joint_actions(sub_action.wrist_joint_action, prime_movers)
 
         if len(exercise.equipments) > 0:
             equipment = exercise.equipments[0]
@@ -832,9 +911,23 @@ class WorkoutProcessor(object):
         if workout_exercise.reps_per_set is not None:
             reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
         elif workout_exercise.duration is not None:
-            reps.lower_bound = workout_exercise.duration / workout_exercise.duration_per_rep.upper_bound
-            reps.upper_bound = workout_exercise.duration / workout_exercise.duration_per_rep.lower_bound
-            reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
+            if isinstance(workout_exercise.duration, Assignment):
+                possible_reps = []
+                durations = [workout_exercise.duration.min_value, workout_exercise.duration.max_value, workout_exercise.duration.assigned_value]
+                durations = [dur for dur in durations if dur is not None]
+                duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
+                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
+                for dur in durations:
+                    for dur_per_rep in duration_per_reps:
+                        possible_reps.append(dur / dur_per_rep)
+                if len(possible_reps) > 0:
+                    reps.lower_bound = min(possible_reps)
+                    reps.upper_bound = max(possible_reps)
+                    reps.observed_value = sum(possible_reps) / len(possible_reps)
+            else:
+                reps.lower_bound = workout_exercise.duration / workout_exercise.duration_per_rep.upper_bound
+                reps.upper_bound = workout_exercise.duration / workout_exercise.duration_per_rep.lower_bound
+                reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
 
         if workout_exercise.weight_measure == WeightMeasure.rep_max:
             if isinstance(workout_exercise.weight, Assignment):

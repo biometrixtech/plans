@@ -44,14 +44,15 @@ def get_session(date, workout, assignment_type='default', movement_option=None):
 
     return session
 
-# def test_1():
-#     all_workouts = get_workout()
-#     # planned_workout = get_workout()
-#     for planned_workout in all_workouts:
-#         # try:
-#             session = get_session(date=datetime.datetime.now(), workout=planned_workout)
-#             if session.power_load is None:
-#                 print(f"worknout has no load: {planned_workout.name}")
+def test_1():
+    all_workouts = get_workout()
+    # planned_workout = get_workout()
+    for planned_workout in all_workouts:
+        # if '15 at the Limit' in planned_workout.name:
+        # try:
+            session = get_session(date=datetime.datetime.now(), workout=planned_workout)
+            if session.power_load is None:
+                print(f"worknout has no load: {planned_workout.name}")
         # except Exception as e:
         #     print(f"processing failed: {planned_workout.name}")
         #     print(e)

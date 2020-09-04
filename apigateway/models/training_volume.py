@@ -381,7 +381,6 @@ class StandardErrorRange(Serialisable):
         else:
             self.observed_value = None
 
-
     def divide(self, factor):
         if self.lower_bound is not None:
             self.lower_bound = self.lower_bound / factor
@@ -474,7 +473,6 @@ class StandardErrorRange(Serialisable):
         # TODO: verify the assumption present in the following line: insufficient data trumps sufficient data
         if standard_error_range is not None:
             self.insufficient_data = min(self.insufficient_data, standard_error_range.insufficient_data)
-
 
     @classmethod
     def get_lower_observed_upper_list(cls, error_range_list):
@@ -662,7 +660,6 @@ class Assignment(object):
             if self.max_value < self.assigned_value:
                 self.min_value = self.max_value
                 self.max_value = None
-
 
     def lowest_value(self):
 
