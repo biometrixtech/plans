@@ -637,6 +637,31 @@ class Calculators(object):
         return power
 
     @classmethod
+    def speed_from_work_vo2_running(cls, work_vo2, grade=0.0):
+
+        min_speed = (work_vo2 - 3.5) / (0.17 + grade * 0.79)
+        speed = min_speed / float(60)
+
+        return speed
+
+    @classmethod
+    def speed_from_watts_running(cls, watts, user_weight, grade, efficiency=.21):
+
+        mets = cls.watts_to_mets(watts, user_weight, efficiency)
+        work_vo2 = mets * 3.5
+        speed = cls.speed_from_work_vo2_running(work_vo2, grade)
+
+        return speed
+
+    @classmethod
+    def speed_from_watts_rowing(cls, watts):
+
+        pace = (2.8 / watts) ** (1/float(3))
+        speed = 1 / pace
+
+        return speed
+
+    @classmethod
     def power_running(cls, speed, grade=None, user_weight=None):
         """
         running power based on speed, grade and users weight
@@ -661,8 +686,9 @@ class Calculators(object):
         :return:
         """
         pace = 1 / speed
-        power = 2.8 / pace ** 3
+        power = 2.8 / (pace ** 3)
         return power
+
 
     @classmethod
     def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_eccentric=None, time_concentric=None):

@@ -222,6 +222,18 @@ class WorkoutProcessor(object):
                 exercise.duration = exercise.distance / exercise.speed
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = exercise.duration * exercise.speed
+            elif exercise.speed is None and exercise.duration is None and exercise.distance is not None and exercise.power is not None:
+                # last ditch effort to get duration (and speed) from power and distance
+                if exercise.cardio_action is not None:
+                    if exercise.cardio_action == CardioAction.row:
+                        exercise.speed = Calculators.speed_from_watts_rowing(exercise.power.lowest_value())
+                        exercise.duration = exercise.speed * exercise.distance
+                    elif exercise.cardio_action == CardioAction.run:
+                        exercise.speed = Calculators.speed_from_watts_running(exercise.power.lowest_value(),
+                                                                              self.user_weight, exercise.grade,
+                                                                              efficiency=.21)
+                        exercise.duration = exercise.speed * exercise.distance
+
             exercise.predicted_rpe = StandardErrorRange()
             if exercise.end_of_workout_hr is not None:
                 exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
@@ -266,6 +278,33 @@ class WorkoutProcessor(object):
                 exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
             elif exercise.speed is not None and exercise.duration is not None and exercise.distance is None:
                 exercise.distance = Assignment.multiply_assignments(exercise.duration, exercise.speed)
+            elif exercise.speed is None and exercise.duration is None and exercise.distance is not None and exercise.power is not None:
+                # last ditch effort to get duration (and speed) from power and distance
+                if exercise.cardio_action is not None:
+                    if exercise.cardio_action == CardioAction.row:
+                        speed_min = Calculators.speed_from_watts_rowing(exercise.power.lowest_value())
+                        speed_max = Calculators.speed_from_watts_rowing(exercise.power.highest_value())
+                        speed_assigned = (speed_min + speed_max) / 2
+
+                        exercise.speed = Assignment(assignment_type=None, assigned_value=speed_assigned,
+                                                    min_value=speed_min, max_value=speed_max)
+
+                        exercise.duration = Assignment.multiply_assignments(exercise.distance, exercise.speed)
+                    elif exercise.cardio_action == CardioAction.run:
+                        speed_min = Calculators.speed_from_watts_running(exercise.power.lowest_value(),
+                                                                         self.user_weight, exercise.grade,
+                                                                         efficiency=.21)
+
+                        speed_max = Calculators.speed_from_watts_running(exercise.power.highest_value(),
+                                                                         self.user_weight, exercise.grade,
+                                                                         efficiency=.21)
+
+                        speed_assigned = (speed_min + speed_max) / 2
+
+                        exercise.speed = Assignment(assignment_type=None, assigned_value=speed_assigned,
+                                                    min_value=speed_min, max_value=speed_max)
+
+                        exercise.duration = Assignment.multiply_assignments(exercise.distance, exercise.speed)
 
             self.set_planned_cardio_rpe(exercise)
         else:

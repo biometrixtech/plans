@@ -341,3 +341,12 @@ def test_vo2_max_from_rpe_0():
     assert None is vo2_max.lower_bound
     assert None is vo2_max.upper_bound
 
+
+def test_speed_from_watts_rowing():
+    speed = Calculators.speed_from_watts_rowing(60)
+    assert 3 == round(speed, 0)
+
+
+def test_speed_from_watts_running():
+    speed = Calculators.speed_from_watts_running(watts=60, user_weight=70, grade=0.0)
+    assert 1.0 == round(speed, 0)
