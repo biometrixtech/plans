@@ -128,6 +128,13 @@ class SubActionLibraryParser(object):
                 if action.id is not None:
                     compound_action.actions.append(action)
                 action = ExerciseAction(row['id'], "")
+                if self.is_valid(row, 'resistance', False):
+                    action.resistance = MovementResistance[row['resistance']]
+
+                if self.is_valid(row, 'speed', False):
+                    if row['speed'] == 'no_speed':  # TODO this needs to be fixed in spreadsheet
+                        row['speed'] = 'none'
+                    action.speed = self.get_speed(row['speed'])
 
             if self.is_valid(row, 'sub_action_id'):
                 sub_action_id = row['sub_action_id']
@@ -214,7 +221,7 @@ class SubActionLibraryParser(object):
                         new_subaction.lateral_distribution = sub_action.lateral_distribution
 
                     # items unique to sub actions
-                    new_subaction.muscle_action = sub_action.muscle_action
+                    new_subaction.primary_muscle_action = sub_action.primary_muscle_action
 
                     # New
                     new_subaction.movement_systems = sub_action.movement_systems
@@ -236,6 +243,10 @@ class SubActionLibraryParser(object):
                     print("ERROR: SUBACTION NOT FOUND")
 
         if action.id is not None:
+            if action.speed is None:
+                action.speed = compound_action.speed
+            if action.resistance is None:
+                action.resistance = compound_action.resistance
             compound_action.actions.append(action)
 
         return compound_action
@@ -252,7 +263,7 @@ class SubActionLibraryParser(object):
                 action = deepcopy(last_sub_action)
 
             if self.is_valid(row, 'muscle_action'):
-                action.muscle_action = MuscleAction[row['muscle_action']]
+                action.primary_muscle_action = MuscleAction[row['muscle_action']]
 
             # New
             if self.is_valid(row, 'movement_system'):

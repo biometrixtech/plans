@@ -1,7 +1,7 @@
 from models.workout_program import WorkoutExercise
 from models.movement_tags import Equipment, WeightDistribution, TrainingType, CardioAction
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.movement_actions import ExerciseAction
+from models.movement_actions import ExerciseAction, ExerciseSubAction, CompoundAction
 from logic.workout_processing import WorkoutProcessor
 
 
@@ -26,24 +26,28 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
 def get_action(action_id, name, exercise,  perc_bodyweight=0,
                weight_dist=WeightDistribution.bilateral, lateral_distribution=(50, 50), cardio_action=None):
 
-    action = ExerciseAction(action_id, name)
-    action.percent_bodyweight = perc_bodyweight
-    action.lateral_distribution = lateral_distribution
-    action.apply_resistance = True
-    action.eligible_external_resistance = [Equipment.barbells, Equipment.dumbbells]
-    action.lateral_distribution_pattern = weight_dist
-    action.cardio_action = cardio_action
+    sub_action = ExerciseSubAction(action_id, name)
+    sub_action.percent_bodyweight = perc_bodyweight
+    sub_action.lateral_distribution = lateral_distribution
+    sub_action.apply_resistance = True
+    sub_action.eligible_external_resistance = [Equipment.barbells, Equipment.dumbbells]
+    sub_action.lateral_distribution_pattern = weight_dist
+    sub_action.cardio_action = cardio_action
     if cardio_action is not None:
         exercise.cardio_action = cardio_action
     exercise = WorkoutProcessor().update_exercise_details(exercise)
-    WorkoutProcessor().add_action_details_from_exercise(exercise, [action])
+    action = ExerciseAction('test', 'test')
+    action.sub_actions = [sub_action]
+    compound_action = CompoundAction('test', 'test')
+    compound_action.actions = [action]
+    WorkoutProcessor().add_action_details_from_exercise(exercise, [compound_action])
     # WorkoutProcessor().initialize_action_from_exercise(action, exercise)
     # WorkoutProcessor().set_action_explosiveness_from_exercise(exercise, [action])
     # action.training_intensity = exercise.training_intensity
     # action.set_external_weight_distribution()
     # action.set_body_weight_distribution()
     # action.set_training_load()
-    return action
+    return sub_action
 
 
 def test_external_intensity_barbell():

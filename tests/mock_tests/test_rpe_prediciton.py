@@ -4,6 +4,7 @@ from logic.workout_processing import WorkoutProcessor
 from models.workout_program import WorkoutExercise
 from models.movement_tags import AdaptationType, Equipment
 from models.exercise import WeightMeasure
+from models.training_volume import Assignment
 
 
 def get_exercise(movement_id='57e2fd3a4c6a031dc777e936'):
@@ -61,9 +62,12 @@ def test_bodyweight_ratio_rpe_range_of_reps():
     exercise.equipments = [Equipment.dumbbells]
     exercise.weight_measure = WeightMeasure.actual_weight
     exercise.weight = 10
+    prev_rpe = 0
     for reps in range(25):
         exercise.reps_per_set = reps
-        print(reps, WorkoutProcessor().get_rpe_from_weight(exercise).observed_value)
+        rpe = WorkoutProcessor().get_rpe_from_weight(exercise).observed_value
+        assert rpe >= prev_rpe
+        prev_rpe = rpe
 
 
 def test_get_rpe_from_weight_percent_rep_max():
@@ -72,10 +76,26 @@ def test_get_rpe_from_weight_percent_rep_max():
     exercise.equipments = [Equipment.dumbbells]
     exercise.weight_measure = WeightMeasure.percent_rep_max
     exercise.weight = 67
+    prev_rpe = 0
     for reps in range(25):
         exercise.reps_per_set = reps
-        print(reps, WorkoutProcessor().get_rpe_from_weight(exercise).observed_value)
+        rpe = WorkoutProcessor().get_rpe_from_weight(exercise).observed_value
+        assert rpe >= prev_rpe
+        prev_rpe = rpe
 
+
+def test_get_rpe_from_weight_percent_rep_max_assignment():
+    exercise = get_exercise()
+    exercise.adaptation_type = AdaptationType.strength_endurance_strength
+    exercise.equipments = [Equipment.dumbbells]
+    exercise.weight_measure = WeightMeasure.percent_rep_max
+    exercise.weight = Assignment(min_value=40, max_value=60)
+    prev_rpe = 0
+    for reps in range(25):
+        exercise.reps_per_set = reps
+        rpe = WorkoutProcessor().get_rpe_from_weight(exercise).observed_value
+        assert rpe >= prev_rpe
+        prev_rpe = rpe
 
 
 def test_get_rpe_from_weight_rep_max():
@@ -83,7 +103,10 @@ def test_get_rpe_from_weight_rep_max():
     exercise.adaptation_type = AdaptationType.strength_endurance_strength
     exercise.equipments = [Equipment.dumbbells]
     exercise.weight_measure = WeightMeasure.rep_max
-    exercise.weight = 10
+    exercise.weight = Assignment(assigned_value=10)
+    prev_rpe = 0
     for reps in range(25):
         exercise.reps_per_set = reps
-        print(reps, WorkoutProcessor().get_rpe_from_weight(exercise).observed_value)
+        rpe = WorkoutProcessor().get_rpe_from_weight(exercise).observed_value
+        assert rpe >= prev_rpe
+        prev_rpe = rpe

@@ -18,9 +18,9 @@ class ActionLibraryDatastore(object):
             file_name = 'actions_library.json'
         try:
             script_dir = os.path.dirname(__file__)
-            # file_path = os.path.join(script_dir, '../models', file_name)
-
-            file_path = os.path.join(script_dir, '../fml', file_name)
+            file_path = os.path.join(script_dir, '../models', file_name)
+            #
+            # file_path = os.path.join(script_dir, '../fml', file_name)
             with open(file_path, 'r') as f:
                 all_actions = json.load(f)
             for action_id, action_dict in all_actions.items():
