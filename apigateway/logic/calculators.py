@@ -1,6 +1,7 @@
 import math
 from models.training_volume import StandardErrorRange, Assignment
 from models.movement_tags import Gender, RunningDistances
+from time import gmtime
 
 
 cardio_mets_table = {
@@ -74,6 +75,33 @@ class Calculators(object):
             return 80467.2
         else:
             return 0
+
+    @classmethod
+    def get_running_speed_from_known_time(cls, known_distance, known_time, running_pace_distance):
+
+        current_race_times = cls.get_mcmillan_race_time_tuples()
+
+        for c in range(0, len(current_race_times)):
+            if current_race_times[c][0] == running_pace_distance:
+                target_sec_pace = current_race_times[c][1] / current_race_times[c][1]
+            elif 0 < c < (len(current_race_times) - 1):
+                if current_race_times[c] < running_pace_distance < current_race_times[c + 1]:
+                    less_distance = current_race_times[c][0]
+                    less_time = current_race_times[c][1]
+                    more_distance = current_race_times[c + 1][0]
+                    more_time = current_race_times[c + 1][1]
+
+                    more_distance_diff = more_distance - running_pace_distance
+                    full_distance_diff = more_distance - less_distance
+                    diff_ratio = more_distance_diff / full_distance_diff
+
+                    more_pace = more_time / more_distance
+                    target_sec_pace = more_pace * diff_ratio
+
+
+
+        #known_meters = cls.get_running_distance_from_type(known_distance_type)
+        #known_pace = known_time / known_meters
 
 
     @classmethod
@@ -167,6 +195,23 @@ class Calculators(object):
             vo2_max_range = StandardErrorRange()
 
         return vo2_max_range
+
+    @classmethod
+    def get_mcmillan_race_time_tuples(cls):
+        race_times = list()
+        race_times.append((100, 29.30))
+        race_times.append((200, 58.70))
+        race_times.append((400, 2 * 60 + 2.70))
+        race_times.append((500, 2 * 60 + 40.00))
+        race_times.append((600, 3 * 60 + 16.50))
+        race_times.append((800, 4 * 60 + 29.30))
+        race_times.append((1000, 5 * 60 + 54.10))
+        race_times.append((1500, 9 * 60 + 55))
+        race_times.append((1600, 9 * 60 + 59))
+        race_times.append((1609.34, 60 * 10)) #1 mile
+        race_times.append((2000, 212 * 60 + 41))
+
+        return race_times
 
     @classmethod
     def get_acsm_rpe_vo2_max_lookup(cls):
