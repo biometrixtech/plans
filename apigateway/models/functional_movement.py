@@ -2,7 +2,7 @@ from enum import Enum
 from collections import namedtuple
 
 from models.compensation_source import CompensationSource
-from models.soreness_base import BodyPartSide
+from models.soreness_base import BodyPartSide, BodyPartSystems
 from models.body_parts import BodyPartFactory
 from models.training_volume import StandardErrorRange
 from datetime import timedelta
@@ -292,6 +292,7 @@ class FunctionalMovementActionMapping(object):
         self.shoulder_scapula_joint_functional_movements = []
         self.elbow_joint_functional_movements = []
         self.wrist_joint_functional_movements = []
+        self.movement_system_functional_movements = []
         self.muscle_load = {}
         self.functional_movement_dict = functional_movement_dict
         #self.injury_risk_dict = injury_risk_dict
@@ -360,6 +361,33 @@ class FunctionalMovementActionMapping(object):
             self.shoulder_scapula_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
             self.elbow_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.elbow_joint_action)
             self.wrist_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.wrist_joint_action)
+            self.movement_system_functional_movements = self.get_functional_movements_for_movement_system(self.exercise_action.movement_systems)
+
+    def get_functional_movements_for_movement_system(self, movement_system_list):
+        pairs = FunctionalMovementPairs()
+
+        functional_movement_list = []
+
+        for movement_system in movement_system_list:
+
+            # functional_movement_type = pairs.get_functional_movement_for_muscle_action(
+            #     self.exercise_action.primary_muscle_action, movement_system.movement_system_type)
+
+            # functional_movement = self.functional_movement_dict[functional_movement_type.value]
+            prime_movers = BodyPartSystems().get_movemement_system(movement_system.movement_system_name)
+
+            if prime_movers is not None:
+                prime_movers = [bp.value for bp in prime_movers]
+                prime_movers = self.convert_enums_to_body_part_side_list(prime_movers)
+                functional_movement = FunctionalMovement(FunctionalMovementType.movement_system)
+                functional_movement.priority = movement_system.priority
+                functional_movement.prime_movers = prime_movers
+
+                functional_movement_load = FunctionalMovementLoad(functional_movement, self.exercise_action.primary_muscle_action)
+
+                functional_movement_list.append(functional_movement_load)
+
+        return functional_movement_list
 
     def get_functional_movements_for_joint_action(self, target_joint_action_list):
 
@@ -431,6 +459,7 @@ class FunctionalMovementActionMapping(object):
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.wrist_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.movement_system_functional_movements, self.exercise_action, left_load, right_load)
 
 
     def get_matching_stability_rating(self, functional_movement_load, exercise_action):

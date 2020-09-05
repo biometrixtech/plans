@@ -44,3 +44,4 @@ class FunctionalMovementType(Enum):
     ankle_plantar_flexion_and_inversion = 39
     wrist_flexion = 40
     wrist_extension = 41
+    movement_system = 101
