@@ -280,6 +280,7 @@ class ExerciseSubAction(object):
         action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
         action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get(
             'resistance') is not None else None
+        action.movement_systems = [PrioritizedMovementSystem.json_deserialise(ms) for ms in input_dict.get('movement_systems', [])]
 
         action.primary_muscle_action = MuscleAction(input_dict['primary_muscle_action']) if input_dict.get('primary_muscle_action') is not None else None
         action.hip_joint_rating = None
