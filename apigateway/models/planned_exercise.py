@@ -15,9 +15,11 @@ class PlannedWorkout(object):
         self.program_module_id = None
         self.event_date = None  # date for which this is planned
         self.duration = None
+        self.distance = None
         self.rpe = None
         self.rest_between_exercises = None
         self.sections = []
+        self.workout_type = None
 
     def json_serialise(self):
         ret = {
@@ -26,9 +28,11 @@ class PlannedWorkout(object):
             'program_id': self.program_id,
             'program_module_id': self.program_module_id,
             'duration': self.duration,
+            'distance': self.distance,
             'rpe': self.rpe.json_serialise() if self.rpe is not None else None,
             'rest_between_exercises': self.rest_between_exercises.json_serialise() if self.rest_between_exercises is not None else None,
-            'sections': [s.json_serialise() for s in self.sections]
+            'sections': [s.json_serialise() for s in self.sections],
+            'workout_type': self.workout_type if self.workout_type is not None else None
         }
         return ret
 
@@ -40,9 +44,11 @@ class PlannedWorkout(object):
         workout.program_id = input_dict.get('program_id')
         workout.program_module_id = input_dict.get('program_module_id')
         workout.duration = input_dict.get('duration')
+        workout.distance = input_dict.get('distance')
         workout.rpe = Assignment.json_deserialise(input_dict['rpe']) if input_dict.get('rpe') is not None else None
         workout.rest_between_exercises = Assignment.json_deserialise(input_dict['rest_between_exercises']) if input_dict.get('rest_between_exercises') is not None else None
         workout.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('sections', [])]
+        workout.workout_type = input_dict.get('workout_type')
 
         return workout
 
