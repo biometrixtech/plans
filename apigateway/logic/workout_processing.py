@@ -115,7 +115,9 @@ class WorkoutProcessor(object):
     def set_session_intensity_metrics(self, session, workout_exercise):
         # update high intensity metrics
         if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and workout_exercise.predicted_rpe is not None:
-            if workout_exercise.predicted_rpe.lowest_value() >= 7.65:
+            if workout_exercise.predicted_rpe.lowest_value() is None:
+                pass
+            elif workout_exercise.predicted_rpe.lowest_value() >= 7.65:
                 if isinstance(workout_exercise.duration, Assignment):
                     high_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
                     high_intensity_minutes = high_intensity_minutes_assignment.lowest_value()

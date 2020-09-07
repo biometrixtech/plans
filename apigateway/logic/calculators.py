@@ -795,6 +795,13 @@ class Calculators(object):
     @classmethod
     def speed_from_watts_running(cls, watts, user_weight, grade, efficiency=.21):
 
+        if isinstance(grade, Assignment):
+            if grade.assigned_value is not None:
+                grade = grade.assigned_value
+            elif grade.min_value is not None and grade.max_value is not None:
+                grade = (grade.min_value + grade.max_value) / 2
+            else:
+                grade = 0.0
         mets = cls.watts_to_mets(watts, user_weight, efficiency)
         work_vo2 = mets * 3.5
         speed = cls.speed_from_work_vo2_running(work_vo2, grade)
@@ -1014,6 +1021,9 @@ class Calculators(object):
         weight = weight or 60
 
         vo2_max_range = cls.percent_vo2_max_from_rpe_range(rpe_range)
+        # this happens for "none: intensity where rpe=0
+        if vo2_max_range.lower_bound is None and vo2_max_range.observed_value is None and vo2_max_range.upper_bound is None:
+            return StandardErrorRange()
         if vo2_max is not None:
             work_vo2_list = [
                 (vo2_max_range.lower_bound / 100) * vo2_max.lower_bound,

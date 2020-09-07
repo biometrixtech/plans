@@ -24,8 +24,11 @@ class WorkoutParser(object):
         self.intensity_measures_pace = {
             'none': 'none',
             'recovery jogs': 'recovery_jog',
+            'recovery jog': 'recovery_jog',
             'long run': 'long_run',
             'comfortable run': 'comfortable_run',
+            'steady state': 'steady_state',
+            'tempo run': 'tempo_run',
             'easy run': 'easy_run',
             'warm up': 'warm_up',
             'cooldown': 'cooldown',
@@ -171,23 +174,24 @@ class WorkoutParser(object):
         # if workout_type is not None:
         intensity_measure = row.get('intensity_measure_units')
         ex.name = row['description'].strip().lower()
+        ex.movement_id = row['description'].strip().lower()
         if self.is_valid(intensity_measure):
             if intensity_measure.lower().strip() == 'pace':
                 intensity = row.get('intensity_measure')
                 if self.is_valid(intensity):
                     intensity = ('_').join(intensity.lower().split(' '))
-                    ex.name = self.pace_exercise_lookup.get(intensity)
+                    ex.movement_id = self.pace_exercise_lookup.get(intensity)
                 else:
                     intensity = row.get('max_intensity_measure')
                     if self.is_valid(intensity):
                         intensity = ('_').join(intensity.lower().split(' '))
-                        ex.name = self.pace_exercise_lookup.get(intensity)
+                        ex.movement_id = self.pace_exercise_lookup.get(intensity)
 
             elif intensity_measure.lower() == 'rpe':
-                ex.name = 'run'
+                ex.movement_id = 'run'
         # else:
         #     ex.name = row['description'].strip().lower()
-        ex.movement_id = ex.name
+        # ex.movement_id = ex.name
 
         observed_duration = None
         max_duration = None
@@ -244,19 +248,39 @@ class WorkoutParser(object):
 
         intensity_measure_unit = row.get('intensity_measure_units')
         if self.is_valid(intensity_measure_unit):
-            if intensity_measure_unit == 'RPE':
+            if intensity_measure_unit.lower() == 'rpe':
                 min_rpe = row.get('intensity_measure')
                 max_rpe = row.get('max_intensity_measure')
                 if self.is_valid(min_rpe):
                     min_rpe = int(min_rpe) if min_rpe is not None else None
+                else:
+                    min_rpe = None
                 if self.is_valid(max_rpe):
                     max_rpe = int(max_rpe) if min_rpe is not None else None
+                else:
+                    max_rpe = None
                 if min_rpe is not None and max_rpe is not None:
                     ex.rpe = StandardErrorRange(lower_bound=min_rpe, upper_bound=max_rpe)
                 elif min_rpe is not None and max_rpe is None:
                     ex.rpe = StandardErrorRange(observed_value=min_rpe)
                 elif min_rpe is None and max_rpe is not None:
                     ex.rpe = StandardErrorRange(observed_value=max_rpe)
+                if ex.rpe is not None:
+                    rpe_for_id = 1
+                    if ex.rpe.observed_value is not None:
+                        rpe_for_id = ex.rpe.observed_value
+                    elif ex.rpe.lower_bound is not None and ex.rpe.upper_bound is not None:
+                        rpe_for_id = (ex.rpe.lower_bound + ex.rpe.upper_bound) / 2
+                    if rpe_for_id <= 3:
+                        ex.movement_id = 'jog'
+                    elif rpe_for_id <= 5:
+                        ex.movement_id = 'run'
+                    elif rpe_for_id <= 8:
+                        ex.movement_id = 'cruising'
+                    else:
+                        ex.movement_id = 'sprint'
+
+
             elif intensity_measure_unit.lower() == 'pace':
                 min_rpe_tuple = None
                 max_rpe_tuple = None
@@ -264,7 +288,7 @@ class WorkoutParser(object):
                 max_rpe = StandardErrorRange()
                 ex.rpe = StandardErrorRange()
 
-                min_measure = row.get('intensity_measure')
+                min_measure = row.get('intensity_measure').lower()
                 if min_measure is not None:
                     if min_measure.lower() in self.intensity_measures_pace:
                         min_pace_value = self.intensity_measures_pace[min_measure.lower()]
@@ -365,7 +389,7 @@ def read_json(file_name):
 def validate_exercises(workout, library_exercise_names):
     for section in workout.sections:
         for exercise in section.exercises:
-            ex_name = exercise.name
+            ex_name = exercise.movement_id
             if ex_name not in ['rest', 'recover', 'warm up']:
                 if ex_name not in library_exercise_names:
                     print(f"missing exercise: {exercise.name}, {section.name}")
@@ -438,11 +462,11 @@ if __name__ == '__main__':
         if 'DS_Store' not in dir:
             files = os.listdir(f"NRC_workouts/{dir}")
             for file in files:
-                if '8K' not in file:
-                    continue
+                # if 'The Roller' not in file:
+                #     continue
                 if 'DS_Store' not in file and 'included in this' not in file and 'Workouts in this' not in file:
                     try:
-                        workout = WorkoutParser().load_data(f"NRC_workouts/{dir}/{file}", write=False)
+                        workout = WorkoutParser().load_data(f"NRC_workouts/{dir}/{file}", write=True)
                         validate_exercises(workout, exercise_names)
                         workout_json = workout.json_serialise()
                         workout_2 = PlannedWorkout.json_deserialise(workout_json)
