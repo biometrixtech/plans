@@ -161,15 +161,18 @@ class ExerciseSubAction(object):
         self.bilateral = True
         self.side = 0  # both
         # new variables for tissue intensity
-        self.duration = None  # seconds
-        self.distance = None  # meters
-        self.pace = None  # in seconds/meter
-        self.speed = None  # meters/second
+        # self.duration = None  # seconds
+        # self.distance = None  # meters
+        # self.pace = None  # in seconds/meter
+        # self.speed = None  # meters/second
         self.power = None  # watts
         self.force = None  # newtons
-        self.grade = None  # percentage (decimal)
-        self.rep_tempo = None
-        self.force = None
+        # self.grade = None  # percentage (decimal)
+        # self.rep_tempo = None
+        # self.force = None
+
+        self.speed = None
+        self.resistance = None
 
         # derived
         self.adaptation_type = None
@@ -212,6 +215,7 @@ class ExerciseSubAction(object):
             "apply_resistance": self.apply_resistance,
             "apply_instability": self.apply_instability,
             'speed': self.speed.value if self.speed is not None else None,
+            'resistance': self.resistance.value if self.resistance is not None else None,
 
             "primary_muscle_action": self.primary_muscle_action.value if self.primary_muscle_action is not None else None,
             "hip_joint_action": [ac.json_serialise() for ac in self.hip_joint_action],
