@@ -147,8 +147,14 @@ class WorkoutProcessor(object):
             for compound_action_id in movement.compound_actions:
                 action_json = action_library.get(compound_action_id)
                 if action_json is not None:
-                    action = CompoundAction.json_deserialise(action_json)
-                    exercise.primary_actions.append(action)
+                    compound_action = CompoundAction.json_deserialise(action_json)
+                    if exercise.bilateral_distribution_of_resistance is not None:
+                        for action in compound_action.actions:
+                            action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                            for sub_action in action.sub_actions:
+                                sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                    exercise.compound_actions.append(compound_action)
+                    # exercise.primary_actions.append(action)
 
 
             # for action_id in movement.primary_actions:
@@ -164,9 +170,10 @@ class WorkoutProcessor(object):
             #         exercise.secondary_actions.append(action)
 
             exercise = self.update_exercise_details(exercise)
+            self.add_action_details_from_exercise(exercise, exercise.compound_actions)
 
-            self.add_action_details_from_exercise(exercise, exercise.primary_actions)
-            self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.primary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
 
@@ -188,7 +195,8 @@ class WorkoutProcessor(object):
                             action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
                             for sub_action in action.sub_actions:
                                 sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
-                    exercise.primary_actions.append(compound_action)
+                    exercise.compound_actions.append(compound_action)
+                    # exercise.primary_actions.append(compound_action)
 
             # for action_id in movement.primary_actions:
             #     action_json = action_library.get(action_id)
@@ -202,9 +210,10 @@ class WorkoutProcessor(object):
             #         exercise.secondary_actions.append(action)
 
             exercise = self.update_planned_exercise_details(exercise, assignment_type)
+            self.add_action_details_from_exercise(exercise, exercise.compound_actions)
 
-            self.add_action_details_from_exercise(exercise, exercise.primary_actions)
-            self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.primary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
 
     def update_exercise_details(self, exercise):
 
@@ -425,10 +434,13 @@ class WorkoutProcessor(object):
             percent_bodyweight = 0
 
             bodyweight_count = 0
-            for action in exercise.primary_actions:
-                if isinstance(action.percent_bodyweight,int):
-                    percent_bodyweight += float(action.percent_bodyweight)
-                    bodyweight_count += 1
+            # for action in exercise.primary_actions:
+            for compound_action in exercise.compound_actions:
+                for action in compound_action.actions:
+                    for sub_action in action.sub_actions:
+                        if isinstance(sub_action.percent_bodyweight, int):
+                            percent_bodyweight += float(sub_action.percent_bodyweight)
+                            bodyweight_count += 1
 
             if bodyweight_count > 0:
                 percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
@@ -888,7 +900,7 @@ class WorkoutProcessor(object):
             "third_prime_movers": set(),
             "fourth_prime_movers": set()
             }
-        for compound_action in exercise.primary_actions:
+        for compound_action in exercise.compound_actions:
             for action in compound_action.actions:
                 for sub_action in action.sub_actions:
                     if sub_action.primary_muscle_action is not None and sub_action.primary_muscle_action.name in ['concentric', 'isometric']:

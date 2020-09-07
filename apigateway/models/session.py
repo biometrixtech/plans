@@ -657,11 +657,13 @@ class PlannedSession(Session):
             for section in self.workout_program_module.workout_sections:
                 if section.assess_load:
                     for exercise in section.exercises:
-                        for action in exercise.primary_actions:
-                            if action.training_type in [TrainingType.power_action_plyometrics,
-                                                        TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
-                                self.ultra_high_intensity = True
-                                return True
+                        for compound_action in exercise.compound_actions:
+                            for action in compound_action.actions:
+                                for sub_action in action.sub_actions:
+                                    if sub_action.training_type in [TrainingType.power_action_plyometrics,
+                                                                TrainingType.power_drills_plyometrics] or sub_action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                                        self.ultra_high_intensity = True
+                                        return True
         self.ultra_high_intensity = False
 
     def high_intensity_RPE(self):
@@ -719,7 +721,7 @@ class MixedActivitySession(Session):
             for section in self.workout_program_module.workout_sections:
                 if section.assess_load:
                     for exercise in section.exercises:
-                        for compound_action in exercise.primary_actions:
+                        for compound_action in exercise.compound_actions:
                             for action in compound_action.actions:
                                 for sub_action in action.sub_actions:
                                     if sub_action.training_type in [TrainingType.power_action_plyometrics,

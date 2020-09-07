@@ -1310,8 +1310,8 @@ class Movement(Serialisable):
     def __init__(self, id, name):
         self.id = id
         self.name = name
-        self.primary_actions = []
-        self.secondary_actions = []
+        # self.primary_actions = []
+        # self.secondary_actions = []
 
         self.surface_stability = None
         self.external_weight_implement = []
@@ -1349,8 +1349,8 @@ class Movement(Serialisable):
             'displacement': self.displacement.value if self.displacement is not None else None,
             'rep_tempo': self.rep_tempo,
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
-            'primary_actions': self.primary_actions,
-            'secondary_actions': self.secondary_actions,
+            # 'primary_actions': self.primary_actions,
+            # 'secondary_actions': self.secondary_actions,
             'explosiveness_rating': self.explosiveness_rating,
             #new
             'compound_actions': self.compound_actions,
@@ -1382,8 +1382,8 @@ class Movement(Serialisable):
         movement.rep_tempo = input_dict.get('rep_tempo')
         movement.set_explosiveness_rating()
         movement.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
-        movement.primary_actions = input_dict.get('primary_actions', [])
-        movement.secondary_actions = input_dict.get('secondary_actions', [])
+        # movement.primary_actions = input_dict.get('primary_actions', [])
+        # movement.secondary_actions = input_dict.get('secondary_actions', [])
         #new
         movement.compound_actions = input_dict.get('compound_actions', [])
         movement.bilateral_distribution_of_resistance = WeightDistribution(input_dict['bilateral_distribution_of_resistance']) if input_dict.get('bilateral_distribution_of_resistance') is not None else None

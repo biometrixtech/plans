@@ -1,7 +1,8 @@
 from utils import format_date, parse_date
 from models.movement_tags import CardioAction, Equipment
 from models.ranked_types import RankedBodyPart
-from models.workout_program import WorkoutSection, BaseWorkoutExercise, ExerciseAction
+from models.workout_program import WorkoutSection, BaseWorkoutExercise
+from models.movement_actions import CompoundAction
 from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
@@ -326,8 +327,9 @@ class PlannedExercise(BaseWorkoutExercise):
         exercise.total_volume = Assignment.json_deserialise(input_dict['total_volume']) if input_dict.get(
             'total_volume') is not None else None
 
-        exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
-        exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
+        exercise.compound_acitons = [CompoundAction.json_deserialise(action) for action in input_dict.get('compound_actions', [])]
+        # exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
+        # exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
 
         exercise.tissue_load = StandardErrorRange.json_deserialise(input_dict.get('tissue_load')) if input_dict.get('tissue_load') is not None else None
         exercise.force_load = StandardErrorRange.json_deserialise(input_dict.get('force_load')) if input_dict.get(

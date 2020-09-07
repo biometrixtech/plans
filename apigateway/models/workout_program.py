@@ -1,6 +1,6 @@
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability
-from models.movement_actions import ExerciseAction
+from models.movement_actions import CompoundAction
 from utils import format_datetime, parse_datetime
 from models.training_volume import StandardErrorRange
 from logic.calculators import Calculators
@@ -143,10 +143,14 @@ class CompletedWorkoutSection(WorkoutSection, Serialisable):
             self.shrz = None
             for exercise in self.exercises:
                 exercise.shrz = None
-                for action in exercise.primary_actions:
-                    action.shrz = None
-                for action in exercise.secondary_actions:
-                    action.shrz = None
+                for compound_action in exercise.compound_actions:
+                    for action in compound_action.actions:
+                        for sub_action in action.sub_actions:
+                            sub_action.shrz = None
+                # for action in exercise.primary_actions:
+                #     action.shrz = None
+                # for action in exercise.secondary_actions:
+                #     action.shrz = None
 
 
 class BaseWorkoutExercise(object):
@@ -176,8 +180,9 @@ class BaseWorkoutExercise(object):
         self.displacement = None
         self.movement_rep_tempo = None
 
-        self.primary_actions = []
-        self.secondary_actions = []
+        self.compound_actions = []
+        # self.primary_actions = []
+        # self.secondary_actions = []
 
         self.equipments = []  # TODO: do we get this from the api
 
@@ -385,8 +390,9 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise.calories = input_dict.get('calories')
         exercise.grade = input_dict.get('grade')
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
-        exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
-        exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
+        exercise.compound_actions = [CompoundAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
+        # exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
+        # exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
         exercise.shrz = input_dict.get('shrz')
         exercise.work_vo2 = StandardErrorRange.json_deserialise(input_dict.get('work_vo2')) if input_dict.get('work_vo2') is not None else None
         exercise.total_volume = input_dict.get('total_volume')
