@@ -208,3 +208,28 @@ class Gender(Enum):
     male = 1
 
 
+class RunningDistances(Enum):
+    m100 = 0
+    m200 = 1
+    m300 = 2
+    m400 = 3
+    m500 = 4
+    m600 = 5
+    m800 = 6
+    m1000 = 7
+    m1200 = 8
+    m1600 = 9
+    m4000 = 10
+    mile3 = 11
+    k5 = 12
+    mile5 = 12
+    k10 = 14
+    k12 = 15
+    marathon_half = 16
+    mile15 = 17
+    k25 = 18
+    marathon = 19
+    k50 = 20
+    mile50 = 21
+
+

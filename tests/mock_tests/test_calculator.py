@@ -1,5 +1,6 @@
 from logic.calculators import Calculators
 from models.movement_tags import Gender, CardioAction
+from models.training_volume import StandardErrorRange
 
 
 def test_percent_max_hr_from_rpe():
@@ -276,29 +277,31 @@ def test_get_mets_from_rpe_acsm():
 
 
 def test_get_power_from_rpe():
-    last = 0
+    last = StandardErrorRange(observed_value=0)
     for rpe in range(1, 11):
-        power = Calculators.get_power_from_rpe(rpe, age=20, weight=70)
-        assert power > last
+        rpe_range = StandardErrorRange(observed_value=rpe)
+        power = Calculators.get_power_from_rpe(rpe_range, weight=70, vo2_max=StandardErrorRange(lower_bound=45, upper_bound=55))
+        assert power.lowest_value() >= last.lowest_value() and power.highest_value() > last.highest_value()
         last = power
-
-
-def test_get_power_from_rpe_diff_age():
-    for rpe in range(1, 11):
-        power1 = Calculators.get_power_from_rpe(rpe, age=20, weight=70)
-        power2 = Calculators.get_power_from_rpe(rpe, age=50, weight=70)
-        power3 = Calculators.get_power_from_rpe(rpe, age=70, weight=70)
-        power4 = Calculators.get_power_from_rpe(rpe, age=90, weight=70)
-        assert power1 > power2 > power3 > power4
 
 
 def test_get_power_from_rpe_diff_weight():
     for rpe in range(1, 11):
-        power1 = Calculators.get_power_from_rpe(rpe, age=20, weight=50)
-        power2 = Calculators.get_power_from_rpe(rpe, age=20, weight=60)
-        power3 = Calculators.get_power_from_rpe(rpe, age=20, weight=70)
-        power4 = Calculators.get_power_from_rpe(rpe, age=20, weight=80)
-        assert power1 < power2 < power3 < power4
+        rpe_range = StandardErrorRange(observed_value=rpe)
+        power1 = Calculators.get_power_from_rpe(rpe_range, weight=50, vo2_max=StandardErrorRange(lower_bound=45, upper_bound=55))
+        power2 = Calculators.get_power_from_rpe(rpe_range, weight=60, vo2_max=StandardErrorRange(lower_bound=45, upper_bound=55))
+        power3 = Calculators.get_power_from_rpe(rpe_range, weight=70, vo2_max=StandardErrorRange(lower_bound=45, upper_bound=55))
+        power4 = Calculators.get_power_from_rpe(rpe_range, weight=80, vo2_max=StandardErrorRange(lower_bound=45, upper_bound=55))
+        assert power1.highest_value() < power2.highest_value() < power3.highest_value() < power4.highest_value()
+
+
+# def test_get_power_from_rpe_diff_weight2():
+#     for rpe in range(1, 11):
+#         power1 = Calculators.get_power_from_rpe(rpe, age=20, weight=50)
+#         power2 = Calculators.get_power_from_rpe(rpe, age=20, weight=60)
+#         power3 = Calculators.get_power_from_rpe(rpe, age=20, weight=70)
+#         power4 = Calculators.get_power_from_rpe(rpe, age=20, weight=80)
+#         assert power1 < power2 < power3 < power4
 
 
 def test_power_resistance_exercise():
@@ -310,10 +313,50 @@ def test_power_resistance_exercise():
     # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
 
 
-
 def test_power_cycling_100():
     speed = 25 * 1610 / 3600
     print(Calculators.power_cycling(speed, user_weight=70))
     print(Calculators.power_cardio(CardioAction.cycle, user_weight=70))
     # power = Calculators.power_resistance_exercise(100, 70).observed_value
     # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
+
+
+def test_vo2_max_from_rpe_5():
+    rpe = StandardErrorRange(observed_value=5)
+    vo2_max = Calculators.percent_vo2_max_from_rpe_range(rpe)
+    assert 65 == vo2_max.lower_bound
+    assert 72.5 == vo2_max.upper_bound
+
+
+def test_vo2_max_from_rpe_10():
+    rpe = StandardErrorRange(observed_value=10)
+    vo2_max = Calculators.percent_vo2_max_from_rpe_range(rpe)
+    assert 100 == vo2_max.lower_bound
+    assert 100 == vo2_max.upper_bound
+
+
+def test_vo2_max_from_rpe_0():
+    rpe = StandardErrorRange(observed_value=0)
+    vo2_max = Calculators.percent_vo2_max_from_rpe_range(rpe)
+    assert None is vo2_max.lower_bound
+    assert None is vo2_max.upper_bound
+
+
+def test_speed_from_watts_rowing():
+    speed = Calculators.speed_from_watts_rowing(60)
+    assert 3 == round(speed, 0)
+
+
+def test_speed_from_watts_running():
+    speed = Calculators.speed_from_watts_running(watts=60, user_weight=70, grade=0.0)
+    assert 1.0 == round(speed, 0)
+
+
+def test_get_running_speed_for_running_pace_distancee():
+    speed = Calculators.get_running_speed_for_running_pace_distance(1609.34)
+    assert 2.68 == round(speed, 2)
+
+
+def test_get_running_speed_for_known_running_pace_distancee():
+    speed = Calculators.get_running_speed_from_known_time(known_distance=4000,known_time=1630.9,running_pace_distance=1609.34)
+    assert 2.68 == round(speed, 2)

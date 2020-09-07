@@ -1,4 +1,4 @@
-from models.movement_tags import Gender
+from models.movement_tags import Gender, RunningDistances
 from serialisable import Serialisable
 from models.load_stats import LoadStats
 from models.session import HighLoadSession, HighDetailedLoadSession
@@ -28,6 +28,11 @@ class UserStats(Serialisable):
 
         self.vo2_max = None
         self.vo2_max_date_time = None
+
+        self.best_running_time = None
+        self.best_running_distance = None
+        self.best_running_date = None
+
         self.functional_threshold_power = None
 
         self.average_force_5_day = None
@@ -76,6 +81,9 @@ class UserStats(Serialisable):
             'timezone': self.timezone,
             'vo2_max': self.vo2_max.json_serialise() if self.vo2_max is not None else None,
             'vo2_max_date_time': format_datetime(self.vo2_max_date_time),
+            'best_running_time': self.best_running_time,
+            'best_running_distance': self.best_running_distance if self.best_running_distance is not None else None,
+            'best_running_date': self.best_running_date,
             'athlete_age': self.athlete_age,
             'athlete_weight': self.athlete_weight,
             'athlete_height': self.athlete_height,
@@ -116,6 +124,10 @@ class UserStats(Serialisable):
         user_stats.eligible_for_high_load_trigger = input_dict.get('eligible_for_high_load_trigger', False)
         user_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         user_stats.vo2_max = StandardErrorRange.json_deserialise(input_dict.get('vo2_max')) if input_dict.get('vo2_max') is not None else None
+        user_stats.best_running_time = input_dict.get('best_running_time')
+        user_stats.best_running_distance = input_dict.get('best_running_distance')
+        user_stats.best_running_date = input_dict.get('best_running_date')
+
         user_stats.functional_threshold_power = input_dict.get('functional_threshold_power')
         user_stats.average_force_5_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_5_day') is not None else None
         user_stats.average_force_20_day = StandardErrorRange.json_deserialise(input_dict) if input_dict.get('average_force_20_day') is not None else None

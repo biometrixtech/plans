@@ -7,6 +7,7 @@ from models.user_stats import UserStats
 from utils import parse_date, format_date
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.athlete_injury_risk import AthleteInjuryRisk
+from models.training_volume import StandardErrorRange
 from logic.calculators import Calculators
 
 
@@ -288,6 +289,15 @@ class UserStatsProcessing(object):
                     activity_level=5.0 # TODO: https://app.asana.com/0/1157098685993091/1182437140766009
             )
             current_user_stats.vo2_max_date_time = self.event_date
+
+    def update_vo2_max_estimations_best_time(self, current_user_stats, time, distance):
+
+        vo2_max = Calculators.vo2max_running_jack_daniels(time, distance)
+        current_user_stats.vo2_max = StandardErrorRange(lower_bound=vo2_max, observed_value=vo2_max, upper_bound=vo2_max)
+        current_user_stats.vo2_max_date_time = self.event_date
+        current_user_stats.best_running_time = time
+        current_user_stats.best_running_distance = distance
+        current_user_stats.best_running_date = self.event_date
 
     # def get_historic_asymmetry(self, sessions):
     #

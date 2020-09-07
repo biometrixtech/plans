@@ -1,6 +1,7 @@
 import math
 from models.training_volume import StandardErrorRange, Assignment
-from models.movement_tags import Gender
+from models.movement_tags import Gender, RunningDistances
+from time import gmtime
 
 
 cardio_mets_table = {
@@ -24,6 +25,110 @@ cardio_mets_table = {
 
 
 class Calculators(object):
+
+    @classmethod
+    def get_running_distance_from_type(cls, distance_type):
+
+        if distance_type == RunningDistances.m100:
+            return 100.00
+        elif distance_type == RunningDistances.m200:
+            return 200.00
+        elif distance_type == RunningDistances.m300:
+            return 300.00
+        elif distance_type == RunningDistances.m400:
+            return 400.00
+        elif distance_type == RunningDistances.m500:
+            return 500.00
+        elif distance_type == RunningDistances.m600:
+            return 600.00
+        elif distance_type == RunningDistances.m800:
+            return 800.00
+        elif distance_type == RunningDistances.m1000:
+            return 1000.00
+        elif distance_type == RunningDistances.m1200:
+            return 1200.00
+        elif distance_type == RunningDistances.m1600:
+            return 1600.00
+        elif distance_type == RunningDistances.m4000:
+            return 4000.00
+        elif distance_type == RunningDistances.mile3:
+            return 4828.03
+        elif distance_type == RunningDistances.k5:
+            return 5000.00
+        elif distance_type == RunningDistances.mile5:
+            return 8046.72
+        elif distance_type == RunningDistances.k10:
+            return 10000.00
+        elif distance_type == RunningDistances.k12:
+            return 12000.00
+        elif distance_type == RunningDistances.marathon_half:
+            return 20921.50
+        elif distance_type == RunningDistances.mile15:
+            return 24140.20
+        elif distance_type == RunningDistances.k25:
+            return 25000.00
+        elif distance_type == RunningDistances.marathon:
+            return 42197.00
+        elif distance_type == RunningDistances.k50:
+            return 50000.00
+        elif distance_type == RunningDistances.mile50:
+            return 80467.2
+        else:
+            return 0
+
+    @classmethod
+    def get_running_speed_for_running_pace_distance(cls, running_pace_distance):
+        current_race_times = cls.get_mcmillan_race_time_tuples()
+
+        for c in range(0, len(current_race_times)):
+            if current_race_times[c][0] == running_pace_distance:
+                target_meters_second = current_race_times[c][0] / current_race_times[c][1]
+                break
+            if current_race_times[c][0] < running_pace_distance < current_race_times[c + 1][0]:
+                less_distance = current_race_times[c][0]
+                less_time = current_race_times[c][1]
+                more_distance = current_race_times[c + 1][0]
+                more_time = current_race_times[c + 1][1]
+
+                more_distance_diff = more_distance - running_pace_distance
+                full_distance_diff = more_distance - less_distance
+                diff_ratio = more_distance_diff / full_distance_diff
+
+                less_meters_second = less_distance / less_time
+                more_meters_second = more_distance / more_time
+                adjusted_meters_second = ((more_meters_second - less_meters_second) * diff_ratio) + less_meters_second
+                target_meters_second = adjusted_meters_second
+                break
+
+            elif running_pace_distance < current_race_times[c][0]:
+                more_distance = current_race_times[c][0]
+                more_time = current_race_times[c][1]
+
+                more_meters_second = more_distance / more_time
+                target_meters_second = more_meters_second
+                break
+            elif c == len(current_race_times) - 1:
+                more_distance = current_race_times[c][0]
+                more_time = current_race_times[c][1]
+
+                more_meters_second = more_distance / more_time
+                target_meters_second = more_meters_second
+
+        return target_meters_second
+
+    @classmethod
+    def get_running_speed_from_known_time(cls, known_distance, known_time, running_pace_distance):
+
+        baseline_speed = cls.get_running_speed_for_running_pace_distance(known_distance)
+        known_speed = known_distance / known_time
+
+        know_baseline_ratio = known_speed / baseline_speed
+
+        running_pace_speed = cls.get_running_speed_for_running_pace_distance(running_pace_distance)
+
+        adjusted_running_speed = running_pace_speed * know_baseline_ratio
+
+        return adjusted_running_speed
 
     @classmethod
     def vo2_max_estimation_demographics(cls, age, user_weight, user_height=1.7, gender=Gender.female, activity_level=5):
@@ -58,17 +163,7 @@ class Calculators(object):
         """
         if percent_vo2max >= 100:
             return 10.0
-        rpe_lookup_tuples = list()
-        rpe_lookup_tuples.append((10, 95, 100))
-        rpe_lookup_tuples.append((9, 90, 95))
-        rpe_lookup_tuples.append((8, 85, 90))
-        rpe_lookup_tuples.append((7, 80, 85))
-        rpe_lookup_tuples.append((6, 72.5, 80))
-        rpe_lookup_tuples.append((5, 65, 72.5))
-        rpe_lookup_tuples.append((4, 60, 65))
-        rpe_lookup_tuples.append((3, 55, 60))
-        rpe_lookup_tuples.append((2, 50, 55))
-        rpe_lookup_tuples.append((1, 0, 50))
+        rpe_lookup_tuples = cls.get_acsm_rpe_vo2_max_lookup()
 
         rpe_tuple = [r for r in rpe_lookup_tuples if r[1] <= percent_vo2max <= r[2]]
 
@@ -85,6 +180,105 @@ class Calculators(object):
             rpe = 1.0
 
         return round(rpe, 1)
+
+    @classmethod
+    def percent_vo2_max_from_rpe_range(cls, rpe):
+
+        """
+
+        :param rpe:
+        :return: StandardErrorRange
+        """
+        if rpe.lowest_value() >= 10:
+            return StandardErrorRange(lower_bound=100, observed_value=100, upper_bound=100)
+        rpe_lookup_tuples = cls.get_acsm_rpe_vo2_max_lookup()
+
+        rpe_tuple_lower = [r for r in rpe_lookup_tuples if r[0] <= rpe.lowest_value()]
+        rpe_tuple_upper = [r for r in rpe_lookup_tuples if r[0] <= rpe.highest_value()]
+
+        if len(rpe_tuple_lower) > 0:
+            sorted_tuple = sorted(rpe_tuple_lower, key=lambda x:[0], reverse=True)
+            vo2_max_range_lower = StandardErrorRange(lower_bound=sorted_tuple[0][1], upper_bound= sorted_tuple[0][2])
+        else:
+            vo2_max_range_lower = None
+
+        if len(rpe_tuple_upper) > 0:
+            sorted_tuple = sorted(rpe_tuple_upper, key=lambda x:[0], reverse=True)
+            vo2_max_range_upper = StandardErrorRange(lower_bound=sorted_tuple[0][1], upper_bound= sorted_tuple[0][2])
+        else:
+            vo2_max_range_upper = None
+
+        if vo2_max_range_lower is None and vo2_max_range_upper is not None:
+            vo2_max_range = vo2_max_range_upper
+        elif vo2_max_range_upper is None and vo2_max_range_lower is not None:
+            vo2_max_range = vo2_max_range_lower
+        elif vo2_max_range_upper is not None and vo2_max_range_lower is not None:
+            vo2_max_range = StandardErrorRange()
+            vo2_max_range.lower_bound = min(vo2_max_range_lower.lowest_value(), vo2_max_range_upper.lowest_value())
+            vo2_max_range.upper_bound = min(vo2_max_range_lower.highest_value(), vo2_max_range_upper.highest_value())
+            vo2_max_range.observed_value = (vo2_max_range.lowest_value() + vo2_max_range.highest_value()) / 2
+        else:
+            vo2_max_range = StandardErrorRange()
+
+        return vo2_max_range
+
+    @classmethod
+    def get_mcmillan_race_time_tuples(cls):
+        race_times = list()
+        race_times.append((100, 29.30))
+        race_times.append((200, 58.70))
+        race_times.append((400, 2 * 60 + 2.70))
+        race_times.append((500, 2 * 60 + 40.00))
+        race_times.append((600, 3 * 60 + 16.50))
+        race_times.append((800, 4 * 60 + 29.30))
+        race_times.append((1000, 5 * 60 + 54.10))
+        race_times.append((1500, 9 * 60 + 14.70))
+        race_times.append((1600, 9 * 60 + 56.10))
+        race_times.append((1609.34, 60 * 10)) # 1 mile
+        race_times.append((2000, 12 * 60 + 41.90))
+        race_times.append((2414.01, 15 * 60 + 37.30)) # 1.5 mile
+        race_times.append((3000, 19 * 60 + 45.60))
+        race_times.append((3200, 21 * 60 + 6.70))
+        race_times.append((3218.68, 21 * 60 + 14.70)) # 2mile
+        race_times.append((4000, 27 * 60 + 10.90))
+        race_times.append((4828.02, 33 * 60 + 15.00)) # 3 mile
+        race_times.append((5000, 34 * 60 + 43.00))
+        race_times.append((6000, 42 * 60 + 0.00))
+        race_times.append((6437.36, 45 * 60 + 7.00))
+        race_times.append((8000, 57 * 60 + 12.00))
+        race_times.append((8046.7, 57 * 60 + 33.00)) # 5 mile
+        race_times.append((10000, 72 * 60 + 5.00))
+        race_times.append((12000, 87 * 60 + 39.00))
+        race_times.append((15000, 91 * 60 + 41.00))
+        race_times.append((16093.4, 120 * 60 + 29.00))
+        race_times.append((20000, 151 * 60 + 57.00))
+        race_times.append((21082.354, 160 * 60 + 43.00)) # half marathon
+        race_times.append((24140.1, 185 * 60 + 57.00))  # 15 miles
+        race_times.append((25000, 193 * 60 + 4.00))
+        race_times.append((30000, 234 * 60 + 48.00))
+        race_times.append((1609.34*20, 252 * 60 + 59.00))
+        race_times.append((1609.34 * 25, 320 * 60 + 16.00))
+        race_times.append((1609.34 * 26.2, 338 * 60 + 13.00))
+        race_times.append((50000, 410 * 60 + 17.00))
+        race_times.append((1609.34 * 50, 750 * 60 + 24.00))
+        race_times.append((100000, 988 * 60 + 40.00))
+        race_times.append((1609.34 * 100, 1952 * 60 + 50.00)) # wth!!!
+        return race_times
+
+    @classmethod
+    def get_acsm_rpe_vo2_max_lookup(cls):
+        rpe_lookup_tuples = list()
+        rpe_lookup_tuples.append((10, 95, 100))
+        rpe_lookup_tuples.append((9, 90, 95))
+        rpe_lookup_tuples.append((8, 85, 90))
+        rpe_lookup_tuples.append((7, 80, 85))
+        rpe_lookup_tuples.append((6, 72.5, 80))
+        rpe_lookup_tuples.append((5, 65, 72.5))
+        rpe_lookup_tuples.append((4, 60, 65))
+        rpe_lookup_tuples.append((3, 55, 60))
+        rpe_lookup_tuples.append((2, 50, 55))
+        rpe_lookup_tuples.append((1, 0, 50))
+        return rpe_lookup_tuples
 
     @classmethod
     def get_percent_max_hr_from_rpe(cls, rpe):
@@ -359,6 +553,14 @@ class Calculators(object):
         return work_vo2
 
     @classmethod
+    def power_running_from_work_vo2(cls, work_vo2, user_weight, efficiency=.22):
+
+        mets = round(work_vo2 / 3.5, 1)
+        watts = cls.mets_to_watts(mets, user_weight, efficiency)
+
+        return watts
+
+    @classmethod
     def work_vo2_cycling(cls, power, weight):
         """
         for power outputs of 300–1,200 kgm/min, or 50-200 watts, and speeds of 50–60 rpm
@@ -583,6 +785,31 @@ class Calculators(object):
         return power
 
     @classmethod
+    def speed_from_work_vo2_running(cls, work_vo2, grade=0.0):
+
+        min_speed = (work_vo2 - 3.5) / (0.17 + grade * 0.79)
+        speed = min_speed / float(60)
+
+        return speed
+
+    @classmethod
+    def speed_from_watts_running(cls, watts, user_weight, grade, efficiency=.21):
+
+        mets = cls.watts_to_mets(watts, user_weight, efficiency)
+        work_vo2 = mets * 3.5
+        speed = cls.speed_from_work_vo2_running(work_vo2, grade)
+
+        return speed
+
+    @classmethod
+    def speed_from_watts_rowing(cls, watts):
+
+        pace = (2.8 / watts) ** (1/float(3))
+        speed = 1 / pace
+
+        return speed
+
+    @classmethod
     def power_running(cls, speed, grade=None, user_weight=None):
         """
         running power based on speed, grade and users weight
@@ -607,8 +834,9 @@ class Calculators(object):
         :return:
         """
         pace = 1 / speed
-        power = 2.8 / pace ** 3
+        power = 2.8 / (pace ** 3)
         return power
+
 
     @classmethod
     def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_eccentric=None, time_concentric=None):
@@ -782,12 +1010,28 @@ class Calculators(object):
         return mets
 
     @classmethod
-    def get_power_from_rpe(cls, rpe, age=None, weight=None):
+    def get_power_from_rpe(cls, rpe_range, weight=None, vo2_max=None):
         weight = weight or 60
-        age = age or 25
-        mets = cls.get_mets_from_rpe_acsm(rpe, age)
-        power = cls.mets_to_watts(mets, weight=weight, efficiency=.21)
-        return power
+
+        vo2_max_range = cls.percent_vo2_max_from_rpe_range(rpe_range)
+        if vo2_max is not None:
+            work_vo2_list = [
+                (vo2_max_range.lower_bound / 100) * vo2_max.lower_bound,
+                (vo2_max_range.upper_bound / 100) * vo2_max.lower_bound,
+                (vo2_max_range.lower_bound / 100) * vo2_max.upper_bound,
+                (vo2_max_range.upper_bound / 100) * vo2_max.upper_bound]
+
+            work_vo2_lower_bound = min(work_vo2_list)
+            work_vo2_upper_bound = max(work_vo2_list)
+
+            watts_lower = cls.power_running_from_work_vo2(work_vo2_lower_bound, weight, efficiency=.21)
+            watts_upper = cls.power_running_from_work_vo2(work_vo2_upper_bound, weight, efficiency=.21)
+            watts_observed = (watts_lower + watts_upper) / 2
+            watts_range = StandardErrorRange(lower_bound=watts_lower, observed_value=watts_observed, upper_bound=watts_upper)
+        else:
+            watts_range = StandardErrorRange()
+
+        return watts_range
 
     @classmethod
     def get_mets_from_rpe_acsm(cls, rpe, age):
