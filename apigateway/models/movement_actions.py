@@ -124,7 +124,7 @@ class ExerciseSubAction(object):
         self.name = name
 
         self.primary_muscle_action = None  # muscle_action
-
+        self.training_type = None
         # New
         self.movement_systems = []
 
@@ -201,6 +201,7 @@ class ExerciseSubAction(object):
         ret = {
             "id": self.id,
             "name": self.name,
+            "training_type": self.training_type.value if self.training_type is not None else None,
             "eligible_external_resistance": [res.value for res in self.eligible_external_resistance],
             "body_position": self.body_position.value if self.body_position is not None else None,
             "lower_body_stance": self.lower_body_stance.value if self.lower_body_stance is not None else None,

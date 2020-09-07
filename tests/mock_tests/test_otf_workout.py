@@ -173,17 +173,17 @@ def test_walking():
 
     jogging = get_treadmill_exercise("walk", "walk", Assignment(assigned_value=60.00, min_value='', max_value=''),
                                      Assignment(assigned_value=.01))
-    jogging.movement_id = "5823768d473c06100052ed9a"
+    jogging.movement_id = "jog"
     jogging.speed = Assignment(assigned_value=1.65)
 
     running = get_treadmill_exercise("walk", "walk", Assignment(assigned_value=60.00, min_value='', max_value=''),
                                      Assignment(assigned_value=.01))
-    running.movement_id = "5823768d473c06100052ed9a"
+    running.movement_id = "jog"
     running.speed = Assignment(assigned_value=1.65)
 
     power_walking = get_treadmill_exercise("walk", "walk", Assignment(assignment_type=None, assigned_value=60.00, min_value='', max_value=''),
                                               otf_calc.get_grade("power_walker", "base", 0))
-    power_walking.movement_id = "5823768d473c06100052ed9a"
+    power_walking.movement_id = "jog"
     power_walking.speed = Assignment(assigned_value=1.65)
 
     workout_processor = WorkoutProcessor()
@@ -200,7 +200,7 @@ def test_running():
 
     otf_calc = OTFCalculator()
 
-    movement_id = "5823768d473c06100052ed9a"
+    movement_id = "run"
 
     duration_assignment = Assignment(assigned_value=60.00, min_value='', max_value='')
     grade_assignment = Assignment(assigned_value=0.0)
@@ -233,7 +233,7 @@ def test_running_diff_inclines():
 
     otf_calc = OTFCalculator()
 
-    movement_id = "5823768d473c06100052ed9a"
+    movement_id = "run"
 
     duration_assignment = Assignment(assigned_value=90.00, min_value='', max_value='')
     base_grade_assignment = Assignment(assigned_value=.06)
@@ -266,7 +266,7 @@ def test_running_diff_inclines():
 def test_rowing():
 
     activity_name = "row"
-    movement_id = "58459d9ddc2ce90011f93d84"
+    movement_id = "rowing"
     duration = 180.0
     duration_assignment = Assignment(assigned_value=duration, min_value='', max_value='')
     jogging = get_rowing_exercise(activity_name, activity_name, duration_assignment, 24)

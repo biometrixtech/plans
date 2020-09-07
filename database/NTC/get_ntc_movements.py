@@ -56,7 +56,7 @@ class ExerciseMovementParser(object):
                 for attribute in self.attributes_to_copy:
                     movement = self.copy_attributes(exercise, base_movement, movement, attribute)
                 movement.compound_actions = base_movement.compound_actions
-                movement.primary_actions = base_movement.primary_actions
+                # movement.primary_actions = base_movement.primary_actions
                 movement.cardio_action = base_movement.cardio_action
                 self.movements.append(movement)
                 # all_movements[exercise.name] = movement

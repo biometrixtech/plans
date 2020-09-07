@@ -1,7 +1,7 @@
 from logic.workout_processing import WorkoutProcessor
 from models.workout_program import WorkoutExercise, CompletedWorkoutSection, WorkoutProgramModule
 from models.movement_tags import AdaptationType, CardioAction, TrainingType
-from models.movement_actions import ExerciseAction, Movement, Explosiveness
+from models.movement_actions import ExerciseAction, Movement, Explosiveness, ExerciseSubAction, CompoundAction
 from models.exercise import UnitOfMeasure
 from models.planned_exercise import PlannedExercise
 from models.heart_rate import HeartRateData
@@ -11,6 +11,14 @@ import datetime
 from utils import format_datetime
 import random
 
+
+
+def get_compound_action(sub_action):
+    action = ExerciseAction("1", "flail_again")
+    action.sub_actions = [sub_action]
+    compound_action = CompoundAction("1", "flail_even_more")
+    compound_action.actions = [action]
+    return compound_action
 
 def get_heart_rate_data(low_value, high_value, observations, single_timestamp=False):
 
@@ -55,14 +63,17 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id=""):
     exercise.pace = 120
     exercise.stroke_rate = 22
     if movement_id == "":
-        action = ExerciseAction('0', 'test_action')
-        action.training_type = TrainingType.strength_cardiorespiratory
-        action.reps = reps
-        action.lateral_distribution = [0, 0]
-        action.apply_resistance = True
-        action.eligible_external_resistance = []
-        action.lateral_distribution_pattern = None
-        exercise.primary_actions = [action]
+        sub_action = ExerciseSubAction('0', 'test_action')
+        sub_action.training_type = TrainingType.strength_cardiorespiratory
+        sub_action.reps = reps
+        sub_action.lateral_distribution = [0, 0]
+        sub_action.apply_resistance = True
+        sub_action.eligible_external_resistance = []
+        sub_action.lateral_distribution_pattern = None
+        action = ExerciseAction('1', 'test_action')
+        action.sub_actions = [sub_action]
+        compound_action = CompoundAction('1', 'test_action')
+        compound_action.actions = [action]
     return exercise
 
 
@@ -78,13 +89,13 @@ def get_section(name, exercises, start=None, end=None):
 
 
 def test_one_load_section_one_no_load():
-    workout_exercise1 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # row
-    workout_exercise2 = get_exercise(reps=180, sets=1, unit=UnitOfMeasure.meters, movement_id="57e2fd3a4c6a031dc777e90c")  # airdyne
+    workout_exercise1 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.seconds, movement_id="rowing")  # row
+    workout_exercise2 = get_exercise(reps=180, sets=1, unit=UnitOfMeasure.meters, movement_id="rowing")  # airdyne
 
-    workout_exercise3 = get_exercise(reps=500, sets=1, unit=UnitOfMeasure.meters, movement_id="58459d9ddc2ce90011f93d84")  # row
-    workout_exercise4 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.count, movement_id="58459df8dc2ce90011f93d87")  # run
+    workout_exercise3 = get_exercise(reps=500, sets=1, unit=UnitOfMeasure.meters, movement_id="rowing")  # row
+    workout_exercise4 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.count, movement_id="run")  # run
 
-    workout_exercise5 = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, movement_id='57e2fd3a4c6a031dc777e936')
+    workout_exercise5 = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, movement_id='barbell rows')
 
     section1 = get_section('warm up', exercises=[workout_exercise1, workout_exercise2])
     section2 = get_section('stamina', exercises=[workout_exercise3, workout_exercise4])
@@ -123,28 +134,28 @@ def test_apply_explosiveness_to_actions():
 
     exercise = WorkoutExercise()
     exercise.explosiveness_rating = 8
-    action_1 = ExerciseAction("2", "Action1")
+    action_1 = ExerciseSubAction("2", "Action1")
     action_1.explosiveness = Explosiveness.high_force
-    action_2 = ExerciseAction("3", "Action2")
+    action_2 = ExerciseSubAction("3", "Action2")
     action_2.explosiveness = Explosiveness.max_force
-
-    exercise.primary_actions.append(action_1)
-    exercise.primary_actions.append(action_2)
+    #
+    # exercise.compound_actions.append(action_1)
+    # exercise.compound_actions.append(action_2)
 
     processor = WorkoutProcessor()
 
-    processor.set_action_explosiveness_from_exercise(exercise, exercise.primary_actions)
+    processor.set_action_explosiveness_from_exercise(exercise, [action_1, action_2])
 
     assert action_1.explosiveness_rating == 8 * 0.75
     assert action_2.explosiveness_rating == 8 * 1.00
 
 
 def test_shrz():
-    workout_exercise1 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # row
+    workout_exercise1 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.seconds, movement_id="rowing")  # row
 
-    workout_exercise4 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.count, movement_id="58459df8dc2ce90011f93d87")  # run
+    workout_exercise4 = get_exercise(reps=90, sets=1, unit=UnitOfMeasure.count, movement_id="run")  # run
 
-    workout_exercise5 = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, movement_id='57e2fd3a4c6a031dc777e936')  # bent over row
+    workout_exercise5 = get_exercise(reps=10, sets=1, unit=UnitOfMeasure.count, movement_id='barbell rows')  # bent over row
 
     start_time = datetime.datetime.now()
     section1_start = start_time + datetime.timedelta(seconds=2)
@@ -175,10 +186,12 @@ def test_shrz():
     shrz = workout.aggregate_shrz()
 
     assert shrz == section2.shrz == workout_exercise4.shrz
-    for action in workout_exercise4.primary_actions:
-        assert action.training_intensity == shrz
-    for action in workout_exercise4.secondary_actions:
-        assert action.training_intensity == shrz
+    for compound_action in workout_exercise4.compound_actions:
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                assert sub_action.training_intensity == shrz
+    # for action in workout_exercise4.secondary_actions:
+    #     assert action.training_intensity == shrz
 
 
 def test_new_actions():

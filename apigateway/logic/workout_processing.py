@@ -401,6 +401,9 @@ class WorkoutProcessor(object):
             action_force.multiply(compound_action_force_ratio)
             action.power = action_power
             action.force = action_force
+            
+            action.training_type = exercise.training_type
+            action.adaptation_type = exercise.adaptation_type
             for sub_action in action.sub_actions:
                 sub_action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 

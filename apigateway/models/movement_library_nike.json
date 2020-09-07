@@ -14,15 +14,128 @@
         "speed": 3,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "30"
         ],
         "bilateral_distribution_of_resistance": 0
+    },
+    "rowing, high strokes per minute": {
+        "id": "rowing, high strokes per minute",
+        "name": "erg rowing",
+        "training_type": 1,
+        "cardio_action": 3,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            1
+        ],
+        "speed": 3,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": ".86/0/.86",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "30"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "jog": {
+        "id": "jog",
+        "name": "jog",
+        "training_type": 1,
+        "cardio_action": 1,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": 0,
+        "displacement": null,
+        "rep_tempo": null,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "2"
+        ],
+        "bilateral_distribution_of_resistance": 3
+    },
+    "run": {
+        "id": "run",
+        "name": "run",
+        "training_type": 1,
+        "cardio_action": 1,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 3,
+        "resistance": 0,
+        "displacement": null,
+        "rep_tempo": null,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "3"
+        ],
+        "bilateral_distribution_of_resistance": 3
+    },
+    "cruising": {
+        "id": "cruising",
+        "name": "400m to 1600m race pace",
+        "training_type": 1,
+        "cardio_action": 2,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 4,
+        "resistance": 0,
+        "displacement": null,
+        "rep_tempo": null,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "4"
+        ],
+        "bilateral_distribution_of_resistance": 3
+    },
+    "sprint": {
+        "id": "sprint",
+        "name": "max sprint",
+        "training_type": 1,
+        "cardio_action": 2,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 4,
+        "resistance": 0,
+        "displacement": null,
+        "rep_tempo": null,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "5"
+        ],
+        "bilateral_distribution_of_resistance": 3
     },
     "explosive push-ups": {
         "id": "explosive push-ups",
@@ -39,10 +152,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".5/.1/.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -64,10 +175,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".17/.25/.17",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "420"
@@ -89,10 +198,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".17/.25/.17",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "420"
@@ -114,10 +221,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .4/0/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110",
@@ -140,10 +245,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .4/0/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110",
@@ -166,10 +269,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .4/0/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110",
@@ -189,19 +290,17 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 3,
+        "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1;1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110",
             "200"
         ],
-        "bilateral_distribution_of_resistance": 2
+        "bilateral_distribution_of_resistance": 3
     },
     "modified burpees": {
         "id": "modified burpees",
@@ -218,10 +317,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .4/.2/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110",
@@ -244,10 +341,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .4/0/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110",
@@ -270,10 +365,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .4/0/.4; 2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110",
@@ -296,10 +389,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -321,10 +412,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -346,10 +435,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -371,10 +458,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -396,10 +481,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".17/.25/.17",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -421,10 +504,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".17/.25/.17",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -434,7 +515,7 @@
     "high knee march": {
         "id": "high knee march",
         "name": "run in place",
-        "training_type": 5,
+        "training_type": 2,
         "cardio_action": 1,
         "power_drill_action": null,
         "power_action": null,
@@ -446,10 +527,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/0/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -471,10 +550,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
@@ -496,15 +573,13 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
         ],
-        "bilateral_distribution_of_resistance": 0
+        "bilateral_distribution_of_resistance": 2
     },
     "pogo jumps": {
         "id": "pogo jumps",
@@ -521,10 +596,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
@@ -546,10 +619,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".1/.1/.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
@@ -571,10 +642,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
@@ -596,10 +665,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
@@ -621,10 +688,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1102"
@@ -646,10 +711,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
@@ -671,10 +734,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1101"
@@ -696,10 +757,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1103"
@@ -721,10 +780,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": ".5/0/.5",
+        "rep_tempo": ".15/.15/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1103.1"
@@ -746,10 +803,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".1/.1/.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -771,10 +826,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".1/.1/.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -796,10 +849,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".1/.1/.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -821,10 +872,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".1/.1/.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -846,10 +895,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -871,10 +918,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".17/.25/.17",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "6"
@@ -896,10 +941,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.25/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "521"
@@ -918,13 +961,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 3,
+        "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": ".5/0/.5",
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "521"
@@ -946,10 +987,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "5"
@@ -971,10 +1010,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "5"
@@ -996,13 +1033,34 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "5"
+        ],
+        "bilateral_distribution_of_resistance": 3
+    },
+    "ski jumps": {
+        "id": "ski jumps",
+        "name": "lateral hop",
+        "training_type": 6,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 3,
+        "resistance": 0,
+        "displacement": null,
+        "rep_tempo": ".15/.15/.15",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "1101"
         ],
         "bilateral_distribution_of_resistance": 3
     },
@@ -1021,10 +1079,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1120"
@@ -1046,10 +1102,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": ".5/0/.5",
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1120"
@@ -1071,10 +1125,8 @@
         "speed": 3,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2/0/3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1001",
@@ -1094,13 +1146,11 @@
         "external_weight_implement": [
             29
         ],
-        "speed": 3,
+        "speed": 4,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1001"
@@ -1122,10 +1172,8 @@
         "speed": 3,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".4/0/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1002"
@@ -1147,10 +1195,8 @@
         "speed": 3,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".4/0/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1002"
@@ -1172,10 +1218,8 @@
         "speed": 3,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".4/0/.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1002"
@@ -1197,10 +1241,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".5/0/.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -1222,10 +1264,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".3/.4/.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -1247,10 +1287,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".75/.25/.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -1272,10 +1310,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".75/.25/.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -1297,10 +1333,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/2.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -1322,10 +1356,8 @@
         "speed": 3,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
@@ -1347,10 +1379,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.4/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
@@ -1372,10 +1402,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
@@ -1397,10 +1425,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
@@ -1422,10 +1448,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.25/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
@@ -1447,10 +1471,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.5/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
@@ -1472,10 +1494,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/.5/.2; .2/.5/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
@@ -1497,40 +1517,13 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1110"
         ],
         "bilateral_distribution_of_resistance": 0
-    },
-    "ski jumps": {
-        "id": "ski jumps",
-        "name": "lateral hop",
-        "training_type": 5,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            0
-        ],
-        "speed": 3,
-        "resistance": 0,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "1101"
-        ],
-        "bilateral_distribution_of_resistance": 3
     },
     "split hops": {
         "id": "split hops",
@@ -1547,10 +1540,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -1572,10 +1563,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": ".5/0/.5",
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -1597,10 +1586,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".3/.2/.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -1622,10 +1609,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": ".5/0/.5",
+        "rep_tempo": ".25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -1647,10 +1632,8 @@
         "speed": 4,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.5/.25; .25/.5/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -1672,10 +1655,8 @@
         "speed": 4,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.2/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1100"
@@ -1697,10 +1678,8 @@
         "speed": 4,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.15/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1200"
@@ -1722,10 +1701,8 @@
         "speed": 4,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.15/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1200"
@@ -1747,10 +1724,8 @@
         "speed": 3,
         "resistance": 1,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/.15/.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1201"
@@ -1772,10 +1747,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1797,10 +1770,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1822,10 +1793,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".8/.2/.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1847,10 +1816,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1872,10 +1839,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/.15/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1897,10 +1862,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1922,10 +1885,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/.3/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1947,10 +1908,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1972,10 +1931,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -1997,10 +1954,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".2/0/.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2022,10 +1977,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2047,10 +2000,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2069,13 +2020,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 0,
         "resistance": 0,
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2097,10 +2046,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2/1/2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2122,10 +2069,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 1,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2147,10 +2092,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.3/0/1.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2172,10 +2115,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2.5/0/2.5",
         "surface_stability": 1,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2194,13 +2135,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2/1/2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2219,13 +2158,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 0,
         "resistance": 0,
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2244,13 +2181,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "3/2/3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2272,10 +2207,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/.75/1.5",
         "surface_stability": 2,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2297,10 +2230,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/.75/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "101"
@@ -2319,13 +2250,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/3/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "102"
@@ -2347,10 +2276,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "102"
@@ -2372,10 +2299,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "102"
@@ -2397,10 +2322,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "102"
@@ -2422,10 +2345,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "420"
@@ -2449,8 +2370,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "210"
@@ -2472,10 +2391,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "210"
@@ -2499,8 +2416,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "210"
@@ -2522,10 +2437,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".5/1/.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "211"
@@ -2544,13 +2457,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 0,
+        "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".5/1/.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "211"
@@ -2569,13 +2480,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 0,
+        "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".5/1/.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "211"
@@ -2597,10 +2506,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/2/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "211"
@@ -2624,8 +2531,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "300"
@@ -2649,8 +2554,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "300"
@@ -2672,10 +2575,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "300"
@@ -2697,10 +2598,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "300"
@@ -2722,10 +2621,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "300"
@@ -2747,10 +2644,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "300"
@@ -2772,10 +2667,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.75/0/1.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "300"
@@ -2797,10 +2690,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2822,10 +2713,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": "1/0/1",
+        "rep_tempo": "1.4/0/1.4",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2847,10 +2736,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2872,10 +2759,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2897,10 +2782,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2922,10 +2805,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2947,10 +2828,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2972,10 +2851,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -2999,8 +2876,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -3024,8 +2899,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "310"
@@ -3049,8 +2922,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "110"
@@ -3074,8 +2945,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "111"
@@ -3097,10 +2966,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": "1/0/1",
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "112"
@@ -3122,10 +2989,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 1,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "111"
@@ -3147,10 +3012,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 1,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "111"
@@ -3174,8 +3037,6 @@
         "displacement": null,
         "rep_tempo": "2/.5/2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "120"
@@ -3197,10 +3058,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "120"
@@ -3222,10 +3081,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "120"
@@ -3249,8 +3106,6 @@
         "displacement": null,
         "rep_tempo": "1/1/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "400"
@@ -3272,10 +3127,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "400"
@@ -3299,8 +3152,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "400"
@@ -3322,10 +3173,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "400"
@@ -3347,10 +3196,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.3/0/1.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "400"
@@ -3374,8 +3221,6 @@
         "displacement": null,
         "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "410",
@@ -3398,10 +3243,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "410",
@@ -3424,10 +3267,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "3/1/3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "211"
@@ -3449,10 +3290,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "3/1/3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "211"
@@ -3474,10 +3313,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "520"
@@ -3501,8 +3338,6 @@
         "displacement": null,
         "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "521"
@@ -3524,10 +3359,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "521"
@@ -3549,10 +3382,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "600"
@@ -3574,10 +3405,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "600"
@@ -3599,10 +3428,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "600"
@@ -3624,13 +3451,34 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "600"
+        ],
+        "bilateral_distribution_of_resistance": 2
+    },
+    "leg balance with toe reach": {
+        "id": "leg balance with toe reach",
+        "name": "lateral leg raise",
+        "training_type": 2,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": 0,
+        "displacement": null,
+        "rep_tempo": "1/.5/1",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "310"
         ],
         "bilateral_distribution_of_resistance": 2
     },
@@ -3649,10 +3497,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "500"
@@ -3674,10 +3520,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "500"
@@ -3701,8 +3545,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "500"
@@ -3726,8 +3568,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "500"
@@ -3751,8 +3591,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "500"
@@ -3774,10 +3612,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3799,10 +3635,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".75/0/.75",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3824,10 +3658,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1; 1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3849,10 +3681,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3874,10 +3704,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3899,10 +3727,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3924,10 +3750,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".5/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3949,10 +3773,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.4/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -3974,10 +3796,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -3999,10 +3819,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4026,8 +3844,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4049,10 +3865,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4074,10 +3888,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4101,8 +3913,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4126,8 +3936,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4149,10 +3957,8 @@
         "speed": 1,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4176,8 +3982,6 @@
         "displacement": null,
         "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4199,10 +4003,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4224,10 +4026,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -4249,10 +4049,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "511"
@@ -4274,10 +4072,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.5/0/1.5",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "511"
@@ -4299,10 +4095,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "511"
@@ -4324,10 +4118,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1; 1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "611"
@@ -4337,7 +4129,7 @@
     "lateral step-ups": {
         "id": "lateral step-ups",
         "name": "lateral step up",
-        "training_type": 2,
+        "training_type": 6,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -4346,13 +4138,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/0/.25;1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "611"
@@ -4374,10 +4164,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "610"
@@ -4399,10 +4187,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1; 1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "610"
@@ -4424,10 +4210,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/1/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "220"
@@ -4449,10 +4233,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4474,10 +4256,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1; 1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4499,10 +4279,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.4/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4524,10 +4302,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".8/.2/.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4549,10 +4325,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.25/.5/1.25",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4574,10 +4348,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4599,10 +4371,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.4/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4624,10 +4394,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.25/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4646,13 +4414,11 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 0,
         "resistance": 0,
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4674,10 +4440,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".8/.2/.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4699,10 +4463,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1; 1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4724,10 +4486,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.25/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4749,10 +4509,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/0/1;1/0/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "200"
@@ -4774,10 +4532,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4799,10 +4555,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4824,10 +4578,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4849,10 +4601,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4874,10 +4624,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4899,10 +4647,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4924,10 +4670,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4949,10 +4693,8 @@
         "speed": 3,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".15/0/.15",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "710"
@@ -4976,8 +4718,6 @@
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "201"
@@ -4999,10 +4739,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.3/.2/1.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "800"
@@ -5024,10 +4762,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.3/.2/1.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "800"
@@ -5049,10 +4785,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.3/.2/1.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "800.1"
@@ -5074,10 +4808,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1; 1/.5/1; 1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "700"
@@ -5099,10 +4831,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "801"
@@ -5124,10 +4854,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "801"
@@ -5149,10 +4877,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1/1.5/1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "801"
@@ -5174,10 +4900,8 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2/.5/2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "220"
@@ -5199,13 +4923,80 @@
         "speed": 2,
         "resistance": 0,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 1,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "130"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "medicine ball sit-ups": {
+        "id": "medicine ball sit-ups",
+        "name": "sit up, with hip flexors",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            15
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1/0/1",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "101"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "kneeling dumbbell halos": {
+        "id": "kneeling dumbbell halos",
+        "name": "halos",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            29
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1.8/.3/1.8",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "910"
+        ],
+        "bilateral_distribution_of_resistance": 2
+    },
+    "pull overs on step": {
+        "id": "pull overs on step",
+        "name": "pull over",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1.8/.3/1.8",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "802"
         ],
         "bilateral_distribution_of_resistance": 0
     },
@@ -5224,10 +5015,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "900"
@@ -5249,10 +5038,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "900"
@@ -5274,10 +5061,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "901"
@@ -5299,10 +5084,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "901"
@@ -5324,10 +5107,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "901"
@@ -5349,10 +5130,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "902"
@@ -5374,10 +5153,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "902"
@@ -5399,10 +5176,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "902"
@@ -5424,10 +5199,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "902"
@@ -5446,13 +5219,11 @@
         "external_weight_implement": [
             7
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": ".25/0/.3",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "902"
@@ -5474,10 +5245,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "902"
@@ -5496,13 +5265,11 @@
         "external_weight_implement": [
             29
         ],
-        "speed": 2,
+        "speed": 0,
         "resistance": 2,
         "displacement": null,
         "rep_tempo": null,
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "903"
@@ -5524,10 +5291,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.1/.1/1.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "904"
@@ -5549,10 +5314,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.1/.1/1.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "904"
@@ -5574,10 +5337,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.1/.1/1.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "904"
@@ -5599,10 +5360,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "904.1"
@@ -5624,10 +5383,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "904.2"
@@ -5649,10 +5406,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2; 1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "904",
@@ -5675,10 +5430,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2; 1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "904",
@@ -5701,10 +5454,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "905.1"
@@ -5726,10 +5477,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "905"
@@ -5751,10 +5500,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "905"
@@ -5776,10 +5523,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "905.1"
@@ -5801,10 +5546,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "905.1"
@@ -5826,10 +5569,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "905.1"
@@ -5851,10 +5592,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.3/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "905.1"
@@ -5876,10 +5615,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "906"
@@ -5901,10 +5638,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "906.1"
@@ -5926,10 +5661,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "907"
@@ -5951,15 +5684,128 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "907"
         ],
         "bilateral_distribution_of_resistance": 2
+    },
+    "front raise": {
+        "id": "front raise",
+        "name": "front raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1.2/.2/1.2",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "908"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "kneeling med ball lifts": {
+        "id": "kneeling med ball lifts",
+        "name": "front raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            15
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1.8/.3/1.8",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "908"
+        ],
+        "bilateral_distribution_of_resistance": 2
+    },
+    "kneeling dumbbell pullovers": {
+        "id": "kneeling dumbbell pullovers",
+        "name": "front raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            29
+        ],
+        "speed": 1,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "2/.25/2",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "908"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "lateral raise": {
+        "id": "lateral raise",
+        "name": "lateral raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            8
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1.2/.2/1.2",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "909"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "med ball rainbows": {
+        "id": "med ball rainbows",
+        "name": "lateral raise",
+        "training_type": 3,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            15
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1.2/.2/1.2",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "909"
+        ],
+        "bilateral_distribution_of_resistance": 3
     },
     "barbell deadlift": {
         "id": "barbell deadlift",
@@ -5976,10 +5822,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2.1/.2/2.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1000"
@@ -6001,10 +5845,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2.1/.2/2.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1000"
@@ -6026,10 +5868,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.2/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "1000"
@@ -6051,10 +5891,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2.1/.2/2.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "600"
@@ -6076,10 +5914,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.2/1.8; 1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "600"
@@ -6101,10 +5937,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "2.1/.2/2.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "600"
@@ -6126,10 +5960,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -6151,10 +5983,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2;1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -6176,10 +6006,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -6201,10 +6029,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -6226,10 +6052,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -6251,10 +6075,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501"
@@ -6276,10 +6098,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2; 1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "501",
@@ -6302,10 +6122,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.8/.2/1.8",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6327,10 +6145,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.1/.1/1.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6352,10 +6168,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6377,10 +6191,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6402,10 +6214,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6427,10 +6237,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.1/.1/1.1",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6452,10 +6260,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.1/.1/1.1; 1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6477,10 +6283,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2; 1.2/.2/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "510"
@@ -6502,10 +6306,8 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.0/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "511"
@@ -6527,214 +6329,12 @@
         "speed": 2,
         "resistance": 2,
         "displacement": null,
-        "rep_tempo": null,
+        "rep_tempo": "1.2/.4/1.2",
         "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
         "explosiveness_rating": 0,
         "compound_actions": [
             "610"
         ],
         "bilateral_distribution_of_resistance": 3
-    },
-    "front raise": {
-        "id": "front raise",
-        "name": "front raise",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            8
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "908"
-        ],
-        "bilateral_distribution_of_resistance": 0
-    },
-    "kneeling med ball lifts": {
-        "id": "kneeling med ball lifts",
-        "name": "front raise",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            15
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "908"
-        ],
-        "bilateral_distribution_of_resistance": 2
-    },
-    "kneeling dumbbell pullovers": {
-        "id": "kneeling dumbbell pullovers",
-        "name": "front raise",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            29
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "908"
-        ],
-        "bilateral_distribution_of_resistance": 0
-    },
-    "lateral raise": {
-        "id": "lateral raise",
-        "name": "lateral raise",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            8
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "909"
-        ],
-        "bilateral_distribution_of_resistance": 0
-    },
-    "med ball rainbows": {
-        "id": "med ball rainbows",
-        "name": "lateral raise",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            15
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "909"
-        ],
-        "bilateral_distribution_of_resistance": 3
-    },
-    "kneeling dumbbell halos": {
-        "id": "kneeling dumbbell halos",
-        "name": "halos",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            29
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "910"
-        ],
-        "bilateral_distribution_of_resistance": 2
-    },
-    "pull overs on step": {
-        "id": "pull overs on step",
-        "name": "pull over",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            8
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "802"
-        ],
-        "bilateral_distribution_of_resistance": 0
-    },
-    "medicine ball sit-ups": {
-        "id": "medicine ball sit-ups",
-        "name": "sit up, with hip flexors",
-        "training_type": 3,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            15
-        ],
-        "speed": 2,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": null,
-        "surface_stability": 0,
-        "primary_actions": [],
-        "secondary_actions": [],
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "101"
-        ],
-        "bilateral_distribution_of_resistance": 0
     }
 }

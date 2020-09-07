@@ -4,7 +4,7 @@ from models.session_functional_movement import SessionFunctionalMovement
 from logic.workout_processing import WorkoutProcessor
 from models.workout_program import WorkoutExercise, CompletedWorkoutSection, WorkoutProgramModule
 from models.movement_tags import TrainingType
-from models.movement_actions import ExerciseAction
+from models.movement_actions import ExerciseAction, ExerciseSubAction, CompoundAction
 from models.exercise import UnitOfMeasure
 from models.training_volume import StandardErrorRange
 from logic.calculators import Calculators
@@ -44,14 +44,18 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, movement_id="", dur
     exercise.pace = 120
     exercise.stroke_rate = 22
     if movement_id == "":
-        action = ExerciseAction('0', 'test_action')
-        action.training_type = TrainingType.strength_cardiorespiratory
-        action.reps = reps
-        action.lateral_distribution = [0, 0]
-        action.apply_resistance = True
-        action.eligible_external_resistance = []
-        action.lateral_distribution_pattern = None
-        exercise.primary_actions = [action]
+        sub_action = ExerciseSubAction('0', 'test_action')
+        sub_action.training_type = TrainingType.strength_cardiorespiratory
+        sub_action.reps = reps
+        sub_action.lateral_distribution = [0, 0]
+        sub_action.apply_resistance = True
+        sub_action.eligible_external_resistance = []
+        sub_action.lateral_distribution_pattern = None
+        action = ExerciseAction('1', 'test_action')
+        action.sub_actions = [sub_action]
+        compound_action = CompoundAction('1', 'test_action')
+        compound_action.actions = [action]
+        exercise.compound_actions = [compound_action]
     return exercise
 
 
@@ -72,19 +76,23 @@ def get_max_load(exercise):
     factory = FunctionalMovementFactory()
     functional_movement_dict = factory.get_functional_movement_dictionary()
     max_loads = {}
-    for exercise_action in exercise.primary_actions:
-        functional_movement_action_mapping = FunctionalMovementActionMapping(exercise_action, {}, datetime.datetime.now(), functional_movement_dict)
-        max_action_load = get_max_action_load(functional_movement_action_mapping)
-        max_loads[exercise_action.id] = max_action_load
+    for compound_action in exercise.compound_actions:
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                functional_movement_action_mapping = FunctionalMovementActionMapping(sub_action, {}, datetime.datetime.now(), functional_movement_dict)
+                max_action_load = get_max_action_load(functional_movement_action_mapping)
+                max_loads[sub_action.id] = max_action_load
     return max_loads
 
 
 def test_rowing():
-    exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
+    exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="rowing")  # rowing
     exercise.pace = .24
     #workout_program = create_and_process_workout([exercise])
-    for action in exercise.primary_actions:
-        assert action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
+    for compound_action in exercise.compound_actions:
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                assert sub_action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
     session = get_session(rpe=5, duration=5, exercises=[exercise])
     session_load_dict = get_session_load_dict(session)
     for body_part, muscle_load in session_load_dict.items():
@@ -92,13 +100,15 @@ def test_rowing():
 
 
 def test_rowing_stroke_rate_25():
-    exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="58459d9ddc2ce90011f93d84")  # rowing
+    exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="rowing")  # rowing
     exercise.stroke_rate = 25
     exercise.pace = .24
     #create_and_process_workout([exercise])
     session = get_session(rpe=5, duration=5, exercises=[exercise])
-    for action in exercise.primary_actions:
-        assert action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
+    for compound_action in exercise.compound_actions:
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                assert sub_action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
 
 
 def test_running():
@@ -110,8 +120,10 @@ def test_running():
     exercise.speed = 5
     #create_and_process_workout([exercise])
     session = get_session(rpe=5, duration=5, exercises=[exercise])
-    for action in exercise.primary_actions:
-        assert action.force.observed_value == round(100 / 5, 2)
+    for compound_action in exercise.compound_actions:
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                assert sub_action.force.observed_value == round(100 / 5, 2)
         #assert action.pace == .2
         #assert action.distance == 5 * 3000
 
@@ -125,10 +137,12 @@ def test_walking():
     exercise.speed = 5
     #create_and_process_workout([exercise])
     session = get_session(rpe=5, duration=5, exercises=[exercise])
-    for action in exercise.primary_actions:
-        assert action.force.observed_value == round(100 / 5, 2)
-        #assert action.pace == .2
-        #assert action.distance == 5 * 3000
+    for compound_action in exercise.compound_actions:
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                assert sub_action.force.observed_value == round(100 / 5, 2)
+                #assert action.pace == .2
+                #assert action.distance == 5 * 3000
 
 
 def test_cycling():
@@ -141,11 +155,13 @@ def test_cycling():
     exercise.speed = 5
     #create_and_process_workout([exercise])
     session = get_session(rpe=5, duration=5, exercises=[exercise])
-    for action in exercise.primary_actions:
-        assert action.force.observed_value == round(100 / 5, 2)
-        #assert action.pace == .2
-        #assert action.duration == 1000
-        assert action.training_volume_left == action.training_volume_right == 1000
+    for compound_action in exercise.compound_actions:
+        for action in compound_action.actions:
+            for sub_action in action.sub_actions:
+                assert sub_action.force.observed_value == round(100 / 5, 2)
+                #assert action.pace == .2
+                #assert action.duration == 1000
+                assert sub_action.training_volume_left == action.training_volume_right == 1000
 
 def test_power_lifting():
     power_same_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1.5, time_eccentric=1.5)
