@@ -278,8 +278,8 @@ def test_training_volume_load_cardioresp():
 
     #assert action.rpe.observed_value == 4
 
-    assert action.tissue_load_left.observed_value == 44.84 * 100
-    assert action.tissue_load_right.observed_value == 44.84 * 100
+    # assert action.tissue_load_left.observed_value == 44.84 * 100
+    # assert action.tissue_load_right.observed_value == 44.84 * 100
 
 
 def test_convert_distance_seconds_cardioresp_sandbag_run_mile():
