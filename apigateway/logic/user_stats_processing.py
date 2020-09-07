@@ -290,14 +290,13 @@ class UserStatsProcessing(object):
             )
             current_user_stats.vo2_max_date_time = self.event_date
 
-    def update_vo2_max_estimations_best_time(self, current_user_stats, time, distance_type):
+    def update_vo2_max_estimations_best_time(self, current_user_stats, time, distance):
 
-        distance = Calculators.get_running_distance_from_type(distance_type)
         vo2_max = Calculators.vo2max_running_jack_daniels(time, distance)
         current_user_stats.vo2_max = StandardErrorRange(lower_bound=vo2_max, observed_value=vo2_max, upper_bound=vo2_max)
         current_user_stats.vo2_max_date_time = self.event_date
         current_user_stats.best_running_time = time
-        current_user_stats.best_running_distance_type = distance_type
+        current_user_stats.best_running_distance = distance
         current_user_stats.best_running_date = self.event_date
 
     # def get_historic_asymmetry(self, sessions):

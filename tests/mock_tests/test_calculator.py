@@ -350,3 +350,13 @@ def test_speed_from_watts_rowing():
 def test_speed_from_watts_running():
     speed = Calculators.speed_from_watts_running(watts=60, user_weight=70, grade=0.0)
     assert 1.0 == round(speed, 0)
+
+
+def test_get_running_speed_for_running_pace_distancee():
+    speed = Calculators.get_running_speed_for_running_pace_distance(1609.34)
+    assert 2.68 == round(speed, 2)
+
+
+def test_get_running_speed_for_known_running_pace_distancee():
+    speed = Calculators.get_running_speed_from_known_time(known_distance=4000,known_time=1630.9,running_pace_distance=1609.34)
+    assert 2.68 == round(speed, 2)

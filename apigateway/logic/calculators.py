@@ -77,32 +77,58 @@ class Calculators(object):
             return 0
 
     @classmethod
-    def get_running_speed_from_known_time(cls, known_distance, known_time, running_pace_distance):
-
+    def get_running_speed_for_running_pace_distance(cls, running_pace_distance):
         current_race_times = cls.get_mcmillan_race_time_tuples()
 
         for c in range(0, len(current_race_times)):
             if current_race_times[c][0] == running_pace_distance:
-                target_sec_pace = current_race_times[c][1] / current_race_times[c][1]
-            elif 0 < c < (len(current_race_times) - 1):
-                if current_race_times[c] < running_pace_distance < current_race_times[c + 1]:
-                    less_distance = current_race_times[c][0]
-                    less_time = current_race_times[c][1]
-                    more_distance = current_race_times[c + 1][0]
-                    more_time = current_race_times[c + 1][1]
+                target_meters_second = current_race_times[c][0] / current_race_times[c][1]
+                break
+            if current_race_times[c][0] < running_pace_distance < current_race_times[c + 1][0]:
+                less_distance = current_race_times[c][0]
+                less_time = current_race_times[c][1]
+                more_distance = current_race_times[c + 1][0]
+                more_time = current_race_times[c + 1][1]
 
-                    more_distance_diff = more_distance - running_pace_distance
-                    full_distance_diff = more_distance - less_distance
-                    diff_ratio = more_distance_diff / full_distance_diff
+                more_distance_diff = more_distance - running_pace_distance
+                full_distance_diff = more_distance - less_distance
+                diff_ratio = more_distance_diff / full_distance_diff
 
-                    more_pace = more_time / more_distance
-                    target_sec_pace = more_pace * diff_ratio
+                less_meters_second = less_distance / less_time
+                more_meters_second = more_distance / more_time
+                adjusted_meters_second = ((more_meters_second - less_meters_second) * diff_ratio) + less_meters_second
+                target_meters_second = adjusted_meters_second
+                break
 
+            elif running_pace_distance < current_race_times[c][0]:
+                more_distance = current_race_times[c][0]
+                more_time = current_race_times[c][1]
 
+                more_meters_second = more_distance / more_time
+                target_meters_second = more_meters_second
+                break
+            elif c == len(current_race_times) - 1:
+                more_distance = current_race_times[c][0]
+                more_time = current_race_times[c][1]
 
-        #known_meters = cls.get_running_distance_from_type(known_distance_type)
-        #known_pace = known_time / known_meters
+                more_meters_second = more_distance / more_time
+                target_meters_second = more_meters_second
 
+        return target_meters_second
+
+    @classmethod
+    def get_running_speed_from_known_time(cls, known_distance, known_time, running_pace_distance):
+
+        baseline_speed = cls.get_running_speed_for_running_pace_distance(known_distance)
+        known_speed = known_distance / known_time
+
+        know_baseline_ratio = known_speed / baseline_speed
+
+        running_pace_speed = cls.get_running_speed_for_running_pace_distance(running_pace_distance)
+
+        adjusted_running_speed = running_pace_speed * know_baseline_ratio
+
+        return adjusted_running_speed
 
     @classmethod
     def vo2_max_estimation_demographics(cls, age, user_weight, user_height=1.7, gender=Gender.female, activity_level=5):
@@ -206,11 +232,37 @@ class Calculators(object):
         race_times.append((600, 3 * 60 + 16.50))
         race_times.append((800, 4 * 60 + 29.30))
         race_times.append((1000, 5 * 60 + 54.10))
-        race_times.append((1500, 9 * 60 + 55))
-        race_times.append((1600, 9 * 60 + 59))
-        race_times.append((1609.34, 60 * 10)) #1 mile
-        race_times.append((2000, 212 * 60 + 41))
-
+        race_times.append((1500, 9 * 60 + 14.70))
+        race_times.append((1600, 9 * 60 + 56.10))
+        race_times.append((1609.34, 60 * 10)) # 1 mile
+        race_times.append((2000, 12 * 60 + 41.90))
+        race_times.append((2414.01, 15 * 60 + 37.30)) # 1.5 mile
+        race_times.append((3000, 19 * 60 + 45.60))
+        race_times.append((3200, 21 * 60 + 6.70))
+        race_times.append((3218.68, 21 * 60 + 14.70)) # 2mile
+        race_times.append((4000, 27 * 60 + 10.90))
+        race_times.append((4828.02, 33 * 60 + 15.00)) # 3 mile
+        race_times.append((5000, 34 * 60 + 43.00))
+        race_times.append((6000, 42 * 60 + 0.00))
+        race_times.append((6437.36, 45 * 60 + 7.00))
+        race_times.append((8000, 57 * 60 + 12.00))
+        race_times.append((8046.7, 57 * 60 + 33.00)) # 5 mile
+        race_times.append((10000, 72 * 60 + 5.00))
+        race_times.append((12000, 87 * 60 + 39.00))
+        race_times.append((15000, 91 * 60 + 41.00))
+        race_times.append((16093.4, 120 * 60 + 29.00))
+        race_times.append((20000, 151 * 60 + 57.00))
+        race_times.append((21082.354, 160 * 60 + 43.00)) # half marathon
+        race_times.append((24140.1, 185 * 60 + 57.00))  # 15 miles
+        race_times.append((25000, 193 * 60 + 4.00))
+        race_times.append((30000, 234 * 60 + 48.00))
+        race_times.append((1609.34*20, 252 * 60 + 59.00))
+        race_times.append((1609.34 * 25, 320 * 60 + 16.00))
+        race_times.append((1609.34 * 26.2, 338 * 60 + 13.00))
+        race_times.append((50000, 410 * 60 + 17.00))
+        race_times.append((1609.34 * 50, 750 * 60 + 24.00))
+        race_times.append((100000, 988 * 60 + 40.00))
+        race_times.append((1609.34 * 100, 1952 * 60 + 50.00)) # wth!!!
         return race_times
 
     @classmethod

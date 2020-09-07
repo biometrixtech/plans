@@ -30,7 +30,7 @@ class UserStats(Serialisable):
         self.vo2_max_date_time = None
 
         self.best_running_time = None
-        self.best_running_distance_type = None
+        self.best_running_distance = None
         self.best_running_date = None
 
         self.functional_threshold_power = None
@@ -82,7 +82,7 @@ class UserStats(Serialisable):
             'vo2_max': self.vo2_max.json_serialise() if self.vo2_max is not None else None,
             'vo2_max_date_time': format_datetime(self.vo2_max_date_time),
             'best_running_time': self.best_running_time,
-            'best_running_distance': self.best_running_distance_type.value if self.best_running_distance_type is not None else None,
+            'best_running_distance': self.best_running_distance if self.best_running_distance is not None else None,
             'best_running_date': self.best_running_date,
             'athlete_age': self.athlete_age,
             'athlete_weight': self.athlete_weight,
@@ -125,7 +125,7 @@ class UserStats(Serialisable):
         user_stats.sport_max_load = {int(sport_name): SportMaxLoad.json_deserialise(sport_max_load) for (sport_name, sport_max_load) in input_dict.get('sport_max_load', {}).items()}
         user_stats.vo2_max = StandardErrorRange.json_deserialise(input_dict.get('vo2_max')) if input_dict.get('vo2_max') is not None else None
         user_stats.best_running_time = input_dict.get('best_running_time')
-        user_stats.best_running_distance_type = RunningDistances(input_dict['best_running_distance_type']) if input_dict.get('best_running_distance_type') is not None else None
+        user_stats.best_running_distance = input_dict.get('best_running_distance')
         user_stats.best_running_date = input_dict.get('best_running_date')
 
         user_stats.functional_threshold_power = input_dict.get('functional_threshold_power')
