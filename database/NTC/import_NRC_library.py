@@ -60,7 +60,7 @@ class WorkoutParser(object):
         }
 
         self.pace_exercise_lookup = {
-            "none": "jog",
+            "none": "",
             "recovery_jog": 'jog',
             "long_run": 'run',
             "comfortable_run": 'run',

@@ -244,7 +244,7 @@ class WorkoutProcessor(object):
                                                                               efficiency=.21)
                         exercise.duration = exercise.speed * exercise.distance
 
-            if exercise.rpe is None:
+            if exercise.rpe is None:  # only predict rpe if not provided by user
                 exercise.predicted_rpe = StandardErrorRange()
                 if exercise.end_of_workout_hr is not None:
                     exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
@@ -253,7 +253,6 @@ class WorkoutProcessor(object):
                                                                                               gender=self.gender,
                                                                                               vo2_max=self.vo2_max.observed_value)
                 else:
-                    #exercise.predicted_rpe.observed_value = exercise.shrz or 4
                     self.set_planned_cardio_rpe(exercise)
             else:
                 if isinstance(exercise.rpe, StandardErrorRange):
@@ -328,7 +327,7 @@ class WorkoutProcessor(object):
 
                         exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
 
-            if exercise.rpe is not None:
+            if exercise.rpe is None:
                 self.set_planned_cardio_rpe(exercise)
             else:
                 if isinstance(exercise.rpe, StandardErrorRange):

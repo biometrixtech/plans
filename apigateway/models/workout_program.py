@@ -532,7 +532,18 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
             if self.predicted_rpe is None:  # this should never be the case as we should always have predicted_rpe (here just in case)
                 rpe = 4.0
             else:
-                rpe = self.predicted_rpe.observed_value
+                # get a single rpe based on presence of lower_bound, observed_value and upper_bound
+                if self.predicted_rpe.observed_value is not None:
+                    rpe = self.predicted_rpe.observed_value
+                elif self.predicted_rpe.lower_bound is not None and self.predicted_rpe.upper_bound is not None:
+                    rpe = (self.predicted_rpe.lower_bound + self.predicted_rpe.upper_bound) / 2
+                elif self.predicted_rpe.lower_bound is not None:
+                    rpe = self.predicted_rpe.lower_bound
+                elif self.predicted_rpe.upper_bound is not None:
+                    rpe = self.predicted_rpe.upper_bound
+                else:
+                    rpe = 4.0  # again should never happen
+
             percent_max_hr = Calculators.get_percent_max_hr_from_rpe(rpe)
             if .65 < percent_max_hr <= .8:
                 self.percent_time_at_65_80_max_hr = 1.0
