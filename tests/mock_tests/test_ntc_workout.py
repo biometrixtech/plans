@@ -66,35 +66,37 @@ def get_session(date, workout, assignment_type='default', movement_option=None):
 
 # def test_ntc():
 #     all_workouts = get_ntc_workout()
-#     # planned_workout = get_workout()
+#     failed_count = 0
+#     success_count = 0
 #     for planned_workout in all_workouts:
-#         # if '15 at the Limit' in planned_workout.name:
-#         # try:
+#         try:
 #             session = get_session(date=datetime.datetime.now(), workout=planned_workout)
-#             if session.power_load is None:
+#             if session.power_load is None or session.power_load.observed_value is None:
 #                 print(f"workout has no load: {planned_workout.name}")
-#         # except Exception as e:
-#         #     print(f"processing failed: {planned_workout.name}")
-#         #     print(e)
-#         # assert session.power_load is not None
-
-
-def test_nrc():
-    all_workouts = get_nrc_workout()
-    failed_count = 0
-    success_count = 0
-    for planned_workout in all_workouts:
-        # if planned_workout.name != 'Lead with Chris Derrick':
-        #     continue
-        try:
-            session = get_session(date=datetime.datetime.now(), workout=planned_workout)
-            if session.power_load is None:
-                print(f"workout has no load: {planned_workout.name}")
-            success_count += 1
-        except Exception as e:
-            failed_count += 1
-            print(f"processing failed: {planned_workout.name}")
-            # print(e)
-            raise
-        # assert session.power_load is not None
-    print(failed_count, success_count)
+#             if session.rpe_load is None or session.rpe_load.observed_value is None:
+#                 print(f"workout has no rpe load: {planned_workout.name}")
+#             success_count += 1
+#         except Exception as e:
+#             failed_count += 1
+#             print(f"processing failed: {planned_workout.name}")
+#             print(e)
+#     print(failed_count, success_count)
+#
+#
+# def test_nrc():
+#     all_workouts = get_nrc_workout()
+#     failed_count = 0
+#     success_count = 0
+#     for planned_workout in all_workouts:
+#         try:
+#             session = get_session(date=datetime.datetime.now(), workout=planned_workout)
+#             if session.power_load is None or session.power_load.observed_value is None:
+#                 print(f"workout has no power load: {planned_workout.name}")
+#             if session.rpe_load is None or session.rpe_load.observed_value is None:
+#                 print(f"workout has no rpe load: {planned_workout.name}")
+#             success_count += 1
+#         except Exception as e:
+#             failed_count += 1
+#             print(f"processing failed: {planned_workout.name}")
+#             print(e)
+#     print(failed_count, success_count)
