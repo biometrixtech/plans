@@ -54,7 +54,6 @@ class WorkoutProcessor(object):
 
                     session = self.set_session_intensity_metrics(session, workout_exercise)
 
-
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, session):
 
@@ -219,7 +218,7 @@ class WorkoutProcessor(object):
 
     def update_exercise_details(self, exercise):
 
-        exercise.set_intensity()
+        # exercise.set_intensity()
         exercise.set_adaption_type()
         exercise.set_rep_tempo()
         exercise.set_reps_duration()
@@ -245,16 +244,22 @@ class WorkoutProcessor(object):
                                                                               efficiency=.21)
                         exercise.duration = exercise.speed * exercise.distance
 
-            exercise.predicted_rpe = StandardErrorRange()
-            if exercise.end_of_workout_hr is not None:
-                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
-                                                                                          user_age=self.user_age,
-                                                                                          user_weight=self.user_weight,
-                                                                                          gender=self.gender,
-                                                                                          vo2_max=self.vo2_max.observed_value)
+            if exercise.rpe is None:
+                exercise.predicted_rpe = StandardErrorRange()
+                if exercise.end_of_workout_hr is not None:
+                    exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
+                                                                                              user_age=self.user_age,
+                                                                                              user_weight=self.user_weight,
+                                                                                              gender=self.gender,
+                                                                                              vo2_max=self.vo2_max.observed_value)
+                else:
+                    #exercise.predicted_rpe.observed_value = exercise.shrz or 4
+                    self.set_planned_cardio_rpe(exercise)
             else:
-                #exercise.predicted_rpe.observed_value = exercise.shrz or 4
-                self.set_planned_cardio_rpe(exercise)
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
 
             exercise.set_hr_zones(self.user_age)
         else:
@@ -265,7 +270,13 @@ class WorkoutProcessor(object):
             # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
-            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            if exercise.rpe is None:
+                exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            else:
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
 
         exercise = self.set_total_volume(exercise)
         exercise.set_training_loads()
@@ -317,7 +328,13 @@ class WorkoutProcessor(object):
 
                         exercise.duration = Assignment.multiply_assignments(exercise.distance, exercise.speed)
 
-            self.set_planned_cardio_rpe(exercise)
+            if exercise.rpe is not None:
+                self.set_planned_cardio_rpe(exercise)
+            else:
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -327,7 +344,13 @@ class WorkoutProcessor(object):
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
             # TODO this needs to handle planned exercises
-            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            if exercise.rpe is None:
+                exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            else:
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
             # rpe = Calculators.get_rpe_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
             # exercise.predicted_rpe = StandardErrorRange(observed_value=rpe)
 
