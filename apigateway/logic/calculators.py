@@ -214,8 +214,8 @@ class Calculators(object):
             vo2_max_range = vo2_max_range_lower
         elif vo2_max_range_upper is not None and vo2_max_range_lower is not None:
             vo2_max_range = StandardErrorRange()
-            vo2_max_range.lower_bound = min(vo2_max_range_lower.lowest_value(), vo2_max_range_upper.lowest_value())
-            vo2_max_range.upper_bound = min(vo2_max_range_lower.highest_value(), vo2_max_range_upper.highest_value())
+            vo2_max_range.lower_bound = max(vo2_max_range_lower.lowest_value(), vo2_max_range_upper.lowest_value())
+            vo2_max_range.upper_bound = max(vo2_max_range_lower.highest_value(), vo2_max_range_upper.highest_value())
             vo2_max_range.observed_value = (vo2_max_range.lowest_value() + vo2_max_range.highest_value()) / 2
         else:
             vo2_max_range = StandardErrorRange()
@@ -793,7 +793,7 @@ class Calculators(object):
         return speed
 
     @classmethod
-    def speed_from_watts_running(cls, watts, user_weight, grade, efficiency=.21):
+    def speed_from_watts_running(cls, watts, user_weight, grade, efficiency=.22):
 
         if isinstance(grade, Assignment):
             if grade.assigned_value is not None:
@@ -919,7 +919,7 @@ class Calculators(object):
         cardio_name = cardio_type.name if cardio_type is not None else None
         # cardio_name = cardio_type.name or None
         mets = cls.mets_cardio(cardio_name, gender)
-        power = cls.mets_to_watts(mets, user_weight, efficiency=.21)
+        power = cls.mets_to_watts(mets, user_weight, efficiency=.22)
         return power
 
     @classmethod
@@ -1025,17 +1025,22 @@ class Calculators(object):
         if vo2_max_range.lower_bound is None and vo2_max_range.observed_value is None and vo2_max_range.upper_bound is None:
             return StandardErrorRange()
         if vo2_max is not None:
-            work_vo2_list = [
-                (vo2_max_range.lower_bound / 100) * vo2_max.lower_bound,
-                (vo2_max_range.upper_bound / 100) * vo2_max.lower_bound,
-                (vo2_max_range.lower_bound / 100) * vo2_max.upper_bound,
-                (vo2_max_range.upper_bound / 100) * vo2_max.upper_bound]
+
+            vo2_max_list = [vo2_max.lower_bound, vo2_max.observed_value, vo2_max.upper_bound]
+            vo2_max_list = [v for v in vo2_max_list if v is not None]
+            vo2_max_range_list = [vo2_max_range.lower_bound, vo2_max_range.upper_bound]
+            work_vo2_list = [v_max * percent / 100 for v_max in vo2_max_range_list for percent in vo2_max_list]
+            # work_vo2_list = [
+            #     (vo2_max_range.lower_bound / 100) * vo2_max.lower_bound,
+            #     (vo2_max_range.upper_bound / 100) * vo2_max.lower_bound,
+            #     (vo2_max_range.lower_bound / 100) * vo2_max.upper_bound,
+            #     (vo2_max_range.upper_bound / 100) * vo2_max.upper_bound]
 
             work_vo2_lower_bound = min(work_vo2_list)
             work_vo2_upper_bound = max(work_vo2_list)
 
-            watts_lower = cls.power_running_from_work_vo2(work_vo2_lower_bound, weight, efficiency=.21)
-            watts_upper = cls.power_running_from_work_vo2(work_vo2_upper_bound, weight, efficiency=.21)
+            watts_lower = cls.power_running_from_work_vo2(work_vo2_lower_bound, weight, efficiency=.22)
+            watts_upper = cls.power_running_from_work_vo2(work_vo2_upper_bound, weight, efficiency=.22)
             watts_observed = (watts_lower + watts_upper) / 2
             watts_range = StandardErrorRange(lower_bound=watts_lower, observed_value=watts_observed, upper_bound=watts_upper)
         else:
@@ -1128,7 +1133,7 @@ class Calculators(object):
         :return:
         """
         mets = cls.get_mets_by_speed_resistance_displacement(speed, resistance, displacement)
-        power = cls.mets_to_watts(mets=mets, weight=weight, efficiency=.21)
+        power = cls.mets_to_watts(mets=mets, weight=weight, efficiency=.22)
         return power
 
     @classmethod
