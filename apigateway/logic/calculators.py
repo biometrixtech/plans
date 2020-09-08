@@ -482,10 +482,11 @@ class Calculators(object):
     def vo2max_running_jack_daniels(cls, time, distance):
         """
 
-        :param time: minutes
+        :param time: seconds
         :param distance: meters
         :return:
         """
+        time /= 60 # convert to minutes as we need m/min
         velocity = distance / time
         percent_max = 0.8 + 0.1894393 * math.exp(-0.012778 * time) + 0.2989558 * math.exp(-0.1932605 * time)
         vo2 = -4.60 + 0.182258 * velocity + 0.000104 * (velocity ** 2)
