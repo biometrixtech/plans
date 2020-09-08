@@ -228,13 +228,16 @@ class TargetLoadCalculator(object):
 
 
 class PeriodizationPlanProcessor(object):
-    def __init__(self, event_date, athlete_periodization_goal, athlete_persona, training_phase_type, completed_session_details_datastore, workout_library_datastore, exclude_completed=True):
+    def __init__(self, event_date, user_stats, injury_risk_dict, completed_session_details_datastore, workout_library_datastore, exclude_completed=True):
         self.start_date = event_date
-
-        self.persona = athlete_persona
-        self.goal = athlete_periodization_goal
-        self.training_phase_type = training_phase_type
-        self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type, periodization_goal=athlete_periodization_goal)
+        self.user_stats = user_stats
+        self.injury_risk_dict = injury_risk_dict
+        #self.persona = user_stats.persona
+        #self.goals = user_stats.periodization_goals
+        #self.training_phase_type = user_stats.training_phase_type
+        self.model = PeriodizationModelFactory().create(persona=user_stats.persona,
+                                                        training_phase_type=user_stats.training_phase_type,
+                                                        periodization_goals=user_stats.periodization_goals)
         self.exclude_completed = exclude_completed
         self.completed_session_details_datastore = completed_session_details_datastore
         self.workout_library_datastore = workout_library_datastore
@@ -359,7 +362,8 @@ class PeriodizationPlanProcessor(object):
         self.set_weekly_targets()
         self.sum_detailed_load()
 
-        periodization_plan = PeriodizationPlan(self.start_date, self.goal, self.training_phase_type, self.persona)
+        periodization_plan = PeriodizationPlan(self.start_date, self.user_stats.periodization_goals,
+                                               self.user_stats.training_phase_type, self.user_stats.persona)
         week_number = 0
         # workouts = self.workout_library_datastore.get()
         # periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,

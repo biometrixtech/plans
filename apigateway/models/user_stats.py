@@ -3,6 +3,7 @@ from serialisable import Serialisable
 from models.load_stats import LoadStats
 from models.session import HighLoadSession, HighDetailedLoadSession
 from models.stats import StandardErrorRange
+from models.periodization import PeriodizationGoal, PeriodizationPersona, TrainingPhaseType
 from utils import parse_date, format_datetime, parse_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
@@ -58,6 +59,7 @@ class UserStats(Serialisable):
 
         self.fitness_provider_cardio_profile = None
 
+        # training load monitoring
         self.internal_ramp = None
         self.internal_monotony = None
         self.historical_internal_strain = []
@@ -68,6 +70,11 @@ class UserStats(Serialisable):
         self.chronic_internal_total_load = None
         self.internal_acwr = None
         self.internal_freshness_index = None
+
+        # periodization
+        self.periodization_goals = []
+        self.persona = None
+        self.training_phase_type = None
 
     def __setattr__(self, name, value):
         if name == 'event_date' and value is not None:
@@ -130,7 +137,9 @@ class UserStats(Serialisable):
             'acute_internal_total_load': self.acute_internal_total_load.json_serialise() if self.acute_internal_total_load is not None else None,
             'chronic_internal_total_load': self.chronic_internal_total_load.json_serialise() if self.chronic_internal_total_load is not None else None,
             'internal_acwr': self.internal_acwr.json_serialise() if self.internal_acwr is not None else None,
-
+            'periodization_goals': [p.value for p in self.periodization_goals],
+            'persona': self.persona.value if self.persona is not None else None,
+            'training_phase_type': self.training_phase_type.value,
         }
         return ret
 
@@ -189,6 +198,10 @@ class UserStats(Serialisable):
         user_stats.internal_strain_events = StandardErrorRange.json_deserialise(input_dict.get('internal_strain_events', None))
         user_stats.internal_ramp = StandardErrorRange.json_deserialise(input_dict.get('internal_ramp', None))
         user_stats.internal_acwr = StandardErrorRange.json_deserialise(input_dict.get('internal_acwr', None))
+
+        user_stats.periodization_goals = [PeriodizationGoal(p) for p in input_dict.get('periodization_goals', [])]
+        user_stats.persona = PeriodizationPersona(input_dict['persona']) if input_dict.get('persona') is not None else None
+        user_stats.training_phase_type = TrainingPhaseType(input_dict['training_phase_type']) if input_dict.get('training_phase_type') is not None else None
 
         return user_stats
 

@@ -151,9 +151,9 @@ class TemplateWorkout(object):
 
 
 class PeriodizationPlan(object):
-    def __init__(self, start_date, athlete_periodization_goal, training_phase, athlete_persona):
+    def __init__(self, start_date, athlete_periodization_goals, training_phase, athlete_persona):
         self.start_date = start_date
-        self.periodization_goal = athlete_periodization_goal
+        self.periodization_goals = athlete_periodization_goals
         self.training_phase = training_phase
         self.athlete_persona = athlete_persona
         self.template_workout = None
@@ -403,18 +403,19 @@ class RequiredExerciseFactory(object):
 
 class PeriodizationModelFactory(object):
 
-    def create(self, persona, training_phase_type, periodization_goal):
+    def create(self, persona, training_phase_type, periodization_goals):
 
         if persona == PeriodizationPersona.well_trained:
 
             periodization_model = PeriodizationModel()
             periodization_model.progression_persona = PeriodizationPersona.well_trained
 
-            periodization_model.required_exercises = RequiredExerciseFactory().get_required_exercises(periodization_goal)
-            periodization_model.one_required_exercises = RequiredExerciseFactory().get_one_required_exercises(
-                periodization_goal)
-            periodization_model.one_required_combinations = RequiredExerciseFactory().get_one_required_combination(
-                periodization_goal)
+            for goal in periodization_goals:
+                periodization_model.required_exercises.extend(RequiredExerciseFactory().get_required_exercises(goal))
+                periodization_model.one_required_exercises.extend(RequiredExerciseFactory().get_one_required_exercises(
+                    goal))
+                periodization_model.one_required_combinations.extend(RequiredExerciseFactory().get_one_required_combination(
+                    goal))
 
             training_phase = TrainingPhaseFactory().create(training_phase_type)
 

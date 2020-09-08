@@ -1,6 +1,7 @@
 from models.session_functional_movement import SessionFunctionalMovement
 from models.workout_program import WorkoutProgramModule
 from models.session import MixedActivitySession, SportTrainingSession
+from models.user_stats import UserStats
 from logic.workout_processing import WorkoutProcessor
 from datetime import datetime, timedelta
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
@@ -233,8 +234,12 @@ def get_seven_day_completed_data_store():
 def test_7_days_completed_sessions_cardio_health():
 
     data_store = get_seven_day_completed_data_store()
-    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardiovascular_health,
-                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
+    user_stats = UserStats("tester")
+    injury_risk_dict = {}
+    user_stats.periodization_goals = [PeriodizationGoal.increase_cardiovascular_health]
+    user_stats.persona = PeriodizationPersona.well_trained
+    user_stats.training_phase_type = TrainingPhaseType.increase
+    proc = PeriodizationPlanProcessor(datetime.now(), user_stats, injury_risk_dict, data_store, None)
     plan = proc.create_periodization_plan(datetime.now().date())
 
     assert plan.template_workout is not None
@@ -242,8 +247,12 @@ def test_7_days_completed_sessions_cardio_health():
 
 def test_7_days_completed_sessions_cardio_endurance():
     data_store = get_seven_day_completed_data_store()
-    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardio_endurance,
-                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
+    user_stats = UserStats("tester")
+    injury_risk_dict = {}
+    user_stats.periodization_goals = [PeriodizationGoal.increase_cardio_endurance]
+    user_stats.persona = PeriodizationPersona.well_trained
+    user_stats.training_phase_type = TrainingPhaseType.increase
+    proc = PeriodizationPlanProcessor(datetime.now(), user_stats, injury_risk_dict, data_store, None)
     plan = proc.create_periodization_plan(datetime.now().date())
 
     assert plan.template_workout is not None
@@ -251,16 +260,24 @@ def test_7_days_completed_sessions_cardio_endurance():
 
 def test_7_days_completed_sessions_cardio_endurance_with_speed():
     data_store = get_seven_day_completed_data_store()
-    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardio_endurance_with_speed,
-                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
+    user_stats = UserStats("tester")
+    injury_risk_dict = {}
+    user_stats.periodization_goals = [PeriodizationGoal.increase_cardio_endurance]
+    user_stats.persona = PeriodizationPersona.well_trained
+    user_stats.training_phase_type = TrainingPhaseType.increase
+    proc = PeriodizationPlanProcessor(datetime.now(), user_stats, injury_risk_dict, data_store, None)
     plan = proc.create_periodization_plan(datetime.now().date())
 
     assert plan.template_workout is not None
 
 def test_7_days_completed_sessions_strength_max_strength():
     data_store = get_seven_day_completed_data_store()
-    proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_strength_max_strength,
-                                      PeriodizationPersona.well_trained, TrainingPhaseType.increase, data_store, None)
+    user_stats = UserStats("tester")
+    injury_risk_dict = {}
+    user_stats.periodization_goals = [PeriodizationGoal.increase_strength_max_strength]
+    user_stats.persona = PeriodizationPersona.well_trained
+    user_stats.training_phase_type = TrainingPhaseType.increase
+    proc = PeriodizationPlanProcessor(datetime.now(), user_stats, injury_risk_dict, data_store, None)
     plan = proc.create_periodization_plan(datetime.now().date())
 
     assert plan.template_workout is not None
