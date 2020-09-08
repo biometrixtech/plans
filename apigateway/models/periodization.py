@@ -445,7 +445,7 @@ class TrainingPhaseFactory(object):
                                  upper_progression_bound=None)
         elif training_phase_type == TrainingPhaseType.taper:
             return TrainingPhase(training_phase_type=training_phase_type, lower_progression_bound=.8,
-                                 upper_progression_bound=.1)
+                                 upper_progression_bound=1.1)
         elif training_phase_type == TrainingPhaseType.maintain:
             return TrainingPhase(training_phase_type=training_phase_type, lower_progression_bound=.9,
                                  upper_progression_bound=1.1)
