@@ -105,7 +105,7 @@ def test_power_cardio_run():
 
 def test_power_cardio_no_type():
     user_weight = 70
-    eff = .21
+    eff = .22
     power_male = Calculators.power_cardio(cardio_type=None, user_weight=user_weight, gender=Gender.male)
     assert power_male == Calculators.mets_to_watts(mets=5, weight=user_weight, efficiency=eff)
     power_female = Calculators.power_cardio(cardio_type=None, user_weight=user_weight)

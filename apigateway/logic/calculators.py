@@ -787,8 +787,8 @@ class Calculators(object):
     @classmethod
     def speed_from_work_vo2_running(cls, work_vo2, grade=0.0):
 
-        min_speed = (work_vo2 - 3.5) / (0.17 + grade * 0.79)
-        speed = min_speed / float(60)
+        min_speed = (work_vo2 - 3.5) / (0.17 + grade * 0.79) # speed in m/min
+        speed = min_speed / float(60) # speed in m/s
 
         return speed
 

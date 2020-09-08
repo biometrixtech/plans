@@ -311,22 +311,22 @@ class WorkoutProcessor(object):
                         exercise.speed = Assignment(assignment_type=None, assigned_value=speed_assigned,
                                                     min_value=speed_min, max_value=speed_max)
 
-                        exercise.duration = Assignment.multiply_assignments(exercise.distance, exercise.speed)
+                        exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
                     elif exercise.cardio_action == CardioAction.run:
                         speed_min = Calculators.speed_from_watts_running(exercise.power.lowest_value(),
                                                                          self.user_weight, exercise.grade,
-                                                                         efficiency=.21)
+                                                                         efficiency=.22)
 
                         speed_max = Calculators.speed_from_watts_running(exercise.power.highest_value(),
                                                                          self.user_weight, exercise.grade,
-                                                                         efficiency=.21)
+                                                                         efficiency=.22)
 
                         speed_assigned = (speed_min + speed_max) / 2
 
                         exercise.speed = Assignment(assignment_type=None, assigned_value=speed_assigned,
                                                     min_value=speed_min, max_value=speed_max)
 
-                        exercise.duration = Assignment.multiply_assignments(exercise.distance, exercise.speed)
+                        exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
 
             if exercise.rpe is not None:
                 self.set_planned_cardio_rpe(exercise)
