@@ -32,7 +32,7 @@ def test_first_session_unknown_high_load():
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
     session = get_session_with_power_load_observed_value(session_event_date, 100)
-    training_load_processing.load_training_session_values([session])
+    training_load_processing.load_training_session_values([session], [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert training_load_processing.high_relative_load_score == 50
 
@@ -54,7 +54,7 @@ def test_several_sessions_high_load():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 50 < training_load_processing.high_relative_load_score < 75
 
@@ -76,7 +76,7 @@ def test_several_sessions_medium_high_load():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 50 < training_load_processing.high_relative_load_score < 75
 
@@ -98,7 +98,7 @@ def test_sparse_sessions_normal_load():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 50 == training_load_processing.high_relative_load_score
 
@@ -120,7 +120,7 @@ def test_sparse_sessions_high_but_normal_load():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 50 == training_load_processing.high_relative_load_score
 
@@ -143,7 +143,7 @@ def test_sparse_sessions_high_load_but_somehow_still_normal():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 50 == training_load_processing.high_relative_load_score
 
@@ -165,7 +165,7 @@ def test_sparse_sessions_high_load_but_not_normal():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 75 < training_load_processing.high_relative_load_score
 
@@ -187,7 +187,7 @@ def test_very_sparse_sessions_mod_high_load():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 50 < training_load_processing.high_relative_load_score < 75
 
@@ -209,7 +209,7 @@ def test_very_sparse_sessions_high_load():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 75 < training_load_processing.high_relative_load_score
 
@@ -232,6 +232,6 @@ def test_very_sparse_sessions_high_load_no_workout_last_day():
 
     training_load_processing = TrainingLoadProcessing(start_date,end_date,load_stats,expected_weekly_workouts)
 
-    training_load_processing.load_training_session_values(sessions)
+    training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
     assert 75 < training_load_processing.high_relative_load_score

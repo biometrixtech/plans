@@ -194,15 +194,15 @@ class TrainingLoadProcessing(object):
                                                                                                  "rpe_load",
                                                                                                 all_training_sessions)))
 
-        if len(self.internal_load_tuples) > 0:
-            internal_load_values = list(x[1] for x in self.internal_load_tuples if x[1] is not None)
-            high_internal = max(internal_load_values)
-            low_internal = min(internal_load_values)
-            range = (high_internal - low_internal) / 3
-            self.low_internal_load_day_lower_bound = low_internal
-            self.low_internal_load_day_upper_bound = low_internal + range
-            self.mod_internal_load_day_upper_bound = high_internal - range
-            self.high_internal_load_day_upper_bound = high_internal
+        # if len(self.internal_load_tuples) > 0:
+        #     internal_load_values = list(x[1] for x in self.internal_load_tuples if x[1] is not None)
+        #     high_internal = max(internal_load_values)
+        #     low_internal = min(internal_load_values)
+        #     range = (high_internal - low_internal) / 3
+        #     self.low_internal_load_day_lower_bound = low_internal
+        #     self.low_internal_load_day_upper_bound = low_internal + range
+        #     self.mod_internal_load_day_upper_bound = high_internal - range
+        #     self.high_internal_load_day_upper_bound = high_internal
 
     @xray_recorder.capture('logic.TrainingLoadProcessing.calc_training_load_metrics')
     def calc_training_load_metrics(self, user_stats):
@@ -409,7 +409,7 @@ class TrainingLoadProcessing(object):
 
         for training_session in training_sessions:
 
-            values.extend((getattr(attribute_1_name, c), getattr(attribute_2_name, c)) for c in training_session)
+            values.append((getattr(training_session, attribute_1_name), getattr(training_session, attribute_2_name)))
 
         return values
 
