@@ -157,7 +157,7 @@ class SessionFunctionalMovement(object):
                     #exercise_load = self.apply_load(workout_exercise.primary_actions, event_date)
                     #exercise_load = {}  # load by adaptation type
 
-                    for compound_action in workout_exercise.primary_actions:
+                    for compound_action in workout_exercise.compound_actions:
                         for action in compound_action.actions:
                             for sub_action in action.sub_actions:
                                 functional_movement_action_mapping = FunctionalMovementActionMapping(sub_action,
@@ -215,29 +215,31 @@ class SessionFunctionalMovement(object):
                     #exercise_load = self.apply_load(workout_exercise.primary_actions, event_date)
                     #exercise_load = {}  # load by adaptation type
 
-                    for action in workout_exercise.primary_actions:
-                        functional_movement_action_mapping = FunctionalMovementActionMapping(action,
-                                                                                             self.injury_risk_dict,
-                                                                                             event_date, function_movement_dict)
-                        # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
-                        detailed_load_processor.add_load(functional_movement_action_mapping,
-                                                         workout_exercise.adaptation_type,
-                                                         action,
-                                                         workout_exercise.power_load,
-                                                         reps=workout_exercise.reps_per_set,
-                                                         duration=workout_exercise.duration,
-                                                         rpe_range=workout_exercise.rpe,
-                                                         percent_max_hr=None)
+                    for compound_action in workout_exercise.compound_actions:
+                        for action in compound_action.actions:
+                            for sub_action in action.sub_actions:
+                                functional_movement_action_mapping = FunctionalMovementActionMapping(sub_action,
+                                                                                                     self.injury_risk_dict,
+                                                                                                     event_date, function_movement_dict)
+                                # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
+                                detailed_load_processor.add_load(functional_movement_action_mapping,
+                                                                 workout_exercise.adaptation_type,
+                                                                 sub_action,
+                                                                 workout_exercise.power_load,
+                                                                 reps=workout_exercise.reps_per_set,
+                                                                 duration=workout_exercise.duration,
+                                                                 rpe_range=workout_exercise.rpe,
+                                                                 percent_max_hr=None)
 
-                        self.functional_movement_mappings.append(functional_movement_action_mapping)
+                                self.functional_movement_mappings.append(functional_movement_action_mapping)
 
-                        # new
-                        for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
-                            muscle = BodyPartSide.from_string(muscle_string)
-                            if muscle not in workout_load:
-                                workout_load[muscle] = load
-                            else:
-                                workout_load[muscle].merge(load)
+                                # new
+                                for muscle_string, load in functional_movement_action_mapping.muscle_load.items():
+                                    muscle = BodyPartSide.from_string(muscle_string)
+                                    if muscle not in workout_load:
+                                        workout_load[muscle] = load
+                                    else:
+                                        workout_load[muscle].merge(load)
 
         detailed_load_processor.rank_types()
         self.completed_session_details.session_detailed_load = detailed_load_processor.session_detailed_load

@@ -235,14 +235,14 @@ def test_check_active_rest_phases_no_soreness_with_mixed_session():
     exercise_1.duration = 90
     exercise_1.power_load = StandardErrorRange(observed_value=300)
     exercise_1.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
-    exercise_1.primary_actions.append(compound_action_1)
+    exercise_1.compound_actions.append(compound_action_1)
 
     exercise_2 = WorkoutExercise()
     exercise_2.rpe = StandardErrorRange(observed_value=5)
     exercise_2.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
     exercise_2.duration = 90
     exercise_2.power_load = StandardErrorRange(observed_value=300)
-    exercise_2.primary_actions.append(compound_action_2)
+    exercise_2.compound_actions.append(compound_action_2)
 
     section_1 = WorkoutSection()
     section_1.exercises.append(exercise_1)

@@ -24,8 +24,11 @@ class WorkoutParser(object):
         self.intensity_measures_pace = {
             'none': 'none',
             'recovery jogs': 'recovery_jog',
+            'recovery jog': 'recovery_jog',
             'long run': 'long_run',
-            'comfortable Run': 'comfortable_run',
+            'comfortable run': 'comfortable_run',
+            'steady state': 'steady_state',
+            'tempo run': 'tempo_run',
             'easy run': 'easy_run',
             'warm up': 'warm_up',
             'cooldown': 'cooldown',
@@ -56,6 +59,25 @@ class WorkoutParser(object):
             'sprint': (9, None, 10),
         }
 
+        self.pace_exercise_lookup = {
+            "none": "",
+            "recovery_jog": 'jog',
+            "long_run": 'run',
+            "comfortable_run": 'run',
+            "easy_run": 'run',
+            "warm_up": 'jog',
+            "cooldown": 'jog',
+            "steady_state":'run',
+            "tempo_run": 'cruising',
+            # "tempo_intervals": 'a',
+            "half_marathon": 'run',
+            "10k": 'run',
+            "5k": 'cruising',
+            "mile": 'cruising',
+            "speed": 'sprint',
+            "sprint": 'sprint'
+        }
+
     def load_data(self, file, write=False):
         """
 
@@ -76,30 +98,30 @@ class WorkoutParser(object):
                     workout.name = row['description'].replace('w/','with')
                 if row[0] == 'average_minutes':
                     if self.is_valid(row['description']):
-                        workout.duration = int(row['description']) * 60
+                        workout.duration = float(row['description']) * 60
                     elif self.is_valid(row['time']):
-                        workout.duration = int(row['time']) * 60
+                        workout.duration = float(row['time']) * 60
 
                 if row[0] == 'average_distance':
                     if self.is_valid(row['description']):
-                        workout.distance = int(row['description'])
+                        workout.distance = float(row['description'])
                     elif self.is_valid(row['distance']):
-                        workout.distance = int(row['distance'])
+                        workout.distance = float(row['distance'])
 
                 if row[0] == 'type':
                     if self.is_valid(row['description']):
                         workout.workout_type = row['description'].lower()
 
-                if row[0] == 'volume_measure':
-                    if self.is_valid(row['description']):
-                        if 'time' in row['description'].lower():
-                            if workout.distance is not None:
-                                print('distance provided for time measure')
-                                raise ValueError
-                        elif 'distance' in row['description'].lower():
-                            if workout.duration is not None:
-                                print('duration provided for distance measure')
-                                raise ValueError
+                # if row[0] == 'volume_measure':
+                #     if self.is_valid(row['description']):
+                #         if 'time' in row['description'].lower():
+                #             if workout.distance is not None:
+                #                 print('distance provided for time measure')
+                #                 # raise ValueError
+                #         elif 'distance' in row['description'].lower():
+                #             if workout.duration is not None:
+                #                 print('duration provided for distance measure')
+                #                 raise ValueError
 
                 if row['row_type'] == 'Block':
                     section = PlannedWorkoutSection()
@@ -149,14 +171,27 @@ class WorkoutParser(object):
 
     def parse_exercise_row(self, row, workout_type=None):
         ex = PlannedExercise()
-        if workout_type is not None:
-            if workout_type.lower() in ['run', 'treadmill run']:
-                ex.name = 'run'
-            else:
-                ex.name = row['description'].strip().lower()
-        else:
-            ex.name = row['description'].strip().lower()
-        ex.movement_id = ex.name
+        # if workout_type is not None:
+        intensity_measure = row.get('intensity_measure_units')
+        ex.name = row['description'].strip().lower()
+        ex.movement_id = row['description'].strip().lower()
+        if self.is_valid(intensity_measure):
+            if intensity_measure.lower().strip() == 'pace':
+                intensity = row.get('intensity_measure')
+                if self.is_valid(intensity):
+                    intensity = ('_').join(intensity.lower().split(' '))
+                    ex.movement_id = self.pace_exercise_lookup.get(intensity)
+                else:
+                    intensity = row.get('max_intensity_measure')
+                    if self.is_valid(intensity):
+                        intensity = ('_').join(intensity.lower().split(' '))
+                        ex.movement_id = self.pace_exercise_lookup.get(intensity)
+
+            elif intensity_measure.lower() == 'rpe':
+                ex.movement_id = 'run'
+        # else:
+        #     ex.name = row['description'].strip().lower()
+        # ex.movement_id = ex.name
 
         observed_duration = None
         max_duration = None
@@ -165,11 +200,11 @@ class WorkoutParser(object):
 
         distance = row.get('distance', None)
         if distance is not None and distance != '':
-            observed_distance = int(distance.replace('m', '').replace(',', ''))
+            observed_distance = float(distance.replace('m', '').replace(',', ''))
 
         max_distance_val = row.get('max_distance', None)
         if max_distance_val is not None and max_distance_val != '':
-            max_distance = int(distance.replace('m', '').replace(',', ''))
+            max_distance = float(distance.replace('m', '').replace(',', ''))
 
         time = row['time']
         max_time = row['max_time']
@@ -199,7 +234,10 @@ class WorkoutParser(object):
 
         incline = row.get('incline')
         if incline is not None and incline != '':
-            ex.grade = Assignment(assigned_value=int(incline))
+            if '%' in incline:
+                incline = incline.replace('%', '')
+            incline = float(incline) / 100
+            ex.grade = Assignment(assigned_value=incline)
 
         # intensity_measurement_units = row.get('intensity_measurement_units')
         # if self.is_valid(intensity_measurement_units):
@@ -210,17 +248,39 @@ class WorkoutParser(object):
 
         intensity_measure_unit = row.get('intensity_measure_units')
         if self.is_valid(intensity_measure_unit):
-            if intensity_measure_unit == 'RPE':
+            if intensity_measure_unit.lower() == 'rpe':
                 min_rpe = row.get('intensity_measure')
                 max_rpe = row.get('max_intensity_measure')
-                min_rpe = int(min_rpe) if min_rpe is not None else None
-                max_rpe = int(max_rpe) if min_rpe is not None else None
+                if self.is_valid(min_rpe):
+                    min_rpe = int(min_rpe) if min_rpe is not None else None
+                else:
+                    min_rpe = None
+                if self.is_valid(max_rpe):
+                    max_rpe = int(max_rpe) if min_rpe is not None else None
+                else:
+                    max_rpe = None
                 if min_rpe is not None and max_rpe is not None:
                     ex.rpe = StandardErrorRange(lower_bound=min_rpe, upper_bound=max_rpe)
                 elif min_rpe is not None and max_rpe is None:
                     ex.rpe = StandardErrorRange(observed_value=min_rpe)
                 elif min_rpe is None and max_rpe is not None:
                     ex.rpe = StandardErrorRange(observed_value=max_rpe)
+                if ex.rpe is not None:
+                    rpe_for_id = 1
+                    if ex.rpe.observed_value is not None:
+                        rpe_for_id = ex.rpe.observed_value
+                    elif ex.rpe.lower_bound is not None and ex.rpe.upper_bound is not None:
+                        rpe_for_id = (ex.rpe.lower_bound + ex.rpe.upper_bound) / 2
+                    if rpe_for_id <= 3:
+                        ex.movement_id = 'jog'
+                    elif rpe_for_id <= 5:
+                        ex.movement_id = 'run'
+                    elif rpe_for_id <= 8:
+                        ex.movement_id = 'cruising'
+                    else:
+                        ex.movement_id = 'sprint'
+
+
             elif intensity_measure_unit.lower() == 'pace':
                 min_rpe_tuple = None
                 max_rpe_tuple = None
@@ -228,7 +288,7 @@ class WorkoutParser(object):
                 max_rpe = StandardErrorRange()
                 ex.rpe = StandardErrorRange()
 
-                min_measure = row.get('intensity_measure')
+                min_measure = row.get('intensity_measure').lower()
                 if min_measure is not None:
                     if min_measure.lower() in self.intensity_measures_pace:
                         min_pace_value = self.intensity_measures_pace[min_measure.lower()]
@@ -291,7 +351,7 @@ class WorkoutParser(object):
             m, s = time_str.split(':')
             return int(m) * 60 + int(s)
         else:
-            return 60 + int(time_str)
+            return 60 * int(time_str)
 
     @staticmethod
     def get_assignment(min_value, max_value):
@@ -329,8 +389,8 @@ def read_json(file_name):
 def validate_exercises(workout, library_exercise_names):
     for section in workout.sections:
         for exercise in section.exercises:
-            ex_name = exercise.name
-            if ex_name not in ['rest', 'recover']:
+            ex_name = exercise.movement_id
+            if ex_name not in ['rest', 'recover', 'warm up']:
                 if ex_name not in library_exercise_names:
                     print(f"missing exercise: {exercise.name}, {section.name}")
                     raise ValueError
@@ -362,19 +422,19 @@ def validate_exercises(workout, library_exercise_names):
             if exercise.distance is not None:
                 if exercise.distance.min_value is not None:
                     all_distances.append(exercise.distance.min_value)
-                    if exercise.distance.min_value > 5000:
+                    if exercise.distance.min_value > 43000:
                         print(f'distance too long: {exercise.distance.min_value}')
                     elif exercise.distance.min_value < 10:
                         print(f'distance too short: {exercise.distance.min_value}')
                 if exercise.distance.assigned_value is not None:
                     all_distances.append(exercise.distance.assigned_value)
-                    if exercise.distance.assigned_value > 5000:
+                    if exercise.distance.assigned_value > 43000:
                         print(f'distance too long: {exercise.distance.assigned_value}')
                     elif exercise.distance.assigned_value < 10:
                         print(f'distance too short: {exercise.distance.assigned_value}')
                 if exercise.distance.max_value is not None:
                     all_distances.append(exercise.distance.max_value)
-                    if exercise.distance.max_value > 5000:
+                    if exercise.distance.max_value > 43000:
                         print(f'distance too long: {exercise.distance.max_value}')
                     elif exercise.distance.max_value < 10:
                         print(f'distance too short: {exercise.distance.max_value}')
@@ -402,6 +462,8 @@ if __name__ == '__main__':
         if 'DS_Store' not in dir:
             files = os.listdir(f"NRC_workouts/{dir}")
             for file in files:
+                # if 'The Roller' not in file:
+                #     continue
                 if 'DS_Store' not in file and 'included in this' not in file and 'Workouts in this' not in file:
                     try:
                         workout = WorkoutParser().load_data(f"NRC_workouts/{dir}/{file}", write=True)
@@ -409,6 +471,7 @@ if __name__ == '__main__':
                         workout_json = workout.json_serialise()
                         workout_2 = PlannedWorkout.json_deserialise(workout_json)
                     except ValueError as e:
+                        print(e)
                         print(dir, file)
     # print(f"duration: {min(all_durations), max(all_durations)}")
     # print(f"distance: {min(all_distances), max(all_distances)}")

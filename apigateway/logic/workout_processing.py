@@ -54,7 +54,6 @@ class WorkoutProcessor(object):
 
                     session = self.set_session_intensity_metrics(session, workout_exercise)
 
-
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, session):
 
@@ -115,7 +114,9 @@ class WorkoutProcessor(object):
     def set_session_intensity_metrics(self, session, workout_exercise):
         # update high intensity metrics
         if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and workout_exercise.predicted_rpe is not None:
-            if workout_exercise.predicted_rpe.lowest_value() >= 7.65:
+            if workout_exercise.predicted_rpe.lowest_value() is None:
+                pass
+            elif workout_exercise.predicted_rpe.lowest_value() >= 7.65:
                 if isinstance(workout_exercise.duration, Assignment):
                     high_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
                     high_intensity_minutes = high_intensity_minutes_assignment.lowest_value()
@@ -147,8 +148,14 @@ class WorkoutProcessor(object):
             for compound_action_id in movement.compound_actions:
                 action_json = action_library.get(compound_action_id)
                 if action_json is not None:
-                    action = CompoundAction.json_deserialise(action_json)
-                    exercise.primary_actions.append(action)
+                    compound_action = CompoundAction.json_deserialise(action_json)
+                    if exercise.bilateral_distribution_of_resistance is not None:
+                        for action in compound_action.actions:
+                            action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                            for sub_action in action.sub_actions:
+                                sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                    exercise.compound_actions.append(compound_action)
+                    # exercise.primary_actions.append(action)
 
 
             # for action_id in movement.primary_actions:
@@ -164,9 +171,10 @@ class WorkoutProcessor(object):
             #         exercise.secondary_actions.append(action)
 
             exercise = self.update_exercise_details(exercise)
+            self.add_action_details_from_exercise(exercise, exercise.compound_actions)
 
-            self.add_action_details_from_exercise(exercise, exercise.primary_actions)
-            self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.primary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
             # if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory:
             #     exercise.convert_reps_to_duration(cardio_data)
 
@@ -188,7 +196,8 @@ class WorkoutProcessor(object):
                             action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
                             for sub_action in action.sub_actions:
                                 sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
-                    exercise.primary_actions.append(compound_action)
+                    exercise.compound_actions.append(compound_action)
+                    # exercise.primary_actions.append(compound_action)
 
             # for action_id in movement.primary_actions:
             #     action_json = action_library.get(action_id)
@@ -202,13 +211,14 @@ class WorkoutProcessor(object):
             #         exercise.secondary_actions.append(action)
 
             exercise = self.update_planned_exercise_details(exercise, assignment_type)
+            self.add_action_details_from_exercise(exercise, exercise.compound_actions)
 
-            self.add_action_details_from_exercise(exercise, exercise.primary_actions)
-            self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.primary_actions)
+            # self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
 
     def update_exercise_details(self, exercise):
 
-        exercise.set_intensity()
+        # exercise.set_intensity()
         exercise.set_adaption_type()
         exercise.set_rep_tempo()
         exercise.set_reps_duration()
@@ -234,16 +244,21 @@ class WorkoutProcessor(object):
                                                                               efficiency=.21)
                         exercise.duration = exercise.speed * exercise.distance
 
-            exercise.predicted_rpe = StandardErrorRange()
-            if exercise.end_of_workout_hr is not None:
-                exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
-                                                                                          user_age=self.user_age,
-                                                                                          user_weight=self.user_weight,
-                                                                                          gender=self.gender,
-                                                                                          vo2_max=self.vo2_max.observed_value)
+            if exercise.rpe is None:  # only predict rpe if not provided by user
+                exercise.predicted_rpe = StandardErrorRange()
+                if exercise.end_of_workout_hr is not None:
+                    exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
+                                                                                              user_age=self.user_age,
+                                                                                              user_weight=self.user_weight,
+                                                                                              gender=self.gender,
+                                                                                              vo2_max=self.vo2_max.observed_value)
+                else:
+                    self.set_planned_cardio_rpe(exercise)
             else:
-                #exercise.predicted_rpe.observed_value = exercise.shrz or 4
-                self.set_planned_cardio_rpe(exercise)
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
 
             exercise.set_hr_zones(self.user_age)
         else:
@@ -254,7 +269,13 @@ class WorkoutProcessor(object):
             # elif exercise.unit_of_measure == UnitOfMeasure.seconds:
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
-            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            if exercise.rpe is None:
+                exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            else:
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
 
         exercise = self.set_total_volume(exercise)
         exercise.set_training_loads()
@@ -289,24 +310,30 @@ class WorkoutProcessor(object):
                         exercise.speed = Assignment(assignment_type=None, assigned_value=speed_assigned,
                                                     min_value=speed_min, max_value=speed_max)
 
-                        exercise.duration = Assignment.multiply_assignments(exercise.distance, exercise.speed)
+                        exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
                     elif exercise.cardio_action == CardioAction.run:
                         speed_min = Calculators.speed_from_watts_running(exercise.power.lowest_value(),
                                                                          self.user_weight, exercise.grade,
-                                                                         efficiency=.21)
+                                                                         efficiency=.22)
 
                         speed_max = Calculators.speed_from_watts_running(exercise.power.highest_value(),
                                                                          self.user_weight, exercise.grade,
-                                                                         efficiency=.21)
+                                                                         efficiency=.22)
 
                         speed_assigned = (speed_min + speed_max) / 2
 
                         exercise.speed = Assignment(assignment_type=None, assigned_value=speed_assigned,
                                                     min_value=speed_min, max_value=speed_max)
 
-                        exercise.duration = Assignment.multiply_assignments(exercise.distance, exercise.speed)
+                        exercise.duration = Assignment.divide_assignments(exercise.distance, exercise.speed)
 
-            self.set_planned_cardio_rpe(exercise)
+            if exercise.rpe is None:
+                self.set_planned_cardio_rpe(exercise)
+            else:
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
         else:
             # if exercise.unit_of_measure in [UnitOfMeasure.yards, UnitOfMeasure.feet, UnitOfMeasure.miles,
             #                                 UnitOfMeasure.kilometers, UnitOfMeasure.meters]:
@@ -316,7 +343,13 @@ class WorkoutProcessor(object):
             #     exercise.reps_per_set = self.convert_seconds_to_reps(exercise.reps_per_set)
             exercise = self.set_force_power_weighted(exercise)
             # TODO this needs to handle planned exercises
-            exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            if exercise.rpe is None:
+                exercise.predicted_rpe = self.get_rpe_from_weight(exercise)
+            else:
+                if isinstance(exercise.rpe, StandardErrorRange):
+                    exercise.predicted_rpe = exercise.rpe.plagiarize()
+                else:
+                    exercise.predicted_rpe = StandardErrorRange(observed_value=exercise.rpe)
             # rpe = Calculators.get_rpe_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement)
             # exercise.predicted_rpe = StandardErrorRange(observed_value=rpe)
 
@@ -431,6 +464,9 @@ class WorkoutProcessor(object):
             action_force.multiply(compound_action_force_ratio)
             action.power = action_power
             action.force = action_force
+            
+            action.training_type = exercise.training_type
+            action.adaptation_type = exercise.adaptation_type
             for sub_action in action.sub_actions:
                 sub_action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
@@ -464,10 +500,13 @@ class WorkoutProcessor(object):
             percent_bodyweight = 0
 
             bodyweight_count = 0
-            for action in exercise.primary_actions:
-                if isinstance(action.percent_bodyweight,int):
-                    percent_bodyweight += float(action.percent_bodyweight)
-                    bodyweight_count += 1
+            # for action in exercise.primary_actions:
+            for compound_action in exercise.compound_actions:
+                for action in compound_action.actions:
+                    for sub_action in action.sub_actions:
+                        if isinstance(sub_action.percent_bodyweight, int):
+                            percent_bodyweight += float(sub_action.percent_bodyweight)
+                            bodyweight_count += 1
 
             if bodyweight_count > 0:
                 percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
@@ -909,7 +948,7 @@ class WorkoutProcessor(object):
             "third_prime_movers": set(),
             "fourth_prime_movers": set()
             }
-        for compound_action in exercise.primary_actions:
+        for compound_action in exercise.compound_actions:
             for action in compound_action.actions:
                 for sub_action in action.sub_actions:
                     if sub_action.primary_muscle_action is not None and sub_action.primary_muscle_action.name in ['concentric', 'isometric']:

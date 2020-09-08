@@ -105,7 +105,7 @@ def test_power_cardio_run():
 
 def test_power_cardio_no_type():
     user_weight = 70
-    eff = .21
+    eff = .22
     power_male = Calculators.power_cardio(cardio_type=None, user_weight=user_weight, gender=Gender.male)
     assert power_male == Calculators.mets_to_watts(mets=5, weight=user_weight, efficiency=eff)
     power_female = Calculators.power_cardio(cardio_type=None, user_weight=user_weight)
@@ -352,11 +352,17 @@ def test_speed_from_watts_running():
     assert 1.0 == round(speed, 0)
 
 
-def test_get_running_speed_for_running_pace_distancee():
+def test_get_running_speed_for_running_pace_distance():
     speed = Calculators.get_running_speed_for_running_pace_distance(1609.34)
     assert 2.68 == round(speed, 2)
 
 
-def test_get_running_speed_for_known_running_pace_distancee():
+def test_get_running_speed_for_known_running_pace_distance():
     speed = Calculators.get_running_speed_from_known_time(known_distance=4000,known_time=1630.9,running_pace_distance=1609.34)
     assert 2.68 == round(speed, 2)
+
+
+def test_get_running_speed_for_known_running_pace_distance_compare():
+    speed1 = Calculators.get_running_speed_from_known_time(known_distance=4000,known_time=1630.9, running_pace_distance=5000)
+    speed2 = Calculators.get_running_speed_from_known_time(known_distance=4000,known_time=1630.9 * 2, running_pace_distance=5000)
+    assert speed1 == 2 * speed2

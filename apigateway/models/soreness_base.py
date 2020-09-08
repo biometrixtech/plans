@@ -521,7 +521,9 @@ class BodyPartSystems(object):
 
     def get_movemement_system(self, movement_system_name):
 
-        if movement_system_name == "Deep Longitudinal Subsystem (DLS)":
+        if movement_system_name is None:
+            return None
+        elif movement_system_name == "Deep Longitudinal Subsystem (DLS)":
             return self.deep_longitudinal_subsystem
         elif movement_system_name == "Posterior Oblique Subsystem (POS)":
             return self.posterior_oblique_subsystem
@@ -533,10 +535,25 @@ class BodyPartSystems(object):
             return self.core_stabilizers
         elif movement_system_name == "Intrinsic Stabilization Subsystem (ISS) (Drawing In)":
             return self.intrinsic_stabilization_subsystem
-        elif movement_system_name is None:
-            return None
         else:
             return getattr(self, movement_system_name)
+
+    @classmethod
+    def get_functional_movement_type_name(cls, movement_system_name):
+        if movement_system_name is not None:
+            if movement_system_name == "Deep Longitudinal Subsystem (DLS)":
+                return 'deep_longitudinal_subsystem'
+            elif movement_system_name == "Posterior Oblique Subsystem (POS)":
+                return 'posterior_oblique_subsystem'
+            elif movement_system_name == "Lateral Subsystem (LS)":
+                return 'lateral_subystem'
+            elif movement_system_name == "Anterior Oblique Subsystem (AOS)":
+                return 'anterior_oblique_subsystem'
+            elif movement_system_name == "Core Stabilizers (Bracing)":
+                return 'core_stabilizers'
+            elif movement_system_name == "Intrinsic Stabilization Subsystem (ISS) (Drawing In)":
+                return 'intrinsic_stabilization_subsystem'
+        return None
 
 
 class BodyPartLocationText(object):

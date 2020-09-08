@@ -369,17 +369,13 @@ class FunctionalMovementActionMapping(object):
         functional_movement_list = []
 
         for movement_system in movement_system_list:
-
-            # functional_movement_type = pairs.get_functional_movement_for_muscle_action(
-            #     self.exercise_action.primary_muscle_action, movement_system.movement_system_type)
-
-            # functional_movement = self.functional_movement_dict[functional_movement_type.value]
-            prime_movers = BodyPartSystems().get_movemement_system(movement_system.movement_system_name)
+            functional_movement_type = BodyPartSystems.get_functional_movement_type_name(movement_system.movement_system_name)
+            prime_movers = BodyPartSystems().get_movemement_system(functional_movement_type)
 
             if prime_movers is not None:
                 prime_movers = [bp.value for bp in prime_movers]
                 prime_movers = self.convert_enums_to_body_part_side_list(prime_movers)
-                functional_movement = FunctionalMovement(FunctionalMovementType.movement_system)
+                functional_movement = FunctionalMovement(FunctionalMovementType[functional_movement_type])
                 functional_movement.priority = movement_system.priority
                 functional_movement.prime_movers = prime_movers
 
@@ -522,6 +518,9 @@ class FunctionalMovementActionMapping(object):
                                           FunctionalMovementType.trunk_flexion_with_rotation,
                                           FunctionalMovementType.trunk_extension_with_rotation]:
             return (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+        elif functional_movement_type in [FunctionalMovementType.wrist_flexion,
+                                          FunctionalMovementType.wrist_extension]:
+            return (.2 * lower_stability_rating) + (.8 * upper_stability_rating)
 
     # def set_compensation_load(self, injury_risk_dict, event_date):
     #
@@ -665,6 +664,10 @@ class FunctionalMovementActionMapping(object):
                                                   FunctionalMovementType.trunk_flexion_with_rotation,
                                                   FunctionalMovementType.trunk_extension_with_rotation]:
                     stability_rating = (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+                elif functional_movement_type in [FunctionalMovementType.wrist_flexion,
+                                                  FunctionalMovementType.wrist_extension]:
+                    stability_rating =  (.2 * lower_stability_rating) + (.8 * upper_stability_rating)
+                # TODO: possibly add a distribution for movement_systems
                 else:
                     stability_rating = 0.0
             else:

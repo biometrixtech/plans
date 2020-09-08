@@ -16,7 +16,7 @@ from logic.exercise_assignment import ExerciseAssignment
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from models.movement_tags import AdaptationType, TrainingType
-from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
+from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction, CompoundAction, ExerciseSubAction
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
 from models.functional_movement_type import FunctionalMovementType
 from models.exercise_phase import ExercisePhaseType
@@ -24,6 +24,14 @@ from models.training_volume import StandardErrorRange
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()
+
+
+def get_compound_action(sub_action):
+    action = ExerciseAction("1", "flail_again")
+    action.sub_actions = [sub_action]
+    compound_action = CompoundAction("1", "flail_even_more")
+    compound_action.actions = [action]
+    return compound_action
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -251,7 +259,7 @@ def test_check_movement_prep_phases_no_soreness_with_mixed_session():
     session = MixedActivitySession()
     session.event_date = datetime.now()
 
-    exercise_action_1 = ExerciseAction("1", "flail")
+    exercise_action_1 = ExerciseSubAction("1", "flail")
     exercise_action_1.primary_muscle_action = MuscleAction.concentric
     exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
@@ -264,7 +272,7 @@ def test_check_movement_prep_phases_no_soreness_with_mixed_session():
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
 
-    exercise_action_2 = ExerciseAction("1", "flail")
+    exercise_action_2 = ExerciseSubAction("1", "flail")
     exercise_action_2.primary_muscle_action = MuscleAction.concentric
     exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
@@ -279,12 +287,12 @@ def test_check_movement_prep_phases_no_soreness_with_mixed_session():
 
     exercise_1 = WorkoutExercise()
     exercise_1.power_load = StandardErrorRange(observed_value=300)
-    exercise_1.primary_actions.append(exercise_action_1)
+    exercise_1.compound_actions.append(get_compound_action(exercise_action_1))
     exercise_1.training_type = TrainingType.strength_integrated_resistance
 
     exercise_2 = WorkoutExercise()
     exercise_2.power_load = StandardErrorRange(observed_value=300)
-    exercise_2.primary_actions.append(exercise_action_2)
+    exercise_2.compound_actions.append(get_compound_action(exercise_action_2))
     exercise_2.training_type = TrainingType.power_action_plyometrics
 
     section_1 = WorkoutSection()
