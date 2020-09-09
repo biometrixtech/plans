@@ -173,7 +173,8 @@ def validate_data():
             symptom['body_part'] = int(symptom['body_part'])
 
     if 'session' not in request.json:
-        raise InvalidSchemaException('session is required parameter to receive Movement Prep')
+        if 'program_module_id' not in request.json:
+            raise InvalidSchemaException('either sesison or program_module_id is required to receive Movement Prep')
     else:
         session = request.json['session']
         try:
