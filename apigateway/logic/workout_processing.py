@@ -244,7 +244,7 @@ class WorkoutProcessor(object):
     def update_exercise_details(self, exercise):
 
         # exercise.set_intensity()
-        exercise.set_adaption_type()
+        exercise.set_adaptation_type()
         exercise.set_rep_tempo()
         exercise.set_reps_duration()
 
@@ -310,7 +310,7 @@ class WorkoutProcessor(object):
     def update_planned_exercise_details(self, exercise, assignment_type):
 
         #exercise.set_intensity()
-        exercise.set_adaption_type()
+        exercise.set_adaptation_type()
         #exercise.set_rep_tempo()
         exercise.update_primary_from_alternates(assignment_type)
         exercise.set_reps_duration()
