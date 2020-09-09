@@ -375,12 +375,12 @@ class Calculators(object):
         return vo2_max
 
     @classmethod
-    def vo2max_population(cls, age, female, activity_level=2):
+    def vo2max_population(cls, age, gender, activity_level=2):
         """
         based on: https://www8.garmin.com/manuals/webhelp/edge520/EN-US/GUID-1FBCCD9E-19E1-4E4C-BD60-1793B5B97EB3.html
         :param age:
         :param activity_level: 1-7 scale based on duration and intensity of activity per week same as nhanes, needs to be  converted to
-        :param female:
+        :param gender:
         :return:
         """
 
@@ -412,7 +412,7 @@ class Calculators(object):
                 'untrained': {30: 33.0, 40: 31.0, 50: 29.0, 60: 26.0, 70: 24.0, 200: 22.0}
              }
         }
-        if female:
+        if gender.name == 'female':
             vo2_max_age_dict = population_fpt.get('female').get(athletic_level)  # use fair as default
         else:
             vo2_max_age_dict = population_fpt.get('male').get(athletic_level)  # use fair as default

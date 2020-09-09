@@ -6,6 +6,7 @@ from models.movement_actions import CompoundAction
 from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
+from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
 
 
@@ -108,7 +109,12 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             'ranked_muscle_detailed_load': [ml.json_serialise() for ml in self.ranked_muscle_detailed_load],
             'projected_rpe_load': self.projected_rpe_load.json_serialise(),
             'projected_power_load': self.projected_power_load.json_serialise(),
-            'projected_session_rpe': self.projected_session_rpe.json_serialise()
+            'projected_session_rpe': self.projected_session_rpe.json_serialise(),
+            'muscle_detailed_load': [
+                {
+                    "body_part": key.json_serialise(),
+                    "detailed_load": value.json_serialise()
+                } for key, value in self.muscle_detailed_load.items()]
         }
 
         return ret
@@ -132,6 +138,9 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             input_dict['projected_power_load']) if input_dict.get('projected_power_load') is not None else None
         workout_load.projected_session_rpe = StandardErrorRange.json_deserialise(
             input_dict['projected_session_rpe']) if input_dict.get('projected_session_rpe') is not None else None
+
+        for item in input_dict.get('items', []):
+            workout_load.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
 
         return workout_load
 

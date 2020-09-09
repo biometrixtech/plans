@@ -30,7 +30,10 @@ class WorkoutProcessor(object):
         self.vo2_max = vo2_max or Calculators.vo2_max_estimation_demographics(age=user_age, user_weight=user_weight, gender=gender)
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_planned_workout')
-    def process_planned_workout(self, session, assignment_type, movement_option=None):
+    def process_planned_workout(self, session, assignment_type=None, movement_option=None):
+
+        volume = 0
+        session_RPE = StandardErrorRange()
         for workout_section in session.workout.sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
 
@@ -51,8 +54,30 @@ class WorkoutProcessor(object):
                         session.add_maximal_strength_hypertrophic_load(workout_exercise.power_load)
                     elif workout_exercise.adaptation_type == AdaptationType.power_explosive_action:
                         session.add_power_explosive_action_load(workout_exercise.power_load)
+                    if workout_exercise.total_volume is not None and workout_exercise.predicted_rpe is not None:
+                        exercise_rpe = workout_exercise.predicted_rpe.plagiarize()
+                        if isinstance(workout_exercise.total_volume, Assignment):
+                            if workout_exercise.total_volume.assigned_value is not None:
+                                ex_volume = workout_exercise.total_volume.assigned_value
+                            elif workout_exercise.total_volume.min_value is not None and workout_exercise.total_volume.max_value is not None:
+                                ex_volume = (workout_exercise.total_volume.min_value + workout_exercise.total_volume.max_value) / 2
+                            elif workout_exercise.total_volume.min_value is not None:
+                                ex_volume = workout_exercise.total_volume.min_value
+                            elif workout_exercise.total_volume.max_value is not None:
+                                ex_volume = workout_exercise.total_volume.max_value
+                            else:
+                                ex_volume = 0
+                        else:
+                            ex_volume = workout_exercise.total_volume
+                        exercise_rpe.multiply(ex_volume)
+                        session_RPE.add(exercise_rpe)
+                        volume += ex_volume
 
                     session = self.set_session_intensity_metrics(session, workout_exercise)
+        if volume > 0 :
+            session_RPE.divide(volume)
+            session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?
+            session.training_volume = volume
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_workout')
     def process_workout(self, session):
@@ -102,7 +127,7 @@ class WorkoutProcessor(object):
                         session_RPE.add(exercise_rpe)
                         volume += workout_exercise.total_volume
 
-                session = self.set_session_intensity_metrics(session, workout_exercise)
+                    session = self.set_session_intensity_metrics(session, workout_exercise)
 
             workout_section.should_assess_shrz()
         if volume > 0 :

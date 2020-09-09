@@ -311,7 +311,7 @@ class CompletedSessionDetails(Serialisable):
         self.workout_id = workout_id
         self.session_detailed_load = DetailedTrainingLoad()
         self.session_training_type_load = TrainingTypeLoad()
-        #self.muscle_detailed_load = {}
+        self.muscle_detailed_load = {}
         self.ranked_muscle_load = []
         #self.ranked_training_types = []
         self.duration = 0
@@ -326,7 +326,7 @@ class CompletedSessionDetails(Serialisable):
             'provider_id': self.provider_id,
             'workout_id': self.workout_id,
             'session_detailed_load': self.session_detailed_load.json_serialise(),
-            #'muscle_detailed_load': self.muscle_detailed_load.json_serialise(),
+            'muscle_detailed_load': self.muscle_detailed_load.json_serialise(),
             'duration': self.duration,
             'session_rpe': self.session_RPE.json_serialise(),
             'rpe_load': self.rpe_load.joson_serialise(),

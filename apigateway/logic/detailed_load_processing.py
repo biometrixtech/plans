@@ -172,13 +172,13 @@ class DetailedLoadProcessor(object):
                     if rpe is not None and duration is not None:
                         # muscular endurance
                         # TODO make this less than VO2Max
-                        if rpe <= 7 and duration >= 240 * 60:
+                        if rpe <= 7 and duration >= 240:
                             adaptation_type_load[DetailedAdaptationType.muscular_endurance].add(muscle_load)
                             training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.muscular_endurance,
                                                  body_part_total_load)
                         # sustained power
-                        elif rpe > 7 and duration >= 15 * 60:
+                        elif rpe > 7 and duration >= 15:
                             adaptation_type_load[DetailedAdaptationType.sustained_power].add(muscle_load)
                             training_type_load[movement_action.training_type].add(muscle_load)
                             self.add_muscle_load(muscle, DetailedAdaptationType.sustained_power,

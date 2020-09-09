@@ -1,3 +1,4 @@
+import database.NTC.set_up_config
 import os
 import json
 import pandas as pd
@@ -5,6 +6,7 @@ from models.planned_exercise import PlannedExercise, PlannedWorkout, PlannedWork
 from models.training_volume import StandardErrorRange, Assignment
 from models.exercise import UnitOfMeasure
 from models.movement_tags import Equipment
+from database.NTC.create_processed_workouts import create_planned_session_detail
 
 all_durations = []
 all_distances = []
@@ -466,10 +468,11 @@ if __name__ == '__main__':
                 #     continue
                 if 'DS_Store' not in file and 'included in this' not in file and 'Workouts in this' not in file:
                     try:
-                        workout = WorkoutParser().load_data(f"NRC_workouts/{dir}/{file}", write=True)
+                        workout = WorkoutParser().load_data(f"NRC_workouts/{dir}/{file}", write=False)
                         validate_exercises(workout, exercise_names)
-                        workout_json = workout.json_serialise()
-                        workout_2 = PlannedWorkout.json_deserialise(workout_json)
+                        create_planned_session_detail(workout)
+                        # workout_json = workout.json_serialise()
+                        # workout_2 = PlannedWorkout.json_deserialise(workout_json)
                     except ValueError as e:
                         print(e)
                         print(dir, file)

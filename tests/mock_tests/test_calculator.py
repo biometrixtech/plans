@@ -256,10 +256,10 @@ def test_vo2max_nhanes():
 
 def test_vo2max_population():
     age = 25
-    vo2_max_1 = Calculators.vo2max_population(age, female=True, activity_level=5.0)
-    vo2_max_2 = Calculators.vo2max_population(age, female=True)
-    vo2_max_3 = Calculators.vo2max_population(age, female=False)
-    vo2_max_4 = Calculators.vo2max_population(age, female=True, activity_level=6.0)
+    vo2_max_1 = Calculators.vo2max_population(age, gender=Gender.female, activity_level=5.0)
+    vo2_max_2 = Calculators.vo2max_population(age, gender=Gender.female)
+    vo2_max_3 = Calculators.vo2max_population(age, gender=Gender.male)
+    vo2_max_4 = Calculators.vo2max_population(age, gender=Gender.female, activity_level=6.0)
     assert vo2_max_1 is not None and vo2_max_1 > 0
     assert vo2_max_2 is not None and vo2_max_2 > 0
     assert vo2_max_3 is not None and vo2_max_3 > 0

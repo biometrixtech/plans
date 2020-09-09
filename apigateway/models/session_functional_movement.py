@@ -227,7 +227,7 @@ class SessionFunctionalMovement(object):
                                                                  sub_action,
                                                                  workout_exercise.power_load,
                                                                  reps=workout_exercise.reps_per_set,
-                                                                 duration=workout_exercise.duration,
+                                                                 duration=workout_exercise.duration.lowest_value(),
                                                                  rpe_range=workout_exercise.rpe,
                                                                  percent_max_hr=None)
 
@@ -244,6 +244,7 @@ class SessionFunctionalMovement(object):
         detailed_load_processor.rank_types()
         self.completed_session_details.session_detailed_load = detailed_load_processor.session_detailed_load
         self.completed_session_details.training_type_load = detailed_load_processor.session_training_type_load
+        self.completed_session_details.muscle_detailed_load = detailed_load_processor.muscle_detailed_load
         self.completed_session_details.ranked_muscle_load = detailed_load_processor.ranked_muscle_load
         if self.session is not None:
             self.completed_session_details.power_load = self.session.power_load
