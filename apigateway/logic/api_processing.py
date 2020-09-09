@@ -27,6 +27,8 @@ class APIProcessing(object):
         self.activity_manager = None
 
     def create_planned_workout_from_id(self, program_module_id):
+        # apply the same cleanup as applied on import
+        program_module_id = ('_').join(program_module_id.replace('w/', 'with').lower().strip().split(' '))
         planned_workout = self.datastore_collection.workout_datastore.get(program_module_id)
         session = PlannedSession()
         session.workout = planned_workout
