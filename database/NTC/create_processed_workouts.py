@@ -13,7 +13,6 @@ def create_planned_workout_load(session, user_profile_id):
     session_functional_movement = SessionFunctionalMovement(session, {})
     session_functional_movement.process(event_date=datetime.datetime.now(), load_stats=None)
 
-
     workout = PlannedWorkoutLoad(workout_id=session.workout.program_module_id)
     workout.program_id = session.workout.program_id
     workout.program_module_id = session.workout.program_module_id
@@ -30,40 +29,48 @@ def create_planned_workout_load(session, user_profile_id):
     workout.muscle_detailed_load = session_details.muscle_detailed_load
     workout.ranked_muscle_detailed_load = session_details.ranked_muscle_load
     PlannedWorkoutLoadDatastore().put(workout)
-    program_id = workout.program_id
-    user_id = session.user_id
-    provider_id = program_id
+    # program_id = workout.program_id
+    # user_id = session.user_id
+    # provider_id = program_id
     workout_id = workout.program_module_id
     planned_workout_retrieved = PlannedWorkoutLoadDatastore().get(user_profile_id=user_profile_id, workout_id=workout_id)
 
-    CompletedSessionDetailsDatastore().put(session_details)
-    session_details_retrieved = CompletedSessionDetailsDatastore().get(user_id=user_id, workout_id=workout_id)
+    # CompletedSessionDetailsDatastore().put(session_details)
+    # session_details_retrieved = CompletedSessionDetailsDatastore().get(user_id=user_id, workout_id=workout_id)
     return workout
 
 def create_planned_session_detail(planned_workout):
     planned_workout_json = planned_workout.json_serialise()
-    session1 = PlannedSession()
-    session1.event_date = datetime.datetime.now()
-    session1.user_id = 'test_user1'
-    session1.workout = PlannedWorkout.json_deserialise(planned_workout_json)
 
-    proc_1 = WorkoutProcessor(user_weight=55, user_age=25, gender=Gender.male)
-    proc_1.process_planned_workout(session1)
-    planned_workout_1 = create_planned_workout_load(session1, 'profile_1')
-    planned_workout_1_json = planned_workout_1.json_serialise()
-    planned_workout_1_recreated = PlannedWorkoutLoad.json_deserialise(planned_workout_1_json)
+    profiles = get_profiles()
+    for profile in profiles:
+        session = PlannedSession()
+        session.event_date = datetime.datetime.now()
+        session.user_id = profile['user_id']
+        session.workout = PlannedWorkout.json_deserialise(planned_workout_json)
 
-    session2 = PlannedSession()
-    session2.user_id = 'test_user2'
-    session1.event_date = datetime.datetime.now()
-    session2.workout = PlannedWorkout.json_deserialise(planned_workout_json)
+        proc = WorkoutProcessor(user_weight=profile['user_weight'], user_age=profile['user_age'], gender=profile['user_gender'], vo2_max=profile['vo2_max'])
+        proc.process_planned_workout(session)
+        planned_workout = create_planned_workout_load(session, profile['user_profile_id'])
 
-    proc_2 = WorkoutProcessor(user_weight=55, user_age=25, gender=Gender.female)
-    proc_2.process_planned_workout(session2)
+def get_profiles():
+    profile_1 = {
+        'user_profile_id': 'profile_1',
+        'user_id': 'test_user_1',
+        'user_age': 25,
+        'user_gender': Gender.female,
+        'user_weight': 55,
+        'vo2_max': StandardErrorRange(observed_value=55.0)
+    }
 
-    planned_workout_2 = create_planned_workout_load(session2, 'profile_2')
-    planned_workout_2_json = planned_workout_1.json_serialise()
-    planned_workout_2_recreated = PlannedWorkoutLoad.json_deserialise(planned_workout_2_json)
 
-    print('here')
+    profile_2 = {
+        'user_profile_id': 'profile_2',
+        'user_id': 'test_user_2',
+        'user_age': 35,
+        'user_gender': Gender.male,
+        'user_weight': 75,
+        'vo2_max': None
+    }
+    return [profile_1, profile_2]
 

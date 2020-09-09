@@ -469,8 +469,8 @@ if __name__ == '__main__':
         if 'DS_Store' not in dir:
             files = os.listdir(f"NRC_workouts/{dir}")
             for file in files:
-                if count >= 1:
-                    break
+                # if count >= 1:
+                #     break
                 # if 'The Roller' not in file:
                 #     continue
                 if 'DS_Store' not in file and 'included in this' not in file and 'Workouts in this' not in file:
@@ -482,7 +482,7 @@ if __name__ == '__main__':
                         # workout_json = workout.json_serialise()
                         # workout_2 = PlannedWorkout.json_deserialise(workout_json)
                     except ValueError as e:
-                        raise
+                        # raise
                         print(e)
                         print(dir, file)
     # print(f"duration: {min(all_durations), max(all_durations)}")
