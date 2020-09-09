@@ -1,7 +1,8 @@
-from models.session import SessionType, SessionFactory
+from models.session import SessionType, SessionFactory, PlannedSession
 from models.sport import SportName
 from models.symptom import Symptom
 from models.heart_rate import SessionHeartRate, HeartRateData
+from models.movement_tags import Gender
 from models.planned_exercise import PlannedWorkout
 from logic.user_stats_processing import UserStatsProcessing
 from logic.activity_management import ActivityManager
@@ -26,21 +27,32 @@ class APIProcessing(object):
         self.activity_manager = None
 
     def create_planned_workout_from_id(self, program_module_id):
-
         planned_workout = self.datastore_collection.workout_datastore.get(program_module_id)
+        session = PlannedSession()
+        session.workout = planned_workout
+        session.user_id = self.user_id
+        session.event_date = self.event_date_time
+        if planned_workout.duration is not None:
+            session.duration_minutes = round(planned_workout.duration / 60, 2)
         user_weight = 60
+        assignment_type = None
+        user_age = 25
+        user_gender = Gender.female
 
         if self.user_stats is not None:
             if self.user_stats.athlete_weight is not None:
                 user_weight = self.user_stats.athlete_weight
+            if self.user_stats.athlete_age is not None:
+                user_age = self.user_stats.athlete_age
+            if self.user_stats.athlete_gender is not None:
+                user_gender = self.user_stats.athlete_gender
             if self.user_stats.fitness_provider_cardio_profile is not None:
-                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout,
-                                                                                  assignment_type=self.user_stats.fitness_provider_cardio_profile)
-            else:
-                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout)
+                assignment_type = self.user_stats.fitness_provider_cardio_profile
 
         if planned_workout is not None:
-            self.sessions.append(planned_workout)
+            workout_processor = WorkoutProcessor(user_weight=user_weight, user_age=user_age, gender=user_gender)
+            workout_processor.process_planned_workout(session, assignment_type=assignment_type)
+            self.sessions.append(session)
         else:
             raise ValueError("invalid program_module_id")
 
