@@ -1,10 +1,12 @@
 from enum import Enum
+import datetime
 from fathomapi.utils.xray import xray_recorder
 from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType, AdaptationDictionary, SubAdaptationType, AdaptationTypeMeasure, TrainingType
-from models.ranked_types import RankedAdaptationType
+from models.ranked_types import RankedAdaptationType, RankedBodyPart
+from utils import format_datetime, parse_datetime
 
 
 class TrainingLoad(object):
@@ -305,10 +307,11 @@ class MuscleDetailedLoad(object):
 
 
 class CompletedSessionDetails(Serialisable):
-    def __init__(self, event_date_time, provider_id, workout_id):
+    def __init__(self, event_date_time, provider_id, workout_id, user_id):
         self.event_date_time = event_date_time
         self.provider_id = provider_id
         self.workout_id = workout_id
+        self.user_id = user_id
         self.session_detailed_load = DetailedTrainingLoad()
         self.session_training_type_load = TrainingTypeLoad()
         self.muscle_detailed_load = {}
@@ -320,20 +323,51 @@ class CompletedSessionDetails(Serialisable):
         self.power_load = None
         self.training_volume = 0
 
+    def __setattr__(self, name, value):
+        if name in ['event_date_time']:
+            if not isinstance(value, datetime.datetime) and value is not None:
+                value = parse_datetime(value)
+        super().__setattr__(name, value)
+
     def json_serialise(self):
         ret = {
-            'event_date_time': self.event_date_time,
+            'event_date_time': format_datetime(self.event_date_time),
             'provider_id': self.provider_id,
             'workout_id': self.workout_id,
+            'user_id': self.user_id,
             'session_detailed_load': self.session_detailed_load.json_serialise(),
-            'muscle_detailed_load': self.muscle_detailed_load.json_serialise(),
+            'session_training_type_load': self.session_training_type_load.json_serialise(),
+            'muscle_detailed_load': [
+                {
+                    "body_part": key.json_serialise(),
+                    "detailed_load": value.json_serialise()
+                } for key, value in self.muscle_detailed_load.items()],
+            'ranked_muscle_load': [ml.json_serialise() for ml in self.ranked_muscle_load],
             'duration': self.duration,
-            'session_rpe': self.session_RPE.json_serialise(),
-            'rpe_load': self.rpe_load.joson_serialise(),
-            'power_load': self.power_load.json_serialise()
+            'session_RPE': self.session_RPE.json_serialise(),
+            'rpe_load': self.rpe_load.json_serialise(),
+            'power_load': self.power_load.json_serialise(),
+            # 'training_volume': self.training_volume
         }
 
         return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        session = cls(input_dict.get('event_date_time'), input_dict.get('provider_id'), input_dict.get('workout_id'), input_dict.get('user_id'))
+        session.user_id = input_dict.get('user_id')
+        session.session_detailed_load = DetailedTrainingLoad.json_deserialise(input_dict['session_detailed_load']) if input_dict.get('session_detailed_load') is not None else DetailedTrainingLoad()
+        session.session_training_type_load = TrainingTypeLoad.json_deserialise(input_dict['session_training_type_load']) if input_dict.get('session_training_type_load') is not None else TrainingTypeLoad()
+        for item in input_dict.get('muscle_detailed_load', []):
+            session.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
+        session.ranked_muscle_load = [RankedBodyPart.json_deserialise(ml) for ml in input_dict.get('ranked_muscle_load', [])]
+        # self.ranked_training_types = []
+        session.duration = input_dict.get('duration', 0)
+        session.session_RPE = StandardErrorRange.json_deserialise(input_dict['session_RPE']) if input_dict.get('session_RPE') is not None else None
+        session.rpe_load = StandardErrorRange.json_deserialise(input_dict['rpe_load']) if input_dict.get('rpe_load') is not None else None
+        session.power_load = StandardErrorRange.json_deserialise(input_dict['power_load']) if input_dict.get('power_load') is not None else None
+        # session.training_volume = input_dict.get('training_volume', 0)
+        return session
 
 
 # TODO need some easy way to see the summary so we can easily rank the workouts

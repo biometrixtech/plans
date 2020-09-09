@@ -8,6 +8,7 @@ os.environ['CODEBUILD_RUN'] = 'TRUE'
 
 os.environ['ENVIRONMENT'] = 'dev'
 os.environ['MONGO_COLLECTION_PLANNEDWORKOUTLOAD'] = 'plannedWorkoutLoad'
+os.environ['MONGO_COLLECTION_COMPLETEDSESSIONDETAILS'] = 'completedSessionDetails'
 Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
                              'body_part_mapping_filename': 'body_part_mapping_fathom.json',
                              'movement_library_filename': 'movement_library_nike.json',

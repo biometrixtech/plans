@@ -142,7 +142,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         workout_load.projected_session_rpe = StandardErrorRange.json_deserialise(
             input_dict['projected_session_rpe']) if input_dict.get('projected_session_rpe') is not None else None
 
-        for item in input_dict.get('items', []):
+        for item in input_dict.get('muscle_detailed_load', []):
             workout_load.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
 
         return workout_load

@@ -30,12 +30,13 @@ class SessionFunctionalMovement(object):
 
         provider_id=None
         workout_id=None
+        user_id = self.session.user_id
 
-        if self.session.workout_program_module is not None:
+        if self.session.workout_program_module is not None:  # completed
             provider_id = self.session.workout_program_module.program_id
             workout_id = self.session.workout_program_module.program_module_id
 
-        self.completed_session_details = CompletedSessionDetails(event_date,provider_id=provider_id, workout_id=workout_id)
+        self.completed_session_details = CompletedSessionDetails(self.session.event_date, provider_id=provider_id, workout_id=workout_id, user_id=user_id)
 
         if self.session.session_type() == SessionType.mixed_activity:
             if self.session.workout_program_module is not None:
@@ -190,7 +191,13 @@ class SessionFunctionalMovement(object):
         if self.session is not None:
             self.completed_session_details.power_load = self.session.power_load
             self.completed_session_details.rpe_load = self.session.rpe_load
-            self.completed_session_details.session_RPE = self.session.session_RPE
+            if self.session.session_RPE is not None:
+                if isinstance(self.session.session_RPE, StandardErrorRange):
+                    self.completed_session_details.session_RPE = self.session.session_RPE
+                else:
+                    self.completed_session_details.session_RPE = StandardErrorRange(observed_value=self.session.session_RPE)
+            else:
+                self.completed_session_details.session_RPE = StandardErrorRange()
             self.completed_session_details.training_volume = self.session.training_volume
             if self.session.duration_minutes is not None:
                 self.completed_session_details.duration = self.session.duration_minutes * 60
@@ -204,6 +211,9 @@ class SessionFunctionalMovement(object):
     @xray_recorder.capture('logic.SessionFunctionalMovement.process_workout_load')
     def process_planned_workout_load(self, workout, event_date, function_movement_dict):
 
+
+        self.completed_session_details.provider_id = workout.program_id
+        self.completed_session_details.workout_id =  workout.program_module_id
         workout_load = {}
 
         detailed_load_processor = DetailedLoadProcessor()
@@ -249,7 +259,13 @@ class SessionFunctionalMovement(object):
         if self.session is not None:
             self.completed_session_details.power_load = self.session.power_load
             self.completed_session_details.rpe_load = self.session.rpe_load
-            self.completed_session_details.session_RPE = self.session.session_RPE
+            if self.session.session_RPE is not None:
+                if isinstance(self.session.session_RPE, StandardErrorRange):
+                    self.completed_session_details.session_RPE = self.session.session_RPE
+                else:
+                    self.completed_session_details.session_RPE = StandardErrorRange(observed_value=self.session.session_RPE)
+            else:
+                self.completed_session_details.session_RPE = StandardErrorRange()
             if self.session.duration_minutes is not None:
                 self.completed_session_details.duration = self.session.duration_minutes * 60
         else:
