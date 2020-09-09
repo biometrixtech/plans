@@ -4,15 +4,19 @@ from models.movement_tags import Gender
 from models.planned_exercise import PlannedWorkout, PlannedWorkoutLoad
 from models.session_functional_movement import SessionFunctionalMovement
 from models.training_volume import StandardErrorRange
+from datastores.planed_workout_load_datastore import PlannedWorkoutLoadDatastore
 import datetime
 
 
-def create_planned_workout_load(session):
+def create_planned_workout_load(session, user_profile_id):
     session_functional_movement = SessionFunctionalMovement(session, {})
     session_functional_movement.process(event_date=datetime.datetime.now(), load_stats=None)
 
 
     workout = PlannedWorkoutLoad(workout_id=session.workout.program_module_id)
+    workout.program_id = session.workout.program_id
+    workout.program_module_id = session.workout.program_module_id
+    workout.user_profile_id = user_profile_id
     workout.projected_session_rpe = StandardErrorRange(observed_value=session.session_RPE)
     workout.projected_rpe_load = session.rpe_load
     workout.projected_power_load = session.power_load
@@ -24,6 +28,7 @@ def create_planned_workout_load(session):
     workout.session_training_type_load = session_details.session_training_type_load
     workout.muscle_detailed_load = session_details.muscle_detailed_load
     workout.ranked_muscle_detailed_load = session_details.ranked_muscle_load
+    PlannedWorkoutLoadDatastore().put(workout)
     return workout
 
 def create_planned_session_detail(planned_workout):
@@ -33,7 +38,7 @@ def create_planned_session_detail(planned_workout):
 
     proc_1 = WorkoutProcessor(user_weight=55, user_age=25, gender=Gender.male)
     proc_1.process_planned_workout(session1)
-    planned_workout_1 = create_planned_workout_load(session1)
+    planned_workout_1 = create_planned_workout_load(session1, 'profile_1')
     planned_workout_1_json = planned_workout_1.json_serialise()
     planned_workout_1_recreated = PlannedWorkoutLoad.json_deserialise(planned_workout_1_json)
 
@@ -43,7 +48,7 @@ def create_planned_session_detail(planned_workout):
     proc_2 = WorkoutProcessor(user_weight=55, user_age=25, gender=Gender.female)
     proc_2.process_planned_workout(session2)
 
-    planned_workout_2 = create_planned_workout_load(session2)
+    planned_workout_2 = create_planned_workout_load(session2, 'profile_2')
     planned_workout_2_json = planned_workout_1.json_serialise()
     planned_workout_2_recreated = PlannedWorkoutLoad.json_deserialise(planned_workout_2_json)
 

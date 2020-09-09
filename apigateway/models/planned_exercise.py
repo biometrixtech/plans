@@ -67,6 +67,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
     def __init__(self, workout_id):
         super().__init__()
         self.workout_id = workout_id
+        self.user_profile_id = None
 
         self.session_detailed_load = DetailedTrainingLoad()
         self.session_training_type_load = TrainingTypeLoad()
@@ -103,6 +104,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             'program_module_id': self.program_module_id,
             'duration': self.duration,
             'sections': [s.json_serialise() for s in self.sections],
+            'user_profile_id': self.user_profile_id,
             'workout_id': self.workout_id,
             'session_detailed_load': self.session_detailed_load.json_serialise(),
             'session_training_type_load': self.session_training_type_load.json_serialise(),
@@ -127,6 +129,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         workout_load.event_date = parse_date(input_dict.get('event_date')) if input_dict.get('event_date') is not None else None
         workout_load.program_id = input_dict.get('program_id')
         workout_load.program_module_id = input_dict.get('program_module_id')
+        workout_load.user_profile_id = input_dict.get('user_profile_id')
         workout_load.duration = input_dict.get('duration')
         workout_load.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('sections', [])]
         workout_load.session_detailed_load = DetailedTrainingLoad.json_deserialise(input_dict['session_detailed_load']) if input_dict.get('session_detailed_load') is not None else None
