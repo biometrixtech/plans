@@ -43,4 +43,4 @@ class DatastoreCollection(object):
         self.mobility_wod_datastore = mobility_wod_datastore.MobilityWODDatastore()
         self.responsive_recovery_datastore = responsive_recovery_datastore.ResponsiveRecoveryDatastore()
         self.workout_datastore = workout_datastore.WorkoutDatastore()
-        self.completed_session_details_datastore = completed_session_details_datastore.ComletedsessionDetailsDatastore()
+        self.completed_session_details_datastore = completed_session_details_datastore.CompletedSessionDetailsDatastore()
