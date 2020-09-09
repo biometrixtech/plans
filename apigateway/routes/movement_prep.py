@@ -51,10 +51,10 @@ def handle_movement_prep_create(user_id):
     )
     # process stored planned session
     workout = None
-    if 'program_id' in request.json:
-        program_id = request.json['program_id']
-        if program_id is not None:
-            api_processor.create_planned_workout_from_id(program_id)
+    if 'program_module_id' in request.json:
+        program_module_id = request.json['program_module_id']
+        if program_module_id is not None:
+            api_processor.create_planned_workout_from_id(program_module_id)
             if len(api_processor.sessions) > 0:
                 workout = api_processor.sessions[0]
 

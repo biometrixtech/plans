@@ -281,15 +281,15 @@ class DetailedTrainingLoad(Serialisable):
 
 
 class MuscleDetailedLoad(object):
-    def __init__(self, provider_id, program_id):
+    def __init__(self, provider_id, program_module_id):
         self.provider_id = provider_id
-        self.program_id = program_id
+        self.program_module_id = program_module_id
         self.items = {}
 
     def json_serialise(self):
         ret = {
             'provider_id': self.provider_id,
-            'program_id': self.program_id,
+            'program_module_id': self.program_module_id,
             'items': [{"body_part": key.json_serialise(),
                        "detailed_load": value.json_serialise()} for key, value in self.items.items()]
         }
@@ -297,7 +297,7 @@ class MuscleDetailedLoad(object):
 
     @classmethod
     def json_deserialise(cls, input_dict):
-        detailed_load = cls(input_dict['provider_id'], input_dict['program_id'])
+        detailed_load = cls(input_dict['provider_id'], input_dict['program_module_id'])
         for item in input_dict.get('items', []):
             detailed_load.items[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
 

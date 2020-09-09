@@ -25,9 +25,9 @@ class APIProcessing(object):
         self.user_stats_processor = None
         self.activity_manager = None
 
-    def create_planned_workout_from_id(self, program_id):
+    def create_planned_workout_from_id(self, program_module_id):
 
-        planned_workout = self.datastore_collection.workout_datastore.get(program_id)
+        planned_workout = self.datastore_collection.workout_datastore.get(program_module_id)
         user_weight = 60
 
         if self.user_stats is not None:
@@ -42,7 +42,7 @@ class APIProcessing(object):
         if planned_workout is not None:
             self.sessions.append(planned_workout)
         else:
-            raise ValueError("invalid program_id")
+            raise ValueError("invalid program_module_id")
 
     def create_session_from_survey(self, session):
         session_obj = self.convert_session(session)
