@@ -322,6 +322,7 @@ class CompletedSessionDetails(Serialisable):
         self.rpe_load = None
         self.power_load = None
         self.training_volume = 0
+        self.planned = False
 
     def __setattr__(self, name, value):
         if name in ['event_date_time']:

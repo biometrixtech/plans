@@ -54,6 +54,7 @@ class SessionFunctionalMovement(object):
                 functional_movement_factory = FunctionalMovementFactory()
                 functional_movement_dict = functional_movement_factory.get_functional_movement_dictionary()
                 total_load_dict = self.process_planned_workout_load(self.session.workout, event_date, functional_movement_dict)
+                self.completed_session_details.planned = True
                 #consolidated_dict = self.consolidate_load(total_load_dict, event_date)
 
                 #self.session_load_dict = consolidated_dict

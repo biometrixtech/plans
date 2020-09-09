@@ -1234,7 +1234,7 @@ class InjuryRiskProcessor(object):
                 session_functional_movement.session_load_dict = session.session_load_dict
                 current_session = session
 
-            if session_functional_movement.completed_session_details is not None:
+            if session_functional_movement.completed_session_details is not None and not session_functional_movement.completed_session_details.planned:
                 self.completed_session_details.append(session_functional_movement.completed_session_details)
 
             injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
