@@ -336,8 +336,8 @@ class CompletedSessionDetails(Serialisable):
             'provider_id': self.provider_id,
             'workout_id': self.workout_id,
             'user_id': self.user_id,
-            'session_detailed_load': self.session_detailed_load.json_serialise(),
-            'session_training_type_load': self.session_training_type_load.json_serialise(),
+            'session_detailed_load': self.session_detailed_load.json_serialise() if self.session_detailed_load is not None else None,
+            'session_training_type_load': self.session_training_type_load.json_serialise() if self.session_training_type_load is not None else None,
             'muscle_detailed_load': [
                 {
                     "body_part": key.json_serialise(),
@@ -345,9 +345,9 @@ class CompletedSessionDetails(Serialisable):
                 } for key, value in self.muscle_detailed_load.items()],
             'ranked_muscle_load': [ml.json_serialise() for ml in self.ranked_muscle_load],
             'duration': self.duration,
-            'session_RPE': self.session_RPE.json_serialise(),
-            'rpe_load': self.rpe_load.json_serialise(),
-            'power_load': self.power_load.json_serialise(),
+            'session_RPE': self.session_RPE.json_serialise() if self.session_RPE is not None else None,
+            'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None,
+            'power_load': self.power_load.json_serialise() if self.power_load is not None else None,
             # 'training_volume': self.training_volume
         }
 
