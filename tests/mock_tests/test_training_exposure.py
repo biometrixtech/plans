@@ -1,19 +1,33 @@
-from models.exposure import TrainingExposure, TrainingExposureProcessor
-from models.planned_exercise import PlannedWorkout, PlannedWorkoutSection, PlannedExercise
+from models.exposure import TrainingExposureProcessor
+from models.planned_exercise import PlannedExercise
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType, AdaptationType
 from models.movement_actions import MovementSpeed, MovementResistance
 
-def get_planned_workout(exercise):
+# def get_planned_workout(exercise):
+#
+#     planned_workout = PlannedWorkout()
+#     section = PlannedWorkoutSection()
+#     section.exercises.append(exercise)
+#     planned_workout.sections.append()
+#     return planned_workout
 
-    planned_workout = PlannedWorkout()
-    section = PlannedWorkoutSection()
-    section.exercises.append(exercise)
-    planned_workout.sections.append()
-    return planned_workout
+
+def test_get_muscular_endurance_base_aerobic_planned_workout():
+
+    exercise = PlannedExercise()
+    exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    exercise.predicted_rpe = StandardErrorRange(lower_bound=2, upper_bound=3)
+    exercise.duration = 250
+
+    proc = TrainingExposureProcessor()
+    exposures = proc.get_exposures(exercise)
+    assert 2 == len(exposures)
+    assert DetailedAdaptationType.muscular_endurance == exposures[0].detailed_adaptation_type
+    assert DetailedAdaptationType.base_aerobic_training == exposures[1].detailed_adaptation_type
 
 
-def test_get_muscular_endurance_planned_workout():
+def test_get_muscular_endurance_anaerobic_threshold_planned_workout():
 
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
@@ -27,7 +41,7 @@ def test_get_muscular_endurance_planned_workout():
     assert DetailedAdaptationType.anaerobic_threshold_training == exposures[1].detailed_adaptation_type
 
 
-def test_get_sustained_power_planned_workout():
+def test_get_sustained_power_high_intensity_anaerobic_planned_workout():
 
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
