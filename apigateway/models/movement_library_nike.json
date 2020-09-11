@@ -1,50 +1,4 @@
 {
-    "rowing": {
-        "id": "rowing",
-        "name": "erg rowing",
-        "training_type": 1,
-        "cardio_action": 3,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            1
-        ],
-        "speed": 3,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": "1/0/1",
-        "surface_stability": 0,
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "30"
-        ],
-        "bilateral_distribution_of_resistance": 0
-    },
-    "rowing, high strokes per minute": {
-        "id": "rowing, high strokes per minute",
-        "name": "erg rowing",
-        "training_type": 1,
-        "cardio_action": 3,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            1
-        ],
-        "speed": 3,
-        "resistance": 2,
-        "displacement": null,
-        "rep_tempo": ".86/0/.86",
-        "surface_stability": 0,
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "30"
-        ],
-        "bilateral_distribution_of_resistance": 0
-    },
     "jog": {
         "id": "jog",
         "name": "jog",
@@ -134,6 +88,75 @@
         "explosiveness_rating": 0,
         "compound_actions": [
             "5"
+        ],
+        "bilateral_distribution_of_resistance": 3
+    },
+    "rowing": {
+        "id": "rowing",
+        "name": "erg rowing",
+        "training_type": 1,
+        "cardio_action": 3,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            1
+        ],
+        "speed": 3,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": "1/0/1",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "30"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "rowing, 35 strokes per minute": {
+        "id": "rowing, 35 strokes per minute",
+        "name": "erg rowing",
+        "training_type": 1,
+        "cardio_action": 3,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            1
+        ],
+        "speed": 3,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": ".86/0/.86",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "30"
+        ],
+        "bilateral_distribution_of_resistance": 0
+    },
+    "cycling, 80 rpm": {
+        "id": "cycling, 80 rpm",
+        "name": "indoor cycle",
+        "training_type": 1,
+        "cardio_action": 4,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            3
+        ],
+        "speed": 3,
+        "resistance": 2,
+        "displacement": null,
+        "rep_tempo": ".375/0/.375",
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "20"
         ],
         "bilateral_distribution_of_resistance": 3
     },
@@ -3484,7 +3507,7 @@
     },
     "single leg balance reach": {
         "id": "single leg balance reach",
-        "name": "iso squat",
+        "name": "iso squat hold",
         "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
@@ -3507,7 +3530,7 @@
     },
     "single leg balance with reach knee tuck": {
         "id": "single leg balance with reach knee tuck",
-        "name": "iso squat",
+        "name": "iso squat hold",
         "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
@@ -3530,7 +3553,7 @@
     },
     "horse stance push and pull": {
         "id": "horse stance push and pull",
-        "name": "iso squat",
+        "name": "iso squat hold",
         "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
@@ -3553,7 +3576,7 @@
     },
     "squat hold": {
         "id": "squat hold",
-        "name": "iso squat",
+        "name": "iso squat hold",
         "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
@@ -3576,7 +3599,7 @@
     },
     "wall sit": {
         "id": "wall sit",
-        "name": "iso squat",
+        "name": "iso squat hold",
         "training_type": 2,
         "cardio_action": null,
         "power_drill_action": null,
