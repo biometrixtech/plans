@@ -5,12 +5,19 @@ from models.movement_actions import MovementSpeed, MovementResistance
 
 
 class TrainingExposure(object):
-    def __init__(self, detailed_adaptation_type):
+    def __init__(self, detailed_adaptation_type, volume=None, volume_measure=None, rpe=None, rpe_load=None):
         self.detailed_adaptation_type = detailed_adaptation_type
-        self.volume = None
-        self.volume_measure = None
-        self.rpe = None
-        self.rpe_load = None
+        self.volume = volume
+        self.volume_measure = volume_measure
+        self.rpe = rpe
+        self.rpe_load = rpe_load
+
+
+class TargetTrainingExposure(object):
+    def __init__(self, training_exposures, exposure_count=None, priority=0):
+        self.training_exposures = training_exposures
+        self.exposure_count = exposure_count
+        self.priority = priority
 
 
 class TrainingExposureProcessor(object):

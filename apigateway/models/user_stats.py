@@ -3,7 +3,8 @@ from serialisable import Serialisable
 from models.load_stats import LoadStats
 from models.session import HighLoadSession, HighDetailedLoadSession
 from models.stats import StandardErrorRange
-from models.periodization import PeriodizationGoal, PeriodizationPersona, TrainingPhaseType
+from models.periodization import PeriodizationPersona, TrainingPhaseType
+from models.periodization_goal import PeriodizationGoalType
 from utils import parse_date, format_datetime, parse_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
@@ -199,7 +200,7 @@ class UserStats(Serialisable):
         user_stats.internal_ramp = StandardErrorRange.json_deserialise(input_dict.get('internal_ramp', None))
         user_stats.internal_acwr = StandardErrorRange.json_deserialise(input_dict.get('internal_acwr', None))
 
-        user_stats.periodization_goals = [PeriodizationGoal(p) for p in input_dict.get('periodization_goals', [])]
+        user_stats.periodization_goals = [PeriodizationGoalType(p) for p in input_dict.get('periodization_goals', [])]
         user_stats.persona = PeriodizationPersona(input_dict['persona']) if input_dict.get('persona') is not None else None
         user_stats.training_phase_type = TrainingPhaseType(input_dict['training_phase_type']) if input_dict.get('training_phase_type') is not None else None
 

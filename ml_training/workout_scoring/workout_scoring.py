@@ -23,7 +23,8 @@ import numpy as np
 import json
 from models.planned_exercise import PlannedWorkoutLoad
 from logic.periodization_processor import WorkoutScoringManager
-from models.periodization import PeriodizedExercise, RequiredExerciseFactory, PeriodizationGoal, PeriodizationModelFactory, PeriodizationPersona, TrainingPhaseType, TemplateWorkout
+from models.periodization import PeriodizedExercise, RequiredExerciseFactory, PeriodizationModelFactory, PeriodizationPersona, TrainingPhaseType, TemplateWorkout
+from models.periodization_goal import PeriodizationGoalType
 from models.training_volume import StandardErrorRange
 from models.ranked_types import RankedBodyPart, RankedAdaptationType
 from models.soreness_base import BodyPartLocation
@@ -81,7 +82,7 @@ def get_detailed_adaptation_type_distribution(workouts):
 # def get_template_workout():
 #     from logic.periodization_processor import PeriodizationPlanProcessor
 #     from datetime import datetime
-#     proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoal.increase_cardiovascular_health,
+#     proc = PeriodizationPlanProcessor(datetime.now(), PeriodizationGoalType.increase_cardiovascular_health,
 #                                       PeriodizationPersona.well_trained, TrainingPhaseType.increase, None, None)
 #     model = proc.model
 #     template_workout = TemplateWorkout()
@@ -93,7 +94,7 @@ def get_periodization_model():
     model = PeriodizationModelFactory().create(
             persona=PeriodizationPersona.well_trained,
             training_phase_type=TrainingPhaseType.slowly_increase,
-            periodization_goal=PeriodizationGoal.increase_cardiovascular_health
+            periodization_goal=PeriodizationGoalType.increase_cardiovascular_health
     )
     return model
 

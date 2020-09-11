@@ -2,7 +2,8 @@ from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager
-from models.periodization import PeriodizedExercise, PeriodizationGoal, PeriodizationPersona, TrainingPhaseType
+from models.periodization import PeriodizedExercise, PeriodizationPersona, TrainingPhaseType
+from models.periodization_goal import PeriodizationGoalType
 from models.movement_tags import AdaptationDictionary, SubAdaptationType, TrainingType, AdaptationTypeMeasure
 from models.ranked_types import RankedAdaptationType
 from models.planned_exercise import PlannedWorkoutLoad
@@ -165,7 +166,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #
 #     athlete_training_history = get_fake_training_history()
 #
-#     athlete_training_goal = PeriodizationGoal.increase_cardiovascular_health
+#     athlete_training_goal = PeriodizationGoalType.increase_cardiovascular_health
 #
 #     proc = PeriodizationPlanProcessor(athlete_training_goal, athlete_training_history, PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
 #     proc.set_weekly_targets()
@@ -216,7 +217,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #
 #     workout_library_datastore = PlannedWorkoutLibraryDatastore()
 #
-#     athlete_training_goal = PeriodizationGoal.increase_cardiovascular_health
+#     athlete_training_goal = PeriodizationGoalType.increase_cardiovascular_health
 #
 #     proc = PeriodizationPlanProcessor(start_date_time,athlete_training_goal,PeriodizationPersona.well_trained,
 #                                       TrainingPhaseType.slowly_increase,

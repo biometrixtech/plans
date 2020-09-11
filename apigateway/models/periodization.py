@@ -1,8 +1,10 @@
 from enum import Enum
+
+from models.periodization_goal import PeriodizationGoalType
 from models.training_volume import StandardErrorRange
-from models.training_load import DetailedTrainingLoad, TrainingLoad
+from models.training_load import TrainingLoad
 from models.movement_tags import DetailedAdaptationType, SubAdaptationType, AdaptationDictionary
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 
 # class AthleteTrainingHistory(object):
@@ -83,19 +85,6 @@ class PeriodizationPersona(Enum):
     well_trained = 4
     elite_athlete_gaining = 5
     elite_athlete_maintaining = 6
-
-
-class PeriodizationGoal(Enum):
-    #building_foundation_proficiency_move_well = 5
-    increase_cardiovascular_health = 10
-    lose_weight = 15
-    increase_cardio_endurance = 20
-    increase_cardio_endurance_with_speed = 25
-    increase_strength_max_strength = 30
-    #increase_athleticism_high_force = 35
-    #increase_athleticism_low_force = 40
-    #increase_functional_strength = 45
-    #increase_general_fitness = 50
 
 
 class PeriodizedExercise(object):
@@ -226,12 +215,12 @@ class RequiredExerciseFactory(object):
 
     def get_required_exercises(self, periodization_goal):
 
-        if periodization_goal == PeriodizationGoal.increase_cardiovascular_health or periodization_goal == PeriodizationGoal.lose_weight:
+        if periodization_goal == PeriodizationGoalType.increase_cardiovascular_health or periodization_goal == PeriodizationGoalType.lose_weight:
 
             return [PeriodizedExercise(None, SubAdaptationType.strength,
                                        times_per_week_range=StandardErrorRange(lower_bound=2), duration_range=None,
                                        rpe_range=None, priority=1)]
-        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance:
+        elif periodization_goal == PeriodizationGoalType.increase_cardio_endurance:
 
             base_training_volume = None # TBD
 
@@ -248,7 +237,7 @@ class RequiredExerciseFactory(object):
 
             return exercises
 
-        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance_with_speed:
+        elif periodization_goal == PeriodizationGoalType.increase_cardio_endurance_with_speed:
 
             correctives = PeriodizedExercise(DetailedAdaptationType.corrective, None,
                                              times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
@@ -263,7 +252,7 @@ class RequiredExerciseFactory(object):
 
             return exercises
 
-        elif periodization_goal == PeriodizationGoal.increase_strength_max_strength:
+        elif periodization_goal == PeriodizationGoalType.increase_strength_max_strength:
 
             movement_efficiency = PeriodizedExercise(None, SubAdaptationType.movement_efficiency,
                                              times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
@@ -280,7 +269,7 @@ class RequiredExerciseFactory(object):
 
     def get_one_required_exercises(self, periodization_goal):
 
-        if periodization_goal == PeriodizationGoal.increase_cardiovascular_health:
+        if periodization_goal == PeriodizationGoalType.increase_cardiovascular_health:
 
             mod_intensity = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
                                                times_per_week_range=StandardErrorRange(lower_bound=5),
@@ -302,7 +291,7 @@ class RequiredExerciseFactory(object):
 
             return exercises
 
-        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance:
+        elif periodization_goal == PeriodizationGoalType.increase_cardio_endurance:
 
             stabilization_strength = PeriodizedExercise(DetailedAdaptationType.stabilization_strength, None,
                                              times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
@@ -318,7 +307,7 @@ class RequiredExerciseFactory(object):
 
             return [stabilization_strength, strength_endurance]
 
-        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance_with_speed:
+        elif periodization_goal == PeriodizationGoalType.increase_cardio_endurance_with_speed:
 
             anaerobic_threshold_training = PeriodizedExercise(DetailedAdaptationType.anaerobic_threshold_training, None,
                                              times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
@@ -346,7 +335,7 @@ class RequiredExerciseFactory(object):
 
             return [anaerobic_threshold_training, high_intensity_anaerobic_training, stabilization_strength, strength_endurance]
 
-        elif periodization_goal == PeriodizationGoal.increase_strength_max_strength:
+        elif periodization_goal == PeriodizationGoalType.increase_strength_max_strength:
 
             hypertrophy = PeriodizedExercise(DetailedAdaptationType.hypertrophy, None,
                                              times_per_week_range=StandardErrorRange(lower_bound=2, upper_bound=3),
@@ -364,7 +353,7 @@ class RequiredExerciseFactory(object):
 
     def get_one_required_combination(self, periodization_goal):
 
-        if periodization_goal == PeriodizationGoal.increase_cardiovascular_health or periodization_goal == PeriodizationGoal.lose_weight:
+        if periodization_goal == PeriodizationGoalType.increase_cardiovascular_health or periodization_goal == PeriodizationGoalType.lose_weight:
 
             combo = PeriodizationOneRequiredCombination()
             combo.periodization_id = 1
@@ -372,7 +361,7 @@ class RequiredExerciseFactory(object):
 
             return [combo]
 
-        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance:
+        elif periodization_goal == PeriodizationGoalType.increase_cardio_endurance:
 
             combo = PeriodizationOneRequiredCombination()
             combo.periodization_id = 2
@@ -380,7 +369,7 @@ class RequiredExerciseFactory(object):
 
             return [combo]
 
-        elif periodization_goal == PeriodizationGoal.increase_cardio_endurance_with_speed:
+        elif periodization_goal == PeriodizationGoalType.increase_cardio_endurance_with_speed:
 
             combo_1 = PeriodizationOneRequiredCombination()
             combo_1.periodization_id = 3
@@ -392,7 +381,7 @@ class RequiredExerciseFactory(object):
 
             return [combo_1, combo_2]
 
-        elif periodization_goal == PeriodizationGoal.increase_strength_max_strength:
+        elif periodization_goal == PeriodizationGoalType.increase_strength_max_strength:
 
             combo = PeriodizationOneRequiredCombination()
             combo.periodization_id = 5

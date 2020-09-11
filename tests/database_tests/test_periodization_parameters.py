@@ -2,7 +2,8 @@ from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager, TargetLoadCalculator
-from models.periodization import PeriodizedExercise, PeriodizationGoal, PeriodizationPersona, TrainingPhaseType, TrainingPhaseFactory, PeriodizationProgression
+from models.periodization import PeriodizedExercise, PeriodizationPersona, TrainingPhaseType, TrainingPhaseFactory, PeriodizationProgression
+from models.periodization_goal import PeriodizationGoalType
 from models.session import MixedActivitySession, SportTrainingSession
 from models.session_functional_movement import SessionFunctionalMovement
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
@@ -147,7 +148,7 @@ from datetime import datetime, timedelta
 #     user_stats = UserStats("tester")
 #     user_stats.training_phase_type = TrainingPhaseType.increase
 #     user_stats.persona = PeriodizationPersona.well_trained
-#     user_stats.periodization_goals = [PeriodizationGoal.increase_cardiovascular_health]
+#     user_stats.periodization_goals = [PeriodizationGoalType.increase_cardiovascular_health]
 #     injury_risk_dict = {}
 #     proc = PeriodizationPlanProcessor(current_date_time, user_stats, injury_risk_dict, data_store, None)
 #     h=0
