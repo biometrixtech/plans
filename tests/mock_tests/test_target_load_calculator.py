@@ -37,7 +37,7 @@ def test_get_target_session_load_and_rate():
     average_session_load = StandardErrorRange(lower_bound=300, upper_bound=400)
     last_weeks_load = StandardErrorRange(lower_bound=1100, upper_bound=1600)
     weekly_load_target = StandardErrorRange(lower_bound=1200, upper_bound=1700)
-    target_session_load, target_rate = calc.get_target_session_load_and_rate(average_session_load, last_weeks_load, weekly_load_target)
+    target_session_load, target_rate = calc.get_target_session_load_and_ramp(average_session_load, last_weeks_load, weekly_load_target)
 
     # first need to understand how much the weekly load is increasing over last week.
     # in this case, smallest increase is from 1600 -> 1700 resulting in a net increase of 100 (rate of 1.0625)
