@@ -29,6 +29,7 @@ class ActivityManager(object):
         self.movement_prep_datastore = datastore_collection.movement_prep_datastore
         self.mobility_wod_datastore = datastore_collection.mobility_wod_datastore
         self.responsive_recovery_datastore = datastore_collection.responsive_recovery_datastore
+        self.completed_session_details_datastore = datastore_collection.completed_session_details_datastore
         self.training_sessions = training_sessions if training_sessions is not None else []
         self.symptoms = symptoms if symptoms is not None else []
         self.historical_injury_risk_dict = None
@@ -119,6 +120,8 @@ class ActivityManager(object):
         # write updated injury risk
         athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
         athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
+        if len(injury_risk_processor.completed_session_details) > 0:
+            self.completed_session_details_datastore.put(injury_risk_processor.completed_session_details)
         self.injury_risk_datastore.put(athlete_injury_risk)
 
     @xray_recorder.capture('logic.ActivityManager.create_movement_prep')

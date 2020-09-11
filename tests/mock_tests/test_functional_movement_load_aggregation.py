@@ -76,7 +76,7 @@ def test_aggregate_load_concentric():
     dict = factory.get_functional_movement_dictionary()
 
     session_functional_movement = SessionFunctionalMovement(None, {})
-    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None)
+    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None, 'test_user')
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     # assert len(load_dict) == 2
@@ -138,7 +138,7 @@ def test_normalize_load_concentric():
 
     athlete_injury_risk = AthleteInjuryRisk("tester")
     session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)
-    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None)
+    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None, 'test_user')
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     # not used anymore

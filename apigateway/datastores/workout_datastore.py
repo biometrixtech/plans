@@ -11,14 +11,14 @@ class WorkoutDatastore(object):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.WorkoutDatastore.get')
-    def get(self, program_id=None, event_date=None, start_date=None, end_date=None, json=False):
+    def get(self, program_module_id=None, event_date=None, start_date=None, end_date=None, json=False):
         """
-        program_id: uuid
+        program_module_id: uuid
         event_date: datetime.date
         start_date: datetime.date
         end_date: datetime.date
         """
-        return self._query_mongodb(program_id, event_date, start_date, end_date, json=json)
+        return self._query_mongodb(program_module_id, event_date, start_date, end_date, json=json)
 
     @xray_recorder.capture('datastore.WorkoutDatastore.put')
     def put(self, items):
@@ -31,11 +31,11 @@ class WorkoutDatastore(object):
             raise e
 
     @xray_recorder.capture('datastore.WorkoutDatastore._query_mongodb')
-    def _query_mongodb(self, program_id, event_date, start_date, end_date, json=False):
+    def _query_mongodb(self, program_module_id, event_date, start_date, end_date, json=False):
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        if program_id is not None:
-            mongo_result = mongo_collection.find_one({'program_id': program_id})
+        if program_module_id is not None:
+            mongo_result = mongo_collection.find_one({'program_module_id': program_module_id})
             if mongo_result is not None:
                 if json:
                     return mongo_result
@@ -43,7 +43,7 @@ class WorkoutDatastore(object):
                     session = PlannedWorkout.json_deserialise(mongo_result)
                     return session
             else:
-                raise NoSuchEntityException(f'Workout with the program_id: {program_id} not found')
+                raise NoSuchEntityException(f'Workout with the program_module_id: {program_module_id} not found')
         else:
             query = {}
             if event_date is not None:
@@ -51,7 +51,7 @@ class WorkoutDatastore(object):
             elif start_date is not None and end_date is not None:
                 query['event_date'] = {'$gte': format_date(start_date), '$lte': format_date(end_date)}
             else:
-                raise InvalidSchemaException("Need to provide either event_date or start_date and end_date when not querying by program_id")
+                raise InvalidSchemaException("Need to provide either event_date or start_date and end_date when not querying by program_module_id")
             mongo_cursor = mongo_collection.find(query)
 
             ret = []
@@ -64,5 +64,5 @@ class WorkoutDatastore(object):
         item = item.json_serialise()
 
         mongo_collection = get_mongo_collection(self.mongo_collection)
-        query = {'program_id': item['program_id']}
+        query = {'program_module_id': item['program_module_id']}
         mongo_collection.replace_one(query, item, upsert=True)

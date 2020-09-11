@@ -45,7 +45,7 @@ def process_adaptation_types(action_list, reps_list, rpe_list, duration=None):
                         base_exercise = BaseWorkoutExercise()
                         base_exercise.training_type = compound_action.training_type
                         base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-                        base_exercise.set_adaption_type()
+                        base_exercise.set_adaptation_type()
 
                         sub_action.power_load_left = base_exercise.power_load
                         sub_action.power_load_right = base_exercise.power_load
@@ -83,7 +83,7 @@ def process_adaptation_types_no_reps(action_list, rpe_list, duration=None):
                     base_exercise = BaseWorkoutExercise()
                     base_exercise.training_type = compound_action.training_type
                     base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-                    base_exercise.set_adaption_type()
+                    base_exercise.set_adaptation_type()
 
                     sub_action.power_load_left = base_exercise.power_load
                     sub_action.power_load_right = base_exercise.power_load
@@ -152,7 +152,7 @@ def process_adaptation_types_percent_max_hr(action_list, percent_max_hr_list, du
                     base_exercise = BaseWorkoutExercise()
                     base_exercise.training_type = compound_action.training_type
                     base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-                    base_exercise.set_adaption_type()
+                    base_exercise.set_adaptation_type()
 
                     sub_action.power_load_left = base_exercise.power_load
                     sub_action.power_load_right = base_exercise.power_load

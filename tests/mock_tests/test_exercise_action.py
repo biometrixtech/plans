@@ -19,7 +19,7 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     exercise.training_type = training_type
     exercise.explosiveness_rating = explosiveness
     exercise.set_intensity()
-    exercise.set_adaption_type()
+    exercise.set_adaptation_type()
     return exercise
 
 

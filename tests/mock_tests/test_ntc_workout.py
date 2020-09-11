@@ -7,6 +7,7 @@ Config.set('PROVIDER_INFO', provider_info)
 from models.planned_exercise import PlannedWorkout
 from models.session import PlannedSession
 from models.sport import SportName
+from models.movement_tags import TrainingType
 from logic.workout_processing import WorkoutProcessor
 import os, json
 import datetime
@@ -64,6 +65,33 @@ def get_session(date, workout, assignment_type='default', movement_option=None):
 
     return session
 
+
+def detect_plyo(all_workouts):
+    workouts_with_plyo = 0
+    total_workouts = 0
+    plyo_ex_details = []
+    for workout in all_workouts:
+        total_workouts += 1
+        total_exercises = 0
+        plyo_exercises = 0
+        for section in workout.sections:
+            for exercise in section.exercises:
+                total_exercises += 1
+                if exercise.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics]:
+                    plyo_exercises += 1
+        if plyo_exercises > 0:
+            workouts_with_plyo += 1
+            percent_plyo = plyo_exercises / total_exercises
+            plyo_ex_details.append({
+                'workout': workout.name,
+                'total_exercises': total_exercises,
+                'plyometric_workouts': plyo_exercises,
+                'plyometrics_percentage': round(percent_plyo * 100, 2)
+            })
+    import pandas as pd
+    pd.DataFrame(plyo_ex_details).to_csv('../../database/NTC/plyometrics_prevalence.csv', index=False)
+    print(workouts_with_plyo, total_workouts)
+
 # def test_ntc():
 #     all_workouts = get_ntc_workout()
 #     failed_count = 0
@@ -80,7 +108,9 @@ def get_session(date, workout, assignment_type='default', movement_option=None):
 #             failed_count += 1
 #             print(f"processing failed: {planned_workout.name}")
 #             print(e)
-#     print(failed_count, success_count)
+#
+#     detect_plyo(all_workouts)
+    # print(failed_count, success_count)
 #
 #
 def validate_result(workout):

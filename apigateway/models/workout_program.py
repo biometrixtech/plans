@@ -220,7 +220,7 @@ class BaseWorkoutExercise(object):
         self.movement_rep_tempo = movement.rep_tempo
         # self.set_adaption_type(movement)
 
-    def set_adaption_type(self):
+    def set_adaptation_type(self):
         if self.training_type == TrainingType.flexibility:
             self.adaptation_type = AdaptationType.not_tracked
         if self.training_type == TrainingType.movement_prep:

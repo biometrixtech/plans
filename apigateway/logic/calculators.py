@@ -375,12 +375,12 @@ class Calculators(object):
         return vo2_max
 
     @classmethod
-    def vo2max_population(cls, age, female, activity_level=2):
+    def vo2max_population(cls, age, gender, activity_level=2):
         """
         based on: https://www8.garmin.com/manuals/webhelp/edge520/EN-US/GUID-1FBCCD9E-19E1-4E4C-BD60-1793B5B97EB3.html
         :param age:
         :param activity_level: 1-7 scale based on duration and intensity of activity per week same as nhanes, needs to be  converted to
-        :param female:
+        :param gender:
         :return:
         """
 
@@ -412,11 +412,11 @@ class Calculators(object):
                 'untrained': {30: 33.0, 40: 31.0, 50: 29.0, 60: 26.0, 70: 24.0, 200: 22.0}
              }
         }
-        if female:
+        if gender.name == 'female':
             vo2_max_age_dict = population_fpt.get('female').get(athletic_level)  # use fair as default
         else:
             vo2_max_age_dict = population_fpt.get('male').get(athletic_level)  # use fair as default
-        vo2_max = max([value for key, value in vo2_max_age_dict.items() if age < key])
+        vo2_max = max([value for key, value in vo2_max_age_dict.items() if age <= key])
         return vo2_max
 
     @classmethod
@@ -491,7 +491,7 @@ class Calculators(object):
         percent_max = 0.8 + 0.1894393 * math.exp(-0.012778 * time) + 0.2989558 * math.exp(-0.1932605 * time)
         vo2 = -4.60 + 0.182258 * velocity + 0.000104 * (velocity ** 2)
         vo2_max = round(vo2 / percent_max, 1)
-        return vo2, vo2_max
+        return vo2_max
 
     @classmethod
     def vo2max_percent_hr_max(cls, percent_hr_max, work_vo2):

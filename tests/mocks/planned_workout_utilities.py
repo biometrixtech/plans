@@ -50,7 +50,7 @@ def process_action(action, detailed_load_processor, event_date, functional_movem
     base_exercise = BaseWorkoutExercise()
     base_exercise.training_type = action.training_type
     base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-    base_exercise.set_adaption_type()
+    base_exercise.set_adaptation_type()
 
     action.power_load_left = base_exercise.power_load
     action.power_load_right = base_exercise.power_load

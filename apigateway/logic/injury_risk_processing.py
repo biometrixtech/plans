@@ -26,6 +26,7 @@ class InjuryRiskProcessor(object):
         self.relative_load_level = 3
         self.high_relative_load_sessions = athlete_stats.high_relative_load_sessions
         self.high_relative_load_score = athlete_stats.high_relative_load_score
+        self.completed_session_details = []
         self.aggregated_injury_risk_dict = {}
         self.viz_aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
@@ -692,6 +693,8 @@ class InjuryRiskProcessor(object):
                     session_functional_movement.session_load_dict = session.session_load_dict
                     current_session = session
 
+                # if session_functional_movement.completed_session_details is not None:
+                #     self.completed_session_details.append(session_functional_movement.completed_session_details)
                 injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                                injury_risk_dict, d)
 
@@ -1230,6 +1233,9 @@ class InjuryRiskProcessor(object):
             else:
                 session_functional_movement.session_load_dict = session.session_load_dict
                 current_session = session
+
+            if session_functional_movement.completed_session_details is not None and not session_functional_movement.completed_session_details.planned:
+                self.completed_session_details.append(session_functional_movement.completed_session_details)
 
             injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                            injury_risk_dict, base_date)

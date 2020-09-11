@@ -6,6 +6,7 @@ from models.movement_actions import CompoundAction
 from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
+from models.soreness_base import BodyPartSide
 from serialisable import Serialisable
 
 
@@ -66,6 +67,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
     def __init__(self, workout_id):
         super().__init__()
         self.workout_id = workout_id
+        self.user_profile_id = None
 
         self.session_detailed_load = DetailedTrainingLoad()
         self.session_training_type_load = TrainingTypeLoad()
@@ -102,13 +104,19 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             'program_module_id': self.program_module_id,
             'duration': self.duration,
             'sections': [s.json_serialise() for s in self.sections],
+            'user_profile_id': self.user_profile_id,
             'workout_id': self.workout_id,
             'session_detailed_load': self.session_detailed_load.json_serialise(),
             'session_training_type_load': self.session_training_type_load.json_serialise(),
             'ranked_muscle_detailed_load': [ml.json_serialise() for ml in self.ranked_muscle_detailed_load],
             'projected_rpe_load': self.projected_rpe_load.json_serialise(),
             'projected_power_load': self.projected_power_load.json_serialise(),
-            'projected_session_rpe': self.projected_session_rpe.json_serialise()
+            'projected_session_rpe': self.projected_session_rpe.json_serialise(),
+            'muscle_detailed_load': [
+                {
+                    "body_part": key.json_serialise(),
+                    "detailed_load": value.json_serialise()
+                } for key, value in self.muscle_detailed_load.items()]
         }
 
         return ret
@@ -121,6 +129,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         workout_load.event_date = parse_date(input_dict.get('event_date')) if input_dict.get('event_date') is not None else None
         workout_load.program_id = input_dict.get('program_id')
         workout_load.program_module_id = input_dict.get('program_module_id')
+        workout_load.user_profile_id = input_dict.get('user_profile_id')
         workout_load.duration = input_dict.get('duration')
         workout_load.sections = [PlannedWorkoutSection.json_deserialise(section) for section in input_dict.get('sections', [])]
         workout_load.session_detailed_load = DetailedTrainingLoad.json_deserialise(input_dict['session_detailed_load']) if input_dict.get('session_detailed_load') is not None else None
@@ -132,6 +141,9 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             input_dict['projected_power_load']) if input_dict.get('projected_power_load') is not None else None
         workout_load.projected_session_rpe = StandardErrorRange.json_deserialise(
             input_dict['projected_session_rpe']) if input_dict.get('projected_session_rpe') is not None else None
+
+        for item in input_dict.get('muscle_detailed_load', []):
+            workout_load.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
 
         return workout_load
 

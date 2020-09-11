@@ -75,7 +75,7 @@ def get_workout(date, file_name):
     planned_workout = PlannedWorkout.json_deserialise(workout_json)
     planned_session.workout = planned_workout
 
-    return planned_session
+    return planned_workout
 
 def get_session(date, rpe=5, duration=60, file_name=None, assignment_type='default', movement_option=None):
     # session = MixedActivitySession()
@@ -307,7 +307,7 @@ def test_api_movement_prep_compare_exercise_counts():
                                    datastore_collection=mock_datastore_collection)
     api_processing.create_planned_workout_from_id("1")
 
-    movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=workout)
+    movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=api_processing.sessions[0])
 
     mock_datastore_collection_2 = DatastoreCollection()
     workout_datastore_2 = WorkoutDatastore()
@@ -325,7 +325,7 @@ def test_api_movement_prep_compare_exercise_counts():
                                      datastore_collection=mock_datastore_collection_2)
     api_processing_2.create_planned_workout_from_id("1")
 
-    movement_prep_2 = api_processing_2.create_activity(activity_type='movement_prep', planned_session=workout_2)
+    movement_prep_2 = api_processing_2.create_activity(activity_type='movement_prep', planned_session=api_processing_2.sessions[0])
 
     mock_datastore_collection_3 = DatastoreCollection()
     workout_datastore_3 = WorkoutDatastore()
@@ -343,7 +343,7 @@ def test_api_movement_prep_compare_exercise_counts():
                                      datastore_collection=mock_datastore_collection_3)
     api_processing_3.create_planned_workout_from_id("1")
 
-    movement_prep_3 = api_processing_3.create_activity(activity_type='movement_prep', planned_session=workout_3)
+    movement_prep_3 = api_processing_3.create_activity(activity_type='movement_prep', planned_session=api_processing_3.sessions[0])
 
     inhibit_1_exercise_count = len(movement_prep.movement_integration_prep.exercise_phases[0].exercises)
     inhibit_2_exercise_count = len(movement_prep_2.movement_integration_prep.exercise_phases[0].exercises)
@@ -415,7 +415,7 @@ def test_api_movement_prep_compare_volume_may1_alt():
                                    datastore_collection=mock_datastore_collection)
     api_processing.create_planned_workout_from_id("1")
 
-    movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=workout)
+    movement_prep = api_processing.create_activity(activity_type='movement_prep', planned_session=api_processing.sessions[0])
     injury_risk_dict_1 = api_processing.activity_manager.exercise_assignment_calculator.injury_risk_dict
 
     total_concentric_volume_1_lower_bound = 0
@@ -443,7 +443,7 @@ def test_api_movement_prep_compare_volume_may1_alt():
                                    datastore_collection=mock_datastore_collection_2)
     api_processing_2.create_planned_workout_from_id("1")
 
-    movement_prep_2 = api_processing_2.create_activity(activity_type='movement_prep', planned_session=workout_2)
+    movement_prep_2 = api_processing_2.create_activity(activity_type='movement_prep', planned_session=api_processing_2.sessions[0])
     injury_risk_dict_2 = api_processing_2.activity_manager.exercise_assignment_calculator.injury_risk_dict
 
     total_concentric_volume_2_lower_bound = 0
@@ -471,7 +471,7 @@ def test_api_movement_prep_compare_volume_may1_alt():
                                    datastore_collection=mock_datastore_collection_3)
     api_processing_3.create_planned_workout_from_id("1")
 
-    movement_prep_3 = api_processing_3.create_activity(activity_type='movement_prep', planned_session=workout_3)
+    movement_prep_3 = api_processing_3.create_activity(activity_type='movement_prep', planned_session=api_processing_3.sessions[0])
     injury_risk_dict_3 = api_processing_3.activity_manager.exercise_assignment_calculator.injury_risk_dict
 
     total_concentric_volume_3_lower_bound = 0

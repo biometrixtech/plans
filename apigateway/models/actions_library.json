@@ -4530,7 +4530,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -4643,7 +4643,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -5965,7 +5965,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -6086,7 +6086,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -6297,7 +6297,7 @@
                             100
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -6338,7 +6338,7 @@
                             100
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -6473,7 +6473,7 @@
                             100
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -6514,7 +6514,7 @@
                             100
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -6677,7 +6677,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -6718,7 +6718,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -7017,7 +7017,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -7058,7 +7058,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -10848,7 +10848,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -10884,7 +10884,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -11007,7 +11007,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -11043,7 +11043,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -11166,7 +11166,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -11206,7 +11206,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -11333,7 +11333,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -11373,7 +11373,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -11500,7 +11500,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -11622,7 +11622,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 1,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -11767,7 +11767,7 @@
                             100
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -11894,7 +11894,7 @@
                             100
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -12779,7 +12779,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -12892,7 +12892,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -13028,7 +13028,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -13064,7 +13064,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -13183,7 +13183,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -13219,7 +13219,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -13361,7 +13361,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -13470,7 +13470,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -13602,7 +13602,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -13711,7 +13711,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -13843,7 +13843,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -13970,7 +13970,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -14247,7 +14247,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -14283,7 +14283,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -14392,7 +14392,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -14428,7 +14428,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -14560,7 +14560,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -14596,7 +14596,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -14700,7 +14700,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -14736,7 +14736,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -14863,7 +14863,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -14899,7 +14899,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -15008,7 +15008,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -15044,7 +15044,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -15176,7 +15176,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -15305,7 +15305,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -15457,7 +15457,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -15571,7 +15571,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -15708,7 +15708,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -15836,7 +15836,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -15987,7 +15987,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -16100,7 +16100,7 @@
                             0
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -16236,7 +16236,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -16276,7 +16276,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -16389,7 +16389,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -16429,7 +16429,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 2,
@@ -16565,7 +16565,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -16683,7 +16683,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -16824,7 +16824,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -16847,7 +16847,39 @@
                             }
                         ],
                         "movement_systems": []
-                    },
+                    }
+                ]
+            },
+            {
+                "id": "1",
+                "name": "",
+                "training_type": null,
+                "eligible_external_resistance": [],
+                "body_position": null,
+                "lower_body_stance": null,
+                "upper_body_stance": null,
+                "lateral_distribution_pattern": 0,
+                "percent_bodyweight": 0.0,
+                "lateral_distribution": [
+                    0,
+                    0
+                ],
+                "apply_resistance": false,
+                "explosiveness": null,
+                "apply_instability": false,
+                "speed": null,
+                "resistance": null,
+                "primary_muscle_action": null,
+                "hip_joint_action": [],
+                "knee_joint_action": [],
+                "ankle_joint_action": [],
+                "pelvic_tilt_joint_action": [],
+                "trunk_joint_action": [],
+                "shoulder_scapula_joint_action": [],
+                "elbow_joint_action": [],
+                "wrist_joint_action": [],
+                "movement_systems": [],
+                "sub_actions": [
                     {
                         "id": "100",
                         "name": "Bracing",
@@ -16933,7 +16965,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -16951,7 +16983,39 @@
                         "elbow_joint_action": [],
                         "wrist_joint_action": [],
                         "movement_systems": []
-                    },
+                    }
+                ]
+            },
+            {
+                "id": "2",
+                "name": "",
+                "training_type": null,
+                "eligible_external_resistance": [],
+                "body_position": null,
+                "lower_body_stance": null,
+                "upper_body_stance": null,
+                "lateral_distribution_pattern": 0,
+                "percent_bodyweight": 0.0,
+                "lateral_distribution": [
+                    0,
+                    0
+                ],
+                "apply_resistance": false,
+                "explosiveness": null,
+                "apply_instability": false,
+                "speed": 2,
+                "resistance": 2,
+                "primary_muscle_action": null,
+                "hip_joint_action": [],
+                "knee_joint_action": [],
+                "ankle_joint_action": [],
+                "pelvic_tilt_joint_action": [],
+                "trunk_joint_action": [],
+                "shoulder_scapula_joint_action": [],
+                "elbow_joint_action": [],
+                "wrist_joint_action": [],
+                "movement_systems": [],
+                "sub_actions": [
                     {
                         "id": "100",
                         "name": "Bracing",
@@ -17060,7 +17124,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -17100,7 +17164,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 0,
@@ -17222,7 +17286,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -17262,7 +17326,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 2,
                         "primary_muscle_action": 1,
@@ -20285,7 +20349,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -20321,7 +20385,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -20642,7 +20706,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -20678,7 +20742,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -21022,7 +21086,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 0,
@@ -21062,7 +21126,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -21397,7 +21461,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 1,
@@ -21437,7 +21501,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 3,
                         "resistance": 0,
                         "primary_muscle_action": 2,
@@ -22514,7 +22578,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 1,
                         "primary_muscle_action": 0,
@@ -22754,7 +22818,7 @@
                             50
                         ],
                         "apply_resistance": true,
-                        "apply_instability": false,
+                        "apply_instability": true,
                         "speed": 2,
                         "resistance": 1,
                         "primary_muscle_action": 0,

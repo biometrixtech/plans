@@ -1,3 +1,4 @@
+import database.NTC.set_up_config
 import os
 import json
 import pandas as pd
@@ -5,6 +6,8 @@ from models.planned_exercise import PlannedExercise, PlannedWorkout, PlannedWork
 from models.training_volume import StandardErrorRange, Assignment
 from models.exercise import UnitOfMeasure
 from models.movement_tags import Equipment
+from database.NTC.create_processed_workouts import create_planned_session_detail
+from datastores.workout_datastore import WorkoutDatastore
 
 all_durations = []
 all_distances = []
@@ -96,6 +99,8 @@ class WorkoutParser(object):
             if self.is_valid(row[0]):
                 if row[0] == 'workout_name':
                     workout.name = row['description'].replace('w/','with')
+                    workout.program_module_id = ('_').join(row['description'].replace('w/','with').lower().strip().split(' '))
+                    workout.program_id = 'nrc'
                 if row[0] == 'average_minutes':
                     if self.is_valid(row['description']):
                         workout.duration = float(row['description']) * 60
@@ -153,6 +158,7 @@ class WorkoutParser(object):
                 #     workout.rest_between_exercises = self.get_assignment(min_rest, max_rest)
 
         if write:
+            WorkoutDatastore().put(workout)
             workout_json = workout.json_serialise()
             directory = file.split('/')[-2]
             self.write_json(workout_json, workout.name, directory)
@@ -458,19 +464,25 @@ if __name__ == '__main__':
     exercise_names = [ex['name'] for ex in exercises]
     exercise_names.sort()
     dirs = os.listdir('NRC_workouts/')
+    count = 0
     for dir in dirs:
         if 'DS_Store' not in dir:
             files = os.listdir(f"NRC_workouts/{dir}")
             for file in files:
+                # if count >= 1:
+                #     break
                 # if 'The Roller' not in file:
                 #     continue
                 if 'DS_Store' not in file and 'included in this' not in file and 'Workouts in this' not in file:
                     try:
                         workout = WorkoutParser().load_data(f"NRC_workouts/{dir}/{file}", write=True)
-                        validate_exercises(workout, exercise_names)
-                        workout_json = workout.json_serialise()
-                        workout_2 = PlannedWorkout.json_deserialise(workout_json)
+                        # validate_exercises(workout, exercise_names)
+                        create_planned_session_detail(workout)
+                        count += 1
+                        # workout_json = workout.json_serialise()
+                        # workout_2 = PlannedWorkout.json_deserialise(workout_json)
                     except ValueError as e:
+                        # raise
                         print(e)
                         print(dir, file)
     # print(f"duration: {min(all_durations), max(all_durations)}")
