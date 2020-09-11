@@ -186,7 +186,7 @@ class PlannedExercise(BaseWorkoutExercise):
         self.weight = None  # in lbs
         self.weight_measure = None
 
-        self.reps = 1
+        #self.reps = 1
         self.prescribed_per_side = False  # if the prescribed dosage is per side or total
         # self.tempo = None  # OTF defines tempo for concentric/eccentric part of movement
 
@@ -239,7 +239,7 @@ class PlannedExercise(BaseWorkoutExercise):
             'weight': self.weight.json_serialise() if self.weight is not None else None,
             'weight_measure': self.weight_measure.value if self.weight_measure is not None else None,
             'side': self.side,
-            'reps': self.reps,
+            #'reps': self.reps,
 
             'sets': self.sets,
             'reps_per_set': self.reps_per_set,
@@ -299,7 +299,7 @@ class PlannedExercise(BaseWorkoutExercise):
 
         exercise.sets = input_dict.get('sets', 0)
         exercise.reps_per_set = input_dict.get('reps_per_set')
-        exercise.reps = input_dict.get('reps', 1)
+        #exercise.reps = input_dict.get('reps', 1)
         exercise.side = input_dict.get('side', 0)
         exercise.equipments = [Equipment(equipment) for equipment in input_dict.get('equipments', [])]
         exercise.explosiveness_rating = input_dict.get('explosiveness_rating', 0)
