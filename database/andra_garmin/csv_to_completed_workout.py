@@ -5,14 +5,20 @@ from utils import format_datetime
 
 
 # data_series = 'april-june2020'
-data_series = 'july-sept2020'
+# data_series = 'july-sept2020'
+data_series = 'aug-nov2019'
 csv_files_folder = f'csv_data/{data_series}'
 workouts_folder = f'workouts/{data_series}'
 if not os.path.exists(workouts_folder):
     os.mkdir(workouts_folder)
 
+if '2020' in data_series:
+    all_workouts = pd.read_csv('garmin_data/Activities_2020.csv')
+elif '2019' in data_series:
+    all_workouts = pd.read_csv('garmin_data/Activities_2019.csv')
+else:
+    all_workouts = pd.DataFrame()
 
-all_workouts = pd.read_csv('garmin_data/Activities.csv')
 # def get_movement_id(distance, speed=2, duration=0):
 #     if 800 < distance <= 5000:
 #         movement_id = 'cruising'
@@ -21,7 +27,7 @@ all_workouts = pd.read_csv('garmin_data/Activities.csv')
 #     else:
 #         movement_id = 'run'
 #     return movement_id
-
+all_speeds = []
 
 def write_json(workout, workout_name, directory):
     json_string = json.dumps(workout, indent=4)
@@ -60,16 +66,20 @@ def create_workout(file_name=''):
             if pace > 540:
                 exercise['movement_id'] = "run"
             else:
+                import matplotlib.pyplot as plt
+                plt.figure()
+                plt.plot(detail_data.enhanced_speed)
                 print('fast_run', file_name)
                 print(pace)
                 exercise['movement_id'] = "tempo"
         elif activity_type == 'Cycling':
-            exercise['speed'] = float( summary['Avg Pace']) * 1609 / 3600  #np.mean(detail_data.enhanced_speed)
+            exercise['speed'] = float( summary['Avg Pace']) * 1609 / 3600  # np.mean(detail_data.enhanced_speed)
             exercise['movement_id'] = 'cycle'
         else:
             print(exercise['name'])
             return None
     else:
+        print('no summary found', start_time)
         exercise['name'] = "Unnamed run"
         exercise['distance'] = detail_data.distance.values[-1]
         start_time = datetime.datetime.strptime(detail_data.timestamp.values[0], "%Y-%m-%d %H:%M:%S")
@@ -77,6 +87,8 @@ def create_workout(file_name=''):
         exercise['duration'] = (end_time - start_time).seconds
         exercise['speed'] =  np.mean(detail_data.enhanced_speed)
         exercise['movement_id'] = 'run'
+    # if exercise['movement_id'] == 'run' and exercise['speed'] < 2.25:
+    #     print(exercise['name'], exercise['duration'] / 60, exercise['duration'] / 1609)
 
 
     # exercise['movement_id'] = get_movement_id(exercise['distance'])
@@ -107,3 +119,4 @@ for file_name in all_files:
     if '.csv' in file_name:
         create_workout(file_name)
         count += 1
+print('here')

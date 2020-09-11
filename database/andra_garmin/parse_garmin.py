@@ -4,7 +4,8 @@ import zipfile
 import os
 
 # data_series = 'april-june2020'
-data_series = 'july-sept2020'
+# data_series = 'july-sept2020'
+data_series = 'aug-nov2019'
 
 zipped_data_folder = f'garmin_data/{data_series}_zipped'
 fit_files_folder = f'garmin_data/{data_series}'

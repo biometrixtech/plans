@@ -44,6 +44,13 @@ class ExerciseMovementParser(object):
         # all_movements = {}
         for exercise in self.exercises:
             exercise = ClientExercise.json_deserialise(exercise)
+            if exercise.base_movement_name == 'iso squat':
+                exercise.base_movement_name = 'iso squat hold'
+            if exercise.name == 'rowing, 35 strokes per minute':
+                exercise.base_movement_name = 'erg rowing'
+            if exercise.name == 'rowing, 30 strokes per minute':
+                exercise.name = 'rowing'
+                exercise.base_movement_name = 'erg rowing'
             base_movement = self.base_movements.get(exercise.base_movement_name)
             if base_movement is None:
                 if exercise.training_type.value not in [0, 7, 8]:
