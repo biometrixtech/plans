@@ -366,3 +366,10 @@ def test_get_running_speed_for_known_running_pace_distance_compare():
     speed1 = Calculators.get_running_speed_from_known_time(known_distance=4000,known_time=1630.9, running_pace_distance=5000)
     speed2 = Calculators.get_running_speed_from_known_time(known_distance=4000,known_time=1630.9 * 2, running_pace_distance=5000)
     assert speed1 == 2 * speed2
+
+
+def test_vo2_max_jack_daniels():
+    vo2_max_1 = Calculators.vo2max_running_jack_daniels(time=6220, distance=21064)  # garmin_data half marathon pr
+    vo2_max_2 = Calculators.vo2max_running_jack_daniels(time=13383, distance=42417.85)  # garmin_data marathon pr
+    demographics_vo2_max = Calculators.vo2_max_estimation_demographics(40, user_weight=50, user_height=1.6, gender=Gender.female, activity_level=5)
+    print(vo2_max_1, vo2_max_2)

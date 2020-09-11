@@ -416,7 +416,7 @@ class Calculators(object):
             vo2_max_age_dict = population_fpt.get('female').get(athletic_level)  # use fair as default
         else:
             vo2_max_age_dict = population_fpt.get('male').get(athletic_level)  # use fair as default
-        vo2_max = max([value for key, value in vo2_max_age_dict.items() if age < key])
+        vo2_max = max([value for key, value in vo2_max_age_dict.items() if age <= key])
         return vo2_max
 
     @classmethod
@@ -491,7 +491,7 @@ class Calculators(object):
         percent_max = 0.8 + 0.1894393 * math.exp(-0.012778 * time) + 0.2989558 * math.exp(-0.1932605 * time)
         vo2 = -4.60 + 0.182258 * velocity + 0.000104 * (velocity ** 2)
         vo2_max = round(vo2 / percent_max, 1)
-        return vo2, vo2_max
+        return vo2_max
 
     @classmethod
     def vo2max_percent_hr_max(cls, percent_hr_max, work_vo2):

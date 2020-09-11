@@ -55,22 +55,23 @@ def create_planned_session_detail(planned_workout):
 
 def get_profiles():
     profile_1 = {
-        'user_profile_id': 'profile_1',
+        # Andra
+        'user_profile_id': 'andra_profile',
         'user_id': 'test_user_1',
-        'user_age': 25,
+        'user_age': 40,
         'user_gender': Gender.female,
         'user_weight': 55,
-        'vo2_max': StandardErrorRange(observed_value=55.0)
+        'vo2_max': StandardErrorRange(lower_bound=41.7, observed_value=42.45, upper_bound=43.2),
+        'activity_level': 6
     }
 
-
-    profile_2 = {
-        'user_profile_id': 'profile_2',
-        'user_id': 'test_user_2',
-        'user_age': 35,
-        'user_gender': Gender.male,
-        'user_weight': 75,
-        'vo2_max': None
-    }
-    return [profile_1, profile_2]
+    # profile_2 = {
+    #     'user_profile_id': 'profile_2',
+    #     'user_id': 'test_user_2',
+    #     'user_age': 35,
+    #     'user_gender': Gender.male,
+    #     'user_weight': 75,
+    #     'vo2_max': None
+    # }
+    return [profile_1]
 

@@ -45,3 +45,5 @@ ml_training/workout_scoring/data/*
 ml_training/workout_scoring/model/*
 database/NTC/*
 !database/NTC/*.py
+database/andra_garmin/*
+!database/andra_garmin/*.py
