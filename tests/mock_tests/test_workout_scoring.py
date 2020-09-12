@@ -1,7 +1,7 @@
 from logic.workout_scoring import WorkoutScoringProcessor
 from models.exposure import TargetTrainingExposure, TrainingExposure
 from models.movement_tags import DetailedAdaptationType
-from models.periodization_goal import AthleteBaselineCapacities, TrainingUnit
+from models.athlete_capacity import AthleteBaselineCapacities, TrainingUnit
 from models.training_volume import StandardErrorRange
 
 
