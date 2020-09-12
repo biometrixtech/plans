@@ -55,9 +55,21 @@ class AthleteStrengthCapacity(object):
 
 class AthleteBaselineCapacities(object):
     def __init__(self):
-        self.cardio_capacities = AthleteCardioCapacity()
-        self.power_capacities = AthletePowerCapacity()
-        self.strength_capacities = AthleteStrengthCapacity()
+        # Cardio
+        self.base_aerobic_training = None
+        self.anaerobic_threshold_training = None
+        self.high_intensity_anaerobic_training = None
+        # Strength
+        self.muscular_endurance = None
+        self.strength_endurance = None
+        self.hypertrophy = None
+        self.maximal_strength = None
+        # Power
+        self.speed = None
+        self.sustained_power = None
+        self.power = None
+        self.maximal_power = None
+        # Personas
         self.cardio_training_persona = TrainingPersona.beginner
         self.power_training_persona = TrainingPersona.beginner
         self.strength_training_persona = TrainingPersona.beginner

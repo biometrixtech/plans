@@ -146,7 +146,6 @@ class PeriodizationPlan(object):
         self.training_phase = training_phase
         self.athlete_persona = athlete_persona
         self.template_workout = None
-        self.next_workouts = {}
 
     def get_week_number(self, event_date):
 
