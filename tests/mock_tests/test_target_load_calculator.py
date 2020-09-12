@@ -1,5 +1,5 @@
 from logic.periodization_processor import TargetLoadCalculator
-from models.periodization import PeriodizationProgression, TrainingPhaseType
+from models.periodization_plan import TrainingPhaseType, PeriodizationProgression
 from models.training_volume import StandardErrorRange
 
 

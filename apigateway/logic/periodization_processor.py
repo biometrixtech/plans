@@ -1,4 +1,5 @@
-from models.periodization import PeriodizationPlanWeek, PeriodizationModelFactory, PeriodizationPlan, TemplateWorkout
+from models.periodization import PeriodizationPlanWeek, PeriodizationModelFactory, TemplateWorkout
+from models.periodization_plan import PeriodizationPlan
 from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
 from models.training_volume import StandardErrorRange

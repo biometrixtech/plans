@@ -1,10 +1,8 @@
-from enum import Enum
-
 from models.periodization_goal import PeriodizationGoalType
+from models.periodization_plan import PeriodizationPersona, TrainingPhaseFactory, PeriodizationProgression
 from models.training_volume import StandardErrorRange
 from models.training_load import TrainingLoad
 from models.movement_tags import DetailedAdaptationType, SubAdaptationType, AdaptationDictionary
-from datetime import timedelta
 
 
 # class AthleteTrainingHistory(object):
@@ -68,25 +66,6 @@ from datetime import timedelta
 #         return load_list
 
 
-class TrainingPhaseType(Enum):
-    recovery = 0
-    taper = 1
-    maintain = 2
-    slowly_increase = 3
-    increase = 4
-    aggressively_increase = 5
-
-
-class PeriodizationPersona(Enum):
-    high_injury_risk = 0
-    sedentary = 1
-    recreational_gaining = 2
-    recreational_maintaining = 3
-    well_trained = 4
-    elite_athlete_gaining = 5
-    elite_athlete_maintaining = 6
-
-
 class PeriodizedExercise(object):
     def __init__(self, detailed_adaptation_type, sub_adaptation_type, times_per_week_range, duration_range, rpe_range,
                  priority=0):
@@ -121,12 +100,6 @@ class PeriodizedExercise(object):
             return False
 
 
-class TrainingPhase(object):
-    def __init__(self, training_phase_type, lower_progression_bound, upper_progression_bound):
-        self.training_phase_type = training_phase_type  # indicates max rate of progressions
-        self.acwr = StandardErrorRange(lower_bound=lower_progression_bound, upper_bound=upper_progression_bound)
-
-
 class TemplateWorkout(object):
     def __init__(self):
         self.acceptable_session_rpe = None
@@ -137,28 +110,6 @@ class TemplateWorkout(object):
         self.acceptable_session_power_load = None
         self.muscle_load_ranking = {}
         self.adaptation_type_ranking = []
-
-
-class PeriodizationPlan(object):
-    def __init__(self, start_date, athlete_periodization_goals, training_phase, athlete_persona):
-        self.start_date = start_date
-        self.periodization_goals = athlete_periodization_goals
-        self.training_phase = training_phase
-        self.athlete_persona = athlete_persona
-        self.template_workout = None
-
-    def get_week_number(self, event_date):
-
-        monday1 = (self.start_date - timedelta(days=self.start_date.weekday()))
-        monday2 = (event_date - timedelta(days=event_date.weekday()))
-
-        return int(round((monday2 - monday1).days / 7, 0))
-
-    def get_week_start_date(self, event_date):
-
-        week_number = self.get_week_number(event_date)
-
-        return self.start_date + timedelta(weeks=week_number)
 
 
 class PeriodizationPlanWeek(object):
@@ -200,14 +151,6 @@ class PeriodizationModel(object):
 #     def get_available_workouts(self, workout_library, completed_workouts):
 #         pass
 #
-
-
-class PeriodizationProgression(object):
-    def __init__(self, week_number, training_phase, rpe_load_contribution, volume_load_contribution):
-        self.week_number = week_number
-        self.training_phase = training_phase
-        self.rpe_load_contribution = rpe_load_contribution
-        self.volume_load_contribution = volume_load_contribution
 
 
 class RequiredExerciseFactory(object):
@@ -424,28 +367,3 @@ class PeriodizationModelFactory(object):
             return periodization_model
 
 
-class TrainingPhaseFactory(object):
-
-    def create(self, training_phase_type):
-
-        if training_phase_type == TrainingPhaseType.recovery:
-            return TrainingPhase(training_phase_type=training_phase_type, lower_progression_bound=None,
-                                 upper_progression_bound=None)
-        elif training_phase_type == TrainingPhaseType.taper:
-            return TrainingPhase(training_phase_type=training_phase_type, lower_progression_bound=.8,
-                                 upper_progression_bound=1.1)
-        elif training_phase_type == TrainingPhaseType.maintain:
-            return TrainingPhase(training_phase_type=training_phase_type, lower_progression_bound=.9,
-                                 upper_progression_bound=1.1)
-        elif training_phase_type == TrainingPhaseType.slowly_increase:
-            return TrainingPhase(training_phase_type=training_phase_type, lower_progression_bound=1.2,
-                                 upper_progression_bound=1.3)
-        elif training_phase_type == TrainingPhaseType.increase:
-            return TrainingPhase(training_phase_type=training_phase_type,lower_progression_bound=1.3,
-                                 upper_progression_bound=1.5)
-        elif training_phase_type == TrainingPhaseType.aggressively_increase:
-            return TrainingPhase(training_phase_type=training_phase_type,lower_progression_bound=1.5,
-                                 upper_progression_bound=2.0)
-        else:
-            return TrainingPhase(training_phase_type=TrainingPhaseType.recovery, lower_progression_bound=None,
-                                 upper_progression_bound=None)

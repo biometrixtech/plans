@@ -2,7 +2,9 @@ from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager, TargetLoadCalculator
-from models.periodization import PeriodizedExercise, PeriodizationPersona, TrainingPhaseType, TrainingPhaseFactory, PeriodizationProgression
+from models.periodization import PeriodizedExercise
+from models.periodization_plan import TrainingPhaseType, PeriodizationPersona, TrainingPhaseFactory, \
+    PeriodizationProgression
 from models.periodization_goal import PeriodizationGoalType
 from models.session import MixedActivitySession, SportTrainingSession
 from models.session_functional_movement import SessionFunctionalMovement

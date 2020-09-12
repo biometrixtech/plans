@@ -14,12 +14,25 @@ class TrainingExposure(object):
         self.rpe_load = rpe_load
         self.weekly_load_percentage = weekly_load_percentage
 
+    def __eq__(self, other):
+
+        if self.detailed_adaptation_type.value == other.detailed_adaptation_type.values and self.weekly_load_percentage == other.weekly_load_percentage:
+            return True
+        else:
+            return False
+
 
 class TargetTrainingExposure(object):
     def __init__(self, training_exposures, exposure_count=None, priority=0):
         self.training_exposures = training_exposures
         self.exposure_count = exposure_count
         self.priority = priority
+
+
+class AthleteTargetTrainingExposure(TargetTrainingExposure):
+    def __init__(self, training_exposures, exposure_count=None, priority=0, progression_week=0):
+        super().__init__(training_exposures, exposure_count, priority)
+        self.progression_week = progression_week
 
 
 class TrainingExposureProcessor(object):

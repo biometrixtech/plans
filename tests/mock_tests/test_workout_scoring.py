@@ -1,5 +1,5 @@
 from logic.workout_scoring import WorkoutScoringProcessor
-from models.exposure import TargetTrainingExposure, TrainingExposure
+from models.exposure import AthleteTargetTrainingExposure, TrainingExposure
 from models.movement_tags import DetailedAdaptationType
 from models.athlete_capacity import AthleteBaselineCapacities, TrainingUnit
 from models.training_volume import StandardErrorRange
@@ -18,8 +18,8 @@ def get_base_training_long_exposure_needs():
     base_training_exposure_long = TrainingExposure(DetailedAdaptationType.base_aerobic_training,rpe=StandardErrorRange(observed_value=3.0), volume=StandardErrorRange(observed_value=60))
     one_required_count = StandardErrorRange(observed_value=1)
 
-    base_target_training_exposure_long = TargetTrainingExposure(training_exposures=[base_training_exposure_long],
-                                                                exposure_count=one_required_count, priority=1)
+    base_target_training_exposure_long = AthleteTargetTrainingExposure(training_exposures=[base_training_exposure_long],
+                                                                       exposure_count=one_required_count, priority=1)
 
     training_exposure_needs = [base_target_training_exposure_long]
 
@@ -32,8 +32,8 @@ def get_anaerobic_threshold_training_exposure_needs():
     training_exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training,rpe=StandardErrorRange(observed_value=5.0), volume=StandardErrorRange(observed_value=240))
     one_required_count = StandardErrorRange(observed_value=1)
 
-    base_target_training_exposure_long = TargetTrainingExposure(training_exposures=[training_exposure],
-                                                                exposure_count=one_required_count, priority=1)
+    base_target_training_exposure_long = AthleteTargetTrainingExposure(training_exposures=[training_exposure],
+                                                                       exposure_count=one_required_count, priority=1)
 
     training_exposure_needs = [base_target_training_exposure_long]
 

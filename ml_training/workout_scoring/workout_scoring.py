@@ -23,7 +23,8 @@ import numpy as np
 import json
 from models.planned_exercise import PlannedWorkoutLoad
 from logic.periodization_processor import WorkoutScoringManager
-from models.periodization import PeriodizedExercise, RequiredExerciseFactory, PeriodizationModelFactory, PeriodizationPersona, TrainingPhaseType, TemplateWorkout
+from models.periodization import PeriodizedExercise, RequiredExerciseFactory, PeriodizationModelFactory, TemplateWorkout
+from models.periodization_plan import TrainingPhaseType, PeriodizationPersona
 from models.periodization_goal import PeriodizationGoalType
 from models.training_volume import StandardErrorRange
 from models.ranked_types import RankedBodyPart, RankedAdaptationType

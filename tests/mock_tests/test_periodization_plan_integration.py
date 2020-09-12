@@ -6,7 +6,7 @@ from logic.workout_processing import WorkoutProcessor
 from datetime import datetime, timedelta
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
 from logic.periodization_processor import PeriodizationPlanProcessor
-from models.periodization import PeriodizationPersona, TrainingPhaseType
+from models.periodization_plan import TrainingPhaseType, PeriodizationPersona
 from models.periodization_goal import PeriodizationGoalType
 from models.training_volume import StandardErrorRange
 

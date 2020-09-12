@@ -9,12 +9,6 @@ class AthleteCapacityProcessor(object):
 
         return capacities
 
-    def update_capacity_for_periodization_plan(self, athlete_capacities):
-
-        # somewhere in here we need to track capacities by week, letting them be at diffeerent weeks
-
-        return athlete_capacities
-
     def update_capacity_with_defaults(self, athlete_capacities: AthleteBaselineCapacities, training_persona):
 
         factory = AthleteDefaultCapacityFactory()
