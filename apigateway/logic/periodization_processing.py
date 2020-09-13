@@ -3,21 +3,14 @@ from models.periodization_goal import PeriodizationGoalFactory
 from models.exposure import AthleteTargetTrainingExposure
 from models.athlete_capacity import AthleteBaselineCapacities
 from logic.athlete_capacity_processing import AthleteCapacityProcessor
+from models.training_volume import StandardErrorRange
 
 
 class PeriodizationPlanProcessor(object):
 
-    def create_periodization_plan(self, event_date, periodization_goals, training_phase_type, athlete_persona, training_persona, existing_athlete_capacities=None):
-
-        periodization_plan = PeriodizationPlan(event_date, periodization_goals, training_phase_type, athlete_persona)
+    def initialize_periodization_plan(self, periodization_plan, training_persona, existing_athlete_capacities=None):
 
         target_training_exposures = periodization_plan.periodization_goals[0].training_exposures
-        # progression_factory = PeriodizationProgressionFactory()
-        # progressions = progression_factory.create(periodization_plan.athlete_persona,
-        #                                           periodization_plan.training_phase_type)
-        #
-        # training_phase_factory = TrainingPhaseFactory()
-        # training_phase = training_phase_factory.create(periodization_plan.training_phase_type)
 
         proc = AthleteCapacityProcessor()
 
@@ -36,6 +29,17 @@ class PeriodizationPlanProcessor(object):
                                                                              target_training_exposure.priority,
                                                                              progression_week=0)
 
+            # populate values from athlete's capacity
+            for training_exposure in athlete_target_training_exposure.training_exposures:
+                detailed_adaptation_type = training_exposure.detailed_adaptation_type.name
+                athlete_capacity = getattr(periodization_plan.athlete_capacities, detailed_adaptation_type)
+                training_exposure.rpe = athlete_capacity.rpe
+                if training_exposure.weekly_load_percentage is None:
+                    training_exposure.volume = athlete_capacity.volume
+                else:
+                    training_exposure.volume = self.get_volume_for_weekly_percentage(periodization_plan.target_weekly_rpe_load,
+                                                                                     periodization_plan.expected_weekly_workouts,
+                                                                                     training_exposure.weekly_load_percentage)
             periodization_plan.target_training_exposures.append(athlete_target_training_exposure)
 
             for training_exposure in athlete_target_training_exposure.training_exposures:
@@ -55,11 +59,27 @@ class PeriodizationPlanProcessor(object):
 
         return periodization_plan
 
-    def update_periodization_plan_week(self,  periodization_plan: PeriodizationPlan, event_date):
+    def get_volume_for_weekly_percentage(self, weekly_load_range, expected_workouts_range, percentage_range):
+
+        volumes = [weekly_load_range.lower_bound * (percentage_range.lower_bound/float(100)),
+                   weekly_load_range.lower_bound * (percentage_range.upper_bound / float(100)),
+                   weekly_load_range.upper_bound * (percentage_range.lower_bound / float(100)),
+                   weekly_load_range.upper_bound * (percentage_range.upper_bound / float(100))]
+
+        min_volume = min(volumes)
+        max_volume = max(volumes)
+
+        volume = StandardErrorRange(lower_bound=min_volume, upper_bound=max_volume)
+
+        return volume
+
+
+    def update_periodization_plan_week(self,  periodization_plan: PeriodizationPlan, training_persona, event_date):
 
         if self.is_week_start_date(periodization_plan.start_date, event_date):
             goal_factory = PeriodizationGoalFactory()
-            target_training_exposures = goal_factory.create(periodization_plan.periodization_goals[0])
+            goal = goal_factory.create(periodization_plan.periodization_goals[0].periodization_goal_type)
+            target_training_exposures = goal.training_exposures
             progression_factory = PeriodizationProgressionFactory()
             progressions = progression_factory.create(periodization_plan.athlete_persona,
                                                       periodization_plan.training_phase_type)
@@ -69,8 +89,12 @@ class PeriodizationPlanProcessor(object):
 
             training_exposures_to_progress = {}
 
+            capacity_proc = AthleteCapacityProcessor()
+            periodization_plan.athlete_capacities = capacity_proc.update_capacity_with_defaults(periodization_plan.athlete_capacities,
+                                                                                       training_persona)
+
             for athlete_target_training_exposure in periodization_plan.target_training_exposures:
-                if athlete_target_training_exposure.exposure_count == 0:  # they completed them all!
+                if athlete_target_training_exposure.exposure_count.highest_value() == 0:  # they completed them all!
                     # advance training exposure to next week of the program!
                     athlete_target_training_exposure.progression_week = min(athlete_target_training_exposure.progression_week + 1,
                                                                             len(progressions) - 1)
@@ -82,16 +106,45 @@ class PeriodizationPlanProcessor(object):
                                                                                                              training_exposures_to_progress[training_exposure.detailed_adaptation_type])
                 # reset the expected counts to original goal
                 for target_training_exposure in target_training_exposures:
-                    if athlete_target_training_exposure == target_training_exposure:
-                        athlete_target_training_exposure.exposure_count = target_training_exposure.expected_count
+                    if self.training_exposures_match(athlete_target_training_exposure.training_exposures,
+                                                     target_training_exposure.training_exposures):
+                        athlete_target_training_exposure.exposure_count = target_training_exposure.exposure_count
 
             # update the athlete capacities based on training phase and progression rules
             # need to loop through the capacities (vs the training exposures) to keep from increasing something 2x
 
-            self.update_athlete_capacity(periodization_plan.athlete_capacities, training_exposures_to_progress,
-                                         progressions, training_phase)
+            periodization_plan.athlete_capacities = self.update_athlete_capacity(periodization_plan.athlete_capacities,
+                                                                                 training_exposures_to_progress,
+                                                                                 progressions, training_phase)
+
+            periodization_plan.target_training_exposures = self.update_athlete_training_exposures(periodization_plan.target_training_exposures,
+                                                                                                  training_exposures_to_progress,
+                                                                                                  progressions,training_phase)
 
         return periodization_plan
+
+    def training_exposures_match(self, exposure_list_1, exposure_list_2):
+
+        found_times = 0
+
+        if len(exposure_list_1) != len(exposure_list_2):
+            return False
+
+        for exposure_1 in exposure_list_1:
+            for exposure_2 in exposure_list_2:
+                if exposure_1.detailed_adaptation_type.value == exposure_2.detailed_adaptation_type.value:
+                    if exposure_1.weekly_load_percentage is not None and exposure_2.weekly_load_percentage is not None:
+                        if (exposure_1.weekly_load_percentage.lower_bound == exposure_2.weekly_load_percentage.lower_bound and
+                                exposure_1.weekly_load_percentage.observed_value == exposure_2.weekly_load_percentage.observed_value and
+                                exposure_1.weekly_load_percentage.upper_bound == exposure_2.weekly_load_percentage.upper_bound):
+                            found_times += 1
+                    if exposure_1.weekly_load_percentage is None and exposure_2.weekly_load_percentage is None:
+                        found_times += 1
+
+        if found_times == len(exposure_list_1):
+            return True
+        else:
+            return False
 
     def is_week_start_date(self, start_date, event_date):
 
@@ -122,6 +175,31 @@ class PeriodizationPlanProcessor(object):
             if athlete_capacity.volume.upper_bound is not None:
                 athlete_capacity.volume.upper_bound = athlete_capacity.volume.upper_bound * (1 + volume_upper_ratio)
         return athlete_capacities
+
+    def update_athlete_training_exposures(self, athlete_training_exposures, training_exposures_to_progress, progressions, training_phase):
+
+        for detailed_adaptation_type, progression_week in training_exposures_to_progress.items():
+            for athlete_training_exposure in athlete_training_exposures:
+                for training_exposure in athlete_training_exposure.training_exposures:
+                    if training_exposure.detailed_adaptation_type == detailed_adaptation_type:
+                        progression = progressions[progression_week]
+                        rpe_lower_ratio = (training_phase.acwr.lower_bound - 1) * progression.rpe_load_contribution
+                        volume_lower_ratio = (training_phase.acwr.lower_bound - 1) * progression.volume_load_contribution
+                        rpe_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.rpe_load_contribution
+                        volume_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.volume_load_contribution
+                        if training_exposure.rpe.lower_bound is not None:
+                            training_exposure.rpe.lower_bound = training_exposure.rpe.lower_bound * (1 + rpe_lower_ratio)
+                        if training_exposure.rpe.observed_value is not None:
+                            training_exposure.rpe.observed_value = training_exposure.rpe.observed_value * (1 + ((rpe_lower_ratio + rpe_upper_ratio)/float(2)))
+                        if training_exposure.rpe.upper_bound is not None:
+                            training_exposure.rpe.upper_bound = training_exposure.rpe.upper_bound * (1 + rpe_upper_ratio)
+                        if training_exposure.volume.lower_bound is not None:
+                            training_exposure.volume.lower_bound = training_exposure.volume.lower_bound * (1 + volume_lower_ratio)
+                        if training_exposure.volume.observed_value is not None:
+                            training_exposure.volume.observed_value = training_exposure.volume.observed_value * (1 + ((volume_lower_ratio + volume_upper_ratio)/float(2)))
+                        if training_exposure.volume.upper_bound is not None:
+                            training_exposure.volume.upper_bound = training_exposure.volume.upper_bound * (1 + volume_upper_ratio)
+        return athlete_training_exposures
 
 
 

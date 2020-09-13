@@ -16,8 +16,14 @@ class TrainingExposure(object):
 
     def __eq__(self, other):
 
-        if self.detailed_adaptation_type.value == other.detailed_adaptation_type.values and self.weekly_load_percentage == other.weekly_load_percentage:
-            return True
+        if self.detailed_adaptation_type.value == other.detailed_adaptation_type.value:
+            if self.weekly_load_percentage is not None and other.weekly_load_percentage is not None:
+                if (self.weekly_load_percentage.lower_bound == other.weekly_load_percentage.lower_bound and
+                        self.weekly_load_percentage.observed_value == other.weekly_load_percentage.observed_value and
+                        self.weekly_load_percentage.upper_bound == other.weekly_load_percentage.upper_bound):
+                    return True
+            if self.weekly_load_percentage is None and other.weekly_load_percentage is None:
+                return True
         else:
             return False
 

@@ -11,6 +11,8 @@ class PeriodizationPlan(object):
         self.training_phase_type = training_phase_type
         self.athlete_persona = athlete_persona
         self.target_training_exposures = []
+        self.target_weekly_rpe_load = None
+        self.expected_weekly_workouts = None
         self.athlete_capacities = AthleteBaselineCapacities()
 
     def get_week_number(self, event_date):
