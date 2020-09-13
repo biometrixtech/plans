@@ -29,8 +29,6 @@ class PeriodizationPlan(object):
         return self.start_date + timedelta(weeks=week_number)
 
 
-
-
 class PeriodizationProgressionFactory(object):
 
     def create(self, persona, training_phase_type):

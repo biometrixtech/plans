@@ -24,6 +24,16 @@ class TrainingPersona(Enum):
     elite = 4
 
 
+class SubAdaptionTypePersonas(object):
+    def __init__(self,
+                 cardio_persona=TrainingPersona.beginner,
+                 power_persona=TrainingPersona.beginner,
+                 strength_persona=TrainingPersona.beginner):
+        self.cardio_persona = cardio_persona
+        self.power_persona = power_persona
+        self.strength_persona = strength_persona
+
+
 class PeriodizationGoal(object):
     def __init__(self, periodization_goal_type):
         self.periodization_goal_type = periodization_goal_type

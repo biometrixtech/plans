@@ -51,6 +51,9 @@ class TrainingLoadProcessing(object):
         # added to support load calcs
         self.last_week_internal_values = []
         self.previous_week_internal_values = []
+        self.previous_week_2_internal_values = []
+        self.previous_week_3_internal_values = []
+        self.previous_week_4_internal_values = []
         self.internal_load_tuples = []
         self.a_internal_load_values = []
         self.c_internal_load_values = []
@@ -121,6 +124,9 @@ class TrainingLoadProcessing(object):
         eight_days_ago = parse_date(self.end_date) - timedelta(days=7)
         fourteen_days_ago = parse_date(self.end_date) - timedelta(days=13)
         twenty_days_ago = parse_date(self.end_date) - timedelta(days=19)
+        twenty_one_days_ago = parse_date(self.end_date) - timedelta(days=20)
+        twenty_eight_days_ago = parse_date(self.end_date) - timedelta(days=27)
+        thirty_five_days_ago = parse_date(self.end_date) - timedelta(days=34)
 
         eight_day_plus_sessions = list(c for c in all_training_sessions if c.event_date <= eight_days_ago)
 
@@ -132,6 +138,13 @@ class TrainingLoadProcessing(object):
 
         last_14_day_sessions = list(c for c in all_training_sessions if c.event_date > fourteen_days_ago)
         previous_7_day_training_sessions = list(c for c in all_training_sessions if eight_days_ago >= c.event_date > fourteen_days_ago)
+        previous_14_day_training_sessions = list(
+            c for c in all_training_sessions if fourteen_days_ago >= c.event_date > twenty_one_days_ago)
+        previous_21_day_training_sessions = list(
+            c for c in all_training_sessions if twenty_one_days_ago >= c.event_date > twenty_eight_days_ago)
+        previous_28_day_training_sessions = list(
+            c for c in all_training_sessions if twenty_eight_days_ago >= c.event_date > thirty_five_days_ago)
+
         last_7_day_training_sessions = list(c for c in all_training_sessions if c.event_date > eight_days_ago)
 
         self.last_14_days_training_sessions = last_14_day_sessions
@@ -184,6 +197,12 @@ class TrainingLoadProcessing(object):
 
         self.last_week_internal_values.extend(x.rpe_load for x in last_7_day_training_sessions if x.rpe_load is not None)
         self.previous_week_internal_values.extend(x.rpe_load for x in previous_7_day_training_sessions if x.rpe_load is not None)
+        self.previous_week_2_internal_values.extend(
+            x.rpe_load for x in previous_14_day_training_sessions if x.rpe_load is not None)
+        self.previous_week_3_internal_values.extend(
+            x.rpe_load for x in previous_21_day_training_sessions if x.rpe_load is not None)
+        self.previous_week_4_internal_values.extend(
+            x.rpe_load for x in previous_28_day_training_sessions if x.rpe_load is not None)
 
         self.a_internal_load_values.extend(x.rpe_load for x in acute_training_sessions if x.rpe_load is not None)
 
@@ -274,7 +293,30 @@ class TrainingLoadProcessing(object):
 
         user_stats.historical_internal_strain = historical_internal_strain
 
+        user_stats.average_weekly_internal_load = self.get_average_weekly_internal_load()
+
         return user_stats
+
+    def get_average_weekly_internal_load(self):
+
+        internal_load_values = []
+        if len(self.last_week_internal_values) > 0:
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.last_week_internal_values))
+        if len(self.previous_week_internal_values) > 0:
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_internal_values))
+        if len(self.previous_week_2_internal_values) > 0:
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_internal_values))
+        if len(self.previous_week_3_internal_values) > 0:
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_internal_values))
+        if len(self.previous_week_4_internal_values) > 0:
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_internal_values))
+
+        if len(internal_load_values) == 1:
+            return StandardErrorRange.get_sum_from_error_range_list(internal_load_values)
+        elif len(internal_load_values) > 1:
+            return StandardErrorRange.get_average_from_error_range_list(internal_load_values)
+        else:
+            return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
     def set_high_relative_load_sessions(self, user_stats, training_sessions):
 

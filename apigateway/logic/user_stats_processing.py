@@ -95,6 +95,8 @@ class UserStatsProcessing(object):
             read_session_load_dict = False
 
         self.load_historical_data(read_session_load_dict)
+        current_user_stats.acute_days = self.acute_days
+        current_user_stats.chronic_days = self.chronic_days
 
         # for symptom in self.last_25_days_symptoms:
         #     symptom.severity = SorenessCalculator.get_severity(symptom.severity, symptom.movement)

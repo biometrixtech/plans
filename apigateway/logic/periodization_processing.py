@@ -8,7 +8,50 @@ from models.training_volume import StandardErrorRange
 
 class PeriodizationPlanProcessor(object):
 
-    def initialize_periodization_plan(self, periodization_plan, training_persona, existing_athlete_capacities=None):
+    def create_periodization_plan(self, start_date, athlete_periodization_goals, training_phase_type, athlete_persona, sub_adaption_type_training_personas, user_stats):
+
+        # TODo consolidate/clean up training personas by sub adaptation type
+
+        periodization_plan = PeriodizationPlan(start_date,athlete_periodization_goals, training_phase_type, athlete_persona)
+
+        if user_stats.total_historical_sessions < 5:
+            raise ValueError("Periodization plans require at least 5 training sessions in the last 35 days")
+
+        periodization_plan.target_weekly_rpe_load = self.get_target_weekly_rpe_load(user_stats.average_weekly_internal_load, training_phase_type)
+
+        periodization_plan = self.initialize_periodization_plan(periodization_plan, sub_adaption_type_training_personas,
+                                                                existing_athlete_capacities=user_stats.athlete_capacities)
+
+        return periodization_plan
+
+    def get_target_weekly_rpe_load(self, average_weekly_internal_load, training_phase_type):
+
+        weekly_load_target = None
+
+        if average_weekly_internal_load is None:
+            return weekly_load_target
+
+        training_phase_factory = TrainingPhaseFactory()
+        training_phase = training_phase_factory.create(training_phase_type)
+
+        weekly_load_target = self.get_weekly_load_target(average_weekly_internal_load, training_phase.acwr)
+
+        return weekly_load_target
+
+    def get_weekly_load_target(self, average_training_load, acwr_range):
+
+        load_calcs_load = [average_training_load.lower_bound * acwr_range.lower_bound,
+                           average_training_load.lower_bound * acwr_range.upper_bound,
+                           average_training_load.upper_bound * acwr_range.lower_bound,
+                           average_training_load.upper_bound * acwr_range.upper_bound]
+
+        min_load_calcs_load = min(load_calcs_load)
+        max_load_calcs_load = max(load_calcs_load)
+        load = StandardErrorRange(lower_bound=min_load_calcs_load, upper_bound=max_load_calcs_load,
+                                  observed_value=(min_load_calcs_load + max_load_calcs_load) / float(2))
+        return load
+
+    def initialize_periodization_plan(self, periodization_plan, sub_adaption_type_training_personas, existing_athlete_capacities=None):
 
         target_training_exposures = periodization_plan.periodization_goals[0].training_exposures
 
@@ -19,7 +62,7 @@ class PeriodizationPlanProcessor(object):
         else:
             athlete_capacities = existing_athlete_capacities
 
-        periodization_plan.athlete_capacities = proc.update_capacity_with_defaults(athlete_capacities, training_persona)
+        periodization_plan.athlete_capacities = proc.update_capacity_with_defaults(athlete_capacities, sub_adaption_type_training_personas)
 
         training_exposures_to_progress = {}
 
@@ -74,7 +117,7 @@ class PeriodizationPlanProcessor(object):
         return volume
 
 
-    def update_periodization_plan_week(self,  periodization_plan: PeriodizationPlan, training_persona, event_date):
+    def update_periodization_plan_week(self,  periodization_plan: PeriodizationPlan, sub_adaption_type_training_personas, event_date):
 
         if self.is_week_start_date(periodization_plan.start_date, event_date):
             goal_factory = PeriodizationGoalFactory()
@@ -91,7 +134,7 @@ class PeriodizationPlanProcessor(object):
 
             capacity_proc = AthleteCapacityProcessor()
             periodization_plan.athlete_capacities = capacity_proc.update_capacity_with_defaults(periodization_plan.athlete_capacities,
-                                                                                       training_persona)
+                                                                                                sub_adaption_type_training_personas)
 
             for athlete_target_training_exposure in periodization_plan.target_training_exposures:
                 if athlete_target_training_exposure.exposure_count.highest_value() == 0:  # they completed them all!
