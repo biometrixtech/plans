@@ -42,74 +42,75 @@ def write_json(workout, workout_name, directory):
 def create_workout(file_name=''):
 
 
-    detail_data = pd.read_csv(f'{csv_files_folder}/{file_name}')
-    start_time = datetime.datetime.strptime(detail_data.timestamp.values[0], "%Y-%m-%d %H:%M:%S") - datetime.timedelta(hours=4)
-    start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
-    summary = all_workouts[all_workouts.Date == start_time]
+    if 'None' not in file_name:
+        detail_data = pd.read_csv(f'{csv_files_folder}/{file_name}')
+        start_time = datetime.datetime.strptime(detail_data.timestamp.values[0], "%Y-%m-%d %H:%M:%S") - datetime.timedelta(hours=4)
+        start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
+        summary = all_workouts[all_workouts.Date == start_time]
 
-    exercise = {}
-    if len(summary) > 0:
-        exercise['name'] = summary.Title.values[0]
-        exercise['distance'] = float(summary.Distance) * 1609 # detail_data.distance.values[-1]
-        start_time = datetime.datetime.strptime(detail_data.timestamp.values[0], "%Y-%m-%d %H:%M:%S")
-        end_time = datetime.datetime.strptime(detail_data.timestamp.values[-1], "%Y-%m-%d %H:%M:%S")
-        duration = summary['Time'].values[0]
-        duration = duration.split(":")
-        duration = float(duration[0]) * 60 * 60 + float(duration[1]) * 60 + float(duration[2])
-        exercise['duration'] = duration  # (end_time - start_time).seconds
-        activity_type = summary['Activity Type'].values[0]
-        if activity_type == 'Running':
-            pace = summary['Avg Pace'].values[0]
-            pace = pace.split(":")
-            pace = float(pace[0]) * 60 + float(pace[1])
-            exercise['speed'] = 1609 / pace
-            if pace > 540:
-                exercise['movement_id'] = "run"
+        exercise = {}
+        if len(summary) > 0:
+            exercise['name'] = summary.Title.values[0]
+            exercise['distance'] = float(summary.Distance) * 1609 # detail_data.distance.values[-1]
+            start_time = datetime.datetime.strptime(detail_data.timestamp.values[0], "%Y-%m-%d %H:%M:%S")
+            end_time = datetime.datetime.strptime(detail_data.timestamp.values[-1], "%Y-%m-%d %H:%M:%S")
+            duration = summary['Time'].values[0]
+            duration = duration.split(":")
+            duration = float(duration[0]) * 60 * 60 + float(duration[1]) * 60 + float(duration[2])
+            exercise['duration'] = duration  # (end_time - start_time).seconds
+            activity_type = summary['Activity Type'].values[0]
+            if activity_type == 'Running':
+                pace = summary['Avg Pace'].values[0]
+                pace = pace.split(":")
+                pace = float(pace[0]) * 60 + float(pace[1])
+                exercise['speed'] = 1609 / pace
+                if pace > 540:
+                    exercise['movement_id'] = "run"
+                else:
+                    import matplotlib.pyplot as plt
+                    plt.figure()
+                    plt.plot(detail_data.enhanced_speed)
+                    print('fast_run', file_name)
+                    print(pace)
+                    exercise['movement_id'] = "tempo"
+            elif activity_type == 'Cycling':
+                exercise['speed'] = float( summary['Avg Pace']) * 1609 / 3600  # np.mean(detail_data.enhanced_speed)
+                exercise['movement_id'] = 'cycle'
             else:
-                import matplotlib.pyplot as plt
-                plt.figure()
-                plt.plot(detail_data.enhanced_speed)
-                print('fast_run', file_name)
-                print(pace)
-                exercise['movement_id'] = "tempo"
-        elif activity_type == 'Cycling':
-            exercise['speed'] = float( summary['Avg Pace']) * 1609 / 3600  # np.mean(detail_data.enhanced_speed)
-            exercise['movement_id'] = 'cycle'
+                print(exercise['name'])
+                return None
         else:
-            print(exercise['name'])
-            return None
-    else:
-        print('no summary found', start_time)
-        exercise['name'] = "Unnamed run"
-        exercise['distance'] = detail_data.distance.values[-1]
-        start_time = datetime.datetime.strptime(detail_data.timestamp.values[0], "%Y-%m-%d %H:%M:%S")
-        end_time = datetime.datetime.strptime(detail_data.timestamp.values[-1], "%Y-%m-%d %H:%M:%S")
-        exercise['duration'] = (end_time - start_time).seconds
-        exercise['speed'] =  np.mean(detail_data.enhanced_speed)
-        exercise['movement_id'] = 'run'
-    # if exercise['movement_id'] == 'run' and exercise['speed'] < 2.25:
-    #     print(exercise['name'], exercise['duration'] / 60, exercise['duration'] / 1609)
+            print('no summary found', start_time)
+            exercise['name'] = "Unnamed run"
+            exercise['distance'] = detail_data.distance.values[-1]
+            start_time = datetime.datetime.strptime(detail_data.timestamp.values[0], "%Y-%m-%d %H:%M:%S")
+            end_time = datetime.datetime.strptime(detail_data.timestamp.values[-1], "%Y-%m-%d %H:%M:%S")
+            exercise['duration'] = (end_time - start_time).seconds
+            exercise['speed'] =  np.mean(detail_data.enhanced_speed)
+            exercise['movement_id'] = 'run'
+        # if exercise['movement_id'] == 'run' and exercise['speed'] < 2.25:
+        #     print(exercise['name'], exercise['duration'] / 60, exercise['duration'] / 1609)
 
 
-    # exercise['movement_id'] = get_movement_id(exercise['distance'])
-    exercise['hr'] = list(detail_data.heart_rate.values)
+        # exercise['movement_id'] = get_movement_id(exercise['distance'])
+        exercise['hr'] = list(detail_data.heart_rate.values)
 
-    section = {}
-    section['name'] = "workout"
-    section['duration_seconds'] = exercise['duration']
-    section['workout_exercises'] = [exercise]
-    section['start_date_time'] = format_datetime(start_time)
-    section['end_date_time'] = format_datetime(end_time)
+        section = {}
+        section['name'] = "workout"
+        section['duration_seconds'] = exercise['duration']
+        section['exercises'] = [exercise]
+        section['start_date_time'] = format_datetime(start_time)
+        section['end_date_time'] = format_datetime(end_time)
 
-    workout = {}
-    workout['name'] = exercise['name']
-    workout['duration_seconds'] = exercise['duration']
-    workout['workout_sections'] = [section]
-    workout['distance'] = exercise['distance']
-    workout['event_date_time'] = format_datetime(start_time)
-    workout['program_module_id'] = exercise['name']
-    workout['program_id'] = "garmin_data"
-    write_json(workout, file_name.split('.')[0], workouts_folder)
+        workout = {}
+        workout['name'] = exercise['name']
+        workout['duration_seconds'] = exercise['duration']
+        workout['workout_sections'] = [section]
+        workout['distance'] = exercise['distance']
+        workout['event_date_time'] = format_datetime(start_time)
+        workout['program_module_id'] = exercise['name']
+        workout['program_id'] = "garmin_data"
+        write_json(workout, file_name.split('.')[0], workouts_folder)
 
 count = 0
 all_files = os.listdir(csv_files_folder)

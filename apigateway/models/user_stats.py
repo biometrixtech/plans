@@ -151,7 +151,7 @@ class UserStats(Serialisable):
 
             'periodization_goals': [p.value for p in self.periodization_goals],
             'persona': self.persona.value if self.persona is not None else None,
-            'training_phase_type': self.training_phase_type.value,
+            'training_phase_type': self.training_phase_type.value if self.training_phase_type is not None else None,
             'athlete_capacities': self.athlete_capacities.json_serialise() if self.athlete_capacities is not None else None
         }
         return ret
