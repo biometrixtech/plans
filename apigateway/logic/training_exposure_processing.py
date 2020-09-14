@@ -165,3 +165,12 @@ class TrainingExposureProcessor(object):
                 combined_exposure.volume.lower_bound = StandardErrorRange.get_min_from_error_range_list(volumes)
                 combined_exposure.volume.upper_bound = StandardErrorRange.get_max_from_error_range_list(volumes)
                 combined_exposure.volume.observed_value = (combined_exposure.volume.lower_bound + combined_exposure.volume.upper_bound) / float(2)
+
+                rpe_loads = [combined_exposure.rpe.lowest_value() * combined_exposure.volume.lowest_value(),
+                             combined_exposure.rpe.lowest_value() * combined_exposure.volume.highest_value(),
+                             combined_exposure.rpe.highest_value() * combined_exposure.volume.lowest_value(),
+                             combined_exposure.rpe.highest_value() * combined_exposure.volume.highest_value()]
+
+                combined_exposure.rpe_load.lower_bound = StandardErrorRange.get_min_from_error_range_list(rpe_loads)
+                combined_exposure.rpe_load.upper_bound = StandardErrorRange.get_max_from_error_range_list(rpe_loads)
+                combined_exposure.rpe_load.observed_value = (combined_exposure.rpe_load.lower_bound + combined_exposure.rpe_load.upper_bound) / float(2)
