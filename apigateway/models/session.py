@@ -641,6 +641,7 @@ class PlannedSession(Session):
         super().__init__()
         self.workout = None
         self.event_date = None
+        self.training_exposures = []
 
     def session_type(self):
         return SessionType.planned
@@ -701,6 +702,7 @@ class MixedActivitySession(Session):
         self.atypical_session_type = False
         self.atypical_high_load = False
         self.sport_name = SportName.other
+        self.training_exposures = []
 
     def session_type(self):
         return SessionType.mixed_activity

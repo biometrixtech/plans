@@ -2,10 +2,13 @@ from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
 from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager
-from models.periodization import PeriodizedExercise, PeriodizationGoal, PeriodizationPersona, TrainingPhaseType
+from models.periodization import PeriodizedExercise
+from models.periodization_plan import TrainingPhaseType, PeriodizationPersona
+from models.periodization_goal import PeriodizationGoalType
 from models.movement_tags import AdaptationDictionary, SubAdaptationType, TrainingType, AdaptationTypeMeasure
 from models.ranked_types import RankedAdaptationType
 from models.planned_exercise import PlannedWorkoutLoad
+from models.user_stats import UserStats
 from tests.mocks.mock_workout_library_datastore import PlannedWorkoutLibraryDatastore
 from tests.mocks.mock_completed_session_details_datastore import CompletedSessionDetailsDatastore
 from tests.mocks.mock_workout_datastore import WorkoutDatastore
@@ -164,7 +167,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #
 #     athlete_training_history = get_fake_training_history()
 #
-#     athlete_training_goal = PeriodizationGoal.increase_cardiovascular_health
+#     athlete_training_goal = PeriodizationGoalType.increase_cardiovascular_health
 #
 #     proc = PeriodizationPlanProcessor(athlete_training_goal, athlete_training_history, PeriodizationPersona.well_trained,TrainingPhaseType.slowly_increase)
 #     proc.set_weekly_targets()
@@ -215,7 +218,7 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #
 #     workout_library_datastore = PlannedWorkoutLibraryDatastore()
 #
-#     athlete_training_goal = PeriodizationGoal.increase_cardiovascular_health
+#     athlete_training_goal = PeriodizationGoalType.increase_cardiovascular_health
 #
 #     proc = PeriodizationPlanProcessor(start_date_time,athlete_training_goal,PeriodizationPersona.well_trained,
 #                                       TrainingPhaseType.slowly_increase,
@@ -251,7 +254,9 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 
 def test_acceptable_strength_cardio_same_score_both_required():
 
-    proc = PeriodizationPlanProcessor(datetime.now(),None, None, None,  CompletedSessionDetailsDatastore(), None)
+    user_stats = UserStats("tester")
+    injury_risk_dict = {}
+    proc = PeriodizationPlanProcessor(datetime.now(),user_stats, injury_risk_dict,  CompletedSessionDetailsDatastore(), None)
     strength_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1, 0),
                     RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.strength_endurance, 1, 0)]
     cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 0),
@@ -281,7 +286,9 @@ def test_acceptable_strength_cardio_same_score_both_required():
 
 def test_completing_combo_required_reduces_score():
 
-    proc = PeriodizationPlanProcessor(datetime.now(), None, None, None,  CompletedSessionDetailsDatastore(), None)
+    user_stats = UserStats("tester")
+    injury_risk_dict = {}
+    proc = PeriodizationPlanProcessor(datetime.now(), user_stats, injury_risk_dict,  CompletedSessionDetailsDatastore(), None)
     cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 10),
                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2, 10)]
 

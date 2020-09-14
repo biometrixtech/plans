@@ -5,6 +5,7 @@ from logic.calculators import Calculators
 from logic.heart_rate_processing import HeartRateProcessing
 from logic.rpe_predictor import RPEPredictor
 from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
+from logic.training_exposure_processing import TrainingExposureProcessor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition
@@ -33,6 +34,9 @@ class WorkoutProcessor(object):
     def process_planned_workout(self, session, assignment_type=None, movement_option=None):
 
         volume = 0
+
+        exposure_processor = TrainingExposureProcessor()
+
         session_RPE = StandardErrorRange()
         for workout_section in session.workout.sections:
             workout_section.should_assess_load(cardio_data['no_load_sections'])
@@ -73,7 +77,12 @@ class WorkoutProcessor(object):
                         session_RPE.add(exercise_rpe)
                         volume += ex_volume
 
+                        session.training_exposures = exposure_processor.get_exposures(workout_exercise)
+
                     session = self.set_session_intensity_metrics(session, workout_exercise)
+
+        session.training_exposures = exposure_processor.aggregate_training_exposures(session.training_exposures)
+
         if volume > 0 :
             session_RPE.divide(volume)
             session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?
@@ -83,6 +92,9 @@ class WorkoutProcessor(object):
     def process_workout(self, session):
 
         volume = 0
+
+        exposure_processor = TrainingExposureProcessor()
+
         session_RPE = StandardErrorRange()
         heart_rate_processing = HeartRateProcessing(self.user_age)
         for workout_section in session.workout_program_module.workout_sections:
@@ -129,7 +141,12 @@ class WorkoutProcessor(object):
 
                     session = self.set_session_intensity_metrics(session, workout_exercise)
 
+                    session.training_exposures = exposure_processor.get_exposures(workout_exercise)
+
             workout_section.should_assess_shrz()
+
+        session.training_exposures = exposure_processor.aggregate_training_exposures(session.training_exposures)
+
         if volume > 0 :
             session_RPE.divide(volume)
             session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?

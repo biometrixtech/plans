@@ -51,7 +51,6 @@ class UserStatsProcessing(object):
         self.symptoms = []
         self.acute_symptoms = []
         self.chronic_symptoms = []
-        self.chronic_symptoms = []
         self.last_7_days_symptoms = []
         self.days_8_14_symptoms = []
         self.last_25_days_symptoms = []
@@ -96,6 +95,8 @@ class UserStatsProcessing(object):
             read_session_load_dict = False
 
         self.load_historical_data(read_session_load_dict)
+        current_user_stats.acute_days = self.acute_days
+        current_user_stats.chronic_days = self.chronic_days
 
         # for symptom in self.last_25_days_symptoms:
         #     symptom.severity = SorenessCalculator.get_severity(symptom.severity, symptom.movement)
@@ -113,7 +114,9 @@ class UserStatsProcessing(object):
         all_training_sessions.extend(self.acute_training_sessions)
         all_training_sessions.extend(self.chronic_training_sessions)
 
-        training_load_processing.load_training_session_values(all_training_sessions)
+        training_load_processing.load_training_session_values(self.acute_training_sessions,
+                                                              self.get_chronic_weeks_training_sessions(),
+                                                              self.chronic_training_sessions)
 
         # three_sensor_sessions = [s for s in self.training_sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
         # if len(three_sensor_sessions) > 0:
@@ -274,6 +277,28 @@ class UserStatsProcessing(object):
         self.last_25_days = self.end_date_time - timedelta(days=25 + adjustment_factor)
         self.previous_week = self.last_week - timedelta(days=7)
         self.days_7_13 = self.previous_week + timedelta(days=1)
+
+    def get_chronic_weeks_training_sessions(self):
+
+        weeks_list = []
+
+        if self.chronic_days is not None:
+
+            week4_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and
+                              self.acute_start_date_time - timedelta(days=min(28, self.chronic_days)) <=
+                              d.get_event_datetime() < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
+            week3_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
+                              - timedelta(days=min(21, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              timedelta(days=min(14, self.chronic_days))]
+            week2_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
+                              - timedelta(days=min(14, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              timedelta(days=min(7, self.chronic_days))]
+            week1_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
+                              - timedelta(days=min(7, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time]
+
+            weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
+
+        return weeks_list
 
     def update_vo2_max_estimations(self, current_user_stats):
         user_provided_vo2_max = (current_user_stats.vo2_max is not None and

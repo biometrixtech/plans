@@ -1,4 +1,5 @@
-from models.periodization import PeriodizationPlanWeek, PeriodizationModelFactory, PeriodizationPlan, TemplateWorkout
+from models.periodization import PeriodizationPlanWeek, PeriodizationModelFactory, TemplateWorkout
+from models.periodization_plan import PeriodizationPlan
 from itertools import combinations, chain, repeat, islice, count
 from collections import Counter
 from models.training_volume import StandardErrorRange
@@ -186,32 +187,32 @@ class TargetLoadCalculator(object):
 
         return target_session_intensity
 
-    def get_target_session_load_and_rate(self, average_session_load, last_weeks_load, weekly_load_target):
+    def get_target_session_load_and_ramp(self, average_session_load, last_weeks_load, weekly_load_target):
 
         net_weeks_load_increase_lower = weekly_load_target.lower_bound - last_weeks_load.lower_bound
         net_weeks_load_increase_upper = weekly_load_target.upper_bound - last_weeks_load.upper_bound
 
-        load_rate_increase_lower = (last_weeks_load.lower_bound + net_weeks_load_increase_lower) / float(
+        load_ramp_increase_lower = (last_weeks_load.lower_bound + net_weeks_load_increase_lower) / float(
             last_weeks_load.lower_bound)
-        load_rate_increase_upper = (last_weeks_load.upper_bound + net_weeks_load_increase_upper) / float(
+        load_ramp_increase_upper = (last_weeks_load.upper_bound + net_weeks_load_increase_upper) / float(
             last_weeks_load.upper_bound)
 
-        target_session_loads = [load_rate_increase_lower * average_session_load.lower_bound,
-                                load_rate_increase_lower * average_session_load.upper_bound,
-                                load_rate_increase_upper * average_session_load.lower_bound,
-                                load_rate_increase_upper * average_session_load.upper_bound]
+        derived_session_loads = [load_ramp_increase_lower * average_session_load.lower_bound,
+                                load_ramp_increase_lower * average_session_load.upper_bound,
+                                load_ramp_increase_upper * average_session_load.lower_bound,
+                                load_ramp_increase_upper * average_session_load.upper_bound]
 
-        min_session_load = min(target_session_loads)
-        max_session_load = max(target_session_loads)
+        min_session_load = min(derived_session_loads)
+        max_session_load = max(derived_session_loads)
         target_session_load = StandardErrorRange(lower_bound=min_session_load,
                                                  upper_bound=max_session_load,
                                                  observed_value=(min_session_load + max_session_load) / 2)
 
-        target_session_rate = StandardErrorRange(lower_bound=load_rate_increase_lower,
-                                                 upper_bound=load_rate_increase_upper,
-                                                 observed_value=(load_rate_increase_lower + load_rate_increase_upper) / 2)
+        target_session_ramp = StandardErrorRange(lower_bound=load_ramp_increase_lower,
+                                                 upper_bound=load_ramp_increase_upper,
+                                                 observed_value=(load_ramp_increase_lower + load_ramp_increase_upper) / 2)
 
-        return target_session_load, target_session_rate
+        return target_session_load, target_session_ramp
 
     def get_updated_session_load_target(self, current_weekly_target_load, target_session_load, load_this_week):
 
@@ -228,13 +229,16 @@ class TargetLoadCalculator(object):
 
 
 class PeriodizationPlanProcessor(object):
-    def __init__(self, event_date, athlete_periodization_goal, athlete_persona, training_phase_type, completed_session_details_datastore, workout_library_datastore, exclude_completed=True):
+    def __init__(self, event_date, user_stats, injury_risk_dict, completed_session_details_datastore, workout_library_datastore, exclude_completed=True):
         self.start_date = event_date
-
-        self.persona = athlete_persona
-        self.goal = athlete_periodization_goal
-        self.training_phase_type = training_phase_type
-        self.model = PeriodizationModelFactory().create(persona=athlete_persona, training_phase_type=training_phase_type, periodization_goal=athlete_periodization_goal)
+        self.user_stats = user_stats
+        self.injury_risk_dict = injury_risk_dict
+        #self.persona = user_stats.persona
+        #self.goals = user_stats.periodization_goals
+        #self.training_phase_type = user_stats.training_phase_type
+        self.model = PeriodizationModelFactory().create(persona=user_stats.persona,
+                                                        training_phase_type=user_stats.training_phase_type,
+                                                        periodization_goals=user_stats.periodization_goals)
         self.exclude_completed = exclude_completed
         self.completed_session_details_datastore = completed_session_details_datastore
         self.workout_library_datastore = workout_library_datastore
@@ -359,7 +363,8 @@ class PeriodizationPlanProcessor(object):
         self.set_weekly_targets()
         self.sum_detailed_load()
 
-        periodization_plan = PeriodizationPlan(self.start_date, self.goal, self.training_phase_type, self.persona)
+        periodization_plan = PeriodizationPlan(self.start_date, self.user_stats.periodization_goals,
+                                               self.user_stats.training_phase_type, self.user_stats.persona)
         week_number = 0
         # workouts = self.workout_library_datastore.get()
         # periodization_plan.next_workouts[0] = self.get_ranked_workouts(week_number,
@@ -755,12 +760,12 @@ class PeriodizationPlanProcessor(object):
             weekly_targets = self.get_weekly_targets(self.model.progressions[t])
             self.weekly_targets.append(weekly_targets)
 
-    def get_weekly_load_target(self, progression, average_training_load):
+    def get_weekly_load_target(self, progression, average_weekly_training_load):
 
         calc = TargetLoadCalculator()
 
-        rpe_load = calc.get_weekly_load_target(average_training_load.rpe_load, progression.training_phase.acwr)
-        power_load = calc.get_weekly_load_target(average_training_load.power_load, progression.training_phase.acwr)
+        rpe_load = calc.get_weekly_load_target(average_weekly_training_load.rpe_load, progression.training_phase.acwr)
+        power_load = calc.get_weekly_load_target(average_weekly_training_load.power_load, progression.training_phase.acwr)
 
         load_target = TrainingLoad()
         load_target.rpe_load = rpe_load
@@ -776,13 +781,13 @@ class PeriodizationPlanProcessor(object):
 
         calc = TargetLoadCalculator()
 
-        target_session_rpe_load, rpe_load_rate_increase = calc.get_target_session_load_and_rate(self.average_session_load.rpe_load,
-                                                                        self.last_weeks_load.rpe_load,
-                                                                        weekly_load_target.rpe_load)
+        target_session_rpe_load, rpe_load_rate_increase = calc.get_target_session_load_and_ramp(self.average_session_load.rpe_load,
+                                                                                                self.last_weeks_load.rpe_load,
+                                                                                                weekly_load_target.rpe_load)
 
-        target_session_power_load, power_load_rate_increase = calc.get_target_session_load_and_rate(self.average_session_load.power_load,
-                                                                          self.last_weeks_load.power_load,
-                                                                          weekly_load_target.power_load)
+        target_session_power_load, power_load_rate_increase = calc.get_target_session_load_and_ramp(self.average_session_load.power_load,
+                                                                                                    self.last_weeks_load.power_load,
+                                                                                                    weekly_load_target.power_load)
 
         # given load rate of increase, determine the RPE's share of that increase
         # apply adjusted RPE rate of increaseƒ
