@@ -5,6 +5,7 @@ from models.session import HighLoadSession, HighDetailedLoadSession
 from models.stats import StandardErrorRange
 from models.periodization_plan import TrainingPhaseType, PeriodizationPersona
 from models.periodization_goal import PeriodizationGoalType
+from models.athlete_capacity import AthleteBaselineCapacities
 from utils import parse_date, format_datetime, parse_datetime
 from fathomapi.utils.exceptions import InvalidSchemaException
 
@@ -80,6 +81,7 @@ class UserStats(Serialisable):
         self.periodization_goals = []
         self.persona = None
         self.training_phase_type = None
+        self.athlete_capacities = AthleteBaselineCapacities()
 
     def __setattr__(self, name, value):
         if name == 'event_date' and value is not None:
@@ -150,6 +152,7 @@ class UserStats(Serialisable):
             'periodization_goals': [p.value for p in self.periodization_goals],
             'persona': self.persona.value if self.persona is not None else None,
             'training_phase_type': self.training_phase_type.value,
+            'athlete_capacities': self.athlete_capacities.json_serialise() if self.athlete_capacities is not None else None
         }
         return ret
 
@@ -216,7 +219,7 @@ class UserStats(Serialisable):
         user_stats.periodization_goals = [PeriodizationGoalType(p) for p in input_dict.get('periodization_goals', [])]
         user_stats.persona = PeriodizationPersona(input_dict['persona']) if input_dict.get('persona') is not None else None
         user_stats.training_phase_type = TrainingPhaseType(input_dict['training_phase_type']) if input_dict.get('training_phase_type') is not None else None
-
+        user_stats.athlete_capacities = AthleteBaselineCapacities().json_deserialise(input_dict['athlete_capacities']) if input_dict.get('athlete_capacities') is not None else None
         return user_stats
 
 

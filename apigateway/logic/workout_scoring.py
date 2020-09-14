@@ -1,5 +1,5 @@
 from models.movement_tags import DetailedAdaptationType
-
+from models.periodization_utilities import PeriodizationUtilities
 
 class WorkoutScoringProcessor(object):
 
@@ -44,6 +44,8 @@ class WorkoutScoringProcessor(object):
 
         score = 0
 
+        utils = PeriodizationUtilities()
+
         total_needs = len(athlete_exposure_needs)
 
         if total_needs > 0:
@@ -51,7 +53,7 @@ class WorkoutScoringProcessor(object):
             exposures_found = 0
 
             for athlete_exposure_need in athlete_exposure_needs:
-                if self.is_athlete_need_in_workout_exposures(athlete_exposure_need, training_exposures):
+                if utils.is_athlete_need_in_workout_exposures(athlete_exposure_need, training_exposures):
                     exposures_found += 1
 
             found_ratio = exposures_found / float(total_needs)
@@ -64,6 +66,8 @@ class WorkoutScoringProcessor(object):
 
         score = 0
 
+        utils = PeriodizationUtilities()
+
         total_needs = len(athlete_exposure_needs)
 
         if total_needs > 0:
@@ -71,7 +75,7 @@ class WorkoutScoringProcessor(object):
             exposures_found = 0
 
             for athlete_exposure_need in athlete_exposure_needs:
-                if self.is_athlete_need_in_workout_exposures(athlete_exposure_need, training_exposures, include_count=True):
+                if utils.is_athlete_need_in_workout_exposures(athlete_exposure_need, training_exposures, include_count=True):
                     exposures_found += 1
 
             found_ratio = exposures_found / float(total_needs)
@@ -86,22 +90,4 @@ class WorkoutScoringProcessor(object):
 
         return score
 
-    def is_athlete_need_in_workout_exposures(self, athlete_target_training_exposure_need, workout_training_exposures, include_count=False):
 
-        if include_count:
-            if athlete_target_training_exposure_need.exposure_count == 0:
-                return False
-
-        # there may be optional training exposures for a single athlete exposure need,
-        # i.e., "you need to have one of the following..."
-        possible_target_training_exposures = athlete_target_training_exposure_need.training_exposures
-
-        for possible_target_training_exposure in possible_target_training_exposures:
-            for workout_training_exposure in workout_training_exposures:
-                if (possible_target_training_exposure.detailed_adaptation_type == workout_training_exposure.detailed_adaptation_type
-                        and possible_target_training_exposure.volume.lowest_value() <= workout_training_exposure.volume.lowest_value()
-                        and (workout_training_exposure.rpe.lowest_value() * 1.05) >= possible_target_training_exposure.rpe.lowest_value()
-                        and workout_training_exposure.rpe.highest_value() <= possible_target_training_exposure.rpe.highest_value() * 1.05):  # allow a workout to be 5% higher and still be relevant
-                    return True
-
-        return False

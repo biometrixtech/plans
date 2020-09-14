@@ -3,14 +3,13 @@ from models.periodization_goal import PeriodizationGoalFactory
 from models.exposure import AthleteTargetTrainingExposure
 from models.athlete_capacity import AthleteBaselineCapacities
 from logic.athlete_capacity_processing import AthleteCapacityProcessor
+from models.periodization_utilities import PeriodizationUtilities
 from models.training_volume import StandardErrorRange
 
 
 class PeriodizationPlanProcessor(object):
 
     def create_periodization_plan(self, start_date, athlete_periodization_goals, training_phase_type, athlete_persona, sub_adaption_type_training_personas, user_stats):
-
-        # TODo consolidate/clean up training personas by sub adaptation type
 
         periodization_plan = PeriodizationPlan(start_date,athlete_periodization_goals, training_phase_type, athlete_persona)
 
@@ -23,6 +22,18 @@ class PeriodizationPlanProcessor(object):
                                                                 existing_athlete_capacities=user_stats.athlete_capacities)
 
         return periodization_plan
+
+    def update_exposure_needs(self, athlete_exposure_needs, training_exposures):
+
+        utils = PeriodizationUtilities()
+
+        total_needs = len(athlete_exposure_needs)
+
+        if total_needs > 0:
+
+            for athlete_exposure_need in athlete_exposure_needs:
+                if utils.does_workout_exposure_meet_athlete_need(athlete_exposure_need, training_exposures, include_count=True):
+                    athlete_exposure_need.exposure_count.subtract_value(1)
 
     def get_target_weekly_rpe_load(self, average_weekly_internal_load, training_phase_type):
 
@@ -117,7 +128,7 @@ class PeriodizationPlanProcessor(object):
         return volume
 
 
-    def update_periodization_plan_week(self,  periodization_plan: PeriodizationPlan, sub_adaption_type_training_personas, event_date):
+    def update_periodization_plan_for_week(self, periodization_plan: PeriodizationPlan, sub_adaption_type_training_personas, event_date):
 
         if self.is_week_start_date(periodization_plan.start_date, event_date):
             goal_factory = PeriodizationGoalFactory()

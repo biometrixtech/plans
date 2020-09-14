@@ -6,6 +6,8 @@ import statistics, math
 from utils import format_date, parse_date
 from models.stats import SportMaxLoad
 from models.movement_tags import AdaptationType
+from logic.athlete_capacity_processing import AthleteCapacityProcessor
+from models.athlete_capacity import AthleteBaselineCapacities
 
 
 class TrainingLoadProcessing(object):
@@ -57,6 +59,7 @@ class TrainingLoadProcessing(object):
         self.internal_load_tuples = []
         self.a_internal_load_values = []
         self.c_internal_load_values = []
+        self.athlete_capacities = AthleteBaselineCapacities
         # self.acute_days = acute_days
         # self.chronic_days = chronic_days
         # self.acute_start_date_time = acute_start_date_time
@@ -212,6 +215,9 @@ class TrainingLoadProcessing(object):
         self.internal_load_tuples.extend(list(x for x in self.get_session_attributes_tuple_list("event_date",
                                                                                                  "rpe_load",
                                                                                                 all_training_sessions)))
+        proc = AthleteCapacityProcessor()
+
+        self.athlete_capacities = proc.get_capacity_from_workout_history(all_training_sessions)
 
         # if len(self.internal_load_tuples) > 0:
         #     internal_load_values = list(x[1] for x in self.internal_load_tuples if x[1] is not None)
@@ -294,6 +300,8 @@ class TrainingLoadProcessing(object):
         user_stats.historical_internal_strain = historical_internal_strain
 
         user_stats.average_weekly_internal_load = self.get_average_weekly_internal_load()
+
+        user_stats.athlete_capacities = self.athlete_capacities  # calculated when loading values
 
         return user_stats
 
