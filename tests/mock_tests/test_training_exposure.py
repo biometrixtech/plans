@@ -1,4 +1,4 @@
-from models.exposure import TrainingExposureProcessor
+from training_exposure_processing import TrainingExposureProcessor
 from models.planned_exercise import PlannedExercise
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType, AdaptationType
