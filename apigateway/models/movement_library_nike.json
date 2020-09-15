@@ -1390,7 +1390,8 @@
                     1.0
                 ],
                 "percent_bodyheight": [
-                    0.24050000000000002
+                    0.24050000000000002,
+                    0.0425
                 ],
                 "description": "None"
             },
@@ -1402,7 +1403,8 @@
                     0.0
                 ],
                 "percent_bodyheight": [
-                    0.0
+                    0.0,
+                    -10.0
                 ],
                 "description": "None"
             },
@@ -1414,7 +1416,8 @@
                     1.0
                 ],
                 "percent_bodyheight": [
-                    0.24050000000000002
+                    0.24050000000000002,
+                    0.0425
                 ],
                 "description": "None"
             }
@@ -1453,10 +1456,11 @@
                 "time": 0.17,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.0
                 ],
                 "percent_bodyheight": [
-                    0.24050000000000002
+                    0.24050000000000002,
+                    0.0425
                 ],
                 "description": "None"
             },
@@ -1465,9 +1469,10 @@
                 "time": 0.25,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    0.0
+                    1.0
                 ],
                 "percent_bodyheight": [
+                    0.0,
                     0.0
                 ],
                 "description": "None"
@@ -1477,10 +1482,11 @@
                 "time": 0.17,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.0
                 ],
                 "percent_bodyheight": [
-                    0.24050000000000002
+                    0.24050000000000002,
+                    0.0425
                 ],
                 "description": "None"
             }
@@ -1513,7 +1519,60 @@
             "6"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.20370000000000002,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.20370000000000002,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002,
+                    0.0
+                ],
+                "description": "None"
+            }
+        ]
     },
     "boxer bounce": {
         "id": "boxer bounce",
@@ -1542,7 +1601,52 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.02
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.02
+                ],
+                "description": "None"
+            }
+        ]
     },
     "pogo hops": {
         "id": "pogo hops",
@@ -1571,7 +1675,52 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            }
+        ]
     },
     "pogo jumps": {
         "id": "pogo jumps",
@@ -1600,7 +1749,52 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.08
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.08
+                ],
+                "description": "None"
+            }
+        ]
     },
     "double pogo knee drives": {
         "id": "double pogo knee drives",
@@ -1629,7 +1823,86 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0425,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0,
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0425,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0,
+                    0.20370000000000002
+                ],
+                "percent_bodyheight": [
+                    0.0425,
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0,
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0,
+                    0.20370000000000002
+                ],
+                "percent_bodyheight": [
+                    0.0425,
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "stance switches": {
         "id": "stance switches",
@@ -1658,7 +1931,85 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            }
+        ]
     },
     "jump rope": {
         "id": "jump rope",
@@ -1687,7 +2038,52 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.03
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.03
+                ],
+                "description": "None"
+            }
+        ]
     },
     "x pattern jumps": {
         "id": "x pattern jumps",
@@ -1716,7 +2112,52 @@
             "1102"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            }
+        ]
     },
     "lateral forward jumps": {
         "id": "lateral forward jumps",
@@ -1745,7 +2186,52 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            }
+        ]
     },
     "plank jumps": {
         "id": "plank jumps",
@@ -1774,7 +2260,52 @@
             "1101"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.23675000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.23675000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "jumping jacks": {
         "id": "jumping jacks",
@@ -1803,7 +2334,60 @@
             "1103"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.03,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0,
+                    0.5017
+                ],
+                "percent_bodyheight": [
+                    -10.0,
+                    0.05825
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.03,
+                    0.0
+                ],
+                "description": "None"
+            }
+        ]
     },
     "highland jacks": {
         "id": "highland jacks",
@@ -1832,7 +2416,60 @@
             "1103.1"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.03,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0,
+                    0.5017
+                ],
+                "percent_bodyheight": [
+                    -10.0,
+                    0.05825
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.03,
+                    0.0
+                ],
+                "description": "None"
+            }
+        ]
     },
     "quick feet": {
         "id": "quick feet",
@@ -1861,7 +2498,41 @@
             "6"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            }
+        ]
     },
     "quick feet forward and back": {
         "id": "quick feet forward and back",
@@ -1890,7 +2561,41 @@
             "6"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            }
+        ]
     },
     "quick feet in and outs": {
         "id": "quick feet in and outs",
@@ -1919,7 +2624,41 @@
             "6"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            }
+        ]
     },
     "quick feet lateral 3 step": {
         "id": "quick feet lateral 3 step",
@@ -1948,7 +2687,41 @@
             "6"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            }
+        ]
     },
     "jog in place": {
         "id": "jog in place",
@@ -1977,7 +2750,41 @@
             "6"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0425
+                ],
+                "description": "None"
+            }
+        ]
     },
     "run in place": {
         "id": "run in place",
@@ -2006,65 +2813,41 @@
             "6"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
-    },
-    "cha cha shuffle": {
-        "id": "cha cha shuffle",
-        "name": "lateral monster walk",
-        "training_type": 6,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            0
-        ],
-        "speed": 2,
-        "resistance": 0,
-        "displacement": 3,
-        "rep_tempo": [
-            0.25,
-            0.25,
-            0.25
-        ],
-        "rest_between_reps": 0.25,
-        "surface_stability": 0,
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "521"
-        ],
-        "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
-    },
-    "lateral shuffle": {
-        "id": "lateral shuffle",
-        "name": "lateral monster walk",
-        "training_type": 6,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            0
-        ],
-        "speed": 2,
-        "resistance": 0,
-        "displacement": 3,
-        "rep_tempo": [
-            0.2,
-            0.25,
-            0.2
-        ],
-        "rest_between_reps": 0.25,
-        "surface_stability": 0,
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "521"
-        ],
-        "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.17,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.08
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.17,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.08
+                ],
+                "description": "None"
+            }
+        ]
     },
     "agility run": {
         "id": "agility run",
@@ -2093,7 +2876,41 @@
             "5"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.413
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.413
+                ],
+                "description": "None"
+            }
+        ]
     },
     "forward back runs with touch": {
         "id": "forward back runs with touch",
@@ -2122,7 +2939,41 @@
             "5"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.413
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.413
+                ],
+                "description": "None"
+            }
+        ]
     },
     "sprint to backpedal": {
         "id": "sprint to backpedal",
@@ -2151,7 +3002,255 @@
             "5"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.413
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.413
+                ],
+                "description": "None"
+            }
+        ]
+    },
+    "cha cha shuffle": {
+        "id": "cha cha shuffle",
+        "name": "lateral monster walk",
+        "training_type": 6,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": 0,
+        "displacement": 3,
+        "rep_tempo": [
+            0.25,
+            0.25,
+            0.25
+        ],
+        "rest_between_reps": 0.25,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "521"
+        ],
+        "bilateral_distribution_of_resistance": 3,
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.03
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.03
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            }
+        ]
+    },
+    "lateral shuffle": {
+        "id": "lateral shuffle",
+        "name": "lateral monster walk",
+        "training_type": 6,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 2,
+        "resistance": 0,
+        "displacement": 3,
+        "rep_tempo": [
+            0.2,
+            0.25,
+            0.2
+        ],
+        "rest_between_reps": 0.25,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "521"
+        ],
+        "bilateral_distribution_of_resistance": 3,
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1165
+                ],
+                "description": "None"
+            }
+        ]
     },
     "ski jumps": {
         "id": "ski jumps",
@@ -2180,7 +3279,52 @@
             "1101"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "diagonal bounds": {
         "id": "diagonal bounds",
@@ -2209,7 +3353,52 @@
             "1120"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            }
+        ]
     },
     "lateral bounds": {
         "id": "lateral bounds",
@@ -2238,7 +3427,52 @@
             "1120"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell clean and press": {
         "id": "dumbbell clean and press",
@@ -2268,7 +3502,41 @@
             "902.1"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 2.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.8665
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 3.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.8665
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell snatch": {
         "id": "dumbbell snatch",
@@ -2297,7 +3565,41 @@
             "1001"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 1.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.9925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 4.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.9925
+                ],
+                "description": "None"
+            }
+        ]
     },
     "hand to hand kettlebell swings": {
         "id": "hand to hand kettlebell swings",
@@ -2326,7 +3628,41 @@
             "1002"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.5355
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.5355
+                ],
+                "description": "None"
+            }
+        ]
     },
     "kettlebell swings": {
         "id": "kettlebell swings",
@@ -2355,7 +3691,41 @@
             "1002"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.5355
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.5355
+                ],
+                "description": "None"
+            }
+        ]
     },
     "one arm kettlebell swings": {
         "id": "one arm kettlebell swings",
@@ -2384,7 +3754,41 @@
             "1002"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 0,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.5355
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.54545
+                ],
+                "percent_bodyheight": [
+                    0.5355
+                ],
+                "description": "None"
+            }
+        ]
     },
     "speed squats": {
         "id": "speed squats",
@@ -2413,7 +3817,52 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "drop squats": {
         "id": "drop squats",
@@ -2442,7 +3891,52 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "squat front kicks": {
         "id": "squat front kicks",
@@ -2619,7 +4113,52 @@
             "1110"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "squat jumps 180": {
         "id": "squat jumps 180",
@@ -2677,7 +4216,52 @@
             "1110"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.40740000000000004
+                ],
+                "percent_bodyheight": [
+                    0.24
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            }
+        ]
     },
     "box jumps": {
         "id": "box jumps",
@@ -2706,7 +4290,52 @@
             "1110"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 3.1,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            }
+        ]
     },
     "advanced box jumps": {
         "id": "advanced box jumps",
@@ -2738,7 +4367,85 @@
             "1110"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 2.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "broad jumps": {
         "id": "broad jumps",
@@ -2767,7 +4474,52 @@
             "1110"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 1.0,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "split hops": {
         "id": "split hops",
@@ -2796,7 +4548,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.12
+                ],
+                "description": "None"
+            }
+        ]
     },
     "split jumps": {
         "id": "split jumps",
@@ -2825,7 +4622,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "lunges to jumps": {
         "id": "lunges to jumps",
@@ -2854,7 +4696,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.2
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.2
+                ],
+                "description": "None"
+            }
+        ]
     },
     "reverse lunge knee drives": {
         "id": "reverse lunge knee drives",
@@ -2883,7 +4770,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.75,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.5,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    -10.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "split jump rotational toss": {
         "id": "split jump rotational toss",
@@ -2944,7 +4876,52 @@
             "1100"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.2
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.2
+                ],
+                "description": "None"
+            }
+        ]
     },
     "med ball slams": {
         "id": "med ball slams",
@@ -2973,7 +4950,52 @@
             "1200"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 1.35,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.662
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.662
+                ],
+                "description": "None"
+            }
+        ]
     },
     "med ball rotational slams": {
         "id": "med ball rotational slams",
@@ -3002,7 +5024,52 @@
             "1200"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 1.35,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.662
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.662
+                ],
+                "description": "None"
+            }
+        ]
     },
     "lunge twist ball toss": {
         "id": "lunge twist ball toss",
@@ -3031,7 +5098,52 @@
             "1201"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 2.65,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.15,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "full sit-ups": {
         "id": "full sit-ups",
@@ -7072,7 +9184,52 @@
             "101"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 2.0,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.081
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.081
+                ],
+                "description": "None"
+            }
+        ]
     },
     "kneeling dumbbell halos": {
         "id": "kneeling dumbbell halos",
@@ -7101,7 +9258,52 @@
             "910"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1075
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1075
+                ],
+                "description": "None"
+            }
+        ]
     },
     "pull overs on step": {
         "id": "pull overs on step",
@@ -7130,7 +9332,52 @@
             "802"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "overhead tricep extensions": {
         "id": "overhead tricep extensions",
@@ -7159,7 +9406,52 @@
             "900"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            }
+        ]
     },
     "tricep kickbacks": {
         "id": "tricep kickbacks",
@@ -7188,7 +9480,52 @@
             "900"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            }
+        ]
     },
     "chest press with dead bugs": {
         "id": "chest press with dead bugs",
@@ -7217,7 +9554,60 @@
             "901"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943,
+                    0.20370000000000002
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943,
+                    0.20370000000000002
+                ],
+                "percent_bodyheight": [
+                    0.331,
+                    0.4925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943,
+                    0.20370000000000002
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943,
+                    0.20370000000000002
+                ],
+                "percent_bodyheight": [
+                    0.331,
+                    0.4925
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell bench press": {
         "id": "dumbbell bench press",
@@ -7246,7 +9636,52 @@
             "901"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "alternating dumbbell chest press": {
         "id": "alternating dumbbell chest press",
@@ -7275,7 +9710,52 @@
             "901"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "alternating dumbbell presses": {
         "id": "alternating dumbbell presses",
@@ -7304,7 +9784,52 @@
             "902"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell press": {
         "id": "dumbbell press",
@@ -7333,7 +9858,52 @@
             "902"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "single arm dumbbell press": {
         "id": "single arm dumbbell press",
@@ -7362,7 +9932,52 @@
             "902"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "kneeling dumbbell press": {
         "id": "kneeling dumbbell press",
@@ -7391,7 +10006,52 @@
             "902"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "barbell push press": {
         "id": "barbell push press",
@@ -7420,7 +10080,52 @@
             "902"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.45,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.45125
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.45125
+                ],
+                "description": "None"
+            }
+        ]
     },
     "bottoms up press": {
         "id": "bottoms up press",
@@ -7449,7 +10154,52 @@
             "902"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell waiter's carry": {
         "id": "dumbbell waiter's carry",
@@ -7474,7 +10224,19 @@
             "903"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 1.0,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            }
+        ]
     },
     "alternating bicep curls": {
         "id": "alternating bicep curls",
@@ -7503,7 +10265,52 @@
             "904"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.317
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.317
+                ],
+                "description": "None"
+            }
+        ]
     },
     "bicep curls half way down": {
         "id": "bicep curls half way down",
@@ -7532,7 +10339,52 @@
             "904"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            }
+        ]
     },
     "bicep curls half way up": {
         "id": "bicep curls half way up",
@@ -7561,7 +10413,52 @@
             "904"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1585
+                ],
+                "description": "None"
+            }
+        ]
     },
     "hammer curls": {
         "id": "hammer curls",
@@ -7590,7 +10487,52 @@
             "904.1"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.317
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.317
+                ],
+                "description": "None"
+            }
+        ]
     },
     "reverse curls": {
         "id": "reverse curls",
@@ -7619,7 +10561,52 @@
             "904.2"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.317
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.317
+                ],
+                "description": "None"
+            }
+        ]
     },
     "bicep curls to overhead press": {
         "id": "bicep curls to overhead press",
@@ -7714,7 +10701,52 @@
             "905.1"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "barbell rows": {
         "id": "barbell rows",
@@ -7743,7 +10775,52 @@
             "905"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell rows": {
         "id": "dumbbell rows",
@@ -7772,7 +10849,52 @@
             "905"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "three point dumbbell rows": {
         "id": "three point dumbbell rows",
@@ -7801,7 +10923,52 @@
             "905.1"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "single arm dumbbell rows": {
         "id": "single arm dumbbell rows",
@@ -7830,7 +10997,52 @@
             "905.1"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "single arm quadruped dumbbell rows": {
         "id": "single arm quadruped dumbbell rows",
@@ -7859,7 +11071,52 @@
             "905.1"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.1725
+                ],
+                "description": "None"
+            }
+        ]
     },
     "high plank dumbbell rows": {
         "id": "high plank dumbbell rows",
@@ -7888,7 +11145,60 @@
             "905.1"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1725,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.04715,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.04715,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.1725,
+                    0.0
+                ],
+                "description": "None"
+            }
+        ]
     },
     "bent over fly": {
         "id": "bent over fly",
@@ -7917,7 +11227,52 @@
             "906"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "alternating flys": {
         "id": "alternating flys",
@@ -7946,7 +11301,52 @@
             "906.1"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "reverse flys": {
         "id": "reverse flys",
@@ -7975,7 +11375,52 @@
             "907"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "side plank dumbbell reverse flys": {
         "id": "side plank dumbbell reverse flys",
@@ -8004,7 +11449,60 @@
             "907"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.331,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.04715,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.04715,
+                    1.0
+                ],
+                "percent_bodyheight": [
+                    0.331,
+                    0.0
+                ],
+                "description": "None"
+            }
+        ]
     },
     "front raise": {
         "id": "front raise",
@@ -8033,7 +11531,52 @@
             "908"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "kneeling med ball lifts": {
         "id": "kneeling med ball lifts",
@@ -8062,7 +11605,52 @@
             "908"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.8845000000000001
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.3,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.8845000000000001
+                ],
+                "description": "None"
+            }
+        ]
     },
     "kneeling dumbbell pullovers": {
         "id": "kneeling dumbbell pullovers",
@@ -8091,7 +11679,52 @@
             "908"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 2.0,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.662
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 2.0,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.662
+                ],
+                "description": "None"
+            }
+        ]
     },
     "lateral raise": {
         "id": "lateral raise",
@@ -8120,7 +11753,52 @@
             "909"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "med ball rainbows": {
         "id": "med ball rainbows",
@@ -8149,7 +11827,52 @@
             "909"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.77325
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.77325
+                ],
+                "description": "None"
+            }
+        ]
     },
     "barbell deadlift": {
         "id": "barbell deadlift",
@@ -8178,7 +11901,52 @@
             "1000"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell deadlift": {
         "id": "dumbbell deadlift",
@@ -8207,7 +11975,52 @@
             "1000"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            }
+        ]
     },
     "low kettlebell windmills": {
         "id": "low kettlebell windmills",
@@ -8236,7 +12049,52 @@
             "1000"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.295
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.295
+                ],
+                "description": "None"
+            }
+        ]
     },
     "kettlebell deadlift": {
         "id": "kettlebell deadlift",
@@ -8265,7 +12123,52 @@
             "600"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            }
+        ]
     },
     "single leg deadlift to ball pass": {
         "id": "single leg deadlift to ball pass",
@@ -8297,7 +12200,85 @@
             "600"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 2.0,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.25175000000000003
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.25175000000000003
+                ],
+                "description": "None"
+            }
+        ]
     },
     "single leg dumbbell deadlift": {
         "id": "single leg dumbbell deadlift",
@@ -8326,7 +12307,52 @@
             "600"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 2.1,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.4925
+                ],
+                "description": "None"
+            }
+        ]
     },
     "barbell front squat": {
         "id": "barbell front squat",
@@ -8355,7 +12381,52 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell narrow and wide squats": {
         "id": "dumbbell narrow and wide squats",
@@ -8387,7 +12458,96 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.75,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell squats": {
         "id": "dumbbell squats",
@@ -8416,7 +12576,52 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "kettlebell front squats": {
         "id": "kettlebell front squats",
@@ -8445,7 +12650,52 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "goblet squats": {
         "id": "goblet squats",
@@ -8474,7 +12724,52 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "reverse hold med ball squats": {
         "id": "reverse hold med ball squats",
@@ -8503,7 +12798,52 @@
             "501"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell squat and press": {
         "id": "dumbbell squat and press",
@@ -8536,7 +12876,85 @@
             "902"
         ],
         "bilateral_distribution_of_resistance": 0,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.331
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell split squats": {
         "id": "dumbbell split squats",
@@ -8565,7 +12983,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.8,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            }
+        ]
     },
     "elevated dumbbell split squat": {
         "id": "elevated dumbbell split squat",
@@ -8594,7 +13057,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 2,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell lunge matrix": {
         "id": "dumbbell lunge matrix",
@@ -8623,7 +13131,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            }
+        ]
     },
     "forward dumbbell lunges": {
         "id": "forward dumbbell lunges",
@@ -8652,7 +13205,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            }
+        ]
     },
     "reverse dumbbell lunges": {
         "id": "reverse dumbbell lunges",
@@ -8681,7 +13279,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     },
     "walking dumbbell lunges": {
         "id": "walking dumbbell lunges",
@@ -8710,7 +13353,52 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.2,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            }
+        ]
     },
     "walking lunges with med ball rotation": {
         "id": "walking lunges with med ball rotation",
@@ -8742,7 +13430,96 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.11125
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.11125
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.1,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            }
+        ]
     },
     "reverse lunges with med ball press": {
         "id": "reverse lunges with med ball press",
@@ -8774,7 +13551,112 @@
             "510"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.180375,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.5926,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.49829999999999997,
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.49829999999999997,
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.49829999999999997,
+                    0.0943
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.331
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.1,
+                "percent_bodyweight": [
+                    0.5926,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0,
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926,
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.180375,
+                    0.0
+                ],
+                "description": "None"
+            }
+        ]
     },
     "lateral dumbbell lunges": {
         "id": "lateral dumbbell lunges",
@@ -8803,7 +13685,52 @@
             "511"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.0,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.180375
+                ],
+                "description": "None"
+            }
+        ]
     },
     "dumbbell step-ups": {
         "id": "dumbbell step-ups",
@@ -8832,6 +13759,51 @@
             "610"
         ],
         "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": []
+        "actions_for_power": [
+            {
+                "muscle_action": 4,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.0
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 1,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 2,
+                "time": 0.4,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": 0,
+                "time": 1.2,
+                "percent_bodyweight": [
+                    0.5926
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            }
+        ]
     }
 }

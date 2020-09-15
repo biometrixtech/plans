@@ -123,8 +123,8 @@ def test_external_intensity_dumbell_bilateral_uneven_left_action_dominant():
     assert action.training_volume_left == 40
     assert action.training_volume_right == 40
 
-    assert int(action.tissue_load_left.observed_value) == int(60 * 9.8 * 40 * 1.2)
-    assert int(action.tissue_load_right.observed_value) == int(40 * 9.8 * 40 * .8)
+    assert int(action.tissue_load_left.observed_value) == int(60 * 9.8 * 40)
+    assert int(action.tissue_load_right.observed_value) == int(40 * 9.8 * 40)
 
 
 def test_external_intensity_unilateral_dumbbell_no_side_defined():

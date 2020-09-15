@@ -224,7 +224,7 @@ class BaseWorkoutExercise(object):
         self.actions_for_power = movement.actions_for_power
         # self.set_adaption_type(movement)
 
-    def set_adaptation_type(self):
+    def set_adaptation_type(self, percent_rep_max=50):
         if self.training_type == TrainingType.flexibility:
             self.adaptation_type = AdaptationType.not_tracked
         if self.training_type == TrainingType.movement_prep:
@@ -242,7 +242,7 @@ class BaseWorkoutExercise(object):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            if self.training_intensity >= 5:  # TODO: validate this number
+            if percent_rep_max >= 75:
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength

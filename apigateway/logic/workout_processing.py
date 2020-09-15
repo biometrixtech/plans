@@ -262,9 +262,12 @@ class WorkoutProcessor(object):
             # self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
 
     def update_exercise_details(self, exercise):
-
         # exercise.set_intensity()
-        exercise.set_adaptation_type()
+        if exercise.training_type == TrainingType.strength_integrated_resistance:
+            percent_rep_max = self.get_percent_rep_max(exercise)
+        else:
+            percent_rep_max = 0
+        exercise.set_adaptation_type(percent_rep_max)
         exercise.set_rep_tempo()
         exercise.set_reps_duration()
 
@@ -330,7 +333,12 @@ class WorkoutProcessor(object):
     def update_planned_exercise_details(self, exercise, assignment_type):
 
         #exercise.set_intensity()
-        exercise.set_adaptation_type()
+        # exercise.set_intensity()
+        if exercise.training_type == TrainingType.strength_integrated_resistance:
+            percent_rep_max = self.get_percent_rep_max(exercise)
+        else:
+            percent_rep_max = 0
+        exercise.set_adaptation_type(percent_rep_max)
         #exercise.set_rep_tempo()
         exercise.update_primary_from_alternates(assignment_type)
         exercise.set_reps_duration()
@@ -903,16 +911,16 @@ class WorkoutProcessor(object):
                 weight = Assignment(assigned_value=exercise.weight)
         elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
             if isinstance(exercise.weight, Assignment):
-                weight = Assignment().multiply_assignment_by_scalar(exercise.weight, self.user_weight)
+                weight = Assignment().multiply_assignment_by_scalar(Assignment().divide_assignment_by_scalar(exercise.weight, 100), self.user_weight)
             else:
-                weight = Assignment(assigned_value=exercise.weight * self.user_weight)
+                weight = Assignment(assigned_value=exercise.weight / 100 * self.user_weight)
         elif exercise.weight_measure == WeightMeasure.percent_rep_max:
             one_RM_BW_ratio = self.get_one_rep_max_bodyweight_ratio(exercise)
             one_RM_actual = one_RM_BW_ratio * self.user_weight
             if isinstance(exercise.weight, Assignment):
-                weight = Assignment().multiply_assignment_by_scalar(exercise.weight, one_RM_actual)
+                weight = Assignment().multiply_assignment_by_scalar(Assignment().divide_assignment_by_scalar(exercise.weight, 100), one_RM_actual)
             else:
-                weight = Assignment(assigned_value = exercise.weight * one_RM_actual)
+                weight = Assignment(assigned_value=exercise.weight / 100 * one_RM_actual)
         # elif exercise.weight_measure == WeightMeasure.rep_max:
         #     weight = None
         else:
@@ -927,6 +935,30 @@ class WorkoutProcessor(object):
                         weight = Assignment().multiply_assignment_by_scalar(weight, 2)
 
         return weight
+
+    def get_percent_rep_max(self, exercise):
+        percent_rep_max = 0
+        if exercise.weight is not None:
+            if exercise.weight_measure == WeightMeasure.actual_weight:
+                one_RM_BW_ratio = self.get_one_rep_max_bodyweight_ratio(exercise)
+                if isinstance(exercise.weight, Assignment):
+                    weight = exercise.weight.lowest_value() / self.user_weight
+                else:
+                    weight = exercise.weight / self.user_weight
+                percent_rep_max = weight / one_RM_BW_ratio * 100
+            elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
+                one_RM_BW_ratio = self.get_one_rep_max_bodyweight_ratio(exercise)
+                if isinstance(exercise.weight, Assignment):
+                    weight = exercise.weight.lowest_value()
+                else:
+                    weight = exercise.weight
+                percent_rep_max = weight / one_RM_BW_ratio * 100
+            elif exercise.weight_measure == WeightMeasure.percent_rep_max:
+                if isinstance(exercise.weight, Assignment):
+                    percent_rep_max = exercise.weight.lowest_value()
+                else:
+                    percent_rep_max = exercise.weight
+        return percent_rep_max
 
     @staticmethod
     def get_rpe_from_rep_max(rep_max, reps):
