@@ -37,7 +37,7 @@ class SubAdaptionTypePersonas(object):
 class PeriodizationGoal(object):
     def __init__(self, periodization_goal_type):
         self.periodization_goal_type = periodization_goal_type
-        self.training_exposures = []
+        self.target_training_exposures = []
 
 
 class PeriodizationGoalFactory(object):
@@ -65,31 +65,31 @@ class PeriodizationGoalFactory(object):
 
         if periodization_goal_type == PeriodizationGoalType.increase_cardio_endurance:
 
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=base_training_long, exposure_count=one_required_count, priority=1))
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=one_required_count, priority=2))
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=base_training_short_mod, exposure_count=two_three_required_count, priority=3))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=base_training_long, exposure_count=one_required_count.plagiarize(), priority=1))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=one_required_count.plagiarize(), priority=2))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=base_training_short_mod, exposure_count=two_three_required_count.plagiarize(), priority=3))
             # ignoring correctives for now
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=strength_endurance_strength, exposure_count=two_three_required_count, priority=5))
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=one_two_required_count, priority=6))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=strength_endurance_strength, exposure_count=two_three_required_count.plagiarize(), priority=5))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=one_two_required_count.plagiarize(), priority=6))
 
         if periodization_goal_type == PeriodizationGoalType.increase_athleticism_low_force:
 
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=speed_sustained_power_power, exposure_count=two_three_required_count, priority=1))
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=two_three_required_count, priority=2))
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=two_three_required_count, priority=2))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=speed_sustained_power_power, exposure_count=two_three_required_count.plagiarize(), priority=1))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=two_three_required_count.plagiarize(), priority=2))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=two_three_required_count.plagiarize(), priority=2))
             # ignoring correctives for now
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=base_training, exposure_count=one_two_required_count, priority=4))
-            goal.training_exposures.append(
-                TargetTrainingExposure(training_exposures=strength_endurance_strength, exposure_count=one_two_required_count, priority=5))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=base_training, exposure_count=one_two_required_count.plagiarize(), priority=4))
+            goal.target_training_exposures.append(
+                TargetTrainingExposure(training_exposures=strength_endurance_strength, exposure_count=one_two_required_count.plagiarize(), priority=5))
 
         return goal
 

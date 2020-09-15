@@ -139,12 +139,14 @@ class APIProcessing(object):
     def create_activity(self, activity_type, update_stats=True, activity_id=None, training_session_id=None, planned_session=None):
         if update_stats:
             # update stats
+
             if self.user_stats_processor is None:
                 self.user_stats_processor = UserStatsProcessing(
                         self.user_id,
                         event_date=self.event_date_time,
                         datastore_collection=self.datastore_collection
                 )
+            self.user_stats_processor.training_sessions.extend(self.sessions)  # add any sessions in memory so they can be considered for user stats processing
             user_stats = self.user_stats_processor.process_user_stats(current_user_stats=self.user_stats)
 
             user_stats_datastore = self.datastore_collection.user_stats_datastore

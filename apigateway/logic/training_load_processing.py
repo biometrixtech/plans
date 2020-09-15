@@ -109,11 +109,14 @@ class TrainingLoadProcessing(object):
 
     @xray_recorder.capture('logic.TrainingLoadProcessing.load_plan_values')
     def load_training_session_values(self, acute_training_sessions, chronic_weeks_training_sessions,
-                                     chronic_training_sessions):
+                                     chronic_training_sessions, pre_acute_chronic_sessions=[]):
 
         all_training_sessions = []
         all_training_sessions.extend(acute_training_sessions)
         all_training_sessions.extend(chronic_training_sessions)
+
+        if len(all_training_sessions)==0:
+            all_training_sessions.extend(pre_acute_chronic_sessions)
 
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}

@@ -149,7 +149,7 @@ from datetime import datetime, timedelta
 #     current_date_time = datetime.now()
 #     user_stats = UserStats("tester")
 #     user_stats.training_phase_type = TrainingPhaseType.increase
-#     user_stats.persona = PeriodizationPersona.well_trained
+#     user_stats.demo_persona = PeriodizationPersona.well_trained
 #     user_stats.periodization_goals = [PeriodizationGoalType.increase_cardiovascular_health]
 #     injury_risk_dict = {}
 #     proc = PeriodizationPlanProcessor(current_date_time, user_stats, injury_risk_dict, data_store, None)
