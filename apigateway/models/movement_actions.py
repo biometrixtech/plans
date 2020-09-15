@@ -10,6 +10,7 @@ class MuscleAction(Enum):
     concentric = 0
     eccentric = 1
     isometric = 2
+    no_load = 4
 
 
 class LowerBodyStance(Enum):
@@ -684,6 +685,7 @@ class ExerciseSubAction(object):
                 self.training_volume_left = total_volume
                 self.training_volume_right = total_volume
 
+
 class ExerciseAction(object):
     def __init__(self, id, name):
         self.id = id
@@ -735,6 +737,7 @@ class ExerciseAction(object):
 
         self.speed = None
         self.resistance = None
+        self.displacement = None
 
         # self.ancillary_muscle_action = None
         # self.hip_stability_action = []
@@ -754,13 +757,13 @@ class ExerciseAction(object):
         self.bilateral = True
         self.side = 0  # both
         # new variables for tissue intensity
-        self.duration = None  # seconds
-        self.distance = None  # meters
-        self.pace = None  # in seconds/meter
-        self.speed = None  # meters/second
+        # self.duration = None  # seconds
+        # self.distance = None  # meters
+        # self.pace = None  # in seconds/meter
+        # self.speed = None  # meters/second
         self.power = None  # watts
         self.force = None  # newtons
-        self.grade = None  # percentage (decimal)
+        # self.grade = None  # percentage (decimal)
         self.rep_tempo = None
         self.force = None
 
@@ -807,6 +810,7 @@ class ExerciseAction(object):
             "apply_instability": self.apply_instability,
             'speed': self.speed.value if self.speed is not None else None,
             'resistance': self.resistance.value if self.resistance is not None else None,
+            'displacement': self.displacement.value if self.displacement is not None else None,
 
             "primary_muscle_action": self.primary_muscle_action.value if self.primary_muscle_action is not None else None,
             "hip_joint_action": [ac.json_serialise() for ac in self.hip_joint_action],
@@ -836,7 +840,7 @@ class ExerciseAction(object):
                 # obtained from exercises
                 "rpe": self.rpe,
                 "shrz": self.shrz,
-                "pace": self.pace,
+                # "pace": self.pace,
                 "rep_tempo": self.rep_tempo,
                 "cardio_action": self.cardio_action.value if self.cardio_action is not None else None,
                 #"reps": self.reps,
@@ -885,6 +889,7 @@ class ExerciseAction(object):
         action.apply_instability = input_dict.get('apply_instability', False)
         action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
         action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
+        action.displacement = MovementDisplacement(input_dict['displacement']) if input_dict.get('displacement') is not None else None
         action.primary_muscle_action = MuscleAction(input_dict['primary_muscle_action']) if input_dict.get('primary_muscle_action') is not None else None
         action.hip_joint_rating = None
         action.hip_joint_action = [PrioritizedJointAction.json_deserialise(joint_action) for joint_action in input_dict.get('hip_joint_action', [])]
@@ -1335,7 +1340,8 @@ class MovementDisplacement(IntEnum):
     full_rom = 2
     min = 3
     mod = 4
-    max = 5
+    large = 5
+    max = 6
 
 
 class Movement(Serialisable):
@@ -1350,7 +1356,8 @@ class Movement(Serialisable):
         self.resistance = None
         self.speed = None
         self.displacement = None
-        self.rep_tempo = None
+        self.rep_tempo = []
+        self.rest_between_reps = 0
         self.training_type = None
         self.cardio_action = None
         self.power_drill_action = None
@@ -1361,6 +1368,7 @@ class Movement(Serialisable):
         # new
         self.compound_actions = []
         self.bilateral_distribution_of_resistance = None
+        self.actions_for_power = []
 
         # calculated
         self.explosiveness_rating = 0
@@ -1380,13 +1388,15 @@ class Movement(Serialisable):
             'resistance': self.resistance.value if self.resistance is not None else None,
             'displacement': self.displacement.value if self.displacement is not None else None,
             'rep_tempo': self.rep_tempo,
+            'rest_between_reps': self.rest_between_reps,
             'surface_stability': self.surface_stability.value if self.surface_stability is not None else None,
             # 'primary_actions': self.primary_actions,
             # 'secondary_actions': self.secondary_actions,
             'explosiveness_rating': self.explosiveness_rating,
             #new
             'compound_actions': self.compound_actions,
-            'bilateral_distribution_of_resistance': self.bilateral_distribution_of_resistance.value if self.bilateral_distribution_of_resistance is not None else None
+            'bilateral_distribution_of_resistance': self.bilateral_distribution_of_resistance.value if self.bilateral_distribution_of_resistance is not None else None,
+            'actions_for_power': [ap.json_serialise() for ap in self.actions_for_power]
         }
         return ret
 
@@ -1410,8 +1420,9 @@ class Movement(Serialisable):
         movement.external_weight_implement = [Equipment(equipment) for equipment in input_dict.get('external_weight_implement', [])]
         movement.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
         movement.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
-        movement.displacement = MovementResistance(input_dict['displacement']) if input_dict.get('displacement') is not None else None
-        movement.rep_tempo = input_dict.get('rep_tempo')
+        movement.displacement = MovementDisplacement(input_dict['displacement']) if input_dict.get('displacement') is not None else None
+        movement.rep_tempo = input_dict.get('rep_tempo', [])
+        movement.rest_between_reps = input_dict.get('rest_between_reps', 0)
         movement.set_explosiveness_rating()
         movement.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
         # movement.primary_actions = input_dict.get('primary_actions', [])
@@ -1419,6 +1430,7 @@ class Movement(Serialisable):
         #new
         movement.compound_actions = input_dict.get('compound_actions', [])
         movement.bilateral_distribution_of_resistance = WeightDistribution(input_dict['bilateral_distribution_of_resistance']) if input_dict.get('bilateral_distribution_of_resistance') is not None else None
+        movement.actions_for_power = [ActionsForPower.json_deserialise(ap) for ap in input_dict.get('actions_for_power', [])]
 
         return movement
 
@@ -1470,3 +1482,32 @@ class ExternalWeight(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         return cls(input_dict.get('equipment'), input_dict.get('value'))
+
+
+class ActionsForPower(object):
+    def __init__(self):
+        self.muscle_action = None
+        self.time = None
+        self.percent_bodyweight = []
+        self.percent_bodyheight = []
+        self.description = "None"
+
+    def json_serialise(self):
+        ret = {
+            'muscle_action':self.muscle_action.value if self.muscle_action is not None else None,
+            'time':self.time,
+            'percent_bodyweight':self.percent_bodyweight,
+            'percent_bodyheight':self.percent_bodyheight,
+            'description':self.description
+        }
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        ap = cls()
+        ap.muscle_action = MuscleAction(input_dict['muscle_action']) if input_dict.get('muscle_action') is not None else None
+        ap.time = input_dict.get('time')
+        ap.percent_bodyweight = input_dict.get('percent_bodyweight', [])
+        ap.percent_bodyheight = input_dict.get('percent_bodyheight', [])
+        ap.description = input_dict.get('description', "")
+        return ap

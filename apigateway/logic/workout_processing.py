@@ -9,7 +9,7 @@ from logic.training_exposure_processing import TrainingExposureProcessor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition, WeightDistribution
-from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement, CompoundAction
+from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement, CompoundAction, MovementResistance, MovementSpeed, Explosiveness
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 from models.training_volume import StandardErrorRange, Assignment
@@ -238,6 +238,9 @@ class WorkoutProcessor(object):
                             action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
                             for sub_action in action.sub_actions:
                                 sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                    if exercise.displacement is not None:  # because displacement is defined in exercise level, inherit it to actions
+                        for action in compound_action.actions:
+                            action.displacement = exercise.displacement
                     exercise.compound_actions.append(compound_action)
                     # exercise.primary_actions.append(compound_action)
 
@@ -439,30 +442,9 @@ class WorkoutProcessor(object):
         #     action.set_body_weight_distribution()
         #     action.set_training_load(total_volume)
 
-    @staticmethod
-    def get_force_level(speed, resistance):
-        explosiveness_dict = {
-            'none': {'none': 'no_force', 'slow': 'no_force', 'mod': 'no_force', 'fast': 'high_force', 'explosive': 'high_force'},
-            'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
-            'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
-            'high': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
-            'max': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
-        }
-        force_level_dict = {
-            "no_force": .5,
-            "low_force": .6,
-            "mod_force": .75,
-            "high_force": .9,
-            "max_force": 1
-        }
-        # if speed is not None and speed != "" and resistance is not None and resistance != "":
-        resistance_dict = explosiveness_dict.get(resistance.name)
-        if resistance_dict is not None:
-            explosiveness = resistance_dict.get(speed.name)
-            return force_level_dict[explosiveness]
 
     def initialize_action_from_exercise(self, action, exercise):
-        compound_action_force_ratio = self.get_force_level(action.speed, action.resistance)
+        # compound_action_force_ratio = self.get_force_level(action.speed, action.resistance)
 
         action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
@@ -497,13 +479,18 @@ class WorkoutProcessor(object):
         for action in compound_action.actions:
             # determine percentage of power to be distributed to each compound action
             if len(compound_action.actions) == 1:
-                compound_action_force_ratio = 1.0
+                action_force_ratio = 1.0
             else:
-                compound_action_force_ratio = self.get_force_level(compound_action.speed, compound_action.resistance)
+                explosiveness = Calculators.get_force_level(action.speed, action.resistance, action.displacement)
+                if explosiveness is not None:
+                    explosiveness = Explosiveness[explosiveness]
+                    action_force_ratio = Calculators.get_percent_intensity_from_force_level(explosiveness)
+                else:
+                    action_force_ratio = 1.0
             action_power = compound_action_power.plagiarize()
             action_force = compound_action_force.plagiarize()
-            action_power.multiply(compound_action_force_ratio)
-            action_force.multiply(compound_action_force_ratio)
+            action_power.multiply(action_force_ratio)
+            action_force.multiply(action_force_ratio)
             action.power = action_power
             action.force = action_force
             
@@ -541,8 +528,8 @@ class WorkoutProcessor(object):
 
         # if weight is not None:
         exercise.force = Calculators.force_resistance_exercise(external_weight)
-
-        percent_bodyweight = 0
+        #
+        # percent_bodyweight = 0
 
         # bodyweight_count = 0
         # # for action in exercise.primary_actions:
@@ -557,36 +544,48 @@ class WorkoutProcessor(object):
         #     percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
 
         # TODO: still need to differentiate distance traveled by exercise
-        observed_power = Calculators.power_resistance_exercise(
-            weight_used=external_weight,
-            user_weight=self.user_weight*percent_bodyweight,
-            time_eccentric=exercise.duration_per_rep.observed_value / 2,
-            time_concentric=exercise.duration_per_rep.observed_value / 2
+        # if len(exercise.actions_for_power) > 0:
+        #     for action_for_power_calc in exercise.actions_for_power:
+        # if exercise.movement_rep_tempo is not None and len(exercise.movement_rep_tempo) > 0:
+        #     total_rep_duration = sum(exercise.movement_rep_tempo)
+        #     if exercise.rest_between_reps is not None:
+        #         total_rep_duration += exercise.rest_between_reps
+        # else:
+        #     total_rep_duration = None
+
+
+        power = Calculators.power_resistance_exercise(
+                external_weight=external_weight,
+                actions=exercise.actions_for_power,
+                duration_per_rep=exercise.duration_per_rep.observed_value,
+                user_weight=self.user_weight
             )
+
+        exercise.power = power
         # exercise.power = StandardErrorRange(observed_value=observed_power)
-        powers = [observed_power]
-        if exercise.reps_per_set is None:
-            # TODO: still need to differentiate distance traveled by exercise
-            power_1 = Calculators.power_resistance_exercise(
-                weight_used=external_weight,
-                user_weight=self.user_weight*percent_bodyweight,
-                time_eccentric=exercise.duration_per_rep.lower_bound / 2,
-                time_concentric=exercise.duration_per_rep.lower_bound / 2
-                )
-            power_2 = Calculators.power_resistance_exercise(
-                weight_used=external_weight,
-                user_weight=self.user_weight*percent_bodyweight,
-                time_eccentric=exercise.duration_per_rep.upper_bound / 2,
-                time_concentric=exercise.duration_per_rep.upper_bound / 2
-                )
-            powers.extend([power_1, power_2])
+        # powers = [observed_power]
+        # if exercise.reps_per_set is None:
+        #     # TODO: still need to differentiate distance traveled by exercise
+        #     power_1 = Calculators.power_resistance_exercise(
+        #         weight_used=external_weight,
+        #         user_weight=self.user_weight*percent_bodyweight,
+        #         time_eccentric=exercise.duration_per_rep.lower_bound / 2,
+        #         time_concentric=exercise.duration_per_rep.lower_bound / 2
+        #         )
+        #     power_2 = Calculators.power_resistance_exercise(
+        #         weight_used=external_weight,
+        #         user_weight=self.user_weight*percent_bodyweight,
+        #         time_eccentric=exercise.duration_per_rep.upper_bound / 2,
+        #         time_concentric=exercise.duration_per_rep.upper_bound / 2
+        #         )
+        #     powers.extend([power_1, power_2])
 
         # exercise.power.lower_bound = min([power_1, power_2])
         # exercise.power.upper_bound = max([power_1, power_2])
         # powers = [observed_power, power_1, power_2]
-        exercise.power = StandardErrorRange().get_average_from_error_range_list(powers)
-        exercise.power.lower_bound = StandardErrorRange().get_min_from_error_range_list(powers)
-        exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
+        # exercise.power = StandardErrorRange().get_average_from_error_range_list(powers)
+        # exercise.power.lower_bound = StandardErrorRange().get_min_from_error_range_list(powers)
+        # exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
 
         return exercise
 
@@ -1059,23 +1058,21 @@ class WorkoutProcessor(object):
         if workout_exercise.reps_per_set is not None:
             reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
         elif workout_exercise.duration is not None:
+            possible_reps = []
             if isinstance(workout_exercise.duration, Assignment):
-                possible_reps = []
                 durations = [workout_exercise.duration.min_value, workout_exercise.duration.max_value, workout_exercise.duration.assigned_value]
                 durations = [dur for dur in durations if dur is not None]
-                duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
-                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
-                for dur in durations:
-                    for dur_per_rep in duration_per_reps:
-                        possible_reps.append(dur / dur_per_rep)
-                if len(possible_reps) > 0:
-                    reps.lower_bound = min(possible_reps)
-                    reps.upper_bound = max(possible_reps)
-                    reps.observed_value = sum(possible_reps) / len(possible_reps)
             else:
-                reps.lower_bound = workout_exercise.duration / workout_exercise.duration_per_rep.upper_bound
-                reps.upper_bound = workout_exercise.duration / workout_exercise.duration_per_rep.lower_bound
-                reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
+                durations = [workout_exercise.duration]
+            duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
+            duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
+            for dur in durations:
+                for dur_per_rep in duration_per_reps:
+                    possible_reps.append(dur / dur_per_rep)
+            if len(possible_reps) > 0:
+                reps.lower_bound = min(possible_reps)
+                reps.upper_bound = max(possible_reps)
+                reps.observed_value = sum(possible_reps) / len(possible_reps)
 
         all_rep_max_reps = self.get_all_rep_max_reps(workout_exercise, equipment)
         all_rpes = []

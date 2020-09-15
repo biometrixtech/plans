@@ -1,5 +1,5 @@
 import os, json
-from models.movement_actions import Movement
+from models.movement_actions import Movement, MuscleAction
 from database.NTC.import_exercises import ClientExercise
 
 
@@ -65,6 +65,7 @@ class ExerciseMovementParser(object):
                 movement.compound_actions = base_movement.compound_actions
                 # movement.primary_actions = base_movement.primary_actions
                 movement.cardio_action = base_movement.cardio_action
+                movement.actions_for_power = exercise.actions_for_power
                 self.movements.append(movement)
                 # all_movements[exercise.name] = movement
         self.write_movements_json()
