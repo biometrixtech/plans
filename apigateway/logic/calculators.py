@@ -865,11 +865,13 @@ class Calculators(object):
             for action in actions:
                 duration = action.time
                 total_duration += duration
-                if action.muscle_action.name != 'no_load':
-                    duration = action.time
-                    action_power = StandardErrorRange()
-                    if duration > 0:
-                        for i in range(len(action.percent_bodyweight)):
+                # if action.muscle_action.name != 'no_load':
+                # duration = action.time
+                action_power = StandardErrorRange()
+                if duration > 0:
+                    for i in range(len(action.percent_bodyweight)):
+                        muscle_action = action.muscle_action[i]
+                        if muscle_action.name != 'no_load':
                             total_weight = external_weight.plagiarize()
                             total_weight.add_value(action.percent_bodyweight[i] * user_weight)
                             perc_bodyheight = action.percent_bodyheight[i]
@@ -887,8 +889,8 @@ class Calculators(object):
                             sub_action_power = force.plagiarize()
                             sub_action_power.multiply(velocity)
                             action_power.add(sub_action_power)
-                        action_power.multiply(duration)
-                        average_power.add(action_power)
+                    action_power.multiply(duration)
+                    average_power.add(action_power)
             if duration_per_rep is not None:
                 average_power.divide(duration_per_rep)
             else:

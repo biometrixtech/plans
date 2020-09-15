@@ -117,7 +117,7 @@ class ExerciseParser(object):
 
         all_rep_tempos = set()
         for file in files:
-            self.exercise_pd = pd.read_csv(f'exercise_to_base_movement/{file}', keep_default_na=False)
+            self.exercise_pd = pd.read_csv(f'_NTC Exercise Library mapped to Fathom Base Movement//{file}', keep_default_na=False)
 
             self.exercise_pd.rename(columns={'speed (as rep tempo or as max action pace)': 'speed'}, inplace=True)
             self.exercises = []
@@ -185,9 +185,10 @@ class ExerciseParser(object):
                 ex.actions_for_power = self.get_actions_for_power(row)
             except KeyError:
                 print(ex.name)
+                raise
             except Exception as e:
-                print(e)
                 print(ex.name)
+                print(e)
                 pass
             return ex
 
@@ -195,6 +196,8 @@ class ExerciseParser(object):
 
     def get_actions_for_power(self, row):
         actions_for_power = []
+        # if row['nike_exercise_name'].lower() == 'straight leg flutters':
+        #     print('here')
         if 'percent_bodyweight' in row:
             all_bodyweights = []
             all_bodyheights = []
@@ -215,14 +218,17 @@ class ExerciseParser(object):
                     all_bodyheights.append(list(bodyheights))
 
             if self.is_valid(row['muscle_action']):
-                # sim_actions = row['muscle_action'].split(';')
+                row['muscle_action'] = row['muscle_action'].replace(",", "/")
+                row['muscle_action'] = row['muscle_action'].replace("\n", "")
+                sim_actions = row['muscle_action'].split(';')
                 # if len(sim_actions) > 1:
 
                 # all_muscle_actions = []
-                # for action in sim_actions:
-                muscle_actions = row['muscle_action'].replace(" ", "").split('/')
-                muscle_actions = [MuscleAction[ma] for ma in muscle_actions if ma != ""]
-                all_muscle_actions.extend(muscle_actions)
+                for action in sim_actions:
+                    # muscle_actions = row['muscle_action'].replace(" ", "").split('/')
+                    muscle_actions = action.replace(" ", "").split('/')
+                    muscle_actions = [MuscleAction[ma] for ma in muscle_actions if ma != ""]
+                    all_muscle_actions.append(muscle_actions)
                 # if len(all_times) != len(all_bodyweights):
                 #     all_times *= 2
 
@@ -237,12 +243,19 @@ class ExerciseParser(object):
                 #     all_times *= 2
             for i in range(len(all_times)):
                 ap = ActionsForPower()
-                ap.muscle_action = all_muscle_actions[i]
+                # ap.muscle_action = all_muscle_actions[i]
                 ap.time = all_times[i]
+                sub_actions = 0
                 for bodyweights in all_bodyweights:
                     ap.percent_bodyweight.append(bodyweights[i])
+                    sub_actions += 1
                 for bodyheights in all_bodyheights:
                     ap.percent_bodyheight.append(bodyheights[i])
+                for muscle_actions in all_muscle_actions:
+                    ap.muscle_action.append(muscle_actions[i])
+                if len(ap.muscle_action) != sub_actions:
+                    ap.muscle_action = ap.muscle_action * sub_actions
+
                 # ap.percent_bodyweight = all_bodyweights[i]
                 # ap.percent_bodyheight = all_bodyheights[i]
                 actions_for_power.append(ap)

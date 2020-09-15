@@ -1486,7 +1486,7 @@ class ExternalWeight(object):
 
 class ActionsForPower(object):
     def __init__(self):
-        self.muscle_action = None
+        self.muscle_action = []
         self.time = None
         self.percent_bodyweight = []
         self.percent_bodyheight = []
@@ -1494,7 +1494,7 @@ class ActionsForPower(object):
 
     def json_serialise(self):
         ret = {
-            'muscle_action':self.muscle_action.value if self.muscle_action is not None else None,
+            'muscle_action': [ma.value for ma in self.muscle_action], #self.muscle_action.value if self.muscle_action is not None else None,
             'time':self.time,
             'percent_bodyweight':self.percent_bodyweight,
             'percent_bodyheight':self.percent_bodyheight,
@@ -1505,7 +1505,7 @@ class ActionsForPower(object):
     @classmethod
     def json_deserialise(cls, input_dict):
         ap = cls()
-        ap.muscle_action = MuscleAction(input_dict['muscle_action']) if input_dict.get('muscle_action') is not None else None
+        ap.muscle_action = [MuscleAction(ma) for ma in input_dict.get('muscle_action', [])]  # MuscleAction(input_dict['muscle_action']) if input_dict.get('muscle_action') is not None else None
         ap.time = input_dict.get('time')
         ap.percent_bodyweight = input_dict.get('percent_bodyweight', [])
         ap.percent_bodyheight = input_dict.get('percent_bodyheight', [])
