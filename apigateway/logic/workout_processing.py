@@ -191,11 +191,11 @@ class WorkoutProcessor(object):
                 action_json = action_library.get(compound_action_id)
                 if action_json is not None:
                     compound_action = CompoundAction.json_deserialise(action_json)
-                    if exercise.bilateral_distribution_of_resistance is not None:
-                        for action in compound_action.actions:
-                            action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
-                            for sub_action in action.sub_actions:
-                                sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+            #         if exercise.bilateral_distribution_of_resistance is not None:
+            #             for action in compound_action.actions:
+            #                 action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+            #                 for sub_action in action.sub_actions:
+            #                     sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
                     exercise.compound_actions.append(compound_action)
                     # exercise.primary_actions.append(action)
 

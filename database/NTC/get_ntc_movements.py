@@ -56,7 +56,8 @@ class ExerciseMovementParser(object):
                 if exercise.training_type.value not in [0, 7, 8]:
                     print(f"{exercise.name}, {exercise.base_movement_name}")
                 else:
-                    print(f"{exercise.name}, {exercise.training_type.value}")
+                    pass
+                    # print(f"{exercise.name}, {exercise.training_type.value}")
             else:
                 base_movement = Movement.json_deserialise(base_movement)
                 movement = Movement(exercise.name, base_movement.name)
@@ -66,9 +67,12 @@ class ExerciseMovementParser(object):
                 # movement.primary_actions = base_movement.primary_actions
                 movement.cardio_action = base_movement.cardio_action
                 movement.actions_for_power = exercise.actions_for_power
+
+                if exercise.bilateral_distribution_of_resistance != base_movement.bilateral_distribution_of_resistance:
+                    print(f'{exercise.name}; {exercise.bilateral_distribution_of_resistance.name}; {base_movement.name}; {base_movement.bilateral_distribution_of_resistance}')
                 self.movements.append(movement)
                 # all_movements[exercise.name] = movement
-        self.write_movements_json()
+        # self.write_movements_json()
         print('here')
     @staticmethod
     def copy_attributes(exercise, base_movement, movement, attribute):
