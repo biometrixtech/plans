@@ -304,3 +304,14 @@ def test_set_planned_power_cardio_diff_rpe_ranges():
     proc.set_planned_power(exercise2)
 
     assert exercise1.power.lower_bound < exercise1.power.observed_value < exercise1.power.upper_bound < exercise2.power.lower_bound < exercise2.power.observed_value < exercise2.power.upper_bound
+
+
+def test_weight_distribution():
+    exercise1 = WorkoutExercise()
+    exercise1.movement_id = 'single leg burpees'
+    exercise1.reps_per_set = 10
+    exercise1.sets = 1
+    proc = WorkoutProcessor()
+
+    proc.add_movement_detail_to_exercise(exercise1)
+    print('here')

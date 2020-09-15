@@ -183,6 +183,8 @@ class ExerciseParser(object):
                 ex.external_weight_implement = [Equipment[self.equipment_name_loookup.get(row['external_weight_implement'].lower()) or row['external_weight_implement'].lower()]]
             try:
                 ex.actions_for_power = self.get_actions_for_power(row)
+            except KeyError:
+                print(ex.name)
             except Exception as e:
                 print(e)
                 print(ex.name)
@@ -219,7 +221,7 @@ class ExerciseParser(object):
                 # all_muscle_actions = []
                 # for action in sim_actions:
                 muscle_actions = row['muscle_action'].replace(" ", "").split('/')
-                muscle_actions = [MuscleAction[ma] for ma in muscle_actions]
+                muscle_actions = [MuscleAction[ma] for ma in muscle_actions if ma != ""]
                 all_muscle_actions.extend(muscle_actions)
                 # if len(all_times) != len(all_bodyweights):
                 #     all_times *= 2
@@ -267,7 +269,8 @@ class ExerciseParser(object):
 
 
 if __name__ == '__main__':
-    files = os.listdir('exercise_to_base_movement/')
+    files = os.listdir('_NTC Exercise Library mapped to Fathom Base Movement/')
+    # files = [file for file in files if 'bw' not in file]
     ExerciseParser().load_data(files)
     # all_data = []
     # for file in files:
