@@ -519,6 +519,19 @@ class BodyPartSystems(object):
             BodyPartLocation.quadratus_lumorum
         ]
 
+        self.shoulder_stabilizers = [
+            BodyPartLocation.supraspinatus,
+            BodyPartLocation.subscapularis,
+            BodyPartLocation.infraspinatus,
+            BodyPartLocation.teres_minor
+        ]
+
+        self.scapula_stabilizers = [
+            BodyPartLocation.serratus_anterior,
+            BodyPartLocation.levator_scapulae,
+            BodyPartLocation.rhomboids
+        ]
+
     def get_movemement_system(self, movement_system_name):
 
         if movement_system_name is None:
@@ -535,6 +548,10 @@ class BodyPartSystems(object):
             return self.core_stabilizers
         elif movement_system_name == "Intrinsic Stabilization Subsystem (ISS) (Drawing In)":
             return self.intrinsic_stabilization_subsystem
+        elif movement_system_name == "Shoulder Stabilizers":
+            return self.shoulder_stabilizers
+        elif movement_system_name == "Scapula Stabilizers":
+            return self.scapula_stabilizers
         else:
             return getattr(self, movement_system_name)
 
@@ -553,6 +570,10 @@ class BodyPartSystems(object):
                 return 'core_stabilizers'
             elif movement_system_name == "Intrinsic Stabilization Subsystem (ISS) (Drawing In)":
                 return 'intrinsic_stabilization_subsystem'
+            elif movement_system_name == "Shoulder Stabilizers":
+                return 'shoulder_stabilizers'
+            elif movement_system_name == "Scapula Stabilizers":
+                return 'scapula_stabilizers'
         return None
 
 

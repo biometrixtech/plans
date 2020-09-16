@@ -60,6 +60,7 @@ class MovementLibraryParser(object):
             if self.is_valid(row, 'typical_eligible_external_weight_implement'):
                 row['typical_eligible_external_weight_implement'].replace(", ", ",")
                 external_weight_implement = row['typical_eligible_external_weight_implement'].lower().split(",")
+                external_weight_implement = ['medicine_balls' if w == 'medicine_ball' else w for w in external_weight_implement]
                 try:
                     movement.external_weight_implement = [Equipment[equipment] for equipment in external_weight_implement]
                 except:
