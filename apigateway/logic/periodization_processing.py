@@ -225,7 +225,6 @@ class PeriodizationPlanProcessor(object):
                                                                                          training_exposure.weekly_load_percentage)
                         training_exposure.volume = training_exposure.rpe_load.plagiarize()
                         training_exposure.volume.divide_range(training_exposure.rpe)
-                        stop_here=0
 
             periodization_plan.target_training_exposures = self.update_athlete_training_exposures(periodization_plan.target_training_exposures,
                                                                                                   training_exposures_to_progress,
@@ -272,8 +271,6 @@ class PeriodizationPlanProcessor(object):
             volume_lower_ratio = (training_phase.acwr.lower_bound - 1) * progression.volume_load_contribution
             rpe_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.rpe_load_contribution
             volume_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.volume_load_contribution
-            if rpe_upper_ratio > 10:
-                stop_here = 0
             if athlete_capacity.rpe.lower_bound is not None:
                 athlete_capacity.rpe.lower_bound = athlete_capacity.rpe.lower_bound * (1 + rpe_lower_ratio)
             if athlete_capacity.rpe.observed_value is not None:
@@ -298,8 +295,6 @@ class PeriodizationPlanProcessor(object):
                         rpe_lower_ratio = (training_phase.acwr.lower_bound - 1) * progression.rpe_load_contribution
                         volume_lower_ratio = (training_phase.acwr.lower_bound - 1) * progression.volume_load_contribution
                         rpe_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.rpe_load_contribution
-                        if rpe_upper_ratio > 10:
-                            stop_here = 0
                         volume_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.volume_load_contribution
                         if training_exposure.rpe.lower_bound is not None:
                             training_exposure.rpe.lower_bound = training_exposure.rpe.lower_bound * (1 + rpe_lower_ratio)
