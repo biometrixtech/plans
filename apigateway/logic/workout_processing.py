@@ -174,8 +174,11 @@ class WorkoutProcessor(object):
                     moderate_intensity_minutes = moderate_intensity_minutes_assignment.lowest_value()
                     session.total_minutes_at_moderate_intensity += moderate_intensity_minutes
                 else:
-                    moderate_intensity_minutes = workout_exercise.duration / float(60)
-                    session.total_minutes_at_moderate_intensity += moderate_intensity_minutes
+                    if workout_exercise.duration is not None:
+                        moderate_intensity_minutes = workout_exercise.duration / float(60)
+                        session.total_minutes_at_moderate_intensity += moderate_intensity_minutes
+                    else:
+                        moderate_intensity_minutes = 0
                 if moderate_intensity_minutes >= 5.0:
                     session.total_blocks_at_moderate_intensity += 1
 

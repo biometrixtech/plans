@@ -467,7 +467,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
             'cardio_plyometrics': self.cardio_plyometrics,
             'ultra_high_intensity': self.ultra_high_intensity,
             'training_volume': self.training_volume,
-            'target_training_exposures': [t.json_serialise() for t in self.training_exposures]
+            'training_exposures': [t.json_serialise() for t in self.training_exposures]
 
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
@@ -555,7 +555,7 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.ultra_high_intensity = input_dict.get('ultra_high_intensity')
         session.training_volume = input_dict.get('training_volume')
 
-        session.training_exposures = [TrainingExposure.json_deserialise(t) for t in input_dict.get('target_training_exposures', [])]
+        session.training_exposures = [TrainingExposure.json_deserialise(t) for t in input_dict.get('training_exposures', [])]
 
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]

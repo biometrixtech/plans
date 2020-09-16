@@ -7,6 +7,7 @@ from models.training_volume import StandardErrorRange, Assignment, MovementOptio
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.soreness_base import BodyPartSide
+from models.exposure import TrainingExposure
 from serialisable import Serialisable
 
 
@@ -87,8 +88,12 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         self.projected_monotony = StandardErrorRange()
         self.projected_strain_event_level = StandardErrorRange()
 
+        self.projected_training_volume = StandardErrorRange()
+
         self.ranking = 0
         self.score = 0
+
+        self.training_exposures = []
 
     def rank_muscle_load(self):
 
@@ -112,6 +117,8 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             'projected_rpe_load': self.projected_rpe_load.json_serialise(),
             'projected_power_load': self.projected_power_load.json_serialise(),
             'projected_session_rpe': self.projected_session_rpe.json_serialise(),
+            'training_exposures': [t.json_serialise() for t in self.training_exposures],
+            'projected_training_volume': self.projected_training_volume,
             'muscle_detailed_load': [
                 {
                     "body_part": key.json_serialise(),
@@ -141,6 +148,10 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
             input_dict['projected_power_load']) if input_dict.get('projected_power_load') is not None else None
         workout_load.projected_session_rpe = StandardErrorRange.json_deserialise(
             input_dict['projected_session_rpe']) if input_dict.get('projected_session_rpe') is not None else None
+        workout_load.training_exposures = [TrainingExposure.json_deserialise(t) for t in
+                                      input_dict.get('training_exposures', [])]
+
+        workout_load.projected_training_volume = input_dict.get('projected_training_volume', 0)
 
         for item in input_dict.get('muscle_detailed_load', []):
             workout_load.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])

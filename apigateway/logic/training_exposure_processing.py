@@ -128,7 +128,12 @@ class TrainingExposureProcessor(object):
 
     def copy_duration_exercise_details_to_exposure(self, exercise, exposure):
 
-        exposure.volume = StandardErrorRange(observed_value=exercise.duration)
+        if isinstance(exercise.duration, Assignment):
+            exposure.volume = StandardErrorRange(lower_bound=exercise.duration.min_value,
+                                                 observed_value=exercise.duration.assigned_value,
+                                                 upper_bound=exercise.duration.max_value)
+        else:
+            exposure.volume = StandardErrorRange(observed_value=exercise.duration)
         exercise.volume_measure = UnitOfMeasure.seconds
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
@@ -137,7 +142,13 @@ class TrainingExposureProcessor(object):
 
     def copy_reps_exercise_details_to_exposure(self, exercise, exposure):
 
-        exposure.volume = StandardErrorRange(observed_value=exercise.reps_per_set * exercise.sets)
+        if isinstance(exercise.reps_per_set, Assignment):
+            reps_range = StandardErrorRange(lower_bound=exercise.reps_per_set.min_value,
+                                                 observed_value=exercise.reps_per_set.assigned_value,
+                                                 upper_bound=exercise.reps_per_set.max_value)
+            exposure.volume = reps_range.multiply(exercise.sets)
+        else:
+            exposure.volume = StandardErrorRange(observed_value=exercise.reps_per_set * exercise.sets)
         exercise.volume_measure = UnitOfMeasure.count
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
