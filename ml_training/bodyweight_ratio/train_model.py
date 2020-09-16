@@ -17,9 +17,11 @@ def prepare_data():
     features = [
         'bodyweight',
         'equipment_barbell', 'equipment_bodyweight', 'equipment_cable', 'equipment_dumbbells', 'equipment_machine',
-        'gender']
+        'gender',
+        'fitness_level_0', 'fitness_level_1', 'fitness_level_2', 'fitness_level_3', 'fitness_level_4'
+    ]
     all_prime_movers = [
-        21, 26, 34, 40, 41, 42, 43, 44, 45, 46,
+        21, 26, 33, 34, 40, 41, 42, 43, 44, 45, 46,
         47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
         57, 58, 60, 61, 63, 64, 65, 66, 69, 70,
         71, 72, 74, 75, 76, 78, 79, 81, 82, 83,

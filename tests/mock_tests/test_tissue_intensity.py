@@ -99,16 +99,16 @@ def test_rowing():
         assert None is muscle_load.total_load().observed_value or muscle_load.total_load().observed_value > 0
 
 
-def test_rowing_stroke_rate_25():
-    exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="rowing")  # rowing
-    exercise.stroke_rate = 25
-    exercise.pace = .24
-    #create_and_process_workout([exercise])
-    session = get_session(rpe=5, duration=5, exercises=[exercise])
-    for compound_action in exercise.compound_actions:
-        for action in compound_action.actions:
-            for sub_action in action.sub_actions:
-                assert sub_action.force.observed_value == round(2.8 / (120 / 500) ** 2, 2)
+# def test_rowing_stroke_rate_25():
+#     exercise = get_exercise(duration=3000, sets=1, unit=UnitOfMeasure.seconds, movement_id="rowing")  # rowing
+#     exercise.stroke_rate = 25
+#     exercise.pace = .24
+#     #create_and_process_workout([exercise])
+#     session = get_session(rpe=5, duration=5, exercises=[exercise])
+#     for compound_action in exercise.compound_actions:
+#         for action in compound_action.actions:
+#             for sub_action in action.sub_actions:
+#                 assert sub_action.force.observed_value == round(2.8 / (120 / 500) ** 2 * , 2)
 
 
 def test_running():
@@ -163,7 +163,7 @@ def test_cycling():
                 #assert action.duration == 1000
                 assert sub_action.training_volume_left == action.training_volume_right == 1000
 
-def test_power_lifting():
-    power_same_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1.5, time_eccentric=1.5)
-    power_different_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1, time_eccentric=2)
-    assert power_same_duration.observed_value < power_different_duration.observed_value
+# def test_power_lifting():
+#     power_same_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1.5, time_eccentric=1.5)
+#     power_different_duration = Calculators.power_resistance_exercise(weight_used=6, user_weight=66, distance_moved=.71, time_concentric=1, time_eccentric=2)
+#     assert power_same_duration.observed_value < power_different_duration.observed_value

@@ -1,5 +1,6 @@
 import os, json, pytest
 import datetime
+import pytz
 from logic.workout_processing import WorkoutProcessor
 from logic.injury_risk_processing import InjuryRiskProcessor
 from logic.exercise_assignment import ExerciseAssignment
@@ -293,7 +294,7 @@ def test_api_movement_prep_compare_exercise_counts():
     mock_datastore_collection = DatastoreCollection()
     workout_datastore = WorkoutDatastore()
 
-    workout = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout = get_workout(datetime.datetime.now(tz=pytz.utc), file_name='may1_alt')
     workout_datastore.side_load_planned_workout(workout)
     mock_datastore_collection.workout_datastore = workout_datastore
     mock_datastore_collection.exercise_datastore = exercise_library_datastore
@@ -301,9 +302,9 @@ def test_api_movement_prep_compare_exercise_counts():
     user_stats = UserStats("tester")
     user_stats.fitness_provider_cardio_profile = "power_walker"
     user_stats.athlete_weight = 70
-    user_stats.event_date = datetime.datetime.now()
+    user_stats.event_date = datetime.datetime.now(tz=pytz.utc)
 
-    api_processing = APIProcessing("tester", datetime.datetime.now(), user_stats=user_stats,
+    api_processing = APIProcessing("tester", datetime.datetime.now(tz=pytz.utc), user_stats=user_stats,
                                    datastore_collection=mock_datastore_collection)
     api_processing.create_planned_workout_from_id("1")
 
@@ -311,7 +312,7 @@ def test_api_movement_prep_compare_exercise_counts():
 
     mock_datastore_collection_2 = DatastoreCollection()
     workout_datastore_2 = WorkoutDatastore()
-    workout_2 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_2 = get_workout(datetime.datetime.now(tz=pytz.utc), file_name='may1_alt')
     workout_datastore_2.side_load_planned_workout(workout_2)
     mock_datastore_collection_2.workout_datastore = workout_datastore_2
     mock_datastore_collection_2.exercise_datastore = exercise_library_datastore
@@ -319,9 +320,9 @@ def test_api_movement_prep_compare_exercise_counts():
     user_stats_2 = UserStats("tester")
     user_stats_2.fitness_provider_cardio_profile = "jogger"
     user_stats_2.athlete_weight = 70
-    user_stats_2.event_date = datetime.datetime.now()
+    user_stats_2.event_date = datetime.datetime.now(tz=pytz.utc)
 
-    api_processing_2 = APIProcessing("tester", datetime.datetime.now(), user_stats=user_stats_2,
+    api_processing_2 = APIProcessing("tester", datetime.datetime.now(tz=pytz.utc), user_stats=user_stats_2,
                                      datastore_collection=mock_datastore_collection_2)
     api_processing_2.create_planned_workout_from_id("1")
 
@@ -329,7 +330,7 @@ def test_api_movement_prep_compare_exercise_counts():
 
     mock_datastore_collection_3 = DatastoreCollection()
     workout_datastore_3 = WorkoutDatastore()
-    workout_3 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_3 = get_workout(datetime.datetime.now(tz=pytz.utc), file_name='may1_alt')
     workout_datastore_3.side_load_planned_workout(workout_3)
     mock_datastore_collection_3.workout_datastore = workout_datastore_3
     mock_datastore_collection_3.exercise_datastore = exercise_library_datastore
@@ -337,9 +338,9 @@ def test_api_movement_prep_compare_exercise_counts():
     user_stats_3 = UserStats("tester")
     user_stats_3.fitness_provider_cardio_profile = "runner"
     user_stats_3.athlete_weight = 70
-    user_stats_3.event_date = datetime.datetime.now()
+    user_stats_3.event_date = datetime.datetime.now(tz=pytz.utc)
 
-    api_processing_3 = APIProcessing("tester", datetime.datetime.now(), user_stats=user_stats_3,
+    api_processing_3 = APIProcessing("tester", datetime.datetime.now(tz=pytz.utc), user_stats=user_stats_3,
                                      datastore_collection=mock_datastore_collection_3)
     api_processing_3.create_planned_workout_from_id("1")
 
@@ -401,7 +402,7 @@ def test_api_movement_prep_compare_volume_may1_alt():
     mock_datastore_collection = DatastoreCollection()
     workout_datastore = WorkoutDatastore()
 
-    workout = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout = get_workout(datetime.datetime.now(tz=pytz.utc), file_name='may1_alt')
     workout_datastore.side_load_planned_workout(workout)
     mock_datastore_collection.workout_datastore = workout_datastore
     mock_datastore_collection.exercise_datastore = exercise_library_datastore
@@ -409,9 +410,9 @@ def test_api_movement_prep_compare_volume_may1_alt():
     user_stats = UserStats("tester")
     user_stats.fitness_provider_cardio_profile = "power_walker"
     user_stats.athlete_weight = 70
-    user_stats.event_date = datetime.datetime.now()
+    user_stats.event_date = datetime.datetime.now(tz=pytz.utc)
 
-    api_processing = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats,
+    api_processing = APIProcessing("tester", datetime.datetime.now(tz=pytz.utc),user_stats=user_stats,
                                    datastore_collection=mock_datastore_collection)
     api_processing.create_planned_workout_from_id("1")
 
@@ -429,7 +430,7 @@ def test_api_movement_prep_compare_volume_may1_alt():
 
     mock_datastore_collection_2 = DatastoreCollection()
     workout_datastore_2 = WorkoutDatastore()
-    workout_2 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_2 = get_workout(datetime.datetime.now(tz=pytz.utc), file_name='may1_alt')
     workout_datastore_2.side_load_planned_workout(workout_2)
     mock_datastore_collection_2.workout_datastore = workout_datastore_2
     mock_datastore_collection_2.exercise_datastore = exercise_library_datastore
@@ -437,9 +438,9 @@ def test_api_movement_prep_compare_volume_may1_alt():
     user_stats_2 = UserStats("tester")
     user_stats_2.fitness_provider_cardio_profile = "jogger"
     user_stats_2.athlete_weight = 70
-    user_stats_2.event_date = datetime.datetime.now()
+    user_stats_2.event_date = datetime.datetime.now(tz=pytz.utc)
 
-    api_processing_2 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_2,
+    api_processing_2 = APIProcessing("tester", datetime.datetime.now(tz=pytz.utc),user_stats=user_stats_2,
                                    datastore_collection=mock_datastore_collection_2)
     api_processing_2.create_planned_workout_from_id("1")
 
@@ -457,7 +458,7 @@ def test_api_movement_prep_compare_volume_may1_alt():
 
     mock_datastore_collection_3 = DatastoreCollection()
     workout_datastore_3 = WorkoutDatastore()
-    workout_3 = get_workout(datetime.datetime.now(), file_name='may1_alt')
+    workout_3 = get_workout(datetime.datetime.now(tz=pytz.utc), file_name='may1_alt')
     workout_datastore_3.side_load_planned_workout(workout_3)
     mock_datastore_collection_3.workout_datastore = workout_datastore_3
     mock_datastore_collection_3.exercise_datastore = exercise_library_datastore
@@ -465,9 +466,9 @@ def test_api_movement_prep_compare_volume_may1_alt():
     user_stats_3 = UserStats("tester")
     user_stats_3.fitness_provider_cardio_profile = "runner"
     user_stats_3.athlete_weight = 70
-    user_stats_3.event_date = datetime.datetime.now()
+    user_stats_3.event_date = datetime.datetime.now(tz=pytz.utc)
 
-    api_processing_3 = APIProcessing("tester", datetime.datetime.now(),user_stats=user_stats_3,
+    api_processing_3 = APIProcessing("tester", datetime.datetime.now(tz=pytz.utc),user_stats=user_stats_3,
                                    datastore_collection=mock_datastore_collection_3)
     api_processing_3.create_planned_workout_from_id("1")
 

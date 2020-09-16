@@ -1,16 +1,32 @@
 import os
 from logic.rpe_predictor import RPEPredictor
-from logic.workout_processing import WorkoutProcessor
+from logic.workout_processing import WorkoutProcessor, movement_library, action_library
 from models.workout_program import WorkoutExercise
 from models.movement_tags import AdaptationType, Equipment
 from models.exercise import WeightMeasure
 from models.training_volume import Assignment
+from models.movement_actions import Movement, CompoundAction
+# action_library = ActionLibraryDatastore().get()
+#
+#
+# from datastores.movement_library_datastore import MovementLibraryDatastore
+# movement_library = MovementLibraryDatastore().get()
 
-
-def get_exercise(movement_id='57e2fd3a4c6a031dc777e936'):
+def get_exercise(movement_id='barbell rows'):
     exercise = WorkoutExercise()
     exercise.sets = 1
     exercise.movement_id = movement_id
+    if exercise.movement_id in movement_library:
+        movement_json = movement_library[exercise.movement_id]
+        movement = Movement.json_deserialise(movement_json)
+        exercise.initialize_from_movement(movement)
+
+        for compound_action_id in movement.compound_actions:
+            action_json = action_library.get(compound_action_id)
+            if action_json is not None:
+                compound_action = CompoundAction.json_deserialise(action_json)
+                exercise.compound_actions.append(compound_action)
+
 
     return exercise
 
@@ -27,14 +43,14 @@ def test_bodyweight_ratio_rpe():
     exercise = get_exercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_strength
     exercise.reps_per_set = 10
-    exercise.weight = 10
+    exercise.weight = 25
     exercise.weight_measure = WeightMeasure.actual_weight
     rpe1 = WorkoutProcessor().get_rpe_from_weight(exercise)
 
     exercise2 = get_exercise()
     exercise2.adaptation_type = AdaptationType.strength_endurance_strength
     exercise2.reps_per_set = 10
-    exercise2.weight = 20
+    exercise2.weight = 35
     exercise2.weight_measure = WeightMeasure.actual_weight
     rpe2 = WorkoutProcessor().get_rpe_from_weight(exercise2)
 

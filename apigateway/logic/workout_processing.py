@@ -8,11 +8,12 @@ from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from logic.training_exposure_processing import TrainingExposureProcessor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
-from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition
-from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement, CompoundAction
+from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition, WeightDistribution
+from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement, CompoundAction, MovementResistance, MovementSpeed, Explosiveness
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 from models.training_volume import StandardErrorRange, Assignment
+from models.soreness_base import BodyPartSystems
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -194,11 +195,11 @@ class WorkoutProcessor(object):
                 action_json = action_library.get(compound_action_id)
                 if action_json is not None:
                     compound_action = CompoundAction.json_deserialise(action_json)
-                    if exercise.bilateral_distribution_of_resistance is not None:
-                        for action in compound_action.actions:
-                            action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
-                            for sub_action in action.sub_actions:
-                                sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+            #         if exercise.bilateral_distribution_of_resistance is not None:
+            #             for action in compound_action.actions:
+            #                 action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+            #                 for sub_action in action.sub_actions:
+            #                     sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
                     exercise.compound_actions.append(compound_action)
                     # exercise.primary_actions.append(action)
 
@@ -241,6 +242,9 @@ class WorkoutProcessor(object):
                             action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
                             for sub_action in action.sub_actions:
                                 sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
+                    if exercise.displacement is not None:  # because displacement is defined in exercise level, inherit it to actions
+                        for action in compound_action.actions:
+                            action.displacement = exercise.displacement
                     exercise.compound_actions.append(compound_action)
                     # exercise.primary_actions.append(compound_action)
 
@@ -262,9 +266,12 @@ class WorkoutProcessor(object):
             # self.add_action_details_from_exercise(exercise, exercise.secondary_actions)
 
     def update_exercise_details(self, exercise):
-
         # exercise.set_intensity()
-        exercise.set_adaptation_type()
+        if exercise.training_type == TrainingType.strength_integrated_resistance:
+            percent_rep_max = self.get_percent_rep_max(exercise)
+        else:
+            percent_rep_max = 0
+        exercise.set_adaptation_type(percent_rep_max)
         exercise.set_rep_tempo()
         exercise.set_reps_duration()
 
@@ -330,7 +337,12 @@ class WorkoutProcessor(object):
     def update_planned_exercise_details(self, exercise, assignment_type):
 
         #exercise.set_intensity()
-        exercise.set_adaptation_type()
+        # exercise.set_intensity()
+        if exercise.training_type == TrainingType.strength_integrated_resistance:
+            percent_rep_max = self.get_percent_rep_max(exercise)
+        else:
+            percent_rep_max = 0
+        exercise.set_adaptation_type(percent_rep_max)
         #exercise.set_rep_tempo()
         exercise.update_primary_from_alternates(assignment_type)
         exercise.set_reps_duration()
@@ -442,30 +454,9 @@ class WorkoutProcessor(object):
         #     action.set_body_weight_distribution()
         #     action.set_training_load(total_volume)
 
-    @staticmethod
-    def get_force_level(speed, resistance):
-        explosiveness_dict = {
-            'none': {'none': 'no_force', 'slow': 'no_force', 'mod': 'no_force', 'fast': 'high_force', 'explosive': 'high_force'},
-            'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
-            'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
-            'high': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
-            'max': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
-        }
-        force_level_dict = {
-            "no_force": .5,
-            "low_force": .6,
-            "mod_force": .75,
-            "high_force": .9,
-            "max_force": 1
-        }
-        # if speed is not None and speed != "" and resistance is not None and resistance != "":
-        resistance_dict = explosiveness_dict.get(resistance.name)
-        if resistance_dict is not None:
-            explosiveness = resistance_dict.get(speed.name)
-            return force_level_dict[explosiveness]
 
     def initialize_action_from_exercise(self, action, exercise):
-        compound_action_force_ratio = self.get_force_level(action.speed, action.resistance)
+        # compound_action_force_ratio = self.get_force_level(action.speed, action.resistance)
 
         action.external_weight = [ExternalWeight(equipment, exercise.weight) for equipment in exercise.equipments]
 
@@ -500,13 +491,18 @@ class WorkoutProcessor(object):
         for action in compound_action.actions:
             # determine percentage of power to be distributed to each compound action
             if len(compound_action.actions) == 1:
-                compound_action_force_ratio = 1.0
+                action_force_ratio = 1.0
             else:
-                compound_action_force_ratio = self.get_force_level(compound_action.speed, compound_action.resistance)
+                explosiveness = Calculators.get_force_level(action.speed, action.resistance, action.displacement)
+                if explosiveness is not None:
+                    explosiveness = Explosiveness[explosiveness]
+                    action_force_ratio = Calculators.get_percent_intensity_from_force_level(explosiveness)
+                else:
+                    action_force_ratio = 1.0
             action_power = compound_action_power.plagiarize()
             action_force = compound_action_force.plagiarize()
-            action_power.multiply(compound_action_force_ratio)
-            action_force.multiply(compound_action_force_ratio)
+            action_power.multiply(action_force_ratio)
+            action_force.multiply(action_force_ratio)
             action.power = action_power
             action.force = action_force
             
@@ -527,71 +523,81 @@ class WorkoutProcessor(object):
                 sub_action.force = action_force
 
     def set_force_power_weighted(self, exercise):
-        if exercise.weight_measure == WeightMeasure.actual_weight:
-            weight = exercise.weight
-        elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
-            weight = Assignment().multiply_assignment_by_scalar(exercise.weight, self.user_weight)
+        # if exercise.weight_measure == WeightMeasure.actual_weight:
+        #     weight = exercise.weight
+        # elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
+        #     weight = Assignment().multiply_assignment_by_scalar(exercise.weight, self.user_weight)
         # elif exercise.weight_measure == WeightMeasure.percent_rep_max:
-        #     weight = Assignment(assigned_value=20)
-        # elif exercise.weight_measure == WeightMeasure.rep_max:
+        #     weight = self.get_external_weight(exercise.weight)
+        #     # weight = Assignment(assigned_value=20)
+        # # elif exercise.weight_measure == WeightMeasure.rep_max:
+        # #     weight = None
+        # else:
+        #     # if weight in rep_max or not provided, use lookup table
         #     weight = None
-        else:
-            # if weight in rep_max, percent_rep_max or not provided, use lookup table
-            weight = None
 
-        if weight is not None:
-            exercise.force = Calculators.force_resistance_exercise(weight)
+        external_weight = self.get_external_weight(exercise)
 
-            percent_bodyweight = 0
+        # if weight is not None:
+        exercise.force = Calculators.force_resistance_exercise(external_weight)
+        #
+        # percent_bodyweight = 0
 
-            bodyweight_count = 0
-            # for action in exercise.primary_actions:
-            for compound_action in exercise.compound_actions:
-                for action in compound_action.actions:
-                    for sub_action in action.sub_actions:
-                        if isinstance(sub_action.percent_bodyweight, int):
-                            percent_bodyweight += float(sub_action.percent_bodyweight)
-                            bodyweight_count += 1
+        # bodyweight_count = 0
+        # # for action in exercise.primary_actions:
+        # for compound_action in exercise.compound_actions:
+        #     for action in compound_action.actions:
+        #         for sub_action in action.sub_actions:
+        #             if isinstance(sub_action.percent_bodyweight, int):
+        #                 percent_bodyweight += float(sub_action.percent_bodyweight)
+        #                 bodyweight_count += 1
+        #
+        # if bodyweight_count > 0:
+        #     percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
 
-            if bodyweight_count > 0:
-                percent_bodyweight = (percent_bodyweight / float(bodyweight_count)) / 100
+        # TODO: still need to differentiate distance traveled by exercise
+        # if len(exercise.actions_for_power) > 0:
+        #     for action_for_power_calc in exercise.actions_for_power:
+        # if exercise.movement_rep_tempo is not None and len(exercise.movement_rep_tempo) > 0:
+        #     total_rep_duration = sum(exercise.movement_rep_tempo)
+        #     if exercise.rest_between_reps is not None:
+        #         total_rep_duration += exercise.rest_between_reps
+        # else:
+        #     total_rep_duration = None
 
-            # TODO: still need to differentiate distance traveled by exercise
-            observed_power = Calculators.power_resistance_exercise(
-                weight_used=weight,
-                user_weight=self.user_weight*percent_bodyweight,
-                time_eccentric=exercise.duration_per_rep.observed_value / 2,
-                time_concentric=exercise.duration_per_rep.observed_value / 2
-                )
-            # exercise.power = StandardErrorRange(observed_value=observed_power)
-            powers = [observed_power]
-            if exercise.reps_per_set is None:
-                # TODO: still need to differentiate distance traveled by exercise
-                power_1 = Calculators.power_resistance_exercise(
-                    weight_used=weight,
-                    user_weight=self.user_weight*percent_bodyweight,
-                    time_eccentric=exercise.duration_per_rep.lower_bound / 2,
-                    time_concentric=exercise.duration_per_rep.lower_bound / 2
-                    )
-                power_2 = Calculators.power_resistance_exercise(
-                    weight_used=weight,
-                    user_weight=self.user_weight*percent_bodyweight,
-                    time_eccentric=exercise.duration_per_rep.upper_bound / 2,
-                    time_concentric=exercise.duration_per_rep.upper_bound / 2
-                    )
-                powers.extend([power_1, power_2])
 
-            # exercise.power.lower_bound = min([power_1, power_2])
-            # exercise.power.upper_bound = max([power_1, power_2])
-            # powers = [observed_power, power_1, power_2]
-            exercise.power = StandardErrorRange().get_average_from_error_range_list(powers)
-            exercise.power.lower_bound = StandardErrorRange().get_min_from_error_range_list(powers)
-            exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
-        else:
-            # get power based on speed/resistance/displacement
-            power = Calculators.get_power_by_speed_resistance_displacement(exercise.movement_speed, exercise.resistance, exercise.displacement, self.user_weight)
-            exercise.power = StandardErrorRange(observed_value=power)
-            exercise.force = StandardErrorRange(observed_value=0)
+        power = Calculators.power_resistance_exercise(
+                external_weight=external_weight,
+                actions=exercise.actions_for_power,
+                duration_per_rep=exercise.duration_per_rep.observed_value,
+                user_weight=self.user_weight
+            )
+
+        exercise.power = power
+        # exercise.power = StandardErrorRange(observed_value=observed_power)
+        # powers = [observed_power]
+        # if exercise.reps_per_set is None:
+        #     # TODO: still need to differentiate distance traveled by exercise
+        #     power_1 = Calculators.power_resistance_exercise(
+        #         weight_used=external_weight,
+        #         user_weight=self.user_weight*percent_bodyweight,
+        #         time_eccentric=exercise.duration_per_rep.lower_bound / 2,
+        #         time_concentric=exercise.duration_per_rep.lower_bound / 2
+        #         )
+        #     power_2 = Calculators.power_resistance_exercise(
+        #         weight_used=external_weight,
+        #         user_weight=self.user_weight*percent_bodyweight,
+        #         time_eccentric=exercise.duration_per_rep.upper_bound / 2,
+        #         time_concentric=exercise.duration_per_rep.upper_bound / 2
+        #         )
+        #     powers.extend([power_1, power_2])
+
+        # exercise.power.lower_bound = min([power_1, power_2])
+        # exercise.power.upper_bound = max([power_1, power_2])
+        # powers = [observed_power, power_1, power_2]
+        # exercise.power = StandardErrorRange().get_average_from_error_range_list(powers)
+        # exercise.power.lower_bound = StandardErrorRange().get_min_from_error_range_list(powers)
+        # exercise.power.upper_bound = StandardErrorRange().get_max_from_error_range_list(powers)
 
         return exercise
 
@@ -901,6 +907,63 @@ class WorkoutProcessor(object):
 
         return exercise
 
+    def get_external_weight(self, exercise):
+        if exercise.weight_measure == WeightMeasure.actual_weight:
+            if isinstance(exercise.weight, Assignment):
+                weight = exercise.weight.plagiarize()
+            else:
+                weight = Assignment(assigned_value=exercise.weight)
+        elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
+            if isinstance(exercise.weight, Assignment):
+                weight = Assignment().multiply_assignment_by_scalar(Assignment().divide_assignment_by_scalar(exercise.weight, 100), self.user_weight)
+            else:
+                weight = Assignment(assigned_value=exercise.weight / 100 * self.user_weight)
+        elif exercise.weight_measure == WeightMeasure.percent_rep_max:
+            one_RM_BW_ratio = self.get_one_rep_max_bodyweight_ratio(exercise)
+            one_RM_actual = one_RM_BW_ratio * self.user_weight
+            if isinstance(exercise.weight, Assignment):
+                weight = Assignment().multiply_assignment_by_scalar(Assignment().divide_assignment_by_scalar(exercise.weight, 100), one_RM_actual)
+            else:
+                weight = Assignment(assigned_value=exercise.weight / 100 * one_RM_actual)
+        # elif exercise.weight_measure == WeightMeasure.rep_max:
+        #     weight = None
+        else:
+            # if weight in rep_max or not provided, use lookup table
+            weight = Assignment(assigned_value=0)
+        # double the weight if equipments like dumbbells used where weight is reported for each dumbbell.
+        if len(exercise.equipments) > 0:
+            equip = exercise.equipments[0]
+            if not equip.distribute_weights():
+                if (exercise.bilateral_distribution_of_resistance is not None and
+                    exercise.bilateral_distribution_of_resistance not in [WeightDistribution.unilateral, WeightDistribution.unilateral_alternating]):
+                        weight = Assignment().multiply_assignment_by_scalar(weight, 2)
+
+        return weight
+
+    def get_percent_rep_max(self, exercise):
+        percent_rep_max = 0
+        if exercise.weight is not None:
+            if exercise.weight_measure == WeightMeasure.actual_weight:
+                one_RM_BW_ratio = self.get_one_rep_max_bodyweight_ratio(exercise)
+                if isinstance(exercise.weight, Assignment):
+                    weight = exercise.weight.lowest_value() / self.user_weight
+                else:
+                    weight = exercise.weight / self.user_weight
+                percent_rep_max = weight / one_RM_BW_ratio * 100
+            elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
+                one_RM_BW_ratio = self.get_one_rep_max_bodyweight_ratio(exercise)
+                if isinstance(exercise.weight, Assignment):
+                    weight = exercise.weight.lowest_value()
+                else:
+                    weight = exercise.weight
+                percent_rep_max = weight / one_RM_BW_ratio * 100
+            elif exercise.weight_measure == WeightMeasure.percent_rep_max:
+                if isinstance(exercise.weight, Assignment):
+                    percent_rep_max = exercise.weight.lowest_value()
+                else:
+                    percent_rep_max = exercise.weight
+        return percent_rep_max
+
     @staticmethod
     def get_rpe_from_rep_max(rep_max, reps):
 
@@ -985,8 +1048,22 @@ class WorkoutProcessor(object):
             elif prioritized_joint_action.priority == 4:
                 prime_movers['fourth_prime_movers'].update(functional_movement.prime_movers)
 
-    def get_one_rep_max_bodyweight_ratio(self, exercise):
-        # get prime movers from action
+    @staticmethod
+    def get_prime_movers_from_movement_systems(movement_systems, prime_movers):
+        for movement_system in movement_systems:
+            body_parts = BodyPartSystems().get_movemement_system(movement_system.movement_system_name)
+            if body_parts is not None:
+                body_parts = [bp.value for bp in body_parts]
+                if movement_system.priority == 1:
+                    prime_movers['first_prime_movers'].update(body_parts)
+                elif movement_system.priority == 2:
+                    prime_movers['second_prime_movers'].update(body_parts)
+                elif movement_system.priority == 3:
+                    prime_movers['third_prime_movers'].update(body_parts)
+                elif movement_system.priority == 4:
+                    prime_movers['fourth_prime_movers'].update(body_parts)
+
+    def get_prime_movers_for_ex(self, exercise):
         prime_movers = {
             "first_prime_movers": set(),
             "second_prime_movers": set(),
@@ -1005,6 +1082,30 @@ class WorkoutProcessor(object):
                         self.get_prime_movers_from_joint_actions(sub_action.shoulder_scapula_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.elbow_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.wrist_joint_action, prime_movers)
+                        # self.get_prime_movers_from_movement_systems(sub_action.movement_systems, prime_movers)
+        return prime_movers
+
+    def get_one_rep_max_bodyweight_ratio(self, exercise):
+        # get prime movers from action
+        prime_movers = self.get_prime_movers_for_ex(exercise)
+        # prime_movers = {
+        #     "first_prime_movers": set(),
+        #     "second_prime_movers": set(),
+        #     "third_prime_movers": set(),
+        #     "fourth_prime_movers": set()
+        #     }
+        # for compound_action in exercise.compound_actions:
+        #     for action in compound_action.actions:
+        #         for sub_action in action.sub_actions:
+        #             if sub_action.primary_muscle_action is not None and sub_action.primary_muscle_action.name in ['concentric', 'isometric']:
+        #                 self.get_prime_movers_from_joint_actions(sub_action.hip_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.knee_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.ankle_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.pelvic_tilt_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.trunk_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.shoulder_scapula_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.elbow_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.wrist_joint_action, prime_movers)
 
         if len(exercise.equipments) > 0:
             equipment = exercise.equipments[0]
@@ -1031,23 +1132,21 @@ class WorkoutProcessor(object):
         if workout_exercise.reps_per_set is not None:
             reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
         elif workout_exercise.duration is not None:
+            possible_reps = []
             if isinstance(workout_exercise.duration, Assignment):
-                possible_reps = []
                 durations = [workout_exercise.duration.min_value, workout_exercise.duration.max_value, workout_exercise.duration.assigned_value]
                 durations = [dur for dur in durations if dur is not None]
-                duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
-                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
-                for dur in durations:
-                    for dur_per_rep in duration_per_reps:
-                        possible_reps.append(dur / dur_per_rep)
-                if len(possible_reps) > 0:
-                    reps.lower_bound = min(possible_reps)
-                    reps.upper_bound = max(possible_reps)
-                    reps.observed_value = sum(possible_reps) / len(possible_reps)
             else:
-                reps.lower_bound = workout_exercise.duration / workout_exercise.duration_per_rep.upper_bound
-                reps.upper_bound = workout_exercise.duration / workout_exercise.duration_per_rep.lower_bound
-                reps.observed_value = workout_exercise.duration / workout_exercise.duration_per_rep.observed_value
+                durations = [workout_exercise.duration]
+            duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
+            duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
+            for dur in durations:
+                for dur_per_rep in duration_per_reps:
+                    possible_reps.append(dur / dur_per_rep)
+            if len(possible_reps) > 0:
+                reps.lower_bound = min(possible_reps)
+                reps.upper_bound = max(possible_reps)
+                reps.observed_value = sum(possible_reps) / len(possible_reps)
 
         all_rep_max_reps = self.get_all_rep_max_reps(workout_exercise, equipment)
         all_rpes = []

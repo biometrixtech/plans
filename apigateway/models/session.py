@@ -203,6 +203,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     #     else:
     #         return False
 
+    def get_event_datetime(self):
+        return self.event_date
+
     def add_tissue_load(self, tissue_load):
         if self.tissue_load is None:
             self.tissue_load = StandardErrorRange(observed_value=0)

@@ -304,21 +304,21 @@ def test_get_power_from_rpe_diff_weight():
 #         assert power1 < power2 < power3 < power4
 
 
-def test_power_resistance_exercise():
-    for weight in range(10, 100):
-        print(weight, Calculators.power_resistance_exercise(weight, .05 * 70).observed_value)
-    speed = 6 * 1610 / 3600
-    print(Calculators.power_running(speed, user_weight=70))
-    # power = Calculators.power_resistance_exercise(100, 70).observed_value
-    # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
+# def test_power_resistance_exercise():
+#     for weight in range(10, 100):
+#         print(weight, Calculators.power_resistance_exercise(weight, .05 * 70).observed_value)
+#     speed = 6 * 1610 / 3600
+#     print(Calculators.power_running(speed, user_weight=70))
+#     # power = Calculators.power_resistance_exercise(100, 70).observed_value
+#     # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
 
 
-def test_power_cycling_100():
-    speed = 25 * 1610 / 3600
-    print(Calculators.power_cycling(speed, user_weight=70))
-    print(Calculators.power_cardio(CardioAction.cycle, user_weight=70))
-    # power = Calculators.power_resistance_exercise(100, 70).observed_value
-    # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
+# def test_power_cycling_100():
+#     speed = 25 * 1610 / 3600
+#     print(Calculators.power_cycling(speed, user_weight=70))
+#     print(Calculators.power_cardio(CardioAction.cycle, user_weight=70))
+#     # power = Calculators.power_resistance_exercise(100, 70).observed_value
+#     # print(power, Calculators.watts_to_mets(power, weight=70, efficiency=1))
 
 
 def test_vo2_max_from_rpe_5():
@@ -373,3 +373,63 @@ def test_vo2_max_jack_daniels():
     vo2_max_2 = Calculators.vo2max_running_jack_daniels(time=13383, distance=42417.85)  # garmin_data marathon pr
     demographics_vo2_max = Calculators.vo2_max_estimation_demographics(40, user_weight=50, user_height=1.6, gender=Gender.female, activity_level=5)
     print(vo2_max_1, vo2_max_2)
+
+
+def test_power_resistance():
+    actions = [
+        {
+            "muscle_action": [0, 0],
+            "time": 0.2,
+            "percent_bodyweight": [
+                0.20370000000000002,
+                1.0
+            ],
+            "percent_bodyheight": [
+                0.24050000000000002,
+                0.0425
+            ],
+            "description": ""
+        },
+        {
+            "muscle_action": [2, 2],
+            "time": 0.25,
+            "percent_bodyweight": [
+                0.20370000000000002,
+                0.0
+            ],
+            "percent_bodyheight": [
+                0.0,
+                -10.0
+            ],
+            "description": ""
+        },
+        {
+            "muscle_action": [1, 1],
+            "time": 0.2,
+            "percent_bodyweight": [
+                0.20370000000000002,
+                1.0
+            ],
+            "percent_bodyheight": [
+                0.24050000000000002,
+                0.0425
+            ],
+            "description": ""
+        }
+    ]
+    from models.movement_actions import ActionsForPower
+    actions = [ActionsForPower.json_deserialise(ap) for ap in actions]
+
+    power = Calculators.power_resistance_exercise(25, actions, duration_per_rep=None)
+    assert power is not None
+    assert power.observed_value is not None
+
+
+def test_power_resistance_no_actions_defined():
+    actions = [
+    ]
+    from models.movement_actions import ActionsForPower
+    actions = [ActionsForPower.json_deserialise(ap) for ap in actions]
+
+    power = Calculators.power_resistance_exercise(25, actions, duration_per_rep=None)
+    assert power is not None

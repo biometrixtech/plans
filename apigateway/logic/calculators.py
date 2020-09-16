@@ -788,7 +788,7 @@ class Calculators(object):
     @classmethod
     def speed_from_work_vo2_running(cls, work_vo2, grade=0.0):
 
-        min_speed = (work_vo2 - 3.5) / (0.17 + grade * 0.79) # speed in m/min
+        min_speed = (work_vo2 - 3.5) / (0.17 + grade * 0.79)  # speed in m/min
         speed = min_speed / float(60) # speed in m/s
 
         return speed
@@ -845,43 +845,109 @@ class Calculators(object):
         power = 2.8 / (pace ** 3)
         return power
 
-
     @classmethod
-    def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_eccentric=None, time_concentric=None):
+    def power_resistance_exercise(cls, external_weight, actions, duration_per_rep=None, user_weight=60, user_height=1.65):
         """
 
-        :param weight_used: kg, weight of equipment used
-        :param user_weight: kg
-        :param distance_moved: m, expected distance moved in each concentric and eccentric direction, default of .5m is used (about halfway between squat and bench press)
-        :param time_eccentric: s, time taken for eccentric movement, default of 1.5s
-        :param time_concentric: s, time taken for concentric movement, default of 1.5s
+        :param external_weight:
+        :param actions:
+        :param user_weight:
+        power is added for simultaneous action and weighted averaged for consecutive ones
         :return:
         """
-        if isinstance(weight_used, Assignment):
-            total_weight = weight_used.plagiarize()
-            total_weight.add_value(user_weight)
+        if isinstance(external_weight, Assignment):
+            external_weight = external_weight.plagiarize()
         else:
-            total_weight = weight_used + user_weight
-        distance_moved = distance_moved or .5
-        time_concentric = time_concentric or 1.5
-        time_eccentric = time_eccentric or 1.5
-        accel_concentric = cls.get_accel(distance_moved, time_concentric)
-        accel_eccentric = cls.get_accel(distance_moved, time_eccentric)
-        force_concentric = cls.get_force(total_weight, accel_concentric)
-        force_eccentric = cls.get_force(total_weight, -accel_eccentric)
-        velocity_concentric = distance_moved / time_concentric
-        velocity_eccentric = distance_moved / time_eccentric
-        power_concentric = force_concentric.plagiarize()
-        power_eccentric = force_eccentric.plagiarize()
-        power_concentric.multiply(velocity_concentric)
-        power_eccentric.multiply(velocity_eccentric)
-        power_concentric.multiply(time_concentric)
-        power_eccentric.multiply(time_eccentric)
-        average_power = power_concentric.plagiarize()
-        average_power.add(power_eccentric)
-        average_power.divide(time_concentric + time_eccentric)
-        # average_power = round((power_concentric * time_concentric + power_eccentric * time_eccentric) / (time_concentric + time_eccentric), 1)
+            external_weight = Assignment(assigned_value=external_weight)
+        if len(actions) > 0:
+            average_power = StandardErrorRange()
+            total_duration = 0
+            for action in actions:
+                duration = action.time
+                total_duration += duration
+                # if action.muscle_action.name != 'no_load':
+                # duration = action.time
+                action_power = StandardErrorRange()
+                if duration > 0:
+                    for i in range(len(action.percent_bodyweight)):
+                        muscle_action = action.muscle_action[i]
+                        if muscle_action.name != 'no_load':
+                            total_weight = external_weight.plagiarize()
+                            total_weight.add_value(action.percent_bodyweight[i] * user_weight)
+                            perc_bodyheight = action.percent_bodyheight[i]
+                            if perc_bodyheight == 0 and muscle_action.name == 'isometric':
+                                distance = .05  # move 5 cm
+                            elif perc_bodyheight < 0:
+                                distance = 0
+                            else:
+                                distance = perc_bodyheight * user_height
+                            accel = cls.get_accel(distance, duration)
+                            if muscle_action.name == 'eccentric':
+                                accel *= -1
+                            force = cls.get_force(total_weight, accel)
+                            velocity = distance / duration
+                            sub_action_power = force.plagiarize()
+                            sub_action_power.multiply(velocity)
+                            action_power.add(sub_action_power)
+                    action_power.multiply(duration)
+                    average_power.add(action_power)
+            if duration_per_rep is not None:
+                average_power.divide(duration_per_rep)
+            else:
+                average_power.divide(total_duration)
+        else:
+            total_weight = external_weight.plagiarize()
+
+            distance = .5
+            if duration_per_rep is not None:
+                duration = duration_per_rep / 2
+            else:
+                duration = 1.5
+            accel = cls.get_accel(distance, duration)
+            force = cls.get_force(total_weight, accel)
+            velocity = distance / duration
+            average_power = force.plagiarize()
+            average_power.multiply(velocity)
+
         return average_power
+
+
+    # @classmethod
+    # def power_resistance_exercise(cls, weight_used, user_weight, distance_moved=None, time_eccentric=None, time_concentric=None):
+    #     """
+
+    #     :param weight_used: kg, weight of equipment used
+    #     :param user_weight: kg
+    #     :param distance_moved: m, expected distance moved in each concentric and eccentric direction, default of .5m is used (about halfway between squat and bench press)
+    #     :param time_eccentric: s, time taken for eccentric movement, default of 1.5s
+    #     :param time_concentric: s, time taken for concentric movement, default of 1.5s
+    #     :return:
+    #     """
+    #     if isinstance(weight_used, Assignment):
+    #         total_weight = weight_used.plagiarize()
+    #         total_weight.add_value(user_weight)
+    #     else:
+    #         total_weight = weight_used + user_weight
+    #     distance_moved = distance_moved or .5
+    #     time_concentric = time_concentric or 1.5
+    #     time_eccentric = time_eccentric or 1.5
+    #     accel_concentric = cls.get_accel(distance_moved, time_concentric)
+    #     accel_eccentric = cls.get_accel(distance_moved, time_eccentric)
+    #     force_concentric = cls.get_force(total_weight, accel_concentric)
+    #     force_eccentric = cls.get_force(total_weight, -accel_eccentric)
+    #     velocity_concentric = distance_moved / time_concentric
+    #     velocity_eccentric = distance_moved / time_eccentric
+    #     power_concentric = force_concentric.plagiarize()
+    #     power_eccentric = force_eccentric.plagiarize()
+    #     power_concentric.multiply(velocity_concentric)
+    #     power_eccentric.multiply(velocity_eccentric)
+    #     power_concentric.multiply(time_concentric)
+    #     power_eccentric.multiply(time_eccentric)
+    #     average_power = power_concentric.plagiarize()
+    #     average_power.add(power_eccentric)
+    #     average_power.divide(time_concentric + time_eccentric)
+    #     # average_power = round((power_concentric * time_concentric + power_eccentric * time_eccentric) / (time_concentric + time_eccentric), 1)
+    #     return average_power
 
     @classmethod
     def force_resistance_exercise(cls, weight, distance_moved=None, time_down=None, time_up=None):
@@ -1054,6 +1120,7 @@ class Calculators(object):
         """
         ACSM based table
         :param rpe:
+        :param age:
         :return:
         """
         mets_lookup_tables = cls.mets_lookup_tables()
@@ -1125,220 +1192,81 @@ class Calculators(object):
         return all_mets_lookup
 
     @classmethod
-    def get_power_by_speed_resistance_displacement(cls, speed, resistance, displacement, weight):
-        """
+    def get_force_level(cls, speed, resistance, displacement):
+        force_level = None
+        if displacement is None or displacement.name in ['partial_rom', 'full_rom']:
+            force_dict = {
+                'none': {'none': 'no_force', 'slow': 'mod_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'high': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
+                'max': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
+            }
+            resistance_dict = force_dict.get(resistance.name)
+            if resistance_dict is not None:
+                force_level = resistance_dict.get(speed.name)
+        elif resistance is None or resistance.name == 'none':
+            force_dict = {
+                'min': {'mod': 'low_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
+                'mod': {'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'large': {'mod': 'high_force', 'fast': 'high_force', 'explosive': 'max_force'},
+                'max': {'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'}
+            }
+            displacement_dict = force_dict.get(displacement.name)
+            if displacement_dict is not None:
+                force_level = displacement_dict.get(speed.name)
+        elif resistance.name == 'low':
+            force_dict = {
+                'min': {'mod': 'mod_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
+                'mod': {'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'large': {'mod': 'high_force', 'fast': 'high_force', 'explosive': 'max_force'},
+                'max': {'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'}
+            }
+            displacement_dict = force_dict.get(displacement.name)
+            if displacement_dict is not None:
+                force_level = displacement_dict.get(speed.name)
 
-        :param speed:
-        :param resistance:
-        :param displacement:
-        :return:
-        """
-        mets = cls.get_mets_by_speed_resistance_displacement(speed, resistance, displacement)
-        power = cls.mets_to_watts(mets=mets, weight=weight, efficiency=.22)
-        return power
+        return force_level
 
     @classmethod
-    def get_mets_by_speed_resistance_displacement(cls, speed, resistance, displacement):
-        """
-
-        :param speed:
-        :param resistance:
-        :param displacement:
-        :return:
-        """
-        if displacement is None or speed is None or resistance is None:
-            return 5
-        lookup_table = cls.get_mets_lookup_table_displacement(displacement)
-        mets_value_speed = lookup_table.get(resistance.name)
-        if mets_value_speed is None:
-            raise ValueError("Invalid Resistance")
-        mets = mets_value_speed.get(speed.name)
-        if mets is None:
-            raise ValueError("Invalid speed")
-        return mets
+    def get_percent_intensity_from_force_level(cls, force_level):
+        force_level_dict = {
+            "no_force": .5,
+            "low_force": .65,
+            "mod_force": .72,
+            "high_force": .86,
+            "max_force": 1
+        }
+        return force_level_dict[force_level.name]
 
     @classmethod
-    def get_mets_lookup_table_displacement(cls, displacement):
-        """
-
-        :param displacement:
-        :return:
-        """
-        if displacement.name in ['partial_rom', 'full_rom']:
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
-        elif displacement.name == 'min':
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
-        elif displacement.name == 'mod':
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
-        elif displacement.name == 'max':
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
+    def get_rpe_from_force_level(cls, force_level, reps=None, adaptation_type=None):
+        if force_level.name == 'no_force':
+            rpe = StandardErrorRange(lower_bound=2, upper_bound=3)
+        elif force_level.name == 'low_force':
+            rpe = StandardErrorRange(lower_bound=4, upper_bound=5)
+        elif force_level.name == 'mod_force':
+            rpe = StandardErrorRange(lower_bound=5, upper_bound=6)
+        elif force_level.name == 'high_force':
+            rpe = StandardErrorRange(lower_bound=7, upper_bound=8)
+        elif force_level.name == 'max_force':
+            rpe = StandardErrorRange(lower_bound=9, upper_bound=10)
         else:
-            raise ValueError('Invalid displacement')
-        return lookup_table
+            rpe = StandardErrorRange(lower_bound=2, upper_bound=3)
 
-    @classmethod
-    def get_rpe_by_speed_resistance_displacement(cls, speed, resistance, displacement):
-        """
-
-        :param speed:
-        :param resistance:
-        :param displacement:
-        :return:
-        """
-        if speed is None or resistance is None or displacement is None:
-            return 3
-        lookup_table = cls.get_rpe_lookup_table_displacement(displacement)
-        rpe_values_speed = lookup_table.get(resistance.name)
-        if rpe_values_speed is None:
-            raise ValueError("Invalid Resistance")
-        rpe = rpe_values_speed.get(speed.name)
-        if rpe is None:
-            raise ValueError("Invalid speed")
+        # update based on expected reps
+        if reps is not None and adaptation_type is not None:
+            expected_rep_counts_by_adaptation_type = {
+                'strength_endurance_strength': (12, 20),
+                'power_drill': (1, 10),
+                'maximal_strength_hypertrophic': (1, 12),
+                'power_explosive_action': (1, 10)
+            }
+            expected_reps = expected_rep_counts_by_adaptation_type.get(adaptation_type.name, (0, 100))
+            if reps < expected_reps[0]:
+                rpe.subtract_value(1)
+            elif reps > expected_reps[1]:
+                rpe.add_value(1)
+                if rpe.observed_value > 10:
+                    rpe.observed_value = 10
         return rpe
-
-    @classmethod
-    def get_rpe_lookup_table_displacement(cls, displacement):
-        """
-
-        :param displacement:
-        :return:
-        """
-        if displacement.name in ['partial_rom', 'full_rom']:
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
-        elif displacement.name == 'min':
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
-        elif displacement.name == 'mod':
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
-        elif displacement.name == 'max':
-            lookup_table = {
-                'none': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'low': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'mod': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'high': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                },
-                'max': {
-                    'none': 0, 'slow': 1, 'mod': 2, 'fast': 3, 'explosive': 4
-                }
-            }
-        else:
-            raise ValueError('Invalid displacement')
-        return lookup_table

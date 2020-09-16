@@ -200,6 +200,8 @@ class BaseWorkoutExercise(object):
         self.predicted_rpe = None
         self.bilateral_distribution_of_resistance = None
 
+        self.actions_for_power = []
+
     def initialize_from_movement(self, movement):
         # self.body_position = movement.body_position
         self.bilateral_distribution_of_resistance = movement.bilateral_distribution_of_resistance
@@ -218,9 +220,11 @@ class BaseWorkoutExercise(object):
         self.resistance = movement.resistance
         self.displacement = movement.displacement
         self.movement_rep_tempo = movement.rep_tempo
+        self.rest_between_reps = movement.rest_between_reps
+        self.actions_for_power = movement.actions_for_power
         # self.set_adaption_type(movement)
 
-    def set_adaptation_type(self):
+    def set_adaptation_type(self, percent_rep_max=50):
         if self.training_type == TrainingType.flexibility:
             self.adaptation_type = AdaptationType.not_tracked
         if self.training_type == TrainingType.movement_prep:
@@ -238,22 +242,33 @@ class BaseWorkoutExercise(object):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            if self.training_intensity >= 5:  # TODO: validate this number
+            if percent_rep_max >= 75:
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
 
     def set_reps_duration(self):
-        if self.adaptation_type == AdaptationType.strength_endurance_strength:
-            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
-        elif self.adaptation_type == AdaptationType.power_drill:
-            self.duration_per_rep = StandardErrorRange(lower_bound=3.5, upper_bound=7, observed_value=5)
-        elif self.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
-            self.duration_per_rep = StandardErrorRange(lower_bound=3, upper_bound=5, observed_value=4)
-        elif self.adaptation_type == AdaptationType.power_explosive_action:
-            self.duration_per_rep = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+        if self.actions_for_power is not None and len(self.actions_for_power) > 0:
+            total_duration = sum([ac.time for ac in self.actions_for_power])
+            if self.rest_between_reps is not None:
+                total_duration += self.rest_between_reps
+            self.duration_per_rep = StandardErrorRange(observed_value=total_duration)
+        elif self.movement_rep_tempo is not None and len(self.movement_rep_tempo) > 0:
+            total_duration = sum(self.movement_rep_tempo)
+            if self.rest_between_reps is not None:
+                total_duration += self.rest_between_reps
+            self.duration_per_rep = StandardErrorRange(observed_value=total_duration)
         else:
-            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+            if self.adaptation_type == AdaptationType.strength_endurance_strength:
+                self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+            elif self.adaptation_type == AdaptationType.power_drill:
+                self.duration_per_rep = StandardErrorRange(lower_bound=3.5, upper_bound=7, observed_value=5)
+            elif self.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                self.duration_per_rep = StandardErrorRange(lower_bound=3, upper_bound=5, observed_value=4)
+            elif self.adaptation_type == AdaptationType.power_explosive_action:
+                self.duration_per_rep = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+            else:
+                self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
 
 
 class WorkoutExercise(BaseWorkoutExercise, Serialisable):

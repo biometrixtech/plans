@@ -51,3 +51,5 @@ class FunctionalMovementType(Enum):
     anterior_oblique_subsystem = 104
     core_stabilizers = 105
     intrinsic_stabilization_subsystem = 106
+    shoulder_stabilizers = 107
+    scapula_stabilizers = 108

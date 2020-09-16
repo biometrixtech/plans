@@ -85,6 +85,8 @@ class SubActionLibraryParser(object):
                             row['eligible_external_resistance'] = row[
                                 'eligible_external_resistance'].replace(", ", ",")
                             resistances = row.get('eligible_external_resistance').lower().split(",")
+
+                            resistances = ['medicine_balls' if w == 'medicine_ball' else w for w in resistances]
                             try:
                                 compound_action.eligible_external_resistance = [Equipment[ex_res] for ex_res in
                                                                                 resistances]
