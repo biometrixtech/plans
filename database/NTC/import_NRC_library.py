@@ -21,7 +21,7 @@ class WorkoutParser(object):
         self.intensity_measure_units = {
             'pace',
             'rpe',
-            'effort' #not yet used
+            'effort' # not yet used
         }
 
         self.intensity_measures_pace = {

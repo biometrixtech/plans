@@ -1044,8 +1044,7 @@ class WorkoutProcessor(object):
             elif prioritized_joint_action.priority == 4:
                 prime_movers['fourth_prime_movers'].update(functional_movement.prime_movers)
 
-    def get_one_rep_max_bodyweight_ratio(self, exercise):
-        # get prime movers from action
+    def get_prime_movers_for_ex(self, exercise):
         prime_movers = {
             "first_prime_movers": set(),
             "second_prime_movers": set(),
@@ -1064,6 +1063,30 @@ class WorkoutProcessor(object):
                         self.get_prime_movers_from_joint_actions(sub_action.shoulder_scapula_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.elbow_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.wrist_joint_action, prime_movers)
+        return prime_movers
+
+
+    def get_one_rep_max_bodyweight_ratio(self, exercise):
+        # get prime movers from action
+        prime_movers = self.get_prime_movers_for_ex(exercise)
+        # prime_movers = {
+        #     "first_prime_movers": set(),
+        #     "second_prime_movers": set(),
+        #     "third_prime_movers": set(),
+        #     "fourth_prime_movers": set()
+        #     }
+        # for compound_action in exercise.compound_actions:
+        #     for action in compound_action.actions:
+        #         for sub_action in action.sub_actions:
+        #             if sub_action.primary_muscle_action is not None and sub_action.primary_muscle_action.name in ['concentric', 'isometric']:
+        #                 self.get_prime_movers_from_joint_actions(sub_action.hip_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.knee_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.ankle_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.pelvic_tilt_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.trunk_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.shoulder_scapula_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.elbow_joint_action, prime_movers)
+        #                 self.get_prime_movers_from_joint_actions(sub_action.wrist_joint_action, prime_movers)
 
         if len(exercise.equipments) > 0:
             equipment = exercise.equipments[0]

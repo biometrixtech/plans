@@ -378,7 +378,7 @@ def test_vo2_max_jack_daniels():
 def test_power_resistance():
     actions = [
         {
-            "muscle_action": 0,
+            "muscle_action": [0, 0],
             "time": 0.2,
             "percent_bodyweight": [
                 0.20370000000000002,
@@ -391,7 +391,7 @@ def test_power_resistance():
             "description": ""
         },
         {
-            "muscle_action": 2,
+            "muscle_action": [2, 2],
             "time": 0.25,
             "percent_bodyweight": [
                 0.20370000000000002,
@@ -404,7 +404,7 @@ def test_power_resistance():
             "description": ""
         },
         {
-            "muscle_action": 1,
+            "muscle_action": [1, 1],
             "time": 0.2,
             "percent_bodyweight": [
                 0.20370000000000002,

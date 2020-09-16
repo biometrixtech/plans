@@ -875,14 +875,14 @@ class Calculators(object):
                             total_weight = external_weight.plagiarize()
                             total_weight.add_value(action.percent_bodyweight[i] * user_weight)
                             perc_bodyheight = action.percent_bodyheight[i]
-                            if perc_bodyheight == 0 and action.muscle_action.name == 'isometric':
+                            if perc_bodyheight == 0 and muscle_action.name == 'isometric':
                                 distance = .05  # move 5 cm
                             elif perc_bodyheight < 0:
                                 distance = 0
                             else:
                                 distance = perc_bodyheight * user_height
                             accel = cls.get_accel(distance, duration)
-                            if action.muscle_action.name == 'eccentric':
+                            if muscle_action.name == 'eccentric':
                                 accel *= -1
                             force = cls.get_force(total_weight, accel)
                             velocity = distance / duration
