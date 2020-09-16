@@ -5,7 +5,7 @@ from models.training_volume import StandardErrorRange
 
 
 class PeriodizationPlan(object):
-    def __init__(self, start_date, athlete_periodization_goals, training_phase_type, athlete_persona):
+    def __init__(self, start_date, athlete_periodization_goals, training_phase_type, athlete_persona, sub_adaptation_type_personas):
         self.start_date = start_date
         self.periodization_goals = athlete_periodization_goals
         self.training_phase_type = training_phase_type
@@ -14,6 +14,7 @@ class PeriodizationPlan(object):
         self.target_weekly_rpe_load = None
         self.expected_weekly_workouts = None
         self.athlete_capacities = AthleteBaselineCapacities()
+        self.sub_adaptation_type_personas = sub_adaptation_type_personas
 
     def get_week_number(self, event_date):
 

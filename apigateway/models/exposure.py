@@ -1,9 +1,14 @@
-class TrainingExposure(object):
+from serialisable import Serialisable
+from models.training_volume import StandardErrorRange
+from models.movement_tags import DetailedAdaptationType
+
+
+class TrainingExposure(Serialisable):
     def __init__(self, detailed_adaptation_type, volume=None, volume_measure=None, rpe=None, rpe_load=None,
                  weekly_load_percentage=None):
         self.detailed_adaptation_type = detailed_adaptation_type
         self.volume = volume
-        self.volume_measure = volume_measure
+        self.volume_measure = volume_measure  #ignoring this for now
         self.rpe = rpe
         self.rpe_load = rpe_load
         self.weekly_load_percentage = weekly_load_percentage
@@ -20,6 +25,30 @@ class TrainingExposure(object):
                 return True
         else:
             return False
+
+    def json_serialise(self):
+        ret = {
+            'detailed_adaptation_type': self.detailed_adaptation_type.value if self.detailed_adaptation_type is not None else None,
+            'volume': self.volume.json_serialise() if self.volume is not None else None,
+            #'volume': self.volume if self.volume is not None else None,
+            'volume_measure': self.volume_measure.value if self.volume_measure is not None else None,
+            'rpe': self.rpe.json_serialise() if self.rpe is not None else None,
+            'rpe_load': self.rpe_load.json_serialise() if self.rpe_load is not None else None,
+            'weekly_load_percentage': self.weekly_load_percentage.json_serialise() if self.weekly_load_percentage is not None else None
+        }
+
+        return ret
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+
+        training_exposure = TrainingExposure(DetailedAdaptationType(input_dict['detailed_adaptation_type']))
+        training_exposure.volume = StandardErrorRange.json_deserialise(input_dict['volume'])
+        training_exposure.rpe = StandardErrorRange.json_deserialise(input_dict['rpe'])
+        training_exposure.rpe_load = StandardErrorRange.json_deserialise(input_dict['rpe_load'])
+        training_exposure.weekly_load_percentage = StandardErrorRange.json_deserialise(input_dict['weekly_load_percentage'])
+
+        return training_exposure
 
 
 class TargetTrainingExposure(object):

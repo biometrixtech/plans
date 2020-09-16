@@ -60,6 +60,7 @@ class TrainingLoadProcessing(object):
         self.a_internal_load_values = []
         self.c_internal_load_values = []
         self.athlete_capacities = AthleteBaselineCapacities
+        self.total_historical_sessions = 0
         # self.acute_days = acute_days
         # self.chronic_days = chronic_days
         # self.acute_start_date_time = acute_start_date_time
@@ -108,11 +109,14 @@ class TrainingLoadProcessing(object):
 
     @xray_recorder.capture('logic.TrainingLoadProcessing.load_plan_values')
     def load_training_session_values(self, acute_training_sessions, chronic_weeks_training_sessions,
-                                     chronic_training_sessions):
+                                     chronic_training_sessions, pre_acute_chronic_sessions=[]):
 
         all_training_sessions = []
         all_training_sessions.extend(acute_training_sessions)
         all_training_sessions.extend(chronic_training_sessions)
+
+        if len(all_training_sessions)==0:
+            all_training_sessions.extend(pre_acute_chronic_sessions)
 
         self.last_week_sport_training_loads = {}
         self.previous_week_sport_training_loads = {}
@@ -218,6 +222,7 @@ class TrainingLoadProcessing(object):
         proc = AthleteCapacityProcessor()
 
         self.athlete_capacities = proc.get_capacity_from_workout_history(all_training_sessions)
+        self.total_historical_sessions = len(all_training_sessions)
 
         # if len(self.internal_load_tuples) > 0:
         #     internal_load_values = list(x[1] for x in self.internal_load_tuples if x[1] is not None)
@@ -703,38 +708,65 @@ class TrainingLoadProcessing(object):
 
         if len(values) > 0:
             if return_sum:
-                standard_error_range.observed_value = sum(values)
+                if isinstance(values[0], StandardErrorRange):
+                    standard_error_range.observed_value = StandardErrorRange.get_sum_from_error_range_list(
+                        values).highest_value()
+                else:
+                    standard_error_range.observed_value = sum(values)
+
             else:
-                standard_error_range.observed_value = statistics.mean(values)
+                if isinstance(values[0], StandardErrorRange):
+                    standard_error_range.observed_value = StandardErrorRange.get_average_from_error_range_list(
+                        values).highest_value()
+                else:
+                    standard_error_range.observed_value = statistics.mean(values)
 
         if 1 < len(values) < expected_workouts:
-            average_value = statistics.mean(values)
-            stdev = statistics.stdev(values)
+            if isinstance(values[0], StandardErrorRange):
+                average_value = StandardErrorRange.get_average_from_error_range_list(values)
+                average_observed_value = average_value.highest_value()
+                observed_values = [l.highest_value() for l in values]
+            else:
+                average_observed_value = statistics.mean(values)
+                observed_values = [l for l in values]
+
+            stdev = statistics.stdev(observed_values)
             standard_error = (stdev / math.sqrt(len(values))) * math.sqrt(
                 (expected_workouts - len(values)) / expected_workouts)  # includes finite population correction
             standard_error_range_factor = 1.96 * standard_error
             if return_sum:
-                standard_error_range.upper_bound = (average_value + standard_error_range_factor) * len(values)
-                standard_error_range.lower_bound = (average_value - standard_error_range_factor) * len(values)
+                standard_error_range.upper_bound = (average_observed_value + standard_error_range_factor) * len(values)
+                standard_error_range.lower_bound = (average_observed_value - standard_error_range_factor) * len(values)
             else:
-                standard_error_range.upper_bound = (average_value + standard_error_range_factor)
-                standard_error_range.lower_bound = (average_value - standard_error_range_factor)
+                standard_error_range.upper_bound = (average_observed_value + standard_error_range_factor)
+                standard_error_range.lower_bound = (average_observed_value - standard_error_range_factor)
         elif 1 == len(values) < expected_workouts:
             #let'a quick manufacture some data
             fake_values = []
             fake_values.extend(values)
-            fake_values.append(values[0] * 1.5)
-            average_value = statistics.mean(fake_values)
-            stdev = statistics.stdev(fake_values)
-            standard_error = (stdev / math.sqrt(len(fake_values))) * math.sqrt(
-                (expected_workouts - len(fake_values)) / expected_workouts)  # includes finite population correction
+            if isinstance(values[0], StandardErrorRange):
+                fake_range = values[0].plagiarize()
+                fake_range.multiply(1.5)
+                fake_values.append(fake_range)
+                average_value = StandardErrorRange.get_average_from_error_range_list(fake_values)
+                average_observed_value = average_value.highest_value()
+
+                observed_values = [l.highest_value() for l in fake_values]
+            else:
+                fake_values.append(values[0]*1.5)
+                average_observed_value = statistics.mean(fake_values)
+                observed_values = [l for l in fake_values]
+
+            stdev = statistics.stdev(observed_values)
+            standard_error = (stdev / math.sqrt(len(observed_values))) * math.sqrt(
+                (expected_workouts - len(observed_values)) / expected_workouts)  # includes finite population correction
             standard_error_range_factor = 1.96 * standard_error
             if return_sum:
-                standard_error_range.upper_bound = (average_value + standard_error_range_factor) * len(fake_values)
-                standard_error_range.lower_bound = (average_value - standard_error_range_factor) * len(fake_values)
+                standard_error_range.upper_bound = (average_observed_value + standard_error_range_factor) * len(observed_values)
+                standard_error_range.lower_bound = (average_observed_value - standard_error_range_factor) * len(observed_values)
             else:
-                standard_error_range.upper_bound = (average_value + standard_error_range_factor)
-                standard_error_range.lower_bound = (average_value - standard_error_range_factor)
+                standard_error_range.upper_bound = (average_observed_value + standard_error_range_factor)
+                standard_error_range.lower_bound = (average_observed_value - standard_error_range_factor)
 
         elif len(values) == 0:
             standard_error_range.insufficient_data = True
@@ -750,7 +782,9 @@ class TrainingLoadProcessing(object):
 
             average_load = self.get_standard_error_range(expected_weekly_workouts, values, return_sum=False)
 
-            stdev_load = statistics.stdev(values)
+            numeric_values = [n.highest_value() for n in values]
+
+            stdev_load = statistics.stdev(numeric_values)
 
             if stdev_load > 0:
 
@@ -898,23 +932,26 @@ class TrainingLoadProcessing(object):
 
         if len(load_values) > 1:
 
-            current_load = sum(load_values)
-            average_load = statistics.mean(load_values)
-            stdev_load = statistics.stdev(load_values)
+            current_load = StandardErrorRange.get_sum_from_error_range_list(load_values)
+
+            numeric_load_values = [n.highest_value() for n in load_values]
+
+            average_load = statistics.mean(numeric_load_values)
+            stdev_load = statistics.stdev(numeric_load_values)
             stdev_load = max(stdev_load, 0.1)
 
             monotony = average_load / stdev_load
-            daily_strain.observed_value = monotony * current_load
+            daily_strain.observed_value = monotony * current_load.highest_value()
 
-            if len(load_values) < weekly_expected_workouts:
-                standard_error = (stdev_load / math.sqrt(len(load_values))) * math.sqrt(
-                    (weekly_expected_workouts - len(load_values)) / weekly_expected_workouts)  # adjusts for finite population correction
+            if len(numeric_load_values) < weekly_expected_workouts:
+                standard_error = (stdev_load / math.sqrt(len(numeric_load_values))) * math.sqrt(
+                    (weekly_expected_workouts - len(numeric_load_values)) / weekly_expected_workouts)  # adjusts for finite population correction
                 standard_error_range_factor = 1.96 * standard_error
 
                 standard_error_high = average_load + standard_error_range_factor
 
                 monotony_high = standard_error_high / stdev_load
-                daily_strain.upper_bound = monotony_high * current_load
+                daily_strain.upper_bound = monotony_high * current_load.highest_value()
 
                 # unlikely actual load is lower than observed value; ignoring for now
                 #standard_error_low = average_load - standard_error_range_factor

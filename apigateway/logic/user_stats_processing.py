@@ -116,7 +116,8 @@ class UserStatsProcessing(object):
 
         training_load_processing.load_training_session_values(self.acute_training_sessions,
                                                               self.get_chronic_weeks_training_sessions(),
-                                                              self.chronic_training_sessions)
+                                                              self.chronic_training_sessions,
+                                                              self.training_sessions)
 
         # three_sensor_sessions = [s for s in self.training_sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
         # if len(three_sensor_sessions) > 0:
@@ -129,6 +130,8 @@ class UserStatsProcessing(object):
         current_user_stats = training_load_processing.calc_training_load_metrics(current_user_stats)
         current_user_stats.high_relative_load_sessions = training_load_processing.high_relative_load_sessions
         current_user_stats.high_relative_load_score = training_load_processing.high_relative_load_score
+        current_user_stats.total_historical_sessions = len(self.training_sessions)
+
         self.update_vo2_max_estimations(current_user_stats)
 
         if current_user_stats.event_date.date() == self.event_date.date():
@@ -173,10 +176,10 @@ class UserStatsProcessing(object):
             self.symptoms = self.symptom_datastore.get(user_id=self.athlete_id,
                                                        start_date_time=self.start_date_time,
                                                        end_date_time=self.end_date_time)
-            self.training_sessions = self.training_session_datastore.get(user_id=self.athlete_id,
+            self.training_sessions.extend(self.training_session_datastore.get(user_id=self.athlete_id,
                                                                          start_date_time=self.start_date_time,
                                                                          end_date_time=self.event_date,
-                                                                         read_session_load_dict=read_session_load_dict)
+                                                                         read_session_load_dict=read_session_load_dict))
         self.update_start_times()
         self.set_acute_chronic_periods()
         self.load_historical_symptoms()
@@ -222,6 +225,7 @@ class UserStatsProcessing(object):
 
         self.days_8_14_training_sessions = [p for p in self.training_sessions if self.last_week > p.event_date >= self.previous_week]
 
+
     def update_start_times(self):
 
         if self.symptoms is not None and len(self.symptoms) > 0:
@@ -233,6 +237,15 @@ class UserStatsProcessing(object):
         if self.training_sessions is not None and len(self.training_sessions) > 0:
             self.training_sessions.sort(key=lambda x: x.event_date, reverse=False)
             self.latest_training_session_date = self.training_sessions[len(self.training_sessions) - 1].event_date
+            if self.symptoms is not None and len(self.symptoms) > 0:
+                self.start_date_time = min(self.training_sessions[0].event_date, self.symptoms[0].reported_date_time)
+            else:
+                self.start_date_time = max(self.start_date_time, self.training_sessions[0].event_date)
+        else:
+            if self.symptoms is not None and len(self.symptoms) > 0:
+                self.start_date_time = max(self.start_date_time, self.symptoms[0].reported_date_time)
+            else:
+                self.start_date_time = self.end_date_time
 
     def set_acute_chronic_periods(self):
 
@@ -286,15 +299,21 @@ class UserStatsProcessing(object):
 
             week4_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and
                               self.acute_start_date_time - timedelta(days=min(28, self.chronic_days)) <=
-                              d.get_event_datetime() < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
+                              #d.get_event_datetime() < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
+                              d.event_date < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
             week3_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
-                              - timedelta(days=min(21, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              #- timedelta(days=min(21, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              - timedelta(days=min(21,
+                                                   self.chronic_days)) <= d.event_date < self.acute_start_date_time -
                               timedelta(days=min(14, self.chronic_days))]
             week2_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
-                              - timedelta(days=min(14, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              #- timedelta(days=min(14, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              - timedelta(days=min(14,
+                                                   self.chronic_days)) <= d.event_date < self.acute_start_date_time -
                               timedelta(days=min(7, self.chronic_days))]
             week1_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
-                              - timedelta(days=min(7, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time]
+                              #- timedelta(days=min(7, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time]
+                              - timedelta(days=min(7, self.chronic_days)) <= d.event_date < self.acute_start_date_time]
 
             weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
 

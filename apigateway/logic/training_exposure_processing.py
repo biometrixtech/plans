@@ -105,14 +105,14 @@ class TrainingExposureProcessor(object):
             if exercise.predicted_rpe is not None:
                 # base aerobic
                 # 65 <= percent_max_hr < 80:
-                if exercise.predicted_rpe.lowest_value() >= 2 and exercise.predicted_rpe.highest_value() < 4:
+                if exercise.predicted_rpe.lowest_value() >= 2 and exercise.predicted_rpe.highest_value() < 4.1:
                     exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
                 # anaerobic threshold
                 #80 <= percent_max_hr < 86:
-                if exercise.predicted_rpe.lowest_value() >= 4 and exercise.predicted_rpe.highest_value() <= 5:
+                if exercise.predicted_rpe.lowest_value() >= 4.1 and exercise.predicted_rpe.highest_value() <= 5:
                     exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -124,11 +124,18 @@ class TrainingExposureProcessor(object):
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
+        if len(exposures) == 0:
+            stop_here = 0
         return exposures
 
     def copy_duration_exercise_details_to_exposure(self, exercise, exposure):
 
-        exposure.volume = exercise.duration
+        if isinstance(exercise.duration, Assignment):
+            exposure.volume = StandardErrorRange(lower_bound=exercise.duration.min_value,
+                                                 observed_value=exercise.duration.assigned_value,
+                                                 upper_bound=exercise.duration.max_value)
+        else:
+            exposure.volume = StandardErrorRange(observed_value=exercise.duration)
         exercise.volume_measure = UnitOfMeasure.seconds
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
@@ -137,7 +144,13 @@ class TrainingExposureProcessor(object):
 
     def copy_reps_exercise_details_to_exposure(self, exercise, exposure):
 
-        exposure.volume = exercise.reps_per_set * exercise.sets
+        if isinstance(exercise.reps_per_set, Assignment):
+            reps_range = StandardErrorRange(lower_bound=exercise.reps_per_set.min_value,
+                                                 observed_value=exercise.reps_per_set.assigned_value,
+                                                 upper_bound=exercise.reps_per_set.max_value)
+            exposure.volume = reps_range.multiply(exercise.sets)
+        else:
+            exposure.volume = StandardErrorRange(observed_value=exercise.reps_per_set * exercise.sets)
         exercise.volume_measure = UnitOfMeasure.count
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
@@ -174,3 +187,14 @@ class TrainingExposureProcessor(object):
                 combined_exposure.rpe_load.lower_bound = StandardErrorRange.get_min_from_error_range_list(rpe_loads)
                 combined_exposure.rpe_load.upper_bound = StandardErrorRange.get_max_from_error_range_list(rpe_loads)
                 combined_exposure.rpe_load.observed_value = (combined_exposure.rpe_load.lower_bound + combined_exposure.rpe_load.upper_bound) / float(2)
+
+                aggregated_exposures[training_exposure.detailed_adaptation_type] = combined_exposure
+
+        training_exposure_list = []
+
+        for detailed_adaptation_type, training_exposure in aggregated_exposures.items():
+            training_exposure_list.append(training_exposure)
+
+        return training_exposure_list
+
+

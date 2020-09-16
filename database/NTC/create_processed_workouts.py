@@ -20,20 +20,23 @@ def create_planned_workout_load(session, user_profile_id):
     workout.projected_session_rpe = StandardErrorRange(observed_value=session.session_RPE)
     workout.projected_rpe_load = session.rpe_load
     workout.projected_power_load = session.power_load
+    workout.training_exposures = session.training_exposures
+    workout.duration = session.duration_minutes
+    workout.projected_training_volume = session.training_volume
 
-    session_details = session_functional_movement.completed_session_details
+    #session_details = session_functional_movement.completed_session_details
 
-    workout.duration = session_details.duration
-    workout.session_detailed_load = session_details.session_detailed_load
-    workout.session_training_type_load = session_details.session_training_type_load
-    workout.muscle_detailed_load = session_details.muscle_detailed_load
-    workout.ranked_muscle_detailed_load = session_details.ranked_muscle_load
+    #workout.duration = session_details.duration
+    # workout.session_detailed_load = session_details.session_detailed_load
+    # workout.session_training_type_load = session_details.session_training_type_load
+    # workout.muscle_detailed_load = session_details.muscle_detailed_load
+    # workout.ranked_muscle_detailed_load = session_details.ranked_muscle_load
     PlannedWorkoutLoadDatastore().put(workout)
     # program_id = workout.program_id
     # user_id = session.user_id
     # provider_id = program_id
-    workout_id = workout.program_module_id
-    planned_workout_retrieved = PlannedWorkoutLoadDatastore().get(user_profile_id=user_profile_id, workout_id=workout_id)
+    # workout_id = workout.program_module_id
+    # planned_workout_retrieved = PlannedWorkoutLoadDatastore().get(user_profile_id=user_profile_id, workout_id=workout_id)
 
     # CompletedSessionDetailsDatastore().put(session_details)
     # session_details_retrieved = CompletedSessionDetailsDatastore().get(user_id=user_id, workout_id=workout_id)

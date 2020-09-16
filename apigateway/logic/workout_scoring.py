@@ -34,6 +34,8 @@ class WorkoutScoringProcessor(object):
         for training_exposure in training_exposures:
             exposure_adaptation_name = training_exposure.detailed_adaptation_type.name
             athlete_capacity = getattr(athlete_baseline_capacities, exposure_adaptation_name)
+            if athlete_capacity is None:
+                return False
             if (athlete_capacity.rpe.highest_value() * 1.10 < training_exposure.rpe.highest_value() or
                 athlete_capacity.volume.highest_value() * 1.10 < training_exposure.volume.highest_value()):
                 return False

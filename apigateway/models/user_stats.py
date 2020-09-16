@@ -150,8 +150,8 @@ class UserStats(Serialisable):
             'average_weekly_internal_load': self.average_weekly_internal_load.json_serialise() if self.average_weekly_internal_load is not None else None,
 
             'periodization_goals': [p.value for p in self.periodization_goals],
-            'persona': self.persona.value if self.persona is not None else None,
-            'training_phase_type': self.training_phase_type.value,
+            'demo_persona': self.persona.value if self.persona is not None else None,
+            'training_phase_type': self.training_phase_type.value if self.training_phase_type is not None else None,
             'athlete_capacities': self.athlete_capacities.json_serialise() if self.athlete_capacities is not None else None
         }
         return ret
@@ -217,7 +217,7 @@ class UserStats(Serialisable):
         user_stats.average_weekly_internal_load = StandardErrorRange.json_deserialise(input_dict['average_weekly_internal_load']) if input_dict.get('average_weekly_internal_load') is not None else None
 
         user_stats.periodization_goals = [PeriodizationGoalType(p) for p in input_dict.get('periodization_goals', [])]
-        user_stats.persona = PeriodizationPersona(input_dict['persona']) if input_dict.get('persona') is not None else None
+        user_stats.persona = PeriodizationPersona(input_dict['demo_persona']) if input_dict.get('demo_persona') is not None else None
         user_stats.training_phase_type = TrainingPhaseType(input_dict['training_phase_type']) if input_dict.get('training_phase_type') is not None else None
         user_stats.athlete_capacities = AthleteBaselineCapacities().json_deserialise(input_dict['athlete_capacities']) if input_dict.get('athlete_capacities') is not None else None
         return user_stats

@@ -1,0 +1,45 @@
+SubAction,,,,,,,literal direction that the joint is moving,,,,,,,,,,,,,,defined for action,,per sub-action,,,,,,,,,,,
+sub_action_id,sub_action_name,description,muscle_action,movement_system_priority,movement_system,hip_joint_priority,hip_joint_action,knee_joint_priority,knee_joint_action,ankle_joint_priority,ankle_joint_action,trunk_joint_priority,trunk_joint_action,shoulder_scapula_joint_priority,shoulder_scapula_joint_action,elbow_joint_priority,elbow_joint_action,wrist_joint_priority,wrist_joint_action,,body_position,,contribute_to_power_production,apply_instability,apply_resistance,stance_lower_body,stance_upper_body,lateral_distribution_pattern,arm,torso,leg,multiplier,percent_bodyweight,lateral_distribution
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Bipedal,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+0_a,gait:Propulsion,,concentric,2,Deep Longitudinal Subsystem (DLS),1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,,,,,single_leg_moving,,TRUE,TRUE,TRUE,alternating_single_leg,,unilateral_alternating,2,1,2,1,100,"100,100"
+0_b,gait:Loading,,eccentric,1,Posterior Oblique Subsystem (POS),1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,,,,,single_leg_moving,,FALSE,TRUE,TRUE,alternating_single_leg,,unilateral_alternating,2,1,2,2,200,"100,100"
+0_b,,,,1,Lateral Subsystem (LS),,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+0_c,gait:Swing,,concentric,2,Anterior Oblique Subsystem (AOS),1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,,,,,single_leg_moving,,FALSE,FALSE,FALSE,alternating_single_leg,,unilateral_alternating,0,0,1,1,20.37,"100,100"
+1_a,lateral gait:Propulsion,,concentric,2,Deep Longitudinal Subsystem (DLS),1,hip extension,2,knee extension,3,ankle plantar flexion,,,,,,,,,,single_leg_moving,,TRUE,TRUE,TRUE,alternating_single_leg,,unilateral_alternating,2,1,2,1,100,"100,100"
+1_a,,,,,,1,hip adduction,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1_b,lateral gait:Loading,,eccentric,1,Posterior Oblique Subsystem (POS),1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,,,,,single_leg_moving,,FALSE,TRUE,TRUE,alternating_single_leg,,unilateral_alternating,2,1,2,2,200,"100,100"
+1_b,,,,1,Lateral Subsystem (LS),1,hip abduction,,,,,,,,,,,,,,,,,,,,,,,,,,,
+1_c,lateral gait:Swing,,concentric,2,Anterior Oblique Subsystem (AOS),1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,,,,,single_leg_moving,,FALSE,FALSE,FALSE,alternating_single_leg,,unilateral_alternating,0,0,1,1,20.37,"100,100"
+1_c,,,,,,1,hip abduction,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2_a,monster gait:Propulsion,,concentric,2,Deep Longitudinal Subsystem (DLS),1,hip extension,3,knee extension,3,ankle plantar flexion,,,,,,,,,,single_leg_moving,,TRUE,TRUE,TRUE,alternating_single_leg,,unilateral_alternating,2,1,2,1,100,"100,100"
+2_b,monster gait:Swing,,concentric,2,Anterior Oblique Subsystem (AOS),1,hip flexion,,,3,ankle dorsiflexion,,,,,,,,,,single_leg_moving,,FALSE,FALSE,FALSE,alternating_single_leg,,unilateral_alternating,0,0,1,1,20.37,"100,100"
+2_c,monster gait: transferring load: unloading,,concentric,2,Deep Longitudinal Subsystem (DLS),1,hip extension,,,3,ankle plantar flexion,,,,,,,,,,,,TRUE,TRUE,TRUE,double_leg,,bilateral_uneven,,,,,,
+2_d,monster gait: transferring load: receiving,,eccentric,1,Posterior Oblique Subsystem (POS),1,hip flexion,2,knee flexion,3,ankle dorsiflexion,,,,,,,,,,split_leg_moving,,FALSE,TRUE,TRUE,double_leg,,bilateral_uneven,2,1,2,2,200,DEFINE
+2_d,,,,1,Lateral Subsystem (LS),,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3_a,lateral monster gait:Propulsion,,concentric,2,Deep Longitudinal Subsystem (DLS),1,hip abduction,,,,,,,,,,,,,,single_leg_moving,,TRUE,TRUE,TRUE,alternating_single_leg,,unilateral_alternating,2,1,2,1,100,"100,100"
+,,,,1,Lateral Subsystem (LS),,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3_b,lateral monster gait:Swing,,concentric,2,Anterior Oblique Subsystem (AOS),1,hip abduction,,,,,,,,,,,,,,single_leg_moving,,FALSE,FALSE,FALSE,alternating_single_leg,,unilateral_alternating,0,0,1,1,20.37,"100,100"
+3_c,lateral monster gait: transferring load: unloading,,concentric,1,Deep Longitudinal Subsystem (DLS),2,hip abduction,,,,,,,,,,,,,,single_leg_moving,,TRUE,TRUE,TRUE,double_leg,,bilateral_uneven,,,,,,
+,,,,2,Anterior Oblique Subsystem (AOS),,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3_d,lateral monster gait: transferring load: receiving,,eccentric,1,Posterior Oblique Subsystem (POS),1,hip adduction,,,,,,,,,,,,,,split_leg_moving,,FALSE,TRUE,TRUE,double_leg,,bilateral_uneven,2,1,2,2,200,DEFINE
+3_d,,,,1,Lateral Subsystem (LS),,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Cycle,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+100_a,Cycling: power phase,,concentric,,,1,hip extension,2,knee extension,2,ankle plantar flexion,,,,,,,,,,seated,,TRUE,TRUE,TRUE,alternating_single_leg,,unilateral_alternating,0,0,1,1,20.37,"100,100"
+100_b,Cycling: recovery phase,,concentric,,,1,hip flexion,1,knee flexion,2,ankle dorsiflexion,,,,,,,,,,seated,,FALSE,FALSE,FALSE,alternating_single_leg,,unilateral_alternating,0,0,1,1,20.37,"100,100"
+Misc,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+200_a,row:power phase,,concentric,,,1,hip extension,2,knee extension,,,2,Trunk Extension,2,Shoulder Horizontal Abduction (Horizontal Extension),2,elbow flexion,,,,supine,,TRUE,TRUE,TRUE,double_leg,double_arm,bilateral,0,0,0,1,0,"50,50"
+200_b,row:recovery phase,,concentric,,,3,hip flexion,3,knee flexion,,,3,Trunk Flexion,3,Shoulder Horizontal Adduction (Horizontal Flexion),3,elbow extension,,,,supine,,FALSE,FALSE,FALSE,double_leg,double_arm,bilateral,0,0,0,1,0,"50,50"
+201_a,ski erg:power phase,,concentric,,,2,hip flexion,2,knee flexion,,,1,Trunk Flexion,,Shoulder Extension,,elbow extension,,,,double_leg_standing,,TRUE,TRUE,TRUE,double_leg,double_arm,bilateral,2,1,0,1,59.26,"50,50"
+201_b,ski erg:recovery phase,,concentric,,,2,hip extension,2,knee extension,2,ankle plantar flexion,2,Trunk Extension,2,Shoulder Flexion,2,elbow flexion,,,,double_leg_standing,,FALSE,FALSE,FALSE,double_leg,double_arm,bilateral,2,1,0,1,59.26,"50,50"
+Swim,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+300_a,freestyle:against resistance,,concentric,,,,,,,,,2,Trunk Rotation,1,Shoulder Extension,,,,,,prone,,TRUE,TRUE,TRUE,,alternating_arms,unilateral_alternating,0,0,0,1,0,"100,100"
+300_b,freestyle:return to start,,concentric,,,,,,,,,,,1,"Shoulder Flexion
+Shoulder External Rotation
+Shoulder Internal Rotation",,,,,,prone,,FALSE,FALSE,FALSE,,alternating_arms,unilateral_alternating,1,0,0,1,4.715,"100,100"
+303_a,scissor kick: kick towards belly,,concentric,,,1,hip flexion,,,,,,,,,,,,,,prone,,TRUE,TRUE,TRUE,double_leg,,unilateral_alternating,0,0,0,1,0,"100,100"
+303_b,scissor kick:hold leg straight while kick towards belly,,isometric,,,,,2,knee extension,,,,,,,,,,,,prone,,FALSE,FALSE,TRUE,double_leg,,unilateral_alternating,0,0,0,1,0,"100,100"
+303_c,scissor kick:kick towards butt,,concentric,,,1,hip extension,,,,,,,,,,,,,,prone,,TRUE,TRUE,TRUE,double_leg,,unilateral_alternating,0,0,0,1,0,"100,100"
+303_d,scissor kick:hold leg straight while kick towards butt,,isometric,,,,,2,knee flexion,,,,,,,,,,,,prone,,FALSE,FALSE,TRUE,double_leg,,unilateral_alternating,0,0,0,1,0,"100,100"

@@ -63,6 +63,8 @@ class MLModelsDatastore(object):
     def file_location(model_filename):
         if os.environ.get('UNIT_TESTS', '') == 'TRUE':
             file_location = os.path.join('..', 'data', model_filename)
+        elif os.environ.get('DATABASE_DEMO', '') == 'TRUE':
+            file_location = os.path.join('../../tests', 'data', model_filename)
         else:
             file_location = f'/tmp/{model_filename}'
         return file_location

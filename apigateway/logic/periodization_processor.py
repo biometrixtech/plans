@@ -233,7 +233,7 @@ class PeriodizationPlanProcessor(object):
         self.start_date = event_date
         self.user_stats = user_stats
         self.injury_risk_dict = injury_risk_dict
-        #self.persona = user_stats.persona
+        #self.demo_persona = user_stats.demo_persona
         #self.goals = user_stats.periodization_goals
         #self.training_phase_type = user_stats.training_phase_type
         self.model = PeriodizationModelFactory().create(persona=user_stats.persona,
