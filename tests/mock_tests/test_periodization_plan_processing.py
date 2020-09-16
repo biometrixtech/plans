@@ -6,6 +6,7 @@ from models.movement_tags import DetailedAdaptationType
 from models.training_volume import StandardErrorRange
 from models.periodization_plan import PeriodizationPlan
 from models.exposure import TrainingExposure, AthleteTargetTrainingExposure
+from models.user_stats import UserStats
 from datetime import datetime
 
 
@@ -88,11 +89,11 @@ def test_create_periodization_plan():
     goal_factory = PeriodizationGoalFactory()
     periodization_goal = goal_factory.create(PeriodizationGoalType.increase_cardio_endurance)
 
-    periodization_plan = PeriodizationPlan(start_date, [periodization_goal], TrainingPhaseType.increase, PeriodizationPersona.well_trained)
+    periodization_plan = PeriodizationPlan(start_date, [periodization_goal], TrainingPhaseType.increase, PeriodizationPersona.well_trained,sub_adaptation_type_persona)
 
     periodization_plan.target_weekly_rpe_load = StandardErrorRange(lower_bound=1000, upper_bound=1100)
 
-    plan = proc.initialize_periodization_plan(periodization_plan,sub_adaptation_type_persona)
+    plan = proc.initialize_periodization_plan(periodization_plan)
 
     assert 4.5 == plan.athlete_capacities.anaerobic_threshold_training.rpe.observed_value
 
@@ -110,18 +111,21 @@ def test_update_periodization_plan_week():
     goal_factory = PeriodizationGoalFactory()
     periodization_goal = goal_factory.create(PeriodizationGoalType.increase_cardio_endurance)
 
-    periodization_plan = PeriodizationPlan(start_date, [periodization_goal], TrainingPhaseType.increase, PeriodizationPersona.well_trained)
+    periodization_plan = PeriodizationPlan(start_date, [periodization_goal], TrainingPhaseType.increase, PeriodizationPersona.well_trained, sub_adaptation_type_persona)
 
     periodization_plan.target_weekly_rpe_load = StandardErrorRange(lower_bound=1000, upper_bound=1100)
 
-    plan = proc.initialize_periodization_plan(periodization_plan,sub_adaptation_type_persona)
+    plan = proc.initialize_periodization_plan(periodization_plan)
 
     initial_volume = plan.target_training_exposures[0].training_exposures[0].volume.highest_value()
 
     plan.target_training_exposures[0].exposure_count.observed_value = 0
     plan.target_training_exposures[1].exposure_count.observed_value = 0
 
-    plan = proc.update_periodization_plan_for_week(plan, sub_adaptation_type_persona, event_date)
+    user_stats = UserStats("tester")
+    user_stats.average_weekly_internal_load=StandardErrorRange(lower_bound=1000, upper_bound=1100)
+
+    plan = proc.update_periodization_plan_for_week(plan, event_date,user_stats)
 
     assert 0 < plan.target_training_exposures[0].exposure_count.observed_value
     assert 0 < plan.target_training_exposures[1].exposure_count.observed_value
