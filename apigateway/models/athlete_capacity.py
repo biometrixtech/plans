@@ -95,33 +95,33 @@ class AthleteDefaultCapacityFactory(object):
 
         if training_persona == TrainingPersona.beginner:
 
-            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5), volume=StandardErrorRange(observed_value=5 * 60))
-            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5), volume=StandardErrorRange())
-            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=6), volume=StandardErrorRange())
+            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=3.0), volume=StandardErrorRange(observed_value=5 * 60))
+            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=5.0), volume=StandardErrorRange())
+            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=7.1), volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.novice:
 
-            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5), volume=StandardErrorRange(observed_value=5 * 60))
-            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5), volume=StandardErrorRange(observed_value=4 * 60))
-            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=6), volume=StandardErrorRange())
+            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=30), volume=StandardErrorRange(observed_value=5 * 60))
+            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=5.0), volume=StandardErrorRange(observed_value=4 * 60))
+            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=7.1), volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.intermediate:
 
-            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5), volume=StandardErrorRange(observed_value=10 * 60))
-            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5), volume=StandardErrorRange(observed_value=9 * 60))
-            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=6), volume=StandardErrorRange(observed_value=1 * 60))
+            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=3.0), volume=StandardErrorRange(observed_value=10 * 60))
+            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=5.0), volume=StandardErrorRange(observed_value=9 * 60))
+            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=7.1), volume=StandardErrorRange(observed_value=1 * 60))
 
         elif training_persona == TrainingPersona.advanced:
 
-            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5), volume=StandardErrorRange(observed_value=10 * 60))
-            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5), volume=StandardErrorRange(observed_value=12 * 60))
-            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=6), volume=StandardErrorRange(observed_value=2 * 60))
+            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=3.0), volume=StandardErrorRange(observed_value=10 * 60))
+            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=5.0), volume=StandardErrorRange(observed_value=12 * 60))
+            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=7.1), volume=StandardErrorRange(observed_value=2 * 60))
 
         elif training_persona == TrainingPersona.elite:
 
-            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5), volume=StandardErrorRange(observed_value=10 * 60))
-            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5), volume=StandardErrorRange(observed_value=15 * 60))
-            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=6), volume=StandardErrorRange(observed_value=2 * 60))
+            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=3.0), volume=StandardErrorRange(observed_value=10 * 60))
+            cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=5.0), volume=StandardErrorRange(observed_value=15 * 60))
+            cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=7.1), volume=StandardErrorRange(observed_value=2 * 60))
 
         return cardio_athlete_capacities
 

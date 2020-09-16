@@ -104,7 +104,7 @@ def test_ignore_default_if_higher():
                                                              default_power_capacities,
                                                              default_strength_capacities)
 
-        athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=4.6),volume=StandardErrorRange(observed_value=16 * 60))
+        athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=5.1),volume=StandardErrorRange(observed_value=16 * 60))
 
         athlete_capacities = proc.update_capacity_with_defaults(athlete_capacities, sub_adaptation_type_personas)
 
