@@ -35,8 +35,8 @@ def create_planned_workout_load(session, user_profile_id):
     # program_id = workout.program_id
     # user_id = session.user_id
     # provider_id = program_id
-    workout_id = workout.program_module_id
-    planned_workout_retrieved = PlannedWorkoutLoadDatastore().get(user_profile_id=user_profile_id, workout_id=workout_id)
+    # workout_id = workout.program_module_id
+    # planned_workout_retrieved = PlannedWorkoutLoadDatastore().get(user_profile_id=user_profile_id, workout_id=workout_id)
 
     # CompletedSessionDetailsDatastore().put(session_details)
     # session_details_retrieved = CompletedSessionDetailsDatastore().get(user_id=user_id, workout_id=workout_id)

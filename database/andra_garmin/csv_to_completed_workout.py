@@ -67,15 +67,15 @@ def create_workout(file_name=''):
                 if pace > 540:
                     exercise['movement_id'] = "run"
                 else:
-                    import matplotlib.pyplot as plt
-                    plt.figure()
-                    plt.plot(detail_data.enhanced_speed)
-                    print('fast_run', file_name)
-                    print(pace)
-                    exercise['movement_id'] = "tempo"
+                    # import matplotlib.pyplot as plt
+                    # plt.figure()
+                    # plt.plot(detail_data.enhanced_speed)
+                    # print('fast_run', file_name)
+                    # print(pace)
+                    exercise['movement_id'] = "cruising"
             elif activity_type == 'Cycling':
                 exercise['speed'] = float( summary['Avg Pace']) * 1609 / 3600  # np.mean(detail_data.enhanced_speed)
-                exercise['movement_id'] = 'cycle'
+                exercise['movement_id'] = 'cycling, 80 rpm'
             else:
                 print(exercise['name'])
                 return None

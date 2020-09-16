@@ -105,14 +105,14 @@ class TrainingExposureProcessor(object):
             if exercise.predicted_rpe is not None:
                 # base aerobic
                 # 65 <= percent_max_hr < 80:
-                if exercise.predicted_rpe.lowest_value() >= 2 and exercise.predicted_rpe.highest_value() < 4:
+                if exercise.predicted_rpe.lowest_value() >= 2 and exercise.predicted_rpe.highest_value() < 4.1:
                     exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
                 # anaerobic threshold
                 #80 <= percent_max_hr < 86:
-                if exercise.predicted_rpe.lowest_value() >= 4 and exercise.predicted_rpe.highest_value() <= 5:
+                if exercise.predicted_rpe.lowest_value() >= 4.1 and exercise.predicted_rpe.highest_value() <= 5:
                     exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -124,6 +124,8 @@ class TrainingExposureProcessor(object):
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
+        if len(exposures) == 0:
+            stop_here = 0
         return exposures
 
     def copy_duration_exercise_details_to_exposure(self, exercise, exposure):
