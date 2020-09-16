@@ -13,6 +13,7 @@ from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodySt
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
 from models.training_volume import StandardErrorRange, Assignment
+from models.soreness_base import BodyPartSystems
 
 movement_library = MovementLibraryDatastore().get()
 cardio_data = get_cardio_data()
@@ -1044,6 +1045,21 @@ class WorkoutProcessor(object):
             elif prioritized_joint_action.priority == 4:
                 prime_movers['fourth_prime_movers'].update(functional_movement.prime_movers)
 
+    @staticmethod
+    def get_prime_movers_from_movement_systems(movement_systems, prime_movers):
+        for movement_system in movement_systems:
+            body_parts = BodyPartSystems().get_movemement_system(movement_system.movement_system_name)
+            if body_parts is not None:
+                body_parts = [bp.value for bp in body_parts]
+                if movement_system.priority == 1:
+                    prime_movers['first_prime_movers'].update(body_parts)
+                elif movement_system.priority == 2:
+                    prime_movers['second_prime_movers'].update(body_parts)
+                elif movement_system.priority == 3:
+                    prime_movers['third_prime_movers'].update(body_parts)
+                elif movement_system.priority == 4:
+                    prime_movers['fourth_prime_movers'].update(body_parts)
+
     def get_prime_movers_for_ex(self, exercise):
         prime_movers = {
             "first_prime_movers": set(),
@@ -1063,8 +1079,8 @@ class WorkoutProcessor(object):
                         self.get_prime_movers_from_joint_actions(sub_action.shoulder_scapula_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.elbow_joint_action, prime_movers)
                         self.get_prime_movers_from_joint_actions(sub_action.wrist_joint_action, prime_movers)
+                        # self.get_prime_movers_from_movement_systems(sub_action.movement_systems, prime_movers)
         return prime_movers
-
 
     def get_one_rep_max_bodyweight_ratio(self, exercise):
         # get prime movers from action
