@@ -849,7 +849,7 @@ class TrainingLoadProcessing(object):
             for t in range(6, len(target_dates)):
                 load_values = []
                 daily_values = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) < p[0] <= target_dates[t]]
-                load_values.extend(x[1] for x in daily_values if x is not None)
+                load_values.extend(x[1] for x in daily_values if x is not None and x[1] is not None)
                 monotony = self.get_monotony(weekly_expected_workouts, load_values)
 
                 if monotony.observed_value is not None or monotony.upper_bound is not None:
@@ -890,7 +890,7 @@ class TrainingLoadProcessing(object):
             for t in range(6, len(target_dates)):
                 load_values = []
                 daily_values = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) <= p[0] <= target_dates[t]]
-                load_values.extend(x[1] for x in daily_values if x is not None)
+                load_values.extend(x[1] for x in daily_values if x is not None and x[1] is not None)
                 strain = self.calculate_daily_strain(load_values, weekly_expected_workouts)
 
                 if strain.observed_value is not None or strain.upper_bound is not None:
