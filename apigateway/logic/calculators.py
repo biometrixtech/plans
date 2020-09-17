@@ -1242,17 +1242,17 @@ class Calculators(object):
     @classmethod
     def get_rpe_from_force_level(cls, force_level, reps=None, adaptation_type=None):
         if force_level.name == 'no_force':
-            rpe = StandardErrorRange(lower_bound=2, upper_bound=3)
+            rpe = StandardErrorRange(lower_bound=2, upper_bound=3, observed_value=2.5)
         elif force_level.name == 'low_force':
-            rpe = StandardErrorRange(lower_bound=4, upper_bound=5)
+            rpe = StandardErrorRange(lower_bound=4, upper_bound=5, observed_value=4.5)
         elif force_level.name == 'mod_force':
-            rpe = StandardErrorRange(lower_bound=5, upper_bound=6)
+            rpe = StandardErrorRange(lower_bound=5, upper_bound=6, observed_value=5.5)
         elif force_level.name == 'high_force':
-            rpe = StandardErrorRange(lower_bound=7, upper_bound=8)
+            rpe = StandardErrorRange(lower_bound=7, upper_bound=8, observed_value=7.7)
         elif force_level.name == 'max_force':
-            rpe = StandardErrorRange(lower_bound=9, upper_bound=10)
+            rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
         else:
-            rpe = StandardErrorRange(lower_bound=2, upper_bound=3)
+            rpe = StandardErrorRange(lower_bound=2, upper_bound=3, observed_value=2.5)
 
         # update based on expected reps
         if reps is not None and adaptation_type is not None:
@@ -1269,4 +1269,6 @@ class Calculators(object):
                 rpe.add_value(1)
                 if rpe.observed_value > 10:
                     rpe.observed_value = 10
+                if rpe.upper_bound > 10:
+                    rpe.upper_bound = 10
         return rpe

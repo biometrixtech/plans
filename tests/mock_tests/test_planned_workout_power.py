@@ -1,6 +1,7 @@
 from models.planned_exercise import PlannedExercise, Assignment
 from models.movement_tags import CardioAction, TrainingType
 from logic.workout_processing import WorkoutProcessor
+from models.movement_actions import MovementResistance, MovementSpeed, MovementDisplacement
 
 
 def get_exercise(cardio_action=CardioAction.run):
@@ -173,6 +174,9 @@ def test_planned_power_plyometrics():
     exercise = PlannedExercise()
     exercise.training_type = TrainingType.power_action_plyometrics
     exercise.reps_per_set = 10
+    exercise.movement_speed = MovementSpeed.slow
+    exercise.resistance = MovementResistance.low
+    exercise.displacement = MovementDisplacement.full_rom
     processor = WorkoutProcessor()
     processor.update_planned_exercise_details(exercise, assignment_type='default')
     assert exercise.power.observed_value is not None

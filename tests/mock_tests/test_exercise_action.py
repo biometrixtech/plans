@@ -1,7 +1,7 @@
 from models.workout_program import WorkoutExercise
 from models.movement_tags import Equipment, WeightDistribution, TrainingType, CardioAction
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.movement_actions import ExerciseAction, ExerciseSubAction, CompoundAction
+from models.movement_actions import ExerciseAction, ExerciseSubAction, CompoundAction, MovementSpeed, MovementResistance, MovementDisplacement
 from logic.workout_processing import WorkoutProcessor
 
 
@@ -18,6 +18,9 @@ def get_exercise(reps=1, sets=1, unit=UnitOfMeasure.seconds, equipment=Equipment
     exercise.side = side
     exercise.training_type = training_type
     exercise.explosiveness_rating = explosiveness
+    exercise.movement_speed = MovementSpeed.slow
+    exercise.resistance = MovementResistance.low
+    exercise.displacement = MovementDisplacement.full_rom
     exercise.set_intensity()
     exercise.set_adaptation_type()
     return exercise

@@ -1117,17 +1117,8 @@ class WorkoutProcessor(object):
 
         return bodyweight_ratio
 
-    def get_rpe_from_weight(self, workout_exercise):
-        rpe = StandardErrorRange(observed_value=1)
-        # get correct equipment
-        if len(workout_exercise.equipments) > 0:
-            equipment = workout_exercise.equipments[0]
-        else:
-            equipment = Equipment.bodyweight
-        if equipment == Equipment.no_equipment:
-            equipment = Equipment.bodyweight
-
-        # get reps
+    @staticmethod
+    def get_exercise_reps_per_set(workout_exercise):
         reps = StandardErrorRange(observed_value=0)
         if workout_exercise.reps_per_set is not None:
             reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
@@ -1147,19 +1138,52 @@ class WorkoutProcessor(object):
                 reps.lower_bound = min(possible_reps)
                 reps.upper_bound = max(possible_reps)
                 reps.observed_value = sum(possible_reps) / len(possible_reps)
+        return reps
 
-        all_rep_max_reps = self.get_all_rep_max_reps(workout_exercise, equipment)
-        all_rpes = []
-        all_reps = [reps.observed_value, reps.lower_bound, reps.upper_bound]
-        all_reps = [value for value in all_reps if value is not None]
-        for rep_max_rep in all_rep_max_reps:
-            for reps in all_reps:
-                all_rpes.append(self.get_rpe_from_rep_max(rep_max_rep, reps))
+    @staticmethod
+    def get_rpe_from_speed_resistance_displacement(workout_exercise, reps):
+        force_level = Calculators.get_force_level(workout_exercise.movement_speed, workout_exercise.resistance, workout_exercise.displacement)
+        if force_level is not None:
+            force_level = Explosiveness[force_level]
+        else:
+            force_level = Explosiveness.no_force
+        rpe = Calculators.get_rpe_from_force_level(force_level, reps=reps.observed_value, adaptation_type=workout_exercise.adaptation_type)
+        return rpe
 
-        if len(all_rpes) > 0:
-            rpe.observed_value = sum(all_rpes) / len(all_rpes)
-            rpe.lower_bound = min(all_rpes)
-            rpe.upper_bound = max(all_rpes)
+    def get_rpe_from_weight(self, workout_exercise):
+        rpe = StandardErrorRange(observed_value=1)
+        # get correct equipment
+        if len(workout_exercise.equipments) > 0:
+            equipment = workout_exercise.equipments[0]
+        else:
+            equipment = Equipment.bodyweight
+        if equipment == Equipment.no_equipment:
+            equipment = Equipment.bodyweight
+
+        # get reps
+        reps = self.get_exercise_reps_per_set(workout_exercise)
+
+        if (workout_exercise.adaptation_type in [AdaptationType.power_explosive_action, AdaptationType.power_drill]  #  use lookup table for all phyometrics
+                or workout_exercise.weight_measure is None):  # or if weight is not defined
+            # for plyo exercises, use lookup table
+            rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
+        else:
+            all_rep_max_reps = self.get_all_rep_max_reps(workout_exercise, equipment)
+            if max(all_rep_max_reps) > 30:  # corresponds to 50% of 1RM and we don't expect anything to be assigned close to this range
+                # if the exercise is performed at very low resistance, use lookup table
+                rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
+            else:
+                all_rpes = []
+                all_reps = [reps.observed_value, reps.lower_bound, reps.upper_bound]
+                all_reps = [value for value in all_reps if value is not None]
+                for rep_max_rep in all_rep_max_reps:
+                    for reps in all_reps:
+                        all_rpes.append(self.get_rpe_from_rep_max(rep_max_rep, reps))
+
+                if len(all_rpes) > 0:
+                    rpe.observed_value = sum(all_rpes) / len(all_rpes)
+                    rpe.lower_bound = min(all_rpes)
+                    rpe.upper_bound = max(all_rpes)
         return rpe
 
     def get_all_rep_max_reps(self, workout_exercise, equipment):
