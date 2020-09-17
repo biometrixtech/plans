@@ -71,12 +71,13 @@ def get_consolidated_dict(session_load_dict):
 
     body_part_factory = BodyPartFactory()
 
-    for body_part_side, body_part_injury_risk in aggregated_session_load_dict.items():
+    for body_part_side, body_part_functional_movement in aggregated_session_load_dict.items():
         body_part = body_part_factory.get_body_part(body_part_side)
+        new_body_part_side = BodyPartSide(body_part.location, 0)
         if body_part not in consolidated_session_load_dict:
-            consolidated_session_load_dict[body_part] = pickle.loads(pickle.dumps(body_part_injury_risk, -1))
+            consolidated_session_load_dict[new_body_part_side] = pickle.loads(pickle.dumps(body_part_functional_movement, -1))
         else:
-            consolidated_session_load_dict[body_part].merge(pickle.loads(pickle.dumps(body_part_injury_risk, -1)))
+            consolidated_session_load_dict[new_body_part_side].merge(pickle.loads(pickle.dumps(body_part_functional_movement, -1)))
 
     return consolidated_session_load_dict
 
@@ -90,6 +91,7 @@ def aggregate_sld(session_load_dict):
             muscle_group = BodyPartLocation.get_muscle_group(body_part_side.body_part_location)
             if isinstance(muscle_group, BodyPartLocation):
                 new_body_part_side = BodyPartSide(muscle_group, body_part_side.side)
+                body_part_functional_movement.body_part_side = new_body_part_side
                 if new_body_part_side not in aggregated_sld:
                     aggregated_sld[new_body_part_side] = pickle.loads(pickle.dumps(body_part_functional_movement, -1))
                 else:
