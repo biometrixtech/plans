@@ -208,10 +208,12 @@ class SubActionLibraryParser(object):
 
                     if self.is_valid(row, 'lateral_distribution'):
                         lateral_distribution = row['lateral_distribution'].split(',')
+                        if ':' in row['lateral_distribution']:
+                            lateral_distribution = row['lateral_distribution'].split(':')
                         try:
                             lateral_distribution = [int(float(val.strip())) for val in lateral_distribution]
                         except ValueError:
-                            print(lateral_distribution)
+                            print(lateral_distribution, sub_action_id)
                         else:
                             if len(lateral_distribution) == 0:
                                 new_subaction.lateral_distribution = [50, 50]
@@ -326,7 +328,7 @@ class SubActionLibraryParser(object):
                 try:
                     lateral_distribution = [int(float(val.strip())) for val in lateral_distribution]
                 except ValueError:
-                    print(lateral_distribution)
+                    print(lateral_distribution, action.id)
                 else:
                     if len(lateral_distribution) == 0:
                         action.lateral_distribution = [50, 50]
