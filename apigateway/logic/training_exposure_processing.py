@@ -15,12 +15,12 @@ class TrainingExposureProcessor(object):
             if exercise.predicted_rpe is not None and exercise.duration is not None:
                 # muscular endurance
                 # TODO make this less than VO2Max
-                if exercise.predicted_rpe.highest_value() <= 7 and isinstance(exercise.duration, Assignment) and exercise.duration.highest_value() >= 240:
+                if 4 < exercise.predicted_rpe.highest_value() <= 7 and isinstance(exercise.duration, Assignment) and exercise.duration.highest_value() >= 240:
                     exposure = TrainingExposure(DetailedAdaptationType.muscular_endurance)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
-                elif exercise.predicted_rpe.highest_value() <= 7 and isinstance(exercise.duration, int) and exercise.duration >= 240:
+                elif 4 < exercise.predicted_rpe.highest_value() <= 7 and isinstance(exercise.duration, int) and exercise.duration >= 240:
                     exposure = TrainingExposure(DetailedAdaptationType.muscular_endurance)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -40,7 +40,7 @@ class TrainingExposureProcessor(object):
         if exercise.adaptation_type == AdaptationType.strength_endurance_strength:
             if exercise.predicted_rpe is not None and exercise.reps_per_set is not None:
                 # strength endurance
-                if 8 <= exercise.reps_per_set <= 12 and 7 <= exercise.predicted_rpe.highest_value() <= 8 and exercise.movement_speed == MovementSpeed.mod:
+                if 8 <= exercise.reps_per_set <= 12 and 5 <= exercise.predicted_rpe.highest_value() <= 7 and exercise.movement_speed == MovementSpeed.mod:
                     exposure = TrainingExposure(DetailedAdaptationType.strength_endurance)
                     exposure = self.copy_reps_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -71,7 +71,8 @@ class TrainingExposureProcessor(object):
         if exercise.adaptation_type == AdaptationType.power_drill or exercise.adaptation_type == AdaptationType.power_explosive_action:
             # speed
             if ((exercise.movement_speed == MovementSpeed.fast or exercise.movement_speed == MovementSpeed.explosive) and
-                    (exercise.resistance == MovementResistance.none or exercise.resistance == MovementResistance.low)):
+                    #(exercise.resistance == MovementResistance.none or exercise.resistance == MovementResistance.low)):
+                    (exercise.resistance == MovementResistance.none)):
                 exposure = TrainingExposure(DetailedAdaptationType.speed)
                 exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                 exposures.append(exposure)
@@ -85,7 +86,7 @@ class TrainingExposureProcessor(object):
 
             # power
             if ((exercise.movement_speed == MovementSpeed.fast or exercise.movement_speed == MovementSpeed.explosive) and
-                    exercise.resistance == MovementResistance.mod):
+                    exercise.resistance == MovementResistance.low):
                 exposure = TrainingExposure(DetailedAdaptationType.power)
                 exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                 exposures.append(exposure)
@@ -93,7 +94,7 @@ class TrainingExposureProcessor(object):
         if exercise.adaptation_type == AdaptationType.power_explosive_action and exercise.predicted_rpe is not None:
 
             # maximal power
-            if (3 <= exercise.predicted_rpe.highest_value() <= 4.5 and (
+            if (9 <= exercise.predicted_rpe.highest_value() <= 10 and (
                     exercise.movement_speed == MovementSpeed.fast or exercise.movement_speed == MovementSpeed.explosive)
                     and (exercise.resistance == MovementResistance.high or exercise.resistance == MovementResistance.max)):
                 exposure = TrainingExposure(DetailedAdaptationType.maximal_power)
@@ -112,14 +113,14 @@ class TrainingExposureProcessor(object):
 
                 # anaerobic threshold
                 #80 <= percent_max_hr < 86:
-                if exercise.predicted_rpe.lowest_value() >= 4.1 and exercise.predicted_rpe.highest_value() <= 5:
+                if exercise.predicted_rpe.lowest_value() >= 4.1 and exercise.predicted_rpe.highest_value() <= 7:
                     exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
                 # anaerobic interval
                 #86 <= percent_max_hr
-                if exercise.predicted_rpe.highest_value() > 5:
+                if exercise.predicted_rpe.highest_value() > 7:
                     exposure = TrainingExposure(DetailedAdaptationType.high_intensity_anaerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)

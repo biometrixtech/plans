@@ -95,7 +95,7 @@ def test_create_periodization_plan():
 
     plan = proc.initialize_periodization_plan(periodization_plan)
 
-    assert 4.5 == plan.athlete_capacities.anaerobic_threshold_training.rpe.observed_value
+    assert 5.0 == plan.athlete_capacities.anaerobic_threshold_training.rpe.observed_value
 
 
 def test_update_periodization_plan_week():

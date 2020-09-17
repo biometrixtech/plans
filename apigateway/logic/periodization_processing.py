@@ -118,7 +118,7 @@ class PeriodizationPlanProcessor(object):
             for training_exposure in athlete_target_training_exposure.training_exposures:
                 detailed_adaptation_type = training_exposure.detailed_adaptation_type.name
                 athlete_capacity = getattr(periodization_plan.athlete_capacities, detailed_adaptation_type)
-                training_exposure.rpe = athlete_capacity.rpe
+                training_exposure.rpe = athlete_capacity.rpe.plagiarize()
                 if training_exposure.weekly_load_percentage is None:
                     training_exposure.volume = athlete_capacity.volume
                 else:
@@ -216,7 +216,7 @@ class PeriodizationPlanProcessor(object):
                 for training_exposure in target_training_exposure.training_exposures:
                     detailed_adaptation_type = training_exposure.detailed_adaptation_type.name
                     athlete_capacity = getattr(periodization_plan.athlete_capacities, detailed_adaptation_type)
-                    training_exposure.rpe = athlete_capacity.rpe
+                    training_exposure.rpe = athlete_capacity.rpe.plagiarize()
                     if training_exposure.weekly_load_percentage is None:
                         training_exposure.volume = athlete_capacity.volume
                     else:
@@ -297,11 +297,11 @@ class PeriodizationPlanProcessor(object):
                         rpe_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.rpe_load_contribution
                         volume_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.volume_load_contribution
                         if training_exposure.rpe.lower_bound is not None:
-                            training_exposure.rpe.lower_bound = training_exposure.rpe.lower_bound * (1 + rpe_lower_ratio)
+                            training_exposure.rpe.lower_bound = min(training_exposure.rpe.lower_bound * (1 + rpe_lower_ratio), 10)
                         if training_exposure.rpe.observed_value is not None:
-                            training_exposure.rpe.observed_value = training_exposure.rpe.observed_value * (1 + ((rpe_lower_ratio + rpe_upper_ratio)/float(2)))
+                            training_exposure.rpe.observed_value = min(training_exposure.rpe.observed_value * (1 + ((rpe_lower_ratio + rpe_upper_ratio)/float(2))),10)
                         if training_exposure.rpe.upper_bound is not None:
-                            training_exposure.rpe.upper_bound = training_exposure.rpe.upper_bound * (1 + rpe_upper_ratio)
+                            training_exposure.rpe.upper_bound = min(training_exposure.rpe.upper_bound * (1 + rpe_upper_ratio), 10)
                         if training_exposure.volume.lower_bound is not None:
                             training_exposure.volume.lower_bound = training_exposure.volume.lower_bound * (1 + volume_lower_ratio)
                         if training_exposure.volume.observed_value is not None:

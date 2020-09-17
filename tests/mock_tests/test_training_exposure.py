@@ -17,14 +17,14 @@ def test_get_muscular_endurance_base_aerobic_planned_workout():
 
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
-    exercise.predicted_rpe = StandardErrorRange(lower_bound=2, upper_bound=3)
+    exercise.predicted_rpe = StandardErrorRange(lower_bound=5.5, upper_bound=6)
     exercise.duration = 250
 
     proc = TrainingExposureProcessor()
     exposures = proc.get_exposures(exercise)
     assert 2 == len(exposures)
     assert DetailedAdaptationType.muscular_endurance == exposures[0].detailed_adaptation_type
-    assert DetailedAdaptationType.base_aerobic_training == exposures[1].detailed_adaptation_type
+    assert DetailedAdaptationType.anaerobic_threshold_training == exposures[1].detailed_adaptation_type
 
 
 def test_get_muscular_endurance_anaerobic_threshold_planned_workout():
@@ -59,7 +59,7 @@ def test_get_strength_endurance_planned_workout():
 
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_strength
-    exercise.predicted_rpe = StandardErrorRange(lower_bound=6, observed_value=7, upper_bound=8)
+    exercise.predicted_rpe = StandardErrorRange(lower_bound=5, observed_value=6, upper_bound=7)
     exercise.movement_speed = MovementSpeed.mod
     exercise.reps_per_set = 10
 
@@ -117,7 +117,7 @@ def test_get_max_strength_planned_workout():
 def test_get_speed_power_adaptation_types_planned_workout():
 
     speeds = [MovementSpeed.fast, MovementSpeed.explosive]
-    resistances = [MovementResistance.none, MovementResistance.low]
+    resistances = [MovementResistance.none]
     power_types = [AdaptationType.power_drill, AdaptationType.power_explosive_action]
 
     for speed in speeds:
@@ -167,7 +167,7 @@ def test_get_power_power_adaptation_types_planned_workout():
             exercise.adaptation_type = power_type
             exercise.predicted_rpe = None
             exercise.movement_speed = speed
-            exercise.resistance = MovementResistance.mod
+            exercise.resistance = MovementResistance.low
             exercise.reps_per_set = None
 
             proc = TrainingExposureProcessor()
