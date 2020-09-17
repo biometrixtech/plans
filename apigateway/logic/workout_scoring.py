@@ -27,7 +27,8 @@ class WorkoutScoringProcessor(object):
 
         return total_score
 
-    def is_safe(self, athlete_baseline_capacities, training_exposures):
+    def is_safe(self, athlete_baseline_capacities, training_exposures, injury_risk_dict=None,
+                session_load_dict=None):
 
         safe = True
 
@@ -35,6 +36,8 @@ class WorkoutScoringProcessor(object):
             exposure_adaptation_name = training_exposure.detailed_adaptation_type.name
             athlete_capacity = getattr(athlete_baseline_capacities, exposure_adaptation_name)
             if athlete_capacity is None:
+                return False
+            if athlete_capacity.rpe is None or athlete_capacity.volume is None:
                 return False
             if (athlete_capacity.rpe.highest_value() * 1.10 < training_exposure.rpe.highest_value() or
                 athlete_capacity.volume.highest_value() * 1.10 < training_exposure.volume.highest_value()):
