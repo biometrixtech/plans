@@ -166,14 +166,14 @@ class SessionFunctionalMovement(object):
                                                                                                      self.injury_risk_dict,
                                                                                                      event_date, function_movement_dict)
                                 # functional_movement_action_mapping.set_compensation_load(self.injury_risk_dict, event_date)
-                                detailed_load_processor.add_load(functional_movement_action_mapping,
-                                                                 workout_exercise.adaptation_type,
-                                                                 sub_action,
-                                                                 workout_exercise.power_load,
-                                                                 reps=workout_exercise.reps_per_set,
-                                                                 duration=workout_exercise.total_volume,
-                                                                 rpe_range=workout_exercise.rpe,
-                                                                 percent_max_hr=None)
+                                # detailed_load_processor.add_load(functional_movement_action_mapping,
+                                #                                  workout_exercise.adaptation_type,
+                                #                                  sub_action,
+                                #                                  workout_exercise.power_load,
+                                #                                  reps=workout_exercise.reps_per_set,
+                                #                                  duration=workout_exercise.total_volume,
+                                #                                  rpe_range=workout_exercise.rpe,
+                                #                                  percent_max_hr=None)
 
                                 self.functional_movement_mappings.append(functional_movement_action_mapping)
 
@@ -185,28 +185,28 @@ class SessionFunctionalMovement(object):
                                     else:
                                         workout_load[muscle].merge(load)
 
-        detailed_load_processor.rank_types()
-        self.completed_session_details.session_detailed_load = detailed_load_processor.session_detailed_load
-        self.completed_session_details.training_type_load = detailed_load_processor.session_training_type_load
-        self.completed_session_details.ranked_muscle_load = detailed_load_processor.ranked_muscle_load
-        if self.session is not None:
-            self.completed_session_details.power_load = self.session.power_load
-            self.completed_session_details.rpe_load = self.session.rpe_load
-            if self.session.session_RPE is not None:
-                if isinstance(self.session.session_RPE, StandardErrorRange):
-                    self.completed_session_details.session_RPE = self.session.session_RPE
-                else:
-                    self.completed_session_details.session_RPE = StandardErrorRange(observed_value=self.session.session_RPE)
-            else:
-                self.completed_session_details.session_RPE = StandardErrorRange()
-            self.completed_session_details.training_volume = self.session.training_volume
-            if self.session.duration_minutes is not None:
-                self.completed_session_details.duration = self.session.duration_minutes * 60
-        else:
-            # TODO - is this the best way to handle this?
-            self.completed_session_details.power_load = StandardErrorRange()
-            self.completed_session_details.rpe_load = StandardErrorRange()
-            self.completed_session_details.session_RPE = StandardErrorRange()
+        # detailed_load_processor.rank_types()
+        # self.completed_session_details.session_detailed_load = detailed_load_processor.session_detailed_load
+        # self.completed_session_details.training_type_load = detailed_load_processor.session_training_type_load
+        # self.completed_session_details.ranked_muscle_load = detailed_load_processor.ranked_muscle_load
+        # if self.session is not None:
+        #     self.completed_session_details.power_load = self.session.power_load
+        #     self.completed_session_details.rpe_load = self.session.rpe_load
+        #     if self.session.session_RPE is not None:
+        #         if isinstance(self.session.session_RPE, StandardErrorRange):
+        #             self.completed_session_details.session_RPE = self.session.session_RPE
+        #         else:
+        #             self.completed_session_details.session_RPE = StandardErrorRange(observed_value=self.session.session_RPE)
+        #     else:
+        #         self.completed_session_details.session_RPE = StandardErrorRange()
+        #     self.completed_session_details.training_volume = self.session.training_volume
+        #     if self.session.duration_minutes is not None:
+        #         self.completed_session_details.duration = self.session.duration_minutes * 60
+        # else:
+        #     # TODO - is this the best way to handle this?
+        #     self.completed_session_details.power_load = StandardErrorRange()
+        #     self.completed_session_details.rpe_load = StandardErrorRange()
+        #     self.completed_session_details.session_RPE = StandardErrorRange()
         return workout_load
 
     @xray_recorder.capture('logic.SessionFunctionalMovement.process_workout_load')
