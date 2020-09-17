@@ -536,8 +536,7 @@ def test_power_detection():
     no_speed_length = len(no_speed_list)
     no_resistance_length = len(no_resistance_list)
 
-    # TODO: there are no actions that fall under this category
-    assert detailed_load_processor.session_detailed_load.power.lowest_value() == 0
+    assert detailed_load_processor.session_detailed_load.power.lowest_value() != 0
 
 
 # def test_power_from_power_drills_plyometrics():
