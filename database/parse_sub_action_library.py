@@ -44,6 +44,9 @@ class SubActionLibraryParser(object):
                             self.sub_actions[action_item.id].shoulder_scapula_joint_action.extend(action_item.shoulder_scapula_joint_action)
                             self.sub_actions[action_item.id].elbow_joint_action.extend(action_item.elbow_joint_action)
                             self.sub_actions[action_item.id].wrist_joint_action.extend(action_item.wrist_joint_action)
+                else:
+                    if row['sub_action_name'] != '':
+                        print(f"sub_action_id is missing:{row['sub_action_name']}")
 
     def load_compound_actions(self, compound_action_files):
         """
@@ -80,6 +83,8 @@ class SubActionLibraryParser(object):
                                 compound_action.training_type = self.get_training_type(row['training_type'])
                             except:
                                 return None
+                        else:
+                            print(f"training_type missing for compound action: {compound_action_file}, {compound_action.id}")
 
                         if self.is_valid(row, 'eligible_external_resistance'):
                             row['eligible_external_resistance'] = row[
@@ -92,6 +97,8 @@ class SubActionLibraryParser(object):
                                                                                 resistances]
                             except:
                                 print(f"eligible_external_resistance: {row['eligible_external_resistance']}")
+                        else:
+                            print(f"equipment missing: {compound_action_file}, {compound_action.id}")
 
                         if self.is_valid(row, 'resistance', False):
                             compound_action.resistance = MovementResistance[row['resistance']]
@@ -108,6 +115,8 @@ class SubActionLibraryParser(object):
                     elif compound_action.id is not None:
                         rows.append(row)
                 else:
+                    if row['sub_action_id'] != '':
+                        print(f"action_id missing: {compound_action_file}, {compound_action.id}, {row['sub_action_id']}")
                     if len(rows) > 0 and compound_action.id is not None:
                         compound_action = self.parse_compound_action_row(rows, compound_action)
                         self.actions.append(compound_action)
@@ -124,7 +133,6 @@ class SubActionLibraryParser(object):
     def parse_compound_action_row(self, rows, compound_action):
 
         action = ExerciseAction(None, None)
-
         for row in rows:
             if action.id is None or action.id != row['id']:
                 if action.id is not None:
@@ -137,6 +145,10 @@ class SubActionLibraryParser(object):
                     if row['speed'] == 'no_speed':  # TODO this needs to be fixed in spreadsheet
                         row['speed'] = 'none'
                     action.speed = self.get_speed(row['speed'])
+                else:
+                    if compound_action.training_type != TrainingType.strength_cardiorespiratory:
+                        print(f"speed missing for action: {row['id']}, in compound action:{compound_action.id}")
+
 
             if self.is_valid(row, 'sub_action_id'):
                 sub_action_id = row['sub_action_id']
@@ -213,7 +225,7 @@ class SubActionLibraryParser(object):
                         try:
                             lateral_distribution = [int(float(val.strip())) for val in lateral_distribution]
                         except ValueError:
-                            print(lateral_distribution, sub_action_id)
+                            print(f"lateral_distribution incorrectly defined for sub_action: {sub_action_id}, {lateral_distribution}")
                         else:
                             if len(lateral_distribution) == 0:
                                 new_subaction.lateral_distribution = [50, 50]
@@ -245,12 +257,14 @@ class SubActionLibraryParser(object):
                     action.sub_actions.append(new_subaction)
                 else:
                     print("ERROR: SUBACTION NOT FOUND")
+            else:
+                print(f'sub_action id missing: {compound_action.id}')
 
         if action.id is not None:
-            if action.speed is None:
-                action.speed = compound_action.speed
-            if action.resistance is None:
-                action.resistance = compound_action.resistance
+            # if action.speed is None:
+            #     action.speed = compound_action.speed
+            # if action.resistance is None:
+            #     action.resistance = compound_action.resistance
             compound_action.actions.append(action)
 
         return compound_action
@@ -268,6 +282,9 @@ class SubActionLibraryParser(object):
 
             if self.is_valid(row, 'muscle_action'):
                 action.primary_muscle_action = MuscleAction[row['muscle_action']]
+            else:
+                if action.primary_muscle_action is None:
+                    print(f'muscle_action missing: {action.id}')
 
             # New
             if self.is_valid(row, 'movement_system'):
@@ -328,7 +345,7 @@ class SubActionLibraryParser(object):
                 try:
                     lateral_distribution = [int(float(val.strip())) for val in lateral_distribution]
                 except ValueError:
-                    print(lateral_distribution, action.id)
+                    print(f"lateral_distribution incorrectly defined for sub_action: {action.id}, {lateral_distribution}")
                 else:
                     if len(lateral_distribution) == 0:
                         action.lateral_distribution = [50, 50]
@@ -339,6 +356,8 @@ class SubActionLibraryParser(object):
 
             return action
         else:
+            if row['sub_action_name'] is not None and row['sub_action_name'] != '':
+                print(f"sub_action_id is missing:{row['sub_action_name']}")
             return None
 
     def is_import_done(self, row):
@@ -479,6 +498,24 @@ class SubActionLibraryParser(object):
     #         return Explosiveness[explosiveness]
     #     return Explosiveness.no_force
 
+    def validate(self):
+        print("STARTING VALIDATION")
+        file_name = os.path.join(os.path.realpath('..'), f"apigateway/fml/actions_library.json")
+        with open(file_name, 'r') as f:
+            library = json.load(f)
+        all_actions = [CompoundAction.json_deserialise(ca) for ca in library.values()]
+        for compound_action in all_actions:
+            if compound_action.training_type is None:
+                print(f"training_type missing for compound_action: {compound_action.id}")
+
+            for action in compound_action.actions:
+                if action.speed is None and compound_action.training_type != TrainingType.strength_cardiorespiratory:
+                    print(f"speed missing for action: {action.id} in compound action: {compound_action.id}")
+                for sub_action in action.sub_actions:
+                    if len(sub_action.eligible_external_resistance) == 0:
+                        print(f"equipment missing for sub_action_id: {sub_action.id}")
+
+
 mapping = {
     "shoulder_flexion": "shoulder_flexion_and_scapular_upward_rotation",
     "shoulder_extension": "shoulder_extension_and_scapular_downward_rotation",
@@ -497,6 +534,8 @@ mapping = {
 
 }
 
+
+
 if __name__ == '__main__':
     action_parser = SubActionLibraryParser()
     # action_parser.load_data("_demo")
@@ -504,5 +543,6 @@ if __name__ == '__main__':
     # TODO: cardio sheet is incomplete, use the old _running sheet for now
     action_parser.load_sub_actions(["Cardio-Table 1", "PosturalStability-Table 1", "Strength-Table 1"])
     action_parser.load_compound_actions(["Cardio", "Strength", "Power", ])
+    action_parser.validate()
     j=0
 
