@@ -2,11 +2,12 @@ import statistics
 
 from models.body_parts import BodyPartFactory
 from models.compensation_source import CompensationSource
-from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, BodyPartFunctionalMovement, FunctionalMovementActionMapping, BodyPartFunction
+from models.functional_movement import ActivityFunctionalMovementFactory, FunctionalMovementFactory, \
+    FunctionalMovementActionMapping
 from models.body_part_injury_risk import BodyPartInjuryRisk
 from models.movement_tags import AdaptationType
 from models.session import SessionType
-from models.soreness_base import BodyPartLocation, BodyPartSide
+from models.soreness_base import BodyPartLocation, BodyPartSide, BodyPartFunction, BodyPartFunctionalMovement
 from models.training_load import CompletedSessionDetails
 from logic.detailed_load_processing import DetailedLoadProcessor
 from models.training_load import DetailedTrainingLoad

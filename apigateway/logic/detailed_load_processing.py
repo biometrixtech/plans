@@ -2,8 +2,9 @@ from models.movement_tags import DetailedAdaptationType, AdaptationType, Trainin
 from models.ranked_types import RankedBodyPart
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.movement_actions import MovementSpeed, ExerciseAction, MovementResistance
-from models.soreness_base import BodyPartSystems, BodyPartSide, BodyPartGeneralLocation, BodyPartLocation
-from models.functional_movement import BodyPartFunctionalMovement, FunctionalMovementActionMapping
+from models.soreness_base import BodyPartSystems, BodyPartSide, BodyPartGeneralLocation, BodyPartLocation, \
+    BodyPartFunctionalMovement
+from models.functional_movement import FunctionalMovementActionMapping
 from models.training_volume import StandardErrorRange
 from models.body_parts import BodyPartFactory
 
