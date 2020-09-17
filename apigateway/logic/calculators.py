@@ -1194,7 +1194,7 @@ class Calculators(object):
     @classmethod
     def get_force_level(cls, speed, resistance, displacement):
         force_level = None
-        if displacement is None or displacement.name in ['partial_rom', 'full_rom']:
+        if displacement is None or displacement.name in ['none', 'partial_rom', 'full_rom']:
             force_dict = {
                 'none': {'none': 'no_force', 'slow': 'mod_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
                 'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},

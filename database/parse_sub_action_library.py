@@ -44,9 +44,9 @@ class SubActionLibraryParser(object):
                             self.sub_actions[action_item.id].shoulder_scapula_joint_action.extend(action_item.shoulder_scapula_joint_action)
                             self.sub_actions[action_item.id].elbow_joint_action.extend(action_item.elbow_joint_action)
                             self.sub_actions[action_item.id].wrist_joint_action.extend(action_item.wrist_joint_action)
-                else:
-                    if row['sub_action_name'] != '':
-                        print(f"sub_action_id is missing:{row['sub_action_name']}")
+                # else:
+                #     if row['sub_action_name'] != '':
+                #         print(f"sub_action_id is missing:{row['sub_action_name']}")
 
     def load_compound_actions(self, compound_action_files):
         """
@@ -145,9 +145,9 @@ class SubActionLibraryParser(object):
                     if row['speed'] == 'no_speed':  # TODO this needs to be fixed in spreadsheet
                         row['speed'] = 'none'
                     action.speed = self.get_speed(row['speed'])
-                else:
-                    if compound_action.training_type != TrainingType.strength_cardiorespiratory:
-                        print(f"speed missing for action: {row['id']}, in compound action:{compound_action.id}")
+                # else:
+                #     if compound_action.training_type != TrainingType.strength_cardiorespiratory:
+                #         print(f"speed missing for action: {row['id']}, in compound action:{compound_action.id}")
 
 
             if self.is_valid(row, 'sub_action_id'):
@@ -161,7 +161,10 @@ class SubActionLibraryParser(object):
                     new_subaction.eligible_external_resistance = compound_action.eligible_external_resistance
                     new_subaction.speed = compound_action.speed
                     new_subaction.resistance = compound_action.resistance
-                    new_subaction.body_position = compound_action.body_position
+                    if sub_action.body_position is None:
+                        new_subaction.body_position = compound_action.body_position
+                    else:
+                        new_subaction.body_position = sub_action.body_position
 
                     # items inherited from compound action (if populated)
                     if self.is_valid(row, 'contribute_to_power_production'):
@@ -251,8 +254,8 @@ class SubActionLibraryParser(object):
                     new_subaction.elbow_joint_action = sub_action.elbow_joint_action
                     new_subaction.wrist_joint_action = sub_action.wrist_joint_action
 
-                    # TODO - we doing this again???
-                    new_subaction.body_position = sub_action.body_position
+                    # # TODO - we doing this again???
+                    # new_subaction.body_position = sub_action.body_position
 
                     action.sub_actions.append(new_subaction)
                 else:
@@ -316,13 +319,17 @@ class SubActionLibraryParser(object):
 
             if self.is_valid(row, 'apply_instability'):
                 action.apply_instability = row['apply_instability'].lower() == "true"
+            if action.apply_instability is None:
+                print(f"apply_instability missing for :{action.id}")
             if self.is_valid(row, 'apply_resistance'):
                 action.apply_resistance = row['apply_resistance'].lower() == "true"
 
             if self.is_valid(row, 'stance_lower_body'):
-                action.lower_body_stance = LowerBodyStance[row['stance_lower_body']]
+                if row['stance_lower_body'] != 'NAN':
+                    action.lower_body_stance = LowerBodyStance[row['stance_lower_body']]
             if self.is_valid(row, 'stance_upper_body'):
-                action.upper_body_stance = UpperBodyStance[row['stance_upper_body']]
+                if row['stance_upper_body'] != 'NAN':
+                    action.upper_body_stance = UpperBodyStance[row['stance_upper_body']]
 
             if self.is_valid(row, 'lateral_distribution_pattern'):
                 action.lateral_distribution_pattern = WeightDistribution[row['lateral_distribution_pattern']]
@@ -404,6 +411,8 @@ class SubActionLibraryParser(object):
                 movement_system_name = row['movement_system']
                 prioritized_movement_system = PrioritizedMovementSystem(priority, movement_system_name)
                 return [prioritized_movement_system]
+            else:
+                print(f"movement_system_priority missing for sub_action: {row['sub_action_id']}")
         return []
 
     def get_prioritized_joint_actions(self, row, joint):
@@ -431,11 +440,15 @@ class SubActionLibraryParser(object):
                     try:
                         res.append(PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]))
                     except:
-                        print(j_action)
+                        print(f"invalid joint_action {j_action}")
 
                     # return [PrioritizedJointAction(joint_priority, FunctionalMovementType[j_action]) for j_action in cleaned_joint_action]
                 # except:
                 #     print(cleaned_joint_action)
+            else:
+                print(f"invalid joint action priority: {row['sub_action_id']}, {row[f'{joint}_action']}")
+        # else:
+        #     print(f"invalid joint action: {row['sub_action_id']}")
         return res
 
     @staticmethod
@@ -507,13 +520,44 @@ class SubActionLibraryParser(object):
         for compound_action in all_actions:
             if compound_action.training_type is None:
                 print(f"training_type missing for compound_action: {compound_action.id}")
+            if compound_action.eligible_external_resistance is None or len(compound_action.eligible_external_resistance) == 0:
+                print(f"training_type missing for compound_action: {compound_action.id}")
 
             for action in compound_action.actions:
                 if action.speed is None and compound_action.training_type != TrainingType.strength_cardiorespiratory:
                     print(f"speed missing for action: {action.id} in compound action: {compound_action.id}")
+                # if action.body_position is None:
+                #     print(f"body_position missing for action: {action.id} in compound action: {compound_action.id}")
+                # if action.eligible_external_resistance is None or len(action.eligible_external_resistance) == 0:
+                #     print(f"equipment missing for action: {action.id} in compound action: {compound_action.id}")
                 for sub_action in action.sub_actions:
-                    if len(sub_action.eligible_external_resistance) == 0:
-                        print(f"equipment missing for sub_action_id: {sub_action.id}")
+                #     if len(sub_action.eligible_external_resistance) == 0:
+                #         print(f"equipment missing for sub_action_id: {sub_action.id}")
+                #     if sub_action.lateral_distribution is None:
+                #         print(f"lateral distribution missing for sub_action: {sub_action.id}")
+                #     if sub_action.lateral_distribution is None or sub_action.lateral_distribution == [0, 0]:
+                #         print(f"lateral distribution missing for sub_action: {sub_action.id}")
+                #     if sub_action.lateral_distribution_pattern is None:
+                #         print(f"lateral_distribution_pattern missing for sub_action: {sub_action.id}")
+                    if sub_action.body_position is None:
+                        print(f"body_position missing for sub_action: {sub_action.id}")
+                    # if sub_action.upper_body_stance is None:
+                    #     print(f"upper_body_stance missing for sub_action: {sub_action.id}")
+        print('SUB-ACTION VALIDATION')
+        for sub_action in self.sub_actions.values():
+            # if len(sub_action.eligible_external_resistance) == 0:
+            #     print(f"equipment missing for sub_action_id: {sub_action.id}")
+            if sub_action.lateral_distribution is None or sub_action.lateral_distribution == [0, 0]:
+                print(f"lateral distribution missing for sub_action: {sub_action.id}")
+            if sub_action.lateral_distribution_pattern is None:
+                print(f"lateral_distribution_pattern missing for sub_action: {sub_action.id}")
+            # if sub_action.body_position is None:
+            #     print(f"body_position missing for sub_action: {sub_action.id}")
+            # if sub_action.upper_body_stance is None:
+            #     print(f"upper_body_stance missing for sub_action: {sub_action.id}")
+            if sub_action.apply_instability is None:
+                print(f"apply_instability missing for sub_action: {sub_action.id}")
+
 
 
 mapping = {
@@ -533,8 +577,6 @@ mapping = {
     "anterior_pelvic_tilt": "pelvic_anterior_tilt"
 
 }
-
-
 
 if __name__ == '__main__':
     action_parser = SubActionLibraryParser()
