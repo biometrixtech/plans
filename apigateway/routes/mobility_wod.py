@@ -36,53 +36,18 @@ def handle_mobility_wod_create(user_id):
     validate_data()
     event_date_time = parse_datetime(request.json['event_date_time'])
     # event_date = fix_early_survey_event_date(event_date)
-    timezone = get_timezone(event_date_time)
-
-    # set up processing
-    user_stats = user_stats_datastore.get(athlete_id=user_id)
-    if user_stats is None:
-        user_stats = UserStats(user_id)
-        user_stats.event_date = event_date_time
-    user_stats.api_version = Config.get('API_VERSION')
-    user_stats.timezone = timezone
-    api_processor = APIProcessing(
-            user_id,
-            event_date_time,
-            user_stats=user_stats,
-            datastore_collection=datastore_collection
-    )
-    api_processor.user_age = request.json.get('user_age', 20)
-
-    # process new symptoms, if any sent
-    if 'symptoms' in request.json:
-        for symptom in request.json['symptoms']:
-            if symptom is None:
-                continue
-            api_processor.create_symptom_from_survey(symptom)
-
-    # process new session, if any sent
     if len(request.json.get('sessions', [])) > 0:
         sessions = request.json['sessions']
-        for session in sessions:
-            api_processor.create_session_from_survey(session)
+    else:
+        sessions = None
 
-    # store the symptoms, session, workout_program and heart rate, if any exist
-    if len(api_processor.symptoms) > 0:
-        symptom_datastore.put(api_processor.symptoms)
+    if 'symptoms' in request.json:
+        symptoms = request.json['symptoms']
+    else:
+        symptoms = None
 
-    # Session will be saved during create_actiity
-    # if len(api_processor.sessions) > 0:
-    #     training_session_datastore.put(api_processor.sessions)
-
-    if len(api_processor.workout_programs) > 0:
-        workout_program_datastore.put(api_processor.workout_programs)
-
-    if len(api_processor.heart_rate_data) > 0:
-        heart_rate_datastore.put(api_processor.heart_rate_data)
-
-    mobility_wod = api_processor.create_activity(
-            activity_type='mobility_wod'
-    )
+    mobility_wod = get_mobility_wod(event_date_time, user_id, sessions=sessions, symptoms=symptoms,
+                                    user_age=request.json.get('user_age', 20))
 
     return {'mobility_wod': mobility_wod.json_serialise(api=True, consolidated=consolidated)}, 201
 
@@ -190,3 +155,45 @@ def validate_data():
                 raise InvalidSchemaException('session_type is required parameter for a session')
             except ValueError:
                 raise InvalidSchemaException('invalid session_type')
+
+
+def get_mobility_wod(event_date_time, user_id, sessions=None, symptoms=None, user_age=20):
+    timezone = get_timezone(event_date_time)
+    # set up processing
+    user_stats = user_stats_datastore.get(athlete_id=user_id)
+    if user_stats is None:
+        user_stats = UserStats(user_id)
+        user_stats.event_date = event_date_time
+    user_stats.api_version = Config.get('API_VERSION')
+    user_stats.timezone = timezone
+    api_processor = APIProcessing(
+        user_id,
+        event_date_time,
+        user_stats=user_stats,
+        datastore_collection=datastore_collection
+    )
+    api_processor.user_age = user_age
+    # process new symptoms, if any sent
+    if symptoms is not None:
+        for symptom in symptoms:
+            # if symptom is None:
+            #     continue
+            api_processor.create_symptom_from_survey(symptom)
+    # process new session, if any sent
+    if sessions is not None:
+        for session in sessions:
+            api_processor.create_session_from_survey(session)
+    # store the symptoms, session, workout_program and heart rate, if any exist
+    if len(api_processor.symptoms) > 0:
+        symptom_datastore.put(api_processor.symptoms)
+    # Session will be saved during create_actiity
+    # if len(api_processor.sessions) > 0:
+    #     training_session_datastore.put(api_processor.sessions)
+    if len(api_processor.workout_programs) > 0:
+        workout_program_datastore.put(api_processor.workout_programs)
+    if len(api_processor.heart_rate_data) > 0:
+        heart_rate_datastore.put(api_processor.heart_rate_data)
+    mobility_wod = api_processor.create_activity(
+        activity_type='mobility_wod'
+    )
+    return mobility_wod
