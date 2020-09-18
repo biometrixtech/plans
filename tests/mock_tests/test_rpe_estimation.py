@@ -226,3 +226,27 @@ def test_get_reps_for_bodyweight_ex_460():
     workout_processor = WorkoutProcessor()
     reps = workout_processor.get_max_reps_for_bodyweight_exercises(4.6)
     assert reps == 109
+
+
+# def test_get_rpe_ranges():
+#
+#     workout_processor = WorkoutProcessor()
+#     intensities ={'strength_endurance': {'intensity': (50, 70), 'reps': (20, 12)},
+#                     'hypertrophy': {'intensity': (75, 85), 'reps': (12, 6)},
+#                     'max_strength': {'intensity': (85, 100), 'reps': (5, 1) }
+#                   }
+#     for int_name, values in intensities.items():
+#         all_rep_maxes = []
+#         percentages = values['intensity']
+#         reps = values['reps']
+#         all_rpes = []
+#         for perc in percentages:
+#             for rep in range(1, reps[0] + 1):
+#                 n_rep_max = workout_processor.get_reps_for_percent_rep_max(perc)
+#                 rpe =  workout_processor.get_rpe_from_rep_max(n_rep_max, rep)
+#                 all_rpes.append((int_name, perc, n_rep_max, rep, rpe))
+#         print(all_rpes)
+#     print('here')
+#     # reps = workout_processor.get_reps_for_percent_rep_max(77)
+#     print(workout_processor.get_reps_for_percent_rep_max(55))
+#     print(workout_processor.get_rpe_from_rep_max(25, 20))
