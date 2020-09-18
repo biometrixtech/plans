@@ -36,7 +36,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 3,
+        "speed": 2,
         "resistance": 0,
         "displacement": 4,
         "rep_tempo": [],
@@ -61,7 +61,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 4,
+        "speed": 3,
         "resistance": 0,
         "displacement": 5,
         "rep_tempo": [],
@@ -97,6 +97,35 @@
             "5"
         ],
         "bilateral_distribution_of_resistance": 3,
+        "actions_for_power": []
+    },
+    "rowing, 26 strokes per minute": {
+        "id": "rowing, 26 strokes per minute",
+        "name": "erg rowing",
+        "training_type": 1,
+        "cardio_action": 3,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            1
+        ],
+        "speed": 2,
+        "resistance": 2,
+        "displacement": 2,
+        "rep_tempo": [
+            1.15,
+            0.0,
+            1.15
+        ],
+        "rest_between_reps": 0.0,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "30"
+        ],
+        "bilateral_distribution_of_resistance": 0,
         "actions_for_power": []
     },
     "rowing": {
@@ -140,7 +169,7 @@
         "external_weight_implement": [
             1
         ],
-        "speed": 3,
+        "speed": 4,
         "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
@@ -1204,7 +1233,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -1282,7 +1311,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -1360,7 +1389,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -1438,7 +1467,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -1507,7 +1536,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -1585,7 +1614,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -1663,7 +1692,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 1,
+        "speed": 2,
         "resistance": 0,
         "displacement": 2,
         "rep_tempo": [
@@ -1757,7 +1786,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 2,
+        "speed": 3,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -2129,7 +2158,7 @@
         "external_weight_implement": [
             0
         ],
-        "speed": 3,
+        "speed": 4,
         "resistance": 0,
         "displacement": 3,
         "rep_tempo": [
@@ -3867,7 +3896,7 @@
     "dumbbell clean and press": {
         "id": "dumbbell clean and press",
         "name": "single arm clean and press",
-        "training_type": 3,
+        "training_type": 5,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -3937,7 +3966,7 @@
     "dumbbell snatch": {
         "id": "dumbbell snatch",
         "name": "single arm clean",
-        "training_type": 3,
+        "training_type": 5,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -4006,7 +4035,7 @@
     "hand to hand kettlebell swings": {
         "id": "hand to hand kettlebell swings",
         "name": "single arm kettlebell swing",
-        "training_type": 3,
+        "training_type": 5,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -4075,7 +4104,7 @@
     "kettlebell swings": {
         "id": "kettlebell swings",
         "name": "kettlebell swing",
-        "training_type": 3,
+        "training_type": 5,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -4144,7 +4173,7 @@
     "one arm kettlebell swings": {
         "id": "one arm kettlebell swings",
         "name": "single arm kettlebell swing",
-        "training_type": 3,
+        "training_type": 5,
         "cardio_action": null,
         "power_drill_action": null,
         "power_action": null,
@@ -4684,10 +4713,10 @@
         "strength_resistance_action": null,
         "strength_endurance_action": null,
         "external_weight_implement": [
-            0
+            15
         ],
         "speed": 3,
-        "resistance": 2,
+        "resistance": 1,
         "displacement": 4,
         "rep_tempo": [
             0.25,
@@ -5765,10 +5794,10 @@
         "strength_resistance_action": null,
         "strength_endurance_action": null,
         "external_weight_implement": [
-            0
+            15
         ],
         "speed": 4,
-        "resistance": 2,
+        "resistance": 1,
         "displacement": 4,
         "rep_tempo": [
             0.25,
@@ -5957,6 +5986,91 @@
                 ],
                 "percent_bodyheight": [
                     0.2
+                ],
+                "description": "None"
+            }
+        ]
+    },
+    "lateral step-ups": {
+        "id": "lateral step-ups",
+        "name": "lateral step up",
+        "training_type": 6,
+        "cardio_action": null,
+        "power_drill_action": null,
+        "power_action": null,
+        "strength_resistance_action": null,
+        "strength_endurance_action": null,
+        "external_weight_implement": [
+            0
+        ],
+        "speed": 3,
+        "resistance": 0,
+        "displacement": 2,
+        "rep_tempo": [
+            0.25,
+            0.0,
+            0.25,
+            1.0,
+            0.5,
+            1.0
+        ],
+        "rest_between_reps": 0.5,
+        "surface_stability": 0,
+        "explosiveness_rating": 0,
+        "compound_actions": [
+            "611"
+        ],
+        "bilateral_distribution_of_resistance": 3,
+        "actions_for_power": [
+            {
+                "muscle_action": [
+                    4
+                ],
+                "time": 1.0,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": [
+                    0
+                ],
+                "time": 0.25,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": [
+                    2
+                ],
+                "time": 0.75,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.0
+                ],
+                "description": "None"
+            },
+            {
+                "muscle_action": [
+                    1
+                ],
+                "time": 1.0,
+                "percent_bodyweight": [
+                    0.7963
+                ],
+                "percent_bodyheight": [
+                    0.24050000000000002
                 ],
                 "description": "None"
             }
@@ -14055,91 +14169,6 @@
                     2
                 ],
                 "time": 0.0,
-                "percent_bodyweight": [
-                    0.7963
-                ],
-                "percent_bodyheight": [
-                    0.0
-                ],
-                "description": "None"
-            },
-            {
-                "muscle_action": [
-                    1
-                ],
-                "time": 1.0,
-                "percent_bodyweight": [
-                    0.7963
-                ],
-                "percent_bodyheight": [
-                    0.24050000000000002
-                ],
-                "description": "None"
-            }
-        ]
-    },
-    "lateral step-ups": {
-        "id": "lateral step-ups",
-        "name": "lateral step up",
-        "training_type": 6,
-        "cardio_action": null,
-        "power_drill_action": null,
-        "power_action": null,
-        "strength_resistance_action": null,
-        "strength_endurance_action": null,
-        "external_weight_implement": [
-            0
-        ],
-        "speed": 3,
-        "resistance": 0,
-        "displacement": 2,
-        "rep_tempo": [
-            0.25,
-            0.0,
-            0.25,
-            1.0,
-            0.5,
-            1.0
-        ],
-        "rest_between_reps": 0.5,
-        "surface_stability": 0,
-        "explosiveness_rating": 0,
-        "compound_actions": [
-            "611"
-        ],
-        "bilateral_distribution_of_resistance": 3,
-        "actions_for_power": [
-            {
-                "muscle_action": [
-                    4
-                ],
-                "time": 1.0,
-                "percent_bodyweight": [
-                    0.7963
-                ],
-                "percent_bodyheight": [
-                    0.0
-                ],
-                "description": "None"
-            },
-            {
-                "muscle_action": [
-                    0
-                ],
-                "time": 0.25,
-                "percent_bodyweight": [
-                    0.7963
-                ],
-                "percent_bodyheight": [
-                    0.24050000000000002
-                ],
-                "description": "None"
-            },
-            {
-                "muscle_action": [
-                    2
-                ],
-                "time": 0.75,
                 "percent_bodyweight": [
                     0.7963
                 ],
