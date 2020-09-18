@@ -152,7 +152,7 @@ def test_get_sustained_power_power_adaptation_types_planned_workout():
 
             proc = TrainingExposureProcessor()
             exposures = proc.get_exposures(exercise)
-            assert 1 == len(exposures)
+            assert 2 == len(exposures)
             assert DetailedAdaptationType.sustained_power == exposures[0].detailed_adaptation_type
 
 

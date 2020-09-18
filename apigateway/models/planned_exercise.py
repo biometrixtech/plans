@@ -6,7 +6,7 @@ from models.movement_actions import CompoundAction
 from models.training_volume import StandardErrorRange, Assignment, MovementOption
 from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.soreness_base import BodyPartSide
+from models.soreness_base import BodyPartSide, BodyPartFunctionalMovement
 from models.exposure import TrainingExposure
 from serialisable import Serialisable
 
@@ -154,7 +154,8 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         workout_load.projected_training_volume = input_dict.get('projected_training_volume', 0)
 
         for item in input_dict.get('muscle_detailed_load', []):
-            workout_load.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
+            #workout_load.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = DetailedTrainingLoad.json_deserialise(item['detailed_load'])
+            workout_load.muscle_detailed_load[BodyPartSide.json_deserialise(item['body_part'])] = BodyPartFunctionalMovement.json_deserialise(item['detailed_load'])
 
         return workout_load
 

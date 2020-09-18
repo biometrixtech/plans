@@ -48,6 +48,7 @@ database/NTC/*
 database/andra_garmin/*
 !database/andra_garmin/*.py
 database/september_demo
+!database/september_demo/*.py
 *.numbers
 database/fml/*.*
 database/Fathom*/*.*

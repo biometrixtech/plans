@@ -8,9 +8,8 @@ from models.sport import SportName, SportType
 from models.post_session_survey import PostSurvey
 from models.asymmetry import Asymmetry
 from models.movement_patterns import MovementPatterns
-from models.soreness_base import BodyPartSide, BodyPartLocation
+from models.soreness_base import BodyPartSide, BodyPartLocation, BodyPartFunction, BodyPartFunctionalMovement
 from models.workout_program import WorkoutProgramModule
-from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
 from models.movement_tags import TrainingType, AdaptationType
 from models.training_volume import StandardErrorRange
 from models.planned_exercise import PlannedWorkout

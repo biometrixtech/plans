@@ -171,7 +171,8 @@ class ActivityManager(object):
         responsive_recovery = self.exercise_assignment_calculator.get_responsive_recovery(self.athlete_id, force_on_demand=force_on_demand)
         if responsive_recovery_id is not None:
             responsive_recovery.responsive_recovery_id = responsive_recovery_id
-        responsive_recovery.training_session_id = self.active_training_sessions[0].id
+        if len(self.active_training_sessions) > 0:
+            responsive_recovery.training_session_id = self.active_training_sessions[0].id
         self.responsive_recovery_datastore.put(responsive_recovery)
         self.save_session()
 

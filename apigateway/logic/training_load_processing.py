@@ -214,7 +214,11 @@ class TrainingLoadProcessing(object):
         self.a_internal_load_values.extend(x.rpe_load for x in acute_training_sessions if x.rpe_load is not None)
 
         for w in chronic_weeks_training_sessions:
-            self.c_internal_load_values.extend(x.rpe_load for x in w if x.rpe_load is not None)
+            weeks_values = [x.rpe_load for x in w if x.rpe_load is not None]
+            week_sum = self.get_standard_error_range(expected_workouts_week=self.expected_weekly_workouts,
+                                                     values=weeks_values,
+                                                     return_sum=True)
+            self.c_internal_load_values.append(week_sum)
 
         self.internal_load_tuples.extend(list(x for x in self.get_session_attributes_tuple_list("event_date",
                                                                                                  "rpe_load",
@@ -292,8 +296,11 @@ class TrainingLoadProcessing(object):
         user_stats.acute_internal_total_load = self.get_standard_error_range(user_stats.expected_weekly_workouts,
                                                                                 self.a_internal_load_values)
 
-        user_stats.chronic_internal_total_load = self.get_standard_error_range(
-            user_stats.expected_weekly_workouts, self.c_internal_load_values)
+        # user_stats.chronic_internal_total_load = self.get_standard_error_range(
+        #     user_stats.expected_weekly_workouts, self.c_internal_load_values, return_sum=False)
+
+        # already factored in expected weekly workouts
+        user_stats.chronic_internal_total_load = StandardErrorRange.get_average_from_error_range_list(self.c_internal_load_values)
 
         user_stats.internal_acwr = self.get_acwr(user_stats.acute_internal_total_load,
                                                  user_stats.chronic_internal_total_load)
@@ -314,15 +321,29 @@ class TrainingLoadProcessing(object):
 
         internal_load_values = []
         if len(self.last_week_internal_values) > 0:
-            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.last_week_internal_values))
+            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.last_week_internal_values))
+            internal_load_values.append(
+                self.get_standard_error_range(self.expected_weekly_workouts, self.last_week_internal_values, return_sum=True))
         if len(self.previous_week_internal_values) > 0:
-            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_internal_values))
+            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_internal_values))
+            internal_load_values.append(
+                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_internal_values,
+                                              return_sum=True))
         if len(self.previous_week_2_internal_values) > 0:
-            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_internal_values))
+            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_internal_values))
+            internal_load_values.append(
+                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_2_internal_values,
+                                              return_sum=True))
         if len(self.previous_week_3_internal_values) > 0:
-            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_internal_values))
+            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_internal_values))
+            internal_load_values.append(
+                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_3_internal_values,
+                                              return_sum=True))
         if len(self.previous_week_4_internal_values) > 0:
-            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_internal_values))
+            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_internal_values))
+            internal_load_values.append(
+                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_4_internal_values,
+                                              return_sum=True))
 
         if len(internal_load_values) == 1:
             return StandardErrorRange.get_sum_from_error_range_list(internal_load_values)
