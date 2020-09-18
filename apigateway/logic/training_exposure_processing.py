@@ -78,7 +78,7 @@ class TrainingExposureProcessor(object):
                 exposures.append(exposure)
 
             # sustained power
-            if (exercise.duration is not None and exercise.duration >= 45 * 60 and
+            if (exercise.duration is not None and exercise.duration >= 45 and
                     (exercise.movement_speed == MovementSpeed.fast or exercise.movement_speed == MovementSpeed.explosive)):
                 exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
                 exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
