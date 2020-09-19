@@ -1257,7 +1257,7 @@
                 "time": 0.2,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
@@ -1289,7 +1289,7 @@
                 "time": 0.2,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
@@ -1335,11 +1335,11 @@
                 "time": 0.2,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
-                    0.159
+                    0.0425
                 ],
                 "description": "None"
             },
@@ -1367,11 +1367,11 @@
                 "time": 0.2,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
-                    0.159
+                    0.0425
                 ],
                 "description": "None"
             }
@@ -1413,7 +1413,7 @@
                 "time": 0.2,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.35700000000000004,
@@ -1445,7 +1445,7 @@
                 "time": 0.2,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.35700000000000004,
@@ -1489,7 +1489,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.10325
@@ -1502,10 +1502,10 @@
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
-                    1.0
+                    0.0
                 ],
                 "percent_bodyheight": [
-                    0.0
+                    -10.0
                 ],
                 "description": "None"
             },
@@ -1515,7 +1515,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.10325
@@ -1560,7 +1560,7 @@
                 "time": 0.17,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
@@ -1592,7 +1592,7 @@
                 "time": 0.17,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
@@ -1654,7 +1654,7 @@
                 "time": 0.25,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0,
@@ -1716,7 +1716,7 @@
                 "time": 0.25,
                 "percent_bodyweight": [
                     0.0,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0,
@@ -1732,7 +1732,7 @@
                 "time": 0.25,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
@@ -1748,7 +1748,7 @@
                 "time": 0.25,
                 "percent_bodyweight": [
                     0.0,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0,
@@ -1764,7 +1764,7 @@
                 "time": 0.25,
                 "percent_bodyweight": [
                     0.20370000000000002,
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002,
@@ -1808,7 +1808,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -1821,7 +1821,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.02
@@ -1847,7 +1847,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.02
@@ -1890,7 +1890,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -1903,7 +1903,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0425
@@ -1929,7 +1929,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0425
@@ -1972,7 +1972,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -1985,7 +1985,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.08
@@ -2011,7 +2011,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.08
@@ -2055,7 +2055,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2087,7 +2087,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2103,7 +2103,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.20370000000000002
                 ],
                 "percent_bodyheight": [
@@ -2135,7 +2135,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.20370000000000002
                 ],
                 "percent_bodyheight": [
@@ -2180,7 +2180,7 @@
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -2193,7 +2193,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0425
@@ -2219,7 +2219,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0425
@@ -2232,7 +2232,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0425
@@ -2258,7 +2258,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0425
@@ -2301,7 +2301,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -2314,7 +2314,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.03
@@ -2340,7 +2340,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.03
@@ -2383,7 +2383,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -2396,7 +2396,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -2422,7 +2422,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -2466,7 +2466,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -2479,7 +2479,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -2505,7 +2505,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -2548,7 +2548,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -2561,7 +2561,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.23675000000000002
@@ -2587,7 +2587,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.23675000000000002
@@ -2631,7 +2631,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2647,7 +2647,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2679,7 +2679,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2725,7 +2725,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2741,7 +2741,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2773,7 +2773,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0,
+                    0.5926,
                     0.0
                 ],
                 "percent_bodyheight": [
@@ -2818,10 +2818,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             },
@@ -2844,10 +2844,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             }
@@ -2887,10 +2887,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             },
@@ -2913,10 +2913,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             }
@@ -2956,10 +2956,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             },
@@ -2982,10 +2982,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             }
@@ -3025,10 +3025,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             },
@@ -3051,10 +3051,10 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             }
@@ -3094,10 +3094,10 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             },
@@ -3120,10 +3120,10 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
-                    0.0425
+                    0.02
                 ],
                 "description": "None"
             }
@@ -3163,7 +3163,7 @@
                 ],
                 "time": 0.17,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.08
@@ -3189,7 +3189,7 @@
                 ],
                 "time": 0.17,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.08
@@ -3232,7 +3232,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.413
@@ -3258,7 +3258,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.413
@@ -3301,7 +3301,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.413
@@ -3327,7 +3327,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.413
@@ -3370,7 +3370,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.413
@@ -3396,7 +3396,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.413
@@ -3439,7 +3439,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -3452,7 +3452,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -3478,7 +3478,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -3491,7 +3491,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.03
@@ -3517,7 +3517,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.03
@@ -3530,7 +3530,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -3556,7 +3556,7 @@
                 ],
                 "time": 0.1,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -3599,7 +3599,7 @@
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -3612,7 +3612,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -3638,7 +3638,7 @@
                 ],
                 "time": 0.2,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.1165
@@ -3681,7 +3681,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -3694,7 +3694,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002
@@ -3720,7 +3720,7 @@
                 ],
                 "time": 0.15,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.24050000000000002
@@ -3763,7 +3763,7 @@
                 ],
                 "time": 0.5,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -3776,7 +3776,7 @@
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.12
@@ -3802,7 +3802,7 @@
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.12
@@ -3845,7 +3845,7 @@
                 ],
                 "time": 0.5,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.0
@@ -3858,7 +3858,7 @@
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.12
@@ -3884,7 +3884,7 @@
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
-                    1.0
+                    0.5926
                 ],
                 "percent_bodyheight": [
                     0.12
