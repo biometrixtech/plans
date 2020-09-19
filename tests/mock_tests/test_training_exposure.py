@@ -2,7 +2,7 @@ from logic.training_exposure_processing import TrainingExposureProcessor
 from models.planned_exercise import PlannedExercise
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType, AdaptationType
-from models.movement_actions import MovementSpeed, MovementResistance
+from models.movement_actions import MovementSpeed, MovementResistance, MovementDisplacement
 
 # def get_planned_workout(exercise):
 #
@@ -13,7 +13,21 @@ from models.movement_actions import MovementSpeed, MovementResistance
 #     return planned_workout
 
 
-def test_get_muscular_endurance_base_aerobic_planned_workout():
+
+def test_get_base_aerobic_planned_workout():
+
+    exercise = PlannedExercise()
+    exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
+    exercise.predicted_rpe = StandardErrorRange(lower_bound=3, upper_bound=4)
+    exercise.duration = 350
+
+    proc = TrainingExposureProcessor()
+    exposures = proc.get_exposures(exercise)
+    assert 1 == len(exposures)
+    assert DetailedAdaptationType.base_aerobic_training == exposures[0].detailed_adaptation_type
+
+
+def test_get_anaerobic_threshold_planned_workout():
 
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
@@ -22,26 +36,12 @@ def test_get_muscular_endurance_base_aerobic_planned_workout():
 
     proc = TrainingExposureProcessor()
     exposures = proc.get_exposures(exercise)
-    assert 2 == len(exposures)
-    assert DetailedAdaptationType.muscular_endurance == exposures[0].detailed_adaptation_type
-    assert DetailedAdaptationType.anaerobic_threshold_training == exposures[1].detailed_adaptation_type
-
-
-def test_get_muscular_endurance_anaerobic_threshold_planned_workout():
-
-    exercise = PlannedExercise()
-    exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
-    exercise.predicted_rpe = StandardErrorRange(lower_bound=4, upper_bound=5)
-    exercise.duration = 250
-
-    proc = TrainingExposureProcessor()
-    exposures = proc.get_exposures(exercise)
     assert 1 == len(exposures)
-    assert DetailedAdaptationType.muscular_endurance == exposures[0].detailed_adaptation_type
-    #assert DetailedAdaptationType.anaerobic_threshold_training == exposures[1].detailed_adaptation_type
+    #assert DetailedAdaptationType.muscular_endurance == exposures[0].detailed_adaptation_type
+    assert DetailedAdaptationType.anaerobic_threshold_training == exposures[0].detailed_adaptation_type
 
 
-def test_get_sustained_power_high_intensity_anaerobic_planned_workout():
+def test_get_high_intensity_anaerobic_planned_workout():
 
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
@@ -50,9 +50,8 @@ def test_get_sustained_power_high_intensity_anaerobic_planned_workout():
 
     proc = TrainingExposureProcessor()
     exposures = proc.get_exposures(exercise)
-    assert 2 == len(exposures)
-    assert DetailedAdaptationType.sustained_power == exposures[0].detailed_adaptation_type
-    assert DetailedAdaptationType.high_intensity_anaerobic_training == exposures[1].detailed_adaptation_type
+    assert 1== len(exposures)
+    assert DetailedAdaptationType.high_intensity_anaerobic_training == exposures[0].detailed_adaptation_type
 
 
 def test_get_strength_endurance_planned_workout():
@@ -61,6 +60,8 @@ def test_get_strength_endurance_planned_workout():
     exercise.adaptation_type = AdaptationType.strength_endurance_strength
     exercise.predicted_rpe = StandardErrorRange(lower_bound=5, observed_value=6, upper_bound=7)
     exercise.movement_speed = MovementSpeed.mod
+    exercise.resistance = MovementResistance.very_low
+    exercise.displacement = MovementDisplacement.mod
     exercise.reps_per_set = 10
 
     proc = TrainingExposureProcessor()

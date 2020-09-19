@@ -1122,35 +1122,6 @@ class WorkoutProcessor(object):
 
         return bodyweight_ratio
 
-    @staticmethod
-    def get_exercise_reps_per_set(workout_exercise):
-        reps = StandardErrorRange(observed_value=0)
-        if workout_exercise.reps_per_set is not None:
-            reps.observed_value = workout_exercise.reps_per_set * workout_exercise.sets
-        elif workout_exercise.duration is not None:
-            possible_reps = []
-            if isinstance(workout_exercise.duration, Assignment):
-                durations = [workout_exercise.duration.min_value, workout_exercise.duration.max_value, workout_exercise.duration.assigned_value]
-                durations = [dur for dur in durations if dur is not None]
-            else:
-                durations = [workout_exercise.duration]
-            if workout_exercise.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics]:
-                # use a default for these training types so that rep count is not over inflated
-                duration_per_reps = [2]
-            else:
-                duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
-                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
-            for dur in durations:
-                for dur_per_rep in duration_per_reps:
-                    possible_reps.append(dur / dur_per_rep)
-            if len(possible_reps) > 0:
-                reps.lower_bound = min(possible_reps)
-                reps.upper_bound = max(possible_reps)
-                reps.observed_value = sum(possible_reps) / len(possible_reps)
-        # for unilateral alternating reps are defined as total reps but we need expected reps per side
-        if workout_exercise.bilateral_distribution_of_resistance == WeightDistribution.unilateral_alternating:
-            reps.divide(2)
-        return reps
 
     @staticmethod
     def get_rpe_from_speed_resistance_displacement(workout_exercise, reps):
@@ -1173,7 +1144,7 @@ class WorkoutProcessor(object):
             equipment = Equipment.bodyweight
 
         # get reps
-        reps = self.get_exercise_reps_per_set(workout_exercise)
+        reps = workout_exercise.get_exercise_reps_per_set()
         # use lookup table in all cases for now
         rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
 
