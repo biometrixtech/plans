@@ -1,6 +1,7 @@
 import os, json
 from models.movement_actions import Movement, MuscleAction
 from database.NTC.import_exercises import ClientExercise
+import copy
 
 
 class ExerciseMovementParser(object):
@@ -53,25 +54,27 @@ class ExerciseMovementParser(object):
                 exercise.base_movement_name = 'erg rowing'
             base_movement = self.base_movements.get(exercise.base_movement_name)
             if base_movement is None:
+                # movement = Movement(exercise.name, exercise.name)
+                # base_movement = copy.deepcopy(exercise)
                 if exercise.training_type.value not in [0, 7, 8]:
                     print(f"{exercise.name}, {exercise.base_movement_name}")
                 else:
                     pass
-                    # print(f"{exercise.name}, {exercise.training_type.value}")
+                    print(f"{exercise.name}, {exercise.training_type.value}")
             else:
                 base_movement = Movement.json_deserialise(base_movement)
                 movement = Movement(exercise.name, base_movement.name)
-                for attribute in self.attributes_to_copy:
-                    movement = self.copy_attributes(exercise, base_movement, movement, attribute)
                 movement.compound_actions = base_movement.compound_actions
                 # movement.primary_actions = base_movement.primary_actions
                 movement.cardio_action = base_movement.cardio_action
                 movement.actions_for_power = exercise.actions_for_power
 
-                # if exercise.bilateral_distribution_of_resistance != base_movement.bilateral_distribution_of_resistance:
-                #     print(f'{exercise.name}; {exercise.bilateral_distribution_of_resistance.name}; {base_movement.name}; {base_movement.bilateral_distribution_of_resistance}')
+            # if exercise.bilateral_distribution_of_resistance != base_movement.bilateral_distribution_of_resistance:
+            #     print(f'{exercise.name}; {exercise.bilateral_distribution_of_resistance.name}; {base_movement.name}; {base_movement.bilateral_distribution_of_resistance}')
+                for attribute in self.attributes_to_copy:
+                    movement = self.copy_attributes(exercise, base_movement, movement, attribute)
                 self.movements.append(movement)
-                # all_movements[exercise.name] = movement
+            # all_movements[exercise.name] = movement
         self.write_movements_json()
         print('here')
     @staticmethod

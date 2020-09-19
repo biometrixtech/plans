@@ -39,23 +39,24 @@ def test_hr_rpe():
         assert rpe2 > rpe1
 
 
-def test_bodyweight_ratio_rpe():
-    exercise = get_exercise()
-    exercise.adaptation_type = AdaptationType.strength_endurance_strength
-    exercise.reps_per_set = 10
-    exercise.weight = 25
-    exercise.weight_measure = WeightMeasure.actual_weight
-    rpe1 = WorkoutProcessor().get_rpe_from_weight(exercise)
-
-    exercise2 = get_exercise()
-    exercise2.adaptation_type = AdaptationType.strength_endurance_strength
-    exercise2.reps_per_set = 10
-    exercise2.weight = 35
-    exercise2.weight_measure = WeightMeasure.actual_weight
-    rpe2 = WorkoutProcessor().get_rpe_from_weight(exercise2)
-
-    if os.environ.get('CODEBUILD_RUN', '') != 'TRUE':
-        assert rpe1.observed_value < rpe2.observed_value
+# Not valid because of using lookup table
+# def test_bodyweight_ratio_rpe():
+#     exercise = get_exercise()
+#     exercise.adaptation_type = AdaptationType.strength_endurance_strength
+#     exercise.reps_per_set = 10
+#     exercise.weight = 25
+#     exercise.weight_measure = WeightMeasure.actual_weight
+#     rpe1 = WorkoutProcessor().get_rpe_from_weight(exercise)
+#
+#     exercise2 = get_exercise()
+#     exercise2.adaptation_type = AdaptationType.strength_endurance_strength
+#     exercise2.reps_per_set = 10
+#     exercise2.weight = 35
+#     exercise2.weight_measure = WeightMeasure.actual_weight
+#     rpe2 = WorkoutProcessor().get_rpe_from_weight(exercise2)
+#
+#     if os.environ.get('CODEBUILD_RUN', '') != 'TRUE':
+#         assert rpe1.observed_value < rpe2.observed_value
 
 
 def test_bodyweight_ratio_rpe_no_reps():

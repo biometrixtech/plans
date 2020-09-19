@@ -78,11 +78,13 @@ class TrainingExposureProcessor(object):
                 exposures.append(exposure)
 
             # sustained power
-            if (exercise.duration is not None and exercise.duration >= 45 and
-                    (exercise.movement_speed == MovementSpeed.fast or exercise.movement_speed == MovementSpeed.explosive)):
-                exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
-                exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                exposures.append(exposure)
+            if exercise.duration is not None:
+                duration = exercise.duration.highest_value() if isinstance(exercise.duration, Assignment) else exercise.duration
+                if (duration >= 45 and
+                        (exercise.movement_speed == MovementSpeed.fast or exercise.movement_speed == MovementSpeed.explosive)):
+                    exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
+                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
+                    exposures.append(exposure)
 
             if exercise.duration is not None:
                 duration = exercise.duration.highest_value() if isinstance(exercise.duration, Assignment) else exercise.duration
@@ -181,10 +183,12 @@ class TrainingExposureProcessor(object):
                            training_exposure.volume]
 
                 combined_exposure = TrainingExposure(training_exposure.detailed_adaptation_type)
+                combined_exposure.rpe = StandardErrorRange()
                 combined_exposure.rpe.lower_bound = StandardErrorRange.get_min_from_error_range_list(rpes)
                 combined_exposure.rpe.upper_bound = StandardErrorRange.get_max_from_error_range_list(rpes)
                 combined_exposure.rpe.observed_value = (combined_exposure.rpe.lower_bound + combined_exposure.rpe.upper_bound) / float(2)
 
+                combined_exposure.volume = StandardErrorRange()
                 combined_exposure.volume.lower_bound = StandardErrorRange.get_min_from_error_range_list(volumes)
                 combined_exposure.volume.upper_bound = StandardErrorRange.get_max_from_error_range_list(volumes)
                 combined_exposure.volume.observed_value = (combined_exposure.volume.lower_bound + combined_exposure.volume.upper_bound) / float(2)
@@ -194,8 +198,9 @@ class TrainingExposureProcessor(object):
                              combined_exposure.rpe.highest_value() * combined_exposure.volume.lowest_value(),
                              combined_exposure.rpe.highest_value() * combined_exposure.volume.highest_value()]
 
-                combined_exposure.rpe_load.lower_bound = StandardErrorRange.get_min_from_error_range_list(rpe_loads)
-                combined_exposure.rpe_load.upper_bound = StandardErrorRange.get_max_from_error_range_list(rpe_loads)
+                combined_exposure.rpe_load = StandardErrorRange()
+                combined_exposure.rpe_load.lower_bound = min(rpe_loads)
+                combined_exposure.rpe_load.upper_bound = max(rpe_loads)
                 combined_exposure.rpe_load.observed_value = (combined_exposure.rpe_load.lower_bound + combined_exposure.rpe_load.upper_bound) / float(2)
 
                 aggregated_exposures[training_exposure.detailed_adaptation_type] = combined_exposure

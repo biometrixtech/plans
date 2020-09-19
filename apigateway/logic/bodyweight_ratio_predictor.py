@@ -52,6 +52,10 @@ class BodyWeightRatioPredictor(object):
                 equipment_dumbbells = 1.0
             if equipment.name == 'machine':
                 equipment_machine = 1.0
+            if equipment.name == 'kettlebells':
+                equipment_dumbbells = 1.0
+            if equipment.name == 'medicine_balls':
+                equipment_dumbbells = 1.0
 
             fitness_level_0 = 0.0
             fitness_level_1 = 0.0

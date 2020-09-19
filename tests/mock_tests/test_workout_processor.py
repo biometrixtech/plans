@@ -146,7 +146,7 @@ def test_apply_explosiveness_to_actions():
 
     processor.set_action_explosiveness_from_exercise(exercise, [action_1, action_2])
 
-    assert action_1.explosiveness_rating == 8 * 0.75
+    assert action_1.explosiveness_rating == 8 * .8 # we have 5 categories now
     assert action_2.explosiveness_rating == 8 * 1.00
 
 
