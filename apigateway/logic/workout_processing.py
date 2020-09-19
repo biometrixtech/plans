@@ -157,22 +157,22 @@ class WorkoutProcessor(object):
     def set_session_intensity_metrics(self, session, workout_exercise):
         # update high intensity metrics
         if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and workout_exercise.predicted_rpe is not None:
-            if workout_exercise.predicted_rpe.lowest_value() is None:
+            if workout_exercise.predicted_rpe.highest_value() is None:
                 pass
-            elif workout_exercise.predicted_rpe.lowest_value() >= 7.65:
+            elif workout_exercise.predicted_rpe.highest_value() >= 7.65:
                 if isinstance(workout_exercise.duration, Assignment):
                     high_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
-                    high_intensity_minutes = high_intensity_minutes_assignment.lowest_value()
+                    high_intensity_minutes = high_intensity_minutes_assignment.highest_value()
                     session.total_minutes_at_high_intensity += high_intensity_minutes
                 else:
                     high_intensity_minutes = workout_exercise.duration / float(60)
                     session.total_minutes_at_high_intensity += high_intensity_minutes
                 if high_intensity_minutes >= 5.0:
                     session.total_blocks_at_high_intensity += 1
-            elif workout_exercise.predicted_rpe.lowest_value() >= 6.80:
+            elif workout_exercise.predicted_rpe.highest_value() >= 6.80:
                 if isinstance(workout_exercise.duration, Assignment):
                     moderate_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
-                    moderate_intensity_minutes = moderate_intensity_minutes_assignment.lowest_value()
+                    moderate_intensity_minutes = moderate_intensity_minutes_assignment.highest_value()
                     session.total_minutes_at_moderate_intensity += moderate_intensity_minutes
                 else:
                     if workout_exercise.duration is not None:
