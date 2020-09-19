@@ -3924,40 +3924,49 @@
         "actions_for_power": [
             {
                 "muscle_action": [
+                    0,
                     0
                 ],
                 "time": 2.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.8665
+                    0.8665,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    4,
                     4
                 ],
                 "time": 0.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.0
+                    0.0,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    1,
                     1
                 ],
                 "time": 3.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.8665
+                    0.8665,
+                    0.12025000000000001
                 ],
                 "description": "None"
             }
@@ -3993,40 +4002,49 @@
         "actions_for_power": [
             {
                 "muscle_action": [
+                    0,
                     0
                 ],
                 "time": 1.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.9925
+                    0.9925,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    4,
                     4
                 ],
                 "time": 0.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.0
+                    0.0,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    1,
                     1
                 ],
                 "time": 4.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.9925
+                    0.9925,
+                    0.12025000000000001
                 ],
                 "description": "None"
             }
@@ -4062,40 +4080,49 @@
         "actions_for_power": [
             {
                 "muscle_action": [
+                    0,
                     0
                 ],
                 "time": 0.4,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.5355
+                    0.5355,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    4,
                     4
                 ],
                 "time": 0.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.0
+                    0.0,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    1,
                     1
                 ],
                 "time": 0.4,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.5355
+                    0.5355,
+                    0.12025000000000001
                 ],
                 "description": "None"
             }
@@ -4131,40 +4158,49 @@
         "actions_for_power": [
             {
                 "muscle_action": [
+                    0,
                     0
                 ],
                 "time": 0.4,
                 "percent_bodyweight": [
-                    0.5926
+                    0.0943,
+                    0.49829999999999997
                 ],
                 "percent_bodyheight": [
-                    0.5355
+                    0.5355,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    4,
                     4
                 ],
                 "time": 0.0,
                 "percent_bodyweight": [
-                    0.5926
+                    0.0943,
+                    0.49829999999999997
                 ],
                 "percent_bodyheight": [
-                    0.0
+                    0.0,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    1,
                     1
                 ],
                 "time": 0.4,
                 "percent_bodyweight": [
-                    0.5926
+                    0.0943,
+                    0.49829999999999997
                 ],
                 "percent_bodyheight": [
-                    0.5355
+                    0.5355,
+                    0.12025000000000001
                 ],
                 "description": "None"
             }
@@ -4200,40 +4236,49 @@
         "actions_for_power": [
             {
                 "muscle_action": [
+                    0,
                     0
                 ],
                 "time": 0.4,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.5355
+                    0.5355,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    4,
                     4
                 ],
                 "time": 0.0,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.0
+                    0.0,
+                    0.12025000000000001
                 ],
                 "description": "None"
             },
             {
                 "muscle_action": [
+                    1,
                     1
                 ],
                 "time": 0.4,
                 "percent_bodyweight": [
+                    0.04715,
                     0.54545
                 ],
                 "percent_bodyheight": [
-                    0.5355
+                    0.5355,
+                    0.12025000000000001
                 ],
                 "description": "None"
             }
@@ -6145,7 +6190,7 @@
             },
             {
                 "muscle_action": [
-                    0
+                    1
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
@@ -6227,7 +6272,7 @@
             },
             {
                 "muscle_action": [
-                    0
+                    1
                 ],
                 "time": 0.25,
                 "percent_bodyweight": [
