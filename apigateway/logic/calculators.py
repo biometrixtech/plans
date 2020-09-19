@@ -1193,12 +1193,14 @@ class Calculators(object):
 
     @classmethod
     def get_force_level(cls, speed, resistance, displacement):
-        force_level = None
+        # force_level = None
         if displacement is None or displacement.name in ['none', 'partial_rom', 'full_rom']:
             force_dict = {
                 'none': {'none': 'no_force', 'slow': 'mod_force', 'mod': 'low_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
+                'very_low': {'none': 'no_force', 'slow': 'mod_force', 'mod': 'low_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
                 'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
                 'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'mod_high': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
                 'high': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
                 'max': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
             }
@@ -1225,6 +1227,8 @@ class Calculators(object):
             displacement_dict = force_dict.get(displacement.name)
             if displacement_dict is not None:
                 force_level = displacement_dict.get(speed.name)
+        else:
+            raise ValueError("not found in lookup table")
 
         return force_level
 
@@ -1232,6 +1236,7 @@ class Calculators(object):
     def get_percent_intensity_from_force_level(cls, force_level):
         force_level_dict = {
             "no_force": .5,
+            "bit_of_force": .6,
             "low_force": .65,
             "mod_force": .72,
             "high_force": .86,
@@ -1240,35 +1245,103 @@ class Calculators(object):
         return force_level_dict[force_level.name]
 
     @classmethod
-    def get_rpe_from_force_level(cls, force_level, reps=None, adaptation_type=None):
+    def get_rpe_from_force_level(cls, force_level, reps=None):
         if force_level.name == 'no_force':
-            rpe = StandardErrorRange(lower_bound=2, upper_bound=3, observed_value=2.5)
+            if reps is None:
+                rpe = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+            elif reps <= 20:
+                rpe = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+            elif reps <= 30:
+                rpe = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+            elif reps <= 40:
+                rpe = StandardErrorRange(lower_bound=3, upper_bound=6, observed_value=4.5)
+            elif reps <= 50:
+                rpe = StandardErrorRange(lower_bound=5, upper_bound=7, observed_value=6)
+            elif reps <= 60:
+                rpe = StandardErrorRange(lower_bound=6, upper_bound=8, observed_value=7)
+            elif reps <= 70:
+                rpe = StandardErrorRange(lower_bound=7, upper_bound=9, observed_value=8)
+            else:  # reps > 60
+                rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
+        elif force_level.name == 'bit_of_force':
+            if reps is None:
+                rpe = StandardErrorRange(lower_bound=2, upper_bound=3, observed_value=2.5)
+            elif reps <= 20:
+                rpe = StandardErrorRange(lower_bound=1, upper_bound=3.5, observed_value=2.5)
+            elif reps <= 30:
+                rpe = StandardErrorRange(lower_bound=3.5, upper_bound=6, observed_value=3)
+            elif reps <= 35:
+                rpe = StandardErrorRange(lower_bound=6, upper_bound=8, observed_value=5.5)
+            elif reps <= 40:
+                rpe = StandardErrorRange(lower_bound=8, upper_bound=9, observed_value=8.5)
+            else:  # reps > 40
+                rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
         elif force_level.name == 'low_force':
-            rpe = StandardErrorRange(lower_bound=4, upper_bound=5, observed_value=4.5)
+            if reps is None:
+                rpe = StandardErrorRange(lower_bound=4, upper_bound=5, observed_value=1.5)
+            elif reps <= 3:
+                rpe = StandardErrorRange(lower_bound=1, upper_bound=3.5, observed_value=2.5)
+            elif reps <= 6:
+                rpe = StandardErrorRange(lower_bound=2, upper_bound=4.5, observed_value=3)
+            elif reps <= 12:
+                rpe = StandardErrorRange(lower_bound=3.5, upper_bound=5.5, observed_value=4.5)
+            elif reps <= 16:
+                rpe = StandardErrorRange(lower_bound=4.5, upper_bound=6.5, observed_value=5.5)
+            elif reps <= 20:
+                rpe = StandardErrorRange(lower_bound=5.5, upper_bound=7.5, observed_value=6)
+            elif reps <= 26:
+                rpe = StandardErrorRange(lower_bound=7, upper_bound=9, observed_value=8)
+            else:  # reps > 26
+                rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
         elif force_level.name == 'mod_force':
-            rpe = StandardErrorRange(lower_bound=5, upper_bound=6, observed_value=5.5)
+            if reps is None:
+                rpe = StandardErrorRange(lower_bound=5, upper_bound=6, observed_value=1.5)
+            elif reps <= 3:
+                rpe = StandardErrorRange(lower_bound=2, upper_bound=5, observed_value=3.5)
+            elif reps <= 9:
+                rpe = StandardErrorRange(lower_bound=5, upper_bound=7, observed_value=6)
+            elif reps <= 12:
+                rpe = StandardErrorRange(lower_bound=6.5, upper_bound=7.5, observed_value=7)
+            elif reps <= 18:
+                rpe = StandardErrorRange(lower_bound=7, upper_bound=9, observed_value=8)
+            else:  # reps > 18
+                rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
         elif force_level.name == 'high_force':
-            rpe = StandardErrorRange(lower_bound=7, upper_bound=8, observed_value=7.7)
+            if reps is None:
+                rpe = StandardErrorRange(lower_bound=7, upper_bound=8, observed_value=7.5)
+            elif reps <= 3:
+                rpe = StandardErrorRange(lower_bound=6, upper_bound=8, observed_value=7.5)
+            elif reps <= 5:
+                rpe = StandardErrorRange(lower_bound=7, upper_bound=9, observed_value=8)
+            elif reps <= 10:
+                rpe = StandardErrorRange(lower_bound=8, upper_bound=9, observed_value=8.5)
+            else:  # reps > 10
+                rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
         elif force_level.name == 'max_force':
-            rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
+            if reps is None:
+                rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
+            elif reps <= 3:
+                rpe = StandardErrorRange(lower_bound=8, upper_bound=10, observed_value=9)
+            else:  # reps > 3
+                rpe = StandardErrorRange(lower_bound=9, upper_bound=10, observed_value=9.5)
         else:
             rpe = StandardErrorRange(lower_bound=2, upper_bound=3, observed_value=2.5)
 
-        # update based on expected reps
-        if reps is not None and adaptation_type is not None:
-            expected_rep_counts_by_adaptation_type = {
-                'strength_endurance_strength': (12, 20),
-                'power_drill': (1, 10),
-                'maximal_strength_hypertrophic': (1, 12),
-                'power_explosive_action': (1, 10)
-            }
-            expected_reps = expected_rep_counts_by_adaptation_type.get(adaptation_type.name, (0, 100))
-            if reps < expected_reps[0]:
-                rpe.subtract_value(1)
-            elif reps > expected_reps[1]:
-                rpe.add_value(1)
-                if rpe.observed_value > 10:
-                    rpe.observed_value = 10
-                if rpe.upper_bound > 10:
-                    rpe.upper_bound = 10
+        # # update based on expected reps
+        # if reps is not None and adaptation_type is not None:
+        #     expected_rep_counts_by_adaptation_type = {
+        #         'strength_endurance_strength': (12, 20),
+        #         'power_drill': (1, 10),
+        #         'maximal_strength_hypertrophic': (1, 12),
+        #         'power_explosive_action': (1, 10)
+        #     }
+        #     expected_reps = expected_rep_counts_by_adaptation_type.get(adaptation_type.name, (0, 100))
+        #     if reps < expected_reps[0]:
+        #         rpe.subtract_value(1)
+        #     elif reps > expected_reps[1]:
+        #         rpe.add_value(1)
+        #         if rpe.observed_value > 10:
+        #             rpe.observed_value = 10
+        #         if rpe.upper_bound > 10:
+        #             rpe.upper_bound = 10
         return rpe

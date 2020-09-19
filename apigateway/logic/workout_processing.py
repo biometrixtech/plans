@@ -242,9 +242,9 @@ class WorkoutProcessor(object):
                             action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
                             for sub_action in action.sub_actions:
                                 sub_action.lateral_distribution_pattern = exercise.bilateral_distribution_of_resistance
-                    if exercise.displacement is not None:  # because displacement is defined in exercise level, inherit it to actions
-                        for action in compound_action.actions:
-                            action.displacement = exercise.displacement
+                    # if exercise.displacement is not None:  # because displacement is defined in exercise level, inherit it to actions
+                    #     for action in compound_action.actions:
+                    #         action.displacement = exercise.displacement
                     exercise.compound_actions.append(compound_action)
                     # exercise.primary_actions.append(compound_action)
 
@@ -488,17 +488,22 @@ class WorkoutProcessor(object):
             exercise.force = StandardErrorRange(observed_value=0)
         compound_action_force = exercise.force.plagiarize()
 
-        for action in compound_action.actions:
-            # determine percentage of power to be distributed to each compound action
-            if len(compound_action.actions) == 1:
-                action_force_ratio = 1.0
-            else:
+        # determine percentage of power to be distributed to each compound action
+        if len(compound_action.actions) == 1:
+            action_force_ratios = [1.0]
+        else:
+            action_force_ratios = []
+            for action in compound_action.actions:
                 explosiveness = Calculators.get_force_level(action.speed, action.resistance, action.displacement)
-                if explosiveness is not None:
-                    explosiveness = Explosiveness[explosiveness]
-                    action_force_ratio = Calculators.get_percent_intensity_from_force_level(explosiveness)
-                else:
-                    action_force_ratio = 1.0
+                explosiveness = Explosiveness[explosiveness]
+                action_force_ratios.append(Calculators.get_percent_intensity_from_force_level(explosiveness))
+            action_force_ratios = [afr / max(action_force_ratios) for afr in action_force_ratios]
+        action_count = 0
+        if max(action_force_ratios) != 1:
+            print('ERROR')
+        for action in compound_action.actions:
+            action_force_ratio = action_force_ratios[action_count]
+            action_count += 1
             action_power = compound_action_power.plagiarize()
             action_force = compound_action_force.plagiarize()
             action_power.multiply(action_force_ratio)
@@ -1129,8 +1134,12 @@ class WorkoutProcessor(object):
                 durations = [dur for dur in durations if dur is not None]
             else:
                 durations = [workout_exercise.duration]
-            duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
-            duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
+            if workout_exercise.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics]:
+                # use a default for these training types so that rep count is not over inflated
+                duration_per_reps = [2]
+            else:
+                duration_per_reps = [workout_exercise.duration_per_rep.lower_bound, workout_exercise.duration_per_rep.upper_bound, workout_exercise.duration_per_rep.observed_value]
+                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
             for dur in durations:
                 for dur_per_rep in duration_per_reps:
                     possible_reps.append(dur / dur_per_rep)
@@ -1138,6 +1147,9 @@ class WorkoutProcessor(object):
                 reps.lower_bound = min(possible_reps)
                 reps.upper_bound = max(possible_reps)
                 reps.observed_value = sum(possible_reps) / len(possible_reps)
+        # for unilateral alternating reps are defined as total reps but we need expected reps per side
+        if workout_exercise.bilateral_distribution_of_resistance == WeightDistribution.unilateral_alternating:
+            reps.divide(2)
         return reps
 
     @staticmethod
@@ -1147,7 +1159,7 @@ class WorkoutProcessor(object):
             force_level = Explosiveness[force_level]
         else:
             force_level = Explosiveness.no_force
-        rpe = Calculators.get_rpe_from_force_level(force_level, reps=reps.observed_value, adaptation_type=workout_exercise.adaptation_type)
+        rpe = Calculators.get_rpe_from_force_level(force_level, reps=reps.observed_value)
         return rpe
 
     def get_rpe_from_weight(self, workout_exercise):
@@ -1162,28 +1174,30 @@ class WorkoutProcessor(object):
 
         # get reps
         reps = self.get_exercise_reps_per_set(workout_exercise)
+        # use lookup table in all cases for now
+        rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
 
-        if (workout_exercise.adaptation_type in [AdaptationType.power_explosive_action, AdaptationType.power_drill]  #  use lookup table for all phyometrics
-                or workout_exercise.weight_measure is None):  # or if weight is not defined
-            # for plyo exercises, use lookup table
-            rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
-        else:
-            all_rep_max_reps = self.get_all_rep_max_reps(workout_exercise, equipment)
-            if max(all_rep_max_reps) > 30:  # corresponds to 50% of 1RM and we don't expect anything to be assigned close to this range
-                # if the exercise is performed at very low resistance, use lookup table
-                rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
-            else:
-                all_rpes = []
-                all_reps = [reps.observed_value, reps.lower_bound, reps.upper_bound]
-                all_reps = [value for value in all_reps if value is not None]
-                for rep_max_rep in all_rep_max_reps:
-                    for reps in all_reps:
-                        all_rpes.append(self.get_rpe_from_rep_max(rep_max_rep, reps))
-
-                if len(all_rpes) > 0:
-                    rpe.observed_value = sum(all_rpes) / len(all_rpes)
-                    rpe.lower_bound = min(all_rpes)
-                    rpe.upper_bound = max(all_rpes)
+        # if (workout_exercise.adaptation_type in [AdaptationType.power_explosive_action, AdaptationType.power_drill]  #  use lookup table for all phyometrics
+        #         or workout_exercise.weight_measure is None):  # or if weight is not defined
+        #     # for plyo exercises, use lookup table
+        #     rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
+        # else:
+        #     all_rep_max_reps = self.get_all_rep_max_reps(workout_exercise, equipment)
+        #     if max(all_rep_max_reps) > 30:  # corresponds to 50% of 1RM and we don't expect anything to be assigned close to this range
+        #         # if the exercise is performed at very low resistance, use lookup table
+        #         rpe = self.get_rpe_from_speed_resistance_displacement(workout_exercise, reps)
+        #     else:
+        #         all_rpes = []
+        #         all_reps = [reps.observed_value, reps.lower_bound, reps.upper_bound]
+        #         all_reps = [value for value in all_reps if value is not None]
+        #         for rep_max_rep in all_rep_max_reps:
+        #             for reps in all_reps:
+        #                 all_rpes.append(self.get_rpe_from_rep_max(rep_max_rep, reps))
+        #
+        #         if len(all_rpes) > 0:
+        #             rpe.observed_value = sum(all_rpes) / len(all_rpes)
+        #             rpe.lower_bound = min(all_rpes)
+        #             rpe.upper_bound = max(all_rpes)
         return rpe
 
     def get_all_rep_max_reps(self, workout_exercise, equipment):
@@ -1217,7 +1231,7 @@ class WorkoutProcessor(object):
                 else:
                     weights = [workout_exercise.weight]
             else:
-                return []
+                weights = [0]
 
             one_rep_max_bodyweight_ratio = self.get_one_rep_max_bodyweight_ratio(workout_exercise)
             if equipment == Equipment.bodyweight:

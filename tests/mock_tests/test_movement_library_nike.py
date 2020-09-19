@@ -1,6 +1,7 @@
 from datastores.movement_library_datastore import MovementLibraryDatastore, Movement
 from models.movement_actions import MovementSpeed, MovementDisplacement, MovementResistance
 from models.movement_tags import TrainingType
+from logic.calculators import  Calculators
 
 
 movement_library = MovementLibraryDatastore().get()
@@ -56,3 +57,37 @@ def test_ntc_exercises_speed_resistance():
     # print(low_resistance_table)
     # print(no_resistance_table)
     # print(strength_count, plyo_count)
+
+def test_power_med_ball_slams():
+    from logic.calculators import Calculators
+
+    movement = movement_library.get('med ball slams')
+    movement['actions_for_power'][3]['muscle_action'][0] = 1
+    movement = Movement.json_deserialise(movement)
+    actions = movement.actions_for_power
+    # actions[4].muscle_action
+
+    power = Calculators.power_resistance_exercise(5, actions, duration_per_rep=None)
+    assert power is not None
+
+
+def test_power_kettlebell_swings():
+    from logic.workout_processing import WorkoutProcessor
+    from models.planned_exercise import PlannedExercise
+    from models.exercise import WeightMeasure
+    from models.training_volume import Assignment
+    workout_processor = WorkoutProcessor()
+    exercise = PlannedExercise()
+    exercise.weight_measure = WeightMeasure.percent_rep_max
+    exercise.weight = Assignment(min_value=60, max_value=70)
+    exercise.movement_id = 'alternating dumbbell chest press'
+    workout_processor.add_movement_detail_to_planned_exercise(exercise, assignment_type=None)
+    movement = movement_library.get(exercise.movement_id)
+    movement = Movement.json_deserialise(movement)
+    exercise.initialize_from_movement(movement)
+    exercise.set_reps_duration()
+    workout_processor.set_force_power_weighted(exercise)
+    external_weight = workout_processor.get_external_weight(exercise)
+
+    # power = Calculators.power_resistance_exercise(5, actions, duration_per_rep=None)
+    # assert power is not None

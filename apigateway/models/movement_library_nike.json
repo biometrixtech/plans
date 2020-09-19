@@ -112,7 +112,7 @@
             1
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.15,
@@ -141,7 +141,7 @@
             1
         ],
         "speed": 3,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.0,
@@ -170,7 +170,7 @@
             1
         ],
         "speed": 4,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             0.86,
@@ -199,7 +199,7 @@
             3
         ],
         "speed": 3,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             0.375,
@@ -3906,7 +3906,7 @@
             29
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             2.0,
@@ -3976,7 +3976,7 @@
             29
         ],
         "speed": 4,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             1.0,
@@ -4045,7 +4045,7 @@
             9
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             0.4,
@@ -4114,7 +4114,7 @@
             9
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             0.4,
@@ -4183,7 +4183,7 @@
             9
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             0.4,
@@ -4716,7 +4716,7 @@
             15
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 4,
         "rep_tempo": [
             0.25,
@@ -5797,7 +5797,7 @@
             15
         ],
         "speed": 4,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 4,
         "rep_tempo": [
             0.25,
@@ -6089,7 +6089,7 @@
             15
         ],
         "speed": 4,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             0.25,
@@ -6171,7 +6171,7 @@
             15
         ],
         "speed": 4,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             0.25,
@@ -6253,7 +6253,7 @@
             15
         ],
         "speed": 3,
-        "resistance": 1,
+        "resistance": 2,
         "displacement": 2,
         "rep_tempo": [
             0.25,
@@ -17188,7 +17188,7 @@
             15
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.0,
@@ -17270,7 +17270,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -17352,7 +17352,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -17434,7 +17434,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -17516,7 +17516,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -17598,7 +17598,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -17692,7 +17692,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -17774,7 +17774,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -17856,7 +17856,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -17938,7 +17938,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -18020,7 +18020,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -18102,7 +18102,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -18184,7 +18184,7 @@
             7
         ],
         "speed": 3,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             0.25,
@@ -18266,7 +18266,7 @@
             9
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -18348,7 +18348,7 @@
             29
         ],
         "speed": 0,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 0,
         "rep_tempo": [],
         "rest_between_reps": 0.0,
@@ -18387,7 +18387,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.1,
@@ -18469,7 +18469,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 1,
         "rep_tempo": [
             1.1,
@@ -18551,7 +18551,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 1,
         "rep_tempo": [
             1.1,
@@ -18633,7 +18633,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -18715,7 +18715,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -18797,7 +18797,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -18909,7 +18909,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19021,7 +19021,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19103,7 +19103,7 @@
             7
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -19185,7 +19185,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19267,7 +19267,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19349,7 +19349,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19431,7 +19431,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -19513,7 +19513,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -19607,7 +19607,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19689,7 +19689,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19771,7 +19771,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19853,7 +19853,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -19947,7 +19947,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -20029,7 +20029,7 @@
             15
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -20111,7 +20111,7 @@
             29
         ],
         "speed": 1,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             2.0,
@@ -20193,7 +20193,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -20275,7 +20275,7 @@
             15
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -20357,7 +20357,7 @@
             7
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             2.1,
@@ -20439,7 +20439,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             2.1,
@@ -20521,7 +20521,7 @@
             9
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -20603,7 +20603,7 @@
             9
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             2.1,
@@ -20685,7 +20685,7 @@
             15
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -20809,7 +20809,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             2.1,
@@ -20891,7 +20891,7 @@
             7
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -20973,7 +20973,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21110,7 +21110,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21192,7 +21192,7 @@
             10
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21274,7 +21274,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21356,7 +21356,7 @@
             15
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21438,7 +21438,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21563,7 +21563,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.8,
@@ -21645,7 +21645,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.1,
@@ -21727,7 +21727,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21809,7 +21809,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21891,7 +21891,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -21973,7 +21973,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.1,
@@ -22055,7 +22055,7 @@
             15
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.1,
@@ -22192,7 +22192,7 @@
             15
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -22353,7 +22353,7 @@
             29
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,
@@ -22435,7 +22435,7 @@
             8
         ],
         "speed": 2,
-        "resistance": 2,
+        "resistance": 3,
         "displacement": 2,
         "rep_tempo": [
             1.2,

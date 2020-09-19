@@ -1320,18 +1320,21 @@ class MovementSpeed(Enum):
 
 class MovementResistance(Enum):
     none = 0
-    low = 1
-    mod = 2
-    high = 3
-    max = 4
+    very_low = 1
+    low = 2
+    mod = 3
+    mod_high = 4
+    high = 5
+    max = 6
 
 
 class Explosiveness(IntEnum):
     no_force = 0
-    low_force = 1
-    mod_force = 2
-    high_force = 3
-    max_force = 4
+    bit_of_force = 1
+    low_force = 2
+    mod_force = 3
+    high_force = 4
+    max_force = 5
 
 
 class MovementDisplacement(IntEnum):
