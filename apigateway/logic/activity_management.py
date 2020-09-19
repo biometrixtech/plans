@@ -117,6 +117,7 @@ class ActivityManager(object):
                 relative_load_level=injury_risk_processor.relative_load_level,
                 aggregated_injury_risk_dict=injury_risk_processor.aggregated_injury_risk_dict
         )
+        self.exercise_assignment_calculator.high_intensity_session = self.is_high_intensity_session()
         # write updated injury risk
         athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
         athlete_injury_risk.items = injury_risk_processor.injury_risk_dict

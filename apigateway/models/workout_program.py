@@ -1,8 +1,8 @@
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability
+from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability, WeightDistribution
 from models.movement_actions import CompoundAction
 from utils import format_datetime, parse_datetime
-from models.training_volume import StandardErrorRange
+from models.training_volume import StandardErrorRange, Assignment
 from logic.calculators import Calculators
 
 import re
@@ -168,6 +168,7 @@ class BaseWorkoutExercise(object):
         self.weight = None
         self.sets = 1
         self.reps_per_set = None
+        self.duration = None
         self.unit_of_measure = UnitOfMeasure.count
 
         self.cardio_action = None
@@ -270,6 +271,35 @@ class BaseWorkoutExercise(object):
             else:
                 self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
 
+    def get_exercise_reps_per_set(self):
+        reps = StandardErrorRange(observed_value=0)
+        if self.reps_per_set is not None:
+            reps.observed_value = self.reps_per_set * self.sets
+        elif self.duration is not None:
+            possible_reps = []
+            if isinstance(self.duration, Assignment):
+                durations = [self.duration.min_value, self.duration.max_value, self.duration.assigned_value]
+                durations = [dur for dur in durations if dur is not None]
+            else:
+                durations = [self.duration]
+            if self.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics]:
+                # use a default for these training types so that rep count is not over inflated
+                duration_per_reps = [2]
+            else:
+                duration_per_reps = [self.duration_per_rep.lower_bound, self.duration_per_rep.upper_bound, self.duration_per_rep.observed_value]
+                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
+            for dur in durations:
+                for dur_per_rep in duration_per_reps:
+                    possible_reps.append(dur / dur_per_rep)
+            if len(possible_reps) > 0:
+                reps.lower_bound = min(possible_reps)
+                reps.upper_bound = max(possible_reps)
+                reps.observed_value = sum(possible_reps) / len(possible_reps)
+        # for unilateral alternating reps are defined as total reps but we need expected reps per side
+        if self.bilateral_distribution_of_resistance == WeightDistribution.unilateral_alternating:
+            reps.divide(2)
+        return reps
+
 
 class WorkoutExercise(BaseWorkoutExercise, Serialisable):
     def __init__(self):
@@ -282,7 +312,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         self.end_date_time = None
 
         # for cardio exercises
-        self.duration = None  # duration in seconds for cardio exercises
+        #self.duration = None  # duration in seconds for cardio exercises
         self.distance = None  # distance covered for cardio exercises
         self.speed = None  # in m/s
         self.pace = None  # pace as time(s)/distance. distance is 500m for rowing, 1mile for running

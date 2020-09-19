@@ -203,7 +203,7 @@ class PlannedExercise(BaseWorkoutExercise):
         # self.tempo = None  # OTF defines tempo for concentric/eccentric part of movement
 
         # primary assignments
-        self.duration = None
+        #self.duration = None
         self.distance = None
         self.pace = None
         self.speed = None
