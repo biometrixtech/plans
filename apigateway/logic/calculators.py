@@ -1194,24 +1194,24 @@ class Calculators(object):
     @classmethod
     def get_force_level(cls, speed, resistance, displacement):
         # force_level = None
-        if displacement is None or displacement.name in ['none', 'partial_rom', 'full_rom']:
+        if displacement is None or displacement.name in ['none', 'partial_rom', 'full_rom'] or resistance.name == 'none':
             force_dict = {
-                'none': {'none': 'no_force', 'slow': 'mod_force', 'mod': 'low_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
-                'very_low': {'none': 'no_force', 'slow': 'mod_force', 'mod': 'low_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
-                'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
-                'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'none': {'none': 'bit_of_force', 'slow': 'bit_of_force', 'mod': 'no_force', 'fast': 'bit_of_force', 'explosive': 'bit_of_force'},
+                'very_low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'no_force', 'fast': 'low_force', 'explosive': 'low_force'},
+                'low': {'none': 'low_force', 'slow': 'low_force', 'mod': 'bit_of_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
+                'mod': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'low_force', 'fast': 'high_force', 'explosive': 'high_force'},
                 'mod_high': {'none': 'mod_force', 'slow': 'mod_force', 'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
                 'high': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
-                'max': {'none': 'high_force', 'slow': 'high_force', 'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'},
+                'max': {'none': 'max_force', 'slow': 'max_force', 'mod': 'max_force', 'fast': 'max_force', 'explosive': 'max_force'},
             }
             resistance_dict = force_dict.get(resistance.name)
             if resistance_dict is not None:
                 force_level = resistance_dict.get(speed.name)
-        elif resistance is None or resistance.name == 'none':
+        elif resistance is None or resistance.name == 'very_low':
             force_dict = {
-                'min': {'mod': 'low_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
-                'mod': {'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
-                'large': {'mod': 'high_force', 'fast': 'high_force', 'explosive': 'max_force'},
+                'min': {'mod': 'bit_of_force', 'fast': 'low_force', 'explosive': 'low_force'},
+                'mod': {'mod': 'low_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
+                'large': {'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
                 'max': {'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'}
             }
             displacement_dict = force_dict.get(displacement.name)
@@ -1219,8 +1219,8 @@ class Calculators(object):
                 force_level = displacement_dict.get(speed.name)
         elif resistance.name == 'low':
             force_dict = {
-                'min': {'mod': 'mod_force', 'fast': 'mod_force', 'explosive': 'mod_force'},
-                'mod': {'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'high_force'},
+                'min': {'mod': 'mod_force', 'fast': 'mod_force', 'explosive': 'high_force'},
+                'mod': {'mod': 'mod_force', 'fast': 'high_force', 'explosive': 'max_force'},
                 'large': {'mod': 'high_force', 'fast': 'high_force', 'explosive': 'max_force'},
                 'max': {'mod': 'high_force', 'fast': 'max_force', 'explosive': 'max_force'}
             }
