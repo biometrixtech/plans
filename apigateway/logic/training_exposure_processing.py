@@ -66,7 +66,7 @@ class TrainingExposureProcessor(object):
             reps_per_set = exercise.get_exercise_reps_per_set()
 
             if explosiveness_value is not None and reps_per_set is not None:
-                if 6 <= exercise.reps_per_set.highest_value() and explosiveness_value == Explosiveness.high_force:
+                if 6 <= reps_per_set.highest_value() and explosiveness_value == Explosiveness.high_force:
                     exposure = TrainingExposure(DetailedAdaptationType.hypertrophy)
                     exposure = self.copy_reps_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -100,13 +100,13 @@ class TrainingExposureProcessor(object):
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
-            if exercise.duration is not None:
-                duration = exercise.duration.highest_value() if isinstance(exercise.duration, Assignment) else exercise.duration
-                # sustained power
-                if duration >= 20 and explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force]:
-                    exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
-                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                    exposures.append(exposure)
+            # if exercise.duration is not None:
+            #     duration = exercise.duration if isinstance(exercise.duration, int) else exercise.duration
+            #     # sustained power
+            #     if duration >= 20 and explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force]:
+            #         exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
+            #         exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
+            #         exposures.append(exposure)
 
         if exercise.adaptation_type == AdaptationType.power_explosive_action and explosiveness_value is not None:
 
