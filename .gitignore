@@ -37,6 +37,7 @@ output/*
 tests/database_tests/*.csv
 output_persona/*
 tests/data/*.joblib
+tests/data/*.csv
 ml_training/hr_rpe/data/*
 ml_training/hr_rpe/model/*
 ml_training/bodyweight_ratio/data/*
