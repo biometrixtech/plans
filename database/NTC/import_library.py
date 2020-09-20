@@ -1,3 +1,4 @@
+import database.NTC.set_up_config
 import os
 import json
 import pandas as pd
@@ -5,6 +6,9 @@ from models.planned_exercise import PlannedExercise, PlannedWorkout, PlannedWork
 from models.training_volume import StandardErrorRange, Assignment
 from models.exercise import WeightMeasure
 from models.movement_tags import Equipment
+
+from datastores.workout_datastore import WorkoutDatastore
+from database.NTC.create_processed_ntc_workouts import create_planned_session_detail
 
 all_durations = []
 all_distances = []
@@ -50,8 +54,8 @@ class WorkoutParser(object):
                 if row['row_type'] == 'intensity':
                     intensity_measure = row.get('intensity_measure_units')
                     if intensity_measure is not None and intensity_measure == 'sRPE':
-                        rpe_min = row.get('intensity_measure')
-                        rpe_max = row.get('max_intensity_measure')
+                        rpe_min = float(row.get('intensity_measure'))
+                        rpe_max = float(row.get('max_intensity_measure'))
                         workout.rpe = self.get_assignment(rpe_min, rpe_max)
                 if row['row_type'] == 'rest_between_exercises':
                     min_rest = row.get('time')
@@ -85,6 +89,7 @@ class WorkoutParser(object):
                     ex = self.parse_exercise_row(row)
                     section.exercises.append(ex)
         if write:
+            # WorkoutDatastore().put(workout)
             workout_json = workout.json_serialise()
             directory = file.split('/')[-2]
             self.write_json(workout_json, workout.name, directory)
@@ -304,9 +309,10 @@ if __name__ == '__main__':
                 if 'DS_Store' not in file and 'included in this' not in file:
                     try:
                         workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=True)
-                        validate_exercises(workout, exercise_names)
-                        workout_json = workout.json_serialise()
-                        workout_2 = PlannedWorkout.json_deserialise(workout_json)
+                        # validate_exercises(workout, exercise_names)
+                        # workout_json = workout.json_serialise()
+                        # workout_2 = PlannedWorkout.json_deserialise(workout_json)
+                        # create_planned_session_detail(workout)
                     except ValueError as e:
                         print(dir, file)
     # print(f"duration: {min(all_durations), max(all_durations)}")

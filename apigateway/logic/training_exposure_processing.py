@@ -180,14 +180,15 @@ class TrainingExposureProcessor(object):
         return exposure
 
     def copy_reps_exercise_details_to_exposure(self, exercise, exposure):
-
-        if isinstance(exercise.reps_per_set, Assignment):
-            reps_range = StandardErrorRange(lower_bound=exercise.reps_per_set.min_value,
-                                                 observed_value=exercise.reps_per_set.assigned_value,
-                                                 upper_bound=exercise.reps_per_set.max_value)
-            exposure.volume = reps_range.multiply(exercise.sets)
-        else:
-            exposure.volume = StandardErrorRange(observed_value=exercise.reps_per_set * exercise.sets)
+        reps_range = exercise.get_exercise_reps_per_set()
+        # if isinstance(exercise.reps_per_set, Assignment):
+        #     reps_range = StandardErrorRange(lower_bound=exercise.reps_per_set.min_value,
+        #                                          observed_value=exercise.reps_per_set.assigned_value,
+        #                                          upper_bound=exercise.reps_per_set.max_value)
+        #     exposure.volume = reps_range.multiply(exercise.sets)
+        # else:
+        #     exposure.volume = StandardErrorRange(observed_value=exercise.reps_per_set * exercise.sets)
+        exposure.volume = reps_range.multiply(exercise.sets)
         exercise.volume_measure = UnitOfMeasure.count
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load

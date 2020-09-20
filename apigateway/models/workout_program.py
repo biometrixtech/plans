@@ -12,20 +12,28 @@ from serialisable import Serialisable
 
 class WorkoutProgramModule(Serialisable):
     def __init__(self):
+        self.name = ""
         self.session_id = None
         self.user_id = None
         self.event_date_time = None
         self.program_id = None
         self.program_module_id = None
+        self.distance = None
+        self.duration = None
+        self.rpe = None
         self.workout_sections = []
 
     def json_serialise(self):
         ret = {
+            'name': self.name,
             'session_id': self.session_id,
             'use_id': self.user_id,
             'event_date_time': format_datetime(self.event_date_time),
             'program_id': self.program_id,
             'program_module_id': self.program_module_id,
+            'distance': self.distance,
+            'duration': self.duration,
+            'rpe': self.rpe,
             'workout_sections': [w.json_serialise() for w in self.workout_sections]
         }
         return ret
@@ -33,11 +41,15 @@ class WorkoutProgramModule(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         workout_program_module = cls()
+        workout_program_module.name = input_dict.get('name', '')
         workout_program_module.session_id = input_dict.get('session_id')
         workout_program_module.user_id = input_dict.get('user_id')
         workout_program_module.event_date_time = input_dict.get('event_date_time')
         workout_program_module.program_id = input_dict.get('program_id')
         workout_program_module.program_module_id = input_dict.get('program_module_id')
+        workout_program_module.distance = input_dict.get('distance')
+        workout_program_module.duration = input_dict.get('duration')
+        workout_program_module.rpe = input_dict.get('rpe')
         workout_program_module.workout_sections = [CompletedWorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_sections', [])]
 
         return workout_program_module
