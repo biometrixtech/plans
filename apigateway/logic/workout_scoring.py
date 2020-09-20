@@ -39,6 +39,9 @@ class WorkoutScoringProcessor(object):
                 return False
             if athlete_capacity.rpe is None or athlete_capacity.volume is None:
                 return False
+            # TEMP FIX
+            if training_exposure.volume.highest_value() is None:
+                return False
             if (athlete_capacity.rpe.highest_value() * 1.10 < training_exposure.rpe.highest_value() or
                 athlete_capacity.volume.highest_value() * 1.10 < training_exposure.volume.highest_value()):
                 return False

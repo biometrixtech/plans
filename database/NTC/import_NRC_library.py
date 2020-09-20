@@ -477,6 +477,8 @@ if __name__ == '__main__':
                     try:
                         workout = WorkoutParser().load_data(f"NRC_workouts/{dir}/{file}", write=True)
                         # validate_exercises(workout, exercise_names)
+                        # if workout.program_module_id in ['five_minute_fartlek', 'hill_hillier_hilliest', 'how_fartlek_can_you_go']:
+                        #     here=5
                         create_planned_session_detail(workout)
                         count += 1
                         # workout_json = workout.json_serialise()
