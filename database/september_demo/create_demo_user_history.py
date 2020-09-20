@@ -10,11 +10,12 @@ from datastores.user_stats_datastore import UserStatsDatastore
 from datastores.planed_workout_load_datastore import PlannedWorkoutLoadDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.injury_risk_datastore import InjuryRiskDatastore
-from models.periodization_plan import PeriodizationPlan, PeriodizationPersona, TrainingPhaseType
+from models.periodization_plan import PeriodizationPlan, PeriodizationPersona, TrainingPhaseType, TrainingPhaseFactory
 from models.periodization_goal import PeriodizationGoalFactory, PeriodizationGoalType, PeriodizationGoal, SubAdaptionTypePersonas, TrainingPersona
 from logic.periodization_processing import PeriodizationPlanProcessor
 from logic.workout_scoring import WorkoutScoringProcessor
 from logic.soreness_processing import SorenessCalculator
+from logic.athlete_capacity_processing import AthleteCapacityProcessor
 from database.september_demo.write_injury_risk_dict import InjuryRiskDictOutputProcessor
 import pytz
 
@@ -209,6 +210,7 @@ def get_user_stats_string(user_stats):
     user_stats_string += get_if_present_string(user_stats, "best_running_time")
     user_stats_string += get_if_present_string(user_stats, "best_running_distance")
     user_stats_string += get_if_present_string(user_stats, "best_running_date")
+
     user_stats_string += get_std_error_if_present_string(user_stats, "internal_ramp")
     user_stats_string += get_std_error_if_present_string(user_stats, "internal_monotony")
     user_stats_string += get_std_error_if_present_string(user_stats, "internal_strain")
@@ -217,6 +219,16 @@ def get_user_stats_string(user_stats):
     user_stats_string += get_std_error_if_present_string(user_stats, "chronic_internal_total_load")
     user_stats_string += get_std_error_if_present_string(user_stats, "internal_acwr")
     user_stats_string += get_std_error_if_present_string(user_stats, "internal_freshness_index")
+
+    user_stats_string += get_std_error_if_present_string(user_stats, "power_load_ramp")
+    user_stats_string += get_std_error_if_present_string(user_stats, "power_load_monotony")
+    user_stats_string += get_std_error_if_present_string(user_stats, "power_load_strain")
+    user_stats_string += get_std_error_if_present_string(user_stats, "power_load_strain_events")
+    user_stats_string += get_std_error_if_present_string(user_stats, "acute_power_total_load")
+    user_stats_string += get_std_error_if_present_string(user_stats, "chronic_power_total_load")
+    user_stats_string += get_std_error_if_present_string(user_stats, "power_load_acwr")
+    user_stats_string += get_std_error_if_present_string(user_stats, "power_load_freshness_index")
+
     user_stats_string += get_if_present_string(user_stats, "acute_days")
     user_stats_string += get_if_present_string(user_stats, "chronic_days")
     user_stats_string += get_if_present_string(user_stats, "total_historical_sessions")
@@ -332,7 +344,7 @@ def get_body_part_side_string(body_parts):
 
     return body_part_string
 
-def get_periodization_plan_string(plan, event_date):
+def get_periodization_plan_string(plan, event_date, readiness_score, load_score, rpe_score):
 
     plan_string = str(plan.start_date) + "," + str(event_date) + ","
     plan_string += get_periodization_goals_string(plan) + ","
@@ -342,6 +354,7 @@ def get_periodization_plan_string(plan, event_date):
                     "strength_persona=" + plan.sub_adaptation_type_personas.strength_persona.name) + ","
     plan_string += get_target_training_exposure_string(plan,is_athlete_target_training_exposure=True) + "," + get_std_error_if_present_string(plan,"target_weekly_rpe_load", is_last=True) + ","
     plan_string += get_std_error_if_present_string(plan,"expected_weekly_workouts", is_last=True) + ","
+    plan_string += str(readiness_score) + "," + str(load_score) + "," + str(rpe_score) + ","
     plan_string += get_plan_capacities_string(plan) + ","
     plan_string += get_body_part_side_string(plan.acute_muscle_issues) + ","
     plan_string += get_body_part_side_string(plan.chronic_muscle_issues) + ","
@@ -596,6 +609,7 @@ if __name__ == '__main__':
     periodization_goal_factory = PeriodizationGoalFactory()
     periodization_goals = periodization_goal_factory.create(PeriodizationGoalType.increase_cardio_endurance)
     training_phase_type = TrainingPhaseType.increase
+
     periodization_persona = PeriodizationPersona.well_trained
     sub_adaptation_type_persona = SubAdaptionTypePersonas(cardio_persona=TrainingPersona.intermediate,
                                                           strength_persona=TrainingPersona.intermediate,
@@ -616,6 +630,8 @@ if __name__ == '__main__':
                                   "expected_weekly_workouts, vo2_max, vo2_max_date_time, best_running_time, best_running_distance, best_running_date," +
                                   "internal_ramp, internal_monotony, internal_strain, internal_strain_events, " +
                                   "acute_internal_total_load, chronic_internal_total_load, internal_acwr, internal_freshness_index," +
+                                  "power_load_ramp, power_load_monotony, power_load_strain, power_load_strain_events, " +
+                                  "acute_total_power_load, chronic_total_power_load, power_load_acwr, power_load_freshness_index," +
                                   "acute_days, chronic_days, total_historical_sessions, average_weekly_internal_load," +
                                   "base_aerobic_training, anaerobic_threshold_training, high_intensity_anaerobic_training," +
                                   "muscular_endurance, strength_endurance, hypertrophy, maximal_strength," +
@@ -630,6 +646,7 @@ if __name__ == '__main__':
         periodization_plan_output = open('output/periodization_plan_' + user_name + ".csv", "w")
         periodization_plan_header_line = ("start_date, current_date, goals, training_phase_type, athlete_persona, sub_adaptation_type_personas," +
                                           "target_training_exposures, target_weekly_rpe_load,expected_weekly_workouts," +
+                                          "readiness_score, load_score, rpe_score," +
                                           "base_aerobic_training, anaerobic_threshold_training, high_intensity_anaerobic_training," +
                                           "muscular_endurance, strength_endurance, hypertrophy, maximal_strength," +
                                           "speed, sustained_power, power, maximal_power," +
@@ -699,7 +716,13 @@ if __name__ == '__main__':
                     plan = periodization_plan_processor.update_periodization_plan_for_week(plan,
                                                                                            event_date,
                                                                                            demo_persona.user_stats)
-                    plan_string = get_periodization_plan_string(plan, event_date)
+
+                    athlete_capacitiy_processor = AthleteCapacityProcessor()
+                    training_phase_factory = TrainingPhaseFactory()
+                    training_phase = training_phase_factory.create(plan.training_phase_type)
+                    readiness_score, load_score, rpe_score = athlete_capacitiy_processor.get_daily_readiness_scores(event_date, injury_risk_dict,demo_persona.user_stats,plan, training_phase)
+
+                    plan_string = get_periodization_plan_string(plan, event_date,readiness_score, load_score, rpe_score)
                     periodization_plan_output.write(plan_string + '\n')
 
             all_files = os.listdir(f'workouts/{user_name}')
@@ -782,7 +805,15 @@ if __name__ == '__main__':
                         plan = periodization_plan_processor.set_acute_chronic_muscle_needs(plan, event_date,
                                                                                            injury_risk_dict)
                         periodization_plan_processor.update_exposure_needs(plan.target_training_exposures, training_session.training_exposures)
-                        plan_string = get_periodization_plan_string(plan, event_date)
+
+                        athlete_capacitiy_processor = AthleteCapacityProcessor()
+                        training_phase_factory = TrainingPhaseFactory()
+                        training_phase = training_phase_factory.create(plan.training_phase_type)
+                        readiness_score, load_score, rpe_score = athlete_capacitiy_processor.get_daily_readiness_scores(
+                            event_date, injury_risk_dict, demo_persona.user_stats, plan, training_phase)
+
+                        plan_string = get_periodization_plan_string(plan, event_date, readiness_score, load_score,
+                                                                    rpe_score)
                         periodization_plan_output.write(plan_string + '\n')
 
                     total_workouts += 1
@@ -810,7 +841,14 @@ if __name__ == '__main__':
                                                                                       demo_persona.user_stats)
                         plan = periodization_plan_processor.set_acute_chronic_muscle_needs(plan, event_date,
                                                                                            injury_risk_dict)
-                        plan_string = get_periodization_plan_string(plan, event_date)
+                        athlete_capacitiy_processor = AthleteCapacityProcessor()
+                        training_phase_factory = TrainingPhaseFactory()
+                        training_phase = training_phase_factory.create(plan.training_phase_type)
+                        readiness_score, load_score, rpe_score = athlete_capacitiy_processor.get_daily_readiness_scores(
+                            event_date, injury_risk_dict, demo_persona.user_stats, plan, training_phase)
+
+                        plan_string = get_periodization_plan_string(plan, event_date, readiness_score, load_score,
+                                                                    rpe_score)
                         periodization_plan_output.write(plan_string + '\n')
 
             #last_date = event_date

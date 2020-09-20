@@ -88,7 +88,7 @@ class WorkoutProcessor(object):
                         session_RPE.add(exercise_rpe)
                         volume += ex_volume
 
-                        session.training_exposures = exposure_processor.get_exposures(workout_exercise)
+                        session.training_exposures.extend(exposure_processor.get_exposures(workout_exercise))
 
                     session = self.set_session_intensity_metrics(session, workout_exercise)
 
@@ -152,7 +152,7 @@ class WorkoutProcessor(object):
 
                     session = self.set_session_intensity_metrics(session, workout_exercise)
 
-                    session.training_exposures = exposure_processor.get_exposures(workout_exercise)
+                    session.training_exposures.extend(exposure_processor.get_exposures(workout_exercise))
 
             workout_section.should_assess_shrz()
 

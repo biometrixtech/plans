@@ -57,9 +57,20 @@ class TrainingLoadProcessing(object):
         self.previous_week_3_internal_values = []
         self.previous_week_4_internal_values = []
         self.internal_load_tuples = []
-        self.cardio_load_tupes = []
+        self.cardio_internal_load_tuples = []
         self.a_internal_load_values = []
         self.c_internal_load_values = []
+
+        self.last_week_power_load_values = []
+        self.previous_week_power_load_values = []
+        self.previous_week_2_power_load_values = []
+        self.previous_week_3_power_load_values = []
+        self.previous_week_4_power_load_values = []
+        self.power_load_tuples = []
+        self.cardio_power_load_tuples = []
+        self.a_power_load_values = []
+        self.c_power_load_values = []
+
         self.athlete_capacities = AthleteBaselineCapacities
         self.total_historical_sessions = 0
         # self.acute_days = acute_days
@@ -127,6 +138,12 @@ class TrainingLoadProcessing(object):
         self.previous_week_internal_values = []
         self.a_internal_load_values = []
         self.c_internal_load_values = []
+
+        self.last_week_power_load_values = []
+        self.power_load_tuples = []
+        self.previous_week_power_load_values = []
+        self.a_power_load_values = []
+        self.c_power_load_values = []
 
         five_days_ago = parse_date(self.end_date) - timedelta(days=4)
         eight_days_ago = parse_date(self.end_date) - timedelta(days=7)
@@ -203,27 +220,53 @@ class TrainingLoadProcessing(object):
                         self.sport_max_load[l.sport_name.value] = SportMaxLoad(l.event_date, training_load.observed_value)
                         self.sport_max_load[l.sport_name.value].first_time_logged = True
 
-        self.last_week_internal_values.extend(x.rpe_load for x in last_7_day_training_sessions if x.rpe_load is not None)
-        self.previous_week_internal_values.extend(x.rpe_load for x in previous_7_day_training_sessions if x.rpe_load is not None)
+        self.last_week_internal_values.extend(
+            x.rpe_load for x in last_7_day_training_sessions if x.rpe_load is not None)
+        self.last_week_power_load_values.extend(
+            x.power_load for x in last_7_day_training_sessions if x.power_load is not None)
+
+        self.previous_week_internal_values.extend(
+            x.rpe_load for x in previous_7_day_training_sessions if x.rpe_load is not None)
+        self.previous_week_power_load_values.extend(
+            x.power_load for x in previous_7_day_training_sessions if x.power_load is not None)
+
         self.previous_week_2_internal_values.extend(
             x.rpe_load for x in previous_14_day_training_sessions if x.rpe_load is not None)
+        self.previous_week_2_power_load_values.extend(
+            x.power_load for x in previous_14_day_training_sessions if x.power_load is not None)
+
         self.previous_week_3_internal_values.extend(
             x.rpe_load for x in previous_21_day_training_sessions if x.rpe_load is not None)
+        self.previous_week_3_power_load_values.extend(
+            x.power_load for x in previous_21_day_training_sessions if x.power_load is not None)
+
         self.previous_week_4_internal_values.extend(
             x.rpe_load for x in previous_28_day_training_sessions if x.rpe_load is not None)
+        self.previous_week_4_power_load_values.extend(
+            x.power_load for x in previous_28_day_training_sessions if x.power_load is not None)
 
         self.a_internal_load_values.extend(x.rpe_load for x in acute_training_sessions if x.rpe_load is not None)
+        self.a_power_load_values.extend(x.power_load for x in acute_training_sessions if x.power_load is not None)
 
         for w in chronic_weeks_training_sessions:
-            weeks_values = [x.rpe_load for x in w if x.rpe_load is not None]
-            week_sum = self.get_standard_error_range(expected_workouts_week=self.expected_weekly_workouts,
-                                                     values=weeks_values,
-                                                     return_sum=True)
-            self.c_internal_load_values.append(week_sum)
+            internal_weeks_values = [x.rpe_load for x in w if x.rpe_load is not None]
+            power_load_weeks_values = [x.power_load for x in w if x.power_load is not None]
+            internal_week_sum = self.get_standard_error_range(expected_workouts_week=self.expected_weekly_workouts,
+                                                            values=internal_weeks_values,
+                                                            return_sum=True)
+            power_load_week_sum = self.get_standard_error_range(expected_workouts_week=self.expected_weekly_workouts,
+                                                              values=power_load_weeks_values,
+                                                              return_sum=True)
+            self.c_internal_load_values.append(internal_week_sum)
+            self.c_power_load_values.append(power_load_week_sum)
 
         self.internal_load_tuples.extend(list(x for x in self.get_session_attributes_tuple_list("event_date",
                                                                                                  "rpe_load",
                                                                                                 all_training_sessions)))
+        self.power_load_tuples.extend(list(x for x in self.get_session_attributes_tuple_list("event_date",
+                                                                                                "power_load",
+                                                                                                all_training_sessions)))
+
         proc = AthleteCapacityProcessor()
 
         self.athlete_capacities = proc.get_capacity_from_workout_history(all_training_sessions)
@@ -275,42 +318,73 @@ class TrainingLoadProcessing(object):
                     user_stats.eligible_for_high_load_trigger = False
 
         user_stats.internal_ramp = self.get_ramp(user_stats.expected_weekly_workouts,
-                                                    self.last_week_internal_values, self.previous_week_internal_values)
+                                                 self.last_week_internal_values, self.previous_week_internal_values)
+        user_stats.power_load_ramp = self.get_ramp(user_stats.expected_weekly_workouts,
+                                                   self.last_week_power_load_values, self.previous_week_power_load_values)
 
         user_stats.internal_monotony = self.get_monotony(user_stats.expected_weekly_workouts,
                                                          self.last_week_internal_values)
 
-        historical_internal_monotony = self.get_historical_internal_monotony(self.start_date, self.end_date,
-                                                                             user_stats.expected_weekly_workouts)
+        user_stats.power_load_monotony = self.get_monotony(user_stats.expected_weekly_workouts,
+                                                           self.last_week_power_load_values)
+
+        historical_internal_monotony = self.get_historical_monotony(self.start_date, self.end_date,
+                                                                    user_stats.expected_weekly_workouts,
+                                                                    self.internal_load_tuples)
+
+        historical_power_load_monotony = self.get_historical_monotony(self.start_date, self.end_date,
+                                                                      user_stats.expected_weekly_workouts,
+                                                                      self.power_load_tuples)
 
         user_stats.historical_internal_monotony = historical_internal_monotony
+        user_stats.historical_power_load_monotony = historical_power_load_monotony
 
-        historical_internal_strain, strain_events = self.get_historical_internal_strain(self.start_date, self.end_date,
-                                                                                        user_stats.expected_weekly_workouts)
+        historical_internal_strain, strain_events = self.get_historical_strain(self.start_date, self.end_date,
+                                                                               user_stats.expected_weekly_workouts,
+                                                                               self.internal_load_tuples)
+        historical_power_load_strain, power_strain_events = self.get_historical_strain(self.start_date, self.end_date,
+                                                                                       user_stats.expected_weekly_workouts,
+                                                                                       self.power_load_tuples)
 
         user_stats.internal_strain_events = strain_events
+        user_stats.power_load_strain_events = power_strain_events
 
         user_stats.internal_strain = self.get_strain(user_stats.expected_weekly_workouts,
                                                      user_stats.internal_monotony, self.last_week_internal_values,
-                                                        historical_internal_strain)
+                                                     historical_internal_strain)
+        user_stats.power_load_strain = self.get_strain(user_stats.expected_weekly_workouts,
+                                                       user_stats.power_load_monotony, self.last_week_power_load_values,
+                                                       historical_power_load_strain)
 
         user_stats.acute_internal_total_load = self.get_standard_error_range(user_stats.expected_weekly_workouts,
-                                                                                self.a_internal_load_values)
+                                                                             self.a_internal_load_values)
+        user_stats.acute_power_total_load = self.get_standard_error_range(user_stats.expected_weekly_workouts,
+                                                                          self.a_power_load_values)
 
         # user_stats.chronic_internal_total_load = self.get_standard_error_range(
         #     user_stats.expected_weekly_workouts, self.c_internal_load_values, return_sum=False)
 
         # already factored in expected weekly workouts
-        user_stats.chronic_internal_total_load = StandardErrorRange.get_average_from_error_range_list(self.c_internal_load_values)
+        user_stats.chronic_internal_total_load = StandardErrorRange.get_average_from_error_range_list(
+            self.c_internal_load_values)
+        user_stats.chronic_power_total_load = StandardErrorRange.get_average_from_error_range_list(
+            self.c_power_load_values)
 
         user_stats.internal_acwr = self.get_acwr(user_stats.acute_internal_total_load,
                                                  user_stats.chronic_internal_total_load)
 
+        user_stats.power_load_acwr = self.get_acwr(user_stats.acute_power_total_load,
+                                                   user_stats.chronic_power_total_load)
+
         user_stats.internal_freshness_index = self.get_freshness_index(
             user_stats.acute_internal_total_load,
             user_stats.chronic_internal_total_load)
+        user_stats.power_load_freshness_index = self.get_freshness_index(
+            user_stats.acute_power_total_load,
+            user_stats.chronic_power_total_load)
 
         user_stats.historical_internal_strain = historical_internal_strain
+        user_stats.historical_power_load_strain = historical_power_load_strain
 
         user_stats.average_weekly_internal_load = self.get_average_weekly_internal_load()
 
@@ -847,7 +921,7 @@ class TrainingLoadProcessing(object):
 
         return standard_error_range
 
-    def get_historical_internal_monotony(self, start_date, end_date, expected_weekly_workouts):
+    def get_historical_monotony(self, start_date, end_date, expected_weekly_workouts, load_tuples):
 
         target_dates = []
 
@@ -856,7 +930,7 @@ class TrainingLoadProcessing(object):
         if expected_weekly_workouts is not None:
             weekly_expected_workouts = expected_weekly_workouts
 
-        self.internal_load_tuples.sort(key=lambda x: x[0])
+        load_tuples.sort(key=lambda x: x[0])
 
         date_diff = parse_date(end_date) - parse_date(start_date)
 
@@ -870,7 +944,7 @@ class TrainingLoadProcessing(object):
         if len(target_dates) > 7:
             for t in range(6, len(target_dates)):
                 load_values = []
-                daily_values = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) < p[0] <= target_dates[t]]
+                daily_values = [p for p in load_tuples if (parse_date(start_date) + timedelta(index)) < p[0] <= target_dates[t]]
                 load_values.extend(x[1] for x in daily_values if x is not None and x[1] is not None)
                 monotony = self.get_monotony(weekly_expected_workouts, load_values)
 
@@ -880,7 +954,7 @@ class TrainingLoadProcessing(object):
 
         return monotony_values
 
-    def get_historical_internal_strain(self, start_date, end_date, expected_weekly_workouts):
+    def get_historical_strain(self, start_date, end_date, expected_weekly_workouts, load_tuples):
 
         target_dates = []
 
@@ -889,7 +963,7 @@ class TrainingLoadProcessing(object):
         if expected_weekly_workouts is not None:
             weekly_expected_workouts = expected_weekly_workouts
 
-        self.internal_load_tuples.sort(key=lambda x: x[0])
+        load_tuples.sort(key=lambda x: x[0])
 
         date_diff = parse_date(end_date) - parse_date(start_date) + timedelta(days=1)  # include all days within start/end
 
@@ -911,7 +985,7 @@ class TrainingLoadProcessing(object):
         if len(target_dates) > 7:
             for t in range(6, len(target_dates)):
                 load_values = []
-                daily_values = [p for p in self.internal_load_tuples if (parse_date(start_date) + timedelta(index)) <= p[0] <= target_dates[t]]
+                daily_values = [p for p in load_tuples if (parse_date(start_date) + timedelta(index)) <= p[0] <= target_dates[t]]
                 load_values.extend(x[1] for x in daily_values if x is not None and x[1] is not None)
                 strain = self.calculate_daily_strain(load_values, weekly_expected_workouts)
 

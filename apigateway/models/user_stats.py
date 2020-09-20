@@ -64,6 +64,7 @@ class UserStats(Serialisable):
         self.power_proficiency = None
 
         # training load monitoring
+        # internal
         self.internal_ramp = None
         self.internal_monotony = None
         self.historical_internal_strain = []
@@ -74,6 +75,19 @@ class UserStats(Serialisable):
         self.chronic_internal_total_load = None
         self.internal_acwr = None
         self.internal_freshness_index = None
+
+        # power
+        self.power_load_ramp = None
+        self.power_load_monotony = None
+        self.historical_power_load_strain = []
+        self.historical_power_load_monotony = []
+        self.power_load_strain = None
+        self.power_load_strain_events = None
+        self.acute_power_total_load = None
+        self.chronic_power_total_load = None
+        self.power_load_acwr = None
+        self.power_load_freshness_index = None
+
         self.acute_days = 0
         self.chronic_days = 0
         self.total_historical_sessions = 0
@@ -149,6 +163,17 @@ class UserStats(Serialisable):
             'acute_internal_total_load': self.acute_internal_total_load.json_serialise() if self.acute_internal_total_load is not None else None,
             'chronic_internal_total_load': self.chronic_internal_total_load.json_serialise() if self.chronic_internal_total_load is not None else None,
             'internal_acwr': self.internal_acwr.json_serialise() if self.internal_acwr is not None else None,
+
+            'power_load_ramp': self.power_load_ramp.json_serialise() if self.power_load_ramp is not None else None,
+            'power_load_monotony': self.power_load_monotony.json_serialise() if self.power_load_monotony is not None else None,
+            'historical_power_load_monotony': [h.json_serialise() for h in self.historical_power_load_monotony],
+            'power_load_strain': self.power_load_strain.json_serialise() if self.power_load_strain is not None else None,
+            'historical_power_load_strain': [h.json_serialise() for h in self.historical_power_load_strain],
+            'power_load_strain_events': self.power_load_strain_events.json_serialise() if self.power_load_strain_events is not None else None,
+            'acute_power_total_load': self.acute_power_total_load.json_serialise() if self.acute_power_total_load is not None else None,
+            'chronic_power_total_load': self.chronic_power_total_load.json_serialise() if self.chronic_power_total_load is not None else None,
+            'power_load_acwr': self.power_load_acwr.json_serialise() if self.power_load_acwr is not None else None,
+
             'acute_days': self.acute_days,
             'chronic_days': self.chronic_days,
             'total_historical_sessions': self.total_historical_sessions,
@@ -218,6 +243,22 @@ class UserStats(Serialisable):
         user_stats.internal_strain_events = StandardErrorRange.json_deserialise(input_dict.get('internal_strain_events', None))
         user_stats.internal_ramp = StandardErrorRange.json_deserialise(input_dict.get('internal_ramp', None))
         user_stats.internal_acwr = StandardErrorRange.json_deserialise(input_dict.get('internal_acwr', None))
+
+        user_stats.acute_power_total_load = StandardErrorRange.json_deserialise(
+            input_dict.get('acute_power_total_load', None))
+        user_stats.chronic_power_total_load = StandardErrorRange.json_deserialise(
+            input_dict.get('chronic_power_total_load', None))
+        user_stats.power_load_monotony = StandardErrorRange.json_deserialise(input_dict.get('power_load_monotony', None))
+        user_stats.historical_power_load_monotony = [StandardErrorRange.json_deserialise(s)
+                                                   for s in input_dict.get('historical_power_load_monotony', [])]
+        user_stats.power_load_strain = StandardErrorRange.json_deserialise(input_dict.get('power_load_strain', None))
+        user_stats.historical_power_load_strain = [StandardErrorRange.json_deserialise(s)
+                                                 for s in input_dict.get('historical_power_load_strain', [])]
+        user_stats.power_load_strain_events = StandardErrorRange.json_deserialise(
+            input_dict.get('power_load_strain_events', None))
+        user_stats.power_load_ramp = StandardErrorRange.json_deserialise(input_dict.get('power_load_ramp', None))
+        user_stats.power_load_acwr = StandardErrorRange.json_deserialise(input_dict.get('power_load_acwr', None))
+
         user_stats.acute_days = input_dict.get('acute_days', 0)
         user_stats.chronic_days = input_dict.get('chronic_days', 0)
         user_stats.total_historical_sessions = input_dict.get('total_historical_sessions', 0)

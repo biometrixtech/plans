@@ -147,8 +147,8 @@ class TrainingExposureProcessor(object):
             else:
                 exposure.volume = StandardErrorRange(observed_value=exercise.duration)
         else:
-            exercise.volume = exercise.total_volume.plagiarize()
-        exercise.volume_measure = UnitOfMeasure.seconds
+            exposure.volume = exercise.total_volume.plagiarize()
+        exposure.volume_measure = UnitOfMeasure.seconds
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
 
@@ -164,7 +164,7 @@ class TrainingExposureProcessor(object):
         # else:
         #     exposure.volume = StandardErrorRange(observed_value=exercise.reps_per_set * exercise.sets)
         exposure.volume = reps_range.multiply(exercise.sets)
-        exercise.volume_measure = UnitOfMeasure.count
+        exposure.volume_measure = UnitOfMeasure.count
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
 
