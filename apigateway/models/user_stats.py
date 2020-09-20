@@ -60,7 +60,8 @@ class UserStats(Serialisable):
         self.average_trimp_20_day = None
 
         self.fitness_provider_cardio_profile = None
-        self.proficiency_level = None
+        self.strength_proficiency = None
+        self.power_proficiency = None
 
         # training load monitoring
         self.internal_ramp = None
@@ -134,8 +135,10 @@ class UserStats(Serialisable):
             'average_trimp_5_day': self.average_trimp_5_day.json_serialise() if self.average_trimp_5_day is not None else None,
             'average_trimp_20_day': self.average_trimp_20_day.json_serialise() if self.average_trimp_20_day is not None else None,
             'high_relative_load_score': self.high_relative_load_score,
+
             'fitness_provider_cardio_profile': self.fitness_provider_cardio_profile if self.fitness_provider_cardio_profile is not None else None,
-            'proficiency_level': self.proficiency_level.value if self.proficiency_level is not None else None,
+            'strength_proficiency': self.strength_proficiency.value if self.strength_proficiency is not None else None,
+            'power_proficiency': self.power_proficiency.value if self.power_proficiency is not None else None,
 
             'internal_ramp': self.internal_ramp.json_serialise() if self.internal_ramp is not None else None,
             'internal_monotony': self.internal_monotony.json_serialise() if self.internal_monotony is not None else None,
@@ -195,7 +198,8 @@ class UserStats(Serialisable):
         user_stats.high_relative_load_score = input_dict.get('high_relative_load_score', 50)
 
         user_stats.fitness_provider_cardio_profile = input_dict.get('fitness_provider_cardio_profile')
-        user_stats.proficiency_level = ProficiencyLevel(input_dict['proficiency_level']) if input_dict.get('proficiency_level') is not None else ProficiencyLevel.novice
+        user_stats.strength_proficiency = ProficiencyLevel(input_dict['strength_proficiency']) if input_dict.get('strength_proficiency') is not None else ProficiencyLevel.novice
+        user_stats.power_proficiency = ProficiencyLevel(input_dict['power_proficiency']) if input_dict.get('power_proficiency') is not None else ProficiencyLevel.novice
 
         user_stats.vo2_max_date_time = input_dict.get('vo2_max_date_time')
         user_stats.athlete_age = input_dict.get('athlete_age', 25)

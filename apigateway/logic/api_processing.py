@@ -40,6 +40,8 @@ class APIProcessing(object):
         assignment_type = None
         user_age = 25
         user_gender = Gender.female
+        strength_proficiency = None
+        power_proficiency = None
 
         if self.user_stats is not None:
             if self.user_stats.athlete_weight is not None:
@@ -50,9 +52,20 @@ class APIProcessing(object):
                 user_gender = self.user_stats.athlete_gender
             if self.user_stats.fitness_provider_cardio_profile is not None:
                 assignment_type = self.user_stats.fitness_provider_cardio_profile
+            if self.user_stats.strength_proficiency is not None:
+                strength_proficiency = self.user_stats.strength_proficiency
+            if self.user_stats.power_proficiency is not None:
+                power_proficiency = self.user_stats.power_proficiency
+
 
         if planned_workout is not None:
-            workout_processor = WorkoutProcessor(user_weight=user_weight, user_age=user_age, gender=user_gender)
+            workout_processor = WorkoutProcessor(
+                    user_weight=user_weight,
+                    user_age=user_age,
+                    gender=user_gender,
+                    strength_proficiency=strength_proficiency,
+                    power_proficiency=power_proficiency
+            )
             workout_processor.process_planned_workout(session, assignment_type=assignment_type)
             self.sessions.append(session)
         else:
@@ -111,7 +124,9 @@ class APIProcessing(object):
                     user_weight=self.user_stats.athlete_weight,
                     hr_data=hr_workout,
                     vo2_max=self.user_stats.vo2_max,
-                    gender=self.user_stats.athlete_gender
+                    gender=self.user_stats.athlete_gender,
+                    strength_proficiency=self.user_stats.strength_proficiency,
+                    power_proficiency=self.user_stats.power_proficiency
             ).process_workout(session_obj)
             #session_obj.update_training_loads(session_training_load)
             self.workout_programs.append(session_obj.workout_program_module)

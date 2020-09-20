@@ -215,7 +215,7 @@ class BaseWorkoutExercise(object):
 
         self.actions_for_power = []
 
-    def initialize_from_movement(self, movement, proficiency_level=ProficiencyLevel.novice):
+    def initialize_from_movement(self, movement, strength_proficiency=ProficiencyLevel.novice, power_proficiency=ProficiencyLevel.novice):
         # self.body_position = movement.body_position
         self.bilateral_distribution_of_resistance = movement.bilateral_distribution_of_resistance
         self.cardio_action = movement.cardio_action
@@ -235,20 +235,30 @@ class BaseWorkoutExercise(object):
         self.movement_rep_tempo = movement.rep_tempo
         self.rest_between_reps = movement.rest_between_reps
         self.actions_for_power = movement.actions_for_power
-        self.update_resistance_by_proficiency_level(proficiency_level)
+        self.update_resistance_by_proficiency_level(strength_proficiency, power_proficiency)
         self.update_resistance_by_external_weight()
         # self.set_adaption_type(movement)
 
-    def update_resistance_by_proficiency_level(self, proficiency_level=ProficiencyLevel.novice):
+    def update_resistance_by_proficiency_level(self, strength_proficiency=ProficiencyLevel.novice, power_proficiency=ProficiencyLevel.novice):
         if len(self.equipments) == 0 or self.equipments[0] in [Equipment.bodyweight, Equipment.no_equipment]:
-            if proficiency_level == ProficiencyLevel.intermediate:
-                old_resistance_value = self.resistance.value
-                new_resistance_value = max(old_resistance_value - 1, 0)
-                self.resistance = MovementResistance(new_resistance_value)
-            elif proficiency_level in [ProficiencyLevel.advanced, ProficiencyLevel.elite]:
-                old_resistance_value = self.resistance.value
-                new_resistance_value = max(old_resistance_value - 2, 0)
-                self.resistance = MovementResistance(new_resistance_value)
+            if self.training_type in [TrainingType.strength_integrated_resistance, TrainingType.strength_endurance]:
+                if strength_proficiency == ProficiencyLevel.intermediate:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 1, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
+                elif strength_proficiency in [ProficiencyLevel.advanced, ProficiencyLevel.elite]:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 2, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
+            elif self.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics]:
+                if power_proficiency == ProficiencyLevel.intermediate:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 1, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
+                elif power_proficiency in [ProficiencyLevel.advanced, ProficiencyLevel.elite]:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 2, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
 
     def update_resistance_by_external_weight(self):
         if self.training_type == TrainingType.strength_integrated_resistance:

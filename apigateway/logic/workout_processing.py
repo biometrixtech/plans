@@ -22,11 +22,18 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 
 
 class WorkoutProcessor(object):
-    def __init__(self, user_age=20, user_weight=60.0, gender=Gender.female, hr_data=None, vo2_max=None, proficiency_level=ProficiencyLevel.novice):
-        self.user_age = user_age
-        self.user_weight = user_weight
-        self.gender = gender
-        self.proficiency_level = proficiency_level
+    def __init__(self, user_age=None,
+                 user_weight=None,
+                 gender=None,
+                 hr_data=None,
+                 vo2_max=None,
+                 strength_proficiency=None,
+                 power_proficiency=None):
+        self.user_age = user_age or 20
+        self.user_weight = user_weight or 60
+        self.gender = gender or Gender.female
+        self.strength_proficiency = strength_proficiency or ProficiencyLevel.novice
+        self.power_proficiency = power_proficiency or ProficiencyLevel.novice
         self.hr_data = hr_data
         self.hr_rpe_predictor = RPEPredictor()
         self.bodyweight_ratio_predictor = BodyWeightRatioPredictor()
@@ -190,7 +197,7 @@ class WorkoutProcessor(object):
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
-            exercise.initialize_from_movement(movement, self.proficiency_level)
+            exercise.initialize_from_movement(movement, self.strength_proficiency, self.power_proficiency)
 
 
             for compound_action_id in movement.compound_actions:
@@ -231,7 +238,7 @@ class WorkoutProcessor(object):
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
-            exercise.initialize_from_movement(movement, self.proficiency_level)
+            exercise.initialize_from_movement(movement, self.strength_proficiency, self.power_proficiency)
 
             for compound_action_id in movement.compound_actions:
                 compound_action_json = action_library.get(compound_action_id)
