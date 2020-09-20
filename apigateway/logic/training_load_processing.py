@@ -57,6 +57,7 @@ class TrainingLoadProcessing(object):
         self.previous_week_3_internal_values = []
         self.previous_week_4_internal_values = []
         self.internal_load_tuples = []
+        self.cardio_load_tupes = []
         self.a_internal_load_values = []
         self.c_internal_load_values = []
         self.athlete_capacities = AthleteBaselineCapacities

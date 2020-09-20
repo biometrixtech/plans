@@ -59,9 +59,9 @@ def test_get_strength_endurance_planned_workout():
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_strength
     exercise.predicted_rpe = StandardErrorRange(lower_bound=5, observed_value=6, upper_bound=7)
-    exercise.movement_speed = MovementSpeed.mod
+    exercise.movement_speed = MovementSpeed.fast
     exercise.resistance = MovementResistance.very_low
-    exercise.displacement = MovementDisplacement.mod
+    exercise.displacement = MovementDisplacement.full_rom
     exercise.reps_per_set = 10
 
     proc = TrainingExposureProcessor()
@@ -79,7 +79,7 @@ def test_get_muscular_endurance_strength_planned_workout():
         exercise.adaptation_type = AdaptationType.strength_endurance_strength
         exercise.predicted_rpe = StandardErrorRange(lower_bound=5, observed_value=6, upper_bound=7)
         exercise.movement_speed = speed
-        exercise.resistance = MovementResistance.very_low
+        exercise.resistance = MovementResistance.mod
         exercise.displacement = MovementDisplacement.partial_rom
         exercise.reps_per_set = 15
 
@@ -96,8 +96,8 @@ def test_get_hypertrophy_planned_workout():
     exercise.adaptation_type = AdaptationType.maximal_strength_hypertrophic
     exercise.predicted_rpe = StandardErrorRange(lower_bound=6, observed_value=7, upper_bound=8)
     exercise.movement_speed = MovementSpeed.mod
-    exercise.resistance = MovementResistance.very_low
-    exercise.displacement = MovementDisplacement.max
+    exercise.resistance = MovementResistance.high
+    exercise.displacement = MovementDisplacement.full_rom
     exercise.reps_per_set = 10
 
     proc = TrainingExposureProcessor()
@@ -112,8 +112,8 @@ def test_get_max_strength_planned_workout():
     exercise.adaptation_type = AdaptationType.maximal_strength_hypertrophic
     exercise.predicted_rpe = StandardErrorRange(lower_bound=7, observed_value=8, upper_bound=9)
     exercise.movement_speed = MovementSpeed.fast
-    exercise.resistance = MovementResistance.very_low
-    exercise.displacement = MovementDisplacement.max
+    exercise.resistance = MovementResistance.max
+    exercise.displacement = MovementDisplacement.full_rom
     exercise.reps_per_set = 3
 
     proc = TrainingExposureProcessor()
@@ -124,7 +124,7 @@ def test_get_max_strength_planned_workout():
 
 def test_get_speed_power_adaptation_types_planned_workout():
 
-    speeds = [MovementSpeed.slow, MovementSpeed.none]
+    speeds = [MovementSpeed.fast, MovementSpeed.explosive]
     power_types = [AdaptationType.power_drill, AdaptationType.power_explosive_action]
 
     for speed in speeds:
@@ -134,7 +134,7 @@ def test_get_speed_power_adaptation_types_planned_workout():
             exercise.predicted_rpe = None
             exercise.movement_speed = speed
             exercise.resistance = MovementResistance.very_low
-            exercise.displacement = MovementDisplacement.partial_rom
+            exercise.displacement = MovementDisplacement.mod
             exercise.reps_per_set = None
 
             proc = TrainingExposureProcessor()
