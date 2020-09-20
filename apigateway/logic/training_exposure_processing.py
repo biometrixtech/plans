@@ -147,7 +147,12 @@ class TrainingExposureProcessor(object):
             else:
                 exposure.volume = StandardErrorRange(observed_value=exercise.duration)
         else:
-            exposure.volume = exercise.total_volume.plagiarize()
+            if isinstance(exercise.total_volume, Assignment):
+                exposure.volume = StandardErrorRange(lower_bound=exercise.total_volume.min_value,
+                                                     observed_value=exercise.total_volume.assigned_value,
+                                                     upper_bound=exercise.total_volume.max_value)
+            else:
+                exposure.volume = StandardErrorRange(observed_value=exercise.total_volume.assigned_value)
         exposure.volume_measure = UnitOfMeasure.seconds
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
@@ -156,6 +161,7 @@ class TrainingExposureProcessor(object):
 
     def copy_reps_exercise_details_to_exposure(self, exercise, exposure):
         reps_range = exercise.get_exercise_reps_per_set()
+        reps_range.multiply(exercise.sets)
         # if isinstance(exercise.reps_per_set, Assignment):
         #     reps_range = StandardErrorRange(lower_bound=exercise.reps_per_set.min_value,
         #                                          observed_value=exercise.reps_per_set.assigned_value,
@@ -163,7 +169,7 @@ class TrainingExposureProcessor(object):
         #     exposure.volume = reps_range.multiply(exercise.sets)
         # else:
         #     exposure.volume = StandardErrorRange(observed_value=exercise.reps_per_set * exercise.sets)
-        exposure.volume = reps_range.multiply(exercise.sets)
+        exposure.volume = reps_range
         exposure.volume_measure = UnitOfMeasure.count
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
@@ -190,6 +196,7 @@ class TrainingExposureProcessor(object):
                 combined_exposure.rpe.observed_value = (combined_exposure.rpe.lower_bound + combined_exposure.rpe.upper_bound) / float(2)
 
                 combined_exposure.volume = StandardErrorRange()
+
                 combined_exposure.volume.lower_bound = StandardErrorRange.get_min_from_error_range_list(volumes)
                 combined_exposure.volume.upper_bound = StandardErrorRange.get_max_from_error_range_list(volumes)
                 combined_exposure.volume.observed_value = (combined_exposure.volume.lower_bound + combined_exposure.volume.upper_bound) / float(2)
