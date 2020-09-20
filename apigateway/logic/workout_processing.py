@@ -8,7 +8,7 @@ from logic.bodyweight_ratio_predictor import BodyWeightRatioPredictor
 from logic.training_exposure_processing import TrainingExposureProcessor
 from models.cardio_data import get_cardio_data
 from models.bodyweight_coefficients import get_bodyweight_coefficients
-from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition, WeightDistribution
+from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment, CardioAction, Gender, BodyPosition, WeightDistribution, ProficiencyLevel
 from models.movement_actions import ExternalWeight, LowerBodyStance, UpperBodyStance, ExerciseAction, Movement, CompoundAction, MovementResistance, MovementSpeed, Explosiveness
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.functional_movement import FunctionalMovementFactory
@@ -22,10 +22,11 @@ bodyweight_coefficients = get_bodyweight_coefficients()
 
 
 class WorkoutProcessor(object):
-    def __init__(self, user_age=20, user_weight=60.0, gender=Gender.female, hr_data=None, vo2_max=None):
+    def __init__(self, user_age=20, user_weight=60.0, gender=Gender.female, hr_data=None, vo2_max=None, proficiency_level=ProficiencyLevel.novice):
         self.user_age = user_age
         self.user_weight = user_weight
         self.gender = gender
+        self.proficiency_level = proficiency_level
         self.hr_data = hr_data
         self.hr_rpe_predictor = RPEPredictor()
         self.bodyweight_ratio_predictor = BodyWeightRatioPredictor()
@@ -189,7 +190,8 @@ class WorkoutProcessor(object):
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
-            exercise.initialize_from_movement(movement)
+            exercise.initialize_from_movement(movement, self.proficiency_level)
+
 
             for compound_action_id in movement.compound_actions:
                 action_json = action_library.get(compound_action_id)
@@ -229,7 +231,7 @@ class WorkoutProcessor(object):
         if exercise.movement_id in movement_library:
             movement_json = movement_library[exercise.movement_id]
             movement = Movement.json_deserialise(movement_json)
-            exercise.initialize_from_movement(movement)
+            exercise.initialize_from_movement(movement, self.proficiency_level)
 
             for compound_action_id in movement.compound_actions:
                 compound_action_json = action_library.get(compound_action_id)
@@ -453,7 +455,6 @@ class WorkoutProcessor(object):
         #     action.set_external_weight_distribution()
         #     action.set_body_weight_distribution()
         #     action.set_training_load(total_volume)
-
 
     def initialize_action_from_exercise(self, action, exercise):
         # compound_action_force_ratio = self.get_force_level(action.speed, action.resistance)
@@ -1118,10 +1119,15 @@ class WorkoutProcessor(object):
             equipment = Equipment.bodyweight
         if equipment == Equipment.no_equipment:
             equipment = Equipment.bodyweight
-        bodyweight_ratio = self.bodyweight_ratio_predictor.predict_bodyweight_ratio(self.user_weight, self.gender, prime_movers, equipment)
+        bodyweight_ratio = self.bodyweight_ratio_predictor.predict_bodyweight_ratio(
+                user_weight=self.user_weight,
+                gender=self.gender,
+                prime_movers=prime_movers,
+                equipment=equipment,
+                fitness_level=self.proficiency_level.value
+        )
 
         return bodyweight_ratio
-
 
     @staticmethod
     def get_rpe_from_speed_resistance_displacement(workout_exercise, reps):
@@ -1219,7 +1225,6 @@ class WorkoutProcessor(object):
                     # find the n of nRM that corresponds to the % 1RM value.  For example, n = 10 for 75% 1RM aka 10RM = 75% of 1RM
                     all_rep_max_reps.append(self.get_reps_for_percent_rep_max(percent_one_rep_max_weight))
         return all_rep_max_reps
-
 
     def convert_reps_to_duration(self, reps, unit_of_measure, cardio_action):
         # distance to duration

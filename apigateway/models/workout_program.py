@@ -1,6 +1,6 @@
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability, WeightDistribution
-from models.movement_actions import CompoundAction
+from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability, WeightDistribution, ProficiencyLevel
+from models.movement_actions import CompoundAction, MovementResistance
 from utils import format_datetime, parse_datetime
 from models.training_volume import StandardErrorRange, Assignment
 from logic.calculators import Calculators
@@ -215,7 +215,7 @@ class BaseWorkoutExercise(object):
 
         self.actions_for_power = []
 
-    def initialize_from_movement(self, movement):
+    def initialize_from_movement(self, movement, proficiency_level=ProficiencyLevel.novice):
         # self.body_position = movement.body_position
         self.bilateral_distribution_of_resistance = movement.bilateral_distribution_of_resistance
         self.cardio_action = movement.cardio_action
@@ -235,7 +235,31 @@ class BaseWorkoutExercise(object):
         self.movement_rep_tempo = movement.rep_tempo
         self.rest_between_reps = movement.rest_between_reps
         self.actions_for_power = movement.actions_for_power
+        self.update_resistance_by_proficiency_level(proficiency_level)
+        self.update_resistance_by_external_weight()
         # self.set_adaption_type(movement)
+
+    def update_resistance_by_proficiency_level(self, proficiency_level=ProficiencyLevel.novice):
+        if len(self.equipments) == 0 or self.equipments[0] in [Equipment.bodyweight, Equipment.no_equipment]:
+            if proficiency_level == ProficiencyLevel.intermediate:
+                old_resistance_value = self.resistance.value
+                new_resistance_value = max(old_resistance_value - 1, 0)
+                self.resistance = MovementResistance(new_resistance_value)
+            elif proficiency_level in [ProficiencyLevel.advanced, ProficiencyLevel.elite]:
+                old_resistance_value = self.resistance.value
+                new_resistance_value = max(old_resistance_value - 2, 0)
+                self.resistance = MovementResistance(new_resistance_value)
+
+    def update_resistance_by_external_weight(self):
+        if self.training_type == TrainingType.strength_integrated_resistance:
+            if self.weight is not None:
+                if self.weight_measure is not None and self.weight_measure == WeightMeasure.percent_rep_max:
+                    if isinstance(self.weight, Assignment):
+                        if self.weight.max_value > 60:
+                            self.resistance = MovementResistance.mod_high
+                    else:
+                        if self.weight > 60:
+                            self.resistance = MovementResistance.mod_high
 
     def set_adaptation_type(self, percent_rep_max=50):
         if self.training_type == TrainingType.flexibility:
