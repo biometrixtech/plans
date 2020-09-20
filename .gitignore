@@ -26,6 +26,7 @@ apigateway/process_metrics.py
 apigateway/update_stats.py
 apigateway/aggregate_dashboard.py
 apigateway/session.py
+apigateway/responsive_recovery.py
 !apigateway/data
 !apigateway/datastores/
 !apigateway/logic/
@@ -37,6 +38,7 @@ output/*
 tests/database_tests/*.csv
 output_persona/*
 tests/data/*.joblib
+tests/data/*.csv
 ml_training/hr_rpe/data/*
 ml_training/hr_rpe/model/*
 ml_training/bodyweight_ratio/data/*

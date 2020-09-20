@@ -233,3 +233,9 @@ class RunningDistances(Enum):
     mile50 = 21
 
 
+class ProficiencyLevel(Enum):
+    beginner = 0
+    novice = 1
+    intermediate = 2
+    advanced = 3
+    elite = 4
