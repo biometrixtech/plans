@@ -171,27 +171,47 @@ class AthleteDefaultCapacityFactory(object):
 
         if training_persona == TrainingPersona.beginner:
 
-            # TODO: Power
-            pass
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+                                                                          volume=StandardErrorRange(observed_value=48))
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+                                                          volume=StandardErrorRange())
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+                                                          volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.novice:
 
-            # TODO: Power
-            pass
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+                                                          volume=StandardErrorRange(observed_value=64))
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+                                                          volume=StandardErrorRange(observed_value=12))
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+                                                                  volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.intermediate:
 
-            # TODO: Power
-            pass
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+                                                          volume=StandardErrorRange(observed_value=80))
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+                                                          volume=StandardErrorRange(observed_value=32))
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+                                                                  volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.advanced:
 
-            # TODO: Power
-            pass
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+                                                          volume=StandardErrorRange(observed_value=80))
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+                                                          volume=StandardErrorRange(observed_value=90))
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+                                                                  volume=StandardErrorRange(observed_value=60))
 
         elif training_persona == TrainingPersona.elite:
 
-            # TODO: Power
-            pass
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+                                                          volume=StandardErrorRange(observed_value=80))
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+                                                          volume=StandardErrorRange(observed_value=120))
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+                                                                  volume=StandardErrorRange(observed_value=120))
 
         return power_athlete_capacities

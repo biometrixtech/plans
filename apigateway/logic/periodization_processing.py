@@ -5,6 +5,7 @@ from models.athlete_capacity import AthleteBaselineCapacities
 from logic.athlete_capacity_processing import AthleteCapacityProcessor
 from models.periodization_utilities import PeriodizationUtilities
 from models.training_volume import StandardErrorRange
+import datetime
 
 
 class PeriodizationPlanProcessor(object):
@@ -63,6 +64,71 @@ class PeriodizationPlanProcessor(object):
         load = StandardErrorRange(lower_bound=min_load_calcs_load, upper_bound=max_load_calcs_load,
                                   observed_value=(min_load_calcs_load + max_load_calcs_load) / float(2))
         return load
+
+    def get_clean_date(self, test_date):
+
+        if isinstance(test_date, datetime.date):
+            return test_date
+        if isinstance(test_date, datetime.datetime):
+            return test_date.date()
+
+    def set_acute_chronic_muscle_needs(self, plan: PeriodizationPlan, current_date, injury_risk_dict):
+
+        plan.acute_muscle_issues = []
+        plan.chronic_muscle_issues = []
+        plan.excessive_strain_muscles = []
+        plan.compensating_muscles = []
+        plan.functional_overreaching_muscles = []
+        plan.non_functional_overreaching_muscles = []
+        plan.tendon_issues = []
+
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+
+            if body_part_injury_risk.last_ache_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_ache_date)):
+                plan.acute_muscle_issues.append(body_part_side)
+            if body_part_injury_risk.last_inflammation_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_inflammation_date)):
+                plan.acute_muscle_issues.append(body_part_side)
+            if body_part_injury_risk.last_muscle_spasm_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_muscle_spasm_date)):
+                plan.acute_muscle_issues.append(body_part_side)
+            if body_part_injury_risk.last_knots_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_knots_date)):
+                plan.acute_muscle_issues.append(body_part_side)
+            if body_part_injury_risk.last_sharp_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_sharp_date)):
+                plan.acute_muscle_issues.append(body_part_side)
+            if body_part_injury_risk.last_tight_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_tight_date)):
+                plan.acute_muscle_issues.append(body_part_side)
+
+            # TODO - make sure you're interpreting this correctly
+            if body_part_injury_risk.last_excessive_strain_date is not None and (current_date.date() - self.get_clean_date(body_part_injury_risk.last_excessive_strain_date)).days < 2:
+                plan.excessive_strain_muscles.append(body_part_side)
+
+            if body_part_injury_risk.last_non_functional_overreaching_date is not None and (current_date.date() - self.get_clean_date(body_part_injury_risk.last_non_functional_overreaching_date)).days < 2:
+                plan.non_functional_overreaching_muscles.append(body_part_side)
+
+            if body_part_injury_risk.last_functional_overreaching_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_functional_overreaching_date)):
+                plan.functional_overreaching_muscles.append(body_part_side)
+
+            if (body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.underactive_long_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.underactive_short_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.long_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.knots_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.tight_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.sharp_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.ache_count_last_0_20_days >= 4 or
+                    body_part_injury_risk.short_count_last_0_20_days >= 3 or
+                    body_part_injury_risk.weak_count_last_0_20_days >= 3):
+                plan.chronic_muscle_issues.append()
+
+            if body_part_injury_risk.last_compensation_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_compensation_date)):
+                plan.compensating_muscles.append(body_part_side)
+
+            if (body_part_injury_risk.last_tendinopathy_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_tendinopathy_date)) or
+                    body_part_injury_risk.last_tendinosis_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_tendinosis_date)) or
+                    body_part_injury_risk.last_altered_joint_arthokinematics_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_altered_joint_arthokinematics_date))):
+                plan.tendon_issues.append(body_part_side)
+
+        return plan
 
     def initialize_periodization_plan(self, periodization_plan, existing_athlete_capacities=None):
 
