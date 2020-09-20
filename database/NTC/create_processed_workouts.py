@@ -17,6 +17,7 @@ def create_planned_workout_load(session, user_profile_id):
     consolidated_dict = get_consolidated_dict(session_functional_movement.session_load_dict)
 
     workout = PlannedWorkoutLoad(workout_id=session.workout.program_module_id)
+    workout.name = session.workout.name
     workout.program_id = session.workout.program_id
     workout.program_module_id = session.workout.program_module_id
     workout.user_profile_id = user_profile_id
