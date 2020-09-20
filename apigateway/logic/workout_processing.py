@@ -30,14 +30,14 @@ class WorkoutProcessor(object):
                  strength_proficiency=None,
                  power_proficiency=None):
         self.user_age = user_age or 20
-        self.user_weight = user_weight or 60
+        self.user_weight = user_weight or 60.0
         self.gender = gender or Gender.female
         self.strength_proficiency = strength_proficiency or ProficiencyLevel.novice
         self.power_proficiency = power_proficiency or ProficiencyLevel.novice
         self.hr_data = hr_data
         self.hr_rpe_predictor = RPEPredictor()
         self.bodyweight_ratio_predictor = BodyWeightRatioPredictor()
-        self.vo2_max = vo2_max or Calculators.vo2_max_estimation_demographics(age=user_age, user_weight=user_weight, gender=gender)
+        self.vo2_max = vo2_max or Calculators.vo2_max_estimation_demographics(age=self.user_age, user_weight=self.user_weight, gender=self.gender)
 
     @xray_recorder.capture('logic.WorkoutProcessor.process_planned_workout')
     def process_planned_workout(self, session, assignment_type=None, movement_option=None):
@@ -1131,7 +1131,7 @@ class WorkoutProcessor(object):
                 gender=self.gender,
                 prime_movers=prime_movers,
                 equipment=equipment,
-                fitness_level=self.proficiency_level.value
+                fitness_level=self.strength_proficiency.value
         )
 
         return bodyweight_ratio
