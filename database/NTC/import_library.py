@@ -315,7 +315,7 @@ if __name__ == '__main__':
                         # validate_exercises(workout, exercise_names)
                         # workout_json = workout.json_serialise()
                         # workout_2 = PlannedWorkout.json_deserialise(workout_json)
-                        if workout.name != 'Runner Warm-up':
+                        if workout.name != 'Runner Warm-Up':
                             create_planned_session_detail(workout)
                     except ValueError as e:
                         print(dir, file)
