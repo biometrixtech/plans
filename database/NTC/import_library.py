@@ -8,7 +8,7 @@ from models.exercise import WeightMeasure
 from models.movement_tags import Equipment
 
 from datastores.workout_datastore import WorkoutDatastore
-from database.NTC.create_processed_ntc_workouts import create_planned_session_detail
+from database.NTC.create_processed_workouts import create_planned_session_detail
 
 all_durations = []
 all_distances = []
@@ -44,7 +44,10 @@ class WorkoutParser(object):
         for index, row in self.workout_pd.iterrows():
             if self.is_valid(row['row_type']):
                 if row['row_type'] == 'workout_name':
-                    workout.name = row['description']
+                    workout.name = row['description'].replace('w/','with')
+                    workout.program_module_id = ('_').join(row['description'].replace('w/','with').lower().strip().split(' '))
+                    workout.program_id = 'ntc'
+
                 if row['row_type'] == 'average_minutes':
                     if self.is_valid(row['description']):
                         workout.duration = int(row['description']) * 60
@@ -308,11 +311,12 @@ if __name__ == '__main__':
             for file in files:
                 if 'DS_Store' not in file and 'included in this' not in file:
                     try:
-                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=True)
+                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=False)
                         # validate_exercises(workout, exercise_names)
                         # workout_json = workout.json_serialise()
                         # workout_2 = PlannedWorkout.json_deserialise(workout_json)
-                        # create_planned_session_detail(workout)
+                        if workout.name != 'Runner Warm-Up':
+                            create_planned_session_detail(workout)
                     except ValueError as e:
                         print(dir, file)
     # print(f"duration: {min(all_durations), max(all_durations)}")

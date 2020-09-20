@@ -139,13 +139,15 @@ class TrainingExposureProcessor(object):
         return exposures
 
     def copy_duration_exercise_details_to_exposure(self, exercise, exposure):
-
-        if isinstance(exercise.duration, Assignment):
-            exposure.volume = StandardErrorRange(lower_bound=exercise.duration.min_value,
-                                                 observed_value=exercise.duration.assigned_value,
-                                                 upper_bound=exercise.duration.max_value)
+        if exercise.duration is not None:
+            if isinstance(exercise.duration, Assignment):
+                exposure.volume = StandardErrorRange(lower_bound=exercise.duration.min_value,
+                                                     observed_value=exercise.duration.assigned_value,
+                                                     upper_bound=exercise.duration.max_value)
+            else:
+                exposure.volume = StandardErrorRange(observed_value=exercise.duration)
         else:
-            exposure.volume = StandardErrorRange(observed_value=exercise.duration)
+            exercise.volume = exercise.total_volume.plagiarize()
         exercise.volume_measure = UnitOfMeasure.seconds
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load
