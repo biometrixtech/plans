@@ -39,7 +39,10 @@ class PeriodizationUtilities(object):
 
         for possible_target_training_exposure in possible_target_training_exposures:
             for workout_training_exposure in workout_training_exposures:
-                if (possible_target_training_exposure.detailed_adaptation_type == workout_training_exposure.detailed_adaptation_type
+                if (possible_target_training_exposure.detailed_adaptation_type == workout_training_exposure.detailed_adaptation_type and
+                        possible_target_training_exposure.volume is None):
+                    return True
+                elif (possible_target_training_exposure.detailed_adaptation_type == workout_training_exposure.detailed_adaptation_type
                         and possible_target_training_exposure.volume.lowest_value() <= workout_training_exposure.volume.lowest_value()
                         and possible_target_training_exposure.rpe.lowest_value() <= workout_training_exposure.rpe.highest_value()):  # allow a workout to be higher and still be relevant
                     return True

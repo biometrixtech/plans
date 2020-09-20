@@ -20,24 +20,16 @@ class TrainingExposureProcessor(object):
 
         if exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and explosiveness_value is not None:
             if exercise.duration is not None and explosiveness_value in [Explosiveness.mod_force, Explosiveness.high_force, Explosiveness.max_force]:
+                duration = exercise.duration.highest_value() if isinstance(exercise.duration,
+                                                                           Assignment) else exercise.duration
                 # muscular endurance
-                if explosiveness_value == Explosiveness.mod_force and isinstance(exercise.duration, Assignment) and exercise.duration.highest_value() >= 20:
-                    exposure = TrainingExposure(DetailedAdaptationType.muscular_endurance)
-                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                    exposures.append(exposure)
-
-                elif explosiveness_value == Explosiveness.mod_force and isinstance(exercise.duration, int) and exercise.duration >= 20:
+                if explosiveness_value == Explosiveness.mod_force and duration >= 20:
                     exposure = TrainingExposure(DetailedAdaptationType.muscular_endurance)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
                 # sustained power
-                elif explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force] and isinstance(exercise.duration, Assignment) and exercise.duration.highest_value() >= 20:
-                    exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
-                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                    exposures.append(exposure)
-
-                elif explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force] and isinstance(exercise.duration, int) and exercise.duration >= 20:
+                elif explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force] and duration >= 20:
                     exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -81,13 +73,13 @@ class TrainingExposureProcessor(object):
         if ((exercise.adaptation_type == AdaptationType.power_drill or exercise.adaptation_type == AdaptationType.power_explosive_action)
                 and explosiveness_value is not None):
             # speed
-            if explosiveness_value in [Explosiveness.low_force, Explosiveness.mod_force]:
+            if explosiveness_value in [Explosiveness.bit_of_force]:
                 exposure = TrainingExposure(DetailedAdaptationType.speed)
                 exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                 exposures.append(exposure)
 
             # power
-            if explosiveness_value == Explosiveness.high_force:
+            if explosiveness_value == Explosiveness.low_force:
                 exposure = TrainingExposure(DetailedAdaptationType.power)
                 exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                 exposures.append(exposure)
@@ -95,7 +87,7 @@ class TrainingExposureProcessor(object):
             # sustained power
             if exercise.duration is not None:
                 duration = exercise.duration.highest_value() if isinstance(exercise.duration, Assignment) else exercise.duration
-                if duration >= 20 and explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force]:
+                if duration >= 20 and explosiveness_value in [Explosiveness.low_force, Explosiveness.mod_force, Explosiveness.high_force, Explosiveness.max_force]:
                     exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -111,7 +103,7 @@ class TrainingExposureProcessor(object):
         if exercise.adaptation_type == AdaptationType.power_explosive_action and explosiveness_value is not None:
 
             # maximal power
-            if explosiveness_value == Explosiveness.max_force:
+            if explosiveness_value in [Explosiveness.max_force, Explosiveness.high_force, Explosiveness.mod_force]:
                 exposure = TrainingExposure(DetailedAdaptationType.maximal_power)
                 exposure = self.copy_reps_exercise_details_to_exposure(exercise, exposure)
                 exposures.append(exposure)
@@ -121,42 +113,23 @@ class TrainingExposureProcessor(object):
             if exercise.predicted_rpe is not None and exercise.duration is not None:
                 # base aerobic
                 # 65 <= percent_max_hr < 80:
-                if (exercise.predicted_rpe.lowest_value() >= 2.0 and exercise.predicted_rpe.highest_value() <= 4.0
-                        and isinstance(exercise.duration, Assignment) and exercise.duration.highest_value() >= 300):
-                    exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
-                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                    exposures.append(exposure)
-
-                if (exercise.predicted_rpe.lowest_value() >= 2.0 and exercise.predicted_rpe.highest_value() <= 4.0
-                        and isinstance(exercise.duration, int) and exercise.duration >= 300):
+                duration = exercise.duration.highest_value() if isinstance(exercise.duration,
+                                                                           Assignment) else exercise.duration
+                if exercise.predicted_rpe.lowest_value() >= 2.0 and exercise.predicted_rpe.highest_value() <= 4.0 and duration >= 300:
                     exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
                 # anaerobic threshold
                 #80 <= percent_max_hr < 86:
-                if (exercise.predicted_rpe.lowest_value() > 4.0 and exercise.predicted_rpe.highest_value() <= 7
-                        and isinstance(exercise.duration, Assignment) and exercise.duration.highest_value() >= 20):
-                    exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
-                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                    exposures.append(exposure)
-
-                if (exercise.predicted_rpe.lowest_value() > 4.0 and exercise.predicted_rpe.highest_value() <= 7
-                        and isinstance(exercise.duration, int) and exercise.duration >= 20):
+                if exercise.predicted_rpe.lowest_value() > 4.0 and exercise.predicted_rpe.highest_value() <= 7 and duration >= 20:
                     exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
 
                 # anaerobic interval
                 #86 <= percent_max_hr
-                if (exercise.predicted_rpe.highest_value() > 7
-                        and isinstance(exercise.duration, Assignment) and exercise.duration.highest_value() >= 5):
-                    exposure = TrainingExposure(DetailedAdaptationType.high_intensity_anaerobic_training)
-                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                    exposures.append(exposure)
-
-                if (exercise.predicted_rpe.highest_value() > 7
-                        and isinstance(exercise.duration, int) and exercise.duration >= 5):
+                if exercise.predicted_rpe.highest_value() > 7 and duration >= 5:
                     exposure = TrainingExposure(DetailedAdaptationType.high_intensity_anaerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)

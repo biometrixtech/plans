@@ -15,6 +15,13 @@ class PeriodizationPlan(object):
         self.expected_weekly_workouts = None
         self.athlete_capacities = AthleteBaselineCapacities()
         self.sub_adaptation_type_personas = sub_adaptation_type_personas
+        self.acute_muscle_issues = []
+        self.chronic_muscle_issues = []
+        self.excessive_strain_muscles = []
+        self.compensating_muscles = []
+        self.functional_overreaching_muscles = []
+        self.non_functional_overreaching_muscles = []
+        self.tendon_issues = []
 
     def get_week_number(self, event_date):
 

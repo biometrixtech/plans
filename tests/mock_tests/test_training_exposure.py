@@ -140,7 +140,7 @@ def test_get_speed_power_adaptation_types_planned_workout():
             proc = TrainingExposureProcessor()
             exposures = proc.get_exposures(exercise)
             assert 1 == len(exposures)
-            assert DetailedAdaptationType.speed == exposures[0].detailed_adaptation_type
+            assert DetailedAdaptationType.power == exposures[0].detailed_adaptation_type
 
 
 def test_get_sustained_power_power_adaptation_types_planned_workout():
@@ -154,9 +154,9 @@ def test_get_sustained_power_power_adaptation_types_planned_workout():
             exercise.adaptation_type = power_type
             exercise.predicted_rpe = None
             exercise.movement_speed = speed
-            exercise.resistance = MovementResistance.very_low
-            exercise.displacement = MovementDisplacement.max
-            exercise.reps_per_set = None
+            exercise.resistance = MovementResistance.mod
+            exercise.displacement = MovementDisplacement.none
+            exercise.reps_per_set = 5
             exercise.duration = 50 * 60
 
             proc = TrainingExposureProcessor()
@@ -166,20 +166,20 @@ def test_get_sustained_power_power_adaptation_types_planned_workout():
             assert DetailedAdaptationType.sustained_power == exposures[1].detailed_adaptation_type
 
 
-def test_get_power_power_adaptation_types_planned_workout():
+def test_get_max_power_adaptation_types_planned_workout():
 
-    power_types = [AdaptationType.power_drill, AdaptationType.power_explosive_action]
+    power_types = [AdaptationType.power_explosive_action]
 
     for power_type in power_types:
         exercise = PlannedExercise()
         exercise.adaptation_type = power_type
         exercise.predicted_rpe = None
-        exercise.movement_speed = MovementSpeed.mod
-        exercise.resistance = MovementResistance.very_low
-        exercise.displacement = MovementDisplacement.max
-        exercise.reps_per_set = None
+        exercise.movement_speed = MovementSpeed.none
+        exercise.resistance = MovementResistance.mod
+        exercise.displacement = MovementDisplacement.none
+        exercise.reps_per_set = 5
 
         proc = TrainingExposureProcessor()
         exposures = proc.get_exposures(exercise)
         assert 1 == len(exposures)
-        assert DetailedAdaptationType.power == exposures[0].detailed_adaptation_type
+        assert DetailedAdaptationType.maximal_power == exposures[0].detailed_adaptation_type
