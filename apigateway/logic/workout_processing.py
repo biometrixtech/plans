@@ -28,9 +28,11 @@ class WorkoutProcessor(object):
                  hr_data=None,
                  vo2_max=None,
                  strength_proficiency=None,
-                 power_proficiency=None):
+                 power_proficiency=None,
+                 user_height=None):
         self.user_age = user_age or 20
         self.user_weight = user_weight or 60.0
+        self.user_height = user_height or 1.7
         self.gender = gender or Gender.female
         self.strength_proficiency = strength_proficiency or ProficiencyLevel.novice
         self.power_proficiency = power_proficiency or ProficiencyLevel.novice
@@ -583,7 +585,8 @@ class WorkoutProcessor(object):
                 external_weight=external_weight,
                 actions=exercise.actions_for_power,
                 duration_per_rep=exercise.duration_per_rep.observed_value,
-                user_weight=self.user_weight
+                user_weight=self.user_weight,
+                user_height=self.user_height
             )
 
         exercise.power = power

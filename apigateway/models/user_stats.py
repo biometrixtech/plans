@@ -204,7 +204,7 @@ class UserStats(Serialisable):
         user_stats.vo2_max_date_time = input_dict.get('vo2_max_date_time')
         user_stats.athlete_age = input_dict.get('athlete_age', 25)
         user_stats.athlete_weight = input_dict.get('athlete_weight', 60.0)
-        user_stats.athlete_height = input_dict.get('athlete_height', 1.7)
+        user_stats.athlete_height = input_dict.get('athlete_height', 1.65)
         user_stats.athlete_gender = input_dict.get('athlete_gender') or Gender.female
 
         user_stats.acute_internal_total_load = StandardErrorRange.json_deserialise(input_dict.get('acute_internal_total_load', None))

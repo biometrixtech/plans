@@ -8,7 +8,7 @@ from models.exercise import WeightMeasure
 from models.movement_tags import Equipment
 
 from datastores.workout_datastore import WorkoutDatastore
-from database.NTC.create_processed_ntc_workouts import create_planned_session_detail
+from database.NTC.create_processed_workouts import create_planned_session_detail
 
 all_durations = []
 all_distances = []
@@ -312,7 +312,8 @@ if __name__ == '__main__':
                         # validate_exercises(workout, exercise_names)
                         # workout_json = workout.json_serialise()
                         # workout_2 = PlannedWorkout.json_deserialise(workout_json)
-                        # create_planned_session_detail(workout)
+                        if workout.name != 'Runner Warm-Up':
+                            create_planned_session_detail(workout)
                     except ValueError as e:
                         print(dir, file)
     # print(f"duration: {min(all_durations), max(all_durations)}")

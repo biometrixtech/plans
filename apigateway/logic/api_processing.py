@@ -37,6 +37,7 @@ class APIProcessing(object):
         if planned_workout.duration is not None:
             session.duration_minutes = round(planned_workout.duration / 60, 2)
         user_weight = 60
+        user_height = 1.65
         assignment_type = None
         user_age = 25
         user_gender = Gender.female
@@ -56,11 +57,14 @@ class APIProcessing(object):
                 strength_proficiency = self.user_stats.strength_proficiency
             if self.user_stats.power_proficiency is not None:
                 power_proficiency = self.user_stats.power_proficiency
+            if self.user_stats.athlete_height is not None:
+                user_height = self.user_stats.athlete_height
 
 
         if planned_workout is not None:
             workout_processor = WorkoutProcessor(
                     user_weight=user_weight,
+                    user_height=user_height,
                     user_age=user_age,
                     gender=user_gender,
                     strength_proficiency=strength_proficiency,
@@ -111,7 +115,7 @@ class APIProcessing(object):
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:
-            heart_rate_processing = HeartRateProcessing(self.user_stats.athlete_agee)
+            heart_rate_processing = HeartRateProcessing(self.user_stats.athlete_age)
             self.create_session_hr_data(session_obj, session['hr_data'])
             # session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         if session_obj.workout_program_module is not None:
@@ -122,11 +126,12 @@ class APIProcessing(object):
             session_obj = WorkoutProcessor(
                     user_age=self.user_stats.athlete_age,
                     user_weight=self.user_stats.athlete_weight,
+                    user_height=self.user_stats.athlete_height,
                     hr_data=hr_workout,
                     vo2_max=self.user_stats.vo2_max,
                     gender=self.user_stats.athlete_gender,
                     strength_proficiency=self.user_stats.strength_proficiency,
-                    power_proficiency=self.user_stats.power_proficiency
+                    power_proficiency=self.user_stats.power_proficiency,
             ).process_workout(session_obj)
             #session_obj.update_training_loads(session_training_load)
             self.workout_programs.append(session_obj.workout_program_module)
