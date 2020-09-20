@@ -26,6 +26,7 @@ apigateway/process_metrics.py
 apigateway/update_stats.py
 apigateway/aggregate_dashboard.py
 apigateway/session.py
+apigateway/responsive_recovery.py
 !apigateway/data
 !apigateway/datastores/
 !apigateway/logic/
