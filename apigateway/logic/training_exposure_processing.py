@@ -22,14 +22,14 @@ class TrainingExposureProcessor(object):
             if exercise.duration is not None and explosiveness_value in [Explosiveness.mod_force, Explosiveness.high_force, Explosiveness.max_force]:
                 duration = exercise.duration.highest_value() if isinstance(exercise.duration,
                                                                            Assignment) else exercise.duration
-                # muscular endurance
-                if explosiveness_value == Explosiveness.mod_force and duration >= 20:
-                    exposure = TrainingExposure(DetailedAdaptationType.muscular_endurance)
-                    exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
-                    exposures.append(exposure)
+                # # muscular endurance
+                # if explosiveness_value == Explosiveness.mod_force and duration >= 20:
+                #     exposure = TrainingExposure(DetailedAdaptationType.muscular_endurance)
+                #     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
+                #     exposures.append(exposure)
 
                 # sustained power
-                elif explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force] and duration >= 20:
+                if explosiveness_value in [Explosiveness.high_force, Explosiveness.max_force] and duration >= 20:
                     exposure = TrainingExposure(DetailedAdaptationType.sustained_power)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
