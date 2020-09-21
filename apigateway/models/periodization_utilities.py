@@ -48,7 +48,7 @@ class PeriodizationUtilities(object):
                     found_match = True
                     return found_match, workout_training_exposures
                 elif (possible_target_training_exposure.detailed_adaptation_type == workout_training_exposures[w].detailed_adaptation_type and
-                        possible_target_training_exposure.volumehighest_value() is None):
+                        possible_target_training_exposure.volume.highest_value() is None):
                     del workout_training_exposures[w]
                     found_match = True
                     return found_match, workout_training_exposures
