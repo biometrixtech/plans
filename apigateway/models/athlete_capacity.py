@@ -1,4 +1,5 @@
-from models.periodization_goal import TrainingPersona
+from enum import Enum
+
 from models.training_volume import StandardErrorRange
 from serialisable import Serialisable
 
@@ -226,3 +227,21 @@ class AthleteDefaultCapacityFactory(object):
                                                                     volume=StandardErrorRange(15 * 60))
 
         return power_athlete_capacities
+
+
+class TrainingPersona(Enum):
+    beginner = 0
+    novice = 1
+    intermediate = 2
+    advanced = 3
+    elite = 4
+
+
+class SubAdaptionTypePersonas(object):
+    def __init__(self,
+                 cardio_persona=TrainingPersona.beginner,
+                 power_persona=TrainingPersona.beginner,
+                 strength_persona=TrainingPersona.beginner):
+        self.cardio_persona = cardio_persona
+        self.power_persona = power_persona
+        self.strength_persona = strength_persona

@@ -1,4 +1,4 @@
-from models.athlete_capacity import AthleteBaselineCapacities, AthleteDefaultCapacityFactory, TrainingUnit
+from models.athlete_capacity import AthleteBaselineCapacities, AthleteDefaultCapacityFactory, TrainingUnit, TrainingPersona, SubAdaptionTypePersonas
 from models.movement_tags import DetailedAdaptationType
 from models.training_volume import StandardErrorRange
 import datetime
@@ -65,6 +65,12 @@ class AthleteCapacityProcessor(object):
         return athlete_default_capacities
 
     def update_capacity_with_defaults(self, athlete_capacities, sub_adaption_type_training_personas):
+
+        if sub_adaption_type_training_personas is None:
+            sub_adaption_type_training_personas = SubAdaptionTypePersonas()
+            sub_adaption_type_training_personas.cardio_persona = TrainingPersona.beginner
+            sub_adaption_type_training_personas.power_persona = TrainingPersona.beginner
+            sub_adaption_type_training_personas.strength_persona = TrainingPersona.beginner
 
         factory = AthleteDefaultCapacityFactory()
         athlete_default_cardio_capacities = factory.get_cardio_capacities(sub_adaption_type_training_personas.cardio_persona)
@@ -183,7 +189,7 @@ class AthleteCapacityProcessor(object):
         elif non_functional_overreaching_value == 0 and (functional_overreaching_value > 0 or
                                                          3 < inflammation_level <= 7 or 4 < muscle_spasm_level <= 7 or
                                                          (internal_load_acwr_ratio is not None and internal_load_acwr_ratio > 1.25) or
-                                                         (power_load_acwr_ratio is not None and power_load_acwr_ratio <= 1.25)):
+                                                         (power_load_acwr_ratio is not None and power_load_acwr_ratio > 1.25)):
 
             readiness_score = 20
 
@@ -198,7 +204,7 @@ class AthleteCapacityProcessor(object):
             if internal_load_acwr_ratio is None:
                 readiness_score += 3
 
-            if 3 < inflammation_level >= 7:
+            if 3 < inflammation_level <= 7:
                 load_score = (readiness_score / float(40)) * 50
             elif power_load_acwr_ratio is not None or internal_load_acwr_ratio is not None:
                 load_score = 50
@@ -250,7 +256,7 @@ class AthleteCapacityProcessor(object):
             if power_load_strain_events is not None and power_load_strain_events == 1:
                 readiness_score += 3.5
 
-            load_score = 100
+            load_score = ((readiness_score / float(90)) * 5) + 100
             rpe_score = (readiness_score / float(90)) + 7
 
         elif (non_functional_overreaching_value == 0 and functional_overreaching_value == 0 and inflammation_level == 0
@@ -268,7 +274,7 @@ class AthleteCapacityProcessor(object):
                 readiness_score += 2.5
 
             load_score = ((readiness_score / float(100)) * 5) + 105
-            rpe_score = (readiness_score / float(90)) + 9
+            rpe_score = (readiness_score / float(100)) + 9
 
         return readiness_score, load_score, rpe_score
 
@@ -293,11 +299,42 @@ class AthleteCapacityProcessor(object):
             if body_part_injury_risk.last_sharp_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_sharp_date)):
                 muscle_spasm_level = max(body_part_injury_risk.last_sharp_level, muscle_spasm_level)
             if body_part_injury_risk.last_ache_date is not None and (
-                    current_date.date() == self.get_clean_date(body_part_injury_risk.last_ache_date)):
+                    current_date.date() == self.get_clean_date(body_part_injury_risk.last_ache_date) and
+                    body_part_injury_risk.last_ache_level > 3):
                 muscle_spasm_level = max(body_part_injury_risk.last_ache_level, muscle_spasm_level)
             if body_part_injury_risk.last_tight_date is not None and (
                     current_date.date() == self.get_clean_date(body_part_injury_risk.last_tight_date)):
                 muscle_spasm_level = max(body_part_injury_risk.last_tight_level, muscle_spasm_level)
 
         return muscle_spasm_level
+
+    def should_session_trigger_active_recovery(self, athlete_baseline_capacities, sub_adaption_type_training_personas, training_exposures):
+
+        athlete_capacities = self.update_capacity_with_defaults(athlete_baseline_capacities, sub_adaption_type_training_personas)
+
+        active_recovery_exposures = [DetailedAdaptationType.anaerobic_threshold_training,
+                                     DetailedAdaptationType.high_intensity_anaerobic_training,
+                                     DetailedAdaptationType.hypertrophy,
+                                     DetailedAdaptationType.maximal_strength,
+                                     DetailedAdaptationType.power,
+                                     DetailedAdaptationType.maximal_power]
+
+        for training_exposure in training_exposures:
+            if training_exposure.detailed_adaptation_type in active_recovery_exposures:
+                exposure_adaptation_name = training_exposure.detailed_adaptation_type.name
+                athlete_capacity = getattr(athlete_capacities, exposure_adaptation_name)
+                if athlete_capacity is None:
+                    return False
+                if athlete_capacity.rpe is None or athlete_capacity.volume is None or athlete_capacity.rpe.highest_value() is None or athlete_capacity.volume.highest_value() is None:
+                    return False
+                baseline_rpe_load = athlete_capacity.rpe.plagiarize()
+                baseline_rpe_load.multipley(athlete_capacity.volume)
+
+                if baseline_rpe_load.highest_value() * 1.05 < training_exposure.rpe_load.highest_value():
+                    return True
+
+        return False
+
+
+
 

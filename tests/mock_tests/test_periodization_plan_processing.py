@@ -1,7 +1,7 @@
 from logic.periodization_processing import PeriodizationPlanProcessor
-from models.athlete_capacity import AthleteBaselineCapacities, TrainingUnit
+from models.athlete_capacity import AthleteBaselineCapacities, TrainingUnit, TrainingPersona, SubAdaptionTypePersonas
 from models.periodization_plan import PeriodizationProgressionFactory, TrainingPhaseFactory, TrainingPhaseType, PeriodizationPersona
-from models.periodization_goal import PeriodizationGoalType, PeriodizationGoalFactory, TrainingPersona, SubAdaptionTypePersonas
+from models.periodization_goal import PeriodizationGoalType, PeriodizationGoalFactory
 from models.movement_tags import DetailedAdaptationType
 from models.training_volume import StandardErrorRange
 from models.periodization_plan import PeriodizationPlan

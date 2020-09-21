@@ -1,5 +1,5 @@
-from models.periodization_goal import TrainingPersona, SubAdaptionTypePersonas
-from models.athlete_capacity import AthleteBaselineCapacities, AthleteDefaultCapacityFactory, TrainingUnit
+from models.athlete_capacity import AthleteBaselineCapacities, AthleteDefaultCapacityFactory, TrainingUnit, \
+    TrainingPersona, SubAdaptionTypePersonas
 from logic.athlete_capacity_processing import AthleteCapacityProcessor
 from models.training_volume import StandardErrorRange
 from models.session import MixedActivitySession
