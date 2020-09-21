@@ -118,7 +118,7 @@ class PeriodizationPlanProcessor(object):
                     body_part_injury_risk.ache_count_last_0_20_days >= 4 or
                     body_part_injury_risk.short_count_last_0_20_days >= 3 or
                     body_part_injury_risk.weak_count_last_0_20_days >= 3):
-                plan.chronic_muscle_issues.append()
+                plan.chronic_muscle_issues.append(body_part_side)
 
             if body_part_injury_risk.last_compensation_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_compensation_date)):
                 plan.compensating_muscles.append(body_part_side)
