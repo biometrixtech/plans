@@ -101,7 +101,7 @@ class AthleteDefaultCapacityFactory(object):
 
         elif training_persona == TrainingPersona.novice:
 
-            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=30), volume=StandardErrorRange(observed_value=5 * 60))
+            cardio_athlete_capacities.base_aerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=3.0), volume=StandardErrorRange(observed_value=5 * 60))
             cardio_athlete_capacities.anaerobic_threshold_training = TrainingUnit(rpe=StandardErrorRange(observed_value=5.0), volume=StandardErrorRange(observed_value=4 * 60))
             cardio_athlete_capacities.high_intensity_anaerobic_training = TrainingUnit(rpe=StandardErrorRange(observed_value=7.1), volume=StandardErrorRange())
 
@@ -131,37 +131,37 @@ class AthleteDefaultCapacityFactory(object):
 
         if training_persona == TrainingPersona.beginner:
 
-            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
                                                                volume=StandardErrorRange(observed_value=48))
-            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=8), volume=StandardErrorRange())
-            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.3), volume=StandardErrorRange())
+            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=7.2), volume=StandardErrorRange())
+            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1), volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.novice:
 
-            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
                                                                volume=StandardErrorRange(observed_value=60))
-            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=8), volume=StandardErrorRange())
-            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.3), volume=StandardErrorRange())
+            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=7.2), volume=StandardErrorRange())
+            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1), volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.intermediate:
 
-            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
                                                                volume=StandardErrorRange(observed_value=72))
-            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=8),
+            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=7.2),
                                                         volume=StandardErrorRange(observed_value=72))
-            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.3), volume=StandardErrorRange())
+            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1), volume=StandardErrorRange())
 
         elif training_persona == TrainingPersona.advanced:
 
-            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=6), volume=StandardErrorRange(observed_value=84))
-            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=8), volume=StandardErrorRange(observed_value=90))
-            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.3), volume=StandardErrorRange(observed_value=4))
+            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=5), volume=StandardErrorRange(observed_value=84))
+            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=7.2), volume=StandardErrorRange(observed_value=90))
+            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1), volume=StandardErrorRange(observed_value=4))
 
         elif training_persona == TrainingPersona.elite:
 
-            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=6), volume=StandardErrorRange(observed_value=96))
-            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=8), volume=StandardErrorRange(observed_value=108))
-            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.3), volume=StandardErrorRange(observed_value=5))
+            strength_athlete_capacities.strength_endurance = TrainingUnit(rpe=StandardErrorRange(observed_value=5), volume=StandardErrorRange(observed_value=96))
+            strength_athlete_capacities.hypertrophy = TrainingUnit(rpe=StandardErrorRange(observed_value=7.2), volume=StandardErrorRange(observed_value=108))
+            strength_athlete_capacities.maximal_strength = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1), volume=StandardErrorRange(observed_value=5))
 
         return strength_athlete_capacities
 
@@ -171,47 +171,58 @@ class AthleteDefaultCapacityFactory(object):
 
         if training_persona == TrainingPersona.beginner:
 
-            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5),
                                                                           volume=StandardErrorRange(observed_value=48))
-            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5),
                                                           volume=StandardErrorRange())
-            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6.5),
                                                           volume=StandardErrorRange())
+            power_athlete_capacities.sustained_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+                                                                    volume=StandardErrorRange())
+
 
         elif training_persona == TrainingPersona.novice:
 
-            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5),
                                                           volume=StandardErrorRange(observed_value=64))
-            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5),
                                                           volume=StandardErrorRange(observed_value=12))
-            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6.5),
                                                                   volume=StandardErrorRange())
+            power_athlete_capacities.sustained_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+                                                                    volume=StandardErrorRange(4 * 60))
 
         elif training_persona == TrainingPersona.intermediate:
 
-            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5),
                                                           volume=StandardErrorRange(observed_value=80))
-            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5),
                                                           volume=StandardErrorRange(observed_value=32))
-            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6.5),
                                                                   volume=StandardErrorRange())
+            power_athlete_capacities.sustained_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+                                                                    volume=StandardErrorRange(9 * 60))
 
         elif training_persona == TrainingPersona.advanced:
 
-            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5),
                                                           volume=StandardErrorRange(observed_value=80))
-            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5),
                                                           volume=StandardErrorRange(observed_value=90))
-            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6.5),
                                                                   volume=StandardErrorRange(observed_value=60))
+            power_athlete_capacities.sustained_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+                                                                    volume=StandardErrorRange(12 * 60))
 
         elif training_persona == TrainingPersona.elite:
 
-            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=5),
+            power_athlete_capacities.speed = TrainingUnit(rpe=StandardErrorRange(observed_value=2.5),
                                                           volume=StandardErrorRange(observed_value=80))
-            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=7.4),
+            power_athlete_capacities.power = TrainingUnit(rpe=StandardErrorRange(observed_value=4.5),
                                                           volume=StandardErrorRange(observed_value=120))
-            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=9.1),
+            power_athlete_capacities.maximal_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6.5),
                                                                   volume=StandardErrorRange(observed_value=120))
+            power_athlete_capacities.sustained_power = TrainingUnit(rpe=StandardErrorRange(observed_value=6),
+                                                                    volume=StandardErrorRange(15 * 60))
 
         return power_athlete_capacities
