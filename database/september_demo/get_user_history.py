@@ -67,6 +67,9 @@ def get_user_data(persona='persona2a'):
     for i, row in workout_history.iterrows():
         day = f"{row['Week']}_{row['Day']}"
         workout = get_completed_workout(row['Workout'], row['Library'])
+        if len(workout) > 0:
+            if workout[0]['duration_seconds'] is None:
+                workout[0]['duration_seconds'] = float(row['Duration (Min)']) * 60
         if day not in user_history:
             user_history[day] = {
                 'workout': [],
