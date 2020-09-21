@@ -4,9 +4,12 @@ from models.workout_program import WorkoutProgramModule, CompletedWorkoutSection
 from models.training_volume import Assignment, StandardErrorRange
 
 
-def convert_planned_workout_to_completed():
+def convert_planned_workout_to_completed(lib):
     # all_workouts = []
-    base_path = 'libraries/workouts/'
+    if lib == 'NTC':
+        base_path = 'libraries/workouts/'
+    else:
+        base_path = 'libraries/NRC_workouts/'
     dirs = os.listdir(base_path)
     for dir in dirs:
         if '.DS_' in dir:
@@ -19,7 +22,7 @@ def convert_planned_workout_to_completed():
                     planned_workout = PlannedWorkout.json_deserialise(json_data)
                     completed_workout = convert_workout(planned_workout)
                     completed_workout_json = completed_workout.json_serialise()
-                    write_json(completed_workout_json, workout_file_name, dir)
+                    write_json(completed_workout_json, workout_file_name, dir, lib)
                     # all_workouts.append(workout)
     # return all_workouts
 
@@ -51,10 +54,10 @@ def convert_assignment_or_ser_to_number(value):
     return value
 
 
-def write_json(workout, workout_name, directory):
+def write_json(workout, workout_name, directory, lib):
     json_string = json.dumps(workout, indent=4)
-    full_dir_path = f"libraries/NTC_completed/{directory}"
-    file_name = os.path.join(full_dir_path, f"{workout_name}.json")
+    full_dir_path = f"libraries/{lib}_completed/{directory}"
+    file_name = os.path.join(full_dir_path, f"{workout_name}")
     if not os.path.exists(full_dir_path):
         os.makedirs(full_dir_path)
     print(f"writing: {file_name}")
@@ -62,11 +65,12 @@ def write_json(workout, workout_name, directory):
     f1.write(json_string)
     f1.close()
 
+
 def convert_workout(planned_workout):
     completed_workout = WorkoutProgramModule()
     completed_workout.name = planned_workout.name
     completed_workout.program_module_id = planned_workout.program_module_id
-    completed_workout.program_id = planned_workout.program_module_id
+    completed_workout.program_id = planned_workout.program_id
     completed_workout.distance = convert_assignment_or_ser_to_number(planned_workout.distance)
     completed_workout.duration = convert_assignment_or_ser_to_number(planned_workout.duration)
     completed_workout.rpe = convert_assignment_or_ser_to_number(planned_workout.rpe)
@@ -103,4 +107,5 @@ def convert_workout(planned_workout):
     return completed_workout
 
 if __name__ == '__main__':
-    convert_planned_workout_to_completed()
+    for lib in ['NTC', 'NRC']:
+        convert_planned_workout_to_completed(lib)
