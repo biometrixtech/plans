@@ -682,7 +682,7 @@ if __name__ == '__main__':
 
                 if plan is not None:
                     planned_load_datastore = PlannedWorkoutLoadDatastore()
-                    planned_workouts = planned_load_datastore.get(user_profile_id="andra_profile")
+                    planned_workouts = planned_load_datastore.get(user_profile_id=user_name)
                     scoring_proc = WorkoutScoringProcessor()
                     for planned_workout in planned_workouts:
                         planned_workout.score = scoring_proc.score_workout(plan.athlete_capacities, plan.target_training_exposures, planned_workout.training_exposures)
@@ -739,7 +739,7 @@ if __name__ == '__main__':
 
                 if plan is not None:
                     planned_load_datastore = PlannedWorkoutLoadDatastore()
-                    planned_workouts = planned_load_datastore.get(user_profile_id="andra_profile")
+                    planned_workouts = planned_load_datastore.get(user_profile_id=user_name)
                     scoring_proc = WorkoutScoringProcessor()
                     for planned_workout in planned_workouts:
                         planned_workout.score = scoring_proc.score_workout(plan.athlete_capacities, plan.target_training_exposures, planned_workout.training_exposures)
