@@ -33,7 +33,8 @@ xray_recorder.configure(sampling=False)
 xray_recorder.begin_segment(name="test")
 
 from database.september_demo.demo_persona import DemoPersona
-from database.september_demo.get_workouts_for_persona import get_completed_workout
+# from database.september_demo.get_workouts_for_persona import get_completed_workout
+from database.september_demo.get_user_history import get_user_data
 from utils import format_datetime, parse_datetime, parse_date, format_date
 from datetime import datetime, timedelta
 
@@ -74,7 +75,6 @@ def get_dates(days):
     end_date = datetime(year=today.year, month=today.month, day=today.day)
     start_date = end_date - timedelta(days=days)
 
-
     delta = end_date - start_date
 
     for i in range(delta.days + 1):
@@ -114,43 +114,13 @@ def submit_movement_prep_request(session, user_id, event_date_time, program_modu
     return response
 
 
-def read_json(file_name, user_folder):
-    file_name = f"workouts/{user_folder}/{file_name}"
-    with open(file_name, 'r') as f:
-        workout = json.load(f)
-    return workout
-
-
-def create_session(file_name, user_id, jwt, workout):
-    # workout = read_json(file_name, user_name)
-    data = {
-        "user_age": 35,
-        "event_date_time": workout['event_date_time'],
-        "symptoms": [
-        ],
-        "session": {
-            "event_date": workout['event_date_time'],
-            "session_type": 7,
-            "duration": workout['duration_seconds'] / 60,
-            "description": workout['name'],
-            # "calories": 100,
-            "distance": workout['distance'],
-            # "session_RPE": 7.3,
-            "end_date": workout['workout_sections'][0]['end_date_time'],
-            # "hr_data": {{hr_data}},
-            "workout_program_module": workout
-        }
-    }
-    return data
-
-
 def create_session_only(workout, session_RPE):
     # workout = read_json(file_name, user_name)
     data = {
         "event_date": workout['event_date_time'],
         "session_type": 7,
         "duration": workout['duration_seconds'] / 60,
-        "description": workout['name'],
+        "description": workout['program_module_id'],
         # "calories": 100,
         "distance": workout['distance'],
         "session_RPE": session_RPE,
@@ -582,18 +552,21 @@ if __name__ == '__main__':
     symptoms = None
 
     for user_name in users:
-        user_history = pd.read_csv(f'personas/{user_name}/workout_history.csv')
+        user_history = get_user_data(user_name)
+        date_0 = user_history['1_Monday']['date']
+        # user_history = pd.read_csv(f'personas/{user_name}/workout_history.csv')
         user_profile = profiles[user_name]
 
-        periodization_goals = periodization_goal_factory.create(PeriodizationGoalType.increase_cardio_endurance)
+        periodization_goals = periodization_goal_factory.create(PeriodizationGoalType[user_profile['periodization_goal_type']])
+        # periodization_goals = periodization_goal_factory.create(PeriodizationGoalType.increase_cardio_endurance)
         training_phase_type = TrainingPhaseType[user_profile['training_phase_type']]
-        periodization_persona = PeriodizationPersona.well_trained
-        sub_adaptation_type_persona = SubAdaptionTypePersonas(cardio_persona=TrainingPersona.intermediate,
+        periodization_persona = PeriodizationPersona[user_profile['periodization_persona']]
+        sub_adaptation_type_persona = SubAdaptionTypePersonas(cardio_persona=TrainingPersona[user_profile['cardio_proficiency']],
                                                               strength_persona=TrainingPersona[user_profile['strength_proficiency']],
                                                               power_persona=TrainingPersona[user_profile['power_proficiency']])
 
-        user_history_length = len(user_history)
-        dates = get_dates(user_history_length)
+        # user_history_length = len(user_history)
+        # dates = get_dates(user_history_length)
 
         days_lived = 0
 
@@ -645,36 +618,29 @@ if __name__ == '__main__':
         demo_persona = DemoPersona(user_id)
 
         demo_persona.clear_user()
-        beginning_event_date_time = dates[0] + timedelta(hours=1, minutes=2, seconds=3)
+        beginning_event_date_time = date_0 + timedelta(hours=1, minutes=2, seconds=3)
         beginning_event_date_time = utc.localize(beginning_event_date_time)
         demo_persona.create_stats(user_profile, beginning_event_date_time)
 
         user_age = user_profile['user_age']  # TODO how do we get this set!?!?!
 
-        for i, daily_info in user_history.iterrows():
-            date = dates[i]
+        # for i, daily_info in user_history.iterrows():
+        for daily_info in user_history.values():
+            date = daily_info['date']
             event_date = date + timedelta(hours=1, minutes=2, seconds=3)
             event_date = utc.localize(event_date)
             event_date_string = format_datetime(event_date)
             print(event_date_string)
 
-            # target_date = datetime(2019, 9, 2) + timedelta(hours=1, minutes=2, seconds=3)
-            # target_date = utc.localize(target_date)
-            #
-            # if event_date == target_date:
-            #     stop_here = 0
+            todays_files = daily_info['workout']
+            todays_soreness = daily_info['soreness']
 
-            if date.strftime("%Y-%m-%d") in all_soreness:
-                todays_soreness = all_soreness[date.strftime("%Y-%m-%d")]
+            if todays_soreness is not None:
+                soreness_before_session = todays_soreness['before_session']
+                soreness_after_session = todays_soreness['after_session']
             else:
-                todays_soreness = []
-
-            if len(todays_soreness) > 0:
-                serialised_soreness = []
-                for soreness in todays_soreness:
-                    serialised_soreness.append(soreness.json_serialise())
-            else:
-                serialised_soreness = []
+                soreness_before_session = []
+                soreness_after_session = []
 
             if days_lived > 0:
                 # update nightly process
@@ -693,13 +659,7 @@ if __name__ == '__main__':
                     plan_string = get_periodization_plan_string(plan, event_date)
                     periodization_plan_output.write(plan_string + '\n')
 
-            # all_files = os.listdir(f'workouts/{user_name}')
-
-            # all_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-
             zero_date = date + timedelta(hours=0, minutes=0, seconds=0)
-
-            todays_files = get_completed_workout(daily_info['Workout'], daily_info['Library'])
 
             ird_datastore = InjuryRiskDatastore()
             injury_risk_dict = ird_datastore.get(user_id)
@@ -712,9 +672,9 @@ if __name__ == '__main__':
             check_now = 0
 
             if len(todays_files) == 0:  # no workout available for this day
-                response = submit_mobility_wod_request([], user_id, event_date, symptoms=serialised_soreness, user_age=user_age)
+                response = submit_mobility_wod_request([], user_id, event_date, symptoms=soreness_before_session, user_age=user_age)
 
-                mobility_wod_string = get_mobility_wod_string(event_date, serialised_soreness, response)
+                mobility_wod_string = get_mobility_wod_string(event_date, soreness_before_session, response)
                 recovery_output.write(mobility_wod_string + '\n')
 
                 user_stats_datastore = UserStatsDatastore()
@@ -736,29 +696,27 @@ if __name__ == '__main__':
             # for file_name in all_files:
             for workout in todays_files:
                 # workout = read_json(file_name, user_name)
+                pre_workout_event_date_time = date + timedelta(hours=8, minutes=30)
+                pre_workout_event_date_time = utc.localize(pre_workout_event_date_time)
                 event_date_time = date + timedelta(hours=17, minutes=30)
                 event_date_time = utc.localize(event_date_time)
 
                 if start_date is None:
                     start_date = event_date
 
-                # if last_date is None:
-                #     last_date = event_date
-
                 days = (event_date - start_date).days
                 workout['event_date_time'] = format_datetime(event_date_time)
-                session_RPE = daily_info['sRPE']
+                session_RPE = daily_info['session_RPE']
                 session_data = create_session_only(workout, session_RPE)
-
-                movement_prep = submit_movement_prep_request(session_data, user_id, event_date_time, program_module_id=None, symptoms=serialised_soreness)
-                movement_prep_string = get_movement_prep_string(event_date, serialised_soreness, movement_prep)
+                movement_prep = submit_movement_prep_request(session_data, user_id, pre_workout_event_date_time, program_module_id=None, symptoms=soreness_before_session)
+                movement_prep_string = get_movement_prep_string(event_date, soreness_before_session, movement_prep)
                 recovery_output.write(movement_prep_string + '\n')
 
                 user_stats_datastore = UserStatsDatastore()
                 demo_persona.user_stats = user_stats_datastore.get(athlete_id=user_id)
 
-                response = submit_session_to_get_responsive_recovery(session_data, user_id, jwt, event_date_time, symptoms=serialised_soreness)
-                responsive_recovery_string = get_responsive_recovery_string(event_date, serialised_soreness, response)
+                response = submit_session_to_get_responsive_recovery(session_data, user_id, jwt, event_date_time, symptoms=soreness_after_session)
+                responsive_recovery_string = get_responsive_recovery_string(event_date, soreness_after_session, response)
                 recovery_output.write(responsive_recovery_string + '\n')
 
                 user_stats_datastore = UserStatsDatastore()
