@@ -158,7 +158,7 @@ class WorkoutProcessor(object):
 
         session.training_exposures = exposure_processor.aggregate_training_exposures(session.training_exposures)
 
-        if session_RPE is None:
+        if session.session_RPE is None:
             if volume > 0 :
                 session_RPE.divide(volume)
                 session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?
