@@ -218,6 +218,7 @@ def get_user_stats_string(user_stats):
     user_stats_string += get_std_error_if_present_string(user_stats, "acute_internal_total_load")
     user_stats_string += get_std_error_if_present_string(user_stats, "chronic_internal_total_load")
     user_stats_string += get_std_error_if_present_string(user_stats, "internal_acwr")
+    user_stats_string += get_std_error_if_present_string(user_stats, "internal_acwr_2")
     user_stats_string += get_std_error_if_present_string(user_stats, "internal_freshness_index")
 
     user_stats_string += get_std_error_if_present_string(user_stats, "power_load_ramp")
@@ -629,7 +630,7 @@ if __name__ == '__main__':
         user_stats_header_line = ("date, high_relative_load_sessions, high_relative_load_score, eligible_for_high_load_trigger," +
                                   "expected_weekly_workouts, vo2_max, vo2_max_date_time, best_running_time, best_running_distance, best_running_date," +
                                   "internal_ramp, internal_monotony, internal_strain, internal_strain_events, " +
-                                  "acute_internal_total_load, chronic_internal_total_load, internal_acwr, internal_freshness_index," +
+                                  "acute_internal_total_load, chronic_internal_total_load, internal_acwr, internal_acwr_2, internal_freshness_index," +
                                   "power_load_ramp, power_load_monotony, power_load_strain, power_load_strain_events, " +
                                   "acute_total_power_load, chronic_total_power_load, power_load_acwr, power_load_freshness_index," +
                                   "acute_days, chronic_days, total_historical_sessions, average_weekly_internal_load," +

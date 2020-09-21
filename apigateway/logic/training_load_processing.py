@@ -370,10 +370,17 @@ class TrainingLoadProcessing(object):
         user_stats.chronic_power_total_load = StandardErrorRange.get_average_from_error_range_list(
             self.c_power_load_values)
 
+        user_stats.average_weekly_internal_load = self.get_average_weekly_internal_load()
+
         acute_internal_load = user_stats.acute_internal_total_load.plagiarize()
         acute_internal_load.divide_range(user_stats.chronic_internal_total_load)
 
         user_stats.internal_acwr = acute_internal_load.plagiarize()
+
+        acute_internal_load_2 = user_stats.acute_internal_total_load.plagiarize()
+        acute_internal_load_2.divide_range(user_stats.average_weekly_internal_load)
+
+        user_stats.internal_acwr_2 = acute_internal_load_2.plagiarize()
 
         acute_power_load = user_stats.acute_power_total_load.plagiarize()
         acute_power_load.divide_range(user_stats.chronic_power_total_load)
@@ -389,8 +396,6 @@ class TrainingLoadProcessing(object):
 
         user_stats.historical_internal_strain = historical_internal_strain
         user_stats.historical_power_load_strain = historical_power_load_strain
-
-        user_stats.average_weekly_internal_load = self.get_average_weekly_internal_load()
 
         user_stats.athlete_capacities = self.athlete_capacities  # calculated when loading values
 

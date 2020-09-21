@@ -74,6 +74,8 @@ class UserStats(Serialisable):
         self.acute_internal_total_load = None
         self.chronic_internal_total_load = None
         self.internal_acwr = None
+        self.internal_acwr_2 = None
+        self.internal_acwr_3 = None
         self.internal_freshness_index = None
 
         # power
@@ -163,6 +165,8 @@ class UserStats(Serialisable):
             'acute_internal_total_load': self.acute_internal_total_load.json_serialise() if self.acute_internal_total_load is not None else None,
             'chronic_internal_total_load': self.chronic_internal_total_load.json_serialise() if self.chronic_internal_total_load is not None else None,
             'internal_acwr': self.internal_acwr.json_serialise() if self.internal_acwr is not None else None,
+            'internal_acwr_2': self.internal_acwr_2.json_serialise() if self.internal_acwr_2 is not None else None,
+            'internal_acwr_3': self.internal_acwr_3.json_serialise() if self.internal_acwr_3 is not None else None,
 
             'power_load_ramp': self.power_load_ramp.json_serialise() if self.power_load_ramp is not None else None,
             'power_load_monotony': self.power_load_monotony.json_serialise() if self.power_load_monotony is not None else None,
@@ -243,6 +247,8 @@ class UserStats(Serialisable):
         user_stats.internal_strain_events = StandardErrorRange.json_deserialise(input_dict.get('internal_strain_events', None))
         user_stats.internal_ramp = StandardErrorRange.json_deserialise(input_dict.get('internal_ramp', None))
         user_stats.internal_acwr = StandardErrorRange.json_deserialise(input_dict.get('internal_acwr', None))
+        user_stats.internal_acwr_2 = StandardErrorRange.json_deserialise(input_dict.get('internal_acwr_2', None))
+        user_stats.internal_acwr_3 = StandardErrorRange.json_deserialise(input_dict.get('internal_acwr_3', None))
 
         user_stats.acute_power_total_load = StandardErrorRange.json_deserialise(
             input_dict.get('acute_power_total_load', None))

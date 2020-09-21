@@ -32,9 +32,12 @@ class PeriodizationPlanProcessor(object):
 
         if total_needs > 0:
 
+            dup_training_exposures = [t for t in training_exposures]
+
             #for athlete_exposure_need in athlete_exposure_needs:
             for a in range(0, len(athlete_exposure_needs)):
-                if utils.does_workout_exposure_meet_athlete_need(athlete_exposure_needs[a], training_exposures, include_count=True):
+                found_match, dup_training_exposures = utils.does_workout_exposure_meet_athlete_need(athlete_exposure_needs[a], dup_training_exposures, include_count=True)
+                if found_match:
                     if athlete_exposure_needs[a].exposure_count.lowest_value() > 0:
                         athlete_exposure_needs[a].exposure_count.subtract_value(1)
 
