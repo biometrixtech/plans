@@ -370,11 +370,15 @@ class TrainingLoadProcessing(object):
         user_stats.chronic_power_total_load = StandardErrorRange.get_average_from_error_range_list(
             self.c_power_load_values)
 
-        user_stats.internal_acwr = self.get_acwr(user_stats.acute_internal_total_load,
-                                                 user_stats.chronic_internal_total_load)
+        acute_internal_load = user_stats.acute_internal_total_load.plagiarize()
+        acute_internal_load.divide_range(user_stats.chronic_internal_total_load)
 
-        user_stats.power_load_acwr = self.get_acwr(user_stats.acute_power_total_load,
-                                                   user_stats.chronic_power_total_load)
+        user_stats.internal_acwr = acute_internal_load.plagiarize()
+
+        acute_power_load = user_stats.acute_power_total_load.plagiarize()
+        acute_power_load.divide_range(user_stats.chronic_power_total_load)
+
+        user_stats.power_load_acwr = acute_power_load.plagiarize()
 
         user_stats.internal_freshness_index = self.get_freshness_index(
             user_stats.acute_internal_total_load,
