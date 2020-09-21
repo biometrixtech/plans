@@ -204,9 +204,9 @@ class TrainingExposureProcessor(object):
 
                 weight = StandardErrorRange()
 
-                weight.add(relevant_exposure.rpe_load)
+                weight.add(relevant_exposure.volume)
 
-                weight.divide_range(aggregated_rpe_load)
+                weight.divide_range(aggregated_volume)
 
                 rpe.multiply_range(weight)
 
