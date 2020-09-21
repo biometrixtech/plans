@@ -63,7 +63,33 @@ def get_user_data(persona='persona2a'):
     workout_history = pd.read_csv(f'personas/{persona}/workout_history.csv')
     soreness_history = get_soreness(persona)
     workout_history_length = len(workout_history)
-    dates = get_dates(workout_history_length)
+    dates = get_dates(workout_history_length + 8)
+
+
+    for i, row in workout_history.iterrows():
+        if i == 0:
+            day = f"00_Sunday"
+        else:
+            week = '0'
+            day = f"{week}_{row['Day']}"
+        workout = get_completed_workout(row['Workout'], row['Library'])
+        if len(workout) > 0:
+            if workout[0]['duration_seconds'] is None:
+                workout[0]['duration_seconds'] = float(row['Duration (Min)']) * 60
+        if day not in user_history:
+            user_history[day] = {
+                'workout': [],
+                'soreness': None,
+                'session_RPE': None,
+                'date': None
+            }
+        user_history[day]['date'] = dates[i]
+        user_history[day]['workout'] = workout
+        user_history[day]['soreness'] = soreness_history.get(day)
+        if len(workout) > 0:
+            user_history[day]['session_RPE'] = float(row['sRPE'])
+        if i == 7:
+            break
     for i, row in workout_history.iterrows():
         day = f"{row['Week']}_{row['Day']}"
         workout = get_completed_workout(row['Workout'], row['Library'])
@@ -77,7 +103,7 @@ def get_user_data(persona='persona2a'):
                 'session_RPE': None,
                 'date': None
             }
-        user_history[day]['date'] = dates[i]
+        user_history[day]['date'] = dates[i + 8]
         user_history[day]['workout'] = workout
         user_history[day]['soreness'] = soreness_history.get(day)
         if len(workout) > 0:
