@@ -178,45 +178,85 @@ class TrainingExposureProcessor(object):
 
     def aggregate_training_exposures(self, training_exposures):
 
-        aggregated_exposures = {}
-
-        for training_exposure in training_exposures:
-            if training_exposure.detailed_adaptation_type not in aggregated_exposures:
-                aggregated_exposures[training_exposure.detailed_adaptation_type] = training_exposure
-            else:
-                rpes = [aggregated_exposures[training_exposure.detailed_adaptation_type].rpe,
-                        training_exposure.rpe]
-                volumes = [aggregated_exposures[training_exposure.detailed_adaptation_type].volume,
-                           training_exposure.volume]
-
-                combined_exposure = TrainingExposure(training_exposure.detailed_adaptation_type)
-                combined_exposure.rpe = StandardErrorRange()
-                combined_exposure.rpe.lower_bound = StandardErrorRange.get_min_from_error_range_list(rpes)
-                combined_exposure.rpe.upper_bound = StandardErrorRange.get_max_from_error_range_list(rpes)
-                combined_exposure.rpe.observed_value = (combined_exposure.rpe.lower_bound + combined_exposure.rpe.upper_bound) / float(2)
-
-                combined_exposure.volume = StandardErrorRange()
-
-                combined_exposure.volume.lower_bound = StandardErrorRange.get_min_from_error_range_list(volumes)
-                combined_exposure.volume.upper_bound = StandardErrorRange.get_max_from_error_range_list(volumes)
-                combined_exposure.volume.observed_value = (combined_exposure.volume.lower_bound + combined_exposure.volume.upper_bound) / float(2)
-
-                rpe_loads = [combined_exposure.rpe.lowest_value() * combined_exposure.volume.lowest_value(),
-                             combined_exposure.rpe.lowest_value() * combined_exposure.volume.highest_value(),
-                             combined_exposure.rpe.highest_value() * combined_exposure.volume.lowest_value(),
-                             combined_exposure.rpe.highest_value() * combined_exposure.volume.highest_value()]
-
-                combined_exposure.rpe_load = StandardErrorRange()
-                combined_exposure.rpe_load.lower_bound = min(rpe_loads)
-                combined_exposure.rpe_load.upper_bound = max(rpe_loads)
-                combined_exposure.rpe_load.observed_value = (combined_exposure.rpe_load.lower_bound + combined_exposure.rpe_load.upper_bound) / float(2)
-
-                aggregated_exposures[training_exposure.detailed_adaptation_type] = combined_exposure
-
         training_exposure_list = []
 
-        for detailed_adaptation_type, training_exposure in aggregated_exposures.items():
-            training_exposure_list.append(training_exposure)
+        detailed_adaptation_types = set([d.detailed_adaptation_type for d in training_exposures])
+
+        for detailed_adaptation_type in detailed_adaptation_types:
+
+            relevant_exposures = [t for t in training_exposures if t.detailed_adaptation_type.value == detailed_adaptation_type.value]
+
+            volumes = [t.volume for t in training_exposures if
+                       t.detailed_adaptation_type.value == detailed_adaptation_type.value]
+
+            aggregated_volume = StandardErrorRange.get_sum_from_error_range_list(volumes)
+
+            rpe_loads = [t.rpe_load for t in training_exposures if
+                         t.detailed_adaptation_type.value == detailed_adaptation_type.value]
+
+            aggregated_rpe_load = StandardErrorRange.get_sum_from_error_range_list(rpe_loads)
+
+            rpe_list = []
+
+            for relevant_exposure in relevant_exposures:
+
+                rpe = relevant_exposure.rpe.plagiarize()
+
+                weight = StandardErrorRange()
+
+                weight.add(relevant_exposure.rpe_load)
+
+                weight.divide_range(aggregated_rpe_load)
+
+                rpe.multiply_range(weight)
+
+                rpe_list.append(rpe)
+
+            aggregated_rpe = StandardErrorRange.get_sum_from_error_range_list(rpe_list)
+
+            combined_exposure = TrainingExposure(detailed_adaptation_type)
+            combined_exposure.volume = aggregated_volume.plagiarize()
+            combined_exposure.rpe_load = aggregated_rpe_load.plagiarize()
+            combined_exposure.rpe = aggregated_rpe.plagiarize()
+            combined_exposure.volume_measure = relevant_exposures[0].volume_measure #TODO - DANGEROUS ASSUMPTION!!
+
+            training_exposure_list.append(combined_exposure)
+
+        # for training_exposure in training_exposures:
+        #     if training_exposure.detailed_adaptation_type not in aggregated_exposures:
+        #         aggregated_exposures[training_exposure.detailed_adaptation_type] = training_exposure
+        #     else:
+        #         rpes = [aggregated_exposures[training_exposure.detailed_adaptation_type].rpe,
+        #                 training_exposure.rpe]
+        #         volumes = [aggregated_exposures[training_exposure.detailed_adaptation_type].volume,
+        #                    training_exposure.volume]
+        #
+        #         combined_exposure = TrainingExposure(training_exposure.detailed_adaptation_type)
+        #         combined_exposure.rpe = StandardErrorRange()
+        #         combined_exposure.rpe.lower_bound = StandardErrorRange.get_min_from_error_range_list(rpes)
+        #         combined_exposure.rpe.upper_bound = StandardErrorRange.get_max_from_error_range_list(rpes)
+        #         combined_exposure.rpe.observed_value = (combined_exposure.rpe.lower_bound + combined_exposure.rpe.upper_bound) / float(2)
+        #
+        #         combined_exposure.volume = StandardErrorRange()
+        #
+        #         combined_exposure.volume.lower_bound = StandardErrorRange.get_min_from_error_range_list(volumes)
+        #         combined_exposure.volume.upper_bound = StandardErrorRange.get_max_from_error_range_list(volumes)
+        #         combined_exposure.volume.observed_value = (combined_exposure.volume.lower_bound + combined_exposure.volume.upper_bound) / float(2)
+        #
+        #         rpe_loads = [combined_exposure.rpe.lowest_value() * combined_exposure.volume.lowest_value(),
+        #                      combined_exposure.rpe.lowest_value() * combined_exposure.volume.highest_value(),
+        #                      combined_exposure.rpe.highest_value() * combined_exposure.volume.lowest_value(),
+        #                      combined_exposure.rpe.highest_value() * combined_exposure.volume.highest_value()]
+        #
+        #         combined_exposure.rpe_load = StandardErrorRange()
+        #         combined_exposure.rpe_load.lower_bound = min(rpe_loads)
+        #         combined_exposure.rpe_load.upper_bound = max(rpe_loads)
+        #         combined_exposure.rpe_load.observed_value = (combined_exposure.rpe_load.lower_bound + combined_exposure.rpe_load.upper_bound) / float(2)
+        #
+        #         aggregated_exposures[training_exposure.detailed_adaptation_type] = combined_exposure
+        #
+        # for detailed_adaptation_type, training_exposure in aggregated_exposures.items():
+        #     training_exposure_list.append(training_exposure)
 
         return training_exposure_list
 
