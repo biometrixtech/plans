@@ -19,7 +19,7 @@ class WorkoutProgramModule(Serialisable):
         self.program_id = None
         self.program_module_id = None
         self.distance = None
-        self.duration = None
+        self.duration_seconds = None
         self.rpe = None
         self.workout_sections = []
 
@@ -32,7 +32,7 @@ class WorkoutProgramModule(Serialisable):
             'program_id': self.program_id,
             'program_module_id': self.program_module_id,
             'distance': self.distance,
-            'duration': self.duration,
+            'duration_seconds': self.duration_seconds,
             'rpe': self.rpe,
             'workout_sections': [w.json_serialise() for w in self.workout_sections]
         }
@@ -48,7 +48,7 @@ class WorkoutProgramModule(Serialisable):
         workout_program_module.program_id = input_dict.get('program_id')
         workout_program_module.program_module_id = input_dict.get('program_module_id')
         workout_program_module.distance = input_dict.get('distance')
-        workout_program_module.duration = input_dict.get('duration')
+        workout_program_module.duration_seconds = input_dict.get('duration_seconds')
         workout_program_module.rpe = input_dict.get('rpe')
         workout_program_module.workout_sections = [CompletedWorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_sections', [])]
 

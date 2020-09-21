@@ -1,11 +1,12 @@
 import database.NTC.set_up_config
-import os
+import os, string
 import json
 import pandas as pd
 from models.planned_exercise import PlannedExercise, PlannedWorkout, PlannedWorkoutSection
 from models.training_volume import StandardErrorRange, Assignment
 from models.exercise import WeightMeasure
 from models.movement_tags import Equipment
+from utils import convert_workout_text_to_id
 
 from datastores.workout_datastore import WorkoutDatastore
 from database.NTC.create_processed_workouts import create_planned_session_detail
@@ -45,7 +46,7 @@ class WorkoutParser(object):
             if self.is_valid(row['row_type']):
                 if row['row_type'] == 'workout_name':
                     workout.name = row['description'].replace('w/','with')
-                    workout.program_module_id = ('_').join(row['description'].replace('w/','with').lower().strip().split(' '))
+                    workout.program_module_id = convert_workout_text_to_id(row['description'])
                     workout.program_id = 'ntc'
 
                 if row['row_type'] == 'average_minutes':
@@ -309,14 +310,13 @@ if __name__ == '__main__':
         if 'DS_Store' not in dir:
             files = os.listdir(f"workouts/{dir}")
             for file in files:
-                if 'DS_Store' not in file and 'included in this' not in file:
+                if 'DS_Store' not in file and 'included in this' not in file  and 'Runner Warm-Up' not in file:
                     try:
-                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=False)
+                        workout = WorkoutParser().load_data(f"workouts/{dir}/{file}", write=True)
                         # validate_exercises(workout, exercise_names)
                         # workout_json = workout.json_serialise()
                         # workout_2 = PlannedWorkout.json_deserialise(workout_json)
-                        if workout.name != 'Runner Warm-Up':
-                            create_planned_session_detail(workout)
+                        create_planned_session_detail(workout)
                     except ValueError as e:
                         print(dir, file)
     # print(f"duration: {min(all_durations), max(all_durations)}")

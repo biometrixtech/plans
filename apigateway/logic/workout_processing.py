@@ -158,10 +158,11 @@ class WorkoutProcessor(object):
 
         session.training_exposures = exposure_processor.aggregate_training_exposures(session.training_exposures)
 
-        if volume > 0 :
-            session_RPE.divide(volume)
-            session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?
-            session.training_volume = volume
+        if session_RPE is None:
+            if volume > 0 :
+                session_RPE.divide(volume)
+                session.session_RPE = session_RPE.observed_value  # TODO: Does this need to be reported as StdErrRange?
+                session.training_volume = volume
         return session
 
     def set_session_intensity_metrics(self, session, workout_exercise):

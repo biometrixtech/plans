@@ -1,4 +1,4 @@
-users = ['demo1']
+users = ['demo1', 'persona2a']
 
 
 def get_users():

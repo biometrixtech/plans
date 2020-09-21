@@ -72,7 +72,7 @@ def convert_workout(planned_workout):
     completed_workout.program_module_id = planned_workout.program_module_id
     completed_workout.program_id = planned_workout.program_id
     completed_workout.distance = convert_assignment_or_ser_to_number(planned_workout.distance)
-    completed_workout.duration = convert_assignment_or_ser_to_number(planned_workout.duration)
+    completed_workout.duration_seconds = convert_assignment_or_ser_to_number(planned_workout.duration)
     completed_workout.rpe = convert_assignment_or_ser_to_number(planned_workout.rpe)
     for planned_section in planned_workout.sections:
         completed_section = CompletedWorkoutSection()
@@ -105,6 +105,7 @@ def convert_workout(planned_workout):
             completed_section.exercises.append(completed_exercise)
 
     return completed_workout
+
 
 if __name__ == '__main__':
     for lib in ['NTC', 'NRC']:

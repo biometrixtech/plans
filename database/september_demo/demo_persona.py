@@ -1,5 +1,6 @@
 from config import get_mongo_collection
 import datetime
+from models.user_stats import UserStats
 # from models.daily_plan import DailyPlan
 # from models.daily_readiness import DailyReadiness
 # from models.soreness import CompletedExercise
@@ -21,6 +22,8 @@ from datastores.datastore_collection import DatastoreCollection
 # from movement_pattern_history import create_elasticity_adf, create_asymmetry
 # from collections import OrderedDict
 from datetime import timedelta
+from models.training_volume import StandardErrorRange
+from models.movement_tags import Gender
 
 
 class DemoPersona(object):
@@ -63,3 +66,17 @@ class DemoPersona(object):
         responsiverecovery.delete_many({"user_id": self.user_id})
         movementprep.delete_many({"user_id": self.user_id})
         mobilitywod.delete_many({"user_id": self.user_id})
+
+    def create_stats(self, user_profile, event_date):
+        user_stats = UserStats(athlete_id=self.user_id)
+        user_stats.event_date = event_date
+        user_stats.athlete_height = user_profile['height']
+        user_stats.athlete_gender = Gender[user_profile['user_gender']]
+        user_stats.athlete_age = user_profile['user_age']
+        user_stats.athlete_weight = user_profile['user_weight']
+        user_stats.vo2_max = StandardErrorRange(observed_value=user_profile['vo2_max'])
+
+        stats_collection = get_mongo_collection('athletestats')
+        query = {'athlete_id': self.user_id}
+        stats_collection.replace_one(query, user_stats.json_serialise(), upsert=True)
+

@@ -152,7 +152,7 @@ class TrainingExposureProcessor(object):
                                                      observed_value=exercise.total_volume.assigned_value,
                                                      upper_bound=exercise.total_volume.max_value)
             else:
-                exposure.volume = StandardErrorRange(observed_value=exercise.total_volume.assigned_value)
+                exposure.volume = StandardErrorRange(observed_value=exercise.total_volume)
         exposure.volume_measure = UnitOfMeasure.seconds
         exposure.rpe = exercise.predicted_rpe
         exposure.rpe_load = exercise.rpe_load

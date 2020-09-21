@@ -1,5 +1,5 @@
 import database.NTC.set_up_config
-import os
+import os, string
 import json
 import pandas as pd
 from models.planned_exercise import PlannedExercise, PlannedWorkout, PlannedWorkoutSection
@@ -8,6 +8,7 @@ from models.exercise import UnitOfMeasure
 from models.movement_tags import Equipment
 from database.NTC.create_processed_workouts import create_planned_session_detail
 from datastores.workout_datastore import WorkoutDatastore
+from utils import convert_workout_text_to_id
 
 all_durations = []
 all_distances = []
@@ -99,7 +100,7 @@ class WorkoutParser(object):
             if self.is_valid(row[0]):
                 if row[0] == 'workout_name':
                     workout.name = row['description'].replace('w/','with')
-                    workout.program_module_id = ('_').join(row['description'].replace('w/','with').lower().strip().split(' '))
+                    workout.program_module_id = convert_workout_text_to_id(row['description'])
                     workout.program_id = 'nrc'
                 if row[0] == 'average_minutes':
                     if self.is_valid(row['description']):
