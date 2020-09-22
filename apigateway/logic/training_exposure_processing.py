@@ -115,7 +115,7 @@ class TrainingExposureProcessor(object):
                 # 65 <= percent_max_hr < 80:
                 duration = exercise.duration.highest_value() if isinstance(exercise.duration,
                                                                            Assignment) else exercise.duration
-                if exercise.percent_max_hr is not None and .65 <= exercise.percent_max_hr < .8:
+                if exercise.percent_max_hr is not None and .6 < exercise.percent_max_hr <= .8:
                     exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -127,7 +127,7 @@ class TrainingExposureProcessor(object):
 
                 # anaerobic threshold
                 #80 <= percent_max_hr < 86:
-                if exercise.percent_max_hr is not None and .8 <= exercise.percent_max_hr < .86 and duration >= 20:
+                if exercise.percent_max_hr is not None and .8 < exercise.percent_max_hr <= .9 and duration >= 20:
                     exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
@@ -138,7 +138,7 @@ class TrainingExposureProcessor(object):
 
                 # anaerobic interval
                 #86 <= percent_max_hr
-                if exercise.percent_max_hr is not None and .86 <= exercise.percent_max_hr:
+                if exercise.percent_max_hr is not None and .9 < exercise.percent_max_hr:
                     exposure = TrainingExposure(DetailedAdaptationType.high_intensity_anaerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)

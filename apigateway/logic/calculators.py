@@ -1351,3 +1351,42 @@ class Calculators(object):
         #         if rpe.upper_bound > 10:
         #             rpe.upper_bound = 10
         return rpe
+
+
+    @classmethod
+    def get_rpe_from_percent_hr_max(cls, percent_hr_max):
+        """
+
+        :param percent_hr_max: 0-100
+        :return:
+        """
+        if percent_hr_max >= 100:
+            return 10.0
+        elif percent_hr_max <= 50:
+            return 1
+        rpe_lookup_tuples = list()
+        rpe_lookup_tuples.append(((1, 2), (50, 60)))
+        rpe_lookup_tuples.append(((2, 4), (60, 80)))
+        rpe_lookup_tuples.append(((4, 7), (80, 90)))
+        rpe_lookup_tuples.append(((7, 10), (90, 100)))
+
+        rpe_tuple = [r for r in rpe_lookup_tuples if r[1][0] < percent_hr_max <= r[1][1]]
+
+        if len(rpe_tuple) > 0:
+            percent_hr_max_range = rpe_tuple[0][1]
+            rpe_range = rpe_tuple[0][0]
+
+            perc_diff = percent_hr_max - percent_hr_max_range[0]
+            rpe_diff = (rpe_range[1] - rpe_range[0]) * perc_diff / (percent_hr_max_range[1] - percent_hr_max_range[0])
+            rpe = rpe_range[0] + rpe_diff
+            #
+            # rpe_diff = perc_diff / float(rpe_tuple[0][1] - rpe_tuple[0][0])
+            # rpe = rpe_tuple[0][0] + rpe_diff
+
+            rpe = min(10.0, rpe)
+            rpe = max(1.0, rpe)
+
+        else:
+            rpe = 1.0
+
+        return round(rpe, 1)
