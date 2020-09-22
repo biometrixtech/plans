@@ -65,9 +65,9 @@ class PeriodizationGoalFactory(object):
             goal.target_training_exposures.append(
                 TargetTrainingExposure(training_exposures=speed_sustained_power_power, exposure_count=two_three_required_count.plagiarize(), priority=1))
             goal.target_training_exposures.append(
-                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=two_three_required_count.plagiarize(), priority=2))
+                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=one_two_required_count.plagiarize(), priority=2))
             goal.target_training_exposures.append(
-                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=two_three_required_count.plagiarize(), priority=2))
+                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=one_two_required_count.plagiarize(), priority=2))
             # ignoring correctives for now
             goal.target_training_exposures.append(
                 TargetTrainingExposure(training_exposures=base_training, exposure_count=one_two_required_count.plagiarize(), priority=4))
