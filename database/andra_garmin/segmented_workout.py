@@ -105,6 +105,8 @@ def create_workout(file_name):
         workout['event_date_time'] = format_datetime(start_time)
         workout['program_module_id'] = f"{workout['name']}_{format_datetime(start_time)}"
         workout['program_id'] = "garmin_data"
+
+        print(workout['program_module_id'], len(exercises))
         write_json(workout, file_name.split('.')[0], workouts_folder)
 
 
@@ -114,13 +116,13 @@ def get_exercises(detail_data):
 
     detail_data['timestamp'] = [datetime.datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S") for time_string in detail_data.timestamp.values]
     detail_data['duration'] = [(ts - detail_data['timestamp'][0]).seconds for ts in detail_data.timestamp.values]
-    speed_zones = define_cadence_zone(detail_data)
+    speed_zones = define_speed_zone(detail_data)
     speed_blocks = get_block(speed_zones, min_change=1)
     detail_data['speed_blocks'] = speed_blocks
     detail_data['epoch_time'] = [dt.timestamp() for dt in detail_data['timestamp']]
     detail_data['speed_zones'] = speed_zones
-    plt.subplot(313)
-    plt.plot(speed_zones)
+    # plt.subplot(313)
+    # plt.plot(speed_zones)
 
     grouped = detail_data.groupby(by='speed_blocks')
 
@@ -158,78 +160,98 @@ def get_exercises(detail_data):
             running_exercises.append(ex)
     return running_exercises
 
-class CadenceZone(Enum):
+
+class SpeedZone(Enum):
     walking = 10
     jogging = 20
     running = 30
     sprinting = 40
 
-def define_cadence_zone(data):
-    cadence = data['speed_mph']
+
+def define_speed_zone(data):
+    # speed_mph = data['speed_mph']
+    mile_pace = 60 / data['speed_mph']
     duration = data['duration'].values
     start_index = 0
-    cadence_zone = np.zeros(len(cadence))
+    speed_zone = np.zeros(len(data))
     last_updated_index = 0
-    current_zone = _get_speed_zones(cadence[0])
-    for i in range(start_index, len(cadence)):
-        if i == len(cadence) - 1:  # end of the block
-            cadence_zone[last_updated_index:i] = current_zone.value
-        elif np.isnan(cadence[i]):
+    current_zone = _get_mile_pace_zones(mile_pace[0])
+    for i in range(start_index, len(data)):
+        if i == len(data) - 1:
+            speed_zone[last_updated_index:i] = current_zone
+        elif np.isnan(mile_pace[i]):
             continue
-        elif _get_speed_zones(cadence[i]) == current_zone:
-            cadence_zone[last_updated_index:i] = current_zone.value
+        elif _get_mile_pace_zones(mile_pace[i]) == current_zone:
+            speed_zone[last_updated_index:i] = current_zone
             last_updated_index = i
         else:
             if duration[i] - duration[last_updated_index] >= 30:
-                current_zone = _get_speed_zones(cadence[i])
-                cadence_zone[last_updated_index:i] = current_zone.value
+                current_zone = _get_mile_pace_zones(mile_pace[i])
+                speed_zone[last_updated_index:i] = current_zone
                 last_updated_index = i
-    return cadence_zone
-    print('here')
-
-
-# def _get_cadence_zone(cadence):
-#     if cadence <= 130:
-#         return CadenceZone.walking
-#     elif 130 < cadence <= 165:
-#         return CadenceZone.jogging
-#     elif 165 < cadence <= 195:
-#         return CadenceZone.running
-#     else:
-#         return CadenceZone.sprinting
+    return speed_zone
 
 
 def _get_speed_zones(speed):
     if speed <= 4:
-        return CadenceZone.walking
+        return SpeedZone.walking
     elif 4 < speed <= 5.5:
-        return CadenceZone.jogging
+        return SpeedZone.jogging
     elif 5.5 < speed <= 8:
-        return CadenceZone.running
+        return SpeedZone.running
     else:
-        return CadenceZone.sprinting
+        return SpeedZone.sprinting
 
 
-def _get_cadence(peaks):
-    peak_diff = np.ediff1d(peaks, to_begin=0).astype(float)
-    peak_diff[0] = peak_diff[1]
-    peak_diff = pd.Series(peak_diff).rolling(window=3, center=True).mean().values
-    peak_diff[np.where(peak_diff > 400)[0]] = np.nan
-    peak_diff[0] = peak_diff[1]
-    peak_diff[-1] = peak_diff[-2]
-    cadence = 100 / peak_diff * 60 * 2
-    cadence = pd.Series(cadence).rolling(window=3, center=True).mean().values
-    cadence[0] = cadence[1]
-    cadence[-1] = cadence[-2]
-
-    return cadence
-
-def interpolate_cadence(peaks, cadence):
-    x = [int((peaks[i-1] + peaks[i]) / 2) for i in range(1, len(peaks))]
-    x.extend(peaks.tolist())
-    x = sorted(x)
-    y = np.interp(x, xp=peaks, fp=cadence)
-    return x, y
+def _get_mile_pace_zones(mile_pace):
+    if mile_pace < 4:
+        return 0
+    elif mile_pace < 4.5:
+        return 1
+    elif mile_pace < 5:
+        return 2
+    elif mile_pace < 5.5:
+        return 3
+    elif mile_pace < 6:
+        return 4
+    elif mile_pace < 6.5:
+        return 5
+    elif mile_pace < 7:
+        return 6
+    elif mile_pace < 7.5:
+        return 7
+    elif mile_pace < 8:
+        return 8
+    elif mile_pace < 8.5:
+        return 9
+    elif mile_pace < 9:
+        return 10
+    elif mile_pace < 9.5:
+        return 11
+    elif mile_pace < 10:
+        return 12
+    elif mile_pace < 10.5:
+        return 13
+    elif mile_pace < 11:
+        return 14
+    elif mile_pace < 11.5:
+        return 15
+    elif mile_pace < 12:
+        return 16
+    elif mile_pace < 12.5:
+        return 17
+    elif mile_pace < 13:
+        return 18
+    elif mile_pace < 13.5:
+        return 19
+    elif mile_pace < 14:
+        return 20
+    elif mile_pace < 14.5:
+        return 21
+    elif mile_pace < 15:
+        return 22
+    else:
+        return 23
 
 
 
@@ -250,50 +272,6 @@ def filter_data(x, filt='band', lowcut=0.1, highcut=40, fs=97.5, order=4):
     return filtfilt(b, a, x, axis=0)
 
 
-def get_ranges(col_data, value, return_length=False):
-    """
-    For a given categorical data, determine start and end index for the given value
-    start: index where it first occurs
-    end: index after the last occurrence
-
-    Args:
-        col_data
-        value: int, value to get ranges for
-        return_length: boolean, return the length each range
-    Returns:
-        ranges: 2d array, start and end index for each occurrence of value
-        length: array, length of each range
-    """
-
-    # determine where column data is the relevant value
-    is_value = np.array(np.array(col_data == value).astype(int)).reshape(-1, 1)
-
-    # if data starts with given value, range starts with index 0
-    if is_value[0] == 1:
-        t_b = 1
-    else:
-        t_b = 0
-
-    # mark where column data changes to and from the given value
-    absdiff = np.abs(np.ediff1d(is_value, to_begin=t_b))
-
-    # handle the closing edge
-    # if the data ends with the given value, if it was the only point, ignore the range,
-    # else assign the last index as end of range
-    if is_value[-1] == 1:
-        if absdiff[-1] == 0:
-            absdiff[-1] = 1
-        else:
-            absdiff[-1] = 0
-    # get the ranges where values begin and end
-    ranges = np.where(absdiff == 1)[0].reshape((-1, 2))
-
-    if return_length:
-        length = ranges[:, 1] - ranges[:, 0]
-        return ranges, length
-    else:
-        return ranges
-
 def get_block(series, min_change, min_duration=1):
     diff = np.ediff1d(series, to_begin=0)
     changes = np.where(abs(diff) >= min_change)[0]
@@ -310,6 +288,7 @@ def get_block(series, min_change, min_duration=1):
         last_value = change
     blocks[last_value:] = block
     return blocks
+
 
 def get_datetime_from_timestamp(timestamp, tz_info=None):
     return datetime.datetime.fromtimestamp(timestamp, tz=tz_info)

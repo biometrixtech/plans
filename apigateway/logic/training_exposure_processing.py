@@ -115,7 +115,7 @@ class TrainingExposureProcessor(object):
                 # 65 <= percent_max_hr < 80:
                 duration = exercise.duration.highest_value() if isinstance(exercise.duration,
                                                                            Assignment) else exercise.duration
-                if exercise.predicted_rpe.lowest_value() >= 2.0 and exercise.predicted_rpe.highest_value() <= 4.0 and duration >= 300:
+                if exercise.predicted_rpe.lowest_value() >= 2.0 and exercise.predicted_rpe.highest_value() <= 4.0:  # and duration >= 300:
                     exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
