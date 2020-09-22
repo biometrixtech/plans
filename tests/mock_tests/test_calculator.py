@@ -433,3 +433,11 @@ def test_power_resistance_no_actions_defined():
 
     power = Calculators.power_resistance_exercise(25, actions, duration_per_rep=None)
     assert power is not None
+
+
+def test_rpe_from_hr():
+    prev_rpe = 0
+    for percent in range(50, 100):
+        rpe = Calculators.get_rpe_from_percent_hr_max(percent)
+        assert rpe > prev_rpe
+        prev_rpe = rpe
