@@ -387,12 +387,20 @@ class TrainingLoadProcessing(object):
 
         user_stats.power_load_acwr = acute_power_load.plagiarize()
 
-        user_stats.internal_freshness_index = self.get_freshness_index(
-            user_stats.acute_internal_total_load,
-            user_stats.chronic_internal_total_load)
-        user_stats.power_load_freshness_index = self.get_freshness_index(
-            user_stats.acute_power_total_load,
-            user_stats.chronic_power_total_load)
+        internal_freshness_index = user_stats.chronic_internal_total_load.plagiarize()
+        internal_freshness_index.subtract(user_stats.acute_internal_total_load)
+        user_stats.internal_freshness_index = internal_freshness_index.plagiarize()
+
+        power_load_freshness_index = user_stats.chronic_power_total_load.plagiarize()
+        power_load_freshness_index.subtract(user_stats.acute_internal_total_load)
+        user_stats.power_load_freshness_index = power_load_freshness_index.plagiarize()
+
+        # user_stats.internal_freshness_index = self.get_freshness_index(
+        #     user_stats.acute_internal_total_load,
+        #     user_stats.chronic_internal_total_load)
+        # user_stats.power_load_freshness_index = self.get_freshness_index(
+        #     user_stats.acute_power_total_load,
+        #     user_stats.chronic_power_total_load)
 
         user_stats.historical_internal_strain = historical_internal_strain
         user_stats.historical_power_load_strain = historical_power_load_strain

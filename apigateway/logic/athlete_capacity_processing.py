@@ -221,8 +221,8 @@ class AthleteCapacityProcessor(object):
         elif (non_functional_overreaching_value == 0 and functional_overreaching_value == 0 and
               (0 < inflammation_level <= 3 or 0 < muscle_spasm_level <= 4 or #(internal_strain_events is not None and internal_strain_events > 2)
                #or (power_load_strain_events is not None and  power_load_strain_events > 2) or
-               (internal_load_acwr_ratio is None or internal_load_acwr_ratio <= 1.25) or
-               (power_load_acwr_ratio is None or power_load_acwr_ratio <= 1.25))):
+               (internal_load_acwr_ratio is not None and internal_load_acwr_ratio <= 1.25) or
+               (power_load_acwr_ratio is not None and power_load_acwr_ratio <= 1.25))):
 
             athlete_readiness.readiness_score = 40
 
@@ -287,9 +287,9 @@ class AthleteCapacityProcessor(object):
             else:
                 athlete_readiness.readiness_score += max((3 - power_load_strain_events), 0)
 
-            if user_stats.internal_acwr.highest_value() < 1.3:
+            if user_stats.internal_acwr.highest_value() is None or user_stats.internal_acwr.highest_value() < 1.3:
                 athlete_readiness.readiness_score += 2
-            if user_stats.power_load_acwr.highest_value() < 1.3:
+            if user_stats.power_load_acwr.highest_value() is None or user_stats.power_load_acwr.highest_value() < 1.3:
                 athlete_readiness.readiness_score += 2
 
             athlete_readiness.load_score = ((athlete_readiness.readiness_score / float(100)) * 5) + 105

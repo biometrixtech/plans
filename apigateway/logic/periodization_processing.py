@@ -341,11 +341,11 @@ class PeriodizationPlanProcessor(object):
             rpe_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.rpe_load_contribution
             volume_upper_ratio = (training_phase.acwr.upper_bound - 1) * progression.volume_load_contribution
             if athlete_capacity.rpe.lower_bound is not None:
-                athlete_capacity.rpe.lower_bound = athlete_capacity.rpe.lower_bound * (1 + rpe_lower_ratio)
+                athlete_capacity.rpe.lower_bound = min(athlete_capacity.rpe.lower_bound * (1 + rpe_lower_ratio), 10)
             if athlete_capacity.rpe.observed_value is not None:
-                athlete_capacity.rpe.observed_value = athlete_capacity.rpe.observed_value * (1 + ((rpe_lower_ratio + rpe_upper_ratio)/float(2)))
+                athlete_capacity.rpe.observed_value = min(athlete_capacity.rpe.observed_value * (1 + ((rpe_lower_ratio + rpe_upper_ratio)/float(2))), 10)
             if athlete_capacity.rpe.upper_bound is not None:
-                athlete_capacity.rpe.upper_bound = athlete_capacity.rpe.upper_bound * (1 + rpe_upper_ratio)
+                athlete_capacity.rpe.upper_bound = min(athlete_capacity.rpe.upper_bound * (1 + rpe_upper_ratio), 10)
             if athlete_capacity.volume.lower_bound is not None:
                 athlete_capacity.volume.lower_bound = athlete_capacity.volume.lower_bound * (1 + volume_lower_ratio)
             if athlete_capacity.volume.observed_value is not None:
