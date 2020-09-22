@@ -377,10 +377,10 @@ class TrainingLoadProcessing(object):
 
         user_stats.internal_acwr = acute_internal_load.plagiarize()
 
-        acute_internal_load_2 = user_stats.acute_internal_total_load.plagiarize()
-        acute_internal_load_2.divide_range(user_stats.average_weekly_internal_load)
-
-        user_stats.internal_acwr_2 = acute_internal_load_2.plagiarize()
+        # acute_internal_load_2 = user_stats.acute_internal_total_load.plagiarize()
+        # acute_internal_load_2.divide_range(user_stats.average_weekly_internal_load)
+        #
+        # user_stats.internal_acwr_2 = acute_internal_load_2.plagiarize()
 
         acute_power_load = user_stats.acute_power_total_load.plagiarize()
         acute_power_load.divide_range(user_stats.chronic_power_total_load)
