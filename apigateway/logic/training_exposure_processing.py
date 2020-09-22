@@ -3,6 +3,7 @@ from models.exposure import TrainingExposure
 from models.movement_actions import MovementSpeed, MovementResistance, Explosiveness
 from models.movement_tags import AdaptationType, DetailedAdaptationType
 from models.training_volume import Assignment, StandardErrorRange
+from models.periodization_utilities import PeriodizationUtilities
 from logic.calculators import Calculators
 
 
@@ -11,6 +12,8 @@ class TrainingExposureProcessor(object):
     def get_exposures(self, exercise):
 
         exposures = []
+
+        utilities = PeriodizationUtilities()
 
         if exercise.movement_speed is not None and exercise.resistance is not None and exercise.displacement is not None:
             explosiveness = Calculators.get_force_level(exercise.movement_speed, exercise.resistance, exercise.displacement)
@@ -119,11 +122,14 @@ class TrainingExposureProcessor(object):
                     exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
+                    return exposures
 
-                elif exercise.predicted_rpe.lowest_value() >= 2.0 and exercise.predicted_rpe.highest_value() <= 4.0:  # and duration >= 300:
+                #elif exercise.predicted_rpe.lowest_value() >= 2.0 and exercise.predicted_rpe.highest_value() <= 4.0:  # and duration >= 300:
+                elif utilities.is_in_range(exercise.predicted_rpe.lowest_value(), exercise.predicted_rpe.highest_value(), 2.0, 4.0):
                     exposure = TrainingExposure(DetailedAdaptationType.base_aerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
+                    return exposures
 
                 # anaerobic threshold
                 #80 <= percent_max_hr < 86:
@@ -131,10 +137,14 @@ class TrainingExposureProcessor(object):
                     exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
-                elif exercise.predicted_rpe.lowest_value() > 4.0 and exercise.predicted_rpe.highest_value() <= 7 and duration >= 20:
+                    return exposures
+                #elif exercise.predicted_rpe.lowest_value() > 4.0 and exercise.predicted_rpe.highest_value() <= 7 and duration >= 20:
+                elif utilities.is_in_range(exercise.predicted_rpe.lowest_value(),
+                                               exercise.predicted_rpe.highest_value(), 4.001, 7.0) and duration >= 20:
                     exposure = TrainingExposure(DetailedAdaptationType.anaerobic_threshold_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
+                    return exposures
 
                 # anaerobic interval
                 #86 <= percent_max_hr
@@ -142,11 +152,14 @@ class TrainingExposureProcessor(object):
                     exposure = TrainingExposure(DetailedAdaptationType.high_intensity_anaerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
-                elif exercise.predicted_rpe.highest_value() > 7 and duration >= 5:
+                    return exposures
+                #elif exercise.predicted_rpe.highest_value() > 7 and duration >= 5:
+                elif utilities.is_in_range(exercise.predicted_rpe.lowest_value(),
+                                               exercise.predicted_rpe.highest_value(), 7.001, 10.0):
                     exposure = TrainingExposure(DetailedAdaptationType.high_intensity_anaerobic_training)
                     exposure = self.copy_duration_exercise_details_to_exposure(exercise, exposure)
                     exposures.append(exposure)
-
+                    return exposures
         if len(exposures) == 0:
             stop_here = 0
         return exposures
