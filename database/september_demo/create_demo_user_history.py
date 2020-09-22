@@ -203,7 +203,7 @@ if __name__ == '__main__':
     periodization_plan_processor = PeriodizationPlanProcessor()
     periodization_goal_factory = PeriodizationGoalFactory()
     periodization_goals = periodization_goal_factory.create(PeriodizationGoalType.increase_cardio_endurance)
-    training_phase_type = TrainingPhaseType.increase
+    training_phase_type = TrainingPhaseType.slowly_increase
 
     periodization_persona = PeriodizationPersona.well_trained
     sub_adaptation_type_persona = SubAdaptionTypePersonas(cardio_persona=TrainingPersona.intermediate,

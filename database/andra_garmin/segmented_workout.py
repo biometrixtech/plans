@@ -115,7 +115,12 @@ def get_exercises(detail_data):
     detail_data['speed_mph'] = detail_data.enhanced_speed * 3600 / 1609
 
     detail_data['timestamp'] = [datetime.datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S") for time_string in detail_data.timestamp.values]
+    #for ts in detail_data.timestamp.values:
+    #detail_data['duration'] = [(ts - detail_data.timestamp.values[0]).seconds for ts in detail_data.timestamp.values]
     detail_data['duration'] = [(ts - detail_data['timestamp'][0]).seconds for ts in detail_data.timestamp.values]
+        #paul = detail_data.timestamp[0]
+        #dipesh = (ts - detail_data['timestamp'][0]).seconds
+        #here=0
     speed_zones = define_speed_zone(detail_data)
     speed_blocks = get_block(speed_zones, min_change=1)
     detail_data['speed_blocks'] = speed_blocks

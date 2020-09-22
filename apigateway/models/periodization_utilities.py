@@ -70,3 +70,15 @@ class PeriodizationUtilities(object):
                                 found_match = True
                                 return found_match, workout_training_exposures
         return found_match, workout_training_exposures
+
+    def is_in_range(self, source_low, source_high, target_low, target_high):
+
+        if target_low is not None and target_high is not None:
+            if source_low is not None and target_low <= source_low <= target_high:
+                return True
+            elif source_high is not None and target_low <= source_high <= target_high:
+                return True
+            else:
+                return False
+        else:
+            return False

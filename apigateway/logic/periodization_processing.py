@@ -101,10 +101,10 @@ class PeriodizationPlanProcessor(object):
                 plan.acute_muscle_issues.append(body_part_side)
 
             # TODO - make sure you're interpreting this correctly
-            if body_part_injury_risk.last_excessive_strain_date is not None and (current_date.date() - self.get_clean_date(body_part_injury_risk.last_excessive_strain_date)).days < 2:
+            if body_part_injury_risk.last_excessive_strain_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_excessive_strain_date)):
                 plan.excessive_strain_muscles.append(body_part_side)
 
-            if body_part_injury_risk.last_non_functional_overreaching_date is not None and (current_date.date() - self.get_clean_date(body_part_injury_risk.last_non_functional_overreaching_date)).days < 2:
+            if body_part_injury_risk.last_non_functional_overreaching_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_non_functional_overreaching_date)):
                 plan.non_functional_overreaching_muscles.append(body_part_side)
 
             if body_part_injury_risk.last_functional_overreaching_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_functional_overreaching_date)):
