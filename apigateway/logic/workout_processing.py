@@ -304,12 +304,12 @@ class WorkoutProcessor(object):
                 if exercise.cardio_action is not None:
                     if exercise.cardio_action == CardioAction.row:
                         exercise.speed = Calculators.speed_from_watts_rowing(exercise.power.lowest_value())
-                        exercise.duration = exercise.speed * exercise.distance
+                        exercise.duration = exercise.distance / exercise.speed
                     elif exercise.cardio_action == CardioAction.run:
                         exercise.speed = Calculators.speed_from_watts_running(exercise.power.lowest_value(),
                                                                               self.user_weight, exercise.grade,
-                                                                              efficiency=.21)
-                        exercise.duration = exercise.speed * exercise.distance
+                                                                              efficiency=.22)
+                        exercise.duration = exercise.distance / exercise.speed
 
             if exercise.rpe is None:  # only predict rpe if not provided by user
                 exercise.predicted_rpe = StandardErrorRange()

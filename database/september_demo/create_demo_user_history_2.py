@@ -122,7 +122,7 @@ def create_session_only(workout, session_RPE):
     data = {
         "event_date": workout['event_date_time'],
         "session_type": 7,
-        "duration_minutes": workout['duration_seconds'] / 60,
+        "duration": workout['duration_seconds'] / 60,
         "description": workout['program_module_id'],
         # "calories": 100,
         "distance": workout['distance'],
