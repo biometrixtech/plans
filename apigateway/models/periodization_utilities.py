@@ -12,12 +12,13 @@ class PeriodizationUtilities(object):
 
         for possible_target_training_exposure in possible_target_training_exposures:
             for workout_training_exposure in workout_training_exposures:
-                if (
-                        possible_target_training_exposure.detailed_adaptation_type == workout_training_exposure.detailed_adaptation_type
-                        and possible_target_training_exposure.volume.lowest_value() <= workout_training_exposure.volume.lowest_value()
-                        and (possible_target_training_exposure.rpe.lowest_value() >= workout_training_exposure.rpe.lowest_value())
-                        and workout_training_exposure.rpe.highest_value() <= possible_target_training_exposure.rpe.highest_value() * factor):  # allow a workout to be 5% higher and still be relevant
-                    return True
+                if possible_target_training_exposure.detailed_adaptation_type == workout_training_exposure.detailed_adaptation_type:
+                    if possible_target_training_exposure.volume.lowest_value() is None:
+                        return False
+                    if (possible_target_training_exposure.volume.lowest_value() <= workout_training_exposure.volume.lowest_value()
+                    and (possible_target_training_exposure.rpe.lowest_value() >= workout_training_exposure.rpe.lowest_value())
+                    and workout_training_exposure.rpe.highest_value() <= possible_target_training_exposure.rpe.highest_value() * factor):  # allow a workout to be 5% higher and still be relevant
+                        return True
                 elif possible_target_training_exposure.weekly_load_percentage is not None:# use load instead of volume:
                     if (possible_target_training_exposure.weekly_load_percentage.lower_bound is not None or
                             possible_target_training_exposure.weekly_load_percentage.observed_value is not None or
