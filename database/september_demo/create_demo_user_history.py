@@ -11,7 +11,8 @@ from datastores.planed_workout_load_datastore import PlannedWorkoutLoadDatastore
 from datastores.daily_plan_datastore import DailyPlanDatastore
 from datastores.injury_risk_datastore import InjuryRiskDatastore
 from models.periodization_plan import PeriodizationPlan, PeriodizationPersona, TrainingPhaseType, TrainingPhaseFactory
-from models.periodization_goal import PeriodizationGoalFactory, PeriodizationGoalType, PeriodizationGoal, SubAdaptionTypePersonas, TrainingPersona
+from models.periodization_goal import PeriodizationGoalFactory, PeriodizationGoalType, PeriodizationGoal
+from models.athlete_capacity import TrainingPersona, SubAdaptionTypePersonas
 from logic.periodization_processing import PeriodizationPlanProcessor
 from logic.workout_scoring import WorkoutScoringProcessor
 from logic.soreness_processing import SorenessCalculator

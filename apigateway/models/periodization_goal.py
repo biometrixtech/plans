@@ -1,4 +1,5 @@
 from enum import Enum
+
 from models.exposure import TrainingExposure, TargetTrainingExposure
 from models.movement_tags import DetailedAdaptationType
 from models.training_volume import StandardErrorRange
@@ -14,24 +15,6 @@ class PeriodizationGoalType(Enum):
     increase_athleticism_low_force = 40
     #increase_functional_strength = 45
     #increase_general_fitness = 50
-
-
-class TrainingPersona(Enum):
-    beginner = 0
-    novice = 1
-    intermediate = 2
-    advanced = 3
-    elite = 4
-
-
-class SubAdaptionTypePersonas(object):
-    def __init__(self,
-                 cardio_persona=TrainingPersona.beginner,
-                 power_persona=TrainingPersona.beginner,
-                 strength_persona=TrainingPersona.beginner):
-        self.cardio_persona = cardio_persona
-        self.power_persona = power_persona
-        self.strength_persona = strength_persona
 
 
 class PeriodizationGoal(object):
@@ -82,9 +65,9 @@ class PeriodizationGoalFactory(object):
             goal.target_training_exposures.append(
                 TargetTrainingExposure(training_exposures=speed_sustained_power_power, exposure_count=two_three_required_count.plagiarize(), priority=1))
             goal.target_training_exposures.append(
-                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=two_three_required_count.plagiarize(), priority=2))
+                TargetTrainingExposure(training_exposures=anaerobic_threshold, exposure_count=one_two_required_count.plagiarize(), priority=2))
             goal.target_training_exposures.append(
-                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=two_three_required_count.plagiarize(), priority=2))
+                TargetTrainingExposure(training_exposures=high_intensity_anaerobic_training, exposure_count=one_two_required_count.plagiarize(), priority=2))
             # ignoring correctives for now
             goal.target_training_exposures.append(
                 TargetTrainingExposure(training_exposures=base_training, exposure_count=one_two_required_count.plagiarize(), priority=4))

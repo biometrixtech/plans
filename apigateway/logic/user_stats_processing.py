@@ -275,7 +275,9 @@ class UserStatsProcessing(object):
 
         adjustment_factor = 0
         if self.latest_training_session_date is not None and self.event_date > self.latest_training_session_date:
-            adjustment_factor = (self.event_date.date() - self.latest_training_session_date.date()).days
+            #adjustment_factor = (self.event_date.date() - self.latest_training_session_date.date()).days
+            # TODO = UNDO THIS MAYBE
+            adjustment_factor = 0
 
         if self.acute_days is not None and self.chronic_days is not None:
             self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)
