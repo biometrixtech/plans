@@ -4,6 +4,35 @@ from models.training_volume import StandardErrorRange
 from serialisable import Serialisable
 
 
+class TrainingPersona(Enum):
+    beginner = 0
+    novice = 1
+    intermediate = 2
+    advanced = 3
+    elite = 4
+
+
+class SubAdaptionTypePersonas(object):
+    def __init__(self,
+                 cardio_persona=TrainingPersona.beginner,
+                 power_persona=TrainingPersona.beginner,
+                 strength_persona=TrainingPersona.beginner):
+        self.cardio_persona = cardio_persona
+        self.power_persona = power_persona
+        self.strength_persona = strength_persona
+
+
+class AthleteReadiness(object):
+    def __init__(self):
+        self.readiness_score = 0.0
+        self.load_score = 0.0
+        self.rpe_score = 0.0
+        self.muscle_spasm_level = 0.0
+        self.inflammation_level = 0.0
+        self.internal_load_acwr_ratio = None
+        self.power_load_acwr_ratio = None
+
+
 class AthleteBaselineCapacities(Serialisable):
     def __init__(self):
         # Cardio
@@ -228,20 +257,3 @@ class AthleteDefaultCapacityFactory(object):
 
         return power_athlete_capacities
 
-
-class TrainingPersona(Enum):
-    beginner = 0
-    novice = 1
-    intermediate = 2
-    advanced = 3
-    elite = 4
-
-
-class SubAdaptionTypePersonas(object):
-    def __init__(self,
-                 cardio_persona=TrainingPersona.beginner,
-                 power_persona=TrainingPersona.beginner,
-                 strength_persona=TrainingPersona.beginner):
-        self.cardio_persona = cardio_persona
-        self.power_persona = power_persona
-        self.strength_persona = strength_persona

@@ -1,4 +1,4 @@
-from models.athlete_capacity import AthleteBaselineCapacities, AthleteDefaultCapacityFactory, TrainingUnit, TrainingPersona, SubAdaptionTypePersonas
+from models.athlete_capacity import AthleteBaselineCapacities, AthleteDefaultCapacityFactory, TrainingUnit, TrainingPersona, SubAdaptionTypePersonas, AthleteReadiness
 from models.movement_tags import DetailedAdaptationType
 from models.training_volume import StandardErrorRange
 import datetime
@@ -143,9 +143,7 @@ class AthleteCapacityProcessor(object):
 
     def get_daily_readiness_scores(self, current_date, injury_risk_dict, user_stats, periodization_plan, training_phase):
 
-        readiness_score = 0
-        load_score = 0
-        rpe_score = 0
+        athlete_readiness = AthleteReadiness()
 
         highest_acwr_allowed = training_phase.acwr.highest_value()
 
@@ -165,6 +163,9 @@ class AthleteCapacityProcessor(object):
             else:
                 internal_load_acwr_ratio = internal_load_acwr_highest / highest_acwr_allowed
 
+        athlete_readiness.power_load_acwr_ratio = power_load_acwr_ratio
+        athlete_readiness.internal_load_acwr_ratio = internal_load_acwr_ratio
+
         internal_strain_events = user_stats.internal_strain_events.highest_value() if user_stats.internal_strain_events is not None else None
         power_load_strain_events = user_stats.power_load_strain_events.highest_value() if user_stats.internal_strain_events is not None else None
 
@@ -174,109 +175,127 @@ class AthleteCapacityProcessor(object):
 
         inflammation_level = self.get_inflammation_level(current_date, injury_risk_dict)
 
+        athlete_readiness.inflammation_level = inflammation_level
+
         muscle_spasm_level = self.get_muscle_spasm_level(current_date, injury_risk_dict)
+
+        athlete_readiness.muscle_spasm_level = muscle_spasm_level
 
         if non_functional_overreaching_value > 0 or max(inflammation_level, muscle_spasm_level) > 7: # is > 7 considered severe?
 
             if non_functional_overreaching_value == 0:
-                readiness_score += 10
-            readiness_score += (10 - muscle_spasm_level) / float(2)
-            readiness_score += (10 - inflammation_level) / float(2)
+                athlete_readiness.readiness_score += 10
+            athlete_readiness.readiness_score += (10 - muscle_spasm_level) / float(2)
+            athlete_readiness.readiness_score += (10 - inflammation_level) / float(2)
 
-            load_score = 0
-            rpe_score = readiness_score / float(20)
+            athlete_readiness.load_score = 0
+            athlete_readiness.rpe_score = athlete_readiness.readiness_score / float(20)
 
         elif non_functional_overreaching_value == 0 and (functional_overreaching_value > 0 or
                                                          3 < inflammation_level <= 7 or 4 < muscle_spasm_level <= 7 or
                                                          (internal_load_acwr_ratio is not None and internal_load_acwr_ratio > 1.25) or
                                                          (power_load_acwr_ratio is not None and power_load_acwr_ratio > 1.25)):
 
-            readiness_score = 20
+            athlete_readiness.readiness_score = 20
 
             if functional_overreaching_value == 0:
-                readiness_score += 4
+                athlete_readiness.readiness_score += 4
 
-            readiness_score += (10 - muscle_spasm_level) / float(2)
-            readiness_score += (10 - inflammation_level) / float(2)
+            athlete_readiness.readiness_score += (10 - muscle_spasm_level) / float(2)
+            athlete_readiness.readiness_score += (10 - inflammation_level) / float(2)
 
             if power_load_acwr_ratio is None:
-                readiness_score += 3
+                athlete_readiness.readiness_score += 3
             if internal_load_acwr_ratio is None:
-                readiness_score += 3
+                athlete_readiness.readiness_score += 3
 
             if 3 < inflammation_level <= 7:
-                load_score = (readiness_score / float(40)) * 50
+                athlete_readiness.load_score = (athlete_readiness.readiness_score / float(40)) * 50
             elif power_load_acwr_ratio is not None or internal_load_acwr_ratio is not None:
-                load_score = 50
+                athlete_readiness.load_score = 50
             else:
-                load_score = 90
+                athlete_readiness.load_score = 90
 
-            rpe_score = (readiness_score / float(40)) + 2
+            athlete_readiness.rpe_score = (athlete_readiness.readiness_score / float(40)) + 2
 
         elif (non_functional_overreaching_value == 0 and functional_overreaching_value == 0 and
-              (0 < inflammation_level <= 3 or 3 < muscle_spasm_level <= 4 or (internal_strain_events is not None and internal_strain_events > 2)
-               or (power_load_strain_events is not None and  power_load_strain_events > 2) or
+              (0 < inflammation_level <= 3 or 0 < muscle_spasm_level <= 4 or #(internal_strain_events is not None and internal_strain_events > 2)
+               #or (power_load_strain_events is not None and  power_load_strain_events > 2) or
                (internal_load_acwr_ratio is None or internal_load_acwr_ratio <= 1.25) or
                (power_load_acwr_ratio is None or power_load_acwr_ratio <= 1.25))):
 
-            readiness_score = 40
+            athlete_readiness.readiness_score = 40
 
-            readiness_score += (5 - muscle_spasm_level)
-            readiness_score += (5 - inflammation_level)
+            athlete_readiness.readiness_score += (10 - muscle_spasm_level)
+            athlete_readiness.readiness_score += (10 - inflammation_level)
 
-            if internal_strain_events is None or internal_strain_events == 0:
-                readiness_score += 6
-            if internal_strain_events is not None and internal_strain_events == 1:
-                readiness_score += 3
-            if power_load_strain_events is None or power_load_strain_events == 0:
-                readiness_score += 6
-            if power_load_strain_events is not None and power_load_strain_events == 1:
-                readiness_score += 3
+            # if internal_strain_events is None or internal_strain_events == 0:
+            #     readiness_score += 6
+            # if internal_strain_events is not None and internal_strain_events == 1:
+            #     readiness_score += 3
+            # if power_load_strain_events is None or power_load_strain_events == 0:
+            #     readiness_score += 6
+            # if power_load_strain_events is not None and power_load_strain_events == 1:
+            #     readiness_score += 3
             if power_load_acwr_ratio is None:
-                readiness_score += 3
+                athlete_readiness.readiness_score += 15
+            else:
+                power_load_acwr_ratio_mod = (power_load_acwr_ratio - 1) * 100  # takes, for example, 1.25 and turns it into 25
+                power_load_acwr_ratio_mod = max(0, power_load_acwr_ratio_mod) # ensures that it's no lower than 0
+                athlete_readiness.readiness_score += (power_load_acwr_ratio_mod / float(25)) * 15
             if internal_load_acwr_ratio is None:
-                readiness_score += 3
+                athlete_readiness.readiness_score += 15
+            else:
+                internal_load_acwr_ratio_mod = (internal_load_acwr_ratio - 1) * 100  # takes, for example, 1.25 and turns it into 25
+                internal_load_acwr_ratio_mod = max(0, internal_load_acwr_ratio_mod) # ensures that it's no lower than 0
+                athlete_readiness.readiness_score += (internal_load_acwr_ratio_mod / float(25)) * 15
 
-            load_score = ((readiness_score / float(70)) * 10) + 90
-            rpe_score = ((readiness_score / float(70)) * 2) + 4
+            athlete_readiness.load_score = ((athlete_readiness.readiness_score / float(105)) * 10) + 90
+            athlete_readiness.rpe_score = ((athlete_readiness.readiness_score / float(105)) * 6) + 4
 
-        elif (non_functional_overreaching_value == 0 and functional_overreaching_value == 0 and inflammation_level == 0 and 0 < muscle_spasm_level <= 3
-              and power_load_acwr_ratio is None and internal_load_acwr_ratio is None and 0 <= internal_strain_events <= 2 and 0 <= power_load_strain_events <= 2):
+        # elif (non_functional_overreaching_value == 0 and functional_overreaching_value == 0 and inflammation_level == 0 and 0 < muscle_spasm_level <= 3
+        #      and power_load_acwr_ratio is None and internal_load_acwr_ratio is None and 0 <= internal_strain_events <= 2 and 0 <= power_load_strain_events <= 2):
 
-            readiness_score = 70
+            # readiness_score = 70
+            #
+            # readiness_score += (5 - muscle_spasm_level)
 
-            readiness_score += (5 - muscle_spasm_level)
+            # if internal_strain_events is None or internal_strain_events == 0:
+            #     readiness_score += 7
+            # if internal_strain_events is not None and internal_strain_events == 1:
+            #     readiness_score += 3.5
+            # if power_load_strain_events is None or power_load_strain_events == 0:
+            #     readiness_score += 7
+            # if power_load_strain_events is not None and power_load_strain_events == 1:
+            #     readiness_score += 3.5
 
-            if internal_strain_events is None or internal_strain_events == 0:
-                readiness_score += 7
-            if internal_strain_events is not None and internal_strain_events == 1:
-                readiness_score += 3.5
-            if power_load_strain_events is None or power_load_strain_events == 0:
-                readiness_score += 7
-            if power_load_strain_events is not None and power_load_strain_events == 1:
-                readiness_score += 3.5
-
-            load_score = ((readiness_score / float(90)) * 5) + 100
-            rpe_score = (readiness_score / float(90)) + 7
+            # load_score = ((readiness_score / float(90)) * 5) + 100
+            # rpe_score = (readiness_score / float(90)) + 7
 
         elif (non_functional_overreaching_value == 0 and functional_overreaching_value == 0 and inflammation_level == 0
-              and muscle_spasm_level == 0 and power_load_acwr_ratio is None and internal_load_acwr_ratio is None):
+              and muscle_spasm_level == 0):
 
-            readiness_score = 90
+            athlete_readiness.readiness_score = 90
 
             if internal_strain_events is None or internal_strain_events == 0:
-                readiness_score += 5
-            if internal_strain_events is not None and internal_strain_events == 1:
-                readiness_score += 2.5
+                athlete_readiness.readiness_score += 3
+            else:
+                athlete_readiness.readiness_score += max((3 - internal_strain_events), 0)
+
             if power_load_strain_events is None or power_load_strain_events == 0:
-                readiness_score += 5
-            if power_load_strain_events is not None and power_load_strain_events == 1:
-                readiness_score += 2.5
+                athlete_readiness.readiness_score += 3
+            else:
+                athlete_readiness.readiness_score += max((3 - power_load_strain_events), 0)
 
-            load_score = ((readiness_score / float(100)) * 5) + 105
-            rpe_score = (readiness_score / float(100)) + 9
+            if user_stats.internal_acwr.highest_value() < 1.3:
+                athlete_readiness.readiness_score += 2
+            if user_stats.power_load_acwr.highest_value() < 1.3:
+                athlete_readiness.readiness_score += 2
 
-        return readiness_score, load_score, rpe_score
+            athlete_readiness.load_score = ((athlete_readiness.readiness_score / float(100)) * 5) + 105
+            athlete_readiness.rpe_score = (athlete_readiness.readiness_score / float(100)) + 9
+
+        return athlete_readiness
 
     def get_inflammation_level(self, current_date, injury_risk_dict):
 
