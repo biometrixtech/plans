@@ -372,6 +372,8 @@ if __name__ == '__main__':
 
                 user_stats_datastore = UserStatsDatastore()
                 demo_persona.user_stats = user_stats_datastore.get(athlete_id=user_id)
+                user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
+                user_stats_output.write(user_stats_string + '\n')
 
                 training_session_datastore = TrainingSessionDatastore()
                 training_sessions = training_session_datastore.get(user_id=user_id, event_date_time=event_date_time, read_session_load_dict=False)
