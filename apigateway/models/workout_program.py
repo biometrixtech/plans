@@ -214,6 +214,7 @@ class BaseWorkoutExercise(object):
         self.bilateral_distribution_of_resistance = None
 
         self.actions_for_power = []
+        self.percent_max_hr = None
 
     def initialize_from_movement(self, movement, strength_proficiency=ProficiencyLevel.novice, power_proficiency=ProficiencyLevel.novice):
         # self.body_position = movement.body_position

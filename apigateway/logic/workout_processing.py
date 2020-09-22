@@ -123,6 +123,9 @@ class WorkoutProcessor(object):
                     hr_values = sorted(workout_exercise.hr)
                     top_95_percentile_hr = hr_values[int(len(hr_values) * .95):]
                     workout_exercise.end_of_workout_hr = round(sum(top_95_percentile_hr) / len(top_95_percentile_hr), 0)
+                    max_hr = max_hr = 207 - .7 * self.user_age
+                    average_hr = sum(workout_exercise.hr) / len(workout_exercise.hr)
+                    workout_exercise.percent_max_hr = average_hr / max_hr
                     # workout_exercise.end_of_workout_hr = max(workout_exercise.hr)
                 elif len(section_hr) > 0:
                     hr_values = sorted([hr.value for hr in section_hr])  # TODO: improve this to use exercise specific values, not inherit all from section
@@ -311,11 +314,34 @@ class WorkoutProcessor(object):
             if exercise.rpe is None:  # only predict rpe if not provided by user
                 exercise.predicted_rpe = StandardErrorRange()
                 if exercise.end_of_workout_hr is not None:
-                    exercise.predicted_rpe.observed_value = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
-                                                                                              user_age=self.user_age,
-                                                                                              user_weight=self.user_weight,
-                                                                                              gender=self.gender,
-                                                                                              vo2_max=self.vo2_max.observed_value)
+                    all_rpes = []
+                    if self.vo2_max.observed_value is not None:
+                        rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
+                                                                                                  user_age=self.user_age,
+                                                                                                  user_weight=self.user_weight,
+                                                                                                  gender=self.gender,
+                                                                                                  vo2_max=self.vo2_max.observed_value)
+                        all_rpes.append(rpe)
+                    if self.vo2_max.lower_bound is not None:
+                        rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
+                                                                                                  user_age=self.user_age,
+                                                                                                  user_weight=self.user_weight,
+                                                                                                  gender=self.gender,
+                                                                                                  vo2_max=self.vo2_max.lower_bound)
+                        all_rpes.append(rpe)
+                    if self.vo2_max.upper_bound is not None:
+                        rpe = self.hr_rpe_predictor.predict_rpe(hr=exercise.end_of_workout_hr,
+                                                                                                  user_age=self.user_age,
+                                                                                                  user_weight=self.user_weight,
+                                                                                                  gender=self.gender,
+                                                                                                  vo2_max=self.vo2_max.upper_bound)
+                        all_rpes.append(rpe)
+                    if len(all_rpes) > 0:
+                        exercise.predicted_rpe = StandardErrorRange(
+                                lower_bound=min(all_rpes),
+                                observed_value=sum(all_rpes) / len(all_rpes),
+                                upper_bound=max(all_rpes)
+                        )
                 else:
                     self.set_planned_cardio_rpe(exercise)
             else:
