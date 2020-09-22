@@ -257,7 +257,7 @@ class PeriodizationPlanProcessor(object):
                                                                                                 periodization_plan.sub_adaptation_type_personas)
 
             for athlete_target_training_exposure in periodization_plan.target_training_exposures:
-                if athlete_target_training_exposure.exposure_count.highest_value() == 0:  # they completed them all!
+                if athlete_target_training_exposure.exposure_count.lowest_value() == 0:  # they completed them all!
                     # advance training exposure to next week of the program!
                     athlete_target_training_exposure.progression_week = min(athlete_target_training_exposure.progression_week + 1,
                                                                             len(progressions) - 1)
