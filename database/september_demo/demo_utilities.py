@@ -11,7 +11,7 @@ class DemoOutput(object):
                                        "muscular_endurance, strength_endurance, hypertrophy, maximal_strength," +
                                        "speed, sustained_power, power, maximal_power")
         self.workout_header_line = ("event_date_time, id,description, distance, duration_minutes, session_rpe, "
-                                    "power_load_highest, rpe_load_highest,  training_volume, target_training_exposures")
+                                    "power_load_highest, rpe_load_highest,  training_volume, high_intensity_session, target_training_exposures")
         self.periodization_plan_header_line = ("start_date, current_date, goals, training_phase_type, athlete_persona, sub_adaptation_type_personas," +
                                                "target_training_exposures, target_weekly_rpe_load,expected_weekly_workouts," +
                                                "readiness_score, load_score, rpe_score, inflammation_level, muscle_spasm_level, internal_load_acwr_ratio, power_load_acwr_ratio," +
@@ -385,7 +385,7 @@ class DemoOutput(object):
         session_string = str(session.event_date) + "," + session.id + "," + session.description + "," + str(
             session.distance) + "," + str(session.duration_minutes) + ","
         session_string += str(session.session_RPE) + "," + str(session.power_load.highest_value()) + "," + str(
-            session.rpe_load.highest_value()) + "," + str(session.training_volume) + ","
+            session.rpe_load.highest_value()) + "," + str(session.training_volume) + "," + str(session.contains_high_intensity_blocks()) + ","
         session_string += self.get_training_exposure_string(session)
 
         return session_string
