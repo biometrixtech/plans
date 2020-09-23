@@ -15,6 +15,7 @@ class DemoOutput(object):
         self.periodization_plan_header_line = ("start_date, current_date, goals, training_phase_type, athlete_persona, sub_adaptation_type_personas," +
                                                "target_training_exposures, target_weekly_rpe_load,expected_weekly_workouts," +
                                                "readiness_score, load_score, rpe_score, inflammation_level, muscle_spasm_level, internal_load_acwr_ratio, power_load_acwr_ratio," +
+                                               "internal_strain_events, internal_acwr, power_load_strain_events, power_load_acwr, average_weekly_internal_load,"
                                                "base_aerobic_training, anaerobic_threshold_training, high_intensity_anaerobic_training," +
                                                "muscular_endurance, strength_endurance, hypertrophy, maximal_strength," +
                                                "speed, sustained_power, power, maximal_power," +
@@ -417,6 +418,12 @@ class DemoOutput(object):
         plan_string += str(athlete_readiness.inflammation_level) + "," + str(
             athlete_readiness.muscle_spasm_level) + "," + str(
             athlete_readiness.internal_load_acwr_ratio) + "," + str(athlete_readiness.power_load_acwr_ratio) + ","
+
+        #"internal_strain_events, internal_acwr, power_load_strain_events, power_load_acwr, average_weekly_internal_load,"
+        plan_string += self.get_std_error_if_present_string(athlete_readiness,"internal_strain_events") + str(athlete_readiness.internal_acwr) + ","
+        plan_string += self.get_std_error_if_present_string(athlete_readiness, "power_load_strain_events") + str(athlete_readiness.power_load_acwr) + ","
+        plan_string += self.get_std_error_if_present_string(athlete_readiness, "average_weekly_internal_load") # comma included in method
+
         plan_string += self.get_plan_capacities_string(plan) + ","
         plan_string += self.get_body_part_side_string(plan.acute_muscle_issues) + ","
         plan_string += self.get_body_part_side_string(plan.chronic_muscle_issues) + ","
