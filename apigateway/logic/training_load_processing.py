@@ -356,10 +356,8 @@ class TrainingLoadProcessing(object):
                                                        user_stats.power_load_monotony, self.last_week_power_load_values,
                                                        historical_power_load_strain)
 
-        user_stats.acute_internal_total_load = self.get_standard_error_range(user_stats.expected_weekly_workouts,
-                                                                             self.a_internal_load_values)
-        user_stats.acute_power_total_load = self.get_standard_error_range(user_stats.expected_weekly_workouts,
-                                                                          self.a_power_load_values)
+        user_stats.acute_internal_total_load = StandardErrorRange.get_sum_from_error_range_list(self.a_internal_load_values)
+        user_stats.acute_power_total_load = StandardErrorRange.get_sum_from_error_range_list(self.a_power_load_values)
 
         # user_stats.chronic_internal_total_load = self.get_standard_error_range(
         #     user_stats.expected_weekly_workouts, self.c_internal_load_values, return_sum=False)

@@ -9,7 +9,9 @@ from logic.injury_risk_processing import InjuryRiskProcessor
 from models.athlete_injury_risk import AthleteInjuryRisk
 from models.training_volume import StandardErrorRange
 from logic.calculators import Calculators
+import pytz
 
+utc = pytz.UTC
 
 class UserStatsProcessing(object):
 
@@ -254,17 +256,36 @@ class UserStatsProcessing(object):
 
         acute_days_adjustment = 0
 
+        # if days_difference == 7:
+        #     self.acute_days = 3
+        #     self.chronic_days = 7
+        # elif 7 < days_difference <= 14:
+        #     self.chronic_days = max(int(days_difference), 7)
+        #     self.acute_days = min(3 + (self.chronic_days - 7), 7)
+        # elif 14 < days_difference <= 28:
+        #     self.acute_days = 7
+        #     self.chronic_days = int(days_difference)
+        #     #acute_days_adjustment = 3
+        # elif 28 < days_difference <= 35:
+        #     self.acute_days = 7
+        #     self.chronic_days = int(days_difference)
+        #     acute_days_adjustment = 35 - days_difference
+        # elif days_difference > 35:
+        #     self.acute_days = 7
+        #     self.chronic_days = 28
+        #     acute_days_adjustment = 7
+
         if days_difference == 7:
             self.acute_days = 3
             self.chronic_days = 7
         elif 7 < days_difference < 10:
             self.acute_days = 3
             self.chronic_days = int(days_difference)
-        elif 10 <= days_difference < 21:
+        elif 10 <= days_difference <= 21:
             self.acute_days = 3
             self.chronic_days = int(days_difference) - 3
             acute_days_adjustment = 3
-        elif 21 <= days_difference <= 35:
+        elif 21 < days_difference <= 35:
             self.acute_days = 7
             self.chronic_days = int(days_difference) - 7
             acute_days_adjustment = 7
@@ -280,10 +301,16 @@ class UserStatsProcessing(object):
             adjustment_factor = 0
 
         if self.acute_days is not None and self.chronic_days is not None:
-            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)
-            self.chronic_start_date_time = self.end_date_time - timedelta(
-                days=self.chronic_days + acute_days_adjustment + adjustment_factor)
+            #acute_start_date_time = (self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)).date()
+            #min_time = datetime.min.time()
+            #self.acute_start_date_time = datetime.combine(acute_start_date_time, min_time)
+            acute_start_date_time = (self.end_date_time - timedelta(days=self.acute_days + adjustment_factor))
+            self.acute_start_date_time = utc.localize(datetime(acute_start_date_time.year, acute_start_date_time.month, acute_start_date_time.day, 0,0,0))
+            chronic_start_date_time = (self.end_date_time - timedelta(
+                days=self.chronic_days + acute_days_adjustment + adjustment_factor)).date()
+            self.chronic_start_date_time = utc.localize(datetime(chronic_start_date_time.year, chronic_start_date_time.month, chronic_start_date_time.day, 0,0,0))
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
+            #chronic_delta = self.end_date_time - utc.localize(chronic_date_time)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
 
