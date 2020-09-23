@@ -328,8 +328,18 @@ class DemoOutput(object):
         training_string = ""
         exposure_count = 0
         for training_exposure in session.training_exposures:
-            training_string += training_exposure.detailed_adaptation_type.name + "; " + str(
-                training_exposure.rpe.highest_value()) + ";" + str(training_exposure.volume.highest_value()) + ";"
+            rpe = training_exposure.rpe.highest_value()
+            if rpe is not None:
+                rpe = round(rpe, 1)
+            volume = training_exposure.volume.highest_value()
+            if volume is not None:
+                volume = round(volume, 2)
+            rpe_load = training_exposure.rpe_load.highest_value()
+            if rpe_load is not None:
+                rpe_load = round(rpe_load, 2)
+            training_string += f"{training_exposure.detailed_adaptation_type.name}; {rpe};{volume};{rpe_load};"
+            # training_string += training_exposure.detailed_adaptation_type.name + "; " + str(
+            #     training_exposure.rpe.highest_value()) + ";" + str(training_exposure.volume.highest_value()) + ";"
             exposure_count += 1
             if exposure_count < len(session.training_exposures):
                 training_string += "||"
