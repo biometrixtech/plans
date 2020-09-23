@@ -145,6 +145,14 @@ class AthleteCapacityProcessor(object):
 
         athlete_readiness = AthleteReadiness()
 
+        athlete_readiness.internal_acwr = user_stats.internal_acwr.highest_value()
+        athlete_readiness.power_load_acwr = user_stats.power_load_acwr.highest_value()
+
+        athlete_readiness.internal_strain_events = user_stats.internal_strain_events
+        athlete_readiness.power_load_strain_events = user_stats.power_load_strain_events
+
+        athlete_readiness.average_weekly_internal_load = user_stats.average_weekly_internal_load
+
         highest_acwr_allowed = training_phase.acwr.highest_value()
 
         power_load_acwr_ratio = None

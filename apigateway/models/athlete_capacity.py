@@ -31,6 +31,11 @@ class AthleteReadiness(object):
         self.inflammation_level = 0.0
         self.internal_load_acwr_ratio = None
         self.power_load_acwr_ratio = None
+        self.internal_acwr = None
+        self.power_load_acwr = None
+        self.internal_strain_events = 0
+        self.power_load_strain_events = 0
+        self.average_weekly_internal_load = None
 
 
 class AthleteBaselineCapacities(Serialisable):
