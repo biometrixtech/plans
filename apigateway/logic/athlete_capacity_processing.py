@@ -259,7 +259,7 @@ class AthleteCapacityProcessor(object):
                 athlete_readiness.readiness_score += (internal_load_acwr_ratio_mod / float(25)) * 15
 
             athlete_readiness.load_score = ((athlete_readiness.readiness_score / float(105)) * 10) + 90
-            athlete_readiness.rpe_score = ((athlete_readiness.readiness_score / float(105)) * 6) + 4
+            athlete_readiness.rpe_score = ((athlete_readiness.readiness_score / float(105)) * 4) + 4
 
         # elif (non_functional_overreaching_value == 0 and functional_overreaching_value == 0 and inflammation_level == 0 and 0 < muscle_spasm_level <= 3
         #      and power_load_acwr_ratio is None and internal_load_acwr_ratio is None and 0 <= internal_strain_events <= 2 and 0 <= power_load_strain_events <= 2):
