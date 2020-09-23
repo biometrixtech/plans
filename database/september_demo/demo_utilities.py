@@ -164,13 +164,26 @@ class DemoOutput(object):
                     exercise_string = " None"
                 phase_exercise_string += exercise_string
             phase_string += phase_exercise_string
-            worked = 0
+        elif active_recovery is not None:
+            phase_string += "Active Recovery,"
+            phase_exercise_string = ""
+            for exercise_phase in active_recovery.exercise_phases:
+                if len(phase_exercise_string) > 0:
+                    phase_exercise_string += "; "
+                phase_exercise_string += str(exercise_phase.name).upper() + ":"
+                exercise_string = ""
+                if len(exercise_phase.exercises) > 0:
+                    for exercise_id, assigned_exercise in exercise_phase.exercises.items():
+                        if len(exercise_string) > 0:
+                            exercise_string += ";"
+                        exercise_string += exercise_id
+                else:
+                    exercise_string = " None"
+                phase_exercise_string += exercise_string
+            phase_string += phase_exercise_string
+        else:
+            phase_string += ","
 
-        if active_rest is None:
-            oops = 0
-
-        if active_recovery is not None:
-            here = 0
         if ice is not None:
             phase_string += "; Ice:"
             for body_part in ice.body_parts:
