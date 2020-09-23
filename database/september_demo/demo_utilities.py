@@ -22,6 +22,48 @@ class DemoOutput(object):
                                                "acute_muscle_issues, chronic_muscle_issues, excessive_strain_muscles, compensating_muscles," +
                                                "functional_overreaching_muscles, non_functional_overreaching_muscles, tendon_issues")
 
+    def get_phase_exercise_string(self, exercise_phases):
+        exercises_string = ""
+        phase_exercise_string_eff = ""
+        phase_exercise_string_complete = ""
+        phase_exercise_string_comprehensive = ""
+        for exercise_phase in exercise_phases:
+            phase_exercise_string_eff = self.get_phase_exercise_string_by_duration(exercise_phase, phase_exercise_string_eff, 'efficient')
+            phase_exercise_string_complete = self.get_phase_exercise_string_by_duration(exercise_phase, phase_exercise_string_complete, 'complete')
+            phase_exercise_string_comprehensive = self.get_phase_exercise_string_by_duration(exercise_phase, phase_exercise_string_comprehensive, 'comprehensive')
+        exercises_string += phase_exercise_string_comprehensive + ","
+        exercises_string += phase_exercise_string_complete + ","
+        exercises_string += phase_exercise_string_eff
+        return exercises_string
+
+    def get_phase_exercise_string_by_duration(self, exercise_phase, phase_exercise_string, duration='comprehensive'):
+        if len(phase_exercise_string) > 0:
+            phase_exercise_string += "; "
+        phase_exercise_string += str(exercise_phase.name).upper() + ":"
+        exercise_string = ""
+        if len(exercise_phase.exercises) > 0:
+            for exercise_id, assigned_exercise in exercise_phase.exercises.items():
+                if duration == 'efficient':
+                    if assigned_exercise.duration_efficient() > 0:
+                        if len(exercise_string) > 0:
+                            exercise_string += ";"
+                        exercise_string += exercise_id
+                elif duration == 'complete':
+                    if assigned_exercise.duration_complete() > 0:
+                        if len(exercise_string) > 0:
+                            exercise_string += ";"
+                        exercise_string += exercise_id
+                else:
+                    if len(exercise_string) > 0:
+                        exercise_string += ";"
+                    exercise_string += exercise_id
+            if exercise_string == "":
+                exercise_string = " None"
+        else:
+            exercise_string = " None"
+        phase_exercise_string += exercise_string
+        return phase_exercise_string
+
     def get_mobility_wod_string(self, event_date, symptoms, responsive_recovery):
 
         active_rest = responsive_recovery.active_rest
@@ -50,24 +92,12 @@ class DemoOutput(object):
 
         if active_rest is not None:
             phase_string += "Mobility WOD: Active Rest,"
-            phase_exercise_string = ""
-            for exercise_phase in active_rest.exercise_phases:
-                if len(phase_exercise_string) > 0:
-                    phase_exercise_string += "; "
-                phase_exercise_string += str(exercise_phase.name).upper() + ":"
-                exercise_string = ""
-                if len(exercise_phase.exercises) > 0:
-                    for exercise_id, assigned_exercise in exercise_phase.exercises.items():
-                        if len(exercise_string) > 0:
-                            exercise_string += ";"
-                        exercise_string += exercise_id
-                else:
-                    exercise_string = " None"
-                phase_exercise_string += exercise_string
-            phase_string += phase_exercise_string
+            exercises_string = self.get_phase_exercise_string(active_rest.exercise_phases)
+            phase_string += exercises_string
             worked = 0
         else:
             oops = 0
+        phase_string += ',' # blank one for ice/cwi
 
         return phase_string
 
@@ -97,24 +127,12 @@ class DemoOutput(object):
 
         if movement_prep is not None:
             phase_string += "Movement Prep,"
-            phase_exercise_string = ""
-            for exercise_phase in movement_prep.movement_integration_prep.exercise_phases:
-                if len(phase_exercise_string) > 0:
-                    phase_exercise_string += "; "
-                phase_exercise_string += str(exercise_phase.name).upper() + ":"
-                exercise_string = ""
-                if len(exercise_phase.exercises) > 0:
-                    for exercise_id, assigned_exercise in exercise_phase.exercises.items():
-                        if len(exercise_string) > 0:
-                            exercise_string += ";"
-                        exercise_string += exercise_id
-                else:
-                    exercise_string = " None"
-                phase_exercise_string += exercise_string
-            phase_string += phase_exercise_string
+            exercises_string = self.get_phase_exercise_string(movement_prep.movement_integration_prep.exercise_phases)
+            phase_string += exercises_string
             worked = 0
         else:
             oops = 0
+        phase_string += ',' # blank one for ice/cwi
 
         return phase_string
 
@@ -149,47 +167,25 @@ class DemoOutput(object):
 
         if active_rest is not None:
             phase_string += "Active Rest,"
-            phase_exercise_string = ""
-            for exercise_phase in active_rest.exercise_phases:
-                if len(phase_exercise_string) > 0:
-                    phase_exercise_string += "; "
-                phase_exercise_string += str(exercise_phase.name).upper() + ":"
-                exercise_string = ""
-                if len(exercise_phase.exercises) > 0:
-                    for exercise_id, assigned_exercise in exercise_phase.exercises.items():
-                        if len(exercise_string) > 0:
-                            exercise_string += ";"
-                        exercise_string += exercise_id
-                else:
-                    exercise_string = " None"
-                phase_exercise_string += exercise_string
-            phase_string += phase_exercise_string
+            exercises_string = self.get_phase_exercise_string(active_rest.exercise_phases)
+            phase_string += exercises_string
         elif active_recovery is not None:
             phase_string += "Active Recovery,"
-            phase_exercise_string = ""
-            for exercise_phase in active_recovery.exercise_phases:
-                if len(phase_exercise_string) > 0:
-                    phase_exercise_string += "; "
-                phase_exercise_string += str(exercise_phase.name).upper() + ":"
-                exercise_string = ""
-                if len(exercise_phase.exercises) > 0:
-                    for exercise_id, assigned_exercise in exercise_phase.exercises.items():
-                        if len(exercise_string) > 0:
-                            exercise_string += ";"
-                        exercise_string += exercise_id
-                else:
-                    exercise_string = " None"
-                phase_exercise_string += exercise_string
-            phase_string += phase_exercise_string
+            exercises_string = self.get_phase_exercise_string(active_recovery.exercise_phases)
+            phase_string += exercises_string
         else:
             phase_string += ","
 
+        ice_cwi_string = ","
         if ice is not None:
-            phase_string += "; Ice:"
+            ice_cwi_string += "Ice:"
             for body_part in ice.body_parts:
-                phase_string += body_part.body_part_location.name + "; side=" + str(body_part.side) + ";"
+                ice_cwi_string += body_part.body_part_location.name + "; side=" + str(body_part.side) + ";"
         if cwi is not None:
-            phase_string += "; **COLD WATER IMMERSION**"
+            if len(ice_cwi_string) > 1:
+                ice_cwi_string += " "
+            ice_cwi_string += "**COLD WATER IMMERSION**"
+        phase_string += ice_cwi_string
 
         return phase_string
 

@@ -122,7 +122,7 @@ def create_session_only(workout, session_RPE):
     data = {
         "event_date": workout['event_date_time'],
         "session_type": 7,
-        "duration_minutes": workout['duration_seconds'] / 60,
+        "duration": workout['duration_seconds'] / 60,
         "description": workout['program_module_id'],
         # "calories": 100,
         "distance": workout['distance'],
@@ -192,7 +192,7 @@ if __name__ == '__main__':
         scoring_output.write(scoring_output_header_line + '\n')
 
         recovery_output = open('output/recovery_plan_' + user_name + ".csv", "w")
-        recovery_header_line = ("event_date, symptoms, activity_type, exercises")
+        recovery_header_line = ("event_date, symptoms, activity_type, comprehensive_exercises, complete_exercises, efficient_exercises, Ice/CWI")
         recovery_output.write(recovery_header_line + '\n')
 
         ird_output = open('output/ird_' + user_name + ".csv", "w")

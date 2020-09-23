@@ -46,11 +46,8 @@ def get_soreness(persona):
 
 def get_dates(days):
     dates = []
-    today =  datetime.today()
-    end_date = datetime(year=today.year, month=today.month, day=today.day)
+    end_date = datetime(year=2020, month=9, day=22)
     start_date = end_date - timedelta(days=days)
-
-
     delta = end_date - start_date
 
     for i in range(delta.days + 1):
@@ -101,6 +98,8 @@ def get_user_data(persona='persona2a'):
                 'workout': [],
                 'soreness': None,
                 'session_RPE': None,
+                'distance': None,
+                'duration': None,
                 'date': None
             }
         user_history[day]['date'] = dates[i + 8]
@@ -108,6 +107,16 @@ def get_user_data(persona='persona2a'):
         user_history[day]['soreness'] = soreness_history.get(day)
         if len(workout) > 0:
             user_history[day]['session_RPE'] = float(row['sRPE'])
+            user_history[day]['duration'] = float(row['Duration (Min)'])
+            if workout[0].get('distance') is not None:
+                user_history[day]['distance'] = float(workout[0].get('distance'))
+            # get duration from table if not present in the workout
+            if workout[0]['program_id'] == 'nrc':
+                if len(workout[0]['workout_sections']) == 1:
+                    if len(workout[0]['workout_sections'][0]['exercises']) == 1:
+                        if workout[0]['workout_sections'][0]['exercises'][0]['movement_id'] in ['run', 'jog', 'cruising']:
+                            if workout[0]['workout_sections'][0]['exercises'][0]['duration'] is None:
+                                workout[0]['workout_sections'][0]['exercises'][0]['duration'] = user_history[day]['duration'] * 60
     return user_history
 
 # user_history = get_user_data()
