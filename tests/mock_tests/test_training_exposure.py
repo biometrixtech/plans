@@ -45,7 +45,7 @@ def test_get_high_intensity_anaerobic_planned_workout():
 
     exercise = PlannedExercise()
     exercise.adaptation_type = AdaptationType.strength_endurance_cardiorespiratory
-    exercise.predicted_rpe = StandardErrorRange(lower_bound=6, observed_value=7, upper_bound=8)
+    exercise.predicted_rpe = StandardErrorRange(lower_bound=7.01, observed_value=8, upper_bound=9)
     exercise.duration = 25
 
     proc = TrainingExposureProcessor()
