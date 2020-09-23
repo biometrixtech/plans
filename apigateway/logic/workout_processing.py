@@ -170,20 +170,25 @@ class WorkoutProcessor(object):
 
     def set_session_intensity_metrics(self, session, workout_exercise):
         # update high intensity metrics
-        if workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and workout_exercise.predicted_rpe is not None:
-            if workout_exercise.predicted_rpe.highest_value() is None:
-                pass
-            elif workout_exercise.predicted_rpe.highest_value() >= 7.65:
+        if workout_exercise.predicted_rpe is not None and workout_exercise.predicted_rpe.highest_value() is not None:
+            if ((workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and workout_exercise.predicted_rpe.highest_value() >= 8.00) or
+                    (workout_exercise.adaptation_type in [AdaptationType.power_explosive_action, AdaptationType.power_drill] and 5 <= workout_exercise.predicted_rpe.highest_value() <= 7.00) or
+                    (workout_exercise.adaptation_type in [AdaptationType.strength_endurance_strength, AdaptationType.maximal_strength_hypertrophic] and workout_exercise.predicted_rpe.highest_value() >= 9.00)):
                 if isinstance(workout_exercise.duration, Assignment):
-                    high_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
-                    high_intensity_minutes = high_intensity_minutes_assignment.highest_value()
-                    session.total_minutes_at_high_intensity += high_intensity_minutes
+                        high_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
+                        high_intensity_minutes = high_intensity_minutes_assignment.highest_value()
+                        session.total_minutes_at_high_intensity += high_intensity_minutes
                 else:
-                    high_intensity_minutes = workout_exercise.duration / float(60)
-                    session.total_minutes_at_high_intensity += high_intensity_minutes
+                    if workout_exercise.duration is not None:
+                        high_intensity_minutes = workout_exercise.duration / float(60)
+                        session.total_minutes_at_high_intensity += high_intensity_minutes
+                    else:
+                        high_intensity_minutes = 0
                 if high_intensity_minutes >= 5.0:
                     session.total_blocks_at_high_intensity += 1
-            elif workout_exercise.predicted_rpe.highest_value() >= 6.80:
+            elif ((workout_exercise.adaptation_type == AdaptationType.strength_endurance_cardiorespiratory and workout_exercise.predicted_rpe.highest_value() >= 6.00) or
+                    (workout_exercise.adaptation_type in [AdaptationType.power_explosive_action, AdaptationType.power_drill] and 4 <= workout_exercise.predicted_rpe.highest_value() < 5.00) or
+                    (workout_exercise.adaptation_type in [AdaptationType.strength_endurance_strength, AdaptationType.maximal_strength_hypertrophic] and 7<= workout_exercise.predicted_rpe.highest_value() < 9.00)):
                 if isinstance(workout_exercise.duration, Assignment):
                     moderate_intensity_minutes_assignment = Assignment.divide_assignment_by_scalar(workout_exercise.duration, float(60))
                     moderate_intensity_minutes = moderate_intensity_minutes_assignment.highest_value()
