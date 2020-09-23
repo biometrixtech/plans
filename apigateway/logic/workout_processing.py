@@ -210,7 +210,6 @@ class WorkoutProcessor(object):
             movement = Movement.json_deserialise(movement_json)
             exercise.initialize_from_movement(movement, self.strength_proficiency, self.power_proficiency)
 
-
             for compound_action_id in movement.compound_actions:
                 action_json = action_library.get(compound_action_id)
                 if action_json is not None:
@@ -1003,9 +1002,9 @@ class WorkoutProcessor(object):
             elif exercise.weight_measure == WeightMeasure.percent_bodyweight:
                 one_RM_BW_ratio = self.get_one_rep_max_bodyweight_ratio(exercise)
                 if isinstance(exercise.weight, Assignment):
-                    weight = exercise.weight.lowest_value()
+                    weight = exercise.weight.lowest_value() / 100
                 else:
-                    weight = exercise.weight
+                    weight = exercise.weight / 100
                 percent_rep_max = weight / one_RM_BW_ratio * 100
             elif exercise.weight_measure == WeightMeasure.percent_rep_max:
                 if isinstance(exercise.weight, Assignment):
