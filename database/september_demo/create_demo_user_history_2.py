@@ -1,4 +1,5 @@
 import database.september_demo.set_up_config
+import pickle
 import os
 import time
 import json
@@ -268,9 +269,12 @@ if __name__ == '__main__':
             check_now = 0
 
             if len(todays_files) == 0:  # no workout available for this day
-                response = submit_mobility_wod_request([], user_id, event_date, symptoms=soreness_before_session, user_age=user_age)
+                all_soreness = []
+                all_soreness.extend(soreness_before_session)
+                all_soreness.extend(soreness_after_session)
+                response = submit_mobility_wod_request([], user_id, event_date, symptoms=all_soreness, user_age=user_age)
 
-                mobility_wod_string = demo_utilities.get_mobility_wod_string(event_date, soreness_before_session, response)
+                mobility_wod_string = demo_utilities.get_mobility_wod_string(event_date, all_soreness, response)
                 recovery_output.write(mobility_wod_string + '\n')
 
                 user_stats_datastore = UserStatsDatastore()
@@ -311,6 +315,7 @@ if __name__ == '__main__':
                 user_stats_datastore = UserStatsDatastore()
                 demo_persona.user_stats = user_stats_datastore.get(athlete_id=user_id)
 
+                # soreness_after_session_copy = pickle.loads(pickle.dumps(soreness_after_session, -1))
                 response = submit_session_to_get_responsive_recovery(session_data, user_id, jwt, event_date_time, symptoms=soreness_after_session)
                 responsive_recovery_string = demo_utilities.get_responsive_recovery_string(event_date, soreness_after_session, response)
                 recovery_output.write(responsive_recovery_string + '\n')

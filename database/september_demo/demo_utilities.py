@@ -158,8 +158,8 @@ class DemoOutput(object):
                         soreness_string += key + ":"
                         if value is None:
                             soreness_string += "None"
-                    else:
-                        soreness_string += str(value)
+                        else:
+                            soreness_string += str(value)
                 all_soreness_string += soreness_string
             phase_string += all_soreness_string + ","
         else:
