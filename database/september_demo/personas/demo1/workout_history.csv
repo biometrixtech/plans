@@ -1,0 +1,107 @@
+event_date_time,description,cyle,id,distance-meters,distance-miles,duration_minutes,session_rpe,Garmin-File-Notes,NRC Workout,
+8/1,Durham Running,,92a422cd-0779-437c-8a4e-bdcfcaa0d4d5,10265.4,6.4,62.7,3.3,,One Hour Run,base_aerobic_training; 3.3;3764.0;
+8/2,Durham Running,,1c081047-1685-4268-af18-72fa17de8bac,14384.5,8.9,82,4.7,This workout is not explicitly listed as a tempo run.,Run with Joanie,anaerobic_threshold_training; 4.7;4922.0;
+8/3,London Running,,467fb32d-a8fb-4a82-be5f-75c3b41e6427,6452.1,4,38.6,3.4,,Four Mile Run,base_aerobic_training; 3.4;2314.0;
+8/4,London Running,,bff4c5c3-694c-4347-9a8a-d6f6ad9bd674,20933.1,13,135.4,3.3,,Half Marathon Run,base_aerobic_training; 3.3;8124.0;
+8/5,Ann Arbor Running,,b8436427-fea2-4c87-bbdb-72fdcb46e424,8093.3,5,49,3.4,,Five Mile Run,base_aerobic_training; 3.4;2942.0;
+8/6,Ann Arbor Running,,9a61a743-b49b-436e-b71b-532f0d0828ec,13338.6,8.3,73.3,4.9,,,anaerobic_threshold_training; 4.9;4398.0;
+8/7,Ann Arbor Running,,c8e70b91-f4be-4b5f-af7a-fb3006f26b91,9831,6.1,58.9,3.3,,One Hour Run,base_aerobic_training; 3.3;3533.0;
+8/8,Ann Arbor Running,,656a8270-b35a-4082-81d7-ee64e20326e5,8077.2,5,48.7,3.4,,Five Mile Run,base_aerobic_training; 3.4;2921.0;
+8/9,Durham Running,,34ee8893-6bb9-4ee4-85a6-8092a4e61a53,20933.1,13,134.3,4.4,,,anaerobic_threshold_training; 4.4;8058.0;
+8/10,Hillsborough Cycling,1.5,c76dd6d5-7605-4ab3-b11a-ddb94f988715,100192.4,62.3,270.3,2.6,,,base_aerobic_training; 2.6;16220.0;
+8/11,,,,,0,,,,,
+8/12,Durham Running,,086fd5af-aa71-41fe-8f6c-997b7468dcd5,5406.2,3.4,32.6,3.3,,Run with Sloane,base_aerobic_training; 3.3;1958.0;
+8/13,Durham Running,,f3ff759a-0a4d-4015-a28d-3f4690844fcd,9782.7,6.1,59.8,3.3,,One Hour Run,base_aerobic_training; 3.3;3585.0;
+8/14,Durham Running,,b9a66b74-c73b-4051-92d8-eb55037fabc6,11842.2,7.4,74.6,4.7,,,anaerobic_threshold_training; 4.7;4474.0;
+8/15,,,,,0,,,,,
+8/16,Durham Running,,19a52fee-ff86-44a9-9ce6-2c3e5490889d,9605.7,6,57.3,3.3,,One Hour Run,base_aerobic_training; 3.3;3435.0;
+8/17,,,,,0,,,,,
+8/18,Salisbury Running,,92e21673-a3af-4e1d-8b1e-cb83e54459c2,22526,14,141.1,3.3,"No match in NRC, should be adequately characterized by simple session",Half Marathon Race,base_aerobic_training; 3.3;8466.0;
+8/19,Raleigh Running,,bf4d5ab2-364b-4e00-bb72-e95783995cc9,7401.4,4.6,45.6,3.3,,Running With Shalane,base_aerobic_training; 3.3;2738.0;
+8/20,Durham Running,,adcce2bd-f745-471c-9d67-67df820afc43,14481,9,83.7,4.5,,,anaerobic_threshold_training; 4.5;5019.0;
+8/21,,,,,0,,,,,
+8/22,Blowing Rock Running,,380d2c70-668c-4eb1-a1dd-5ea2f8a6cf71,6436,4,43.1,3.4,,Four Mile Run,base_aerobic_training; 3.4;2584.0;
+8/23,Blowing Rock Running,,23446f6c-76ff-4d01-855e-3d005a5e9a25,12888.1,8,70.2,4.1,,,anaerobic_threshold_training; 4.1;4214.0;
+8/24,Blowing Rock Running,,ff29b92d-ec15-4c1b-b728-d442d5a0b940,28978.1,18,198.4,5.5,No match in NRC for time or milage. This 13.1 mile workout is closes in distance,Half Marathon Race,anaerobic_threshold_training; 5.5;11901.0;
+8/25,,,,,0,,,,,
+8/26,,,,,0,,,,,
+8/27,Durham Running,,c152e031-7b01-4327-9af8-5a4ae6f4bbd0,10313.7,6.4,69,3.2,No match in NRC for time or milage. This 65min workout is closes in time.,Run With Joanie,base_aerobic_training; 3.2;4141.0;
+8/28,Durham Running,,2bc6b050-ef0e-4b52-baa6-7ad3dd014fbf,17184.1,10.7,97.8,4.5,No match in NRC for time or milage. This 10mile workout is closes in distance,Ten Mile Run,anaerobic_threshold_training; 4.5;5868.0;
+8/29,Durham Running,,e60cd69b-47c4-4032-9cad-28d7b24e9d2a,8447.3,5.3,50.7,3.3,,Five Mile Run,base_aerobic_training; 3.3;3040.0;
+8/30,Durham Running,,02f65fcd-b326-4d14-89df-814472499471,8061.1,5,49.5,3.2,,Five Mile Run,base_aerobic_training; 3.2;2970.0;
+8/31,Buncombe County Running,,29187aa6-4037-4698-a81c-a382d674b787,16814.1,10.5,123,3.3,,Two Hour Run,base_aerobic_training; 3.3;7377.0;
+9/1,,,,,0,,,,,
+9/2,,,,,0,,,,,
+9/3,Durham Running,,3eab4ab1-0723-4c84-9066-df6711508f81,6436,4,38.6,3.3,,Four Mile Run,base_aerobic_training; 3.3;2318.0;
+9/4,Durham Running,,b0440a8a-f2e9-4946-ad2f-d3be4c7bfb9b,16910.6,10.5,99.7,4.9,,Ten Mile Run,anaerobic_threshold_training; 4.9;5984.0;
+9/5,Durham Running,,ccfed1eb-e7fe-49f5-b774-91cd4ada9da3,8061.1,5,50.7,3.2,,Five Mile Run,base_aerobic_training; 3.2;3043.0;
+9/6,Durham Running,,5c16bc17-bd7c-46ce-b06b-397ac621e68a,6452.1,4,38.5,3.3,,Four Mile Run,base_aerobic_training; 3.3;2312.0;
+9/7,Durham Running,,925a9d82-465d-4d8d-af26-f8d37d0b90cc,12888.1,8,71.1,4.1,,Eight Mile Run,anaerobic_threshold_training; 4.1;4266.0;
+9/8,Durham Running,,2ae5ff57-b145-48f8-89e2-b711c77e42af,28962,18,169.9,4.7,NRC is short,Half Marathon Race,anaerobic_threshold_training; 4.7;10191.0;
+9/10,Durham Running,,ea09a952-7dfb-40b8-a951-ab85ac853acd,10571.1,6.6,71.6,3.2,No match in NRC for time or milage. This 65min workout is closes in time.,Run With Joanie,base_aerobic_training; 3.2;4298.0;
+9/11,Durham Running,,dd9aecfc-324f-44df-a1c9-2590ce86b37a,13676.5,8.5,78.2,4.7,,Run Long With Joanie,anaerobic_threshold_training; 4.7;4689.0;
+9/12,Durham Running,,9dbb21a5-14d8-47ed-8a20-c3ad6911146d,9975.8,6.2,60.1,3.4,,One Hour Run,base_aerobic_training; 3.4;3608.0;
+9/13,Durham Running,,97d1139f-7ac1-4f8c-b146-6d7828d5e497,9766.6,6.1,59.7,3.3,,One Hour Run,base_aerobic_training; 3.3;3583.0;
+9/14,Raleigh Running,,5c0691ff-26e4-4d37-9fe7-55ea1db317d0,19308,12,155.5,3.4,No match in NRC for time or milage. This 13.1mile workout is closes in distance.,Half Marathon Run,base_aerobic_training; 3.4;9330.0;
+9/15,Durham Running,,d62853f8-8b6b-4255-9098-b2c4929bcd3f,9654,6,62.7,3.2,,One Hour Run,base_aerobic_training; 3.2;3759.0;
+9/16,Hillsborough Running,,dd5e2462-5649-4630-9a5a-7239ad0c2543,10812.5,6.7,68.9,4.6,No match in NRC for time or milage. This 65min workout is closes in time.,Run with Joanie,anaerobic_threshold_training; 4.6;4133.0;
+9/16,Hillsborough Running,,dd5e2462-5649-4630-9a5a-7239ad0c2543,10812.5,6.7,68.9,4.6,No match in NRC for time or milage. This 65min workout is closes in time.,Run with Joanie,anaerobic_threshold_training; 4.6;4133.0;
+9/16,Hillsborough Running,,fd625e2d-8ff7-4dda-b22d-abe06302ff32,1110.2,0.7,7.8,3.2,No match in NRC for time or milage. This 7min workout is closes in time.,Seven Minute Run,base_aerobic_training; 3.2;465.7;
+9/17,Durham Running,,a77d6529-9eb0-42ac-ba26-acde2d741385,7514,4.7,45.2,3.3,,Running With Shalane,base_aerobic_training; 3.3;2711.0;
+9/18,Durham Running,,5a786a1f-0f53-4034-bb95-eea1def1a299,18342.6,11.4,101.5,4.6,NRC is short,90 Minute Run,anaerobic_threshold_training; 4.6;6089.0;
+9/19,Durham Cycling,1,7e3a0de5-7026-4c02-b0de-2a0da331eb87,11182.6,7,28.9,3.2,,Seven Mile Run,base_aerobic_training; 3.2;1735.0;
+9/19,Durham Cycling,1,7e3a0de5-7026-4c02-b0de-2a0da331eb87,11182.6,7,28.9,3.2,,Seven Mile Run,base_aerobic_training; 3.2;1735.0;
+9/19,Durham Cycling,1,c22f018f-493a-4deb-8f51-5b3c1b066fd6,10925.1,6.8,35.1,1.6,,A Hot Run,
+9/20,,,,,0,,,,,
+9/21,Durham Running,,d0af6c74-2ac2-465e-a8fa-d7ae0b6003ab,13628.2,8.5,76.7,4.5,"10min warmup, 50min tempo, 15min cooldown",8K Tempo Run,anaerobic_threshold_training; 4.5;4599.0;
+9/22,Durham County Running,,d43f19e1-8a1f-48a3-b193-aa94fa5d109d,28978.1,18,173.3,4.7,NRC is short,Half Marathon Race,anaerobic_threshold_training; 4.7;10397.0;
+9/23,Durham Running,,288de3dc-a591-4ba0-9b55-dd220c513a75,9782.7,6.1,64.2,2.6,,Run with Joanie,base_aerobic_training; 2.6;3849.0;
+9/24,Durham Running,,9a9776bf-ddf7-4e62-88ff-1d83c889cd85,7385.3,4.6,44.3,3.3,,Running with Shalane,base_aerobic_training; 3.3;2655.0;
+9/25,Durham Running,,11a568c4-ff7d-41d5-9166-b2f4faf2ec8e,10892.9,6.8,72,3.2,,Seven Mile Run,base_aerobic_training; 3.2;4318.0;
+9/26,Durham County Running,,5ae15904-cd1d-4498-8a84-77d54f01e8c5,23411,14.6,134.3,4.5,,Half Marathon Race,anaerobic_threshold_training; 4.5;8056.0;
+9/27,,,,,0,,,,,
+9/28,Raleigh Running,,c8274477-8b42-4162-95f1-f1020026cf5c,13000.7,8.1,109.4,2.6,,Eight Mile Run,base_aerobic_training; 2.6;6565.0;
+9/29,Durham Running,,94d942c9-4d7a-423c-a353-a03fcd1a3575,19324.1,12,128.2,3.2,,Two Hour Run,base_aerobic_training; 3.2;7693.0;
+9/30,,,,,0,,,,,
+10/1,Durham Running,,aaeacb37-c2f3-4b25-ac6e-524b0c6897b2,11922.7,7.4,78.1,3.3,,Run Long With Joanie,base_aerobic_training; 3.3;4684.0;
+10/2,Durham Running,,ea94426c-e1dc-4832-ad74-882e5bfb6627,10201.1,6.3,58,3.6,,One Hour Run,base_aerobic_training; 3.6;3481.0;
+10/3,Durham Running,,44f3837d-eb29-44d0-be8f-514494f32d94,16106.1,10,85.6,5,,Half Marathon Race,anaerobic_threshold_training; 5.0;5137.0;
+,,,,,0,,,,,
+10/5,Durham County Running,,5c0cc45d-a050-49db-86cd-4623db214666,8350.7,5.2,46.5,4.4,,Out Strong. Back Fast.,anaerobic_threshold_training; 4.4;2787.0;
+10/6,Durham County Running,,9023b5b3-02a0-42c8-912d-7b6c30a1daba,32180,20,188.4,4.6,"No match in NRC, should be adequately characterized by simple session",Half Marathon Race,anaerobic_threshold_training; 4.6;11304.0;
+,,,,,0,,,,,
+10/8,Durham Running,,f0ad01d2-fe19-4848-aeca-d967fa8e4188,10265.4,6.4,65.8,3.2,,Run with Joanie,base_aerobic_training; 3.2;3946.0;
+10/9,Durham Running,,ebb1a1a9-39f3-47d0-af94-081b38465f20,9814.9,6.1,63.3,2.6,,Run with Joanie,base_aerobic_training; 2.6;3799.0;
+10/10,Durham Running,,85ec5bad-2504-48a4-9226-e9b693d4ee8c,16991,10.6,100.3,3.4,,Ten Mile Run,base_aerobic_training; 3.4;6018.0;
+10/11,Durham Running,,0f1abb87-43b6-4eb3-a943-171126c84ecb,9300,5.8,58.7,3.3,,One Hour Run,base_aerobic_training; 3.3;3521.0;
+10/12,Durham Running,,8e5be402-34d4-4ac0-80c7-2c6699720d10,22526,14,134.9,3.4,,Two Hour Run,base_aerobic_training; 3.4;8095.0;
+10/13,,,,,0,,,,,
+10/14,,,,,0,,,,,
+10/15,,,,,0,,,,,
+10/16,,,,,0,,,,,
+10/17,,,,,0,,,,,
+10/18,,,,,0,,,,,
+10/19,Durham Running,,130cfe44-adb8-4274-94b5-b356f063803f,5213.2,3.2,31,4.5,,,anaerobic_threshold_training; 4.5;1861.0;
+10/20,Durham Running,,a76920fe-10d1-4f90-b504-5b36332dcabe,21110.1,13.1,104.9,4.5,,,anaerobic_threshold_training; 4.5;6295.0;
+10/21,,,,,0,,,,,
+10/22,Durham Running,,c9f72709-d87c-4fb9-8fce-c39498f45c37,8045,5,54.7,3.2,,,base_aerobic_training; 3.2;3281.0;
+10/23,Durham Running,,f2b7fe35-f736-442e-af4b-11f29e99ff73,8045,5,50.3,3.3,,,base_aerobic_training; 3.3;3015.0;
+10/24,Durham Running,,71abeaea-bb8d-44a4-9f1e-46088b466eec,8109.4,5,49,5.5,,,anaerobic_threshold_training; 5.5;2941.0;
+10/25,Durham Running,,66df2b85-dbc7-4112-82aa-d8b8541b28c4,8061.1,5,51.6,3.3,,,base_aerobic_training; 3.3;3094.0;
+10/26,Durham County Running,,050e0d49-cdff-428e-b6e3-2be78734e7f2,19308,12,112.8,5.2,,,anaerobic_threshold_training; 5.2;6769.0;
+10/27,Durham Running,,c97b0ffe-632a-427a-bb93-ad262e6a4dc8,6532.5,4.1,40.8,3.4,,,base_aerobic_training; 3.4;2448.0;
+10/28,Durham Running,,70ae82fe-11c6-4529-91ce-272a8a8c8197,16106.1,10,93.1,4.7,,,anaerobic_threshold_training; 4.7;5587.0;
+10/29,,,,,0,,,,,
+10/31,Durham Running,,2b0617f4-6cff-4b72-94c9-ed5e11d0f7dd,6532.5,4.1,41.2,3.3,,,base_aerobic_training; 3.3;2472.0;
+11/1,Durham County Running,,d54ed781-cbc8-4ee0-adbf-abbfae7af37f,16347.4,10.2,92.3,4.2,,,anaerobic_threshold_training; 4.2;5536.0;
+11/2,Durham Running,,93443c0f-65a6-4ef9-887f-153ec154425b,6452.1,4,39.1,4.6,,,anaerobic_threshold_training; 4.6;2346.0;
+11/3,Unnamed run,,10608172-08bb-4631-8466-36cfd289f6e0,16361.2,10.2,115.1,3.3,,,base_aerobic_training; 3.3;6903;
+11/4,Unnamed run,,f7661bd7-f087-4e48-b0fd-60dbb4d49e95,6460.4,4,38.6,4.5,,,anaerobic_threshold_training; 4.5;2313;
+11/5,Unnamed run,,a062004c-e7d3-4b82-9544-650846ff581d,9946.8,6.2,65.1,4.1,,,anaerobic_threshold_training; 4.1;3906;
+11/6,Unnamed run,,64359681-91f9-457e-ac5d-3277e57947cc,10699.7,6.6,68.8,5.5,,,anaerobic_threshold_training; 5.5;4127;
+11/7,Unnamed run,,c46fbe75-1032-48eb-b860-0ea6d603339b,6805,4.2,40.1,3.4,,,base_aerobic_training; 3.4;2406;
+11/8,,,,,0,,,,,
+11/9,Unnamed run,,ceab1418-e687-46f7-9a1d-c2f0488c2b7a,2885.2,1.8,17.7,2.6,,,base_aerobic_training; 2.6;1062;
+11/10,Unnamed run,,de5ad120-c6d3-4cc7-bee0-a57756a3af65,1417.3,0.9,10.3,4.5,,,anaerobic_threshold_training; 4.5;616;
+11/10,Unnamed run,,de5ad120-c6d3-4cc7-bee0-a57756a3af65,1417.3,0.9,10.3,4.5,,,anaerobic_threshold_training; 4.5;616;
+11/10,Unnamed run,,d42ebe01-6dfc-466d-8cd2-9fa57c70f20e,42417.9,26.4,223.1,4.2,,,anaerobic_threshold_training; 4.2;13383;

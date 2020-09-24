@@ -44,4 +44,47 @@ def get_completed_workout(workout, lib):
             return [daily_workout]
         return []
 
+
+def get_planned_workouts(lib):
+    all_workouts = {}
+    if lib == 'NTC':
+        base_path = f'../../database/ntc/libraries/workouts/'
+    elif lib == 'NRC':
+        base_path = f'../../database/ntc/libraries/{lib}_workouts/'
+    else:
+        raise ValueError("No library found")
+    dirs = os.listdir(base_path)
+    for dir in dirs:
+        if '.DS_' in dir:
+            continue
+        files = os.listdir(f"{base_path}/{dir}")
+        for file in files:
+            if '.json' in file:
+                with open(f'{base_path}/{dir}/{file}', 'r') as f:
+                    workout = json.load(f)
+                    all_workouts[workout['program_module_id']] = workout
+    return all_workouts
+
+planned_nrc_workouts = get_completed_workouts('NRC')
+planned_ntc_workouts = get_completed_workouts('NTC')
+
+
+def get_planned_workout(workout, lib):
+        if workout != 'Off':
+            program_module_id = convert_workout_text_to_id(workout)
+            if lib == 'NTC':
+                if program_module_id in planned_ntc_workouts:
+                    daily_workout = planned_ntc_workouts[program_module_id]
+                else:
+                    raise ValueError(f"Workout not found in library. Possible typo: {workout}")
+            elif lib == 'NRC':
+                if program_module_id in planned_nrc_workouts:
+                    daily_workout = planned_nrc_workouts[program_module_id]
+                else:
+                    raise ValueError(f"Workout not found in library. Possible typo: {workout}")
+            else:
+                raise ValueError('invalid library name')
+            return [daily_workout]
+        return []
+
 # get_all_workouts()
