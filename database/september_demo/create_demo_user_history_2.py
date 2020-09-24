@@ -321,6 +321,14 @@ if __name__ == '__main__':
                 training_session_datastore = TrainingSessionDatastore()
                 training_sessions = training_session_datastore.get(user_id=user_id, event_date_time=event_date_time, read_session_load_dict=False)
 
+                ird_datastore = InjuryRiskDatastore()
+                injury_risk_dict = ird_datastore.get(user_id)
+
+                ird_processor_2 = InjuryRiskDictOutputProcessor('output/irds/', user_id, user_name+"_2")
+                ird_processor_2.write_headers(date.strftime("%Y-%m-%d"))
+                ird_processor_2.write_day(event_date.date())
+                ird_processor_2.close()
+
                 for training_session in training_sessions:
                     session_string = demo_utilities.get_session_string(training_session)
                     workout_output.write(session_string + '\n')
