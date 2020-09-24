@@ -139,6 +139,23 @@ def create_session(file_name, user_id, jwt, workout):
     }
     return data
 
+def create_planned_session_only(file_name, user_id, jwt, workout):
+
+    #workout = read_json(file_name, user_name)
+    data = {
+            "event_date": workout['event_date_time'],
+            "session_type": 8,
+            "duration": workout['duration_seconds']  / 60,
+            "description": workout['name'],
+            # "calories": 100,
+            "distance": workout['distance'],
+            # "session_RPE": 7.3,
+            "end_date": workout['workout_sections'][0]['end_date_time'],
+            # "hr_data": {{hr_data}},
+            "workout": workout
+    }
+    return data
+
 def create_session_only(file_name, user_id, jwt, workout):
 
     #workout = read_json(file_name, user_name)
@@ -359,9 +376,9 @@ if __name__ == '__main__':
                 days = (event_date - start_date).days
                 session_data = create_session_only(file_name, user_id, jwt, workout)
 
-                movement_prep = submit_movement_prep_request(session_data, user_id, event_date_time, program_module_id=None, symptoms=serialised_soreness)
-                movement_prep_string = demo_utilities.get_movement_prep_string(event_date, serialised_soreness, movement_prep)
-                recovery_output.write(movement_prep_string + '\n')
+                # movement_prep = submit_movement_prep_request(session_data, user_id, event_date_time, program_module_id=None, symptoms=serialised_soreness)
+                # movement_prep_string = demo_utilities.get_movement_prep_string(event_date, serialised_soreness, movement_prep)
+                # recovery_output.write(movement_prep_string + '\n')
 
                 user_stats_datastore = UserStatsDatastore()
                 demo_persona.user_stats = user_stats_datastore.get(athlete_id=user_id)
@@ -380,6 +397,11 @@ if __name__ == '__main__':
 
                 ird_datastore = InjuryRiskDatastore()
                 injury_risk_dict = ird_datastore.get(user_id)
+
+                ird_processor_2 = InjuryRiskDictOutputProcessor('output/irds/', user_id, user_name+"_2")
+                ird_processor_2.write_headers(date.strftime("%Y-%m-%d"))
+                ird_processor_2.write_day(event_date.date())
+                ird_processor_2.close()
 
                 for training_session in training_sessions:
                     session_string = demo_utilities.get_session_string(training_session)
