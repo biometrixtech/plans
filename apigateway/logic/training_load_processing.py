@@ -73,6 +73,7 @@ class TrainingLoadProcessing(object):
 
         self.athlete_capacities = AthleteBaselineCapacities
         self.total_historical_sessions = 0
+        self.all_training_sessions = []
         # self.acute_days = acute_days
         # self.chronic_days = chronic_days
         # self.acute_start_date_time = acute_start_date_time
@@ -271,7 +272,7 @@ class TrainingLoadProcessing(object):
 
         self.athlete_capacities = proc.get_capacity_from_workout_history(all_training_sessions)
         self.total_historical_sessions = len(all_training_sessions)
-
+        self.all_training_sessions = all_training_sessions
         # if len(self.internal_load_tuples) > 0:
         #     internal_load_values = list(x[1] for x in self.internal_load_tuples if x[1] is not None)
         #     high_internal = max(internal_load_values)
@@ -389,7 +390,8 @@ class TrainingLoadProcessing(object):
 
 
         if user_stats.eligible_for_high_load_trigger:
-            self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
+            #self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
+            self.set_high_relative_load_sessions(user_stats, self.all_training_sessions)
         else:
             if self.training_sessions_exist_days_8_35:
                 eligible_for_high_load_trigger = False
@@ -406,7 +408,8 @@ class TrainingLoadProcessing(object):
 
                 if eligible_for_high_load_trigger:
                     user_stats.eligible_for_high_load_trigger = True
-                    self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
+                    #self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
+                    self.set_high_relative_load_sessions(user_stats, self.all_training_sessions)
                 else:
                     user_stats.eligible_for_high_load_trigger = False
 
@@ -553,31 +556,32 @@ class TrainingLoadProcessing(object):
                         self.high_relative_load_sessions.append(high_load_session)
             elif t.session_type() == SessionType.mixed_activity:
 
+                #if t.event_date.date() == parse_date(self.end_date).date() or (t.end_date is not None and t.end_date.date()==parse_date(self.end_date).date()):
+
+                score = 50
+
+                if mod_rpe_load_threshold.highest_value() is not None and high_rpe_load_threshold.highest_value() is not None:
+
+                    if t.rpe_load is not None and mod_rpe_load_threshold.highest_value() < t.rpe_load.highest_value() < high_rpe_load_threshold.highest_value():
+                       score += 15
+
+                    if t.rpe_load is not None and t.rpe_load.highest_value() >= high_rpe_load_threshold.highest_value():
+                       score += 25
+
+                if mod_power_load_threshold.highest_value() is not None and high_power_load_threshold.highest_value() is not None:
+
+                    if t.power_load is not None and mod_power_load_threshold.highest_value() < t.power_load.highest_value() < high_power_load_threshold.highest_value():
+                        score += 15
+
+                    if t.power_load is not None and t.power_load.highest_value() >= high_power_load_threshold.highest_value():
+                        score += 25
+
+                if score > 50:
+                    high_load_session = HighDetailedLoadSession(t.event_date)
+                    high_load_session.percent_of_max = score
+                    self.high_relative_load_sessions.append(high_load_session)
+
                 if t.event_date.date() == parse_date(self.end_date).date():
-
-                    score = 50
-
-                    if mod_rpe_load_threshold.highest_value() is not None and high_rpe_load_threshold.highest_value() is not None:
-
-                        if t.rpe_load is not None and mod_rpe_load_threshold.highest_value() < t.rpe_load.highest_value() < high_rpe_load_threshold.highest_value():
-                           score += 15
-
-                        if t.rpe_load is not None and t.rpe_load.highest_value() >= high_rpe_load_threshold.highest_value():
-                           score += 25
-
-                    if mod_power_load_threshold.highest_value() is not None and high_power_load_threshold.highest_value() is not None:
-
-                        if t.power_load is not None and mod_power_load_threshold.highest_value() < t.power_load.highest_value() < high_power_load_threshold.highest_value():
-                            score += 15
-
-                        if t.power_load is not None and t.power_load.highest_value() >= high_power_load_threshold.highest_value():
-                            score += 25
-
-                    if score > 50:
-                        high_load_session = HighDetailedLoadSession(t.event_date)
-                        high_load_session.percent_of_max = score
-                        self.high_relative_load_sessions.append(high_load_session)
-
                     self.high_relative_load_score = max(score, self.high_relative_load_score)
 
                 # max_percent = 0
