@@ -207,7 +207,7 @@ if __name__ == '__main__':
         demo_persona = DemoPersona(user_id)
 
         demo_persona.clear_user()
-        beginning_event_date_time = date_0 + timedelta(hours=1, minutes=2, seconds=3)
+        beginning_event_date_time = date_0 + timedelta(hours=3, minutes=2, seconds=3)
         beginning_event_date_time = utc.localize(beginning_event_date_time)
         demo_persona.create_stats(user_profile, beginning_event_date_time)
 
@@ -216,7 +216,7 @@ if __name__ == '__main__':
         # for i, daily_info in user_history.iterrows():
         for daily_info in user_history.values():
             date = daily_info['date']
-            event_date = date + timedelta(hours=1, minutes=2, seconds=3)
+            event_date = date + timedelta(hours=3, minutes=2, seconds=3)
             event_date = utc.localize(event_date)
             event_date_string = format_datetime(event_date)
             print(event_date_string)
