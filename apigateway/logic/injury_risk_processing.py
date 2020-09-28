@@ -470,9 +470,9 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.last_functional_overreaching_date)
             if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
                 if body_part_injury_risk.total_volume_percent_tier == 0:
-                    body_part_injury_risk.total_volume_percent_tier = 3
+                    body_part_injury_risk.total_volume_percent_tier = 2
                 else:
-                    body_part_injury_risk.total_volume_percent_tier = min(body_part_injury_risk.total_volume_percent_tier, 3)
+                    body_part_injury_risk.total_volume_percent_tier = min(body_part_injury_risk.total_volume_percent_tier, 2)
             if (body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
                     body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
                     body_part_injury_risk.underactive_short_count_last_0_20_days >= 3):
