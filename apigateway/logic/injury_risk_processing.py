@@ -462,12 +462,12 @@ class InjuryRiskProcessor(object):
 
         # add prevention and delayed excessive strain ranking
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
-            if body_part_side in self.injury_risk_dict:
-                body_part_injury_risk.last_non_functional_overreaching_date = self.get_max_date(self.injury_risk_dict[body_part_side].last_non_functional_overreaching_date,
-                                                                                                body_part_injury_risk.last_non_functional_overreaching_date)
-                body_part_injury_risk.last_functional_overreaching_date = self.get_max_date(
-                    self.injury_risk_dict[body_part_side].last_functional_overreaching_date,
-                    body_part_injury_risk.last_functional_overreaching_date)
+            # if body_part_side in self.injury_risk_dict:
+            #     body_part_injury_risk.last_non_functional_overreaching_date = self.get_max_date(self.injury_risk_dict[body_part_side].last_non_functional_overreaching_date,
+            #                                                                                     body_part_injury_risk.last_non_functional_overreaching_date)
+            #     body_part_injury_risk.last_functional_overreaching_date = self.get_max_date(
+            #         self.injury_risk_dict[body_part_side].last_functional_overreaching_date,
+            #         body_part_injury_risk.last_functional_overreaching_date)
             if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
                 if body_part_injury_risk.total_volume_percent_tier == 0:
                     body_part_injury_risk.total_volume_percent_tier = 2

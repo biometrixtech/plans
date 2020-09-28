@@ -81,6 +81,12 @@ class TrainingLoadProcessing(object):
         # self.acute_training_sessions = []
         # self.chronic_training_sessions = []
 
+        self.functional_overreaching_workout_today = False
+        self.functional_overreaching_workout_1_day = False
+        self.non_functional_overreaching_workout_today = False
+        self.non_functional_overreaching_workout_1_day = False
+        self.non_functional_overreaching_workout_2_day = False
+
     def get_load_5_20(self, attribute_5_day_name, attribute_20_day_name):
 
         attribute_5_day = getattr(self, attribute_5_day_name)
@@ -415,6 +421,38 @@ class TrainingLoadProcessing(object):
 
         return user_stats
 
+    def is_functional_overreaching(self, load_score, training_session):
+
+        if 50.0 < load_score < 75.0:
+            return True
+
+        high_intensity_session = training_session.ultra_high_intensity_session()
+        if training_session.session_RPE is not None:
+            if (3 <= training_session.session_RPE < 5 and high_intensity_session) or (5 <= training_session.session_RPE < 7 and not high_intensity_session):
+                return True
+
+        if training_session.session_type() == SessionType.mixed_activity or training_session.session_type() == SessionType.planned:
+            if training_session.contains_moderate_intensity_blocks() and not training_session.contains_high_intensity_blocks():
+                return True
+
+        return False
+
+    def is_non_functional_overreaching(self, load_score, training_session):
+
+        if load_score >= 75.0:
+            return True
+
+        high_intensity_session = training_session.ultra_high_intensity_session()
+        if training_session.session_RPE is not None:
+            if (training_session.session_RPE >= 5 and high_intensity_session) or (training_session.session_RPE >= 7 and not high_intensity_session):
+                return True
+
+        if training_session.session_type() == SessionType.mixed_activity or training_session.session_type() == SessionType.planned:
+            if training_session.contains_high_intensity_blocks():
+                return True
+
+        return False
+
     def get_average_weekly_internal_load(self):
 
         internal_load_values = []
@@ -583,6 +621,31 @@ class TrainingLoadProcessing(object):
 
                 if t.event_date.date() == parse_date(self.end_date).date():
                     self.high_relative_load_score = max(score, self.high_relative_load_score)
+                    if not self.non_functional_overreaching_workout_today:
+                        is_nfo = self.is_non_functional_overreaching(score, t)
+                        self.non_functional_overreaching_workout_today = is_nfo
+                        if not is_nfo:
+                            if not self.functional_overreaching_workout_today:
+                                is_fo = self.is_functional_overreaching(score, t)
+                                self.functional_overreaching_workout_today = is_fo
+                        else:
+                            self.functional_overreaching_workout_today = False
+
+                if (parse_date(self.end_date).date() - t.event_date.date()).days == 1:
+                    if not self.non_functional_overreaching_workout_1_day:
+                        is_nfo = self.is_non_functional_overreaching(score, t)
+                        self.non_functional_overreaching_workout_1_day = is_nfo
+                        if not is_nfo:
+                            if not self.functional_overreaching_workout_1_day:
+                                is_fo = self.is_functional_overreaching(score, t)
+                                self.functional_overreaching_workout_1_day = is_fo
+                        else:
+                            self.functional_overreaching_workout_1_day = False
+
+                if (parse_date(self.end_date).date() - t.event_date.date()).days == 2:
+                    if not self.non_functional_overreaching_workout_2_day:
+                        is_nfo = self.is_non_functional_overreaching(score, t)
+                        self.non_functional_overreaching_workout_2_day = is_nfo
 
                 # max_percent = 0
                 # greater_than_50 = []
