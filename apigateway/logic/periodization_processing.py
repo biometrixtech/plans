@@ -85,6 +85,8 @@ class PeriodizationPlanProcessor(object):
         plan.non_functional_overreaching_muscles = []
         plan.tendon_issues = []
 
+        two_days_ago = current_date.date() - datetime.timedelta(days=1)
+
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
 
             if body_part_injury_risk.last_ache_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_ache_date)):
@@ -109,6 +111,13 @@ class PeriodizationPlanProcessor(object):
 
             if body_part_injury_risk.last_functional_overreaching_date is not None and (current_date.date() == self.get_clean_date(body_part_injury_risk.last_functional_overreaching_date)):
                 plan.functional_overreaching_muscles.append(body_part_side)
+
+            # ADDED Code 2020-09-24
+            if body_part_injury_risk.last_non_functional_overreaching_date is not None and (two_days_ago == self.get_clean_date(body_part_injury_risk.last_non_functional_overreaching_date)):
+                plan.functional_overreaching_muscles.append(body_part_side)
+
+            plan.functional_overreaching_muscles = list(set(plan.functional_overreaching_muscles))
+            # END ADDED
 
             if (body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
                     body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or

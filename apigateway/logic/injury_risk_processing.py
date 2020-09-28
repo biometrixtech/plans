@@ -68,7 +68,8 @@ class InjuryRiskProcessor(object):
         # check workload for relative load level
         if len(self.high_relative_load_sessions) > 0:
 
-            max_percent = max(50, self.high_relative_load_score)
+            #max_percent = max(50, self.high_relative_load_score)
+            max_percent = 50
 
             relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date() == base_date]
 
@@ -461,6 +462,12 @@ class InjuryRiskProcessor(object):
 
         # add prevention and delayed excessive strain ranking
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            if body_part_side in self.injury_risk_dict:
+                body_part_injury_risk.last_non_functional_overreaching_date = self.get_max_date(self.injury_risk_dict[body_part_side].last_non_functional_overreaching_date,
+                                                                                                body_part_injury_risk.last_non_functional_overreaching_date)
+                body_part_injury_risk.last_functional_overreaching_date = self.get_max_date(
+                    self.injury_risk_dict[body_part_side].last_functional_overreaching_date,
+                    body_part_injury_risk.last_functional_overreaching_date)
             if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
                 if body_part_injury_risk.total_volume_percent_tier == 0:
                     body_part_injury_risk.total_volume_percent_tier = 3
@@ -514,6 +521,17 @@ class InjuryRiskProcessor(object):
 
         return injury_risk_dict
     
+    def get_max_date(self, date_1, date_2):
+
+        if date_1 is None and date_2 is None:
+            return
+        elif date_1 is None:
+            return date_2
+        elif date_2 is None:
+            return date_1
+        else:
+            return max(date_1, date_2)
+
     def update_historic_session_stats(self, base_date, injury_risk_dict):
 
         twenty_days_ago = base_date - timedelta(days=19)

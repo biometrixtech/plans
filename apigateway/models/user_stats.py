@@ -94,6 +94,9 @@ class UserStats(Serialisable):
         self.chronic_days = 0
         self.total_historical_sessions = 0
         self.average_weekly_internal_load = None
+        self.average_weekly_power_load = None
+        self.average_session_internal_load = None
+        self.average_session_power_load = None
 
         # periodization
         self.periodization_goals = []
@@ -181,7 +184,11 @@ class UserStats(Serialisable):
             'acute_days': self.acute_days,
             'chronic_days': self.chronic_days,
             'total_historical_sessions': self.total_historical_sessions,
+
             'average_weekly_internal_load': self.average_weekly_internal_load.json_serialise() if self.average_weekly_internal_load is not None else None,
+            'average_weekly_power_load': self.average_weekly_power_load.json_serialise() if self.average_weekly_power_load is not None else None,
+            'average_session_internal_load': self.average_session_internal_load.json_serialise() if self.average_session_internal_load is not None else None,
+            'average_session_power_load': self.average_session_power_load.json_serialise() if self.average_session_power_load is not None else None,
 
             'periodization_goals': [p.value for p in self.periodization_goals],
             'demo_persona': self.persona.value if self.persona is not None else None,
@@ -269,6 +276,15 @@ class UserStats(Serialisable):
         user_stats.chronic_days = input_dict.get('chronic_days', 0)
         user_stats.total_historical_sessions = input_dict.get('total_historical_sessions', 0)
         user_stats.average_weekly_internal_load = StandardErrorRange.json_deserialise(input_dict['average_weekly_internal_load']) if input_dict.get('average_weekly_internal_load') is not None else None
+        user_stats.average_weekly_power_load = StandardErrorRange.json_deserialise(
+            input_dict['average_weekly_power_load']) if input_dict.get(
+            'average_weekly_power_load') is not None else None
+        user_stats.average_session_power_load = StandardErrorRange.json_deserialise(
+            input_dict['average_session_power_load']) if input_dict.get(
+            'average_session_power_load') is not None else None
+        user_stats.average_session_internal_load = StandardErrorRange.json_deserialise(
+            input_dict['average_session_internal_load']) if input_dict.get(
+            'average_session_internal_load') is not None else None
 
         user_stats.periodization_goals = [PeriodizationGoalType(p) for p in input_dict.get('periodization_goals', [])]
         user_stats.persona = PeriodizationPersona(input_dict['demo_persona']) if input_dict.get('demo_persona') is not None else None

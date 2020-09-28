@@ -32,10 +32,10 @@ class DemoPersona(object):
         self.user_id = user_id
         self.user_stats = None
 
-    def update_stats(self, event_date):
+    def update_stats(self, event_date, force_historical=False):
         self.user_stats = UserStatsProcessing(self.user_id,
                                               event_date=event_date,
-                                              datastore_collection=DatastoreCollection()).process_user_stats()
+                                              datastore_collection=DatastoreCollection()).process_user_stats(force_historical_process=force_historical)
         DatastoreCollection().user_stats_datastore.put(self.user_stats)
 
     def create_history(self, days, suffix='', clear_history=True, start_date_time=datetime.datetime.now()):

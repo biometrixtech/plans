@@ -7,6 +7,7 @@ class DemoOutput(object):
                                        "power_load_ramp, power_load_monotony, power_load_strain, power_load_strain_events, " +
                                        "acute_total_power_load, chronic_total_power_load, power_load_acwr, power_load_freshness_index," +
                                        "acute_days, chronic_days, total_historical_sessions, average_weekly_internal_load," +
+                                       "average_weekly_power_load,average_session_internal_load,average_session_power_load," +
                                        "base_aerobic_training, anaerobic_threshold_training, high_intensity_anaerobic_training," +
                                        "muscular_endurance, strength_endurance, hypertrophy, maximal_strength," +
                                        "speed, sustained_power, power, maximal_power")
@@ -288,7 +289,12 @@ class DemoOutput(object):
         user_stats_string += self.get_if_present_string(user_stats, "acute_days")
         user_stats_string += self.get_if_present_string(user_stats, "chronic_days")
         user_stats_string += self.get_if_present_string(user_stats, "total_historical_sessions")
+
         user_stats_string += self.get_std_error_if_present_string(user_stats, "average_weekly_internal_load")
+        user_stats_string += self.get_std_error_if_present_string(user_stats, "average_weekly_power_load")
+        user_stats_string += self.get_std_error_if_present_string(user_stats, "average_session_internal_load")
+        user_stats_string += self.get_std_error_if_present_string(user_stats, "average_session_power_load")
+
         user_stats_string += self.get_training_unit_if_present_string(user_stats.athlete_capacities, "base_aerobic_training")
         user_stats_string += self.get_training_unit_if_present_string(user_stats.athlete_capacities,
                                                                  "anaerobic_threshold_training")

@@ -240,6 +240,11 @@ if __name__ == '__main__':
                 ird_datastore = InjuryRiskDatastore()
                 injury_risk_dict = ird_datastore.get(user_id)
 
+                ird_processor = InjuryRiskDictOutputProcessor('output/irds/', user_id, user_name)
+                ird_processor.write_headers(date.strftime("%Y-%m-%d"))
+                ird_processor.write_day(event_date.date())
+                ird_processor.close()
+
                 if plan is not None:
                     plan = periodization_plan_processor.set_acute_chronic_muscle_needs(plan, event_date, injury_risk_dict)
                     plan = periodization_plan_processor.update_periodization_plan_for_week(plan,
@@ -260,11 +265,6 @@ if __name__ == '__main__':
 
             ird_datastore = InjuryRiskDatastore()
             injury_risk_dict = ird_datastore.get(user_id)
-
-            ird_processor = InjuryRiskDictOutputProcessor('output/irds/', user_id, user_name)
-            ird_processor.write_headers(date.strftime("%Y-%m-%d"))
-            ird_processor.write_day(event_date.date())
-            ird_processor.close()
 
             check_now = 0
 

@@ -73,6 +73,7 @@ class TrainingLoadProcessing(object):
 
         self.athlete_capacities = AthleteBaselineCapacities
         self.total_historical_sessions = 0
+        self.all_training_sessions = []
         # self.acute_days = acute_days
         # self.chronic_days = chronic_days
         # self.acute_start_date_time = acute_start_date_time
@@ -271,7 +272,7 @@ class TrainingLoadProcessing(object):
 
         self.athlete_capacities = proc.get_capacity_from_workout_history(all_training_sessions)
         self.total_historical_sessions = len(all_training_sessions)
-
+        self.all_training_sessions = all_training_sessions
         # if len(self.internal_load_tuples) > 0:
         #     internal_load_values = list(x[1] for x in self.internal_load_tuples if x[1] is not None)
         #     high_internal = max(internal_load_values)
@@ -294,28 +295,6 @@ class TrainingLoadProcessing(object):
                                                                       self.previous_week_sport_training_loads[
                                                                              sport_name]
                                                                       )
-
-        if user_stats.eligible_for_high_load_trigger:
-            self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
-        else:
-            if self.training_sessions_exist_days_8_35:
-                eligible_for_high_load_trigger = False
-
-                if user_stats.expected_weekly_workouts is None or user_stats.expected_weekly_workouts <= 1:
-                    if len(self.last_14_days_training_sessions) > 1:
-                        eligible_for_high_load_trigger = True
-                elif 1 < user_stats.expected_weekly_workouts <= 4:
-                    if len(self.last_14_days_training_sessions) > 2:
-                        eligible_for_high_load_trigger = True
-                elif user_stats.expected_weekly_workouts > 4:
-                    if len(self.last_14_days_training_sessions) > 4:
-                        eligible_for_high_load_trigger = True
-
-                if eligible_for_high_load_trigger:
-                    user_stats.eligible_for_high_load_trigger = True
-                    self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
-                else:
-                    user_stats.eligible_for_high_load_trigger = False
 
         user_stats.internal_ramp = self.get_ramp(user_stats.expected_weekly_workouts,
                                                  self.last_week_internal_values, self.previous_week_internal_values)
@@ -369,6 +348,10 @@ class TrainingLoadProcessing(object):
             self.c_power_load_values)
 
         user_stats.average_weekly_internal_load = self.get_average_weekly_internal_load()
+        user_stats.average_weekly_power_load = self.get_average_weekly_power_load()
+
+        user_stats.average_session_internal_load = self.get_average_session_internal_load()
+        user_stats.average_session_power_load = self.get_average_session_power_load()
 
         acute_internal_load = user_stats.acute_internal_total_load.plagiarize()
         acute_internal_load.divide_range(user_stats.chronic_internal_total_load)
@@ -405,35 +388,60 @@ class TrainingLoadProcessing(object):
 
         user_stats.athlete_capacities = self.athlete_capacities  # calculated when loading values
 
+
+        if user_stats.eligible_for_high_load_trigger:
+            #self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
+            self.set_high_relative_load_sessions(user_stats, self.all_training_sessions)
+        else:
+            if self.training_sessions_exist_days_8_35:
+                eligible_for_high_load_trigger = False
+
+                if user_stats.expected_weekly_workouts is None or user_stats.expected_weekly_workouts <= 1:
+                    if len(self.last_14_days_training_sessions) > 1:
+                        eligible_for_high_load_trigger = True
+                elif 1 < user_stats.expected_weekly_workouts <= 4:
+                    if len(self.last_14_days_training_sessions) > 2:
+                        eligible_for_high_load_trigger = True
+                elif user_stats.expected_weekly_workouts > 4:
+                    if len(self.last_14_days_training_sessions) > 4:
+                        eligible_for_high_load_trigger = True
+
+                if eligible_for_high_load_trigger:
+                    user_stats.eligible_for_high_load_trigger = True
+                    #self.set_high_relative_load_sessions(user_stats, self.last_14_days_training_sessions)
+                    self.set_high_relative_load_sessions(user_stats, self.all_training_sessions)
+                else:
+                    user_stats.eligible_for_high_load_trigger = False
+
         return user_stats
 
     def get_average_weekly_internal_load(self):
 
         internal_load_values = []
         if len(self.last_week_internal_values) > 0:
-            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.last_week_internal_values))
-            internal_load_values.append(
-                self.get_standard_error_range(self.expected_weekly_workouts, self.last_week_internal_values, return_sum=True))
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.last_week_internal_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.last_week_internal_values, return_sum=True))
         if len(self.previous_week_internal_values) > 0:
-            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_internal_values))
-            internal_load_values.append(
-                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_internal_values,
-                                              return_sum=True))
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_internal_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_internal_values,
+            #                                   return_sum=True))
         if len(self.previous_week_2_internal_values) > 0:
-            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_internal_values))
-            internal_load_values.append(
-                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_2_internal_values,
-                                              return_sum=True))
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_internal_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_2_internal_values,
+            #                                   return_sum=True))
         if len(self.previous_week_3_internal_values) > 0:
-            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_internal_values))
-            internal_load_values.append(
-                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_3_internal_values,
-                                              return_sum=True))
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_internal_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_3_internal_values,
+            #                                   return_sum=True))
         if len(self.previous_week_4_internal_values) > 0:
-            #internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_internal_values))
-            internal_load_values.append(
-                self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_4_internal_values,
-                                              return_sum=True))
+            internal_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_internal_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_4_internal_values,
+            #                                   return_sum=True))
 
         if len(internal_load_values) == 1:
             return StandardErrorRange.get_sum_from_error_range_list(internal_load_values)
@@ -442,7 +450,95 @@ class TrainingLoadProcessing(object):
         else:
             return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
+    def get_average_session_internal_load(self):
+
+        internal_load_values = []
+        internal_load_values.extend(self.last_week_internal_values)
+        internal_load_values.extend(self.previous_week_internal_values)
+        #internal_load_values.extend(self.previous_week_2_internal_values)
+        #internal_load_values.extend(self.previous_week_3_internal_values)
+        #internal_load_values.extend(self.previous_week_4_internal_values)
+
+        if len(internal_load_values) == 1:
+            return StandardErrorRange.get_sum_from_error_range_list(internal_load_values)
+        elif len(internal_load_values) > 1:
+            return StandardErrorRange.get_average_from_error_range_list(internal_load_values)
+        else:
+            return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
+
+    def get_average_session_power_load(self):
+
+        power_load_values = []
+        power_load_values.extend(self.last_week_power_load_values)
+        power_load_values.extend(self.previous_week_power_load_values)
+        #power_load_values.extend(self.previous_week_2_power_load_values)
+        #power_load_values.extend(self.previous_week_3_power_load_values)
+        #power_load_values.extend(self.previous_week_4_power_load_values)
+
+        if len(power_load_values) == 1:
+            return StandardErrorRange.get_sum_from_error_range_list(power_load_values)
+        elif len(power_load_values) > 1:
+            return StandardErrorRange.get_average_from_error_range_list(power_load_values)
+        else:
+            return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
+
+    def get_average_weekly_power_load(self):
+
+        power_load_values = []
+        if len(self.last_week_power_load_values) > 0:
+            power_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.last_week_power_load_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.last_week_internal_values, return_sum=True))
+        if len(self.previous_week_power_load_values) > 0:
+            power_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_power_load_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_internal_values,
+            #                                   return_sum=True))
+        if len(self.previous_week_2_power_load_values) > 0:
+            power_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_2_power_load_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_2_internal_values,
+            #                                   return_sum=True))
+        if len(self.previous_week_3_power_load_values) > 0:
+            power_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_3_power_load_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_3_internal_values,
+            #                                   return_sum=True))
+        if len(self.previous_week_4_power_load_values) > 0:
+            power_load_values.append(StandardErrorRange.get_sum_from_error_range_list(self.previous_week_4_power_load_values))
+            # internal_load_values.append(
+            #     self.get_standard_error_range(self.expected_weekly_workouts, self.previous_week_4_internal_values,
+            #                                   return_sum=True))
+
+        if len(power_load_values) == 1:
+            return StandardErrorRange.get_sum_from_error_range_list(power_load_values)
+        elif len(power_load_values) > 1:
+            return StandardErrorRange.get_average_from_error_range_list(power_load_values)
+        else:
+            return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
+
     def set_high_relative_load_sessions(self, user_stats, training_sessions):
+
+        self.high_relative_load_sessions = []
+        self.high_relative_load_score = 50
+
+        mod_rpe_load_threshold = user_stats.average_session_internal_load.plagiarize()
+        mod_power_load_threshold = user_stats.average_session_power_load.plagiarize()
+
+        if mod_rpe_load_threshold is not None:
+            mod_rpe_load_threshold.multiply(1.15)
+
+        if mod_power_load_threshold is not None:
+            mod_power_load_threshold.multiply(1.15)
+
+        high_rpe_load_threshold = user_stats.average_session_internal_load.plagiarize()
+        high_power_load_threshold = user_stats.average_session_power_load.plagiarize()
+
+        if high_rpe_load_threshold is not None:
+            high_rpe_load_threshold.multiply(1.25)
+
+        if high_power_load_threshold is not None:
+            high_power_load_threshold.multiply(1.25)
 
         for t in training_sessions:
             if t.session_type() == SessionType.sport_training:
@@ -460,111 +556,139 @@ class TrainingLoadProcessing(object):
                         self.high_relative_load_sessions.append(high_load_session)
             elif t.session_type() == SessionType.mixed_activity:
 
-                max_percent = 0
-                greater_than_50 = []
+                #if t.event_date.date() == parse_date(self.end_date).date() or (t.end_date is not None and t.end_date.date()==parse_date(self.end_date).date()):
 
-                percent = self.get_percent(t.not_tracked_load, self.adaptation_type_load[AdaptationType.not_tracked.value])
-                if percent > 80:
-                    max_percent = percent
-                if percent > 50:
-                    greater_than_50.append(percent)
+                score = 50
 
-                percent = self.get_percent(t.strength_endurance_cardiorespiratory_load,
-                                             self.adaptation_type_load[AdaptationType.strength_endurance_cardiorespiratory.value])
-                if percent > 80 and percent > max_percent:
-                    max_percent = percent
+                if mod_rpe_load_threshold.highest_value() is not None and high_rpe_load_threshold.highest_value() is not None:
 
-                if percent > 50:
-                    greater_than_50.append(percent)
+                    if t.rpe_load is not None and mod_rpe_load_threshold.highest_value() < t.rpe_load.highest_value() < high_rpe_load_threshold.highest_value():
+                       score += 15
 
-                percent = self.get_percent(t.strength_endurance_strength_load,
-                                               self.adaptation_type_load[
-                                                   AdaptationType.strength_endurance_strength.value])
-                if percent > 50:
-                    greater_than_50.append(percent)
+                    if t.rpe_load is not None and t.rpe_load.highest_value() >= high_rpe_load_threshold.highest_value():
+                       score += 25
 
-                if percent > 80 and percent > max_percent:
-                    max_percent = percent
+                if mod_power_load_threshold.highest_value() is not None and high_power_load_threshold.highest_value() is not None:
 
-                percent = self.get_percent(t.power_drill_load, self.adaptation_type_load[AdaptationType.power_drill.value])
-                if percent > 80 and percent > max_percent:
-                    max_percent = percent
+                    if t.power_load is not None and mod_power_load_threshold.highest_value() < t.power_load.highest_value() < high_power_load_threshold.highest_value():
+                        score += 15
 
-                if percent > 50:
-                    greater_than_50.append(percent)
+                    if t.power_load is not None and t.power_load.highest_value() >= high_power_load_threshold.highest_value():
+                        score += 25
 
-                percent = self.get_percent(t.maximal_strength_hypertrophic_load,
-                                                 self.adaptation_type_load[AdaptationType.maximal_strength_hypertrophic.value])
-                if percent > 80 and percent > max_percent:
-                    max_percent = percent
-
-                if percent > 50:
-                    greater_than_50.append(percent)
-
-                percent = self.get_percent(t.power_explosive_action_load,self.adaptation_type_load[AdaptationType.power_explosive_action.value])
-
-                if percent > 80 and percent > max_percent:
-                    max_percent = percent
-
-                if percent > 50:
-                    greater_than_50.append(percent)
-
-                if max_percent > 80:
+                if score > 50:
                     high_load_session = HighDetailedLoadSession(t.event_date)
-                    high_load_session.percent_of_max = max_percent
+                    high_load_session.percent_of_max = score
                     self.high_relative_load_sessions.append(high_load_session)
 
-                else:
-                    if len(greater_than_50) >= 2:
-                        high_load_session = HighDetailedLoadSession(t.event_date)
-                        high_load_session.percent_of_max = max(greater_than_50)
-                        self.high_relative_load_sessions.append(high_load_session)
+                if t.event_date.date() == parse_date(self.end_date).date():
+                    self.high_relative_load_score = max(score, self.high_relative_load_score)
 
-        average_5_day_tissue_load_list = [f.tissue_load for f in self.last_5_days_training_sessions if
-                                          f.tissue_load is not None]
-        if len(average_5_day_tissue_load_list) > 0:
-            self.average_tissue_load_5_day = self.get_average_for_error_ranges(average_5_day_tissue_load_list,
-                                                                               0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+                # max_percent = 0
+                # greater_than_50 = []
+                #
+                # percent = self.get_percent(t.not_tracked_load, self.adaptation_type_load[AdaptationType.not_tracked.value])
+                # if percent > 80:
+                #     max_percent = percent
+                # if percent > 50:
+                #     greater_than_50.append(percent)
+                #
+                # percent = self.get_percent(t.strength_endurance_cardiorespiratory_load,
+                #                              self.adaptation_type_load[AdaptationType.strength_endurance_cardiorespiratory.value])
+                # if percent > 80 and percent > max_percent:
+                #     max_percent = percent
+                #
+                # if percent > 50:
+                #     greater_than_50.append(percent)
+                #
+                # percent = self.get_percent(t.strength_endurance_strength_load,
+                #                                self.adaptation_type_load[
+                #                                    AdaptationType.strength_endurance_strength.value])
+                # if percent > 50:
+                #     greater_than_50.append(percent)
+                #
+                # if percent > 80 and percent > max_percent:
+                #     max_percent = percent
+                #
+                # percent = self.get_percent(t.power_drill_load, self.adaptation_type_load[AdaptationType.power_drill.value])
+                # if percent > 80 and percent > max_percent:
+                #     max_percent = percent
+                #
+                # if percent > 50:
+                #     greater_than_50.append(percent)
+                #
+                # percent = self.get_percent(t.maximal_strength_hypertrophic_load,
+                #                                  self.adaptation_type_load[AdaptationType.maximal_strength_hypertrophic.value])
+                # if percent > 80 and percent > max_percent:
+                #     max_percent = percent
+                #
+                # if percent > 50:
+                #     greater_than_50.append(percent)
+                #
+                # percent = self.get_percent(t.power_explosive_action_load,self.adaptation_type_load[AdaptationType.power_explosive_action.value])
+                #
+                # if percent > 80 and percent > max_percent:
+                #     max_percent = percent
+                #
+                # if percent > 50:
+                #     greater_than_50.append(percent)
+                #
+                # if max_percent > 80:
+                #     high_load_session = HighDetailedLoadSession(t.event_date)
+                #     high_load_session.percent_of_max = max_percent
+                #     self.high_relative_load_sessions.append(high_load_session)
+                #
+                # else:
+                #     if len(greater_than_50) >= 2:
+                #         high_load_session = HighDetailedLoadSession(t.event_date)
+                #         high_load_session.percent_of_max = max(greater_than_50)
+                #         self.high_relative_load_sessions.append(high_load_session)
 
-        average_20_day_tissue_load_list = [f.tissue_load for f in self.last_20_days_training_sessions if
-                                           f.tissue_load is not None]
-        if len(average_20_day_tissue_load_list) > 0:
-            self.average_tissue_load_20_day = self.get_average_for_error_ranges(average_20_day_tissue_load_list,
-                                                                                0.95 * (
-                                                                                            self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
-
-        average_5_day_power_load_list = [f.power_load for f in self.last_5_days_training_sessions if
-                                         f.power_load is not None]
-        if len(average_5_day_power_load_list) > 0:
-            self.average_power_load_5_day = self.get_average_for_error_ranges(average_5_day_power_load_list,
-                                                                              0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
-
-        average_20_day_power_load_list = [f.power_load for f in self.last_20_days_training_sessions if
-                                          f.power_load is not None]
-        if len(average_20_day_power_load_list) > 0:
-            self.average_power_load_20_day = self.get_average_for_error_ranges(average_20_day_power_load_list,
-                                                                               0.95 * (
-                                                                                           self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
-        tissue_load_5_20_lowest_value = 0.0
-        power_load_5_20_lowest_value = 0.0
-
-        tissue_load_5_20 = self.tissue_load_5_20()
-        if tissue_load_5_20 is not None:
-            tissue_load_5_20_lowest_value = tissue_load_5_20.lowest_value()
-        power_load_5_20 = self.power_load_5_20()
-        if power_load_5_20 is not None:
-            power_load_5_20_lowest_value = power_load_5_20.lowest_value()
-
-        tissue_load_percent = 50
-        power_load_percent = 50
-
-        if tissue_load_5_20_lowest_value is not None and tissue_load_5_20_lowest_value > 1.1:
-            tissue_load_percent = min(100, ((tissue_load_5_20_lowest_value - 1.1) * 100) + 50)
-
-        if power_load_5_20_lowest_value is not None and power_load_5_20_lowest_value > 1.1:
-            power_load_percent = min(100, ((power_load_5_20_lowest_value - 1.1) * 100) + 50)
-
-        self.high_relative_load_score = max(tissue_load_percent, power_load_percent)
+        # average_5_day_tissue_load_list = [f.tissue_load for f in self.last_5_days_training_sessions if
+        #                                   f.tissue_load is not None]
+        # if len(average_5_day_tissue_load_list) > 0:
+        #     self.average_tissue_load_5_day = self.get_average_for_error_ranges(average_5_day_tissue_load_list,
+        #                                                                        0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+        #
+        # average_20_day_tissue_load_list = [f.tissue_load for f in self.last_20_days_training_sessions if
+        #                                    f.tissue_load is not None]
+        # if len(average_20_day_tissue_load_list) > 0:
+        #     self.average_tissue_load_20_day = self.get_average_for_error_ranges(average_20_day_tissue_load_list,
+        #                                                                         0.95 * (
+        #                                                                                     self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+        #
+        # average_5_day_power_load_list = [f.power_load for f in self.last_5_days_training_sessions if
+        #                                  f.power_load is not None]
+        # if len(average_5_day_power_load_list) > 0:
+        #     self.average_power_load_5_day = self.get_average_for_error_ranges(average_5_day_power_load_list,
+        #                                                                       0.714 * self.expected_weekly_workouts)  # adjusted expected weekly workouts by 5/7 of value
+        #
+        # average_20_day_power_load_list = [f.power_load for f in self.last_20_days_training_sessions if
+        #                                   f.power_load is not None]
+        # if len(average_20_day_power_load_list) > 0:
+        #     self.average_power_load_20_day = self.get_average_for_error_ranges(average_20_day_power_load_list,
+        #                                                                        0.95 * (
+        #                                                                                    self.expected_weekly_workouts * 3))  # adjusted expected weekly workouts by 20/21 of value
+        # tissue_load_5_20_lowest_value = 0.0
+        # power_load_5_20_lowest_value = 0.0
+        #
+        # tissue_load_5_20 = self.tissue_load_5_20()
+        # if tissue_load_5_20 is not None:
+        #     tissue_load_5_20_lowest_value = tissue_load_5_20.lowest_value()
+        # power_load_5_20 = self.power_load_5_20()
+        # if power_load_5_20 is not None:
+        #     power_load_5_20_lowest_value = power_load_5_20.lowest_value()
+        #
+        # tissue_load_percent = 50
+        # power_load_percent = 50
+        #
+        # if tissue_load_5_20_lowest_value is not None and tissue_load_5_20_lowest_value > 1.1:
+        #     tissue_load_percent = min(100, ((tissue_load_5_20_lowest_value - 1.1) * 100) + 50)
+        #
+        # if power_load_5_20_lowest_value is not None and power_load_5_20_lowest_value > 1.1:
+        #     power_load_percent = min(100, ((power_load_5_20_lowest_value - 1.1) * 100) + 50)
+        #
+        # self.high_relative_load_score = max(tissue_load_percent, power_load_percent)
 
     # def get_average_error_range(self, atrribute_name, session_list):
     #
