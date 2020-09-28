@@ -113,8 +113,6 @@ class PeriodizationPlanProcessor(object):
                 plan.functional_overreaching_muscles.append(body_part_side)
 
             # ADDED Code 2020-09-24
-            clean_date = self.get_clean_date(body_part_injury_risk.last_non_functional_overreaching_date)
-
             if body_part_injury_risk.last_non_functional_overreaching_date is not None and (two_days_ago == self.get_clean_date(body_part_injury_risk.last_non_functional_overreaching_date)):
                 plan.functional_overreaching_muscles.append(body_part_side)
 

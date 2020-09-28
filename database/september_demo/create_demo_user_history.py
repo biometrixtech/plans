@@ -274,16 +274,16 @@ if __name__ == '__main__':
         user_age = 30  #TODO how do we get this set!?!?!
 
         for date in dates:
-            event_date = date + timedelta(hours=1, minutes=2, seconds=3)
+            event_date = date + timedelta(hours=3, minutes=2, seconds=3)
             event_date = utc.localize(event_date)
             event_date_string = format_datetime(event_date)
             print(event_date_string)
 
-            target_date = datetime(2019, 9, 2) + timedelta(hours=1, minutes=2, seconds=3)
-            target_date = utc.localize(target_date)
-
-            if event_date == target_date:
-                stop_here=0
+            # target_date = datetime(2019, 9, 2) + timedelta(hours=3, minutes=2, seconds=3)
+            # target_date = utc.localize(target_date)
+            #
+            # if event_date == target_date:
+            #     stop_here=0
 
             if date.strftime("%Y-%m-%d") in all_soreness:
                 todays_soreness = all_soreness[date.strftime("%Y-%m-%d")]
@@ -299,7 +299,7 @@ if __name__ == '__main__':
 
             if days_lived > 0:
                 # update nightly process
-                demo_persona.update_stats(event_date)
+                demo_persona.update_stats(event_date, force_historical=True)
                 user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
                 user_stats_output.write(user_stats_string + '\n')
 
