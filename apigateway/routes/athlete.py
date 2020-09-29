@@ -51,7 +51,9 @@ def create_daily_plan(athlete_id):
 @xray_recorder.capture('routes.athlete.stats.update')
 def update_athlete_stats(athlete_id):
     event_date = request.json.get('event_date', None)
-    if is_fathom_environment():
+    collection = request.json.get('collection', 'athletestats')
+    if collection == 'athletestats':
+    # if is_fathom_environment():
         athlete_stats = StatsProcessing(athlete_id, event_date=parse_date(event_date), datastore_collection=DatastoreCollection()).process_athlete_stats()
 
         if event_date is not None:
@@ -84,13 +86,14 @@ def get_athlete_metrics(athlete_id):
 def manage_athlete_push_notification(athlete_id):
     # Make sure stats are consistent
     try:
+        collection = request.json.get('collection', 'athletestats')
         minute_offset = _get_offset()
         event_date = format_date(datetime.datetime.now())
         stats_update_time = event_date + 'T03:30:00Z'
         trigger_event_date = _randomize_trigger_time(stats_update_time, 10*60, minute_offset)
         Service('plans', Config.get('API_VERSION')).call_apigateway_async(method='POST',
                                                                           endpoint=f"athlete/{athlete_id}/stats",
-                                                                          body={"event_date": event_date},
+                                                                          body={"event_date": event_date, 'collection': collection},
                                                                           execute_at=trigger_event_date)
     except Exception as e:
         print(e)

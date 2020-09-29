@@ -236,7 +236,8 @@ def update_dates(daily_plans, athlete_stats, event_date):
 @xray_recorder.capture('routes.misc.dailycron')
 def handle_dailycron():
     # This route will be called daily via a CloudWatch Scheduled Event.
-    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', 'misc/activeusers', body={})
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', 'misc/activeusers', body={'collection': 'userstats'})
+    Service('plans', Config.get('API_VERSION')).call_apigateway_async('POST', 'misc/activeusers', body={'collection': 'athletestats'})
 
     return {'status': 'Success'}, 200
 
@@ -247,9 +248,10 @@ def handle_dailycron():
 @xray_recorder.capture('routes.misc.activeusers')
 def handle_activeusers():
     last_user = request.json.get('last_user', None)
+    collection = request.json.get('collection', 'athletestats')
     # This route will be invoked daily.  It should scan to find users which meet
     # some definition of 'active', and for each one should push to the plans service with them
-    batch_users, last_user = _get_user_batch(last_user)
+    batch_users, last_user = _get_user_batch(last_user, collection)
 
     # remove users that are api_version < 4_4 (they'll go throuh the old route)
     batch_users = [user for user in batch_users if user['api_version'] != '4_3']
@@ -263,7 +265,9 @@ def handle_activeusers():
     for timezone in timezones:
         execute_at = three_am_today - datetime.timedelta(minutes=_get_offset(timezone))  # this will be specific for timezone
         tz_users = [user for user in batch_users if user['timezone'] == timezone]
-        body = {"timezone": timezone}
+        body = {
+                "timezone": timezone,
+                "collection": collection}
 
         # now group users by their last used api version
         api_versions = set(user['api_version'] for user in tz_users)
@@ -282,14 +286,17 @@ def handle_activeusers():
     if last_user is not None:
         print('Triggering next batch')
         self_service = Service('plans', Config.get('API_VERSION'))
-        self_service.call_apigateway_async('POST', 'misc/activeusers', body={'last_user': str(last_user)}, execute_at=now + datetime.timedelta(seconds=60))
+        self_service.call_apigateway_async('POST',
+            'misc/activeusers',
+            body={'collection': collection, 'last_user': str(last_user)},
+             execute_at=now + datetime.timedelta(seconds=60))
 
     return {'status': 'Success'}
 
 
-def _get_user_batch(last_user):
+def _get_user_batch(last_user, collection='athletestats'):
     end_reached = False
-    stats_collection = get_mongo_collection('athletestats')
+    stats_collection = get_mongo_collection(collection)
     if last_user is None:
         query = {}
     else:
