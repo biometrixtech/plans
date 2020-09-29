@@ -356,8 +356,8 @@ class TrainingLoadProcessing(object):
         user_stats.average_weekly_internal_load = self.get_average_weekly_internal_load()
         user_stats.average_weekly_power_load = self.get_average_weekly_power_load()
 
-        user_stats.average_session_internal_load = self.get_average_session_internal_load()
-        user_stats.average_session_power_load = self.get_average_session_power_load()
+        user_stats.average_session_internal_load = self.get_average_session_internal_load(parse_date(self.end_date))
+        user_stats.average_session_power_load = self.get_average_session_power_load(parse_date(self.end_date))
 
         acute_internal_load = user_stats.acute_internal_total_load.plagiarize()
         acute_internal_load.divide_range(user_stats.chronic_internal_total_load)
@@ -488,11 +488,13 @@ class TrainingLoadProcessing(object):
         else:
             return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
-    def get_average_session_internal_load(self):
+    def get_average_session_internal_load(self, end_date):
 
-        internal_load_values = []
-        internal_load_values.extend(self.last_week_internal_values)
-        internal_load_values.extend(self.previous_week_internal_values)
+        two_weeks_back = end_date.date() - timedelta(days=13)
+
+        internal_load_values = [i[1] for i in self.internal_load_tuples if end_date.date() >= i[0].date() >= two_weeks_back]
+        #internal_load_values.extend(self.last_week_internal_values)
+        #internal_load_values.extend(self.previous_week_internal_values)
         #internal_load_values.extend(self.previous_week_2_internal_values)
         #internal_load_values.extend(self.previous_week_3_internal_values)
         #internal_load_values.extend(self.previous_week_4_internal_values)
@@ -504,11 +506,14 @@ class TrainingLoadProcessing(object):
         else:
             return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
-    def get_average_session_power_load(self):
+    def get_average_session_power_load(self, end_date):
 
-        power_load_values = []
-        power_load_values.extend(self.last_week_power_load_values)
-        power_load_values.extend(self.previous_week_power_load_values)
+        two_weeks_back = end_date.date() - timedelta(days=13)
+
+        power_load_values = [i[1] for i in self.power_load_tuples if
+                                end_date.date() >= i[0].date() >= two_weeks_back]
+        #power_load_values.extend(self.last_week_power_load_values)
+        #power_load_values.extend(self.previous_week_power_load_values)
         #power_load_values.extend(self.previous_week_2_power_load_values)
         #power_load_values.extend(self.previous_week_3_power_load_values)
         #power_load_values.extend(self.previous_week_4_power_load_values)
@@ -555,28 +560,39 @@ class TrainingLoadProcessing(object):
         else:
             return StandardErrorRange(lower_bound=0, observed_value=0, upper_bound=0)
 
+    def get_load_threshold(self, load, factor):
+
+        mod_load = load.plagiarize()
+
+        if mod_load is not None:
+            mod_load.multiply(factor)
+
+        return mod_load
+
     def set_high_relative_load_sessions(self, user_stats, training_sessions):
 
         self.high_relative_load_sessions = []
         self.high_relative_load_score = 50
 
-        mod_rpe_load_threshold = user_stats.average_session_internal_load.plagiarize()
-        mod_power_load_threshold = user_stats.average_session_power_load.plagiarize()
+        average_session_power_load_1_day = self.get_average_session_power_load(parse_date(self.end_date) - timedelta(days=1))
+        average_session_rpe_load_1_day = self.get_average_session_internal_load(parse_date(self.end_date) - timedelta(days=1))
+        average_session_power_load_2_day = self.get_average_session_power_load(parse_date(self.end_date) - timedelta(days=2))
+        average_session_rpe_load_2_day = self.get_average_session_internal_load(parse_date(self.end_date) - timedelta(days=2))
 
-        if mod_rpe_load_threshold is not None:
-            mod_rpe_load_threshold.multiply(1.15)
+        mod_power_load_threshold = self.get_load_threshold(user_stats.average_session_power_load, 1.15)
+        mod_rpe_load_threshold = self.get_load_threshold(user_stats.average_session_internal_load, 1.15)
+        high_power_load_threshold = self.get_load_threshold(user_stats.average_session_power_load, 1.25)
+        high_rpe_load_threshold = self.get_load_threshold(user_stats.average_session_internal_load, 1.25)
 
-        if mod_power_load_threshold is not None:
-            mod_power_load_threshold.multiply(1.15)
+        mod_power_load_threshold_1_day = self.get_load_threshold(average_session_power_load_1_day, 1.15)
+        mod_rpe_load_threshold_1_day = self.get_load_threshold(average_session_rpe_load_1_day, 1.15)
+        high_power_load_threshold_1_day = self.get_load_threshold(average_session_power_load_1_day, 1.25)
+        high_rpe_load_threshold_1_day = self.get_load_threshold(average_session_rpe_load_1_day, 1.25)
 
-        high_rpe_load_threshold = user_stats.average_session_internal_load.plagiarize()
-        high_power_load_threshold = user_stats.average_session_power_load.plagiarize()
-
-        if high_rpe_load_threshold is not None:
-            high_rpe_load_threshold.multiply(1.25)
-
-        if high_power_load_threshold is not None:
-            high_power_load_threshold.multiply(1.25)
+        mod_power_load_threshold_2_day = self.get_load_threshold(average_session_power_load_2_day, 1.15)
+        mod_rpe_load_threshold_2_day = self.get_load_threshold(average_session_rpe_load_2_day, 1.15)
+        high_power_load_threshold_2_day = self.get_load_threshold(average_session_power_load_2_day, 1.25)
+        high_rpe_load_threshold_2_day = self.get_load_threshold(average_session_rpe_load_2_day, 1.25)
 
         for t in training_sessions:
             if t.session_type() == SessionType.sport_training:
@@ -596,23 +612,16 @@ class TrainingLoadProcessing(object):
 
                 #if t.event_date.date() == parse_date(self.end_date).date() or (t.end_date is not None and t.end_date.date()==parse_date(self.end_date).date()):
 
-                score = 50
+                score = self.get_high_load_score_for_session(high_rpe_load_threshold, high_power_load_threshold,
+                                                             mod_power_load_threshold, mod_rpe_load_threshold, t)
 
-                if mod_rpe_load_threshold.highest_value() is not None and high_rpe_load_threshold.highest_value() is not None:
+                score_1_day =self.get_high_load_score_for_session(high_rpe_load_threshold_1_day, high_power_load_threshold_1_day,
+                                                             mod_power_load_threshold_1_day, mod_rpe_load_threshold_1_day, t)
 
-                    if t.rpe_load is not None and mod_rpe_load_threshold.highest_value() < t.rpe_load.highest_value() < high_rpe_load_threshold.highest_value():
-                       score += 15
-
-                    if t.rpe_load is not None and t.rpe_load.highest_value() >= high_rpe_load_threshold.highest_value():
-                       score += 25
-
-                if mod_power_load_threshold.highest_value() is not None and high_power_load_threshold.highest_value() is not None:
-
-                    if t.power_load is not None and mod_power_load_threshold.highest_value() < t.power_load.highest_value() < high_power_load_threshold.highest_value():
-                        score += 15
-
-                    if t.power_load is not None and t.power_load.highest_value() >= high_power_load_threshold.highest_value():
-                        score += 25
+                score_2_day = self.get_high_load_score_for_session(high_rpe_load_threshold_2_day,
+                                                                   high_power_load_threshold_2_day,
+                                                                   mod_power_load_threshold_2_day,
+                                                                   mod_rpe_load_threshold_2_day, t)
 
                 if score > 50:
                     high_load_session = HighDetailedLoadSession(t.event_date)
@@ -633,18 +642,18 @@ class TrainingLoadProcessing(object):
 
                 if (parse_date(self.end_date).date() - t.event_date.date()).days == 1:
                     if not self.non_functional_overreaching_workout_1_day:
-                        is_nfo = self.is_non_functional_overreaching(score, t)
+                        is_nfo = self.is_non_functional_overreaching(score_1_day, t)
                         self.non_functional_overreaching_workout_1_day = is_nfo
                         if not is_nfo:
                             if not self.functional_overreaching_workout_1_day:
-                                is_fo = self.is_functional_overreaching(score, t)
+                                is_fo = self.is_functional_overreaching(score_1_day, t)
                                 self.functional_overreaching_workout_1_day = is_fo
                         else:
                             self.functional_overreaching_workout_1_day = False
 
                 if (parse_date(self.end_date).date() - t.event_date.date()).days == 2:
                     if not self.non_functional_overreaching_workout_2_day:
-                        is_nfo = self.is_non_functional_overreaching(score, t)
+                        is_nfo = self.is_non_functional_overreaching(score_2_day, t)
                         self.non_functional_overreaching_workout_2_day = is_nfo
 
                 # max_percent = 0
@@ -752,6 +761,25 @@ class TrainingLoadProcessing(object):
         #     power_load_percent = min(100, ((power_load_5_20_lowest_value - 1.1) * 100) + 50)
         #
         # self.high_relative_load_score = max(tissue_load_percent, power_load_percent)
+
+    def get_high_load_score_for_session(self, high_rpe_load_threshold, high_power_load_threshold,
+                                        mod_power_load_threshold, mod_rpe_load_threshold, session):
+        score = 50
+        if mod_rpe_load_threshold.highest_value() is not None and high_rpe_load_threshold.highest_value() is not None:
+
+            if session.rpe_load is not None and mod_rpe_load_threshold.highest_value() < session.rpe_load.highest_value() < high_rpe_load_threshold.highest_value():
+                score += 15
+
+            if session.rpe_load is not None and session.rpe_load.highest_value() >= high_rpe_load_threshold.highest_value():
+                score += 25
+        if mod_power_load_threshold.highest_value() is not None and high_power_load_threshold.highest_value() is not None:
+
+            if session.power_load is not None and mod_power_load_threshold.highest_value() < session.power_load.highest_value() < high_power_load_threshold.highest_value():
+                score += 15
+
+            if session.power_load is not None and session.power_load.highest_value() >= high_power_load_threshold.highest_value():
+                score += 25
+        return score
 
     # def get_average_error_range(self, atrribute_name, session_list):
     #
