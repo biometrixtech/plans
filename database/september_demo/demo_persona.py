@@ -46,8 +46,8 @@ class DemoPersona(object):
     def clear_user(self, suffix=''):
         readiness = get_mongo_collection('dailyreadiness')
         daily_plan = get_mongo_collection('dailyplan')
-        #stats = get_mongo_collection('userstats', suffix)
-        stats = get_mongo_collection('athletestats')
+        stats = get_mongo_collection('userstats')
+        # stats = get_mongo_collection('athletestats')
         exercises = get_mongo_collection('completedexercises')
         training_sessions = get_mongo_collection('trainingsession')
         heartrate = get_mongo_collection('heartrate')
@@ -76,7 +76,7 @@ class DemoPersona(object):
         user_stats.athlete_weight = user_profile['user_weight']
         user_stats.vo2_max = StandardErrorRange(observed_value=user_profile['vo2_max'])
 
-        stats_collection = get_mongo_collection('athletestats')
+        stats_collection = get_mongo_collection('userstats')
         query = {'athlete_id': self.user_id}
         stats_collection.replace_one(query, user_stats.json_serialise(), upsert=True)
 
