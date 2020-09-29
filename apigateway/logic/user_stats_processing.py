@@ -134,6 +134,12 @@ class UserStatsProcessing(object):
         current_user_stats.high_relative_load_score = training_load_processing.high_relative_load_score
         current_user_stats.total_historical_sessions = len(self.training_sessions)
 
+        current_user_stats.functional_overreaching_workout_today = training_load_processing.functional_overreaching_workout_today
+        current_user_stats.functional_overreaching_workout_1_day = training_load_processing.functional_overreaching_workout_1_day
+        current_user_stats.non_functional_overreaching_workout_today = training_load_processing.non_functional_overreaching_workout_today
+        current_user_stats.non_functional_overreaching_workout_1_day = training_load_processing.non_functional_overreaching_workout_1_day
+        current_user_stats.non_functional_overreaching_workout_2_day = training_load_processing.non_functional_overreaching_workout_2_day
+
         self.update_vo2_max_estimations(current_user_stats)
 
         if current_user_stats.event_date.date() == self.event_date.date():

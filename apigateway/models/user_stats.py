@@ -104,6 +104,12 @@ class UserStats(Serialisable):
         self.training_phase_type = None
         self.athlete_capacities = AthleteBaselineCapacities()
 
+        self.functional_overreaching_workout_today = False
+        self.functional_overreaching_workout_1_day = False
+        self.non_functional_overreaching_workout_today = False
+        self.non_functional_overreaching_workout_1_day = False
+        self.non_functional_overreaching_workout_2_day = False
+
     def __setattr__(self, name, value):
         if name == 'event_date' and value is not None:
             if isinstance(value, str):
@@ -193,7 +199,12 @@ class UserStats(Serialisable):
             'periodization_goals': [p.value for p in self.periodization_goals],
             'demo_persona': self.persona.value if self.persona is not None else None,
             'training_phase_type': self.training_phase_type.value if self.training_phase_type is not None else None,
-            'athlete_capacities': self.athlete_capacities.json_serialise() if self.athlete_capacities is not None else None
+            'athlete_capacities': self.athlete_capacities.json_serialise() if self.athlete_capacities is not None else None,
+            'functional_overreaching_workout_today':  self.functional_overreaching_workout_today,
+            'functional_overreaching_workout_1_day': self.functional_overreaching_workout_1_day,
+            'non_functional_overreaching_workout_today': self.non_functional_overreaching_workout_today,
+            'non_functional_overreaching_workout_1_day': self.non_functional_overreaching_workout_1_day,
+            'non_functional_overreaching_workout_2_day': self.non_functional_overreaching_workout_2_day,
         }
         return ret
 
@@ -290,6 +301,12 @@ class UserStats(Serialisable):
         user_stats.persona = PeriodizationPersona(input_dict['demo_persona']) if input_dict.get('demo_persona') is not None else None
         user_stats.training_phase_type = TrainingPhaseType(input_dict['training_phase_type']) if input_dict.get('training_phase_type') is not None else None
         user_stats.athlete_capacities = AthleteBaselineCapacities().json_deserialise(input_dict['athlete_capacities']) if input_dict.get('athlete_capacities') is not None else None
+
+        user_stats.functional_overreaching_workout_today = input_dict.get('functional_overreaching_workout_today', False)
+        user_stats.functional_overreaching_workout_1_day = input_dict.get('functional_overreaching_workout_1_day', False)
+        user_stats.non_functional_overreaching_workout_today = input_dict.get('non_functional_overreaching_workout_today', False)
+        user_stats.non_functional_overreaching_workout_1_day = input_dict.get('non_functional_overreaching_workout_1_day', False)
+        user_stats.non_functional_overreaching_workout_2_day = input_dict.get('non_functional_overreaching_workout_2_day', False)
         return user_stats
 
 

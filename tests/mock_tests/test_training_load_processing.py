@@ -14,6 +14,7 @@ def get_session_with_power_load_observed_value(session_event_date, observed_load
     session = MixedActivitySession()
     session.event_date = session_event_date
     session.power_load = StandardErrorRange(observed_value=observed_load_value)
+    session.rpe_load = StandardErrorRange(observed_value=observed_load_value)
     return session
 
 def test_first_session_unknown_high_load():
@@ -56,9 +57,9 @@ def test_several_sessions_high_load():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 50 < training_load_processing.high_relative_load_score < 75
+    assert 100 == training_load_processing.high_relative_load_score
 
-def test_several_sessions_medium_high_load():
+def test_several_sessions_high_load_2():
 
     start_date = format_date(datetime.now().date())
     end_date = format_date(datetime.now().date())
@@ -78,9 +79,9 @@ def test_several_sessions_medium_high_load():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 50 < training_load_processing.high_relative_load_score < 75
+    assert 100 == training_load_processing.high_relative_load_score
 
-def test_sparse_sessions_normal_load():
+def test_sparse_sessions_mod_load():
 
     start_date = format_date(datetime.now().date())
     end_date = format_date(datetime.now().date())
@@ -100,9 +101,9 @@ def test_sparse_sessions_normal_load():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 50 == training_load_processing.high_relative_load_score
+    assert 80 == training_load_processing.high_relative_load_score
 
-def test_sparse_sessions_high_but_normal_load():
+def test_sparse_sessions_high_and_top():
 
     start_date = format_date(datetime.now().date())
     end_date = format_date(datetime.now().date())
@@ -122,10 +123,10 @@ def test_sparse_sessions_high_but_normal_load():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 50 == training_load_processing.high_relative_load_score
+    assert 100 == training_load_processing.high_relative_load_score
 
 
-def test_sparse_sessions_high_load_but_somehow_still_normal():
+def test_sparse_sessions_high_load_top():
 
     start_date = format_date(datetime.now().date())
     end_date = format_date(datetime.now().date())
@@ -145,7 +146,7 @@ def test_sparse_sessions_high_load_but_somehow_still_normal():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 50 == training_load_processing.high_relative_load_score
+    assert 100 == training_load_processing.high_relative_load_score
 
 def test_sparse_sessions_high_load_but_not_normal():
 
@@ -189,7 +190,7 @@ def test_very_sparse_sessions_mod_high_load():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 50 < training_load_processing.high_relative_load_score < 75
+    assert 80 == training_load_processing.high_relative_load_score
 
 def test_very_sparse_sessions_high_load():
 
@@ -234,4 +235,4 @@ def test_very_sparse_sessions_high_load_no_workout_last_day():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 75 < training_load_processing.high_relative_load_score
+    assert 50 == training_load_processing.high_relative_load_score
