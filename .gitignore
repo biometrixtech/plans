@@ -56,3 +56,4 @@ database/fml/*.*
 database/Fathom*/*.*
 database/strength_level/*.*
 !database/strength_level/*.py
+database/september_demo/persona_1_discards
