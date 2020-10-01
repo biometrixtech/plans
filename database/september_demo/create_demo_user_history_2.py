@@ -221,6 +221,12 @@ if __name__ == '__main__':
             event_date_string = format_datetime(event_date)
             print(event_date_string)
 
+            target_date = datetime(2020, 8, 10) + timedelta(hours=3, minutes=2, seconds=3)
+            target_date = utc.localize(target_date)
+
+            if event_date == target_date:
+                stop_here=0
+
             todays_files = daily_info['workout']
             todays_soreness = daily_info['soreness']
 
@@ -233,7 +239,7 @@ if __name__ == '__main__':
 
             if days_lived > 0:
                 # update nightly process
-                demo_persona.update_stats(event_date)
+                demo_persona.update_stats(event_date, force_historical=True)
                 user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
                 user_stats_output.write(user_stats_string + '\n')
 
@@ -322,6 +328,8 @@ if __name__ == '__main__':
 
                 user_stats_datastore = UserStatsDatastore()
                 demo_persona.user_stats = user_stats_datastore.get(athlete_id=user_id)
+                user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
+                user_stats_output.write(user_stats_string + '\n')
 
                 training_session_datastore = TrainingSessionDatastore()
                 training_sessions = training_session_datastore.get(user_id=user_id, event_date_time=event_date_time, read_session_load_dict=False)

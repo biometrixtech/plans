@@ -393,7 +393,11 @@ if __name__ == '__main__':
                 user_stats_output.write(user_stats_string + '\n')
 
                 training_session_datastore = TrainingSessionDatastore()
-                training_sessions = training_session_datastore.get(user_id=user_id, event_date_time=event_date_time, read_session_load_dict=False)
+                all_training_sessions = training_session_datastore.get(user_id=user_id, event_date_time=event_date_time, read_session_load_dict=False)
+                training_sessions = [a for a in all_training_sessions if a.event_date == event_date_time]
+
+                if len(training_sessions) > 1 or len(training_sessions) == 0:
+                    print('training_sessions='+str(len(training_sessions)))
 
                 ird_datastore = InjuryRiskDatastore()
                 injury_risk_dict = ird_datastore.get(user_id)
