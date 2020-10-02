@@ -214,7 +214,7 @@ if __name__ == '__main__':
 
         user_age = user_profile['user_age']  # TODO how do we get this set!?!?!
 
-        updated_spreadsheets = UpdatedSpreadsheets(user_name, start_date='08-10')
+        updated_spreadsheets = UpdatedSpreadsheets(user_name, start_date='08-11')
         # for i, daily_info in user_history.iterrows():
         for daily_info in user_history.values():
             date = daily_info['date']
