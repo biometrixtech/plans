@@ -20,7 +20,7 @@ from logic.soreness_processing import SorenessCalculator
 from database.september_demo.write_injury_risk_dict import InjuryRiskDictOutputProcessor
 from logic.athlete_capacity_processing import AthleteCapacityProcessor
 from database.september_demo.user_profiles import profiles
-from database.september_demo.demo_utilities import DemoOutput
+from database.september_demo.demo_utilities import DemoOutput, UpdatedSpreadsheets
 import pytz
 import pandas as pd
 
@@ -124,7 +124,7 @@ def create_session_only(workout, session_RPE):
         "event_date": workout['event_date_time'],
         "session_type": 7,
         "duration": workout['duration_seconds'] / 60,
-        "description": workout['program_module_id'],
+        "description": workout['description'],
         # "calories": 100,
         "distance": workout['distance'],
         "session_RPE": session_RPE,
@@ -213,6 +213,7 @@ if __name__ == '__main__':
 
         user_age = user_profile['user_age']  # TODO how do we get this set!?!?!
 
+        updated_spreadsheets = UpdatedSpreadsheets(user_name, start_date='08-10')
         # for i, daily_info in user_history.iterrows():
         for daily_info in user_history.values():
             date = daily_info['date']
@@ -220,6 +221,8 @@ if __name__ == '__main__':
             event_date = utc.localize(event_date)
             event_date_string = format_datetime(event_date)
             print(event_date_string)
+            formatted_date = "-".join(format_date(event_date).split('-')[1:])
+            updated_spreadsheets.initialize_table1_row(formatted_date)
 
             target_date = datetime(2020, 8, 10) + timedelta(hours=3, minutes=2, seconds=3)
             target_date = utc.localize(target_date)
@@ -242,6 +245,10 @@ if __name__ == '__main__':
                 demo_persona.update_stats(event_date, force_historical=True)
                 user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
                 user_stats_output.write(user_stats_string + '\n')
+                if len(todays_files) == 0:
+                    updated_spreadsheets.session_today = False
+                    updated_spreadsheets.initialize_table2_row(date=formatted_date)
+                updated_spreadsheets.update_daily_rows(user_stats_before=demo_persona.user_stats)
 
                 ird_datastore = InjuryRiskDatastore()
                 injury_risk_dict = ird_datastore.get(user_id)
@@ -266,6 +273,7 @@ if __name__ == '__main__':
 
                     plan_string = demo_utilities.get_periodization_plan_string(plan, event_date, athlete_readiness)
                     periodization_plan_output.write(plan_string + '\n')
+                    updated_spreadsheets.update_daily_rows(periodization_plan_before=plan, readiness_before=athlete_readiness)
 
             zero_date = date + timedelta(hours=0, minutes=0, seconds=0)
 
@@ -282,6 +290,7 @@ if __name__ == '__main__':
 
                 mobility_wod_string = demo_utilities.get_mobility_wod_string(event_date, all_soreness, response)
                 recovery_output.write(mobility_wod_string + '\n')
+                updated_spreadsheets.update_daily_rows(recovery_string=mobility_wod_string)
 
                 user_stats_datastore = UserStatsDatastore()
                 demo_persona.user_stats = user_stats_datastore.get(athlete_id=user_id)
@@ -301,6 +310,9 @@ if __name__ == '__main__':
 
             # for file_name in all_files:
             for workout in todays_files:
+                updated_spreadsheets.session_today = True
+                updated_spreadsheets.initialize_table2_row(formatted_date)
+                updated_spreadsheets.table2_row['Library'] = workout['library']
                 # workout = read_json(file_name, user_name)
                 pre_workout_event_date_time = date + timedelta(hours=8, minutes=30)
                 pre_workout_event_date_time = utc.localize(pre_workout_event_date_time)
@@ -325,11 +337,13 @@ if __name__ == '__main__':
                 response = submit_session_to_get_responsive_recovery(session_data, user_id, jwt, event_date_time, symptoms=soreness_after_session)
                 responsive_recovery_string = demo_utilities.get_responsive_recovery_string(event_date, soreness_after_session, response)
                 recovery_output.write(responsive_recovery_string + '\n')
+                updated_spreadsheets.update_daily_rows(recovery_string=responsive_recovery_string)
 
                 user_stats_datastore = UserStatsDatastore()
                 demo_persona.user_stats = user_stats_datastore.get(athlete_id=user_id)
                 user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
                 user_stats_output.write(user_stats_string + '\n')
+                updated_spreadsheets.update_daily_rows(user_stats_after=demo_persona.user_stats)
 
                 training_session_datastore = TrainingSessionDatastore()
                 training_sessions = training_session_datastore.get(user_id=user_id, event_date_time=event_date_time, read_session_load_dict=False)
@@ -345,6 +359,8 @@ if __name__ == '__main__':
                 for training_session in training_sessions:
                     session_string = demo_utilities.get_session_string(training_session)
                     workout_output.write(session_string + '\n')
+                    updated_spreadsheets.update_daily_rows(session=training_session)
+
                     if plan is not None:
                         plan = periodization_plan_processor.set_acute_chronic_muscle_needs(plan, event_date,
                                                                                            injury_risk_dict)
@@ -358,6 +374,7 @@ if __name__ == '__main__':
 
                         plan_string = demo_utilities.get_periodization_plan_string(plan, event_date, athlete_readiness)
                         periodization_plan_output.write(plan_string + '\n')
+                        updated_spreadsheets.update_daily_rows(periodization_plan_after=plan, readiness_after=athlete_readiness)
 
                     total_workouts += 1
 
@@ -393,9 +410,12 @@ if __name__ == '__main__':
 
                         plan_string = demo_utilities.get_periodization_plan_string(plan, event_date, athlete_readiness)
                         periodization_plan_output.write(plan_string + '\n')
+                        updated_spreadsheets.update_daily_rows(periodization_plan_after=plan, readiness_after=athlete_readiness)
 
             # last_date = event_date
             days_lived += 1
+
+        updated_spreadsheets.write_to_csv()
 
         user_stats_output.close()
         workout_output.close()
