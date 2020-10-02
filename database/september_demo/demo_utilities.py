@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 class DemoOutput(object):
     def __init__(self):
         self.user_stats_header_line = ("date, high_relative_load_sessions, high_relative_load_score, eligible_for_high_load_trigger," +
@@ -490,3 +493,353 @@ class DemoOutput(object):
         # scoring_string += get_training_unit_if_present_string(workout.athlete_capacities, "maximal_power", is_last=True)
 
         return scoring_string
+
+
+class UpdatedSpreadsheets(object):
+    def __init__(self, persona, start_date=None):
+        self.persona = persona
+        self.start_date = start_date
+        self.table1_periodization_plan = []
+        self.table2_workouts = []
+        self.table1_row = None
+        self.table2_row = None
+        self.demo_output = DemoOutput()
+        self.session_today = True
+
+
+    def initialize_table1_row(self, date):
+        self.table1_row = self.get_blank_table1_row()
+        self.table1_row['current_date'] = date
+        self.table1_periodization_plan.append(self.table1_row)
+
+    def initialize_table2_row(self, date=None):
+        self.table2_row = self.get_blank_table2_row()
+        self.table2_row['event_date_time'] = date
+        self.table2_workouts.append(self.table2_row)
+
+    def update_daily_rows(self, periodization_plan_before=None, periodization_plan_after=None,
+                          user_stats_before=None, user_stats_after=None,
+                          session=None,
+                          recovery_string=None,
+                          readiness_before=None, readiness_after=None
+                          ):
+        if recovery_string is not None:
+            self.update_table1_with_recovery(self.table1_row, recovery_string)
+        if periodization_plan_before is not None:
+            self.update_table1_with_periodization_plan_before(self.table1_row, periodization_plan_before)
+        if periodization_plan_after is not None:
+            self.update_table1_with_periodization_plan_after(self.table1_row, periodization_plan_after)
+        if user_stats_before is not None:
+            self.update_table1_with_user_stats(self.table1_row, user_stats_before)
+        if user_stats_after is not None:
+            self.update_table1_with_user_stats(self.table1_row, user_stats_after)
+            self.update_table2_with_user_stats(user_stats_after)
+        if session is not None:
+            self.update_table1_with_session(self.table1_row, session)
+            self.update_table2_with_session(self.table2_row, session)
+        if readiness_before is not None:
+            self.update_table1_with_athlete_readiness_before(self.table1_row, readiness_before)
+        if readiness_after is not None:
+            self.update_table1_with_athlete_readiness_after(self.table1_row, readiness_after)
+
+
+    @staticmethod
+    def get_blank_table1_row():
+        blank_row = {
+            "current_date": None,
+            # from athlete_readiness after overnight process
+            "readiness_score": None,
+            "load_score": None,
+            "rpe_score": None,
+            "internal_load_acwr_ratio": None,
+            "power_load_acwr_ratio": None,
+            "internal_acwr": None,
+            "power_load_acwr": None,
+
+            # from athlete_readiness after session
+            "after_readiness_score": None,
+            "after_load_score": None,
+            "after_rpe_score": None,
+            "after_internal_load_acwr_ratio": None,
+            "after_power_load_acwr_ratio": None,
+            "after_internal_acwr": None,
+            "after_power_load_acwr": None,
+
+            # from periodization plan sheet after overnight process
+            "acute_muscle_issues": None,
+            "chronic_muscle_issues": None,
+            "excessive_strain_muscles": None,
+            "compensating_muscles": None,
+            "functional_overreaching_muscles": None,
+            "non_functional_overreaching_muscles": None,
+            "tendon_issues": None,
+
+            "inflammation_level": None,
+            "muscle_spasm_level": None,
+            "internal_strain_events": None,
+            "power_load_strain_events": None,
+
+            # from periodization plan sheet after session
+            "after_acute_muscle_issues": None,
+            "after_chronic_muscle_issues": None,
+            "after_excessive_strain_muscles": None,
+            "after_compensating_muscles": None,
+            "after_functional_overreaching_muscles": None,
+            "after_non_functional_overreaching_muscles": None,
+            "after_tendon_issues": None,
+
+            # from workout (if present)
+            "high_intensity_session": None,
+
+            # from user_stats
+            "fo_workout_today": None,
+            "fo_workout_1_day": None,
+            "nfo_workout_today": None,
+            "nfo_workout_1_day": None,
+            "nfo_workout_2_day": None,
+            "average_weekly_internal_load": None,
+
+            "symptoms": None,
+            "CWI": None,
+            "Active Recovery": None,
+            "Mobility WOD": None,
+            "Active Rest": None,
+            "Ice": None,
+        }
+        return blank_row
+
+    @staticmethod
+    def get_output_columns_table1():
+        return [
+        'current_date',
+        'readiness_score',
+        'after_readiness_score',
+        'load_score',
+        'rpe_score',
+        'after_load_score',
+        'after_rpe_score',
+        'CWI',
+        'Active Recovery',
+        'Mobility WOD',
+        'Active Rest',
+        'Ice',
+        'internal_load_acwr_ratio',
+        'power_load_acwr_ratio',
+        'internal_acwr',
+        'power_load_acwr',
+        'high_intensity_session',
+        'fo_workout_today',
+        'fo_workout_1_day',
+        'nfo_workout_today',
+        'nfo_workout_1_day',
+        'nfo_workout_2_day',
+        'after_internal_load_acwr_ratio',
+        'after_power_load_acwr_ratio',
+        'after_internal_acwr',
+        'after_power_load_acwr',
+        'average_weekly_internal_load',
+        'symptoms',
+        'inflammation_level',
+        'muscle_spasm_level',
+        'internal_strain_events',
+        'power_load_strain_events',
+        'acute_muscle_issues',
+        'chronic_muscle_issues',
+        'excessive_strain_muscles',
+        'compensating_muscles',
+        'functional_overreaching_muscles',
+        'non_functional_overreaching_muscles',
+        'tendon_issues',
+        'after_acute_muscle_issues',
+        'after_chronic_muscle_issues',
+        'after_excessive_strain_muscles',
+        'after_compensating_muscles',
+        'after_functional_overreaching_muscles',
+        'after_non_functional_overreaching_muscles',
+        'after_tendon_issues'
+        ]
+
+    @staticmethod
+    def get_blank_table2_row():
+        return {
+            "event_date_time": None,
+            "Workout": None,
+            "Library": None,
+            "distance": None,
+            "duration_minutes": None,
+            "session_rpe": None,
+            "power_load_highest": None,
+            "scaled_power_load_highest": None,
+            "rpe_load_highest": None,
+            "training_volume": None,
+            "high_intensity_session": None,
+            "fo_workout_today": None,
+            "fo_workout_1_day": None,
+            "nfo_workout_today": None,
+            "nfo_workout_1_day": None,
+            "nfo_workout_2_day": None,
+            "load_remaining": None,
+            "rpe_base_aerobic_training": None,
+            "volume_base_aerobic_training": None,
+            "load_base_aerobic_training": None,
+            "rpe_anaerobic_threshold_training": None,
+            "volume_anaerobic_threshold_training": None,
+            "load_anaerobic_threshold_training": None,
+            "rpe_high_intensity_anaerobic_training": None,
+            "volume_high_intensity_anaerobic_training": None,
+            "load_high_intensity_anaerobic_training": None,
+            "rpe_strength_endurance": None,
+            "volume_strength_endurance": None,
+            "load_strength_endurance": None,
+            "rpe_speed": None,
+            "volume_speed": None,
+            "load_speed": None,
+            "rpe_power": None,
+            "volume_power": None,
+            "load_power": None,
+            "rpe_maximal_power": None,
+            "volume_maximal_power": None,
+            "load_maximal_power": None,
+            "rpe_sustained_power": None,
+            "volume_sustained_power": None,
+            "load_sustained_power": None,
+            "rpe_muscular_endurance": None,
+            "volume_muscular_endurance": None,
+            "load_muscular_endurance": None,
+            "target_training_exposures": None
+        }
+
+    @staticmethod
+    def get_output_columns_table2():
+        return []
+
+    @staticmethod
+    def get_recovery_from_string(recovery_string):
+        components = recovery_string.split(',')
+        symptoms = components[1]
+        recovery = {"symptoms": symptoms,
+                    "CWI": False,
+                    "Active Recovery": False,
+                    "Mobility WOD": False,
+                    "Active Rest": False,
+                    "Ice": False}
+        if "Mobility WOD: Active" in components[2]:
+            recovery["Mobility WOD"] = True
+        if components[2] == "Active Rest":
+            recovery["Active Rest"] = True
+        if "Active Recovery" in components[2]:
+            recovery["Active Recovery"] = True
+        if "Ice" in components[6]:
+            recovery["Ice"] = True
+        if "COLD WATER IMMERSION" in components[6]:
+            recovery["CWI"] = True
+        return recovery
+
+    def update_table1_with_recovery(self, daily_row, recovery_string):
+        recovery = self.get_recovery_from_string(recovery_string)
+        for key, value in recovery.items():
+            daily_row[key] = value
+
+    def update_table1_with_athlete_readiness_before(self, daily_row, athlete_readiness):
+        daily_row['readiness_score'] = int(athlete_readiness.readiness_score) if athlete_readiness.readiness_score is not None else None
+        daily_row['load_score'] = int(athlete_readiness.load_score) if athlete_readiness.load_score is not None else None
+        daily_row['rpe_score'] = int(athlete_readiness.rpe_score) if athlete_readiness.rpe_score is not None else None
+        daily_row['internal_load_acwr_ratio'] = round(athlete_readiness.internal_load_acwr_ratio, 2) if athlete_readiness.internal_load_acwr_ratio is not None else None
+        daily_row['power_load_acwr_ratio'] = round(athlete_readiness.power_load_acwr_ratio, 2) if athlete_readiness.power_load_acwr_ratio is not None else None
+        daily_row['internal_acwr'] = round(athlete_readiness.internal_acwr, 2) if athlete_readiness.internal_acwr is not None else None
+        daily_row['power_load_acwr'] = round(athlete_readiness.power_load_acwr, 2) if athlete_readiness.power_load_acwr is not None else None
+        if athlete_readiness.average_weekly_internal_load is not None and athlete_readiness.average_weekly_internal_load.highest_value() is not None:
+            daily_row['average_weekly_internal_load'] = int(athlete_readiness.average_weekly_internal_load.highest_value())
+
+    @staticmethod
+    def update_table1_with_athlete_readiness_after(daily_row, athlete_readiness):
+        daily_row['after_readiness_score'] = int(athlete_readiness.readiness_score) if athlete_readiness.readiness_score is not None else None
+        daily_row['after_load_score'] = int(athlete_readiness.load_score) if athlete_readiness.load_score is not None else None
+        daily_row['after_rpe_score'] = int(athlete_readiness.rpe_score) if athlete_readiness.rpe_score is not None else None
+        daily_row['after_internal_load_acwr_ratio'] = round(athlete_readiness.internal_load_acwr_ratio, 2) if athlete_readiness.internal_load_acwr_ratio is not None else None
+        daily_row['after_power_load_acwr_ratio'] = round(athlete_readiness.power_load_acwr_ratio, 2) if athlete_readiness.power_load_acwr_ratio is not None else None
+        daily_row['after_internal_acwr'] = round(athlete_readiness.internal_acwr, 2) if athlete_readiness.internal_acwr is not None else None
+        daily_row['after_power_load_acwr'] = round(athlete_readiness.power_load_acwr, 2) if athlete_readiness.power_load_acwr is not None else None
+
+    def update_table1_with_periodization_plan_before(self, daily_row, periodization_plan_before):
+
+        daily_row['acute_muscle_issues'] = self.demo_output.get_body_part_side_string(periodization_plan_before.acute_muscle_issues)
+        daily_row['chronic_muscle_issues'] = self.demo_output.get_body_part_side_string(periodization_plan_before.chronic_muscle_issues)
+        daily_row['excessive_strain_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_before.excessive_strain_muscles)
+        daily_row['compensating_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_before.compensating_muscles)
+        daily_row['functional_overreaching_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_before.functional_overreaching_muscles)
+        daily_row['non_functional_overreaching_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_before.non_functional_overreaching_muscles)
+        daily_row['tendon_issues'] = self.demo_output.get_body_part_side_string(periodization_plan_before.tendon_issues)
+
+    def update_table1_with_periodization_plan_after(self, daily_row, periodization_plan_after):
+
+        daily_row['after_acute_muscle_issues'] = self.demo_output.get_body_part_side_string(periodization_plan_after.acute_muscle_issues)
+        daily_row['after_chronic_muscle_issues'] = self.demo_output.get_body_part_side_string(periodization_plan_after.chronic_muscle_issues)
+        daily_row['after_excessive_strain_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_after.excessive_strain_muscles)
+        daily_row['after_compensating_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_after.compensating_muscles)
+        daily_row['after_functional_overreaching_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_after.functional_overreaching_muscles)
+        daily_row['after_non_functional_overreaching_muscles'] = self.demo_output.get_body_part_side_string(periodization_plan_after.non_functional_overreaching_muscles)
+        daily_row['after_tendon_issues'] = self.demo_output.get_body_part_side_string(periodization_plan_after.tendon_issues)
+
+    def update_table1_with_user_stats_before(self, daily_row, user_stats_before):
+        pass
+        # daily_row['fo_workoout_today'] = str(user_stats_before.functional_overreaching_workout_today)
+        # daily_row['fo_workout_1_day'] = str(user_stats_before.functional_overreaching_workout_1_day)
+        # daily_row['nfo_workout_today'] = str(user_stats_before.non_functional_overreaching_workout_today)
+        # daily_row['nfo_workout_1_day'] = str(user_stats_before.non_functional_overreaching_workout_1_day)
+        # daily_row['nfo_workout_2_day'] = str(user_stats_before.non_functional_overreaching_workout_2_day)
+
+    def update_table1_with_user_stats(self, daily_row, user_stats_after):
+        daily_row['fo_workout_today'] = str(user_stats_after.functional_overreaching_workout_today)
+        daily_row['fo_workout_1_day'] = str(user_stats_after.functional_overreaching_workout_1_day)
+        daily_row['nfo_workout_today'] = str(user_stats_after.non_functional_overreaching_workout_today)
+        daily_row['nfo_workout_1_day'] = str(user_stats_after.non_functional_overreaching_workout_1_day)
+        daily_row['nfo_workout_2_day'] = str(user_stats_after.non_functional_overreaching_workout_2_day)
+
+    @staticmethod
+    def update_table1_with_session(daily_row, session):
+        if daily_row['high_intensity_session'] is None or not daily_row['high_intensity_session']:
+            daily_row['high_intensity_session'] = session.contains_high_intensity_blocks()
+
+    def update_table2_with_session(self, session_row, session):
+        session_row['Workout'] = session.description
+        session_row['distance'] = int(session.distance) if session.distance is not None else None
+        session_row['distance'] = round(session.distance / 100, 1) if session.distance is not None else None
+        session_row['duration_minutes'] = int(session.duration_minutes)
+        session_row['session_rpe'] = round(session.session_RPE, 1)
+        session_row['power_load_highest'] = int(session.power_load.highest_value()) if session.power_load.highest_value() is not None else None
+        session_row['scaled_power_load_highest'] = int(session.power_load.highest_value() / 50) if session.power_load.highest_value() is not None else None
+        session_row['rpe_load_highest'] = int(session.rpe_load.highest_value()) if session.rpe_load.highest_value() is not None else None
+        session_row['training_volume'] = int(session.training_volume) if session.training_volume is not None else None
+        session_row['high_intensity_session'] = session.contains_high_intensity_blocks()
+        for exposure in session.training_exposures:
+            adaptation_type = exposure.detailed_adaptation_type.name
+            rpe = exposure.rpe.highest_value()
+            if rpe is not None:
+                rpe = round(rpe, 1)
+            volume = exposure.volume.highest_value()
+            if volume is not None:
+                volume = round(volume, 2)
+            rpe_load = exposure.rpe_load.highest_value()
+            if rpe_load is not None:
+                rpe_load = round(rpe_load, 2)
+            session_row[f"rpe_{adaptation_type}"] = rpe
+            session_row[f"volume_{adaptation_type}"] = volume
+            session_row[f"load_{adaptation_type}"] = rpe_load
+
+    def update_table2_with_user_stats(self, user_stats):
+        self.table2_row['fo_workout_today'] = str(user_stats.functional_overreaching_workout_today)
+        self.table2_row['fo_workout_1_day'] = str(user_stats.functional_overreaching_workout_1_day)
+        self.table2_row['nfo_workout_today'] = str(user_stats.non_functional_overreaching_workout_today)
+        self.table2_row['nfo_workout_1_day'] = str(user_stats.non_functional_overreaching_workout_1_day)
+        self.table2_row['nfo_workout_2_day'] = str(user_stats.non_functional_overreaching_workout_2_day)
+
+    def write_to_csv(self):
+        table1_pd = pd.DataFrame(self.table1_periodization_plan)
+        if self.start_date is not None:
+            table1_pd = table1_pd[table1_pd['current_date'] >= self.start_date]
+        table1_pd.to_csv(f'output/periodization_plan_{self.persona}_v2.csv', index=False, columns=self.get_output_columns_table1())
+        table2_pd = pd.DataFrame(self.table2_workouts)
+        if self.start_date is not None:
+            table2_pd = table2_pd[table2_pd['event_date_time'] >= self.start_date]
+        table2_pd.to_csv(f'output/workouts_{self.persona}_v2.csv', index=False)  #, columns=self.get_output_columns_table2())
