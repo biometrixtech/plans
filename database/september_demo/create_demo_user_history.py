@@ -328,6 +328,7 @@ if __name__ == '__main__':
 
                     plan_string = demo_utilities.get_periodization_plan_string(plan, event_date, athlete_readiness)
                     periodization_plan_output.write(plan_string + '\n')
+                    updated_spreadsheets.update_daily_rows(periodization_plan_before=plan, readiness_before=athlete_readiness)
 
             all_files = os.listdir(f'workouts/{user_name}')
 
