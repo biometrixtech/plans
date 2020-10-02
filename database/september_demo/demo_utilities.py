@@ -472,8 +472,9 @@ class DemoOutput(object):
 
     def get_scoring_string(self, event_date, workout):
 
-        scoring_string = str(event_date) + "," + str(workout.score) + "," + workout.program_module_id.replace(',',
-                                                                                                              '_') + ","
+        scoring_string = str(event_date) + ","
+        scoring_string += str(workout.score.is_safe) + "," + str(workout.score.is_relevant) + "," + str(workout.score.is_necessary) + ","
+        scoring_string += workout.program_module_id.replace(',', '_') + ","
 
         scoring_string += self.get_training_exposure_string(workout)
         # scoring_string += get_training_unit_if_present_string(workout.athlete_capacities, "base_aerobic_training")

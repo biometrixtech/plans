@@ -79,7 +79,7 @@ def test_several_sessions_high_load_2():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 100 == training_load_processing.high_relative_load_score
+    assert 70 == training_load_processing.high_relative_load_score
 
 def test_sparse_sessions_mod_load():
 
@@ -101,7 +101,7 @@ def test_sparse_sessions_mod_load():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 80 == training_load_processing.high_relative_load_score
+    assert 70 == training_load_processing.high_relative_load_score
 
 def test_sparse_sessions_high_and_top():
 
@@ -168,7 +168,7 @@ def test_sparse_sessions_high_load_but_not_normal():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 75 < training_load_processing.high_relative_load_score
+    assert 50 == training_load_processing.high_relative_load_score
 
 def test_very_sparse_sessions_mod_high_load():
 
@@ -190,7 +190,7 @@ def test_very_sparse_sessions_mod_high_load():
 
     training_load_processing.load_training_session_values(sessions, [], [])
     current_user_stats = training_load_processing.calc_training_load_metrics(user_stats)
-    assert 80 == training_load_processing.high_relative_load_score
+    assert 100 == training_load_processing.high_relative_load_score
 
 def test_very_sparse_sessions_high_load():
 

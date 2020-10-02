@@ -809,7 +809,7 @@ class TrainingLoadProcessing(object):
 
         if second_highest_rpe_load.highest_value() is not None:
 
-            if session.rpe_load is not None and session.rpe_load.highest_value() is not None and session.rpe_load.highest_value() > 0:
+            if session.rpe_load is not None and session.rpe_load.highest_value() is not None and second_highest_rpe_load.highest_value() > 0:
                 load_ratio = session.rpe_load.highest_value() / second_highest_rpe_load.highest_value()
 
                 if 1.05 <= load_ratio <= 1.20:
@@ -818,7 +818,7 @@ class TrainingLoadProcessing(object):
                     score += 25
         if second_highest_power_load.highest_value() is not None:
 
-            if session.power_load is not None and session.power_load.highest_value() is not None and session.power_load.highest_value() > 0:
+            if session.power_load is not None and session.power_load.highest_value() is not None and second_highest_power_load.highest_value() > 0:
                 load_ratio = session.power_load.highest_value() / second_highest_power_load.highest_value()
 
                 if 1.05 <= load_ratio <= 1.20:
