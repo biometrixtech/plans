@@ -372,9 +372,13 @@ class AthleteCapacityProcessor(object):
             first_date = next(iter(sorted_inflammation))
             days_diff = (current_date.date() - first_date[0]).days
 
+            days_diff = min(days_diff, first_date[1])
+
             recent_max_inflammation = first_date[1]
 
-            decayed_inflammation = ((10 - days_diff) / 10) * recent_max_inflammation
+            decayed_inflammation = ((first_date[1] - days_diff) / first_date[1]) * recent_max_inflammation
+
+            decayed_inflammation = max(decayed_inflammation, 0)
 
         return decayed_inflammation
 
