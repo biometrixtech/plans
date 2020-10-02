@@ -97,14 +97,15 @@ class InjuryRiskProcessor(object):
         relevant_training_sessions = [s for s in self.training_sessions if s.event_date.date() == base_date]
 
         for r in relevant_training_sessions:
-            high_intensity_session = r.ultra_high_intensity_session()
-            if r.session_RPE is not None:
-                if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
-                    self.relative_load_level = min(self.relative_load_level, 1)
-                elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
-                    self.relative_load_level = min(self.relative_load_level, 2)
+            if r.session_type == SessionType.sport_training:
+                high_intensity_session = r.ultra_high_intensity_session()
+                if r.session_RPE is not None:
+                    if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
+                        self.relative_load_level = min(self.relative_load_level, 1)
+                    elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
+                        self.relative_load_level = min(self.relative_load_level, 2)
 
-            if r.session_type() == SessionType.mixed_activity or r.session_type() == SessionType.planned:
+            elif r.session_type() == SessionType.mixed_activity or r.session_type() == SessionType.planned:
                 if r.contains_high_intensity_blocks():
                     self.relative_load_level = min(self.relative_load_level, 1)
                 elif r.contains_moderate_intensity_blocks():

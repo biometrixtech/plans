@@ -185,6 +185,9 @@ class AthleteCapacityProcessor(object):
 
         inflammation_level = self.get_inflammation_level(current_date, injury_risk_dict)
 
+        if inflammation_level == 0:
+            inflammation_level = self.get_decayed_inflammation_level(current_date, injury_risk_dict)
+
         athlete_readiness.inflammation_level = inflammation_level
 
         muscle_spasm_level = self.get_muscle_spasm_level(current_date, injury_risk_dict)
@@ -340,6 +343,44 @@ class AthleteCapacityProcessor(object):
                 inflammation_level = max(body_part_injury_risk.last_ache_level, inflammation_level)
 
         return inflammation_level
+
+    def get_decayed_inflammation_level(self, current_date, injury_risk_dict):
+
+        date_with_inflammation = {}
+        decayed_inflammation = 0
+
+        for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            if body_part_injury_risk.last_sharp_date is not None:
+                cleaned_date = self.get_clean_date(body_part_injury_risk.last_sharp_date)
+                if cleaned_date not in date_with_inflammation:
+                    date_with_inflammation[cleaned_date] = body_part_injury_risk.last_sharp_level
+                else:
+                    date_with_inflammation[cleaned_date] = max(body_part_injury_risk.last_sharp_level,
+                                                               date_with_inflammation[cleaned_date])
+            if body_part_injury_risk.last_ache_date is not None:
+                cleaned_date = self.get_clean_date(body_part_injury_risk.last_ache_date)
+                if cleaned_date not in date_with_inflammation:
+                    date_with_inflammation[cleaned_date] = body_part_injury_risk.last_ache_level
+                else:
+                    date_with_inflammation[cleaned_date] = max(body_part_injury_risk.last_ache_level,
+                                                               date_with_inflammation[cleaned_date])
+
+        if len(date_with_inflammation) > 0:
+            inflammation_items = date_with_inflammation.items()
+            sorted_inflammation = sorted(inflammation_items, reverse=True)
+
+            first_date = next(iter(sorted_inflammation))
+            days_diff = (current_date.date() - first_date[0]).days
+
+            days_diff = min(days_diff, first_date[1])
+
+            recent_max_inflammation = first_date[1]
+
+            decayed_inflammation = ((first_date[1] - days_diff) / first_date[1]) * recent_max_inflammation
+
+            decayed_inflammation = max(decayed_inflammation, 0)
+
+        return decayed_inflammation
 
     def get_muscle_spasm_level(self, current_date, injury_risk_dict):
 
