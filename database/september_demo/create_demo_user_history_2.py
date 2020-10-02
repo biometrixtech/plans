@@ -188,7 +188,8 @@ if __name__ == '__main__':
         periodization_plan_output.write(demo_utilities.periodization_plan_header_line + '\n')
 
         scoring_output = open('output/workout_scoring_' + user_name + ".csv", "w")
-        scoring_output_header_line = ("event_date,score,program_module_id, training_exposures")
+        scoring_output_header_line = (
+            "event_date,is_safe, is_relevant, is_necessary, program_module_id, training_exposures")
 
         scoring_output.write(scoring_output_header_line + '\n')
 

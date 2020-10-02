@@ -1,31 +1,36 @@
 from models.movement_tags import DetailedAdaptationType
 from models.periodization_utilities import PeriodizationUtilities
+from models.workout_score import WorkoutScore
 
 class WorkoutScoringProcessor(object):
 
     def score_workout(self, athlete_baseline_capacities, athlete_exposure_needs, training_exposures):
 
-        total_score = 0
+        workout_score = WorkoutScore()
 
-        is_safe = self.is_safe(athlete_baseline_capacities, training_exposures)
+        workout_score.total_score = 0
 
-        if is_safe:
+        workout_score.is_safe = self.is_safe(athlete_baseline_capacities, training_exposures)
 
-            total_score += 35
+        if workout_score.is_safe:
 
-            relevant_score = self.get_relevant_score(athlete_exposure_needs, training_exposures)
+            workout_score.total_score += 35
 
-            total_score += relevant_score
+            workout_score.is_relevant = self.is_relevant(athlete_exposure_needs, training_exposures)
 
-            necessary_score = self.get_necessary_score(athlete_exposure_needs, training_exposures)
+            if workout_score.is_relevant:
+                workout_score.total_score += 20
 
-            total_score += necessary_score
+            workout_score.is_necessary = self.is_necessary(athlete_exposure_needs, training_exposures)
 
-            ideal_score = self.get_ideal_score(athlete_exposure_needs, training_exposures)
+            if workout_score.is_necessary:
+                workout_score.total_score += 20
 
-            total_score += ideal_score
+            #ideal_score = self.get_ideal_score(athlete_exposure_needs, training_exposures)
 
-        return total_score
+            #total_score += ideal_score
+
+        return workout_score
 
     def is_safe(self, athlete_baseline_capacities, training_exposures, injury_risk_dict=None,
                 session_load_dict=None):
@@ -52,9 +57,9 @@ class WorkoutScoringProcessor(object):
 
         return safe
 
-    def get_relevant_score(self, athlete_exposure_needs, training_exposures):
+    def is_relevant(self, athlete_exposure_needs, training_exposures):
 
-        score = 0
+        relevant = False
 
         utils = PeriodizationUtilities()
 
@@ -65,18 +70,22 @@ class WorkoutScoringProcessor(object):
             exposures_found = 0
 
             for athlete_exposure_need in athlete_exposure_needs:
-                if utils.is_athlete_need_in_workout_exposures(athlete_exposure_need, training_exposures):
+                if utils.is_athlete_need_in_workout_exposures(athlete_exposure_need, training_exposures, factor=1.10):
                     exposures_found += 1
 
-            found_ratio = exposures_found / float(total_needs)
+            #found_ratio = exposures_found / float(total_needs)
 
-            score = found_ratio * 20
+            #score = found_ratio * 20
 
-        return score
+            if exposures_found > 0:
+                #score = 20
+                relevant = True
 
-    def get_necessary_score(self, athlete_exposure_needs, training_exposures):
+        return relevant
 
-        score = 0
+    def is_necessary(self, athlete_exposure_needs, training_exposures):
+
+        necessary = False
 
         utils = PeriodizationUtilities()
 
@@ -90,11 +99,14 @@ class WorkoutScoringProcessor(object):
                 if utils.is_athlete_need_in_workout_exposures(athlete_exposure_need, training_exposures, include_count=True):
                     exposures_found += 1
 
-            found_ratio = exposures_found / float(total_needs)
+            #found_ratio = exposures_found / float(total_needs)
 
-            score = found_ratio * 20
+            #score = found_ratio * 20
+            if exposures_found > 0:
+                #score = 20
+                necessary = True
 
-        return score
+        return necessary
 
     def get_ideal_score(self, athlete_exposure_needs, training_exposures):
 

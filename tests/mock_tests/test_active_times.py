@@ -246,10 +246,10 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
     assert duration_complete > 0
     assert duration_comprehensive > 0
 
-    assert ice is None
-    assert cwi is not None
-    cwi_json = cwi.json_serialise()
-    assert cwi_json['minutes'] == 10
+    assert ice is not None
+    assert cwi is  None
+    #cwi_json = cwi.json_serialise()
+    #assert cwi_json['minutes'] == 10
 
 
 def test_get_responsive_recovery_with_simple_session_one_symptom_low_rpe():

@@ -8,6 +8,7 @@ from models.training_load import DetailedTrainingLoad, TrainingTypeLoad
 from models.exercise import UnitOfMeasure, WeightMeasure
 from models.soreness_base import BodyPartSide, BodyPartFunctionalMovement
 from models.exposure import TrainingExposure
+from models.workout_score import WorkoutScore
 from serialisable import Serialisable
 
 
@@ -91,7 +92,7 @@ class PlannedWorkoutLoad(PlannedWorkout, Serialisable):
         self.projected_training_volume = StandardErrorRange()
 
         self.ranking = 0
-        self.score = 0
+        self.score = None
 
         self.training_exposures = []
 

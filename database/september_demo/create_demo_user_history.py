@@ -252,7 +252,7 @@ if __name__ == '__main__':
         periodization_plan_output.write(demo_utilities.periodization_plan_header_line + '\n')
         
         scoring_output = open('output/workout_scoring_' + user_name + ".csv", "w")
-        scoring_output_header_line = ("event_date,score,program_module_id, training_exposures")
+        scoring_output_header_line = ("event_date,is_safe, is_relevant, is_necessary, program_module_id, training_exposures")
 
         scoring_output.write(scoring_output_header_line + '\n')
 
@@ -361,7 +361,7 @@ if __name__ == '__main__':
                     for planned_workout in planned_workouts:
                         planned_workout.score = scoring_proc.score_workout(plan.athlete_capacities, plan.target_training_exposures, planned_workout.training_exposures)
 
-                    planned_workouts.sort(key=lambda x:x.score, reverse=True)
+                    planned_workouts.sort(key=lambda x:x.score.total_score, reverse=True)
 
                     for planned_workout in planned_workouts:
                         scoring_string = demo_utilities.get_scoring_string(event_date, planned_workout)
@@ -445,7 +445,7 @@ if __name__ == '__main__':
                     for planned_workout in planned_workouts:
                         planned_workout.score = scoring_proc.score_workout(plan.athlete_capacities, plan.target_training_exposures, planned_workout.training_exposures)
 
-                    planned_workouts.sort(key=lambda x:x.score, reverse=True)
+                    planned_workouts.sort(key=lambda x:x.score.total_score, reverse=True)
 
                     for planned_workout in planned_workouts:
                         scoring_string = demo_utilities.get_scoring_string(event_date, planned_workout)

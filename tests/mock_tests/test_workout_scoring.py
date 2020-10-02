@@ -68,9 +68,9 @@ def test_relevant_score_20():
     athlete_training_exposure_needs = get_base_training_long_exposure_needs()
     workout_training_exposures = get_base_training_workout_exposures()
 
-    score = proc.get_relevant_score(athlete_training_exposure_needs, workout_training_exposures)
+    relevant = proc.is_relevant(athlete_training_exposure_needs, workout_training_exposures)
 
-    assert 20 == score
+    assert True is relevant
 
 
 def test_relevant_score_0():
@@ -80,7 +80,7 @@ def test_relevant_score_0():
     athlete_training_exposure_needs = get_anaerobic_threshold_training_exposure_needs()
     workout_training_exposures = get_base_training_workout_exposures()
 
-    score = proc.get_relevant_score(athlete_training_exposure_needs, workout_training_exposures)
+    score = proc.is_relevant(athlete_training_exposure_needs, workout_training_exposures)
 
     assert 0 == score
 
@@ -95,9 +95,9 @@ def test_relevant_score_10():
     athlete_training_exposure_needs.extend(get_anaerobic_threshold_training_exposure_needs())
     workout_training_exposures = get_base_training_workout_exposures()
 
-    score = proc.get_relevant_score(athlete_training_exposure_needs, workout_training_exposures)
+    relevant = proc.is_relevant(athlete_training_exposure_needs, workout_training_exposures)
 
-    assert 10 == score
+    assert True is relevant
 
 
 def test_necessary_score_20():
@@ -107,9 +107,9 @@ def test_necessary_score_20():
     athlete_training_exposure_needs = get_base_training_long_exposure_needs()
     workout_training_exposures = get_base_training_workout_exposures()
 
-    score = proc.get_necessary_score(athlete_training_exposure_needs, workout_training_exposures)
+    necessary = proc.is_necessary(athlete_training_exposure_needs, workout_training_exposures)
 
-    assert 20 == score
+    assert True is necessary
 
 
 def test_necessary_score_0():
@@ -121,7 +121,7 @@ def test_necessary_score_0():
 
     workout_training_exposures = get_base_training_workout_exposures()
 
-    score = proc.get_necessary_score(athlete_training_exposure_needs, workout_training_exposures)
+    score = proc.is_necessary(athlete_training_exposure_needs, workout_training_exposures)
 
     assert 0 == score
 
@@ -136,9 +136,9 @@ def test_necessary_score_10():
     athlete_training_exposure_needs.extend(get_anaerobic_threshold_training_exposure_needs())
     workout_training_exposures = get_base_training_workout_exposures()
 
-    score = proc.get_necessary_score(athlete_training_exposure_needs, workout_training_exposures)
+    necessary = proc.is_necessary(athlete_training_exposure_needs, workout_training_exposures)
 
-    assert 10 == score
+    assert True is necessary
 
 
 # TODO include ideal score
@@ -152,4 +152,4 @@ def test_total_score_75():
 
     score = proc.score_workout(capacities, athlete_training_exposure_needs, workout_training_exposures)
 
-    assert 75 == score
+    assert 75 == score.total_score

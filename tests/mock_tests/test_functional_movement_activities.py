@@ -339,8 +339,8 @@ def test_get_responsive_recovery_with_mixed_activity_session_no_symptoms():
     print("\nactive_recovery, 100 mins mixed activity, no symptoms")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
 
-    assert responsive_recovery.active_recovery is not None
-    activity = responsive_recovery.active_recovery
+    assert responsive_recovery.active_rest is not None
+    activity = responsive_recovery.active_rest
 
     assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
 
@@ -393,8 +393,8 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
 
     assert responsive_recovery.active_recovery is not None
     assert responsive_recovery.active_rest is None
-    assert responsive_recovery.ice is None
-    assert responsive_recovery.cold_water_immersion is not None
+    assert responsive_recovery.ice is not None
+    assert responsive_recovery.cold_water_immersion is None
     activity = responsive_recovery.active_recovery
 
     assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
