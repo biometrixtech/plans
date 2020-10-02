@@ -529,12 +529,10 @@ class UpdatedSpreadsheets(object):
         if periodization_plan_after is not None:
             self.update_table1_with_periodization_plan_after(self.table1_row, periodization_plan_after)
         if user_stats_before is not None:
-            self.update_table1_with_user_stats_before(self.table1_row, user_stats_before)
-            if not self.session_today:
-                self.update_table2_with_user_stats(self.table2_row, user_stats_before)
+            self.update_table1_with_user_stats(self.table1_row, user_stats_before)
         if user_stats_after is not None:
-            self.update_table1_with_user_stats_after(self.table1_row, user_stats_after)
-            self.update_table2_with_user_stats(self.table2_row, user_stats_after)
+            self.update_table1_with_user_stats(self.table1_row, user_stats_after)
+            self.update_table2_with_user_stats(user_stats_after)
         if session is not None:
             self.update_table1_with_session(self.table1_row, session)
             self.update_table2_with_session(self.table2_row, session)
@@ -790,7 +788,7 @@ class UpdatedSpreadsheets(object):
         # daily_row['nfo_workout_1_day'] = str(user_stats_before.non_functional_overreaching_workout_1_day)
         # daily_row['nfo_workout_2_day'] = str(user_stats_before.non_functional_overreaching_workout_2_day)
 
-    def update_table1_with_user_stats_after(self, daily_row, user_stats_after):
+    def update_table1_with_user_stats(self, daily_row, user_stats_after):
         daily_row['fo_workout_today'] = str(user_stats_after.functional_overreaching_workout_today)
         daily_row['fo_workout_1_day'] = str(user_stats_after.functional_overreaching_workout_1_day)
         daily_row['nfo_workout_today'] = str(user_stats_after.non_functional_overreaching_workout_today)
@@ -799,7 +797,7 @@ class UpdatedSpreadsheets(object):
 
     @staticmethod
     def update_table1_with_session(daily_row, session):
-        if daily_row['high_intensity_session'] is not None and not daily_row['high_intensity_session']:
+        if daily_row['high_intensity_session'] is None or not daily_row['high_intensity_session']:
             daily_row['high_intensity_session'] = session.contains_high_intensity_blocks()
 
     def update_table2_with_session(self, session_row, session):
@@ -828,13 +826,12 @@ class UpdatedSpreadsheets(object):
             session_row[f"volume_{adaptation_type}"] = volume
             session_row[f"load_{adaptation_type}"] = rpe_load
 
-    @staticmethod
-    def update_table2_with_user_stats(session_row, user_stats_after):
-        session_row['fo_workout_today'] = str(user_stats_after.functional_overreaching_workout_today)
-        session_row['fo_workout_1_day'] = str(user_stats_after.functional_overreaching_workout_1_day)
-        session_row['nfo_workout_today'] = str(user_stats_after.non_functional_overreaching_workout_today)
-        session_row['nfo_workout_1_day'] = str(user_stats_after.non_functional_overreaching_workout_1_day)
-        session_row['nfo_workout_2_day'] = str(user_stats_after.non_functional_overreaching_workout_2_day)
+    def update_table2_with_user_stats(self, user_stats):
+        self.table2_row['fo_workout_today'] = str(user_stats.functional_overreaching_workout_today)
+        self.table2_row['fo_workout_1_day'] = str(user_stats.functional_overreaching_workout_1_day)
+        self.table2_row['nfo_workout_today'] = str(user_stats.non_functional_overreaching_workout_today)
+        self.table2_row['nfo_workout_1_day'] = str(user_stats.non_functional_overreaching_workout_1_day)
+        self.table2_row['nfo_workout_2_day'] = str(user_stats.non_functional_overreaching_workout_2_day)
 
     def write_to_csv(self):
         table1_pd = pd.DataFrame(self.table1_periodization_plan)

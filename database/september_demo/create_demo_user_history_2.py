@@ -245,9 +245,6 @@ if __name__ == '__main__':
                 demo_persona.update_stats(event_date, force_historical=True)
                 user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
                 user_stats_output.write(user_stats_string + '\n')
-                if len(todays_files) == 0:
-                    updated_spreadsheets.session_today = False
-                    updated_spreadsheets.initialize_table2_row(date=formatted_date)
                 updated_spreadsheets.update_daily_rows(user_stats_before=demo_persona.user_stats)
 
                 ird_datastore = InjuryRiskDatastore()
@@ -283,6 +280,8 @@ if __name__ == '__main__':
             check_now = 0
 
             if len(todays_files) == 0:  # no workout available for this day
+                updated_spreadsheets.initialize_table2_row(date=formatted_date)
+                updated_spreadsheets.update_table2_with_user_stats(demo_persona.user_stats)
                 all_soreness = []
                 all_soreness.extend(soreness_before_session)
                 all_soreness.extend(soreness_after_session)
@@ -310,7 +309,6 @@ if __name__ == '__main__':
 
             # for file_name in all_files:
             for workout in todays_files:
-                updated_spreadsheets.session_today = True
                 updated_spreadsheets.initialize_table2_row(formatted_date)
                 updated_spreadsheets.table2_row['Library'] = workout['library']
                 # workout = read_json(file_name, user_name)

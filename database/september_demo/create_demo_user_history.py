@@ -305,9 +305,6 @@ if __name__ == '__main__':
                 demo_persona.update_stats(event_date, force_historical=True)
                 user_stats_string = demo_utilities.get_user_stats_string(demo_persona.user_stats)
                 user_stats_output.write(user_stats_string + '\n')
-                if len(todays_files) == 0:
-                    updated_spreadsheets.session_today = False
-                    updated_spreadsheets.initialize_table2_row(date=formatted_date)
                 updated_spreadsheets.update_daily_rows(user_stats_before=demo_persona.user_stats)
 
                 ird_datastore = InjuryRiskDatastore()
@@ -346,6 +343,8 @@ if __name__ == '__main__':
             check_now =0
 
             if len(todays_files) == 0:  # no workout available for this day
+                updated_spreadsheets.initialize_table2_row(date=formatted_date)
+                updated_spreadsheets.update_table2_with_user_stats(demo_persona.user_stats)
                 response = submit_mobility_wod_request([], user_id, event_date, symptoms=serialised_soreness, user_age=user_age)
 
                 mobility_wod_string = demo_utilities.get_mobility_wod_string(event_date, serialised_soreness, response)
@@ -370,7 +369,6 @@ if __name__ == '__main__':
 
             #for file_name in all_files:
             for file_name in todays_files:
-                updated_spreadsheets.session_today = True
                 updated_spreadsheets.initialize_table2_row(formatted_date)
                 workout = read_json(file_name, user_name)
 
@@ -476,7 +474,7 @@ if __name__ == '__main__':
             #last_date = event_date
             days_lived += 1
         updated_spreadsheets.write_to_csv()
-        
+
         user_stats_output.close()
         workout_output.close()
         periodization_plan_output.close()
