@@ -302,7 +302,7 @@ if __name__ == '__main__':
                     for planned_workout in planned_workouts:
                         planned_workout.score = scoring_proc.score_workout(plan.athlete_capacities, plan.target_training_exposures, planned_workout.training_exposures)
 
-                    planned_workouts.sort(key=lambda x: x.score, reverse=True)
+                    planned_workouts.sort(key=lambda x: x.score.total_score, reverse=True)
 
                     for planned_workout in planned_workouts:
                         scoring_string = demo_utilities.get_scoring_string(event_date, planned_workout)
@@ -384,7 +384,7 @@ if __name__ == '__main__':
                     for planned_workout in planned_workouts:
                         planned_workout.score = scoring_proc.score_workout(plan.athlete_capacities, plan.target_training_exposures, planned_workout.training_exposures)
 
-                    planned_workouts.sort(key=lambda x: x.score, reverse=True)
+                    planned_workouts.sort(key=lambda x: x.score.total_score, reverse=True)
 
                     for planned_workout in planned_workouts:
                         scoring_string = demo_utilities.get_scoring_string(event_date, planned_workout)
