@@ -1,7 +1,7 @@
 from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
-from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager, TargetLoadCalculator
+from logic.periodization_processor import TargetLoadCalculator
 from models.periodization import PeriodizedExercise
 from models.periodization_plan import TrainingPhaseType, PeriodizationPersona, TrainingPhaseFactory, \
     PeriodizationProgression
@@ -155,169 +155,169 @@ from datetime import datetime, timedelta
 #     proc = PeriodizationPlanProcessor(current_date_time, user_stats, injury_risk_dict, data_store, None)
 #     h=0
 
-def test_training_load_calculator_weekly_load_target():
-
-    calc = TargetLoadCalculator()
-    training_phase_types = list(TrainingPhaseType)
-    chronic_average_weekly_load = StandardErrorRange(lower_bound=1000, upper_bound=1300)
-    last_weeks_load = StandardErrorRange(lower_bound=1100, observed_value=1200, upper_bound=1400)
-    average_session_rpe = StandardErrorRange(lower_bound=4, observed_value=5, upper_bound=6)
-    average_session_load = StandardErrorRange(lower_bound=216, observed_value=230, upper_bound=250)
-
-    factory = TrainingPhaseFactory()
-
-    f1 = open('../../output_periodization/periodization.csv', 'w')
-    f1.write("training_phase_type," +
-             "training_phase_acwr_lower_bound," +
-             "training_phase_acwr_observed_value," +
-             "training_phase_acwr_upper_bound," +
-             "progression_week_number," +
-             "progression_rpe_load_contribution," +
-             "progression_volume_load_contribution," +
-             "weekly_load_target_lower_bound," +
-             "weekly_load_target_observed_value," +
-             "weekly_load_target_upper_bound," +
-             "safe_weekly_load_target_lower_bound," +
-             "safe_weekly_load_target_observed_value," +
-             "safe_weekly_load_target_upper_bound," +
-             "target_session_load_lower_bound," +
-             "target_session_load_observed_value," +
-             "target_session_load_upper_bound," +
-             "safe_target_session_load_lower_bound," +
-             "safe_target_session_load_observed_value," +
-             "safe_target_session_load_upper_bound," +
-             "target_load_rate_lower_bound," +
-             "target_load_rate_observed_value," +
-             "target_load_rate_upper_bound," +
-             "safe_load_rate_lower_bound," +
-             "safe_load_rate_observed_value," +
-             "safe_load_rate_upper_bound," +
-             "safe_derived_rate_lower_bound," +
-             "safe_derived_rate_observed_value," +
-             "safe_derived_rate_upper_bound," +
-             "target_session_rpe_lower_bound," +
-             "target_session_rpe_observed_value," +
-             "target_session_rpe_upper_bound," +
-             "safe_session_rpe_lower_bound," +
-             "safe_session_rpe_observed_value," +
-             "safe_session_rpe_upper_bound," +
-             "safe_derived_session_rpe_lower_bound," +
-             "safe_derived_session_rpe_observed_value," +
-             "safe_derived_session_rpe_upper_bound," +
-             "target_session_volume_lower_bound," +
-             "target_session_volume_observed_value," +
-             "target_session_volume_upper_bound," +
-             "safe_session_volume_lower_bound," +
-             "safe_session_volume_observed_value," +
-             "safe_session_volume_upper_bound," +
-             "safe_derived_session_volume_lower_bound," +
-             "safe_derived_session_volume_observed_value," +
-             "safe_derived_session_volume_upper_bound" + '\n'
-             )
-
-    for training_phase_type in training_phase_types:
-        training_phase = factory.create(training_phase_type)
-
-        periodization_progression_1 = PeriodizationProgression(week_number=0, training_phase=training_phase,
-                                                               rpe_load_contribution=0.20,
-                                                               volume_load_contribution=0.80)
-        periodization_progression_2 = PeriodizationProgression(week_number=1, training_phase=training_phase,
-                                                               rpe_load_contribution=0.40,
-                                                               volume_load_contribution=0.60)
-        periodization_progression_3 = PeriodizationProgression(week_number=2, training_phase=training_phase,
-                                                               rpe_load_contribution=0.60,
-                                                               volume_load_contribution=0.40)
-        periodization_progression_4 = PeriodizationProgression(week_number=3, training_phase=training_phase,
-                                                               rpe_load_contribution=0.80,
-                                                               volume_load_contribution=0.20)
-
-        progressions = [periodization_progression_1, periodization_progression_2, periodization_progression_3,
-                        periodization_progression_4]
-
-        for progression in progressions:
-            if training_phase.acwr.lower_bound is not None:
-                safe_target_rate = StandardErrorRange(lower_bound=.8,
-                                                      observed_value=None,
-                                                      upper_bound=max(1.5, training_phase.acwr.upper_bound))
-
-                # given their training phase and history, what's an appropriate weekly total load target?
-                weekly_load_target = calc.get_weekly_load_target(chronic_average_weekly_load, training_phase.acwr)
-
-                # given their training phase and history, what's a safe maximum range of weekly load for this athlete?
-                safe_weekly_load_target = calc.get_weekly_load_target(chronic_average_weekly_load, safe_target_rate)
-
-                # given the average load they're used to in a session, and the implied ramp of the weekly load target,
-                # what is the average range of load for a session?
-                target_average_session_load, target_implied_ramp = calc.get_target_session_load_and_ramp(average_session_load,
-                                                                                                 last_weeks_load,
-                                                                                                 weekly_load_target)
-
-                # given the average load they're used to in a session, and the implied ramp of the weekly load target,
-                # what is the maximum safe load range of load for a session?
-                safe_target_average_session_load, safe_target_implied_ramp = calc.get_target_session_load_and_ramp(average_session_load,
-                                                                                                                   last_weeks_load,
-                                                                                                                   safe_weekly_load_target)
-
-                # why could we not just apply the safe acwr range to the average session load?
-
-                # could we ignore the previous step and just proceed with the average session rpe?
-
-                target_average_session_rpe = calc.get_target_session_intensity(average_session_rpe, progression, target_implied_ramp)
-
-                safe_limit_session_rpe = calc.get_target_session_intensity(average_session_rpe, progression, safe_target_rate)
-
-                safe_derived_session_rpe = calc.get_target_session_intensity(average_session_rpe, progression,
-                                                                             safe_target_implied_ramp)
-
-                target_session_volume = calc.get_target_session_volume(target_average_session_load, target_average_session_rpe)
-                safe_target_session_volume = calc.get_target_session_volume(target_average_session_load, safe_limit_session_rpe)
-                safe_derived_session_volume = calc.get_target_session_volume(target_average_session_load, safe_derived_session_rpe)
-                f1.write(str(training_phase_type.name) + "," +
-                         str(training_phase.acwr.lower_bound) + "," +
-                         str(training_phase.acwr.observed_value) + "," +
-                         str(training_phase.acwr.upper_bound) + "," +
-                         str(progression.week_number) + "," +
-                         str(progression.rpe_load_contribution) + "," +
-                         str(progression.volume_load_contribution) + "," +
-                         str(weekly_load_target.lower_bound) + "," +
-                         str(weekly_load_target.observed_value) + "," +
-                         str(weekly_load_target.upper_bound) + "," +
-                         str(safe_weekly_load_target.lower_bound) + "," +
-                         str(safe_weekly_load_target.observed_value) + "," +
-                         str(safe_weekly_load_target.upper_bound) + "," +
-                         str(target_average_session_load.lower_bound) + "," +
-                         str(target_average_session_load.observed_value) + "," +
-                         str(target_average_session_load.upper_bound) + "," +
-                         str(safe_target_average_session_load.lower_bound) + "," +
-                         str(safe_target_average_session_load.observed_value) + "," +
-                         str(safe_target_average_session_load.upper_bound) + "," +
-                         str(target_implied_ramp.lower_bound) + "," +
-                         str(target_implied_ramp.observed_value) + "," +
-                         str(target_implied_ramp.upper_bound) + "," +
-                         str(safe_target_rate.lower_bound) + "," +
-                         str(safe_target_rate.observed_value) + "," +
-                         str(safe_target_rate.upper_bound) + "," +
-                         str(safe_target_implied_ramp.lower_bound) + "," +
-                         str(safe_target_implied_ramp.observed_value) + "," +
-                         str(safe_target_implied_ramp.upper_bound) + "," +
-                         str(target_average_session_rpe.lower_bound) + "," +
-                         str(target_average_session_rpe.observed_value) + "," +
-                         str(target_average_session_rpe.upper_bound) + "," +
-                         str(safe_limit_session_rpe.lower_bound) + "," +
-                         str(safe_limit_session_rpe.observed_value) + "," +
-                         str(safe_limit_session_rpe.upper_bound) + "," +
-                         str(safe_derived_session_rpe.lower_bound) + "," +
-                         str(safe_derived_session_rpe.observed_value) + "," +
-                         str(safe_derived_session_rpe.upper_bound) + "," +
-                         str(target_session_volume.lower_bound) + "," +
-                         str(target_session_volume.observed_value) + "," +
-                         str(target_session_volume.upper_bound) + "," +
-                         str(safe_target_session_volume.lower_bound) + "," +
-                         str(safe_target_session_volume.observed_value) + "," +
-                         str(safe_target_session_volume.upper_bound) + "," +
-                         str(safe_derived_session_volume.lower_bound) + "," +
-                         str(safe_derived_session_volume.observed_value) + "," +
-                         str(safe_derived_session_volume.upper_bound) + '\n')
-    f1.close()
+# def test_training_load_calculator_weekly_load_target():
+#
+#     calc = TargetLoadCalculator()
+#     training_phase_types = list(TrainingPhaseType)
+#     chronic_average_weekly_load = StandardErrorRange(lower_bound=1000, upper_bound=1300)
+#     last_weeks_load = StandardErrorRange(lower_bound=1100, observed_value=1200, upper_bound=1400)
+#     average_session_rpe = StandardErrorRange(lower_bound=4, observed_value=5, upper_bound=6)
+#     average_session_load = StandardErrorRange(lower_bound=216, observed_value=230, upper_bound=250)
+#
+#     factory = TrainingPhaseFactory()
+#
+#     f1 = open('../../output_periodization/periodization.csv', 'w')
+#     f1.write("training_phase_type," +
+#              "training_phase_acwr_lower_bound," +
+#              "training_phase_acwr_observed_value," +
+#              "training_phase_acwr_upper_bound," +
+#              "progression_week_number," +
+#              "progression_rpe_load_contribution," +
+#              "progression_volume_load_contribution," +
+#              "weekly_load_target_lower_bound," +
+#              "weekly_load_target_observed_value," +
+#              "weekly_load_target_upper_bound," +
+#              "safe_weekly_load_target_lower_bound," +
+#              "safe_weekly_load_target_observed_value," +
+#              "safe_weekly_load_target_upper_bound," +
+#              "target_session_load_lower_bound," +
+#              "target_session_load_observed_value," +
+#              "target_session_load_upper_bound," +
+#              "safe_target_session_load_lower_bound," +
+#              "safe_target_session_load_observed_value," +
+#              "safe_target_session_load_upper_bound," +
+#              "target_load_rate_lower_bound," +
+#              "target_load_rate_observed_value," +
+#              "target_load_rate_upper_bound," +
+#              "safe_load_rate_lower_bound," +
+#              "safe_load_rate_observed_value," +
+#              "safe_load_rate_upper_bound," +
+#              "safe_derived_rate_lower_bound," +
+#              "safe_derived_rate_observed_value," +
+#              "safe_derived_rate_upper_bound," +
+#              "target_session_rpe_lower_bound," +
+#              "target_session_rpe_observed_value," +
+#              "target_session_rpe_upper_bound," +
+#              "safe_session_rpe_lower_bound," +
+#              "safe_session_rpe_observed_value," +
+#              "safe_session_rpe_upper_bound," +
+#              "safe_derived_session_rpe_lower_bound," +
+#              "safe_derived_session_rpe_observed_value," +
+#              "safe_derived_session_rpe_upper_bound," +
+#              "target_session_volume_lower_bound," +
+#              "target_session_volume_observed_value," +
+#              "target_session_volume_upper_bound," +
+#              "safe_session_volume_lower_bound," +
+#              "safe_session_volume_observed_value," +
+#              "safe_session_volume_upper_bound," +
+#              "safe_derived_session_volume_lower_bound," +
+#              "safe_derived_session_volume_observed_value," +
+#              "safe_derived_session_volume_upper_bound" + '\n'
+#              )
+#
+#     for training_phase_type in training_phase_types:
+#         training_phase = factory.create(training_phase_type)
+#
+#         periodization_progression_1 = PeriodizationProgression(week_number=0, training_phase=training_phase,
+#                                                                rpe_load_contribution=0.20,
+#                                                                volume_load_contribution=0.80)
+#         periodization_progression_2 = PeriodizationProgression(week_number=1, training_phase=training_phase,
+#                                                                rpe_load_contribution=0.40,
+#                                                                volume_load_contribution=0.60)
+#         periodization_progression_3 = PeriodizationProgression(week_number=2, training_phase=training_phase,
+#                                                                rpe_load_contribution=0.60,
+#                                                                volume_load_contribution=0.40)
+#         periodization_progression_4 = PeriodizationProgression(week_number=3, training_phase=training_phase,
+#                                                                rpe_load_contribution=0.80,
+#                                                                volume_load_contribution=0.20)
+#
+#         progressions = [periodization_progression_1, periodization_progression_2, periodization_progression_3,
+#                         periodization_progression_4]
+#
+#         for progression in progressions:
+#             if training_phase.acwr.lower_bound is not None:
+#                 safe_target_rate = StandardErrorRange(lower_bound=.8,
+#                                                       observed_value=None,
+#                                                       upper_bound=max(1.5, training_phase.acwr.upper_bound))
+#
+#                 # given their training phase and history, what's an appropriate weekly total load target?
+#                 weekly_load_target = calc.get_weekly_load_target(chronic_average_weekly_load, training_phase.acwr)
+#
+#                 # given their training phase and history, what's a safe maximum range of weekly load for this athlete?
+#                 safe_weekly_load_target = calc.get_weekly_load_target(chronic_average_weekly_load, safe_target_rate)
+#
+#                 # given the average load they're used to in a session, and the implied ramp of the weekly load target,
+#                 # what is the average range of load for a session?
+#                 target_average_session_load, target_implied_ramp = calc.get_target_session_load_and_ramp(average_session_load,
+#                                                                                                  last_weeks_load,
+#                                                                                                  weekly_load_target)
+#
+#                 # given the average load they're used to in a session, and the implied ramp of the weekly load target,
+#                 # what is the maximum safe load range of load for a session?
+#                 safe_target_average_session_load, safe_target_implied_ramp = calc.get_target_session_load_and_ramp(average_session_load,
+#                                                                                                                    last_weeks_load,
+#                                                                                                                    safe_weekly_load_target)
+#
+#                 # why could we not just apply the safe acwr range to the average session load?
+#
+#                 # could we ignore the previous step and just proceed with the average session rpe?
+#
+#                 target_average_session_rpe = calc.get_target_session_intensity(average_session_rpe, progression, target_implied_ramp)
+#
+#                 safe_limit_session_rpe = calc.get_target_session_intensity(average_session_rpe, progression, safe_target_rate)
+#
+#                 safe_derived_session_rpe = calc.get_target_session_intensity(average_session_rpe, progression,
+#                                                                              safe_target_implied_ramp)
+#
+#                 target_session_volume = calc.get_target_session_volume(target_average_session_load, target_average_session_rpe)
+#                 safe_target_session_volume = calc.get_target_session_volume(target_average_session_load, safe_limit_session_rpe)
+#                 safe_derived_session_volume = calc.get_target_session_volume(target_average_session_load, safe_derived_session_rpe)
+#                 f1.write(str(training_phase_type.name) + "," +
+#                          str(training_phase.acwr.lower_bound) + "," +
+#                          str(training_phase.acwr.observed_value) + "," +
+#                          str(training_phase.acwr.upper_bound) + "," +
+#                          str(progression.week_number) + "," +
+#                          str(progression.rpe_load_contribution) + "," +
+#                          str(progression.volume_load_contribution) + "," +
+#                          str(weekly_load_target.lower_bound) + "," +
+#                          str(weekly_load_target.observed_value) + "," +
+#                          str(weekly_load_target.upper_bound) + "," +
+#                          str(safe_weekly_load_target.lower_bound) + "," +
+#                          str(safe_weekly_load_target.observed_value) + "," +
+#                          str(safe_weekly_load_target.upper_bound) + "," +
+#                          str(target_average_session_load.lower_bound) + "," +
+#                          str(target_average_session_load.observed_value) + "," +
+#                          str(target_average_session_load.upper_bound) + "," +
+#                          str(safe_target_average_session_load.lower_bound) + "," +
+#                          str(safe_target_average_session_load.observed_value) + "," +
+#                          str(safe_target_average_session_load.upper_bound) + "," +
+#                          str(target_implied_ramp.lower_bound) + "," +
+#                          str(target_implied_ramp.observed_value) + "," +
+#                          str(target_implied_ramp.upper_bound) + "," +
+#                          str(safe_target_rate.lower_bound) + "," +
+#                          str(safe_target_rate.observed_value) + "," +
+#                          str(safe_target_rate.upper_bound) + "," +
+#                          str(safe_target_implied_ramp.lower_bound) + "," +
+#                          str(safe_target_implied_ramp.observed_value) + "," +
+#                          str(safe_target_implied_ramp.upper_bound) + "," +
+#                          str(target_average_session_rpe.lower_bound) + "," +
+#                          str(target_average_session_rpe.observed_value) + "," +
+#                          str(target_average_session_rpe.upper_bound) + "," +
+#                          str(safe_limit_session_rpe.lower_bound) + "," +
+#                          str(safe_limit_session_rpe.observed_value) + "," +
+#                          str(safe_limit_session_rpe.upper_bound) + "," +
+#                          str(safe_derived_session_rpe.lower_bound) + "," +
+#                          str(safe_derived_session_rpe.observed_value) + "," +
+#                          str(safe_derived_session_rpe.upper_bound) + "," +
+#                          str(target_session_volume.lower_bound) + "," +
+#                          str(target_session_volume.observed_value) + "," +
+#                          str(target_session_volume.upper_bound) + "," +
+#                          str(safe_target_session_volume.lower_bound) + "," +
+#                          str(safe_target_session_volume.observed_value) + "," +
+#                          str(safe_target_session_volume.upper_bound) + "," +
+#                          str(safe_derived_session_volume.lower_bound) + "," +
+#                          str(safe_derived_session_volume.observed_value) + "," +
+#                          str(safe_derived_session_volume.upper_bound) + '\n')
+#     f1.close()
 
 

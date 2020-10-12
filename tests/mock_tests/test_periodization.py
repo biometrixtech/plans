@@ -1,7 +1,7 @@
 from models.training_load import DetailedTrainingLoad, CompletedSessionDetails
 from models.training_volume import StandardErrorRange
 from models.movement_tags import DetailedAdaptationType
-from logic.periodization_processor import PeriodizationPlanProcessor, WorkoutScoringManager
+from logic.periodization_processor import WorkoutScoringManager
 from models.periodization import PeriodizedExercise
 from models.periodization_plan import TrainingPhaseType, PeriodizationPersona
 from models.periodization_goal import PeriodizationGoalType
@@ -252,113 +252,113 @@ def complete_a_planned_workout(event_date_time, planned_workout: PlannedWorkoutL
 #     assert acceptable_workouts_3[0].session_detailed_load.sub_adaptation_types[0].adaptation_type == SubAdaptationType.cardiorespiratory_training
 
 
-def test_acceptable_strength_cardio_same_score_both_required():
-
-    user_stats = UserStats("tester")
-    injury_risk_dict = {}
-    proc = PeriodizationPlanProcessor(datetime.now(),user_stats, injury_risk_dict,  CompletedSessionDetailsDatastore(), None)
-    strength_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1, 0),
-                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.strength_endurance, 1, 0)]
-    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 0),
-                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2, 0)]
-    periodized_strength_exercise = PeriodizedExercise(None, SubAdaptationType.strength,
-                                                      times_per_week_range=StandardErrorRange(lower_bound=2),
-                                                      duration_range=None,
-                                                      rpe_range=None)
-    periodized_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
-                                                    times_per_week_range=StandardErrorRange(lower_bound=2),
-                                                    duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
-                                                    rpe_range=StandardErrorRange(lower_bound=4, upper_bound=5))
-
-    session_rpe_load = StandardErrorRange(500, 700, 600)
-    # Note session rpe needs to match cardio's rpe range for this to work
-    session_rpe = StandardErrorRange(lower_bound=4, observed_value=4.5, upper_bound=5)
-    strength_workout = SimpleWorkout(1, session_rpe, 75, strength_list,[], session_rpe_load=session_rpe_load)
-    cardio_workout = SimpleWorkout(1, session_rpe, 75, cardio_list, [], session_rpe_load=session_rpe_load)
-
-    strength_score = proc.get_workout_score(strength_workout, periodized_strength_exercise,
-                                            StandardErrorRange(lower_bound=450, upper_bound=650))
-    cardio_score = proc.get_workout_score(cardio_workout, periodized_cardio_exercise,
-                                          StandardErrorRange(lower_bound=450, upper_bound=650))
-
-    assert strength_score == cardio_score
-
-
-def test_completing_combo_required_reduces_score():
-
-    user_stats = UserStats("tester")
-    injury_risk_dict = {}
-    proc = PeriodizationPlanProcessor(datetime.now(), user_stats, injury_risk_dict,  CompletedSessionDetailsDatastore(), None)
-    cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 10),
-                   RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2, 10)]
-
-    vigorous_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
-                                                    times_per_week_range=StandardErrorRange(lower_bound=2),
-                                                    duration_range=StandardErrorRange(lower_bound=30, upper_bound=60),
-                                                    rpe_range=StandardErrorRange(lower_bound=6, upper_bound=10))
-
-    moderate_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
-                                                    times_per_week_range=StandardErrorRange(lower_bound=3, upper_bound=5),
-                                                    duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
-                                                    rpe_range=StandardErrorRange(lower_bound=3, upper_bound=5))
-
-    paul_cardio_workout = get_planned_workout(1, [TrainingType.strength_cardiorespiratory],
-                                              session_rpe=StandardErrorRange(lower_bound=3, observed_value=4, upper_bound=5),
-                                              projected_rpe_load=StandardErrorRange(lower_bound=3 * 75, observed_value=4 * 75,
-                                                                upper_bound=5 * 75),
-                                              reps=10,
-                                              rpe=StandardErrorRange(observed_value=7.5),
-                                              duration=75,
-                                              percent_max_hr=65
-                                              )
-
-    vigorous_cardio_workout = get_planned_workout(1, [TrainingType.strength_cardiorespiratory],
-                                                  session_rpe=StandardErrorRange(lower_bound=7, observed_value=8, upper_bound=9),
-                                                  projected_rpe_load=StandardErrorRange(lower_bound=7 * 75, observed_value=8 * 75,
-                                                                upper_bound=9 * 75),
-                                                  reps=10,
-                                                  rpe=StandardErrorRange(observed_value=7.5),
-                                                  duration=75,
-                                                  percent_max_hr=75)
-
-    one_required_combination = StandardErrorRange(lower_bound=3, upper_bound=5)
-
-    paul_cardio_workout_score_vigorous = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
-                                            StandardErrorRange(lower_bound=2700, upper_bound=3500),
-                                                                one_required_combination)
-    paul_cardio_workout_score_moderate = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
-                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
-                                                                one_required_combination)
-
-    vigorous_cardio_workout_score_vigorous = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
-                                            StandardErrorRange(lower_bound=2700, upper_bound=3500),
-                                                                one_required_combination)
-    vigorous_cardio_workout_score_moderate = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
-                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
-                                                                one_required_combination)
-
-    one_required_combination_statisfied = StandardErrorRange(lower_bound=0, upper_bound=2)
-
-    paul_cardio_workout_score_vigorous_2 = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
-                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
-                                                                  one_required_combination_statisfied)
-    paul_cardio_workout_score_moderate_2 = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
-                                                                StandardErrorRange(lower_bound=2700, upper_bound=3500),
-                                                                  one_required_combination_statisfied)
-
-    vigorous_cardio_workout_score_vigorous_2 = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
-                                                                    StandardErrorRange(lower_bound=2700,
-                                                                                       upper_bound=3500),
-                                                                      one_required_combination_statisfied)
-    vigorous_cardio_workout_score_moderate_2 = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
-                                                                    StandardErrorRange(lower_bound=2700,
-                                                                                       upper_bound=3500),
-                                                                      one_required_combination_statisfied)
-
-    assert paul_cardio_workout_score_moderate > paul_cardio_workout_score_moderate_2
-    assert paul_cardio_workout_score_vigorous > paul_cardio_workout_score_vigorous_2
-    assert vigorous_cardio_workout_score_moderate > vigorous_cardio_workout_score_moderate_2
-    assert vigorous_cardio_workout_score_vigorous > vigorous_cardio_workout_score_vigorous_2
+# def test_acceptable_strength_cardio_same_score_both_required():
+#
+#     user_stats = UserStats("tester")
+#     injury_risk_dict = {}
+#     proc = PeriodizationPlanProcessor(datetime.now(),user_stats, injury_risk_dict,  CompletedSessionDetailsDatastore(), None)
+#     strength_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.muscular_endurance, 1, 0),
+#                     RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.strength_endurance, 1, 0)]
+#     cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 0),
+#                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2, 0)]
+#     periodized_strength_exercise = PeriodizedExercise(None, SubAdaptationType.strength,
+#                                                       times_per_week_range=StandardErrorRange(lower_bound=2),
+#                                                       duration_range=None,
+#                                                       rpe_range=None)
+#     periodized_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+#                                                     times_per_week_range=StandardErrorRange(lower_bound=2),
+#                                                     duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
+#                                                     rpe_range=StandardErrorRange(lower_bound=4, upper_bound=5))
+#
+#     session_rpe_load = StandardErrorRange(500, 700, 600)
+#     # Note session rpe needs to match cardio's rpe range for this to work
+#     session_rpe = StandardErrorRange(lower_bound=4, observed_value=4.5, upper_bound=5)
+#     strength_workout = SimpleWorkout(1, session_rpe, 75, strength_list,[], session_rpe_load=session_rpe_load)
+#     cardio_workout = SimpleWorkout(1, session_rpe, 75, cardio_list, [], session_rpe_load=session_rpe_load)
+#
+#     strength_score = proc.get_workout_score(strength_workout, periodized_strength_exercise,
+#                                             StandardErrorRange(lower_bound=450, upper_bound=650))
+#     cardio_score = proc.get_workout_score(cardio_workout, periodized_cardio_exercise,
+#                                           StandardErrorRange(lower_bound=450, upper_bound=650))
+#
+#     assert strength_score == cardio_score
+#
+#
+# def test_completing_combo_required_reduces_score():
+#
+#     user_stats = UserStats("tester")
+#     injury_risk_dict = {}
+#     proc = PeriodizationPlanProcessor(datetime.now(), user_stats, injury_risk_dict,  CompletedSessionDetailsDatastore(), None)
+#     cardio_list = [RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.anaerobic_threshold_training, 1, 10),
+#                    RankedAdaptationType(AdaptationTypeMeasure.detailed_adaptation_type, DetailedAdaptationType.high_intensity_anaerobic_training, 2, 10)]
+#
+#     vigorous_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+#                                                     times_per_week_range=StandardErrorRange(lower_bound=2),
+#                                                     duration_range=StandardErrorRange(lower_bound=30, upper_bound=60),
+#                                                     rpe_range=StandardErrorRange(lower_bound=6, upper_bound=10))
+#
+#     moderate_cardio_exercise = PeriodizedExercise(None, SubAdaptationType.cardiorespiratory_training,
+#                                                     times_per_week_range=StandardErrorRange(lower_bound=3, upper_bound=5),
+#                                                     duration_range=StandardErrorRange(lower_bound=60, upper_bound=90),
+#                                                     rpe_range=StandardErrorRange(lower_bound=3, upper_bound=5))
+#
+#     paul_cardio_workout = get_planned_workout(1, [TrainingType.strength_cardiorespiratory],
+#                                               session_rpe=StandardErrorRange(lower_bound=3, observed_value=4, upper_bound=5),
+#                                               projected_rpe_load=StandardErrorRange(lower_bound=3 * 75, observed_value=4 * 75,
+#                                                                 upper_bound=5 * 75),
+#                                               reps=10,
+#                                               rpe=StandardErrorRange(observed_value=7.5),
+#                                               duration=75,
+#                                               percent_max_hr=65
+#                                               )
+#
+#     vigorous_cardio_workout = get_planned_workout(1, [TrainingType.strength_cardiorespiratory],
+#                                                   session_rpe=StandardErrorRange(lower_bound=7, observed_value=8, upper_bound=9),
+#                                                   projected_rpe_load=StandardErrorRange(lower_bound=7 * 75, observed_value=8 * 75,
+#                                                                 upper_bound=9 * 75),
+#                                                   reps=10,
+#                                                   rpe=StandardErrorRange(observed_value=7.5),
+#                                                   duration=75,
+#                                                   percent_max_hr=75)
+#
+#     one_required_combination = StandardErrorRange(lower_bound=3, upper_bound=5)
+#
+#     paul_cardio_workout_score_vigorous = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
+#                                             StandardErrorRange(lower_bound=2700, upper_bound=3500),
+#                                                                 one_required_combination)
+#     paul_cardio_workout_score_moderate = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
+#                                                                 StandardErrorRange(lower_bound=2700, upper_bound=3500),
+#                                                                 one_required_combination)
+#
+#     vigorous_cardio_workout_score_vigorous = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
+#                                             StandardErrorRange(lower_bound=2700, upper_bound=3500),
+#                                                                 one_required_combination)
+#     vigorous_cardio_workout_score_moderate = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
+#                                                                 StandardErrorRange(lower_bound=2700, upper_bound=3500),
+#                                                                 one_required_combination)
+#
+#     one_required_combination_statisfied = StandardErrorRange(lower_bound=0, upper_bound=2)
+#
+#     paul_cardio_workout_score_vigorous_2 = proc.get_workout_score(paul_cardio_workout, vigorous_cardio_exercise,
+#                                                                 StandardErrorRange(lower_bound=2700, upper_bound=3500),
+#                                                                   one_required_combination_statisfied)
+#     paul_cardio_workout_score_moderate_2 = proc.get_workout_score(paul_cardio_workout, moderate_cardio_exercise,
+#                                                                 StandardErrorRange(lower_bound=2700, upper_bound=3500),
+#                                                                   one_required_combination_statisfied)
+#
+#     vigorous_cardio_workout_score_vigorous_2 = proc.get_workout_score(vigorous_cardio_workout, vigorous_cardio_exercise,
+#                                                                     StandardErrorRange(lower_bound=2700,
+#                                                                                        upper_bound=3500),
+#                                                                       one_required_combination_statisfied)
+#     vigorous_cardio_workout_score_moderate_2 = proc.get_workout_score(vigorous_cardio_workout, moderate_cardio_exercise,
+#                                                                     StandardErrorRange(lower_bound=2700,
+#                                                                                        upper_bound=3500),
+#                                                                       one_required_combination_statisfied)
+#
+#     assert paul_cardio_workout_score_moderate > paul_cardio_workout_score_moderate_2
+#     assert paul_cardio_workout_score_vigorous > paul_cardio_workout_score_vigorous_2
+#     assert vigorous_cardio_workout_score_moderate > vigorous_cardio_workout_score_moderate_2
+#     assert vigorous_cardio_workout_score_vigorous > vigorous_cardio_workout_score_vigorous_2
 
 
 # def test_too_high_session_load_lower_score():

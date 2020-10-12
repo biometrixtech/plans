@@ -110,20 +110,20 @@ class TemplateWorkout(object):
         self.acceptable_session_power_load = None
         self.muscle_load_ranking = {}
         self.adaptation_type_ranking = []
-
-
-class PeriodizationPlanWeek(object):
-    def __init__(self):
-        self.target_weekly_load = TrainingLoad()
-        self.start_date = None
-        self.end_date = None
-        self.target_session_duration = StandardErrorRange()
-        self.target_session_watts_duration = StandardErrorRange()
-        self.target_session_rpe = StandardErrorRange()
-        self.target_session_watts = StandardErrorRange()
-        self.target_session_load = TrainingLoad()
-        self.target_day_load = StandardErrorRange()
-        self.target_sessions_per_week = StandardErrorRange()
+#
+#
+# class PeriodizationPlanWeek(object):
+#     def __init__(self):
+#         self.target_weekly_load = TrainingLoad()
+#         self.start_date = None
+#         self.end_date = None
+#         self.target_session_duration = StandardErrorRange()
+#         self.target_session_watts_duration = StandardErrorRange()
+#         self.target_session_rpe = StandardErrorRange()
+#         self.target_session_watts = StandardErrorRange()
+#         self.target_session_load = TrainingLoad()
+#         self.target_day_load = StandardErrorRange()
+#         self.target_sessions_per_week = StandardErrorRange()
 
 
 class PeriodizationOneRequiredCombination(object):
