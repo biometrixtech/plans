@@ -521,17 +521,6 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.underactive_weak_tier = 3
 
         return injury_risk_dict
-    
-    def get_max_date(self, date_1, date_2):
-
-        if date_1 is None and date_2 is None:
-            return
-        elif date_1 is None:
-            return date_2
-        elif date_2 is None:
-            return date_1
-        else:
-            return max(date_1, date_2)
 
     def update_historic_session_stats(self, base_date, injury_risk_dict):
 
