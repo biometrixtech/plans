@@ -99,9 +99,6 @@ class AthleteCapacityProcessor(object):
         athlete_capacities.hypertrophy = self.get_highest_capacity(athlete_capacities,
                                                                    athlete_default_capacities,
                                                                    "hypertrophy")
-        athlete_capacities.hypertrophy = self.get_highest_capacity(athlete_capacities,
-                                                                   athlete_default_capacities,
-                                                                   "hypertrophy")
         athlete_capacities.maximal_strength = self.get_highest_capacity(athlete_capacities,
                                                                         athlete_default_capacities,
                                                                         "maximal_strength")
