@@ -510,7 +510,7 @@ class BodyPartSystems(object):
             BodyPartLocation.rectus_abdominis,
             BodyPartLocation.erector_spinae
         ]
-        self.lateral_subystem = [
+        self.lateral_subsystem = [
             BodyPartLocation.gluteus_medius_anterior_fibers,
             BodyPartLocation.gluteus_medius_posterior_fibers,
             BodyPartLocation.tensor_fascia_latae,
@@ -545,7 +545,7 @@ class BodyPartSystems(object):
         elif movement_system_name == "Posterior Oblique Subsystem (POS)":
             return self.posterior_oblique_subsystem
         elif movement_system_name == "Lateral Subsystem (LS)":
-            return self.lateral_subystem
+            return self.lateral_subsystem
         elif movement_system_name == "Anterior Oblique Subsystem (AOS)":
             return self.anterior_oblique_subsystem
         elif movement_system_name == "Core Stabilizers (Bracing)":
@@ -567,7 +567,7 @@ class BodyPartSystems(object):
             elif movement_system_name == "Posterior Oblique Subsystem (POS)":
                 return 'posterior_oblique_subsystem'
             elif movement_system_name == "Lateral Subsystem (LS)":
-                return 'lateral_subystem'
+                return 'lateral_subsystem'
             elif movement_system_name == "Anterior Oblique Subsystem (AOS)":
                 return 'anterior_oblique_subsystem'
             elif movement_system_name == "Core Stabilizers (Bracing)":
