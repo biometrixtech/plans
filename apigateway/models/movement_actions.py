@@ -79,6 +79,7 @@ class CompoundAction(object):
             "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
             "percent_bodyweight": self.percent_bodyweight,
             "lateral_distribution": self.lateral_distribution,
+            "contribute_to_power_production": self.contribute_to_power_production,
             "apply_resistance": self.apply_resistance,
             "apply_instability": self.apply_instability,
             'speed': self.speed.value if self.speed is not None else None,
@@ -109,6 +110,7 @@ class CompoundAction(object):
             'lateral_distribution_pattern') is not None else WeightDistribution.bilateral
         compound_action.percent_bodyweight = input_dict.get('percent_bodyweight', 0.0)
         compound_action.lateral_distribution = input_dict.get('lateral_distribution', [0, 0])
+        compound_action.contribute_to_power_production = input_dict.get('contribute_to_power_production', False)
         compound_action.apply_resistance = input_dict.get('apply_resistance', False)
         compound_action.apply_instability = input_dict.get('apply_instability', False)
         compound_action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
@@ -213,6 +215,7 @@ class ExerciseSubAction(object):
             "lateral_distribution_pattern": self.lateral_distribution_pattern.value,
             "percent_bodyweight": self.percent_bodyweight,
             "lateral_distribution": self.lateral_distribution,
+            "contribute_to_power_production": self.contribute_to_power_production,
             "apply_resistance": self.apply_resistance,
             "apply_instability": self.apply_instability,
             'speed': self.speed.value if self.speed is not None else None,
@@ -281,6 +284,7 @@ class ExerciseSubAction(object):
         action.lateral_distribution_pattern = WeightDistribution(input_dict['lateral_distribution_pattern']) if input_dict.get('lateral_distribution_pattern') is not None else WeightDistribution.bilateral
         action.percent_bodyweight = input_dict.get('percent_bodyweight', 0.0)
         action.lateral_distribution = input_dict.get('lateral_distribution', [0, 0])
+        action.contribute_to_power_production = input_dict.get('contribute_to_power_production', False)
         action.apply_resistance = input_dict.get('apply_resistance', False)
         action.apply_instability = input_dict.get('apply_instability', False)
         action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
@@ -807,6 +811,7 @@ class ExerciseAction(object):
             "lateral_distribution": self.lateral_distribution,
             "apply_resistance": self.apply_resistance,
             "explosiveness": self.explosiveness.value if self.explosiveness is not None else None,
+            "contribute_to_power_production": self.contribute_to_power_production,
             "apply_instability": self.apply_instability,
             'speed': self.speed.value if self.speed is not None else None,
             'resistance': self.resistance.value if self.resistance is not None else None,
@@ -886,6 +891,7 @@ class ExerciseAction(object):
         action.lateral_distribution = input_dict.get('lateral_distribution', [0, 0])
         action.apply_resistance = input_dict.get('apply_resistance', False)
         action.explosiveness = Explosiveness(input_dict['explosiveness']) if input_dict.get('explosiveness') is not None else None
+        action.contribute_to_power_production = input_dict.get('contribute_to_power_production', False)
         action.apply_instability = input_dict.get('apply_instability', False)
         action.speed = MovementSpeed(input_dict['speed']) if input_dict.get('speed') is not None else None
         action.resistance = MovementResistance(input_dict['resistance']) if input_dict.get('resistance') is not None else None
