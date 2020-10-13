@@ -151,7 +151,7 @@ class SessionFunctionalMovement(object):
 
         workout_load = {}
 
-        detailed_load_processor = DetailedLoadProcessor()
+        #detailed_load_processor = DetailedLoadProcessor()
 
         for workout_section in workout_program.workout_sections:
             if workout_section.assess_load:
@@ -218,7 +218,7 @@ class SessionFunctionalMovement(object):
         self.completed_session_details.workout_id =  workout.program_module_id
         workout_load = {}
 
-        detailed_load_processor = DetailedLoadProcessor()
+        #detailed_load_processor = DetailedLoadProcessor()
 
         for workout_section in workout.sections:
             if workout_section.assess_load:
