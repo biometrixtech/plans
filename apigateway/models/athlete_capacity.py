@@ -5,6 +5,9 @@ from serialisable import Serialisable
 
 
 class TrainingPersona(Enum):
+    """
+    The different personas the determine the default baseline capacity
+    """
     beginner = 0
     novice = 1
     intermediate = 2
@@ -13,6 +16,11 @@ class TrainingPersona(Enum):
 
 
 class SubAdaptionTypePersonas(object):
+    """
+    An athlete may identify as a different training persona by sub adaptation type
+    This object stores the different training personas in one place
+
+    """
     def __init__(self,
                  cardio_persona=TrainingPersona.beginner,
                  power_persona=TrainingPersona.beginner,
@@ -23,6 +31,12 @@ class SubAdaptionTypePersonas(object):
 
 
 class AthleteReadiness(object):
+    """
+    This is the object which stores the results of the daily readiness score calculation.  It also stores details of the
+    underlying components for diagnostic purposes.
+
+    """
+
     def __init__(self):
         self.readiness_score = 0.0
         self.load_score = 0.0
@@ -39,6 +53,9 @@ class AthleteReadiness(object):
 
 
 class AthleteBaselineCapacities(Serialisable):
+    """
+    Stores the current baseline capacities for an athlete by training exposure/detailed adaptation type
+    """
     def __init__(self):
         # Cardio
         self.base_aerobic_training = None
@@ -102,6 +119,10 @@ class AthleteBaselineCapacities(Serialisable):
 
 
 class TrainingUnit(Serialisable):
+
+    """
+    Object used to store both rpe and volume for a type of load (prevents unnecessary duplication of method names)
+    """
     def __init__(self, rpe=None, volume=None):
         self.rpe = rpe
         self.volume = volume
@@ -123,6 +144,10 @@ class TrainingUnit(Serialisable):
 
 
 class AthleteDefaultCapacityFactory(object):
+
+    """
+    Generates the default capacity for a given training exposure for a given training persona
+    """
 
     def get_cardio_capacities(self, training_persona):
 

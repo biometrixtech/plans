@@ -7,6 +7,13 @@ import datetime
 class AthleteCapacityProcessor(object):
 
     def get_capacity_from_workout_history(self, workouts):
+        """
+        Finds the top two training exposures (of a given type) within a workout history in order to determine the
+        athlete's baseline capacity for that training exposure type
+
+        :param workouts: list of training sessions
+        :return: AthleteBaselineCapacities()
+        """
 
         capacities = AthleteBaselineCapacities()
 
@@ -46,6 +53,18 @@ class AthleteCapacityProcessor(object):
 
     def combine_default_capacities(self, athlete_default_cardio_capacities, athlete_default_power_capacities, athlete_default_strength_capacities):
 
+        """
+        The system provides default capacities by sub adaptation type (cardio, power, strength).  These are handled separately
+        because the athlete may have a different persona for each of these sub adaptation types.
+
+        This method combines them into the full AthleteBaselineCapacities object
+
+        :param athlete_default_cardio_capacities:
+        :param athlete_default_power_capacities:
+        :param athlete_default_strength_capacities:
+        :return:
+        """
+
         athlete_default_capacities = AthleteBaselineCapacities()
 
         athlete_default_capacities.base_aerobic_training = athlete_default_cardio_capacities.base_aerobic_training
@@ -65,6 +84,14 @@ class AthleteCapacityProcessor(object):
         return athlete_default_capacities
 
     def update_capacity_with_defaults(self, athlete_capacities, sub_adaption_type_training_personas):
+
+        """
+        Called to provide a full athlete baseline capacity that fills in defaults alongside the athlete's workout history
+
+        :param athlete_capacities:
+        :param sub_adaption_type_training_personas:
+        :return:
+        """
 
         if sub_adaption_type_training_personas is None:
             sub_adaption_type_training_personas = SubAdaptionTypePersonas()
@@ -139,6 +166,18 @@ class AthleteCapacityProcessor(object):
             return test_date.date()
 
     def get_daily_readiness_scores(self, current_date, injury_risk_dict, user_stats, periodization_plan, training_phase):
+
+        """
+
+        Calculates an athlete's readiness, load and rpe score (combined in an Athlete Readiness object).  See documentation.
+
+        :param current_date:
+        :param injury_risk_dict:
+        :param user_stats:
+        :param periodization_plan:
+        :param training_phase:
+        :return:
+        """
 
         athlete_readiness = AthleteReadiness()
 
