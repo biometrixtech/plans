@@ -312,7 +312,7 @@ class AthleteCapacityProcessor(object):
             #    athlete_readiness.readiness_score += 2
 
             athlete_readiness.load_score = ((athlete_readiness.readiness_score / float(70)) * 40) + 60
-            athlete_readiness.rpe_score = ((athlete_readiness.readiness_score / float(700)) * 2) + 4
+            athlete_readiness.rpe_score = ((athlete_readiness.readiness_score / float(70)) * 2) + 4
 
         elif ((not user_stats.functional_overreaching_workout_today and
               not user_stats.non_functional_overreaching_workout_today and
