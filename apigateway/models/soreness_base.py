@@ -1,5 +1,9 @@
 from enum import IntEnum, Enum
+
+from models.compensation_source import CompensationSource
 from models.styles import LegendColor
+from models.training_volume import StandardErrorRange
+from serialisable import Serialisable
 
 
 class HistoricSorenessStatus(IntEnum):
@@ -506,10 +510,76 @@ class BodyPartSystems(object):
             BodyPartLocation.rectus_abdominis,
             BodyPartLocation.erector_spinae
         ]
+        self.lateral_subsystem = [
+            BodyPartLocation.gluteus_medius_anterior_fibers,
+            BodyPartLocation.gluteus_medius_posterior_fibers,
+            BodyPartLocation.tensor_fascia_latae,
+            BodyPartLocation.adductor_longus,
+            BodyPartLocation.adductor_magnus_anterior_fibers,
+            BodyPartLocation.adductor_brevis,
+            BodyPartLocation.adductor_magnus_posterior_fibers,
+            BodyPartLocation.pectineus,
+            BodyPartLocation.gracilis,
+            BodyPartLocation.quadratus_lumorum
+        ]
+
+        self.shoulder_stabilizers = [
+            BodyPartLocation.supraspinatus,
+            BodyPartLocation.subscapularis,
+            BodyPartLocation.infraspinatus,
+            BodyPartLocation.teres_minor
+        ]
+
+        self.scapula_stabilizers = [
+            BodyPartLocation.serratus_anterior,
+            BodyPartLocation.levator_scapulae,
+            BodyPartLocation.rhomboids
+        ]
 
     def get_movemement_system(self, movement_system_name):
 
-        return getattr(self, movement_system_name)
+        if movement_system_name is None:
+            return None
+        elif movement_system_name == "Deep Longitudinal Subsystem (DLS)":
+            return self.deep_longitudinal_subsystem
+        elif movement_system_name == "Posterior Oblique Subsystem (POS)":
+            return self.posterior_oblique_subsystem
+        elif movement_system_name == "Lateral Subsystem (LS)":
+            return self.lateral_subsystem
+        elif movement_system_name == "Anterior Oblique Subsystem (AOS)":
+            return self.anterior_oblique_subsystem
+        elif movement_system_name == "Core Stabilizers (Bracing)":
+            return self.core_stabilizers
+        elif movement_system_name == "Intrinsic Stabilization Subsystem (ISS) (Drawing In)":
+            return self.intrinsic_stabilization_subsystem
+        elif movement_system_name == "Shoulder Stabilizers":
+            return self.shoulder_stabilizers
+        elif movement_system_name == "Scapula Stabilizers":
+            return self.scapula_stabilizers
+        else:
+            return getattr(self, movement_system_name)
+
+    @classmethod
+    def get_functional_movement_type_name(cls, movement_system_name):
+        if movement_system_name is not None:
+            if movement_system_name == "Deep Longitudinal Subsystem (DLS)":
+                return 'deep_longitudinal_subsystem'
+            elif movement_system_name == "Posterior Oblique Subsystem (POS)":
+                return 'posterior_oblique_subsystem'
+            elif movement_system_name == "Lateral Subsystem (LS)":
+                return 'lateral_subsystem'
+            elif movement_system_name == "Anterior Oblique Subsystem (AOS)":
+                return 'anterior_oblique_subsystem'
+            elif movement_system_name == "Core Stabilizers (Bracing)":
+                return 'core_stabilizers'
+            elif movement_system_name == "Intrinsic Stabilization Subsystem (ISS) (Drawing In)":
+                return 'intrinsic_stabilization_subsystem'
+            elif movement_system_name == "Shoulder Stabilizers":
+                return 'shoulder_stabilizers'
+            elif movement_system_name == "Scapula Stabilizers":
+                return 'scapula_stabilizers'
+        return None
+
 
 class BodyPartLocationText(object):
     def __init__(self, body_part_location):
@@ -623,3 +693,177 @@ class BodyPartSideViz(object):
         return cls(BodyPartLocation(input_dict['body_part_location']), input_dict['side'], legend_color)
 
 
+class BodyPartFunction(Enum):
+    prime_mover = 0
+    antagonist = 1
+    synergist = 2
+    stabilizer = 3
+    fixator = 4
+
+    def get_ranking(self):
+        rankings = {
+            'prime_mover': 0,
+            'antagonist': 3,
+            'synergist': 2,
+            'stabilizer': 1,
+            'fixator': 4,
+        }
+        return rankings[self.name]
+
+    @classmethod
+    def merge(cls, function1, function2):
+        if function1 is not None and function2 is not None:
+            if function1 == function2:
+                return function1
+            elif function1.get_ranking() < function2.get_ranking():
+                return function1
+            else:
+                return function2
+        elif function1 is not None:
+            return function1
+        elif function2 is not None:
+            return function2
+        else:
+            return None
+
+
+class BodyPartFunctionalMovement(Serialisable):
+    def __init__(self, body_part_side):
+        self.body_part_side = body_part_side
+        self.concentric_load = StandardErrorRange()
+        self.isometric_load = StandardErrorRange()
+        self.eccentric_load = StandardErrorRange()
+        self.compensated_concentric_load = StandardErrorRange()
+        self.compensated_isometric_load = StandardErrorRange()
+        self.compensated_eccentric_load = StandardErrorRange()
+        self.compensating_causes_load = []
+        self.is_compensating = False
+        #self.compensation_source_load = None
+        self.body_part_function = None
+        #self.inhibited = 0
+        #self.weak = 0
+        #self.tight = 0
+        #self.inflamed = 0
+        #self.long = 0
+
+        #self.total_normalized_load = StandardErrorRange()
+
+    def total_load(self):
+
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.concentric_load)
+        total_load.add(self.isometric_load)
+        total_load.add(self.eccentric_load)
+        total_load.add(self.compensated_concentric_load)
+        total_load.add(self.compensated_isometric_load)
+        total_load.add(self.compensated_eccentric_load)
+
+        return total_load
+
+    def total_concentric_load(self):
+
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.concentric_load)
+        total_load.add(self.compensated_concentric_load)
+
+        return total_load
+
+    def total_isometric_load(self):
+
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.isometric_load)
+        total_load.add(self.compensated_isometric_load)
+
+        return total_load
+
+    def total_eccentric_load(self):
+
+        total_load = StandardErrorRange(observed_value=0)
+        total_load.add(self.eccentric_load)
+        total_load.add(self.compensated_eccentric_load)
+
+        return total_load
+
+    def __hash__(self):
+        return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
+
+    def __eq__(self, other):
+        return self.body_part_side.body_part_location == other.body_part_side.body_part_location and self.body_part_side.side == other.body_part_side.side
+
+    def __ne__(self, other):
+        # Not strictly necessary, but to avoid having both x==y and x!=y
+        # True at the same time
+        return not (self == other)
+
+    def json_serialise(self):
+        return {
+                'body_part_side': self.body_part_side.json_serialise(),
+                'concentric_load': self.concentric_load.json_serialise(),
+                'isometric_load': self.isometric_load.json_serialise(),
+                'eccentric_load': self.eccentric_load.json_serialise(),
+                'compensated_concentric_load': self.compensated_concentric_load.json_serialise(),
+                'compensated_isometric_load': self.compensated_isometric_load.json_serialise(),
+                'compensated_eccentric_load': self.compensated_eccentric_load.json_serialise(),
+                'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
+                'is_compensating': self.is_compensating,
+                #'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
+                'body_part_function': self.body_part_function.value if self.body_part_function is not None else None,
+                #'inhibited': self.inhibited if self.inhibited is not None else None,
+                #'weak': self.weak,
+                #'tight': self.tight,
+                #'inflamed': self.inflamed,
+                #'long': self.long,
+                #'total_normalized_load': self.total_normalized_load
+            }
+
+    @classmethod
+    def json_deserialise(cls, input_dict):
+        movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
+        movement.concentric_load = StandardErrorRange.json_deserialise(input_dict.get('concentric_load')) if input_dict.get('concentric_load') is not None else StandardErrorRange()
+        movement.isometric_load = StandardErrorRange.json_deserialise(
+            input_dict.get('isometric_load')) if input_dict.get('isometric_load') is not None else StandardErrorRange()
+        movement.eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('eccentric_load')) if input_dict.get('eccentric_load') is not None else StandardErrorRange()
+        movement.compensated_concentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_concentric_load')) if input_dict.get('compensated_concentric_load') is not None else StandardErrorRange()
+        movement.compensated_isometric_load = StandardErrorRange.json_deserialise(
+            input_dict.get('compensated_isometric_load')) if input_dict.get(
+            'compensated_isometric_load') is not None else StandardErrorRange()
+        movement.compensated_eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_eccentric_load')) if input_dict.get('compensated_eccentric_load') is not None else StandardErrorRange()
+        movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
+        movement.is_compensating = input_dict.get('is_compensating', False)
+        #movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
+        movement.body_part_function = BodyPartFunction(input_dict['body_part_function']) if input_dict.get('body_part_function') is not None else None
+        #movement.inhibited = input_dict.get('inhibited', 0)
+        #movement.weak = input_dict.get('weak', 0)
+        #movement.tight = input_dict.get('tight', 0)
+        #movement.inflamed = input_dict.get('inflamed', 0)
+        #movement.long = input_dict.get('long', 0)
+        #movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
+        return movement
+
+    def merge(self, target):
+
+        if self.body_part_side == target.body_part_side:
+
+            self.concentric_load.add(target.concentric_load)
+            self.isometric_load.add(target.isometric_load)
+            self.eccentric_load.add(target.eccentric_load)
+            self.compensated_concentric_load.add(target.compensated_concentric_load)
+            self.compensated_isometric_load.add(target.compensated_isometric_load)
+            self.compensated_eccentric_load.add(target.compensated_eccentric_load)
+            self.compensating_causes_load.extend(target.compensating_causes_load)
+            self.compensating_causes_load = list(set(self.compensating_causes_load))
+            self.is_compensating = max(self.is_compensating, target.is_compensating)
+            #self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
+            self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
+            #self.total_normalized_load.add(target.total_normalized_load)
+
+    def merge_with_none(self, value_a, value_b):
+
+        if value_a is None and value_b is None:
+            return None
+        if value_a is not None and value_b is None:
+            return CompensationSource(value_a.value)
+        if value_b is not None and value_a is None:
+            return CompensationSource(value_b.value)
+        if value_a is not None and value_b is not None:
+            return CompensationSource(max(value_a.value, value_b.value))

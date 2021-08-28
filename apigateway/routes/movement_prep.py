@@ -34,8 +34,28 @@ def handle_movement_prep_create(user_id):
     validate_data()
     event_date_time = parse_datetime(request.json['event_date_time'])
     # event_date_time = fix_early_survey_event_date(event_date_time)
-    timezone = get_timezone(event_date_time)
+    if 'program_module_id' in request.json:
+        program_module_id = request.json['program_module_id']
+    else:
+        program_module_id = None
 
+    if 'session' in request.json:
+        session = request.json['session']
+    else:
+        session = None
+
+    if 'symptoms' in request.json:
+        symptoms = request.json['symptoms']
+    else:
+        symptoms = None
+
+    movement_prep = get_movement_prep(event_date_time, user_id, program_module_id,session, symptoms)
+
+    return {'movement_prep': movement_prep.json_serialise(api=True, consolidated=consolidated)}, 201
+
+
+def get_movement_prep(event_date_time, user_id, program_module_id, session, symptoms):
+    timezone = get_timezone(event_date_time)
     # set up processing
     user_stats = user_stats_datastore.get(athlete_id=user_id)
     if user_stats is None:
@@ -44,51 +64,43 @@ def handle_movement_prep_create(user_id):
     user_stats.api_version = Config.get('API_VERSION')
     user_stats.timezone = timezone
     api_processor = APIProcessing(
-            user_id,
-            event_date_time,
-            user_stats=user_stats,
-            datastore_collection=datastore_collection
+        user_id,
+        event_date_time,
+        user_stats=user_stats,
+        datastore_collection=datastore_collection
     )
     # process stored planned session
     workout = None
-    if 'program_id' in request.json:
-        program_id = request.json['program_id']
-        if program_id is not None:
-            api_processor.create_planned_workout_from_id(program_id)
-            if len(api_processor.sessions) > 0:
-                workout = api_processor.sessions[0]
 
-    # process planned session
-    elif 'session' in request.json:
-        session = request.json['session']
-        if session is not None:
-            api_processor.create_session_from_survey(session)
+    if program_module_id is not None:
+        api_processor.create_planned_workout_from_id(program_module_id)
+        if len(api_processor.sessions) > 0:
             workout = api_processor.sessions[0]
 
-    # get symptoms
-    if 'symptoms' in request.json:
-        for symptom in request.json['symptoms']:
-            if symptom is None:
-                continue
-            api_processor.create_symptom_from_survey(symptom)
+    # process planned session
+    if session is not None:
+        api_processor.create_session_from_survey(session)
+        workout = api_processor.sessions[0]
 
+    # get symptoms
+    for symptom in symptoms:
+        if symptom is None:
+            continue
+        api_processor.create_symptom_from_survey(symptom)
     # store the symptoms, session and workout_program, if any exist
     if len(api_processor.symptoms) > 0:
         symptom_datastore.put(api_processor.symptoms)
-
     # Session will be saved during create_actiity
     # if len(api_processor.sessions) > 0:
     #     training_session_datastore.put(api_processor.sessions)
-
     if len(api_processor.workout_programs) > 0:
         workout_program_datastore.put(api_processor.workout_programs)
 
     # create movement_prep
     movement_prep = api_processor.create_activity(
-            activity_type='movement_prep', planned_session=workout
+        activity_type='movement_prep', planned_session=workout
     )
-
-    return {'movement_prep': movement_prep.json_serialise(api=True, consolidated=consolidated)}, 201
+    return movement_prep
 
 
 @app.route('/<uuid:user_id>/<uuid:movement_prep_id>/start_activity', methods=['POST'])
@@ -173,7 +185,8 @@ def validate_data():
             symptom['body_part'] = int(symptom['body_part'])
 
     if 'session' not in request.json:
-        raise InvalidSchemaException('session is required parameter to receive Movement Prep')
+        if 'program_module_id' not in request.json:
+            raise InvalidSchemaException('either sesison or program_module_id is required to receive Movement Prep')
     else:
         session = request.json['session']
         try:

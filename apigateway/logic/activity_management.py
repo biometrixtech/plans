@@ -29,6 +29,7 @@ class ActivityManager(object):
         self.movement_prep_datastore = datastore_collection.movement_prep_datastore
         self.mobility_wod_datastore = datastore_collection.mobility_wod_datastore
         self.responsive_recovery_datastore = datastore_collection.responsive_recovery_datastore
+        self.completed_session_details_datastore = datastore_collection.completed_session_details_datastore
         self.training_sessions = training_sessions if training_sessions is not None else []
         self.symptoms = symptoms if symptoms is not None else []
         self.historical_injury_risk_dict = None
@@ -116,9 +117,12 @@ class ActivityManager(object):
                 relative_load_level=injury_risk_processor.relative_load_level,
                 aggregated_injury_risk_dict=injury_risk_processor.aggregated_injury_risk_dict
         )
+        self.exercise_assignment_calculator.high_intensity_session = self.is_high_intensity_session()
         # write updated injury risk
         athlete_injury_risk = AthleteInjuryRisk(self.athlete_id)
         athlete_injury_risk.items = injury_risk_processor.injury_risk_dict
+        if len(injury_risk_processor.completed_session_details) > 0:
+            self.completed_session_details_datastore.put(injury_risk_processor.completed_session_details)
         self.injury_risk_datastore.put(athlete_injury_risk)
 
     @xray_recorder.capture('logic.ActivityManager.create_movement_prep')
@@ -168,7 +172,8 @@ class ActivityManager(object):
         responsive_recovery = self.exercise_assignment_calculator.get_responsive_recovery(self.athlete_id, force_on_demand=force_on_demand)
         if responsive_recovery_id is not None:
             responsive_recovery.responsive_recovery_id = responsive_recovery_id
-        responsive_recovery.training_session_id = self.active_training_sessions[0].id
+        if len(self.active_training_sessions) > 0:
+            responsive_recovery.training_session_id = self.active_training_sessions[0].id
         self.responsive_recovery_datastore.put(responsive_recovery)
         self.save_session()
 

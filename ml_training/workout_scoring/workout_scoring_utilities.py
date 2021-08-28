@@ -1,4 +1,4 @@
-from models.periodization import PeriodizationGoal
+from models.periodization_goal import PeriodizationGoalType
 from models.training_volume import StandardErrorRange
 from models.soreness_base import BodyPartLocation
 from models.ranked_types import RankedAdaptationType
@@ -81,10 +81,10 @@ def adjust_adaptation_type_ranking(adaptation_type_ranking):
 
 def get_template_workouts():
     goals = [
-        PeriodizationGoal.increase_cardiovascular_health,
-        PeriodizationGoal.increase_cardio_endurance,
-        PeriodizationGoal.increase_cardio_endurance_with_speed,
-        PeriodizationGoal.increase_strength_max_strength
+        PeriodizationGoalType.increase_cardiovascular_health,
+        PeriodizationGoalType.increase_cardio_endurance,
+        PeriodizationGoalType.increase_cardio_endurance_with_speed,
+        PeriodizationGoalType.increase_strength_max_strength
     ]
     all_template_workouts = []
     for goal in goals:

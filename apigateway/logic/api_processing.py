@@ -1,7 +1,8 @@
-from models.session import SessionType, SessionFactory
+from models.session import SessionType, SessionFactory, PlannedSession
 from models.sport import SportName
 from models.symptom import Symptom
 from models.heart_rate import SessionHeartRate, HeartRateData
+from models.movement_tags import Gender
 from models.planned_exercise import PlannedWorkout
 from logic.user_stats_processing import UserStatsProcessing
 from logic.activity_management import ActivityManager
@@ -25,24 +26,54 @@ class APIProcessing(object):
         self.user_stats_processor = None
         self.activity_manager = None
 
-    def create_planned_workout_from_id(self, program_id):
-
-        planned_workout = self.datastore_collection.workout_datastore.get(program_id)
+    def create_planned_workout_from_id(self, program_module_id):
+        # apply the same cleanup as applied on import
+        program_module_id = ('_').join(program_module_id.replace('w/', 'with').lower().strip().split(' '))
+        planned_workout = self.datastore_collection.workout_datastore.get(program_module_id)
+        session = PlannedSession()
+        session.workout = planned_workout
+        session.user_id = self.user_id
+        session.event_date = self.event_date_time
+        if planned_workout.duration is not None:
+            session.duration_minutes = round(planned_workout.duration / 60, 2)
         user_weight = 60
+        user_height = 1.65
+        assignment_type = None
+        user_age = 25
+        user_gender = Gender.female
+        strength_proficiency = None
+        power_proficiency = None
 
         if self.user_stats is not None:
             if self.user_stats.athlete_weight is not None:
                 user_weight = self.user_stats.athlete_weight
+            if self.user_stats.athlete_age is not None:
+                user_age = self.user_stats.athlete_age
+            if self.user_stats.athlete_gender is not None:
+                user_gender = self.user_stats.athlete_gender
             if self.user_stats.fitness_provider_cardio_profile is not None:
-                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout,
-                                                                                  assignment_type=self.user_stats.fitness_provider_cardio_profile)
-            else:
-                WorkoutProcessor(user_weight=user_weight).process_planned_workout(planned_workout)
+                assignment_type = self.user_stats.fitness_provider_cardio_profile
+            if self.user_stats.strength_proficiency is not None:
+                strength_proficiency = self.user_stats.strength_proficiency
+            if self.user_stats.power_proficiency is not None:
+                power_proficiency = self.user_stats.power_proficiency
+            if self.user_stats.athlete_height is not None:
+                user_height = self.user_stats.athlete_height
+
 
         if planned_workout is not None:
-            self.sessions.append(planned_workout)
+            workout_processor = WorkoutProcessor(
+                    user_weight=user_weight,
+                    user_height=user_height,
+                    user_age=user_age,
+                    gender=user_gender,
+                    strength_proficiency=strength_proficiency,
+                    power_proficiency=power_proficiency
+            )
+            workout_processor.process_planned_workout(session, assignment_type=assignment_type)
+            self.sessions.append(session)
         else:
-            raise ValueError("invalid program_id")
+            raise ValueError("invalid program_module_id")
 
     def create_session_from_survey(self, session):
         session_obj = self.convert_session(session)
@@ -84,7 +115,7 @@ class APIProcessing(object):
         if existing_session_id is not None:
             session_obj.id = existing_session_id  # this is a merge case
         if 'hr_data' in session and len(session['hr_data']) > 0:
-            heart_rate_processing = HeartRateProcessing(self.user_age)
+            heart_rate_processing = HeartRateProcessing(self.user_stats.athlete_age)
             self.create_session_hr_data(session_obj, session['hr_data'])
             # session_obj.shrz = heart_rate_processing.get_shrz(self.heart_rate_data[0].hr_workout)
         if session_obj.workout_program_module is not None:
@@ -93,11 +124,14 @@ class APIProcessing(object):
             session_obj.workout_program_module.event_date_time = session_obj.event_date
             hr_workout = self.heart_rate_data[0].hr_workout if len(self.heart_rate_data) > 0 else None
             session_obj = WorkoutProcessor(
-                    user_age=self.user_age,
+                    user_age=self.user_stats.athlete_age,
                     user_weight=self.user_stats.athlete_weight,
+                    user_height=self.user_stats.athlete_height,
                     hr_data=hr_workout,
                     vo2_max=self.user_stats.vo2_max,
-                    gender=self.user_stats.athlete_gender
+                    gender=self.user_stats.athlete_gender,
+                    strength_proficiency=self.user_stats.strength_proficiency,
+                    power_proficiency=self.user_stats.power_proficiency,
             ).process_workout(session_obj)
             #session_obj.update_training_loads(session_training_load)
             self.workout_programs.append(session_obj.workout_program_module)
@@ -125,12 +159,14 @@ class APIProcessing(object):
     def create_activity(self, activity_type, update_stats=True, activity_id=None, training_session_id=None, planned_session=None):
         if update_stats:
             # update stats
+
             if self.user_stats_processor is None:
                 self.user_stats_processor = UserStatsProcessing(
                         self.user_id,
                         event_date=self.event_date_time,
                         datastore_collection=self.datastore_collection
                 )
+            self.user_stats_processor.training_sessions.extend(self.sessions)  # add any sessions in memory so they can be considered for user stats processing
             user_stats = self.user_stats_processor.process_user_stats(current_user_stats=self.user_stats)
 
             user_stats_datastore = self.datastore_collection.user_stats_datastore

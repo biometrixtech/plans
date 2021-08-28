@@ -3,6 +3,7 @@ from models.functional_movement import FunctionalMovementActionMapping, Function
 from models.training_volume import StandardErrorRange
 from models.planned_exercise import PlannedWorkoutLoad
 from models.movement_tags import DetailedAdaptationType
+from models.movement_actions import CompoundAction
 from logic.detailed_load_processing import DetailedLoadProcessor
 from datetime import datetime
 from tests.mocks.mock_action_library_datastore import ActionLibraryDatastore
@@ -49,7 +50,7 @@ def process_action(action, detailed_load_processor, event_date, functional_movem
     base_exercise = BaseWorkoutExercise()
     base_exercise.training_type = action.training_type
     base_exercise.power_load = StandardErrorRange(lower_bound=50, observed_value=75, upper_bound=100)
-    base_exercise.set_adaption_type()
+    base_exercise.set_adaptation_type()
 
     action.power_load_left = base_exercise.power_load
     action.power_load_right = base_exercise.power_load
@@ -79,18 +80,30 @@ def process_adaptation_types(training_type_list, reps, rpe, duration=None, perce
     if actions_group_dict is not None:  # if we want all actions for the training types
         if duration is not None:
             duration /= len(actions_group_dict)
-        for action__id_list in actions_group_dict.values():
-            action_list = get_all_actions_for_groups(action__id_list)
+        for action_id_list in actions_group_dict.values():
+            action_list = get_all_actions_for_groups(action_id_list)
             exercise_detail_adaptation_types = set()
             for action in action_list:
-                action_detailed_adaptation_types = process_action(action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
-                exercise_detail_adaptation_types.update(action_detailed_adaptation_types)
+                if isinstance(action, CompoundAction):
+                    for ac in action.actions:
+                        for sub_action in ac.sub_actions:
+                            action_detailed_adaptation_types = process_action(sub_action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
+                            exercise_detail_adaptation_types.update(action_detailed_adaptation_types)
+                else:
+                    action_detailed_adaptation_types = process_action(action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
+                    exercise_detail_adaptation_types.update(action_detailed_adaptation_types)
             for detailed_adaptation_type in exercise_detail_adaptation_types:
                 detailed_load_processor.session_detailed_load.add_duration(detailed_adaptation_type, duration)
     else:  # if a subset of specific actions is defined
         action_list = get_filtered_actions(training_type_list)
         for action in action_list:
-            process_action(action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
+            if isinstance(action, CompoundAction):
+                for ac in action.actions:
+                    for sub_action in ac.sub_actions:
+                        process_action(sub_action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
+            else:
+                process_action(action, detailed_load_processor, event_date, functional_movement_dict, reps, duration, rpe, percent_max_hr)
+
         for detailed_adaptation_type in DetailedAdaptationType:
             if getattr(detailed_load_processor.session_detailed_load, detailed_adaptation_type.name) is not None:
                 detailed_load_processor.session_detailed_load.add_duration(detailed_adaptation_type, duration)

@@ -1,7 +1,7 @@
 import os
 import json
 
-from models.movement_actions import ExerciseAction
+from models.movement_actions import ExerciseAction, CompoundAction
 from fathomapi.api.config import Config
 
 
@@ -25,7 +25,7 @@ class ActionLibraryDatastore(object):
             with open(file_path, 'r') as f:
                 all_actions = json.load(f)
             for action_id, action_dict in all_actions.items():
-                actions[action_id] = ExerciseAction.json_deserialise(action_dict)
+                actions[action_id] = CompoundAction.json_deserialise(action_dict)
 
         except FileNotFoundError:
             print("Action library does not exist")

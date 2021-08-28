@@ -1,0 +1,21 @@
+import os
+from aws_xray_sdk.core import xray_recorder
+xray_recorder.configure(sampling=False, context_missing='LOG_ERROR')
+xray_recorder.begin_segment(name="test")
+from fathomapi.api.config import Config
+os.environ['UNIT_TESTS'] = 'TRUE'
+os.environ['CODEBUILD_RUN'] = 'TRUE'
+
+os.environ['ENVIRONMENT'] = 'dev'
+os.environ['MONGO_COLLECTION_PLANNEDWORKOUTLOAD'] = 'plannedWorkoutLoad'
+os.environ['MONGO_COLLECTION_COMPLETEDSESSIONDETAILS'] = 'completedSessionDetails'
+Config.set('PROVIDER_INFO', {'exercise_library_filename': 'exercise_library_fathom.json',
+                             'body_part_mapping_filename': 'body_part_mapping_fathom.json',
+                             'movement_library_filename': 'movement_library_nike.json',
+                             'cardio_data_filename': 'cardiorespiratory_data_soflete.json',
+                             'hr_rpe_model_filename': 'hr_rpe.joblib',
+                             'bodyweight_ratio_model_filename': 'bodyweight_ratio.joblib',
+                             'model_bucket': 'biometrix-globalmodels',
+                             'action_library_filename': 'actions_library.json',
+                             }
+           )

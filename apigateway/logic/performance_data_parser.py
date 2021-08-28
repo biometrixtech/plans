@@ -14,7 +14,7 @@ class PerformanceDataParser(object):
         self.treadmill_data = None
         self.planned_workout = None
 
-    def parse_fileobj(self, fileobj, program_id):
+    def parse_fileobj(self, fileobj, program_module_id):
         # TODO: Standardize the names of the files and update this.
         unzipped_files = zipfile.ZipFile(fileobj)
         print('unzipped file')
@@ -31,7 +31,7 @@ class PerformanceDataParser(object):
                 print('treadmill data read')
 
         # TODO: Better strategy to store/retrieve the planned session (probably store in mongo/s3s)
-        self.planned_workout = WorkoutDatastore().get(program_id=program_id, json=True)
+        self.planned_workout = WorkoutDatastore().get(program_module_id=program_module_id, json=True)
 
     def get_completed_workout(self, user_id):
         planned_workout = self.planned_workout

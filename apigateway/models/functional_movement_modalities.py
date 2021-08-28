@@ -5,14 +5,13 @@ from enum import Enum
 from serialisable import Serialisable
 
 from models.soreness import Alert
-from models.soreness_base import HistoricSorenessStatus, BodyPartLocation
+from models.soreness_base import HistoricSorenessStatus, BodyPartLocation, BodyPartFunction
 from models.exercise import AssignedExercise
 from models.goal import AthleteGoalType, AthleteGoal
 from models.trigger import TriggerType
 from models.dosage import ExerciseDosage, DosageProgression
 from models.body_parts import BodyPartFactory, BodyPart
 from models.exercise_phase import ExercisePhase, ExercisePhaseType
-from models.functional_movement import BodyPartFunction
 from models.functional_movement_activities import Activity, ActivityType, ActivityGoal, ActiveRecovery, DosageDuration, ActiveRestBase, ActiveRest, MovementIntegrationPrep
 from utils import parse_datetime, format_datetime
 

@@ -1,15 +1,12 @@
 from enum import Enum
 from collections import namedtuple
 
-from models.compensation_source import CompensationSource
-from models.soreness_base import BodyPartSide
+from models.soreness_base import BodyPartSystems, BodyPartFunction, BodyPartFunctionalMovement
 from models.body_parts import BodyPartFactory
 from models.training_volume import StandardErrorRange
 from datetime import timedelta
 from models.movement_actions import MuscleAction
 from models.functional_movement_type import FunctionalMovementType
-from serialisable import Serialisable
-
 
 FunctionalMovementPair = namedtuple('FunctionalMovementPair',['movement_1', 'movement_2'])
 
@@ -86,40 +83,6 @@ class JointActionPlane(Enum):
     adduction_in_transverse = 3
 
 
-class BodyPartFunction(Enum):
-    prime_mover = 0
-    antagonist = 1
-    synergist = 2
-    stabilizer = 3
-    fixator = 4
-
-    def get_ranking(self):
-        rankings = {
-            'prime_mover': 0,
-            'antagonist': 3,
-            'synergist': 2,
-            'stabilizer': 1,
-            'fixator': 4,
-        }
-        return rankings[self.name]
-
-    @classmethod
-    def merge(cls, function1, function2):
-        if function1 is not None and function2 is not None:
-            if function1 == function2:
-                return function1
-            elif function1.get_ranking() < function2.get_ranking():
-                return function1
-            else:
-                return function2
-        elif function1 is not None:
-            return function1
-        elif function2 is not None:
-            return function2
-        else:
-            return None
-
-
 class FunctionalMovement(object):
     def __init__(self, functional_movement_type, priority=0):
         self.functional_movement_type = functional_movement_type
@@ -131,148 +94,6 @@ class FunctionalMovement(object):
         self.fixators = []
         self.parts_receiving_compensation = []
         self.planes = []
-
-
-class BodyPartFunctionalMovement(Serialisable):
-    def __init__(self, body_part_side):
-        self.body_part_side = body_part_side
-        self.concentric_load = StandardErrorRange()
-        self.isometric_load = StandardErrorRange()
-        self.eccentric_load = StandardErrorRange()
-        self.compensated_concentric_load = StandardErrorRange()
-        self.compensated_isometric_load = StandardErrorRange()
-        self.compensated_eccentric_load = StandardErrorRange()
-        self.compensating_causes_load = []
-        self.is_compensating = False
-        #self.compensation_source_load = None
-        self.body_part_function = None
-        #self.inhibited = 0
-        #self.weak = 0
-        #self.tight = 0
-        #self.inflamed = 0
-        #self.long = 0
-
-        #self.total_normalized_load = StandardErrorRange()
-
-    def total_load(self):
-
-        total_load = StandardErrorRange(observed_value=0)
-        total_load.add(self.concentric_load)
-        total_load.add(self.isometric_load)
-        total_load.add(self.eccentric_load)
-        total_load.add(self.compensated_concentric_load)
-        total_load.add(self.compensated_isometric_load)
-        total_load.add(self.compensated_eccentric_load)
-
-        return total_load
-
-    def total_concentric_load(self):
-
-        total_load = StandardErrorRange(observed_value=0)
-        total_load.add(self.concentric_load)
-        total_load.add(self.compensated_concentric_load)
-
-        return total_load
-
-    def total_isometric_load(self):
-
-        total_load = StandardErrorRange(observed_value=0)
-        total_load.add(self.isometric_load)
-        total_load.add(self.compensated_isometric_load)
-
-        return total_load
-
-    def total_eccentric_load(self):
-
-        total_load = StandardErrorRange(observed_value=0)
-        total_load.add(self.eccentric_load)
-        total_load.add(self.compensated_eccentric_load)
-
-        return total_load
-
-    def __hash__(self):
-        return hash((self.body_part_side.body_part_location.value, self.body_part_side.side))
-
-    def __eq__(self, other):
-        return self.body_part_side.body_part_location == other.body_part_side.body_part_location and self.body_part_side.side == other.body_part_side.side
-
-    def __ne__(self, other):
-        # Not strictly necessary, but to avoid having both x==y and x!=y
-        # True at the same time
-        return not (self == other)
-
-    def json_serialise(self):
-        return {
-                'body_part_side': self.body_part_side.json_serialise(),
-                'concentric_load': self.concentric_load.json_serialise(),
-                'isometric_load': self.isometric_load.json_serialise(),
-                'eccentric_load': self.eccentric_load.json_serialise(),
-                'compensated_concentric_load': self.compensated_concentric_load.json_serialise(),
-                'compensated_isometric_load': self.compensated_isometric_load.json_serialise(),
-                'compensated_eccentric_load': self.compensated_eccentric_load.json_serialise(),
-                'compensating_causes_load': [c.json_serialise() for c in self.compensating_causes_load],
-                'is_compensating': self.is_compensating,
-                #'compensation_source_load': self.compensation_source_load.value if self.compensation_source_load is not None else None,
-                'body_part_function': self.body_part_function.value if self.body_part_function is not None else None,
-                #'inhibited': self.inhibited if self.inhibited is not None else None,
-                #'weak': self.weak,
-                #'tight': self.tight,
-                #'inflamed': self.inflamed,
-                #'long': self.long,
-                #'total_normalized_load': self.total_normalized_load
-            }
-
-    @classmethod
-    def json_deserialise(cls, input_dict):
-        movement = cls(BodyPartSide.json_deserialise(input_dict['body_part_side']))
-        movement.concentric_load = StandardErrorRange.json_deserialise(input_dict.get('concentric_load')) if input_dict.get('concentric_load') is not None else StandardErrorRange()
-        movement.isometric_load = StandardErrorRange.json_deserialise(
-            input_dict.get('isometric_load')) if input_dict.get('isometric_load') is not None else StandardErrorRange()
-        movement.eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('eccentric_load')) if input_dict.get('eccentric_load') is not None else StandardErrorRange()
-        movement.compensated_concentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_concentric_load')) if input_dict.get('compensated_concentric_load') is not None else StandardErrorRange()
-        movement.compensated_isometric_load = StandardErrorRange.json_deserialise(
-            input_dict.get('compensated_isometric_load')) if input_dict.get(
-            'compensated_isometric_load') is not None else StandardErrorRange()
-        movement.compensated_eccentric_load = StandardErrorRange.json_deserialise(input_dict.get('compensated_eccentric_load')) if input_dict.get('compensated_eccentric_load') is not None else StandardErrorRange()
-        movement.compensating_causes_load = [BodyPartSide.json_deserialise(b) for b in input_dict.get('compensating_causes_load', [])]  # I don't know what gets saved here!
-        movement.is_compensating = input_dict.get('is_compensating', False)
-        #movement.compensation_source_load = CompensationSource(input_dict['compensation_source_load']) if input_dict.get('compensation_source_load') is not None else None
-        movement.body_part_function = BodyPartFunction(input_dict['body_part_function']) if input_dict.get('body_part_function') is not None else None
-        #movement.inhibited = input_dict.get('inhibited', 0)
-        #movement.weak = input_dict.get('weak', 0)
-        #movement.tight = input_dict.get('tight', 0)
-        #movement.inflamed = input_dict.get('inflamed', 0)
-        #movement.long = input_dict.get('long', 0)
-        #movement.total_normalized_load = input_dict.get('total_normalized_load', 0)
-        return movement
-
-    def merge(self, target):
-
-        if self.body_part_side == target.body_part_side:
-
-            self.concentric_load.add(target.concentric_load)
-            self.isometric_load.add(target.isometric_load)
-            self.eccentric_load.add(target.eccentric_load)
-            self.compensated_concentric_load.add(target.compensated_concentric_load)
-            self.compensated_isometric_load.add(target.compensated_isometric_load)
-            self.compensated_eccentric_load.add(target.compensated_eccentric_load)
-            self.compensating_causes_load.extend(target.compensating_causes_load)
-            self.compensating_causes_load = list(set(self.compensating_causes_load))
-            self.is_compensating = max(self.is_compensating, target.is_compensating)
-            #self.compensation_source_load = self.merge_with_none(self.compensation_source_load, target.compensation_source_load)
-            self.body_part_function = BodyPartFunction.merge(self.body_part_function, target.body_part_function)
-            #self.total_normalized_load.add(target.total_normalized_load)
-
-    def merge_with_none(self, value_a, value_b):
-
-        if value_a is None and value_b is None:
-            return None
-        if value_a is not None and value_b is None:
-            return CompensationSource(value_a.value)
-        if value_b is not None and value_a is None:
-            return CompensationSource(value_b.value)
-        if value_a is not None and value_b is not None:
-            return CompensationSource(max(value_a.value, value_b.value))
 
 
 class FunctionalMovementLoad(object):
@@ -292,6 +113,7 @@ class FunctionalMovementActionMapping(object):
         self.shoulder_scapula_joint_functional_movements = []
         self.elbow_joint_functional_movements = []
         self.wrist_joint_functional_movements = []
+        self.movement_system_functional_movements = []
         self.muscle_load = {}
         self.functional_movement_dict = functional_movement_dict
         #self.injury_risk_dict = injury_risk_dict
@@ -360,6 +182,29 @@ class FunctionalMovementActionMapping(object):
             self.shoulder_scapula_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.shoulder_scapula_joint_action)
             self.elbow_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.elbow_joint_action)
             self.wrist_joint_functional_movements = self.get_functional_movements_for_joint_action(self.exercise_action.wrist_joint_action)
+            self.movement_system_functional_movements = self.get_functional_movements_for_movement_system(self.exercise_action.movement_systems)
+
+    def get_functional_movements_for_movement_system(self, movement_system_list):
+        pairs = FunctionalMovementPairs()
+
+        functional_movement_list = []
+
+        for movement_system in movement_system_list:
+            functional_movement_type = BodyPartSystems.get_functional_movement_type_name(movement_system.movement_system_name)
+            prime_movers = BodyPartSystems().get_movemement_system(functional_movement_type)
+
+            if prime_movers is not None:
+                prime_movers = [bp.value for bp in prime_movers]
+                prime_movers = self.convert_enums_to_body_part_side_list(prime_movers)
+                functional_movement = FunctionalMovement(FunctionalMovementType[functional_movement_type])
+                functional_movement.priority = movement_system.priority
+                functional_movement.prime_movers = prime_movers
+
+                functional_movement_load = FunctionalMovementLoad(functional_movement, self.exercise_action.primary_muscle_action)
+
+                functional_movement_list.append(functional_movement_load)
+
+        return functional_movement_list
 
     def get_functional_movements_for_joint_action(self, target_joint_action_list):
 
@@ -431,6 +276,7 @@ class FunctionalMovementActionMapping(object):
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.shoulder_scapula_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.elbow_joint_functional_movements, self.exercise_action, left_load, right_load)
         self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.wrist_joint_functional_movements, self.exercise_action, left_load, right_load)
+        self.apply_load_to_functional_movements(injury_risk_dict, event_date, self.movement_system_functional_movements, self.exercise_action, left_load, right_load)
 
 
     def get_matching_stability_rating(self, functional_movement_load, exercise_action):
@@ -493,6 +339,9 @@ class FunctionalMovementActionMapping(object):
                                           FunctionalMovementType.trunk_flexion_with_rotation,
                                           FunctionalMovementType.trunk_extension_with_rotation]:
             return (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+        elif functional_movement_type in [FunctionalMovementType.wrist_flexion,
+                                          FunctionalMovementType.wrist_extension]:
+            return (.2 * lower_stability_rating) + (.8 * upper_stability_rating)
 
     # def set_compensation_load(self, injury_risk_dict, event_date):
     #
@@ -636,6 +485,10 @@ class FunctionalMovementActionMapping(object):
                                                   FunctionalMovementType.trunk_flexion_with_rotation,
                                                   FunctionalMovementType.trunk_extension_with_rotation]:
                     stability_rating = (.5 * lower_stability_rating) + (.5 * upper_stability_rating)
+                elif functional_movement_type in [FunctionalMovementType.wrist_flexion,
+                                                  FunctionalMovementType.wrist_extension]:
+                    stability_rating =  (.2 * lower_stability_rating) + (.8 * upper_stability_rating)
+                # TODO: possibly add a distribution for movement_systems
                 else:
                     stability_rating = 0.0
             else:

@@ -1,6 +1,6 @@
 from models.functional_movement_type import FunctionalMovementType
 from models.functional_movement import FunctionalMovementFactory
-from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction
+from models.movement_actions import MuscleAction, ExerciseAction, PrioritizedJointAction, ExerciseSubAction, CompoundAction
 from models.workout_program import WorkoutProgramModule, WorkoutSection, WorkoutExercise
 # from logic.workout_processing import WorkoutProcessor
 from models.movement_tags import AdaptationType, TrainingType, MovementSurfaceStability, Equipment
@@ -12,9 +12,17 @@ from models.training_volume import StandardErrorRange
 from models.training_load import CompletedSessionDetails
 from datetime import datetime
 
-def test_aggregate_load_concentric():
 
-    exercise_action_1 = ExerciseAction("1", "flail")
+def get_compound_action(sub_action):
+    action = ExerciseAction("1", "flail_again")
+    action.sub_actions = [sub_action]
+    compound_action = CompoundAction("1", "flail_even_more")
+    compound_action.actions = [action]
+    return compound_action
+
+
+def test_aggregate_load_concentric():
+    exercise_action_1 = ExerciseSubAction("1", "flail")
     exercise_action_1.primary_muscle_action = MuscleAction.concentric
     exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
@@ -27,7 +35,7 @@ def test_aggregate_load_concentric():
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
 
-    exercise_action_2 = ExerciseAction("1", "flail")
+    exercise_action_2 = ExerciseSubAction("1", "flail")
     exercise_action_2.primary_muscle_action = MuscleAction.concentric
     exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
@@ -46,12 +54,12 @@ def test_aggregate_load_concentric():
     exercise_1.reps_per_set = 5
     exercise_1.power_load = StandardErrorRange(observed_value=300)
     exercise_1.equipment = Equipment.dumbbells
-    exercise_1.primary_actions.append(exercise_action_1)
+    exercise_1.compound_actions.append(get_compound_action(exercise_action_1))
     exercise_1.training_type = TrainingType.strength_integrated_resistance
 
     exercise_2 = WorkoutExercise()
     exercise_2.power_load = StandardErrorRange(observed_value=300)
-    exercise_2.primary_actions.append(exercise_action_2)
+    exercise_2.compound_actions.append(get_compound_action(exercise_action_2))
     exercise_2.training_type = TrainingType.power_action_plyometrics
 
     section_1 = WorkoutSection()
@@ -68,7 +76,7 @@ def test_aggregate_load_concentric():
     dict = factory.get_functional_movement_dictionary()
 
     session_functional_movement = SessionFunctionalMovement(None, {})
-    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None)
+    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None, 'test_user')
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     # assert len(load_dict) == 2
@@ -79,7 +87,7 @@ def test_aggregate_load_concentric():
 
 def test_normalize_load_concentric():
 
-    exercise_action_1 = ExerciseAction("1", "flail")
+    exercise_action_1 = ExerciseSubAction("1", "flail")
     exercise_action_1.primary_muscle_action = MuscleAction.concentric
     exercise_action_1.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_1.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
@@ -92,7 +100,7 @@ def test_normalize_load_concentric():
     exercise_action_1.upper_body_stability_rating = 0.6
     exercise_action_1.adaptation_type = AdaptationType.strength_endurance_strength
 
-    exercise_action_2 = ExerciseAction("1", "flail")
+    exercise_action_2 = ExerciseSubAction("1", "flail")
     exercise_action_2.primary_muscle_action = MuscleAction.concentric
     exercise_action_2.hip_joint_action = [PrioritizedJointAction(1, FunctionalMovementType.hip_extension)]
     exercise_action_2.knee_joint_action = [PrioritizedJointAction(2, FunctionalMovementType.knee_extension)]
@@ -107,12 +115,12 @@ def test_normalize_load_concentric():
 
     exercise_1 = WorkoutExercise()
     exercise_1.power_load = StandardErrorRange(observed_value=300)
-    exercise_1.primary_actions.append(exercise_action_1)
+    exercise_1.compound_actions.append(get_compound_action(exercise_action_1))
     exercise_1.training_type = TrainingType.strength_integrated_resistance
 
     exercise_2 = WorkoutExercise()
     exercise_2.power_load = StandardErrorRange(observed_value=300)
-    exercise_2.primary_actions.append(exercise_action_2)
+    exercise_2.compound_actions.append(get_compound_action(exercise_action_2))
     exercise_2.training_type = TrainingType.power_action_plyometrics
 
     section_1 = WorkoutSection()
@@ -130,7 +138,7 @@ def test_normalize_load_concentric():
 
     athlete_injury_risk = AthleteInjuryRisk("tester")
     session_functional_movement = SessionFunctionalMovement(MixedActivitySession(), athlete_injury_risk.items)
-    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None)
+    session_functional_movement.completed_session_details = CompletedSessionDetails(datetime.now(), None, None, 'test_user')
     load_dict = session_functional_movement.process_workout_load(program_module, datetime.now(), dict)
 
     # not used anymore

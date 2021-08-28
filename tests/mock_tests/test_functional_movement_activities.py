@@ -64,12 +64,12 @@ def get_exercise_json(name, movement_id, reps, reps_unit=1, weight_measure=None,
 
 def define_all_exercises():
     return {
-        "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="58459d9ddc2ce90011f93d84", rpe=6),
-        "indoor_cycle": get_exercise_json("Indoor Cycle", reps=180, reps_unit=4, movement_id="57e2fd3a4c6a031dc777e90c"),
-        "med_ball_chest_pass": get_exercise_json("Med Ball Chest Pass", reps=15, reps_unit=1, movement_id="586540fd4d0fec0011c031a4", weight_measure=2, weight=15),
-        "explosive_burpee": get_exercise_json("Explosive Burpee", reps=15, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e913"),
-        "dumbbell_bench_press": get_exercise_json("Dumbbell Bench Press", reps=8, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e847", weight_measure=2, weight=50),
-        "bent_over_row": get_exercise_json("Bent Over Row", reps=8, reps_unit=1, movement_id="57e2fd3a4c6a031dc777e936", weight_measure=2, weight=150)
+        "rowing": get_exercise_json("2k Row", reps=90, reps_unit=0, movement_id="rowing", rpe=6),
+        "indoor_cycle": get_exercise_json("Running", reps=180, reps_unit=4, movement_id="run"),
+        "med_ball_chest_pass": get_exercise_json("Med Ball Chest Pass", reps=15, reps_unit=1, movement_id="med ball slams", weight_measure=2, weight=15),
+        "explosive_burpee": get_exercise_json("Explosive Burpee", reps=15, reps_unit=1, movement_id="burpees"),
+        "dumbbell_bench_press": get_exercise_json("Dumbbell Bench Press", reps=8, reps_unit=1, movement_id="dumbbell bench press", weight_measure=2, weight=50),
+        "bent_over_row": get_exercise_json("Bent Over Row", reps=8, reps_unit=1, movement_id="barbell rows", weight_measure=2, weight=150)
     }
 
 
@@ -339,8 +339,8 @@ def test_get_responsive_recovery_with_mixed_activity_session_no_symptoms():
     print("\nactive_recovery, 100 mins mixed activity, no symptoms")
     responsive_recovery = get_activity(dates[0], symptoms, sessions, 'responsive_recovery')
 
-    assert responsive_recovery.active_recovery is not None
-    activity = responsive_recovery.active_recovery
+    assert responsive_recovery.active_rest is not None
+    activity = responsive_recovery.active_rest
 
     assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something
 
@@ -393,8 +393,8 @@ def test_get_responsive_recovery_with_simple_session_one_symptom_high_rpe():
 
     assert responsive_recovery.active_recovery is not None
     assert responsive_recovery.active_rest is None
-    assert responsive_recovery.ice is None
-    assert responsive_recovery.cold_water_immersion is not None
+    assert responsive_recovery.ice is not None
+    assert responsive_recovery.cold_water_immersion is None
     activity = responsive_recovery.active_recovery
 
     assert len(activity.exercise_phases[0].exercises) > 0  # make sure there's something

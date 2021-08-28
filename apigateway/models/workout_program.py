@@ -1,8 +1,8 @@
 from models.exercise import UnitOfMeasure, WeightMeasure
-from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability
-from models.movement_actions import ExerciseAction
+from models.movement_tags import AdaptationType, CardioAction, TrainingType, Equipment, MovementSurfaceStability, WeightDistribution, ProficiencyLevel
+from models.movement_actions import CompoundAction, MovementResistance
 from utils import format_datetime, parse_datetime
-from models.training_volume import StandardErrorRange
+from models.training_volume import StandardErrorRange, Assignment
 from logic.calculators import Calculators
 
 import re
@@ -12,20 +12,28 @@ from serialisable import Serialisable
 
 class WorkoutProgramModule(Serialisable):
     def __init__(self):
+        self.name = ""
         self.session_id = None
         self.user_id = None
         self.event_date_time = None
         self.program_id = None
         self.program_module_id = None
+        self.distance = None
+        self.duration_seconds = None
+        self.rpe = None
         self.workout_sections = []
 
     def json_serialise(self):
         ret = {
+            'name': self.name,
             'session_id': self.session_id,
             'use_id': self.user_id,
             'event_date_time': format_datetime(self.event_date_time),
             'program_id': self.program_id,
             'program_module_id': self.program_module_id,
+            'distance': self.distance,
+            'duration_seconds': self.duration_seconds,
+            'rpe': self.rpe,
             'workout_sections': [w.json_serialise() for w in self.workout_sections]
         }
         return ret
@@ -33,11 +41,15 @@ class WorkoutProgramModule(Serialisable):
     @classmethod
     def json_deserialise(cls, input_dict):
         workout_program_module = cls()
+        workout_program_module.name = input_dict.get('name', '')
         workout_program_module.session_id = input_dict.get('session_id')
         workout_program_module.user_id = input_dict.get('user_id')
         workout_program_module.event_date_time = input_dict.get('event_date_time')
         workout_program_module.program_id = input_dict.get('program_id')
         workout_program_module.program_module_id = input_dict.get('program_module_id')
+        workout_program_module.distance = input_dict.get('distance')
+        workout_program_module.duration_seconds = input_dict.get('duration_seconds')
+        workout_program_module.rpe = input_dict.get('rpe')
         workout_program_module.workout_sections = [CompletedWorkoutSection.json_deserialise(workout_section) for workout_section in input_dict.get('workout_sections', [])]
 
         return workout_program_module
@@ -143,10 +155,14 @@ class CompletedWorkoutSection(WorkoutSection, Serialisable):
             self.shrz = None
             for exercise in self.exercises:
                 exercise.shrz = None
-                for action in exercise.primary_actions:
-                    action.shrz = None
-                for action in exercise.secondary_actions:
-                    action.shrz = None
+                for compound_action in exercise.compound_actions:
+                    for action in compound_action.actions:
+                        for sub_action in action.sub_actions:
+                            sub_action.shrz = None
+                # for action in exercise.primary_actions:
+                #     action.shrz = None
+                # for action in exercise.secondary_actions:
+                #     action.shrz = None
 
 
 class BaseWorkoutExercise(object):
@@ -164,6 +180,7 @@ class BaseWorkoutExercise(object):
         self.weight = None
         self.sets = 1
         self.reps_per_set = None
+        self.duration = None
         self.unit_of_measure = UnitOfMeasure.count
 
         self.cardio_action = None
@@ -171,9 +188,14 @@ class BaseWorkoutExercise(object):
         self.power_drill_action = None
         self.strength_endurance_action = None
         self.strength_resistance_action = None
+        self.movement_speed = None
+        self.resistance = None
+        self.displacement = None
+        self.movement_rep_tempo = None
 
-        self.primary_actions = []
-        self.secondary_actions = []
+        self.compound_actions = []
+        # self.primary_actions = []
+        # self.secondary_actions = []
 
         self.equipments = []  # TODO: do we get this from the api
 
@@ -189,9 +211,14 @@ class BaseWorkoutExercise(object):
         self.rpe_load = None
 
         self.predicted_rpe = None
+        self.bilateral_distribution_of_resistance = None
 
-    def initialize_from_movement(self, movement):
+        self.actions_for_power = []
+        self.percent_max_hr = None
+
+    def initialize_from_movement(self, movement, strength_proficiency=ProficiencyLevel.novice, power_proficiency=ProficiencyLevel.novice):
         # self.body_position = movement.body_position
+        self.bilateral_distribution_of_resistance = movement.bilateral_distribution_of_resistance
         self.cardio_action = movement.cardio_action
         self.power_drill_action = movement.power_drill_action
         self.power_action = movement.power_action
@@ -200,10 +227,52 @@ class BaseWorkoutExercise(object):
         self.training_type = movement.training_type
         self.explosiveness_rating = movement.explosiveness_rating
         self.surface_stability = movement.surface_stability
-        self.equipments = movement.external_weight_implement  # TODO: do we get it from the api
+        if len(self.equipments) == 0:
+            # if none provided from the workout, inherit it from movement
+            self.equipments = movement.external_weight_implement
+        self.movement_speed = movement.speed
+        self.resistance = movement.resistance
+        self.displacement = movement.displacement
+        self.movement_rep_tempo = movement.rep_tempo
+        self.rest_between_reps = movement.rest_between_reps
+        self.actions_for_power = movement.actions_for_power
+        self.update_resistance_by_proficiency_level(strength_proficiency, power_proficiency)
+        self.update_resistance_by_external_weight()
         # self.set_adaption_type(movement)
 
-    def set_adaption_type(self):
+    def update_resistance_by_proficiency_level(self, strength_proficiency=ProficiencyLevel.novice, power_proficiency=ProficiencyLevel.novice):
+        if len(self.equipments) == 0 or self.equipments[0] in [Equipment.bodyweight, Equipment.no_equipment]:
+            if self.training_type in [TrainingType.strength_integrated_resistance, TrainingType.strength_endurance]:
+                if strength_proficiency == ProficiencyLevel.intermediate:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 1, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
+                elif strength_proficiency in [ProficiencyLevel.advanced, ProficiencyLevel.elite]:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 2, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
+            elif self.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics]:
+                if power_proficiency == ProficiencyLevel.intermediate:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 1, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
+                elif power_proficiency in [ProficiencyLevel.advanced, ProficiencyLevel.elite]:
+                    old_resistance_value = self.resistance.value
+                    new_resistance_value = max(old_resistance_value - 2, 0)
+                    self.resistance = MovementResistance(new_resistance_value)
+
+    def update_resistance_by_external_weight(self):
+        if self.training_type == TrainingType.strength_integrated_resistance:
+            if self.weight is not None:
+                if self.weight_measure is not None and self.weight_measure == WeightMeasure.percent_rep_max:
+                    if isinstance(self.weight, Assignment):
+                        if self.weight.max_value > 60:
+                            self.resistance = MovementResistance.mod_high
+                    else:
+                        if self.weight > 60:
+                            self.resistance = MovementResistance.mod_high
+
+    def set_adaptation_type(self, percent_rep_max=50):
         if self.training_type == TrainingType.flexibility:
             self.adaptation_type = AdaptationType.not_tracked
         if self.training_type == TrainingType.movement_prep:
@@ -221,22 +290,62 @@ class BaseWorkoutExercise(object):
         elif self.training_type == TrainingType.power_drills_plyometrics:
             self.adaptation_type = AdaptationType.power_drill
         elif self.training_type == TrainingType.strength_integrated_resistance:
-            if self.training_intensity >= 5:  # TODO: validate this number
+            if percent_rep_max >= 75:
                 self.adaptation_type = AdaptationType.maximal_strength_hypertrophic
             else:
                 self.adaptation_type = AdaptationType.strength_endurance_strength
 
     def set_reps_duration(self):
-        if self.adaptation_type == AdaptationType.strength_endurance_strength:
-            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
-        elif self.adaptation_type == AdaptationType.power_drill:
-            self.duration_per_rep = StandardErrorRange(lower_bound=3.5, upper_bound=7, observed_value=5)
-        elif self.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
-            self.duration_per_rep = StandardErrorRange(lower_bound=3, upper_bound=5, observed_value=4)
-        elif self.adaptation_type == AdaptationType.power_explosive_action:
-            self.duration_per_rep = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+        if self.actions_for_power is not None and len(self.actions_for_power) > 0:
+            total_duration = sum([ac.time for ac in self.actions_for_power])
+            if self.rest_between_reps is not None:
+                total_duration += self.rest_between_reps
+            self.duration_per_rep = StandardErrorRange(observed_value=total_duration)
+        elif self.movement_rep_tempo is not None and len(self.movement_rep_tempo) > 0:
+            total_duration = sum(self.movement_rep_tempo)
+            if self.rest_between_reps is not None:
+                total_duration += self.rest_between_reps
+            self.duration_per_rep = StandardErrorRange(observed_value=total_duration)
         else:
-            self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+            if self.adaptation_type == AdaptationType.strength_endurance_strength:
+                self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+            elif self.adaptation_type == AdaptationType.power_drill:
+                self.duration_per_rep = StandardErrorRange(lower_bound=3.5, upper_bound=7, observed_value=5)
+            elif self.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                self.duration_per_rep = StandardErrorRange(lower_bound=3, upper_bound=5, observed_value=4)
+            elif self.adaptation_type == AdaptationType.power_explosive_action:
+                self.duration_per_rep = StandardErrorRange(lower_bound=1, upper_bound=2, observed_value=1.5)
+            else:
+                self.duration_per_rep = StandardErrorRange(lower_bound=2, upper_bound=4, observed_value=3)
+
+    def get_exercise_reps_per_set(self):
+        reps = StandardErrorRange(observed_value=0)
+        if self.reps_per_set is not None:
+            reps.observed_value = self.reps_per_set * self.sets
+        elif self.duration is not None:
+            possible_reps = []
+            if isinstance(self.duration, Assignment):
+                durations = [self.duration.min_value, self.duration.max_value, self.duration.assigned_value]
+                durations = [dur for dur in durations if dur is not None]
+            else:
+                durations = [self.duration]
+            if self.training_type in [TrainingType.power_action_plyometrics, TrainingType.power_drills_plyometrics]:
+                # use a default for these training types so that rep count is not over inflated
+                duration_per_reps = [2]
+            else:
+                duration_per_reps = [self.duration_per_rep.lower_bound, self.duration_per_rep.upper_bound, self.duration_per_rep.observed_value]
+                duration_per_reps = [dur for dur in duration_per_reps if dur is not None]
+            for dur in durations:
+                for dur_per_rep in duration_per_reps:
+                    possible_reps.append(dur / dur_per_rep)
+            if len(possible_reps) > 0:
+                reps.lower_bound = min(possible_reps)
+                reps.upper_bound = max(possible_reps)
+                reps.observed_value = sum(possible_reps) / len(possible_reps)
+        # for unilateral alternating reps are defined as total reps but we need expected reps per side
+        if self.bilateral_distribution_of_resistance == WeightDistribution.unilateral_alternating:
+            reps.divide(2)
+        return reps
 
 
 class WorkoutExercise(BaseWorkoutExercise, Serialisable):
@@ -250,7 +359,7 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         self.end_date_time = None
 
         # for cardio exercises
-        self.duration = None  # duration in seconds for cardio exercises
+        #self.duration = None  # duration in seconds for cardio exercises
         self.distance = None  # distance covered for cardio exercises
         self.speed = None  # in m/s
         self.pace = None  # pace as time(s)/distance. distance is 500m for rowing, 1mile for running
@@ -373,8 +482,9 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
         exercise.calories = input_dict.get('calories')
         exercise.grade = input_dict.get('grade')
         exercise.surface_stability = MovementSurfaceStability(input_dict['surface_stability']) if input_dict.get('surface_stability') is not None else None
-        exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
-        exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
+        exercise.compound_actions = [CompoundAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
+        # exercise.primary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('primary_actions', [])]
+        # exercise.secondary_actions = [ExerciseAction.json_deserialise(action) for action in input_dict.get('secondary_actions', [])]
         exercise.shrz = input_dict.get('shrz')
         exercise.work_vo2 = StandardErrorRange.json_deserialise(input_dict.get('work_vo2')) if input_dict.get('work_vo2') is not None else None
         exercise.total_volume = input_dict.get('total_volume')
@@ -514,7 +624,18 @@ class WorkoutExercise(BaseWorkoutExercise, Serialisable):
             if self.predicted_rpe is None:  # this should never be the case as we should always have predicted_rpe (here just in case)
                 rpe = 4.0
             else:
-                rpe = self.predicted_rpe.observed_value
+                # get a single rpe based on presence of lower_bound, observed_value and upper_bound
+                if self.predicted_rpe.observed_value is not None:
+                    rpe = self.predicted_rpe.observed_value
+                elif self.predicted_rpe.lower_bound is not None and self.predicted_rpe.upper_bound is not None:
+                    rpe = (self.predicted_rpe.lower_bound + self.predicted_rpe.upper_bound) / 2
+                elif self.predicted_rpe.lower_bound is not None:
+                    rpe = self.predicted_rpe.lower_bound
+                elif self.predicted_rpe.upper_bound is not None:
+                    rpe = self.predicted_rpe.upper_bound
+                else:
+                    rpe = 4.0  # again should never happen
+
             percent_max_hr = Calculators.get_percent_max_hr_from_rpe(rpe)
             if .65 < percent_max_hr <= .8:
                 self.percent_time_at_65_80_max_hr = 1.0

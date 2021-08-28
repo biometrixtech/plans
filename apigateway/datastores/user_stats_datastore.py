@@ -5,7 +5,7 @@ from fathomapi.utils.exceptions import InvalidSchemaException
 
 
 class UserStatsDatastore(object):
-    def __init__(self, mongo_collection='athletestats'):
+    def __init__(self, mongo_collection='userstats'):
         self.mongo_collection = mongo_collection
 
     @xray_recorder.capture('datastore.UserStatsDatastore.get')

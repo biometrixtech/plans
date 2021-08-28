@@ -15,6 +15,7 @@ from datastores import movement_prep_datastore
 from datastores import mobility_wod_datastore
 from datastores import responsive_recovery_datastore
 from datastores import workout_datastore
+from datastores import completed_session_details_datastore
 
 
 class DatastoreCollection(object):
@@ -42,3 +43,4 @@ class DatastoreCollection(object):
         self.mobility_wod_datastore = mobility_wod_datastore.MobilityWODDatastore()
         self.responsive_recovery_datastore = responsive_recovery_datastore.ResponsiveRecoveryDatastore()
         self.workout_datastore = workout_datastore.WorkoutDatastore()
+        self.completed_session_details_datastore = completed_session_details_datastore.CompletedSessionDetailsDatastore()

@@ -183,7 +183,7 @@ def parse_file(file_name, write=True, path=None):
 
 
     workout = {}
-    workout['program_id'] = 'may'
+    workout['program_module_id'] = 'may'
     if file_name == "may1":
         workout['program_module_id'] = 'may_first'
     elif file_name == 'may1_alt':
@@ -196,7 +196,7 @@ def parse_file(file_name, write=True, path=None):
         workout['program_module_id'] = 'at_home2'
     elif file_name == 'june8_alt':
         workout['program_module_id'] = 'june_8'
-        workout['program_id'] = 'june_8'
+        workout['program_module_id'] = 'june_8'
 
     workout['sections'] = list(sections.values())
     if write:

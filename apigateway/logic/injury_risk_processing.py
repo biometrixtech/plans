@@ -26,6 +26,7 @@ class InjuryRiskProcessor(object):
         self.relative_load_level = 3
         self.high_relative_load_sessions = athlete_stats.high_relative_load_sessions
         self.high_relative_load_score = athlete_stats.high_relative_load_score
+        self.completed_session_details = []
         self.aggregated_injury_risk_dict = {}
         self.viz_aggregated_injury_risk_dict = {}
         self.two_days_ago = self.event_date_time.date() - timedelta(days=1)
@@ -67,7 +68,8 @@ class InjuryRiskProcessor(object):
         # check workload for relative load level
         if len(self.high_relative_load_sessions) > 0:
 
-            max_percent = max(50, self.high_relative_load_score)
+            #max_percent = max(50, self.high_relative_load_score)
+            max_percent = 50
 
             relevant_high_load_sessions = [s for s in self.high_relative_load_sessions if s.date.date() == base_date]
 
@@ -95,14 +97,15 @@ class InjuryRiskProcessor(object):
         relevant_training_sessions = [s for s in self.training_sessions if s.event_date.date() == base_date]
 
         for r in relevant_training_sessions:
-            high_intensity_session = r.ultra_high_intensity_session()
-            if r.session_RPE is not None:
-                if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
-                    self.relative_load_level = min(self.relative_load_level, 1)
-                elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
-                    self.relative_load_level = min(self.relative_load_level, 2)
+            if r.session_type == SessionType.sport_training:
+                high_intensity_session = r.ultra_high_intensity_session()
+                if r.session_RPE is not None:
+                    if (r.session_RPE >= 5 and high_intensity_session) or (r.session_RPE >= 7 and not high_intensity_session):
+                        self.relative_load_level = min(self.relative_load_level, 1)
+                    elif (r.session_RPE >= 3 and high_intensity_session) or (r.session_RPE >= 5 and not high_intensity_session):
+                        self.relative_load_level = min(self.relative_load_level, 2)
 
-            if r.session_type() == SessionType.mixed_activity or r.session_type() == SessionType.planned:
+            elif r.session_type() == SessionType.mixed_activity or r.session_type() == SessionType.planned:
                 if r.contains_high_intensity_blocks():
                     self.relative_load_level = min(self.relative_load_level, 1)
                 elif r.contains_moderate_intensity_blocks():
@@ -460,11 +463,17 @@ class InjuryRiskProcessor(object):
 
         # add prevention and delayed excessive strain ranking
         for body_part_side, body_part_injury_risk in injury_risk_dict.items():
+            # if body_part_side in self.injury_risk_dict:
+            #     body_part_injury_risk.last_non_functional_overreaching_date = self.get_max_date(self.injury_risk_dict[body_part_side].last_non_functional_overreaching_date,
+            #                                                                                     body_part_injury_risk.last_non_functional_overreaching_date)
+            #     body_part_injury_risk.last_functional_overreaching_date = self.get_max_date(
+            #         self.injury_risk_dict[body_part_side].last_functional_overreaching_date,
+            #         body_part_injury_risk.last_functional_overreaching_date)
             if body_part_injury_risk.last_non_functional_overreaching_date == two_days_ago:
                 if body_part_injury_risk.total_volume_percent_tier == 0:
-                    body_part_injury_risk.total_volume_percent_tier = 3
+                    body_part_injury_risk.total_volume_percent_tier = 2
                 else:
-                    body_part_injury_risk.total_volume_percent_tier = min(body_part_injury_risk.total_volume_percent_tier, 3)
+                    body_part_injury_risk.total_volume_percent_tier = min(body_part_injury_risk.total_volume_percent_tier, 2)
             if (body_part_injury_risk.overactive_long_count_last_0_20_days >= 3 or
                     body_part_injury_risk.overactive_short_count_last_0_20_days >= 3 or
                     body_part_injury_risk.underactive_short_count_last_0_20_days >= 3):
@@ -512,7 +521,7 @@ class InjuryRiskProcessor(object):
                     body_part_injury_risk.underactive_weak_tier = 3
 
         return injury_risk_dict
-    
+
     def update_historic_session_stats(self, base_date, injury_risk_dict):
 
         twenty_days_ago = base_date - timedelta(days=19)
@@ -692,6 +701,8 @@ class InjuryRiskProcessor(object):
                     session_functional_movement.session_load_dict = session.session_load_dict
                     current_session = session
 
+                # if session_functional_movement.completed_session_details is not None:
+                #     self.completed_session_details.append(session_functional_movement.completed_session_details)
                 injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                                injury_risk_dict, d)
 
@@ -1230,6 +1241,9 @@ class InjuryRiskProcessor(object):
             else:
                 session_functional_movement.session_load_dict = session.session_load_dict
                 current_session = session
+
+            if session_functional_movement.completed_session_details is not None and not session_functional_movement.completed_session_details.planned:
+                self.completed_session_details.append(session_functional_movement.completed_session_details)
 
             injury_cycle_summary_dict = self.update_injury_cycle_summaries(current_session,
                                                                            injury_risk_dict, base_date)

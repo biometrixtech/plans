@@ -2,6 +2,7 @@ import datetime
 import pytz
 import math
 import uuid
+import string
 from fathomapi.utils.exceptions import InvalidSchemaException
 from config import get_mongo_collection
 
@@ -175,3 +176,7 @@ def none_max(value_array):
 def _check_plan_exists(user_id, event_date):
     mongo_collection = get_mongo_collection('dailyplan')
     return mongo_collection.count({"user_id": user_id, "date": event_date}) == 1
+
+
+def convert_workout_text_to_id(workout_name):
+    return workout_name.replace('w/','with').replace('&', 'and').lower().strip().replace('’', "'").translate(str.maketrans('', '', string.punctuation)).replace(" ", "")

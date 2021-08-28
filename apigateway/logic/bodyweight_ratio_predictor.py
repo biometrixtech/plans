@@ -10,7 +10,7 @@ non_prime_mover_features = [
     'equipment_barbells', 'equipment_bodyweight', 'equipment_cable', 'equipment_dumbbells', 'equipment_machine',
     'gender']
 all_prime_movers = [
-    21, 26, 34, 40, 41, 42, 43, 44, 45, 46,
+    21, 26, 33, 34, 40, 41, 42, 43, 44, 45, 46,
     47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
     57, 58, 60, 61, 63, 64, 65, 66, 69, 70,
     71, 72, 74, 75, 76, 78, 79, 81, 82, 83,
@@ -23,13 +23,14 @@ class BodyWeightRatioPredictor(object):
         self.model = MLModelsDatastore.get_bodyweight_ratio_model()
 
     @xray_recorder.capture('logic.BodyWeightRatioPredictor.predict_bodyweight_ratio')
-    def predict_bodyweight_ratio(self, user_weight, gender, prime_movers, equipment):
+    def predict_bodyweight_ratio(self, user_weight, gender, prime_movers, equipment, fitness_level=2):
         """
 
         :param user_weight:
         :param gender:
         :param prime_movers:
         :param equipment:
+        :param fitness_level: default 2 = intermediate
         :return:
         """
         if os.environ.get('CODEBUILD_RUN', '') == 'TRUE':
@@ -51,7 +52,33 @@ class BodyWeightRatioPredictor(object):
                 equipment_dumbbells = 1.0
             if equipment.name == 'machine':
                 equipment_machine = 1.0
-            features = [user_weight, equipment_barbells, equipment_bodyweight, equipment_cable, equipment_dumbbells, equipment_machine, gender]
+            if equipment.name == 'kettlebells':
+                equipment_dumbbells = 1.0
+            if equipment.name == 'medicine_balls':
+                equipment_dumbbells = 1.0
+
+            fitness_level_0 = 0.0
+            fitness_level_1 = 0.0
+            fitness_level_2 = 0.0
+            fitness_level_3 = 0.0
+            fitness_level_4 = 0.0
+
+            if fitness_level == 0:
+                fitness_level_0 = 1.0
+            if fitness_level == 1:
+                fitness_level_1 = 1.0
+            if fitness_level == 2:
+                fitness_level_2 = 1.0
+            if fitness_level == 3:
+                fitness_level_3 = 1.0
+            if fitness_level == 4:
+                fitness_level_4 = 1.0
+            features = [
+                user_weight,
+                equipment_barbells, equipment_bodyweight, equipment_cable, equipment_dumbbells, equipment_machine,
+                gender,
+                fitness_level_0, fitness_level_1, fitness_level_2, fitness_level_3, fitness_level_4
+            ]
             prime_movers_features = self.get_prime_movers_features(prime_movers)
             features.extend(prime_movers_features)
             predicted_ratio = self.model.predict([features])[0]

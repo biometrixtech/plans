@@ -8,7 +8,7 @@ def create_week_workouts(load_values):
     week = []
 
     for load in load_values:
-        completed_session_details = CompletedSessionDetails(datetime.now(),1,1)
+        completed_session_details = CompletedSessionDetails(datetime.now(),1,1, 'test_user')
         completed_session_details.rpe_load = StandardErrorRange(lower_bound=load*.87, observed_value=load, upper_bound=load*1.14)
         completed_session_details.power_load = StandardErrorRange(lower_bound=load * .87, observed_value=load,
                                                                 upper_bound=load * 1.14)

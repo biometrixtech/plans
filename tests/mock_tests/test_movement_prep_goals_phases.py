@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime, timedelta
 from utils import format_datetime, parse_datetime
 from models.soreness import Soreness
-from models.soreness_base import HistoricSorenessStatus
+from models.soreness_base import HistoricSorenessStatus, BodyPartFunction
 from models.body_parts import BodyPart, BodyPartLocation, BodyPartFactory
 #from models.historic_soreness import HistoricSoreness
 from models.functional_movement_modalities import MovementIntegrationPrepModality
@@ -14,7 +14,6 @@ from models.exercise_phase import ExercisePhaseType
 from tests.mocks.mock_exercise_datastore import ExerciseLibraryDatastore
 from tests.mocks.mock_completed_exercise_datastore import CompletedExerciseDatastore
 from models.body_part_injury_risk import BodyPartInjuryRisk
-from models.functional_movement import BodyPartFunction
 
 exercise_library_datastore = ExerciseLibraryDatastore()
 completed_exercise_datastore = CompletedExerciseDatastore()

@@ -59,7 +59,7 @@ def parse_file(file_name):
 
 
     workout = {}
-    workout['program_id'] = 'may'
+    workout['program_module_exists'] = 'may'
     if file_name == "may1":
         workout['program_module_id'] = 'may_first'
     elif file_name == 'may2':

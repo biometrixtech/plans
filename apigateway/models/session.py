@@ -8,12 +8,12 @@ from models.sport import SportName, SportType
 from models.post_session_survey import PostSurvey
 from models.asymmetry import Asymmetry
 from models.movement_patterns import MovementPatterns
-from models.soreness_base import BodyPartSide, BodyPartLocation
+from models.soreness_base import BodyPartSide, BodyPartLocation, BodyPartFunction, BodyPartFunctionalMovement
 from models.workout_program import WorkoutProgramModule
-from models.functional_movement import BodyPartFunctionalMovement, BodyPartFunction
 from models.movement_tags import TrainingType, AdaptationType
 from models.training_volume import StandardErrorRange
 from models.planned_exercise import PlannedWorkout
+from models.exposure import TrainingExposure
 
 
 class SessionType(Enum):
@@ -154,6 +154,8 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
         self.training_volume = 0
 
+        self.training_exposures = []
+
     def __setattr__(self, name, value):
         if name in ['event_date', 'end_date', 'created_date', 'completed_date_time', 'sensor_start_date_time', 'sensor_end_date_time', 'last_updated']:
             if not isinstance(value, datetime.datetime) and value is not None:
@@ -199,6 +201,9 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
     #         return True
     #     else:
     #         return False
+
+    def get_event_datetime(self):
+        return self.event_date
 
     def add_tissue_load(self, tissue_load):
         if self.tissue_load is None:
@@ -463,7 +468,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
 
             'cardio_plyometrics': self.cardio_plyometrics,
             'ultra_high_intensity': self.ultra_high_intensity,
-            'training_volume': self.training_volume
+            'training_volume': self.training_volume,
+            'training_exposures': [t.json_serialise() for t in self.training_exposures],
+            'total_minutes_at_moderate_intensity': self.total_minutes_at_moderate_intensity,
+            'total_minutes_at_high_intensity': self.total_minutes_at_high_intensity,
+            'total_blocks_at_high_intensity': self.total_blocks_at_high_intensity,
+            'total_blocks_at_moderate_intensity': self.total_blocks_at_moderate_intensity,
 
             # 'overactive_body_parts': [o.json_serialise() for o in self.overactive_body_parts],
             # 'underactive_inhibited_body_parts': [u.json_serialise() for u in self.underactive_inhibited_body_parts],
@@ -550,6 +560,12 @@ class Session(Serialisable, metaclass=abc.ABCMeta):
         session.cardio_plyometrics = input_dict.get('cardio_plyometrics')
         session.ultra_high_intensity = input_dict.get('ultra_high_intensity')
         session.training_volume = input_dict.get('training_volume')
+
+        session.training_exposures = [TrainingExposure.json_deserialise(t) for t in input_dict.get('training_exposures', [])]
+        session.total_blocks_at_moderate_intensity = input_dict.get('total_blocks_at_moderate_intensity', 0)
+        session.total_blocks_at_high_intensity = input_dict.get('total_blocks_at_high_intensity', 0)
+        session.total_minutes_at_high_intensity = input_dict.get('total_minutes_at_high_intensity', 0)
+        session.total_minutes_at_moderate_intensity = input_dict.get('total_minutes_at_moderate_intensity', 0)
 
         # session.overactive_body_parts = [BodyPartSide.json_deserialise(o) for o in input_dict.get('overactive_body_parts', [])]
         # session.underactive_inhibited_body_parts = [BodyPartSide.json_deserialise(u) for u in input_dict.get('underactive_inhibited_body_parts',[])]
@@ -657,11 +673,12 @@ class PlannedSession(Session):
             for section in self.workout_program_module.workout_sections:
                 if section.assess_load:
                     for exercise in section.exercises:
-                        for action in exercise.primary_actions:
-                            if action.training_type in [TrainingType.power_action_plyometrics,
-                                                        TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
-                                self.ultra_high_intensity = True
-                                return True
+                        for compound_action in exercise.compound_actions:
+                            for action in compound_action.actions:
+                                if action.training_type in [TrainingType.power_action_plyometrics,
+                                                            TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                                    self.ultra_high_intensity = True
+                                    return True
         self.ultra_high_intensity = False
 
     def high_intensity_RPE(self):
@@ -719,11 +736,12 @@ class MixedActivitySession(Session):
             for section in self.workout_program_module.workout_sections:
                 if section.assess_load:
                     for exercise in section.exercises:
-                        for action in exercise.primary_actions:
-                            if action.training_type in [TrainingType.power_action_plyometrics,
-                                                        TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
-                                self.ultra_high_intensity = True
-                                return True
+                        for compound_action in exercise.compound_actions:
+                            for action in compound_action.actions:
+                                if action.training_type in [TrainingType.power_action_plyometrics,
+                                                            TrainingType.power_drills_plyometrics] or action.adaptation_type == AdaptationType.maximal_strength_hypertrophic:
+                                    self.ultra_high_intensity = True
+                                    return True
         self.ultra_high_intensity = False
         return False
 

@@ -20,21 +20,21 @@ _s3_config = TransferConfig(use_threads=False)
 app = Blueprint('performance_data', __name__)
 
 
-@app.route('/<uuid:user_id>/<string:program_id>/upload', methods=['PUT'])
+@app.route('/<uuid:user_id>/<string:program_module_id>/upload', methods=['PUT'])
 @require.authenticated.any
 @xray_recorder.capture('routes.performance_data.upload')
-def handle_performance_data_upload(user_id, program_id):
+def handle_performance_data_upload(user_id, program_module_id):
     event_date_time = format_datetime(datetime.datetime.now())
-    unique_key = f'http://session.fathomai.com/{user_id}_{program_id}_{event_date_time}'
+    unique_key = f'http://session.fathomai.com/{user_id}_{program_module_id}_{event_date_time}'
     session_id = str(uuid.uuid5(uuid.NAMESPACE_URL, unique_key))
 
-    if program_exists(program_id):
+    if program_module_exists(program_module_id):
         if request.headers['Content-Type'] == 'application/octet-stream':
             data = base64.b64decode(request.get_data())
             api_version = Config.get('API_VERSION')
             if len(api_version.split('_')) > 2:
                 api_version = '_'.join(api_version.split('_')[0:2])
-            file_name = f'{api_version}_lambda_version/{user_id}/{program_id}/{session_id}.zip'
+            file_name = f'{api_version}_lambda_version/{user_id}/{program_module_id}/{session_id}.zip'
             f = io.BytesIO(data)
             _ingest_s3_bucket.upload_fileobj(f, file_name, Config=_s3_config)
         else:
@@ -45,10 +45,10 @@ def handle_performance_data_upload(user_id, program_id):
             )
         return {'session_id': session_id}, 201
     else:
-        return {'message': 'Workout Program with the provided ID does not exist'}, 404
+        return {'message': 'Workout with the provided ID does not exist'}, 404
 
 
-def program_exists(program_id):
-    if WorkoutDatastore().get(program_id=program_id, json=True) is not None:
+def program_module_exists(program_module_id):
+    if WorkoutDatastore().get(program_module_id=program_module_id, json=True) is not None:
         return True
     return False

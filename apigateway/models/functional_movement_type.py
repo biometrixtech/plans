@@ -44,3 +44,12 @@ class FunctionalMovementType(Enum):
     ankle_plantar_flexion_and_inversion = 39
     wrist_flexion = 40
     wrist_extension = 41
+
+    deep_longitudinal_subsystem = 101
+    posterior_oblique_subsystem = 102
+    lateral_subsystem = 103
+    anterior_oblique_subsystem = 104
+    core_stabilizers = 105
+    intrinsic_stabilization_subsystem = 106
+    shoulder_stabilizers = 107
+    scapula_stabilizers = 108

@@ -7,8 +7,11 @@ from models.user_stats import UserStats
 from utils import parse_date, format_date
 from logic.injury_risk_processing import InjuryRiskProcessor
 from models.athlete_injury_risk import AthleteInjuryRisk
+from models.training_volume import StandardErrorRange
 from logic.calculators import Calculators
+import pytz
 
+utc = pytz.UTC
 
 class UserStatsProcessing(object):
 
@@ -49,7 +52,6 @@ class UserStatsProcessing(object):
 
         self.symptoms = []
         self.acute_symptoms = []
-        self.chronic_symptoms = []
         self.chronic_symptoms = []
         self.last_7_days_symptoms = []
         self.days_8_14_symptoms = []
@@ -95,6 +97,8 @@ class UserStatsProcessing(object):
             read_session_load_dict = False
 
         self.load_historical_data(read_session_load_dict)
+        current_user_stats.acute_days = self.acute_days
+        current_user_stats.chronic_days = self.chronic_days
 
         # for symptom in self.last_25_days_symptoms:
         #     symptom.severity = SorenessCalculator.get_severity(symptom.severity, symptom.movement)
@@ -112,7 +116,10 @@ class UserStatsProcessing(object):
         all_training_sessions.extend(self.acute_training_sessions)
         all_training_sessions.extend(self.chronic_training_sessions)
 
-        training_load_processing.load_training_session_values(all_training_sessions)
+        training_load_processing.load_training_session_values(self.acute_training_sessions,
+                                                              self.get_chronic_weeks_training_sessions(),
+                                                              self.chronic_training_sessions,
+                                                              self.training_sessions)
 
         # three_sensor_sessions = [s for s in self.training_sessions if s.source.value == 3 and (s.asymmetry is not None or s.movement_patterns is not None)]
         # if len(three_sensor_sessions) > 0:
@@ -125,6 +132,14 @@ class UserStatsProcessing(object):
         current_user_stats = training_load_processing.calc_training_load_metrics(current_user_stats)
         current_user_stats.high_relative_load_sessions = training_load_processing.high_relative_load_sessions
         current_user_stats.high_relative_load_score = training_load_processing.high_relative_load_score
+        current_user_stats.total_historical_sessions = len(self.training_sessions)
+
+        current_user_stats.functional_overreaching_workout_today = training_load_processing.functional_overreaching_workout_today
+        current_user_stats.functional_overreaching_workout_1_day = training_load_processing.functional_overreaching_workout_1_day
+        current_user_stats.non_functional_overreaching_workout_today = training_load_processing.non_functional_overreaching_workout_today
+        current_user_stats.non_functional_overreaching_workout_1_day = training_load_processing.non_functional_overreaching_workout_1_day
+        current_user_stats.non_functional_overreaching_workout_2_day = training_load_processing.non_functional_overreaching_workout_2_day
+
         self.update_vo2_max_estimations(current_user_stats)
 
         if current_user_stats.event_date.date() == self.event_date.date():
@@ -169,10 +184,10 @@ class UserStatsProcessing(object):
             self.symptoms = self.symptom_datastore.get(user_id=self.athlete_id,
                                                        start_date_time=self.start_date_time,
                                                        end_date_time=self.end_date_time)
-            self.training_sessions = self.training_session_datastore.get(user_id=self.athlete_id,
+            self.training_sessions.extend(self.training_session_datastore.get(user_id=self.athlete_id,
                                                                          start_date_time=self.start_date_time,
                                                                          end_date_time=self.event_date,
-                                                                         read_session_load_dict=read_session_load_dict)
+                                                                         read_session_load_dict=read_session_load_dict))
         self.update_start_times()
         self.set_acute_chronic_periods()
         self.load_historical_symptoms()
@@ -218,6 +233,7 @@ class UserStatsProcessing(object):
 
         self.days_8_14_training_sessions = [p for p in self.training_sessions if self.last_week > p.event_date >= self.previous_week]
 
+
     def update_start_times(self):
 
         if self.symptoms is not None and len(self.symptoms) > 0:
@@ -229,6 +245,15 @@ class UserStatsProcessing(object):
         if self.training_sessions is not None and len(self.training_sessions) > 0:
             self.training_sessions.sort(key=lambda x: x.event_date, reverse=False)
             self.latest_training_session_date = self.training_sessions[len(self.training_sessions) - 1].event_date
+            if self.symptoms is not None and len(self.symptoms) > 0:
+                self.start_date_time = min(self.training_sessions[0].event_date, self.symptoms[0].reported_date_time)
+            else:
+                self.start_date_time = max(self.start_date_time, self.training_sessions[0].event_date)
+        else:
+            if self.symptoms is not None and len(self.symptoms) > 0:
+                self.start_date_time = max(self.start_date_time, self.symptoms[0].reported_date_time)
+            else:
+                self.start_date_time = self.end_date_time
 
     def set_acute_chronic_periods(self):
 
@@ -237,17 +262,36 @@ class UserStatsProcessing(object):
 
         acute_days_adjustment = 0
 
+        # if days_difference == 7:
+        #     self.acute_days = 3
+        #     self.chronic_days = 7
+        # elif 7 < days_difference <= 14:
+        #     self.chronic_days = max(int(days_difference), 7)
+        #     self.acute_days = min(3 + (self.chronic_days - 7), 7)
+        # elif 14 < days_difference <= 28:
+        #     self.acute_days = 7
+        #     self.chronic_days = int(days_difference)
+        #     #acute_days_adjustment = 3
+        # elif 28 < days_difference <= 35:
+        #     self.acute_days = 7
+        #     self.chronic_days = int(days_difference)
+        #     acute_days_adjustment = 35 - days_difference
+        # elif days_difference > 35:
+        #     self.acute_days = 7
+        #     self.chronic_days = 28
+        #     acute_days_adjustment = 7
+
         if days_difference == 7:
             self.acute_days = 3
             self.chronic_days = 7
         elif 7 < days_difference < 10:
             self.acute_days = 3
             self.chronic_days = int(days_difference)
-        elif 10 <= days_difference < 21:
+        elif 10 <= days_difference <= 21:
             self.acute_days = 3
             self.chronic_days = int(days_difference) - 3
             acute_days_adjustment = 3
-        elif 21 <= days_difference <= 35:
+        elif 21 < days_difference <= 35:
             self.acute_days = 7
             self.chronic_days = int(days_difference) - 7
             acute_days_adjustment = 7
@@ -258,13 +302,21 @@ class UserStatsProcessing(object):
 
         adjustment_factor = 0
         if self.latest_training_session_date is not None and self.event_date > self.latest_training_session_date:
-            adjustment_factor = (self.event_date.date() - self.latest_training_session_date.date()).days
+            #adjustment_factor = (self.event_date.date() - self.latest_training_session_date.date()).days
+            # TODO = UNDO THIS MAYBE
+            adjustment_factor = 0
 
         if self.acute_days is not None and self.chronic_days is not None:
-            self.acute_start_date_time = self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)
-            self.chronic_start_date_time = self.end_date_time - timedelta(
-                days=self.chronic_days + acute_days_adjustment + adjustment_factor)
+            #acute_start_date_time = (self.end_date_time - timedelta(days=self.acute_days + adjustment_factor)).date()
+            #min_time = datetime.min.time()
+            #self.acute_start_date_time = datetime.combine(acute_start_date_time, min_time)
+            acute_start_date_time = (self.end_date_time - timedelta(days=self.acute_days + adjustment_factor))
+            self.acute_start_date_time = utc.localize(datetime(acute_start_date_time.year, acute_start_date_time.month, acute_start_date_time.day, 0,0,0))
+            chronic_start_date_time = (self.end_date_time - timedelta(
+                days=self.chronic_days + acute_days_adjustment + adjustment_factor)).date()
+            self.chronic_start_date_time = utc.localize(datetime(chronic_start_date_time.year, chronic_start_date_time.month, chronic_start_date_time.day, 0,0,0))
             chronic_date_time = self.acute_start_date_time - timedelta(days=self.chronic_days)
+            #chronic_delta = self.end_date_time - utc.localize(chronic_date_time)
             chronic_delta = self.end_date_time - chronic_date_time
             self.chronic_load_start_date_time = self.end_date_time - chronic_delta
 
@@ -274,20 +326,60 @@ class UserStatsProcessing(object):
         self.previous_week = self.last_week - timedelta(days=7)
         self.days_7_13 = self.previous_week + timedelta(days=1)
 
+    def get_chronic_weeks_training_sessions(self):
+
+        weeks_list = []
+
+        if self.chronic_days is not None:
+
+            week4_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and
+                              self.acute_start_date_time - timedelta(days=min(28, self.chronic_days)) <=
+                              #d.get_event_datetime() < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
+                              d.event_date < self.acute_start_date_time - timedelta(days=min(21, self.chronic_days))]
+            week3_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
+                              #- timedelta(days=min(21, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              - timedelta(days=min(21,
+                                                   self.chronic_days)) <= d.event_date < self.acute_start_date_time -
+                              timedelta(days=min(14, self.chronic_days))]
+            week2_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
+                              #- timedelta(days=min(14, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time -
+                              - timedelta(days=min(14,
+                                                   self.chronic_days)) <= d.event_date < self.acute_start_date_time -
+                              timedelta(days=min(7, self.chronic_days))]
+            week1_sessions = [d for d in self.chronic_training_sessions if self.acute_start_date_time is not None and self.acute_start_date_time
+                              #- timedelta(days=min(7, self.chronic_days)) <= d.get_event_datetime() < self.acute_start_date_time]
+                              - timedelta(days=min(7, self.chronic_days)) <= d.event_date < self.acute_start_date_time]
+
+            weeks_list = [week1_sessions, week2_sessions, week3_sessions, week4_sessions]
+
+        return weeks_list
+
     def update_vo2_max_estimations(self, current_user_stats):
         user_provided_vo2_max = (current_user_stats.vo2_max is not None and
                                  current_user_stats.vo2_max.observed_value is not None and
                                  current_user_stats.vo2_max.lower_bound is None and
                                  current_user_stats.vo2_max.upper_bound is None)
         if not user_provided_vo2_max:  # TODO: https://app.asana.com/0/1157098685993091/1182437140766011
-            current_user_stats.vo2_max = Calculators.vo2_max_estimation_demographics(
-                    age=current_user_stats.athlete_age,
-                    user_weight=current_user_stats.athlete_weight,
-                    user_height=current_user_stats.athlete_height,
-                    gender=current_user_stats.athlete_gender,
-                    activity_level=5.0 # TODO: https://app.asana.com/0/1157098685993091/1182437140766009
-            )
-            current_user_stats.vo2_max_date_time = self.event_date
+            if current_user_stats.best_running_time is not None and current_user_stats.best_running_distance is not None:
+                self.update_vo2_max_estimations_best_time(self.current_user_stats, current_user_stats.best_running_time, current_user_stats.best_running_distance)
+            else:
+                current_user_stats.vo2_max = Calculators.vo2_max_estimation_demographics(
+                        age=current_user_stats.athlete_age,
+                        user_weight=current_user_stats.athlete_weight,
+                        user_height=current_user_stats.athlete_height,
+                        gender=current_user_stats.athlete_gender,
+                        activity_level=5.0 # TODO: https://app.asana.com/0/1157098685993091/1182437140766009
+                )
+                current_user_stats.vo2_max_date_time = self.event_date
+
+    def update_vo2_max_estimations_best_time(self, current_user_stats, time, distance):
+
+        vo2_max = Calculators.vo2max_running_jack_daniels(time, distance)
+        current_user_stats.vo2_max = StandardErrorRange(lower_bound=vo2_max, observed_value=vo2_max, upper_bound=vo2_max)
+        current_user_stats.vo2_max_date_time = self.event_date
+        current_user_stats.best_running_time = time
+        current_user_stats.best_running_distance = distance
+        current_user_stats.best_running_date = self.event_date
 
     # def get_historic_asymmetry(self, sessions):
     #

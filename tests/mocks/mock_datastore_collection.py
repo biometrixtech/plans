@@ -9,6 +9,7 @@ from tests.mocks import mock_training_session_datastore
 from tests.mocks import mock_movement_prep_datastore
 from tests.mocks import mock_mobility_wod_datastore
 from tests.mocks import mock_responsive_recovery_datastore
+from tests.mocks import mock_completed_session_details_datastore
 
 class DatastoreCollection(object):
 
@@ -28,4 +29,5 @@ class DatastoreCollection(object):
         self.movement_prep_datastore = mock_movement_prep_datastore.MovementPrepDatastore()
         self.mobility_wod_datastore = mock_mobility_wod_datastore.MobilityWodDatastore()
         self.responsive_recovery_datastore = mock_responsive_recovery_datastore.ResponsiveRecoveryDatastore()
+        self.completed_session_details_datastore = mock_completed_session_details_datastore.CompletedSessionDetailsDatastore()
 
